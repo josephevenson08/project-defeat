@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Project Defeat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Project Defeat is a local React + TypeScript + Vite simulator and planning prototype inspired by MMO combat simulator interfaces.
 
-Currently, two official plugins are available:
+## Current Status
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Early local MVP. The simulator math is intentionally simple and deterministic so the app has a clean foundation before real World of Warcraft / TBC formulas, item data, talents, buffs, and rotations are added.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Character class, specialization, and race selection
+- Placeholder gear slots with selectable prototype items
+- Calculated stat panel combining class base stats and equipped gear
+- Basic estimated DPS simulation result
+- Anime.js-powered result animation
+- Playwright coverage for the main local simulation flow
+- Dark simulator-style layout built with plain CSS
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React
+- TypeScript
+- Vite
+- Anime.js
+- Playwright
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The local Vite app runs at the URL Vite prints in your terminal. Playwright starts it on `http://127.0.0.1:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Build
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+## Tests
+
+```bash
+npm run test
+```
+
+If Playwright browsers are not installed:
+
+```bash
+npx playwright install
+```
+
+On Linux or CI environments that need browser dependencies:
+
+```bash
+npx playwright install --with-deps
+```
+
+## Scripts
+
+- `npm run dev` starts the local Vite dev server.
+- `npm run build` type-checks and builds the app.
+- `npm run lint` runs ESLint.
+- `npm run test` runs Playwright tests.
+- `npm run test:ui` opens Playwright's UI runner.
+- `npm run preview` previews the production build.
+
+## Roadmap
+
+- Improve stat formulas
+- Add real item data
+- Add talent support
+- Add buff, debuff, and consume selection
+- Add rotation configuration
+- Add simulation iterations and result variance
+- Add charts and result breakdowns
+- Add save/load build support
+- Add import/export support
+- Improve visual similarity to the simulator reference image
+- Perform a deeper accessibility pass
