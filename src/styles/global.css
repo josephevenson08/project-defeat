@@ -96,7 +96,7 @@ select {
 .dashboard-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(280px, 0.9fr) minmax(420px, 1.3fr);
   margin-top: 24px;
 }
 
@@ -133,8 +133,22 @@ select {
   gap: 7px;
 }
 
+.gear-row {
+  background: rgba(15, 23, 42, 0.54);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.gear-row label,
+.socket-list label {
+  display: grid;
+  gap: 7px;
+}
+
 .field span,
-.gear-row span {
+.gear-row span,
+.socket-list span {
   color: #cbd5e1;
   font-size: 13px;
   font-weight: 700;
@@ -174,10 +188,24 @@ select:focus,
   margin: 0;
 }
 
+.summary-card small {
+  color: #94a3b8;
+  display: block;
+  line-height: 1.45;
+  margin-top: 10px;
+}
+
+.socket-list {
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+}
+
 .stats-grid {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .stat-tile {
@@ -237,6 +265,28 @@ select:focus,
 .simulation-result p {
   color: #cbd5e1;
   line-height: 1.5;
+  margin: 0;
+}
+
+.breakdown-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.breakdown-list div {
+  align-items: center;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.breakdown-list strong {
+  color: #ffffff;
+  font-size: 14px;
   margin: 0;
 }
 

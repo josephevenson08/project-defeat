@@ -1,4 +1,14 @@
+import type { CharacterRole } from '../character/characterTypes'
+
+export type SimulationBreakdownEntry = {
+  label: string
+  value: number
+}
+
 export type SimulationResult = {
-  estimatedDps: number
+  role: CharacterRole
+  metricLabel: 'Estimated DPS' | 'Estimated Healing' | 'Survivability Score'
+  score: number
   summary: string
+  breakdown: SimulationBreakdownEntry[]
 }

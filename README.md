@@ -1,20 +1,29 @@
 # Project Defeat
 
-Project Defeat is a local React + TypeScript + Vite simulator and planning prototype inspired by MMO combat simulator interfaces.
+Project Defeat is a local-first React + TypeScript + Vite simulator/planner for **TBC World of Warcraft Classic Anniversary**.
+
+The project is currently an early foundation, not an accuracy-complete simulator. The goal is to build toward a typed, local-first planner that can eventually support gear, gems, enchants, talents, buffs, debuffs, consumables, rotations, encounter settings, and build comparison.
 
 ## Current Status
 
-Early local MVP. The simulator math is intentionally simple and deterministic so the app has a clean foundation before real World of Warcraft / TBC formulas, item data, talents, buffs, and rotations are added.
+Early MVP / foundation phase.
 
-## Features
+## Current Features
 
-- Character class, specialization, and race selection
-- Placeholder gear slots with selectable prototype items
-- Calculated stat panel combining class base stats and equipped gear
-- Basic estimated DPS simulation result
+- TBC class/spec selection for all nine TBC classes
+- Faction-aware race selection
+- Full TBC-style gear slot model
+- Sample gear items with quality, source, phase, sockets, socket bonuses, and stats
+- Sample gems and enchants
+- Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
+- Role-aware prototype simulation outputs:
+  - Physical DPS
+  - Caster DPS
+  - Healer
+  - Tank
+- Result breakdown panel
 - Anime.js-powered result animation
-- Playwright coverage for the main local simulation flow
-- Dark simulator-style layout built with plain CSS
+- Playwright tests for physical, caster, healer, and tank flows
 
 ## Tech Stack
 
@@ -31,7 +40,7 @@ npm install
 npm run dev
 ```
 
-The local Vite app runs at the URL Vite prints in your terminal. Playwright starts it on `http://127.0.0.1:5173`.
+The Vite dev server prints the local URL in your terminal. Playwright starts the app at `http://127.0.0.1:5173`.
 
 ## Build
 
@@ -66,16 +75,14 @@ npx playwright install --with-deps
 - `npm run test:ui` opens Playwright's UI runner.
 - `npm run preview` previews the production build.
 
+## Known Limitations
+
+- Simulation formulas are placeholders and are not yet TBC-accurate.
+- Sample gear, gems, and enchants are intentionally small starter datasets.
+- Feral Druid is treated as physical DPS until bear/cat mode support is split.
+- Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
+- No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.
+
 ## Roadmap
 
-- Improve stat formulas
-- Add real item data
-- Add talent support
-- Add buff, debuff, and consume selection
-- Add rotation configuration
-- Add simulation iterations and result variance
-- Add charts and result breakdowns
-- Add save/load build support
-- Add import/export support
-- Improve visual similarity to the simulator reference image
-- Perform a deeper accessibility pass
+See [ROADMAP.md](./ROADMAP.md).

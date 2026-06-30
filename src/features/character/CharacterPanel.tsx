@@ -1,7 +1,7 @@
 import { Panel } from '../../components/layout/Panel'
 import { SelectField } from '../../components/ui/SelectField'
-import { characterClasses, getClassDefinition, races } from './characterData'
-import type { CharacterClass, CharacterProfile, CharacterSpec, Race } from './characterTypes'
+import { characterClasses, factions, getClassDefinition, getRoleForSpec, racesByFaction, tbcClassNames } from './characterData'
+import type { CharacterClass, CharacterProfile, CharacterSpec, Faction, Race } from './characterTypes'
 
 type CharacterPanelProps = {
   character: CharacterProfile
@@ -10,7 +10,12 @@ type CharacterPanelProps = {
 
 export function CharacterPanel({ character, onChange }: CharacterPanelProps) {
   const classDefinition = getClassDefinition(character.className)
-  const classNames = characterClasses.map((entry) => entry.className)
+  const role = getRoleForSpec(character.className, character.spec)
+  const raceOptions = racesByFaction[character.faction]
+
+  function handleFactionChange(faction: Faction) {
+    onChange({ ...character, faction, race: racesByFaction[faction][0] })
+  }
 
   function handleClassChange(className: CharacterClass) {
     const nextDefinition = getClassDefinition(className)
@@ -18,23 +23,25 @@ export function CharacterPanel({ character, onChange }: CharacterPanelProps) {
   }
 
   return (
-    <Panel title="Character" eyebrow="Build setup">
+    <Panel title="Character" eyebrow="TBC build setup">
       <div className="form-grid">
-        <SelectField label="Class" value={character.className} values={classNames} onChange={handleClassChange} />
+        <SelectField label="Faction" value={character.faction} values={factions} onChange={handleFactionChange} />
+        <SelectField label="Race" value={character.race} values={raceOptions} onChange={(race: Race) => onChange({ ...character, race })} />
+        <SelectField label="Class" value={character.className} values={tbcClassNames} onChange={handleClassChange} />
         <SelectField
           label="Specialization"
           value={character.spec}
           values={classDefinition.specs}
           onChange={(spec: CharacterSpec) => onChange({ ...character, spec })}
         />
-        <SelectField label="Race" value={character.race} values={races} onChange={(race: Race) => onChange({ ...character, race })} />
       </div>
       <div className="summary-card">
         <span>Current role</span>
-        <strong>{classDefinition.role}</strong>
+        <strong>{role}</strong>
         <p>
           {character.race} {character.spec} {character.className}
         </p>
+        <small>{characterClasses.length} TBC classes represented. Feral is treated as physical DPS until bear/cat mode is split.</small>
       </div>
     </Panel>
   )
