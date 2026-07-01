@@ -11,6 +11,8 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Faction/race selection
 - Full TBC slot model
 - Sample gear, gems, enchants
+- Expanded starter gear options for every slot
+- Enhancement Shaman Phase 2 ranked/BiS proof-of-concept data
 - Prototype stat calculation
 - Role-aware prototype results
 - Playwright flow coverage
@@ -18,6 +20,8 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 ## Phase 2: Gear, Gems, Enchants
 
 - Replace sample items with structured TBC item data
+- Split base item definitions from class/spec/phase slot rankings as coverage grows
+- Import guide-backed ranked items by class/spec/phase/slot
 - Add real socket layouts and socket bonuses
 - Add real gem and enchant options
 - Add source, material, profession, and phase metadata
