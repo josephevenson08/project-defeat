@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import { getBisListForSpec, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { gearSlots, type GearSlot } from '../../domain/gear/gearSlots'
+import { getPairedGearSlots, isItemBlockedByUniqueInGear, isPairedGearSlot } from '../../domain/gear/slotCompatibility'
 import { getGemById } from '../../domain/gems/sampleGems'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getItemById } from '../gear/gearData'
@@ -41,6 +42,14 @@ function recommendationsFor(entry: RankedGearEntry) {
   return {
     enchantName: enchant?.name,
     gemNames: gems.map((gem) => gem.name),
+  }
+}
+
+function equippedSlotFor(entry: RankedGearEntry, item: GearItem): EquippedSlot {
+  return {
+    item,
+    enchantId: entry.recommendedEnchantId,
+    gemIds: item.sockets?.map((_, index) => entry.recommendedGemIds?.[index] ?? '') ?? [],
   }
 }
 
@@ -84,7 +93,8 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                   {entries.map((entry) => {
                     const item = getItemById(entry.itemId)
                     const { enchantName, gemNames } = recommendationsFor(entry)
-                    const isEquipped = gear[entry.slot].item.id === entry.itemId
+                    const targetSlots = getPairedGearSlots(entry.slot)
+                    const isPairedItem = isPairedGearSlot(entry.slot)
                     const wowItemId = entry.wowItemId ?? item?.wowItemId
 
                     return (
@@ -121,20 +131,30 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                         </dl>
 
                         {item ? (
-                          <Button
-                            className="bis-equip-button"
-                            disabled={isEquipped}
-                            onClick={() => {
-                              onEquip(entry.slot, {
-                                item,
-                                enchantId: entry.recommendedEnchantId,
-                                gemIds: item.sockets?.map((_, index) => entry.recommendedGemIds?.[index] ?? '') ?? [],
-                              })
-                            }}
-                          >
-                            <CheckCircle2 aria-hidden="true" size={16} />
-                            {isEquipped ? 'Equipped' : `Equip ${item.name}`}
-                          </Button>
+                          <div className="bis-equip-actions">
+                            {targetSlots.map((targetSlot) => {
+                              const isEquipped = gear[targetSlot].item.id === entry.itemId
+                              const blockedByUnique = isItemBlockedByUniqueInGear(item, targetSlot, gear)
+
+                              return (
+                                <Button
+                                  className="bis-equip-button"
+                                  disabled={isEquipped || blockedByUnique}
+                                  key={targetSlot}
+                                  onClick={() => onEquip(targetSlot, equippedSlotFor(entry, item))}
+                                >
+                                  <CheckCircle2 aria-hidden="true" size={16} />
+                                  {isEquipped
+                                    ? `Equipped ${targetSlot}`
+                                    : blockedByUnique
+                                      ? 'Unique equipped'
+                                      : isPairedItem
+                                        ? `Equip ${targetSlot}`
+                                        : `Equip ${item.name}`}
+                                </Button>
+                              )
+                            })}
+                          </div>
                         ) : (
                           <span className="bis-missing-item">Missing registry item</span>
                         )}

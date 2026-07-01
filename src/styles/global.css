@@ -372,6 +372,14 @@ select:focus,
   margin: 0;
 }
 
+.bis-equip-actions {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .bis-equip-button {
   gap: 8px;
   min-height: 38px;
@@ -451,8 +459,16 @@ select:focus,
     grid-template-columns: 1fr;
   }
 
+  .bis-equip-actions,
   .bis-equip-button {
     width: 100%;
+  }
+
+  .bis-equip-actions {
+    justify-content: stretch;
+  }
+
+  .bis-equip-button {
     white-space: normal;
   }
 }
