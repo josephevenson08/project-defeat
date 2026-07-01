@@ -13,7 +13,7 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
-  await expect(page.getByRole('heading', { name: /gear/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /simulation/i })).toBeVisible()
 
@@ -128,6 +128,37 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('talon-of-the-phoenix')
   await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Dragonstrike' })).toHaveCount(1)
+
+  const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  expect(after).toBeGreaterThan(before)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('BiS panel shows Enhancement Shaman rankings and equips a listed item', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
+  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Fury Warrior/i)
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+
+  await expect(page.getByTestId('bis-panel')).toBeVisible()
+  await expect(page.getByText('Enhancement Shaman Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Wrists' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'True-Aim Stalker Bands' })).toBeVisible()
+  await expect(page.getByText(/Item ID 30091/i)).toBeVisible()
+
+  const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  await page.getByRole('button', { name: /Equip True-Aim Stalker Bands/i }).click()
+
+  await expect(page.getByLabel('Wrists', { exact: true })).toHaveValue('true-aim-stalker-bands')
+  await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   expect(after).toBeGreaterThan(before)

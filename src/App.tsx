@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
+import { BisPanel } from './features/bis/BisPanel'
 import { CharacterPanel } from './features/character/CharacterPanel'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
@@ -45,6 +46,7 @@ function App() {
     <AppShell>
       <CharacterPanel character={character} onChange={updateCharacter} />
       <GearPanel gear={gear} onChange={updateGear} />
+      <BisPanel character={character} gear={gear} onEquip={updateGear} />
       <StatsPanel stats={stats} />
       <SimulatorPanel result={simulationResult} onRun={runSimulation} />
     </AppShell>
