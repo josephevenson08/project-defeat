@@ -2,7 +2,7 @@ import { Panel } from '../../components/layout/Panel'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { sampleGems } from '../../domain/gems/sampleGems'
 import type { CharacterProfile } from '../character/characterTypes'
-import { gearSlots, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
+import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 
 type GearPanelProps = {
@@ -30,17 +30,18 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
   return (
     <Panel title="Gear" eyebrow="TBC slot foundation">
       <div className="gear-list">
-        {gearSlots.map((slot) => {
+        {getVisibleGearSlotsForSpec(character.className, character.spec).map((slot) => {
           const equipped = gear[slot]
           const enchants = getEnchantsForSlot(slot, character, equipped.item)
           const slotItems = getItemsForSlotAndCharacter(slot, character.className, character.spec)
+          const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
 
           return (
             <div className="gear-row" key={slot}>
               <label>
-                <span>{slot}</span>
+                <span>{displayName}</span>
                 <select
-                  aria-label={slot}
+                  aria-label={displayName}
                   value={equipped.item.id}
                   disabled={slotItems.length === 0}
                   onChange={(event) => {
@@ -66,7 +67,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
               {enchants.length > 0 && (
                 <label>
                   <span>Enchant</span>
-                  <select aria-label={`${slot} enchant`} value={equipped.enchantId ?? ''} onChange={(event) => updateEnchant(slot, event.target.value)}>
+                  <select aria-label={`${displayName} enchant`} value={equipped.enchantId ?? ''} onChange={(event) => updateEnchant(slot, event.target.value)}>
                     <option value="">No enchant</option>
                     {enchants.map((enchant) => (
                       <option key={enchant.id} value={enchant.id}>
@@ -77,12 +78,12 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
                 </label>
               )}
               {equipped.item.sockets && (
-                <div className="socket-list" aria-label={`${slot} sockets`}>
+                <div className="socket-list" aria-label={`${displayName} sockets`}>
                   {equipped.item.sockets.map((socket, index) => (
                     <label key={`${slot}-${socket}-${index}`}>
                       <span>{socket} Socket</span>
                       <select
-                        aria-label={`${slot} ${socket} socket`}
+                        aria-label={`${displayName} ${socket} socket`}
                         value={equipped.gemIds[index] ?? ''}
                         onChange={(event) => updateGem(slot, index, event.target.value)}
                       >

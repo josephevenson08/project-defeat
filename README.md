@@ -17,6 +17,7 @@ Early MVP / foundation phase.
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Enhancement Shaman Phase 2 starter ranked/BiS data structure as the first reusable guide-style proof of concept
 - Spec-aware starter filtering for Enhancement Shaman gear, relics, and enchants
+- Spec-aware gear slot visibility, including Totem display for Enhancement Shaman
 - Sample gems and enchants
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
 - Role-aware prototype simulation outputs:
