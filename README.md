@@ -25,7 +25,8 @@ Early MVP / foundation phase.
   - Healer
   - Tank
 - Result breakdown panel
-- Anime.js-powered result animation
+- Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
+- Reduced-motion aware animation helpers
 - Playwright tests for physical, caster, healer, and tank flows
 - Playwright regression coverage for expanded slot options and Enhancement Shaman Phase 2 sample gear selection
 

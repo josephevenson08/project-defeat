@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
+import { LoadingIntro } from './components/layout/LoadingIntro'
 import { BisPanel } from './features/bis/BisPanel'
 import { CharacterPanel } from './features/character/CharacterPanel'
 import { getRoleForSpec } from './features/character/characterData'
@@ -21,6 +22,7 @@ const initialCharacter: CharacterProfile = {
 }
 
 function App() {
+  const [introComplete, setIntroComplete] = useState(false)
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
   const [gear, setGear] = useState<EquippedGear>(() => normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec))
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
@@ -42,6 +44,12 @@ function App() {
   function runSimulation() {
     setSimulationResult(calculateSimulation(stats, role))
   }
+
+  const completeIntro = useCallback(() => {
+    setIntroComplete(true)
+  }, [])
+
+  if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
 
   return (
     <AppShell>
