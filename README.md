@@ -13,7 +13,9 @@ Early MVP / foundation phase.
 - TBC class/spec selection for all nine TBC classes
 - Faction-aware race selection
 - Full TBC-style gear slot model
-- Sample gear items with quality, source, phase, sockets, socket bonuses, and stats
+- Expanded starter gear items for every slot with quality, source, phase, sockets, socket bonuses, stats, and WoW item IDs where currently confident
+- Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
+- Enhancement Shaman Phase 2 starter ranked/BiS data structure as the first reusable guide-style proof of concept
 - Sample gems and enchants
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
 - Role-aware prototype simulation outputs:
@@ -24,6 +26,7 @@ Early MVP / foundation phase.
 - Result breakdown panel
 - Anime.js-powered result animation
 - Playwright tests for physical, caster, healer, and tank flows
+- Playwright regression coverage for expanded slot options and Enhancement Shaman Phase 2 sample gear selection
 
 ## Tech Stack
 
@@ -78,7 +81,8 @@ npx playwright install --with-deps
 ## Known Limitations
 
 - Simulation formulas are placeholders and are not yet TBC-accurate.
-- Sample gear, gems, and enchants are intentionally small starter datasets.
+- Gear, gems, and enchants are still starter datasets, not a complete audited TBC database.
+- Enhancement Shaman Phase 2 has a guide-shaped starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.

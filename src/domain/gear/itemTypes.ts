@@ -20,6 +20,7 @@ export type SocketColor = 'Red' | 'Yellow' | 'Blue' | 'Meta'
 
 export type GearItem = {
   id: string
+  wowItemId?: number
   name: string
   slot: GearSlot
   quality: ItemQuality
@@ -32,6 +33,13 @@ export type GearItem = {
   sockets?: SocketColor[]
   socketBonus?: Partial<StatBlock>
   allowedClasses?: TbcClass[]
+  zone?: string
+  instance?: string
+  boss?: string
+  vendor?: string
+  reputation?: string
+  craftedBy?: string
+  notes?: string
 }
 
 export type EquippedSlot = {
