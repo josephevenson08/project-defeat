@@ -125,7 +125,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
   await page.getByLabel('Wrists', { exact: true }).selectOption({ label: 'True-Aim Stalker Bands' })
   await page.getByLabel('Main Hand', { exact: true }).selectOption({ label: 'Talon of the Phoenix' })
   await page.getByLabel('Off Hand', { exact: true }).selectOption({ label: 'Rod of the Sun King' })
-  await page.getByLabel('Relic', { exact: true }).selectOption({ label: 'Totem of the Astral Winds' })
+  await page.getByLabel('Totem', { exact: true }).selectOption({ label: 'Totem of the Astral Winds' })
 
   await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('talon-of-the-phoenix')
   await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Dragonstrike' })).toHaveCount(1)
@@ -153,13 +153,14 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await expect(page.getByLabel('Off Hand enchant')).toContainText('Enchant Weapon - Mongoose')
   await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Enchant Shield - Defense')
 
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'No Ranged Weapon Recommended' })).toHaveCount(1)
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Practice Longbow' })).toHaveCount(0)
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(0)
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('No Ranged Weapon Recommended')).toHaveCount(0)
 
-  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Totem of the Astral Winds' })).toHaveCount(1)
-  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Idol of Testing' })).toHaveCount(0)
-  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
+  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Totem of the Astral Winds' })).toHaveCount(1)
+  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Idol of Testing' })).toHaveCount(0)
+  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ranged', exact: true })).toHaveCount(0)
 
   await expect(page.getByText('Serpentshrine Cavern · Leotheras the Blind · Phase 2')).toBeVisible()
   await expect(page.getByText(/Needs source\/rank verification/i).first()).toBeVisible()

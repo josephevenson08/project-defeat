@@ -3,12 +3,12 @@ import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
 import { getBisListForSpec, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
-import { gearSlots, type GearSlot } from '../../domain/gear/gearSlots'
+import type { GearSlot } from '../../domain/gear/gearSlots'
 import { getPairedGearSlots, isItemBlockedByUniqueInGear, isPairedGearSlot } from '../../domain/gear/slotCompatibility'
 import { getGemById } from '../../domain/gems/sampleGems'
 import { animateEquipFeedback } from '../../lib/animations'
 import type { CharacterProfile } from '../character/characterTypes'
-import { getItemById } from '../gear/gearData'
+import { getGearSlotDisplayName, getItemById, getVisibleGearSlotsForSpec } from '../gear/gearData'
 import type { EquippedGear, EquippedSlot, GearItem } from '../gear/gearTypes'
 
 type BisPanelProps = {
@@ -92,14 +92,15 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
         </div>
 
         <div className="bis-slot-list">
-          {gearSlots.map((slot) => {
+          {getVisibleGearSlotsForSpec(character.className, character.spec).map((slot) => {
             const entries = groupedEntries.get(slot)
             if (!entries) return null
+            const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
 
             return (
-              <section className="bis-slot-group" key={slot} aria-label={`${slot} ranked items`}>
+              <section className="bis-slot-group" key={slot} aria-label={`${displayName} ranked items`}>
                 <div className="bis-slot-heading">
-                  <h3>{slot}</h3>
+                  <h3>{displayName}</h3>
                   <span>{entries.length} ranked</span>
                 </div>
 
@@ -119,7 +120,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                           <div>
                             <h4>{item?.name ?? entry.itemId}</h4>
                             <p>
-                              {wowItemId ? `Item ID ${wowItemId}` : 'Item ID pending audit'} · {entry.slot}
+                              {wowItemId ? `Item ID ${wowItemId}` : 'Item ID pending audit'} · {displayName}
                             </p>
                           </div>
                         </div>
