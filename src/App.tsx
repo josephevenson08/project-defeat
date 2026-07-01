@@ -4,7 +4,7 @@ import { BisPanel } from './features/bis/BisPanel'
 import { CharacterPanel } from './features/character/CharacterPanel'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
-import { defaultGear } from './features/gear/gearData'
+import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
@@ -22,7 +22,7 @@ const initialCharacter: CharacterProfile = {
 
 function App() {
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
-  const [gear, setGear] = useState<EquippedGear>(defaultGear)
+  const [gear, setGear] = useState<EquippedGear>(() => normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec))
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const role = getRoleForSpec(character.className, character.spec)
@@ -35,6 +35,7 @@ function App() {
 
   function updateCharacter(nextCharacter: CharacterProfile) {
     setCharacter(nextCharacter)
+    setGear((current) => normalizeGearForCharacter(current, nextCharacter.className, nextCharacter.spec))
     setSimulationResult(undefined)
   }
 
@@ -45,7 +46,7 @@ function App() {
   return (
     <AppShell>
       <CharacterPanel character={character} onChange={updateCharacter} />
-      <GearPanel gear={gear} onChange={updateGear} />
+      <GearPanel character={character} gear={gear} onChange={updateGear} />
       <BisPanel character={character} gear={gear} onEquip={updateGear} />
       <StatsPanel stats={stats} />
       <SimulatorPanel result={simulationResult} onRun={runSimulation} />

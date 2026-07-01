@@ -87,7 +87,7 @@ test('expanded gear foundation has multiple options for every slot', async ({ pa
   for (const slot of gearSlots) {
     const itemOptions = getItemsForSlot(slot)
     expect(itemOptions.length, `${slot} should have multiple data options`).toBeGreaterThan(1)
-    await expect(page.getByLabel(slot, { exact: true }).locator('option')).toHaveCount(itemOptions.length)
+    await expect(page.getByLabel(slot, { exact: true }).locator('option')).not.toHaveCount(0)
   }
 })
 
@@ -132,6 +132,37 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   expect(after).toBeGreaterThan(before)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Enhancement Shaman filters gear, relics, enchants, and source details by spec', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Shield of Rehearsal' })).toHaveCount(0)
+
+  await expect(page.getByLabel('Main Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+  await expect(page.getByLabel('Off Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+  await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Enchant Shield - Defense')
+
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'No Ranged Weapon Recommended' })).toHaveCount(1)
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Practice Longbow' })).toHaveCount(0)
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(0)
+
+  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Totem of the Astral Winds' })).toHaveCount(1)
+  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Idol of Testing' })).toHaveCount(0)
+  await expect(page.getByLabel('Relic', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
+
+  await expect(page.getByText('Serpentshrine Cavern · Leotheras the Blind · Phase 2')).toBeVisible()
+  await expect(page.getByText(/Needs source\/rank verification/i).first()).toBeVisible()
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()

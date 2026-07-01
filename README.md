@@ -16,6 +16,7 @@ Early MVP / foundation phase.
 - Expanded starter gear items for every slot with quality, source, phase, sockets, socket bonuses, stats, and WoW item IDs where currently confident
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Enhancement Shaman Phase 2 starter ranked/BiS data structure as the first reusable guide-style proof of concept
+- Spec-aware starter filtering for Enhancement Shaman gear, relics, and enchants
 - Sample gems and enchants
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
 - Role-aware prototype simulation outputs:
@@ -83,6 +84,7 @@ npx playwright install --with-deps
 - Simulation formulas are placeholders and are not yet TBC-accurate.
 - Gear, gems, and enchants are still starter datasets, not a complete audited TBC database.
 - Enhancement Shaman Phase 2 has a guide-shaped starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending.
+- Spec-aware filtering is currently focused on Enhancement Shaman and should be expanded per class/spec as more lists are audited.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.

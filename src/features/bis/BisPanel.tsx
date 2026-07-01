@@ -35,6 +35,19 @@ function itemLocation(item: GearItem) {
     .join(' / ')
 }
 
+function sourceDetails(entry: RankedGearEntry, item: GearItem | undefined) {
+  const source = entry.source
+
+  return {
+    sourceType: source?.type ?? item?.source,
+    instance: source?.instance ?? item?.instance ?? item?.zone,
+    bossOrVendor: source?.boss ?? source?.vendor ?? source?.reputation ?? source?.craftedBy ?? item?.boss ?? item?.vendor ?? item?.reputation ?? item?.craftedBy,
+    phase: source?.phase ?? item?.phase,
+    notes: source?.notes,
+    needsVerification: source?.needsVerification === true || entry.needsVerification === true || item?.needsVerification === true,
+  }
+}
+
 function recommendationsFor(entry: RankedGearEntry) {
   const enchant = getEnchantById(entry.recommendedEnchantId)
   const gems = entry.recommendedGemIds?.map(getGemById).filter((gem) => gem !== undefined) ?? []
@@ -96,6 +109,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                     const targetSlots = getPairedGearSlots(entry.slot)
                     const isPairedItem = isPairedGearSlot(entry.slot)
                     const wowItemId = entry.wowItemId ?? item?.wowItemId
+                    const source = sourceDetails(entry, item)
 
                     return (
                       <article className="bis-entry" key={`${entry.slot}-${entry.rank}-${entry.itemId}`}>
@@ -112,8 +126,22 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                         <dl className="bis-entry-details">
                           <div>
                             <dt>Source</dt>
-                            <dd>{item ? itemLocation(item) || item.source : entry.sourceName}</dd>
+                            <dd>{source.sourceType ?? (item ? itemLocation(item) || item.source : entry.sourceName)}</dd>
                           </div>
+                          {(source.instance || source.bossOrVendor || source.phase) && (
+                            <div>
+                              <dt>Farm</dt>
+                              <dd>
+                                {[source.instance, source.bossOrVendor, source.phase ? `Phase ${source.phase}` : undefined].filter(Boolean).join(' · ')}
+                              </dd>
+                            </div>
+                          )}
+                          {source.needsVerification && (
+                            <div className="bis-verification-warning">
+                              <dt>Verification</dt>
+                              <dd>{source.notes ?? 'Needs source/rank verification before treating as final.'}</dd>
+                            </div>
+                          )}
                           {entry.notes && (
                             <div>
                               <dt>Notes</dt>
