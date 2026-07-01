@@ -1,5 +1,6 @@
 import type { GearSlot } from './gearSlots'
 import type { GearItem } from './itemTypes'
+import { isItemCompatibleWithGearSlot } from './slotCompatibility'
 
 export const sampleItems: readonly GearItem[] = [
   {
@@ -736,7 +737,7 @@ export const sampleItems: readonly GearItem[] = [
 ]
 
 export function getItemsForSlot(slot: GearSlot) {
-  return sampleItems.filter((item) => item.slot === slot)
+  return sampleItems.filter((item) => isItemCompatibleWithGearSlot(item, slot))
 }
 
 export function getItemById(id: string) {

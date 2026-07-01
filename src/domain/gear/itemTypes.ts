@@ -29,6 +29,7 @@ export type GearItem = {
   requiredLevel?: number
   itemLevel?: number
   unique?: boolean
+  uniqueEquipped?: boolean
   stats: Partial<StatBlock>
   sockets?: SocketColor[]
   socketBonus?: Partial<StatBlock>

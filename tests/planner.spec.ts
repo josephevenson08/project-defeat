@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { enhancementShamanPhase2Bis } from '../src/domain/bis'
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
+import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 
 function readStatValue(text: string) {
   const match = text.match(/-?\d+/)
@@ -13,7 +14,7 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
-  await expect(page.getByRole('heading', { name: /gear/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /simulation/i })).toBeVisible()
 
@@ -100,7 +101,7 @@ test('Enhancement Shaman Phase 2 starter ranking resolves to catalog items', asy
   for (const entry of enhancementShamanPhase2Bis.entries) {
     const item = getItemById(entry.itemId)
     expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
-    expect(item?.slot, `${entry.itemId} should match ${entry.slot}`).toBe(entry.slot)
+    expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
     if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
   }
 
@@ -131,6 +132,90 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   expect(after).toBeGreaterThan(before)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('BiS panel shows Enhancement Shaman rankings and equips a listed item', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
+  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Fury Warrior/i)
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+
+  await expect(page.getByTestId('bis-panel')).toBeVisible()
+  await expect(page.getByText('Enhancement Shaman Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Wrists' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'True-Aim Stalker Bands' })).toBeVisible()
+  await expect(page.getByText(/Item ID 30091/i)).toBeVisible()
+
+  const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  await page.getByRole('button', { name: /Equip True-Aim Stalker Bands/i }).click()
+
+  await expect(page.getByLabel('Wrists', { exact: true })).toHaveValue('true-aim-stalker-bands')
+  await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
+
+  const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  expect(after).toBeGreaterThan(before)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('BiS panel can equip paired trinket targets without duplicating unique items', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+
+  const dragonspineRow = page.locator('.bis-entry', { hasText: 'Dragonspine Trophy' })
+  const bloodlustRow = page.locator('.bis-entry', { hasText: 'Bloodlust Brooch' })
+
+  await dragonspineRow.getByRole('button', { name: 'Equip Trinket 1' }).click()
+  await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
+  await expect(dragonspineRow.getByRole('button', { name: 'Unique equipped' })).toBeDisabled()
+
+  await bloodlustRow.getByRole('button', { name: 'Equip Trinket 2' }).click()
+  await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('paired ring and trinket slots share compatible options and block duplicate unique items', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
+  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
+  await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
+  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
+
+  await page.getByLabel('Trinket 1', { exact: true }).selectOption('dragonspine-trophy')
+  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option[value="dragonspine-trophy"]')).toHaveAttribute('disabled', '')
+  await page.getByLabel('Trinket 2', { exact: true }).selectOption('bloodlust-brooch')
+
+  await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
+  await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
+
+  await expect(page.getByLabel('Finger 1', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
+  await expect(page.getByLabel('Finger 2', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
+
+  await page.getByLabel('Finger 1', { exact: true }).selectOption('ring-of-a-thousand-marks')
+  await expect(page.getByLabel('Finger 2', { exact: true }).locator('option[value="ring-of-a-thousand-marks"]')).toHaveAttribute('disabled', '')
+  await page.getByLabel('Finger 2', { exact: true }).selectOption('garonas-signet-ring')
+
+  await expect(page.getByLabel('Finger 1', { exact: true })).toHaveValue('ring-of-a-thousand-marks')
+  await expect(page.getByLabel('Finger 2', { exact: true })).toHaveValue('garonas-signet-ring')
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
