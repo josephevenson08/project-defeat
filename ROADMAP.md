@@ -26,6 +26,7 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Add real gem and enchant options
 - Add source, material, profession, and phase metadata
 - Add legality checks for class, weapon, relic, and profession restrictions
+- Expand spec-aware recommendation filters beyond the Enhancement Shaman starter rules
 
 ## Phase 3: Character Systems
 

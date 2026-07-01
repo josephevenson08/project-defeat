@@ -372,6 +372,10 @@ select:focus,
   margin: 0;
 }
 
+.bis-verification-warning dd {
+  color: #fcd34d;
+}
+
 .bis-equip-actions {
   align-items: start;
   display: flex;

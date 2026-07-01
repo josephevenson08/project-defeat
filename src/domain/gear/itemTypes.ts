@@ -1,4 +1,4 @@
-import type { TbcClass } from '../character/characterTypes'
+import type { CharacterRole, TbcClass, TbcSpec } from '../character/characterTypes'
 import type { StatBlock } from '../stats/statTypes'
 import type { GearSlot } from './gearSlots'
 
@@ -18,6 +18,30 @@ export type ItemSource =
 
 export type SocketColor = 'Red' | 'Yellow' | 'Blue' | 'Meta'
 
+export type ArmorType = 'Cloth' | 'Leather' | 'Mail' | 'Plate' | 'Shield' | 'Relic' | 'Other'
+
+export type WeaponType =
+  | 'Axe'
+  | 'Dagger'
+  | 'Fist Weapon'
+  | 'Mace'
+  | 'Sword'
+  | 'Staff'
+  | 'Polearm'
+  | 'Bow'
+  | 'Gun'
+  | 'Crossbow'
+  | 'Thrown'
+  | 'Wand'
+  | 'Shield'
+  | 'Held In Off-hand'
+  | 'Totem'
+  | 'Libram'
+  | 'Idol'
+  | 'Other'
+
+export type BuildRole = CharacterRole | 'Hybrid'
+
 export type GearItem = {
   id: string
   wowItemId?: number
@@ -31,15 +55,20 @@ export type GearItem = {
   unique?: boolean
   uniqueEquipped?: boolean
   stats: Partial<StatBlock>
+  armorType?: ArmorType
+  weaponType?: WeaponType
   sockets?: SocketColor[]
   socketBonus?: Partial<StatBlock>
   allowedClasses?: TbcClass[]
+  allowedSpecs?: TbcSpec[]
+  roles?: BuildRole[]
   zone?: string
   instance?: string
   boss?: string
   vendor?: string
   reputation?: string
   craftedBy?: string
+  needsVerification?: boolean
   notes?: string
 }
 

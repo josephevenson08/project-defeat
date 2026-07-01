@@ -1,15 +1,17 @@
 import { Panel } from '../../components/layout/Panel'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { sampleGems } from '../../domain/gems/sampleGems'
-import { gearSlots, getItemsForSlot, isItemBlockedByUniqueInGear } from './gearData'
+import type { CharacterProfile } from '../character/characterTypes'
+import { gearSlots, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 
 type GearPanelProps = {
+  character: CharacterProfile
   gear: EquippedGear
   onChange: (slot: GearSlot, equippedSlot: EquippedSlot) => void
 }
 
-export function GearPanel({ gear, onChange }: GearPanelProps) {
+export function GearPanel({ character, gear, onChange }: GearPanelProps) {
   function updateItem(slot: GearSlot, item: GearItem) {
     if (isItemBlockedByUniqueInGear(item, slot, gear)) return
     onChange(slot, { item, gemIds: item.sockets?.map(() => '') ?? [] })
@@ -30,8 +32,8 @@ export function GearPanel({ gear, onChange }: GearPanelProps) {
       <div className="gear-list">
         {gearSlots.map((slot) => {
           const equipped = gear[slot]
-          const enchants = getEnchantsForSlot(slot)
-          const slotItems = getItemsForSlot(slot)
+          const enchants = getEnchantsForSlot(slot, character, equipped.item)
+          const slotItems = getItemsForSlotAndCharacter(slot, character.className, character.spec)
 
           return (
             <div className="gear-row" key={slot}>
@@ -40,16 +42,21 @@ export function GearPanel({ gear, onChange }: GearPanelProps) {
                 <select
                   aria-label={slot}
                   value={equipped.item.id}
+                  disabled={slotItems.length === 0}
                   onChange={(event) => {
                     const nextItem = slotItems.find((item) => item.id === event.target.value)
                     if (nextItem) updateItem(slot, nextItem)
                   }}
                 >
-                  {slotItems.map((item) => (
-                    <option key={item.id} value={item.id} disabled={isItemBlockedByUniqueInGear(item, slot, gear)}>
-                      {item.name}
-                    </option>
-                  ))}
+                  {slotItems.length > 0 ? (
+                    slotItems.map((item) => (
+                      <option key={item.id} value={item.id} disabled={isItemBlockedByUniqueInGear(item, slot, gear)}>
+                        {item.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option>No relevant item options</option>
+                  )}
                 </select>
               </label>
               <small>
