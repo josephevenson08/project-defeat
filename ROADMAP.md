@@ -15,6 +15,7 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Enhancement Shaman Phase 2 ranked/BiS proof-of-concept data
 - Prototype stat calculation
 - Role-aware prototype results
+- Anime.js UI polish with reduced-motion support
 - Playwright flow coverage
 
 ## Phase 2: Gear, Gems, Enchants

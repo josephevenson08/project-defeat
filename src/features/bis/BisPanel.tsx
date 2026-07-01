@@ -6,6 +6,7 @@ import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { gearSlots, type GearSlot } from '../../domain/gear/gearSlots'
 import { getPairedGearSlots, isItemBlockedByUniqueInGear, isPairedGearSlot } from '../../domain/gear/slotCompatibility'
 import { getGemById } from '../../domain/gems/sampleGems'
+import { animateEquipFeedback } from '../../lib/animations'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getItemById } from '../gear/gearData'
 import type { EquippedGear, EquippedSlot, GearItem } from '../gear/gearTypes'
@@ -169,7 +170,10 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                                   className="bis-equip-button"
                                   disabled={isEquipped || blockedByUnique}
                                   key={targetSlot}
-                                  onClick={() => onEquip(targetSlot, equippedSlotFor(entry, item))}
+                                  onClick={(event) => {
+                                    animateEquipFeedback(event.currentTarget)
+                                    onEquip(targetSlot, equippedSlotFor(entry, item))
+                                  }}
                                 >
                                   <CheckCircle2 aria-hidden="true" size={16} />
                                   {isEquipped
