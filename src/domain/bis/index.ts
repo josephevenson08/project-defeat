@@ -1,3 +1,5 @@
 export type { BisList, RankedGearEntry } from './bisTypes'
 export { bisLists, getBisListForSpec } from './bisLists'
 export { enhancementShamanPhase2Bis } from './enhancementShamanPhase2'
+export { elementalShamanPhase2Bis } from './elementalShamanPhase2'
+export { restorationShamanPhase2Bis } from './restorationShamanPhase2'

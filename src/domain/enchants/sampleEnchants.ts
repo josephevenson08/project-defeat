@@ -7,9 +7,11 @@ import type { Enchant } from './enchantTypes'
 export const sampleEnchants: readonly Enchant[] = [
   { id: 'glyph-of-ferocity', name: 'Glyph of Ferocity', slot: 'Head', source: 'Reputation', roles: ['Physical DPS'], stats: { attackPower: 34, hitRating: 16 } },
   { id: 'glyph-of-power', name: 'Glyph of Power', slot: 'Head', source: 'Reputation', roles: ['Caster DPS'], stats: { spellPower: 22, spellHitRating: 14 } },
+  { id: 'glyph-of-renewal', name: 'Glyph of Renewal', slot: 'Head', source: 'Reputation', roles: ['Healer'], stats: { healingPower: 28, mp5: 4 } },
   { id: 'greater-stats-chest', name: 'Enchant Chest - Exceptional Stats', slot: 'Chest', source: 'Other', stats: { strength: 6, agility: 6, stamina: 6, intellect: 6, spirit: 6 } },
   { id: 'assault-wrists', name: 'Enchant Bracer - Assault', slot: 'Wrists', source: 'Other', roles: ['Physical DPS'], stats: { attackPower: 24 } },
   { id: 'spellpower-wrists', name: 'Enchant Bracer - Spellpower', slot: 'Wrists', source: 'Other', roles: ['Caster DPS'], stats: { spellPower: 15 } },
+  { id: 'superior-healing-wrists', name: 'Enchant Bracer - Superior Healing', slot: 'Wrists', source: 'Other', roles: ['Healer'], stats: { healingPower: 20 } },
   {
     id: 'major-spellpower-weapon',
     name: 'Enchant Weapon - Major Spellpower',
@@ -19,6 +21,16 @@ export const sampleEnchants: readonly Enchant[] = [
     allowedSlots: ['Main Hand', 'Off Hand'],
     allowedWeaponTypes: ['Dagger', 'Mace', 'Sword', 'Staff'],
     stats: { spellPower: 40 },
+  },
+  {
+    id: 'major-healing-weapon',
+    name: 'Enchant Weapon - Major Healing',
+    slot: 'Main Hand',
+    source: 'Other',
+    roles: ['Healer'],
+    allowedSlots: ['Main Hand', 'Off Hand'],
+    allowedWeaponTypes: ['Dagger', 'Mace', 'Sword', 'Staff'],
+    stats: { healingPower: 55 },
   },
   {
     id: 'mongoose-main-hand',
@@ -52,6 +64,17 @@ export const sampleEnchants: readonly Enchant[] = [
     roles: ['Tank'],
     allowedWeaponTypes: ['Shield'],
     stats: { defenseRating: 18 },
+  },
+  {
+    id: 'intellect-shield',
+    name: 'Enchant Shield - Intellect',
+    slot: 'Off Hand',
+    source: 'Other',
+    roles: ['Healer'],
+    allowedWeaponTypes: ['Shield'],
+    needsVerification: true,
+    notes: 'Starter enchant option; verify final TBC value before treating as BiS.',
+    stats: { intellect: 12 },
   },
 ]
 

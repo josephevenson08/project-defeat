@@ -8,6 +8,11 @@ const enhancementExcludedWeaponTypes: readonly WeaponType[] = ['Bow', 'Gun', 'Cr
 const enhancementMainHandTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger']
 const enhancementOffHandTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger']
 
+// Shamans can use Daggers, Axes, Fist Weapons, Maces, and Staves; everything else is illegal for any Shaman spec.
+const shamanIllegalWeaponTypes: readonly WeaponType[] = ['Sword', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Wand', 'Libram', 'Idol']
+// Only Enhancement has the Dual Wield talent; other specs cannot put a second weapon in the off-hand slot.
+const shamanDualWieldOnlyWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger', 'Staff']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -15,11 +20,17 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
   const role = getRoleForSpec(className, spec)
   if (item.roles && !item.roles.includes(role) && !item.roles.includes('Hybrid')) return false
 
-  if (className === 'Shaman' && spec === 'Enhancement') {
-    if (item.weaponType && enhancementExcludedWeaponTypes.includes(item.weaponType)) return false
-    if (item.slot === 'Main Hand' && item.weaponType && !enhancementMainHandTypes.includes(item.weaponType)) return false
-    if (item.slot === 'Off Hand' && item.weaponType && !enhancementOffHandTypes.includes(item.weaponType)) return false
-    if (item.slot === 'Relic' && item.weaponType !== 'Totem') return false
+  if (className === 'Shaman') {
+    if (item.weaponType && shamanIllegalWeaponTypes.includes(item.weaponType)) return false
+    if (item.slot === 'Relic' && item.weaponType && item.weaponType !== 'Totem') return false
+
+    if (spec === 'Enhancement') {
+      if (item.weaponType && enhancementExcludedWeaponTypes.includes(item.weaponType)) return false
+      if (item.slot === 'Main Hand' && item.weaponType && !enhancementMainHandTypes.includes(item.weaponType)) return false
+      if (item.slot === 'Off Hand' && item.weaponType && !enhancementOffHandTypes.includes(item.weaponType)) return false
+    } else if (item.slot === 'Off Hand' && item.weaponType && shamanDualWieldOnlyWeaponTypes.includes(item.weaponType)) {
+      return false
+    }
   }
 
   return true
