@@ -64,6 +64,27 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
                 {equipped.item.quality} {equipped.item.source} item
                 {equipped.item.phase ? ` · Phase ${equipped.item.phase}` : ''}
               </small>
+              {equipped.item.crafting && (
+                <div className="crafting-details" aria-label={`${displayName} crafting details`}>
+                  <p className="crafting-headline">
+                    {equipped.item.craftedBy}
+                    {equipped.item.crafting.requiredSkill ? ` (${equipped.item.crafting.requiredSkill} skill)` : ''}
+                    {equipped.item.crafting.specialization ? ` · ${equipped.item.crafting.specialization}` : ''}
+                  </p>
+                  <p className="crafting-recipe-source">Recipe: {equipped.item.crafting.recipeSource}</p>
+                  <ul className="crafting-materials">
+                    {equipped.item.crafting.materials.map((material) => (
+                      <li key={material.name}>
+                        <strong>
+                          {material.quantity}x {material.name}
+                        </strong>
+                        <span> — {material.farmSource}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {equipped.item.crafting.needsVerification && <small className="needs-verification">Recipe/materials need source verification.</small>}
+                </div>
+              )}
               {enchants.length > 0 && (
                 <label>
                   <span>Enchant</span>

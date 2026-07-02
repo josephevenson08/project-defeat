@@ -42,6 +42,27 @@ export type WeaponType =
 
 export type BuildRole = CharacterRole | 'Hybrid'
 
+export type CraftingMaterial = {
+  name: string
+  quantity: number
+  wowItemId?: number
+  /** Where/how to obtain this material: farmed mob(s) + zone, vendor, auction house, sub-recipe, etc. */
+  farmSource: string
+  needsVerification?: boolean
+}
+
+export type CraftingInfo = {
+  /** Profession skill level required to learn/craft the recipe. */
+  requiredSkill?: number
+  /** Profession specialization required, if any (e.g. "Spellfire Tailoring", "Hammersmith"). */
+  specialization?: string
+  /** Where the recipe/pattern/plans/schematic itself is obtained. */
+  recipeSource: string
+  materials: readonly CraftingMaterial[]
+  needsVerification?: boolean
+  notes?: string
+}
+
 export type GearItem = {
   id: string
   wowItemId?: number
@@ -68,6 +89,7 @@ export type GearItem = {
   vendor?: string
   reputation?: string
   craftedBy?: string
+  crafting?: CraftingInfo
   needsVerification?: boolean
   notes?: string
 }

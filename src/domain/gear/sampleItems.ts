@@ -57,6 +57,7 @@ export const sampleItems: readonly GearItem[] = [
     quality: 'Rare',
     source: 'Dungeon',
     phase: 1,
+    roles: ['Caster DPS'],
     stats: { intellect: 14, spellPower: 18, spellCritRating: 6 },
   },
   {
@@ -170,6 +171,16 @@ export const sampleItems: readonly GearItem[] = [
     stats: { agility: 23, stamina: 18, attackPower: 46 },
     roles: ['Physical DPS'],
     craftedBy: 'Tailoring',
+    crafting: {
+      requiredSkill: 350,
+      recipeSource: 'BoE world drop pattern',
+      materials: [
+        { name: 'Primal Shadow', quantity: 2, farmSource: 'Shadow-school elementals/demons in Outland instances; also purchasable from other players via trade/AH.', needsVerification: true },
+        { name: 'Bolt of Netherweave', quantity: 4, farmSource: 'Crafted from Netherweave Cloth, farmed off most Outland humanoids.', needsVerification: true },
+      ],
+      needsVerification: true,
+      notes: 'Recipe/material list is a starter approximation pending final Wowhead audit.',
+    },
     notes: 'Crafted DPS cloak fallback.',
   },
   {
@@ -190,6 +201,21 @@ export const sampleItems: readonly GearItem[] = [
     quality: 'Rare',
     source: 'Crafted',
     phase: 1,
+    roles: ['Caster DPS'],
+    craftedBy: 'Tailoring',
+    crafting: {
+      requiredSkill: 350,
+      specialization: 'Spellfire Tailoring',
+      recipeSource: "Gidge Spellweave, Lower City, Shattrath City — sold once you've completed the Spellfire specialization quest (no reputation or drop RNG involved).",
+      materials: [
+        { name: 'Spellcloth', quantity: 4, farmSource: 'Crafted sub-recipe from Primal Mana + Primal Fire + Primal Life; not purchasable directly.' },
+        { name: 'Primal Mana', quantity: 2, farmSource: 'Dropped by Arcane elementals in Netherstorm.' },
+        { name: 'Primal Fire', quantity: 2, farmSource: 'Dropped by Fire elementals near the Throne of the Elements (Nagrand) and Fel flame mobs in Shadowmoon Valley.' },
+        { name: 'Bolt of Imbued Netherweave', quantity: 2, farmSource: 'Crafted from Netherweave Cloth (farmed off most Outland humanoids) plus an Arcane Dust/Primal Mana infusion.' },
+      ],
+      needsVerification: true,
+      notes: 'Recipe source and Spellcloth requirement are confirmed; exact per-piece material counts are approximate pending final Wowhead audit.',
+    },
     stats: { intellect: 18, spellPower: 34, spellHitRating: 8 },
     sockets: ['Red', 'Yellow'],
     socketBonus: { spellPower: 5 },
@@ -230,6 +256,7 @@ export const sampleItems: readonly GearItem[] = [
     quality: 'Rare',
     source: 'Dungeon',
     phase: 1,
+    roles: ['Caster DPS'],
     stats: { spellPower: 16, spellHitRating: 8 },
   },
   {
@@ -269,6 +296,7 @@ export const sampleItems: readonly GearItem[] = [
     quality: 'Rare',
     source: 'Dungeon',
     phase: 1,
+    roles: ['Caster DPS'],
     stats: { intellect: 14, spellPower: 22, spellCritRating: 6 },
   },
   {
@@ -278,6 +306,7 @@ export const sampleItems: readonly GearItem[] = [
     quality: 'Rare',
     source: 'Reputation',
     phase: 1,
+    roles: ['Healer'],
     stats: { intellect: 14, healingPower: 38, mp5: 4 },
   },
   {
@@ -340,6 +369,16 @@ export const sampleItems: readonly GearItem[] = [
     sockets: ['Red', 'Yellow'],
     socketBonus: { agility: 3 },
     craftedBy: 'Leatherworking',
+    crafting: {
+      requiredSkill: 340,
+      recipeSource: 'BoE world drop pattern (exact source needs final audit).',
+      materials: [
+        { name: 'Knothide Leather', quantity: 8, farmSource: 'Crafted from Knothide Leather Scraps, skinned throughout Outland.', needsVerification: true },
+        { name: 'Primal Shadow', quantity: 2, farmSource: 'Shadow-school elementals/demons in Outland instances; also purchasable from other players via trade/AH.', needsVerification: true },
+      ],
+      needsVerification: true,
+      notes: 'Recipe source and material list are a starter approximation pending final Wowhead audit.',
+    },
     notes: 'Crafted leatherworking DPS option; later profession filters should highlight, not hide, this row.',
   },
   {
@@ -409,6 +448,18 @@ export const sampleItems: readonly GearItem[] = [
     sockets: ['Red', 'Yellow'],
     socketBonus: { agility: 3 },
     craftedBy: 'Leatherworking',
+    crafting: {
+      requiredSkill: 350,
+      specialization: 'Dragonscale Leatherworking',
+      recipeSource: 'Leatherworking trainer or BoE world drop pattern (exact source needs final audit).',
+      materials: [
+        { name: 'Primal Life', quantity: 2, farmSource: 'Dropped by Life-school elementals/treants in Outland zones such as Nagrand and Zangarmarsh.', needsVerification: true },
+        { name: 'Fel Scales', quantity: 4, farmSource: 'Skinned from Outland demon-type beasts (Felboars, Fel Stalkers).', needsVerification: true },
+        { name: 'Knothide Leather', quantity: 6, farmSource: 'Crafted from Knothide Leather Scraps, skinned throughout Outland.', needsVerification: true },
+      ],
+      needsVerification: true,
+      notes: 'Recipe source and material list are a starter approximation pending final Wowhead audit.',
+    },
     notes: 'Crafted physical DPS boot option.',
   },
   {
@@ -643,6 +694,19 @@ export const sampleItems: readonly GearItem[] = [
     roles: ['Physical DPS'],
     stats: { attackPower: 80, hasteRating: 30, critRating: 18 },
     craftedBy: 'Blacksmithing',
+    crafting: {
+      requiredSkill: 375,
+      specialization: 'Hammersmith',
+      recipeSource: 'Weaponsmith trainer (requires the Hammersmith specialization quest); crafted in three stages, each stage upgrading the previous weapon in place.',
+      materials: [
+        { name: 'Adamantite Bar', quantity: 8, farmSource: 'Smelted from Adamantite Ore, mined throughout Outland (Blade\'s Edge Mountains, Nagrand, etc.).', needsVerification: true },
+        { name: 'Primal Might', quantity: 1, farmSource: 'Crafted by an Alchemist (Transmute: Primal Might) from Primal Nether plus one of each other Primal.', needsVerification: true },
+        { name: 'Primal Nether', quantity: 1, farmSource: 'Drops from the final boss of Heroic (non-normal) 5-man dungeons; also usable for the stage-2 upgrade.' },
+        { name: 'Nether Vortex', quantity: 1, farmSource: 'Drops from trash and bosses in Serpentshrine Cavern and Tempest Keep (stage-3 upgrade).' },
+      ],
+      needsVerification: true,
+      notes: 'Multi-stage Blacksmithing upgrade path; exact per-stage material counts are approximate pending final Wowhead audit.',
+    },
     notes: 'Dragonmaw upgrade path weapon; should remain visible even when Blacksmithing is not selected.',
   },
   {

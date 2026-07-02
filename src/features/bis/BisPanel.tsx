@@ -150,6 +150,29 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                               <dd>{entry.notes}</dd>
                             </div>
                           )}
+                          {item?.crafting && (
+                            <div className="bis-crafting-details">
+                              <dt>Crafting</dt>
+                              <dd>
+                                <p className="crafting-headline">
+                                  {item.craftedBy}
+                                  {item.crafting.requiredSkill ? ` (${item.crafting.requiredSkill} skill)` : ''}
+                                  {item.crafting.specialization ? ` · ${item.crafting.specialization}` : ''}
+                                </p>
+                                <p className="crafting-recipe-source">Recipe: {item.crafting.recipeSource}</p>
+                                <ul className="crafting-materials">
+                                  {item.crafting.materials.map((material) => (
+                                    <li key={material.name}>
+                                      <strong>
+                                        {material.quantity}x {material.name}
+                                      </strong>
+                                      <span> — {material.farmSource}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </dd>
+                            </div>
+                          )}
                           {(enchantName || gemNames.length > 0) && (
                             <div>
                               <dt>Recommended</dt>
