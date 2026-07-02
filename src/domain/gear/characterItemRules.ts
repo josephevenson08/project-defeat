@@ -16,6 +16,9 @@ const shamanDualWieldOnlyWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'F
 // Paladins can use Axes, Maces, Swords, Polearms, and Shields; everything else is illegal for any Paladin spec.
 const paladinIllegalWeaponTypes: readonly WeaponType[] = ['Dagger', 'Fist Weapon', 'Staff', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Wand', 'Totem', 'Idol']
 
+// Priests can use Daggers, Maces, Staves, and Wands; everything else is illegal for any Priest spec.
+const priestIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Sword', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Totem', 'Libram', 'Idol']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -40,6 +43,8 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
     if (item.weaponType && paladinIllegalWeaponTypes.includes(item.weaponType)) return false
     if (item.slot === 'Relic' && item.weaponType && item.weaponType !== 'Libram') return false
   }
+
+  if (className === 'Priest' && item.weaponType && priestIllegalWeaponTypes.includes(item.weaponType)) return false
 
   return true
 }

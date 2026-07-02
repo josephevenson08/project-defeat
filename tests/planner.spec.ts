@@ -1,14 +1,17 @@
 import { expect, test } from '@playwright/test'
 import {
   armsWarriorPhase2Bis,
+  disciplinePriestPhase2Bis,
   elementalShamanPhase2Bis,
   enhancementShamanPhase2Bis,
   furyWarriorPhase2Bis,
   holyPaladinPhase2Bis,
+  holyPriestPhase2Bis,
   protectionPaladinPhase2Bis,
   protectionWarriorPhase2Bis,
   restorationShamanPhase2Bis,
   retributionPaladinPhase2Bis,
+  shadowPriestPhase2Bis,
 } from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
@@ -493,6 +496,49 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
   await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
   await expect(page.getByText('Retribution Paladin Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [disciplinePriestPhase2Bis, holyPriestPhase2Bis, shadowPriestPhase2Bis]) {
+    // Priests have no Relic slot in TBC (only Shaman/Paladin/Druid do); they use a real Ranged wand instead.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Priest ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Priest specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Priest')
+  await page.getByLabel('Specialization').selectOption('Holy')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Holy Priest Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Discipline')
+  await expect(page.getByText('Discipline Priest Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Shadow')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Shadow Priest Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
