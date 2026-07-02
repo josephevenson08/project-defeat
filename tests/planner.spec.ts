@@ -4,8 +4,11 @@ import {
   elementalShamanPhase2Bis,
   enhancementShamanPhase2Bis,
   furyWarriorPhase2Bis,
+  holyPaladinPhase2Bis,
+  protectionPaladinPhase2Bis,
   protectionWarriorPhase2Bis,
   restorationShamanPhase2Bis,
+  retributionPaladinPhase2Bis,
 } from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
@@ -281,6 +284,23 @@ test('paired ring and trinket slots share compatible options and block duplicate
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
+test('Elemental and Restoration Shaman Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [elementalShamanPhase2Bis, restorationShamanPhase2Bis]) {
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of gearSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Shaman ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
 test('every class has a legal race in both factions, and every race maps back to its classes', async () => {
   for (const { className } of tbcClasses) {
     for (const faction of factions) {
@@ -427,4 +447,54 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
   await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Destroyer Chestguard' })
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/Survivability Score/i)).toBeVisible()
+})
+
+test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [holyPaladinPhase2Bis, protectionPaladinPhase2Bis, retributionPaladinPhase2Bis]) {
+    // Paladin has a Relic (Libram) slot but no Ranged slot (they share the same physical slot in TBC).
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Ranged')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Paladin ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Paladin')
+  await page.getByLabel('Specialization').selectOption('Holy')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
+  await expect(page.getByText('Holy Paladin Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Protection')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
+  await expect(page.getByText('Protection Paladin Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/Survivability Score/i)).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Retribution')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
+  await expect(page.getByText('Retribution Paladin Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })

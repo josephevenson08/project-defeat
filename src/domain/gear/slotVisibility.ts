@@ -5,18 +5,22 @@ import { gearSlots, type GearSlot } from './gearSlots'
 const relicClasses: readonly TbcClass[] = ['Shaman', 'Paladin', 'Druid']
 
 export function getVisibleGearSlotsForSpec(className: TbcClass, _specName: TbcSpec): readonly GearSlot[] {
-  if (className === 'Shaman') {
+  // Ranged and Relic are the same physical equipment slot in real TBC: Shaman/Paladin/Druid
+  // use it for a Totem/Libram/Idol, so their Ranged slot never applies.
+  if (relicClasses.includes(className)) {
     return gearSlots.filter((slot) => slot !== 'Ranged')
   }
 
-  if (!relicClasses.includes(className)) {
-    return gearSlots.filter((slot) => slot !== 'Relic')
-  }
+  return gearSlots.filter((slot) => slot !== 'Relic')
+}
 
-  return gearSlots
+const relicDisplayNames: Partial<Record<TbcClass, string>> = {
+  Shaman: 'Totem',
+  Paladin: 'Libram',
+  Druid: 'Idol',
 }
 
 export function getGearSlotDisplayName(slot: GearSlot, className: TbcClass, _specName: TbcSpec) {
-  if (className === 'Shaman' && slot === 'Relic') return 'Totem'
+  if (slot === 'Relic') return relicDisplayNames[className] ?? slot
   return slot
 }

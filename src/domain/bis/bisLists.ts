@@ -5,6 +5,9 @@ import { restorationShamanPhase2Bis } from './restorationShamanPhase2'
 import { armsWarriorPhase2Bis } from './armsWarriorPhase2'
 import { furyWarriorPhase2Bis } from './furyWarriorPhase2'
 import { protectionWarriorPhase2Bis } from './protectionWarriorPhase2'
+import { holyPaladinPhase2Bis } from './holyPaladinPhase2'
+import { protectionPaladinPhase2Bis } from './protectionPaladinPhase2'
+import { retributionPaladinPhase2Bis } from './retributionPaladinPhase2'
 
 export const bisLists = [
   enhancementShamanPhase2Bis,
@@ -13,6 +16,9 @@ export const bisLists = [
   armsWarriorPhase2Bis,
   furyWarriorPhase2Bis,
   protectionWarriorPhase2Bis,
+  holyPaladinPhase2Bis,
+  protectionPaladinPhase2Bis,
+  retributionPaladinPhase2Bis,
 ] as const
 
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {

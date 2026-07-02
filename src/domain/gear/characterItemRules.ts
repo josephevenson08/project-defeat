@@ -13,6 +13,9 @@ const shamanIllegalWeaponTypes: readonly WeaponType[] = ['Sword', 'Polearm', 'Bo
 // Only Enhancement has the Dual Wield talent; other specs cannot put a second weapon in the off-hand slot.
 const shamanDualWieldOnlyWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger', 'Staff']
 
+// Paladins can use Axes, Maces, Swords, Polearms, and Shields; everything else is illegal for any Paladin spec.
+const paladinIllegalWeaponTypes: readonly WeaponType[] = ['Dagger', 'Fist Weapon', 'Staff', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Wand', 'Totem', 'Idol']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -31,6 +34,11 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
     } else if (item.slot === 'Off Hand' && item.weaponType && shamanDualWieldOnlyWeaponTypes.includes(item.weaponType)) {
       return false
     }
+  }
+
+  if (className === 'Paladin') {
+    if (item.weaponType && paladinIllegalWeaponTypes.includes(item.weaponType)) return false
+    if (item.slot === 'Relic' && item.weaponType && item.weaponType !== 'Libram') return false
   }
 
   return true
