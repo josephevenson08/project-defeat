@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { elementalShamanPhase2Bis, enhancementShamanPhase2Bis, restorationShamanPhase2Bis } from '../src/domain/bis'
+import {
+  armsWarriorPhase2Bis,
+  elementalShamanPhase2Bis,
+  enhancementShamanPhase2Bis,
+  furyWarriorPhase2Bis,
+  protectionWarriorPhase2Bis,
+  restorationShamanPhase2Bis,
+} from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import { tbcClasses } from '../src/domain/character/tbcClasses'
@@ -25,6 +32,12 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
   await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
   await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('training-sword')
+
+  // Regression check: Warriors have no Relic slot, and the default gear should not silently
+  // inherit phantom spell/healing power from an illegally-equipped Totem/Libram/Idol.
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  expect(readStatValue(await page.getByTestId('stat-spell-power').innerText())).toBe(0)
+  expect(readStatValue(await page.getByTestId('stat-healing-power').innerText())).toBe(0)
 
   await page.getByRole('button', { name: /run simulation/i }).click()
 
@@ -87,9 +100,16 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {
   await page.goto('/')
 
+  // Default character is Warrior/Fury, which has no Relic slot in TBC (only Shaman/Paladin/Druid do),
+  // so that slot is intentionally not rendered here even though the underlying catalog has Relic items.
+  const visibleSlotsForDefaultCharacter = gearSlots.filter((slot) => slot !== 'Relic')
+
   for (const slot of gearSlots) {
     const itemOptions = getItemsForSlot(slot)
     expect(itemOptions.length, `${slot} should have multiple data options`).toBeGreaterThan(1)
+  }
+
+  for (const slot of visibleSlotsForDefaultCharacter) {
     await expect(page.getByLabel(slot, { exact: true }).locator('option')).not.toHaveCount(0)
   }
 })
@@ -177,7 +197,11 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
-  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Fury Warrior/i)
+
+  // Fury Warrior (the default character) now has a real BiS list, so check the empty state
+  // against a spec that hasn't been audited yet instead.
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Arcane Mage/i)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByLabel('Race').selectOption('Troll')
@@ -267,6 +291,25 @@ test('every class has a legal race in both factions, and every race maps back to
   for (const [className, races] of Object.entries(racesByClass)) {
     for (const race of races) {
       expect(getClassesForRace(race), `${race} should list ${className} as playable`).toContain(className)
+    }
+  }
+})
+
+test('Arms, Fury, and Protection Warrior Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [armsWarriorPhase2Bis, furyWarriorPhase2Bis, protectionWarriorPhase2Bis]) {
+    // Warriors have no Relic slot in TBC, so only the other 17 slots are expected to be ranked.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Warrior ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
   }
 })
@@ -363,4 +406,25 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated healing/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Warrior specs hide the Relic slot and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Warrior')
+  await page.getByLabel('Specialization').selectOption('Arms')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Arms Warrior Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Protection')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Protection Warrior Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(1)
+
+  await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Destroyer Chestguard' })
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/Survivability Score/i)).toBeVisible()
 })
