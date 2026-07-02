@@ -19,6 +19,9 @@ const paladinIllegalWeaponTypes: readonly WeaponType[] = ['Dagger', 'Fist Weapon
 // Priests can use Daggers, Maces, Staves, and Wands; everything else is illegal for any Priest spec.
 const priestIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Sword', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Totem', 'Libram', 'Idol']
 
+// Druids can use Daggers, Maces, Staves, and Fist Weapons; everything else is illegal for any Druid spec.
+const druidIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Sword', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Wand', 'Totem', 'Libram']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -45,6 +48,11 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
   }
 
   if (className === 'Priest' && item.weaponType && priestIllegalWeaponTypes.includes(item.weaponType)) return false
+
+  if (className === 'Druid') {
+    if (item.weaponType && druidIllegalWeaponTypes.includes(item.weaponType)) return false
+    if (item.slot === 'Relic' && item.weaponType && item.weaponType !== 'Idol') return false
+  }
 
   return true
 }

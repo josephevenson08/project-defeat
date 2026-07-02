@@ -1,14 +1,17 @@
 import { expect, test } from '@playwright/test'
 import {
   armsWarriorPhase2Bis,
+  balanceDruidPhase2Bis,
   disciplinePriestPhase2Bis,
   elementalShamanPhase2Bis,
   enhancementShamanPhase2Bis,
+  feralDruidPhase2Bis,
   furyWarriorPhase2Bis,
   holyPaladinPhase2Bis,
   holyPriestPhase2Bis,
   protectionPaladinPhase2Bis,
   protectionWarriorPhase2Bis,
+  restorationDruidPhase2Bis,
   restorationShamanPhase2Bis,
   retributionPaladinPhase2Bis,
   shadowPriestPhase2Bis,
@@ -542,5 +545,57 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Balance, Feral, and Restoration Druid Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [balanceDruidPhase2Bis, feralDruidPhase2Bis, restorationDruidPhase2Bis]) {
+    // Druid has a Relic (Idol) slot but no Ranged slot (they share the same physical slot in TBC).
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Ranged')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Druid ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  // Druid is only legal for Night Elf (Alliance) and Tauren (Horde); pick Night Elf before Class so it's offered.
+  await page.getByLabel('Race').selectOption('Night Elf')
+  await page.getByLabel('Class').selectOption('Druid')
+  await page.getByLabel('Specialization').selectOption('Balance')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
+  await expect(page.getByText('Balance Druid Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Feral')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
+  await expect(page.getByText('Feral Druid (Cat DPS) Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Restoration')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
+  await expect(page.getByText('Restoration Druid Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated healing/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })

@@ -1,0 +1,182 @@
+import type { RankedGearEntry, RankedGearSource, BisList } from './bisTypes'
+
+const guideUrl = 'https://www.wowhead.com/tbc/guide/classes/druid/feral/dps-bis-gear-pve-phase-2'
+
+function source(source: RankedGearSource): RankedGearSource {
+  return source
+}
+
+function entry(values: Omit<RankedGearEntry, 'className' | 'spec' | 'phase' | 'sourceUrl'>): RankedGearEntry {
+  return {
+    className: 'Druid',
+    spec: 'Feral',
+    phase: 2,
+    sourceUrl: guideUrl,
+    ...values,
+  }
+}
+
+const verifyNote = 'Starter row; verify exact final ranking/stats against current Wowhead/Icy Veins/wowtbc.gg data before treating as final.'
+
+export const feralDruidPhase2Bis: BisList = {
+  id: 'feral-druid-phase-2-starter',
+  className: 'Druid',
+  spec: 'Feral',
+  phase: 2,
+  title: 'Feral Druid (Cat DPS) Phase 2 Starter Ranked List',
+  sourceName: 'Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows',
+  sourceUrl: guideUrl,
+  entries: [
+    entry({
+      slot: 'Head',
+      rank: 1,
+      itemId: 'wolfshead-helm',
+      notes: "Low-level Leatherworking recipe; the +20 Energy on Cat Form shapeshift (not modeled yet) makes it BiS through most of Phase 2.",
+      sourceName: 'Starter sample',
+      source: source({ type: 'Crafted', craftedBy: 'Leatherworking', phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Neck',
+      rank: 1,
+      itemId: 'telonicus-pendant-of-mayhem',
+      notes: 'Shared physical DPS neck (also an Enhancement Shaman pick).',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'The Eye', boss: 'High Astromancer Solarian', phase: 2 }),
+    }),
+    entry({
+      slot: 'Shoulders',
+      rank: 1,
+      itemId: 'mantle-of-malorne',
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: "Gruul's Lair", boss: 'High King Maulgar', phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Back',
+      rank: 1,
+      itemId: 'thalassian-wildercloak',
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: "Kael'thas Sunstrider", phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Chest',
+      rank: 1,
+      itemId: 'breastplate-of-malorne',
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: "Magtheridon's Lair", boss: 'Magtheridon', phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Wrists',
+      rank: 1,
+      itemId: 'vambraces-of-ending',
+      notes: 'Shared physical DPS wrists.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Karazhan', phase: 1 }),
+    }),
+    entry({
+      slot: 'Hands',
+      rank: 1,
+      itemId: 'gloves-of-the-searing-grip',
+      notes: 'Shared physical DPS/tank hands (also picked by Protection Warrior/Retribution Paladin).',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: "Al'ar", phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Waist',
+      rank: 1,
+      itemId: 'belt-of-one-hundred-deaths',
+      wowItemId: 30106,
+      notes: 'Shared physical DPS belt.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Lady Vashj', phase: 2 }),
+    }),
+    entry({
+      slot: 'Legs',
+      rank: 1,
+      itemId: 'leggings-of-murderous-intent',
+      notes: 'Shared physical DPS legs (also a Fury Warrior pick).',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: "Kael'thas Sunstrider", phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Feet',
+      rank: 1,
+      itemId: 'edgewalker-longboots',
+      notes: 'Shared physical DPS boots.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Karazhan', boss: 'Moroes', phase: 1 }),
+    }),
+    entry({
+      slot: 'Finger 1',
+      rank: 1,
+      itemId: 'ring-of-lethality',
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Hydross the Unstable', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Finger 2',
+      rank: 1,
+      itemId: 'band-of-the-ranger-general',
+      notes: 'Shared physical DPS ring (also an Arms/Fury Warrior pick).',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: "Kael'thas Sunstrider", phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Trinket 1',
+      rank: 1,
+      itemId: 'bloodlust-brooch',
+      wowItemId: 29383,
+      notes: 'Badge of Justice vendor trinket.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Vendor', vendor: "G'eras", phase: 1 }),
+    }),
+    entry({
+      slot: 'Trinket 2',
+      rank: 1,
+      itemId: 'tsunami-talisman',
+      wowItemId: 30627,
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Main Hand',
+      rank: 1,
+      itemId: 'terestians-stranglestaff',
+      notes: 'Weapon damage does not apply in Cat Form; picked for stat budget. Weapon DPS/speed modeling is future work.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Karazhan', boss: 'Terestian Illhoof', phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Off Hand',
+      rank: 1,
+      itemId: 'claw-of-the-phoenix',
+      notes: 'Two-handed main-hand leaves this slot generic pending 2H-exclusivity modeling; not a real Feral recommendation.',
+      sourceName: 'Existing generic filler',
+      source: source({ type: 'Other', phase: 2, notes: 'Placeholder pending 2H weapon exclusivity support.', needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Relic',
+      rank: 1,
+      itemId: 'everbloom-idol',
+      notes: 'Feral Druid relic proof-of-concept row; Badge of Justice vendor item.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Vendor', vendor: "G'eras", phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+  ],
+}
