@@ -305,3 +305,32 @@ test('crafted items show recipe source, required skill, and material farm locati
   await expect(craftingDetails).toContainText('4x Spellcloth')
   await expect(craftingDetails).toContainText('Primal Mana')
 })
+
+test('item quality renders with the standard WoW rarity color', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Headguard' })
+
+  const qualityLabel = page.locator('.gear-row', { has: page.getByLabel('Head', { exact: true }) }).locator('small strong')
+  await expect(qualityLabel).toHaveText('Epic')
+  await expect(qualityLabel).toHaveCSS('color', 'rgb(163, 53, 238)')
+})
+
+test('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
+  await page.goto('/')
+
+  // Default Warrior/Fury is Physical DPS -> amber accent.
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(245, 158, 11)')
+
+  await page.getByLabel('Class').selectOption('Priest')
+  await page.getByLabel('Specialization').selectOption('Holy')
+
+  // Holy Priest is a Healer -> teal accent, and it should carry through to the Stats and Simulator panels too.
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(45, 212, 191)')
+  await expect(page.getByRole('region', { name: 'Stats' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
+  await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
+})

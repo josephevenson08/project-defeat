@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import { getBisListForSpec, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import type { GearSlot } from '../../domain/gear/gearSlots'
+import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getPairedGearSlots, isItemBlockedByUniqueInGear, isPairedGearSlot } from '../../domain/gear/slotCompatibility'
 import { getGemById } from '../../domain/gems/sampleGems'
 import { animateEquipFeedback } from '../../lib/animations'
@@ -118,7 +119,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                         <div className="bis-entry-main">
                           <span className="bis-rank">#{entry.rank}</span>
                           <div>
-                            <h4>{item?.name ?? entry.itemId}</h4>
+                            <h4 style={item ? { color: getQualityColor(item.quality) } : undefined}>{item?.name ?? entry.itemId}</h4>
                             <p>
                               {wowItemId ? `Item ID ${wowItemId}` : 'Item ID pending audit'} · {displayName}
                             </p>

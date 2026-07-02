@@ -1,21 +1,24 @@
 import { useEffect } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
+import type { CharacterRole } from '../../domain/character/characterTypes'
+import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { animateResultCard } from '../../lib/animations'
 import type { SimulationResult } from './simulationTypes'
 
 type SimulatorPanelProps = {
   result: SimulationResult | undefined
+  role: CharacterRole
   onRun: () => void
 }
 
-export function SimulatorPanel({ result, onRun }: SimulatorPanelProps) {
+export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
   useEffect(() => {
     if (result) animateResultCard('.simulation-result')
   }, [result])
 
   return (
-    <Panel title="Simulation" eyebrow="Role-aware prototype">
+    <Panel title="Simulation" eyebrow="Role-aware prototype" accentColor={getRoleAccentColor(role)}>
       <p className="panel-copy">
         Run a deterministic prototype calculation using the current character role, gear, gems, enchants, and stat totals.
         These formulas are intentionally simple placeholders.

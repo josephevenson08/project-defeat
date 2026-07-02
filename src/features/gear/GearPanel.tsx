@@ -1,5 +1,6 @@
 import { Panel } from '../../components/layout/Panel'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
+import { getQualityColor } from '../../domain/gear/qualityColors'
 import { sampleGems } from '../../domain/gems/sampleGems'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
@@ -35,6 +36,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
           const enchants = getEnchantsForSlot(slot, character, equipped.item)
           const slotItems = getItemsForSlotAndCharacter(slot, character.className, character.spec)
           const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
+          const isEquippedItemValid = slotItems.some((option) => option.id === equipped.item.id)
 
           return (
             <div className="gear-row" key={slot}>
@@ -51,7 +53,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
                 >
                   {slotItems.length > 0 ? (
                     slotItems.map((item) => (
-                      <option key={item.id} value={item.id} disabled={isItemBlockedByUniqueInGear(item, slot, gear)}>
+                      <option key={item.id} value={item.id} disabled={isItemBlockedByUniqueInGear(item, slot, gear)} style={{ color: getQualityColor(item.quality) }}>
                         {item.name}
                       </option>
                     ))
@@ -60,11 +62,15 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
                   )}
                 </select>
               </label>
-              <small>
-                {equipped.item.quality} {equipped.item.source} item
-                {equipped.item.phase ? ` · Phase ${equipped.item.phase}` : ''}
-              </small>
-              {equipped.item.crafting && (
+              {isEquippedItemValid ? (
+                <small>
+                  <strong style={{ color: getQualityColor(equipped.item.quality) }}>{equipped.item.quality}</strong> {equipped.item.source} item
+                  {equipped.item.phase ? ` · Phase ${equipped.item.phase}` : ''}
+                </small>
+              ) : (
+                <small className="stale-slot-warning">No valid item currently equipped for this spec.</small>
+              )}
+              {isEquippedItemValid && equipped.item.crafting && (
                 <div className="crafting-details" aria-label={`${displayName} crafting details`}>
                   <p className="crafting-headline">
                     {equipped.item.craftedBy}

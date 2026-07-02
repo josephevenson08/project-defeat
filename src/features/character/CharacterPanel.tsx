@@ -1,5 +1,6 @@
 import { Panel } from '../../components/layout/Panel'
 import { SelectField } from '../../components/ui/SelectField'
+import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { characterClasses, factions, getClassDefinition, getClassesForRace, isClassLegalForRace, racesByFaction, getRoleForSpec } from './characterData'
 import type { CharacterClass, CharacterProfile, CharacterSpec, Faction, Race } from './characterTypes'
 
@@ -38,7 +39,7 @@ export function CharacterPanel({ character, onChange }: CharacterPanelProps) {
   }
 
   return (
-    <Panel title="Character" eyebrow="TBC build setup">
+    <Panel title="Character" eyebrow="TBC build setup" accentColor={getRoleAccentColor(role)}>
       <div className="form-grid">
         <SelectField label="Faction" value={character.faction} values={factions} onChange={handleFactionChange} />
         <SelectField label="Race" value={character.race} values={raceOptions} onChange={handleRaceChange} />

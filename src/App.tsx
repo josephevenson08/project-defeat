@@ -56,8 +56,8 @@ function App() {
       <CharacterPanel character={character} onChange={updateCharacter} />
       <GearPanel character={character} gear={gear} onChange={updateGear} />
       <BisPanel character={character} gear={gear} onEquip={updateGear} />
-      <StatsPanel stats={stats} />
-      <SimulatorPanel result={simulationResult} onRun={runSimulation} />
+      <StatsPanel stats={stats} role={role} />
+      <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
     </AppShell>
   )
 }
