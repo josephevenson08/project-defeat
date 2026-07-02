@@ -57,6 +57,27 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Source and cost planning
 - Better responsive/mobile layout
 
+## Phase 6: In-Game Import (CurseForge Addon)
+
+- Build a companion WoW addon (distributed via CurseForge) that reads the player's live character
+  state in-game: equipped gear, gems, enchants, talents, professions, and known recipes.
+- Addon exports that state to a file (or copyable string/SavedVariables blob) the player can paste
+  or upload into this site.
+- The site parses the export and can then:
+  - Show exactly what's missing versus the current BiS list for the player's spec/phase.
+  - Run the DPS/HPS simulator against the player's actual gear instead of a hand-picked build.
+  - Suggest concrete upgrades with source/farm/crafting detail already in the item database.
+- No backend is required for this if export/import stays client-side (paste a blob, parse in
+  the browser); a small backend only becomes necessary if we want shareable links or account sync.
+
+## Current Data Provenance
+
+Wowhead and WoWSims are the primary research sources for item data, BiS rankings, and simulation
+formulas going forward (per project direction). Wowhead's guide pages are JS-rendered, so item
+stat blocks are currently best-effort approximations cross-checked against static summaries and
+prior knowledge; every approximated value is flagged `needsVerification: true` in the data files
+until it's been checked against an actual Wowhead item tooltip.
+
 ## Current Known Limitations
 
 - Current formulas are useful only as deterministic placeholders.

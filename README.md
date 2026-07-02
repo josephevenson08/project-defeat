@@ -11,10 +11,11 @@ Early MVP / foundation phase.
 ## Current Features
 
 - TBC class/spec selection for all nine TBC classes
-- Faction-aware race selection
+- Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior)
 - Full TBC-style gear slot model
 - Expanded starter gear items for every slot with quality, source, phase, sockets, socket bonuses, stats, and WoW item IDs where currently confident
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
+- Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location
 - Enhancement Shaman Phase 2 starter ranked/BiS data structure as the first reusable guide-style proof of concept
 - Spec-aware starter filtering for Enhancement Shaman gear, relics, and enchants
 - Spec-aware gear slot visibility, including Totem display for Enhancement Shaman
@@ -90,6 +91,8 @@ npx playwright install --with-deps
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.
+- Recipe/material crafting detail exists on a handful of items as a proof of concept; most crafted items still need it filled in as each class's gear gets audited.
+- Gem and enchant coverage still has real gaps (no tank meta gem, no leg/shoulder/cloak enchants yet).
 
 ## Roadmap
 

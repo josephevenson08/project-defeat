@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { enhancementShamanPhase2Bis } from '../src/domain/bis'
+import { factions } from '../src/domain/character/races'
+import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
+import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
@@ -183,14 +186,14 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
 
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expect(page.getByText('Enhancement Shaman Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Wrists' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'True-Aim Stalker Bands' })).toBeVisible()
-  await expect(page.getByText(/Item ID 30091/i)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Cataclysm Headguard' })).toBeVisible()
+  await expect(page.getByText(/Item ID 30190/i)).toBeVisible()
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
-  await page.getByRole('button', { name: /Equip True-Aim Stalker Bands/i }).click()
+  await page.getByRole('button', { name: /Equip Cataclysm Headguard/i }).click()
 
-  await expect(page.getByLabel('Wrists', { exact: true })).toHaveValue('true-aim-stalker-bands')
+  await expect(page.getByLabel('Head', { exact: true })).toHaveValue('cataclysm-helm')
   await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
@@ -252,4 +255,82 @@ test('paired ring and trinket slots share compatible options and block duplicate
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('every class has a legal race in both factions, and every race maps back to its classes', async () => {
+  for (const { className } of tbcClasses) {
+    for (const faction of factions) {
+      expect(getRacesForClassAndFaction(className, faction).length, `${className} should have a legal race in ${faction}`).toBeGreaterThan(0)
+    }
+  }
+
+  for (const [className, races] of Object.entries(racesByClass)) {
+    for (const race of races) {
+      expect(getClassesForRace(race), `${race} should list ${className} as playable`).toContain(className)
+    }
+  }
+})
+
+test('race/class selection enforces real TBC legality in the UI', async ({ page }) => {
+  await page.goto('/')
+
+  // Default is Alliance/Human; Human cannot be a Shaman, so Shaman should not be a selectable class yet.
+  await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(0)
+
+  await page.getByLabel('Race').selectOption('Draenei')
+  await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(1)
+
+  await page.getByLabel('Class').selectOption('Shaman')
+  await expect(page.getByLabel('Specialization')).toHaveValue('Elemental')
+
+  // Switching faction should keep the class legal by picking a valid race for it (Draenei -> Horde has no Draenei,
+  // so it should land on a Horde race that can still be a Shaman: Orc, Tauren, or Troll).
+  await page.getByLabel('Faction').selectOption('Horde')
+  await expect(page.getByLabel('Race')).toHaveValue(/Orc|Tauren|Troll/)
+  await expect(page.getByLabel('Class')).toHaveValue('Shaman')
+  await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
+})
+
+test('crafted items show recipe source, required skill, and material farm locations', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Mage')
+  await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Spellfire Training Robe' })
+
+  const craftingDetails = page.getByLabel('Chest crafting details')
+  await expect(craftingDetails).toContainText('Tailoring')
+  await expect(craftingDetails).toContainText('350 skill')
+  await expect(craftingDetails).toContainText('Spellfire Tailoring')
+  await expect(craftingDetails).toContainText('Gidge Spellweave')
+  await expect(craftingDetails).toContainText('4x Spellcloth')
+  await expect(craftingDetails).toContainText('Primal Mana')
+})
+
+test('item quality renders with the standard WoW rarity color', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Headguard' })
+
+  const qualityLabel = page.locator('.gear-row', { has: page.getByLabel('Head', { exact: true }) }).locator('small strong')
+  await expect(qualityLabel).toHaveText('Epic')
+  await expect(qualityLabel).toHaveCSS('color', 'rgb(163, 53, 238)')
+})
+
+test('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
+  await page.goto('/')
+
+  // Default Warrior/Fury is Physical DPS -> amber accent.
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(245, 158, 11)')
+
+  await page.getByLabel('Class').selectOption('Priest')
+  await page.getByLabel('Specialization').selectOption('Holy')
+
+  // Holy Priest is a Healer -> teal accent, and it should carry through to the Stats and Simulator panels too.
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(45, 212, 191)')
+  await expect(page.getByRole('region', { name: 'Stats' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
+  await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
 })
