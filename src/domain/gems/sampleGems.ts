@@ -9,6 +9,14 @@ export const sampleGems: readonly Gem[] = [
   { id: 'solid-star-of-elune', name: 'Solid Star of Elune', color: 'Blue', quality: 'Rare', stats: { stamina: 12 } },
   { id: 'royal-nightseye', name: 'Royal Nightseye', color: 'Blue', quality: 'Rare', stats: { healingPower: 9, mp5: 2 } },
   { id: 'relentless-earthstorm-diamond', name: 'Relentless Earthstorm Diamond', color: 'Meta', quality: 'Epic', stats: { agility: 12, critRating: 6 }, uniqueEquipped: true },
+  {
+    id: 'insightful-earthstorm-diamond',
+    name: 'Insightful Earthstorm Diamond',
+    color: 'Meta',
+    quality: 'Epic',
+    stats: { intellect: 16 },
+    uniqueEquipped: true,
+  },
 ]
 
 export function getGemById(id: string) {

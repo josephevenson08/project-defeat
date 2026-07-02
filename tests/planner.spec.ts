@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { enhancementShamanPhase2Bis } from '../src/domain/bis'
+import { elementalShamanPhase2Bis, enhancementShamanPhase2Bis, restorationShamanPhase2Bis } from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import { tbcClasses } from '../src/domain/character/tbcClasses'
@@ -333,4 +333,34 @@ test('character role sets a distinct accent color across Character, Stats, and S
   await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(45, 212, 191)')
   await expect(page.getByRole('region', { name: 'Stats' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
   await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
+})
+
+test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatment and their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByLabel('Class').selectOption('Shaman')
+  await page.getByLabel('Specialization').selectOption('Elemental')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
+  await expect(page.getByText('Elemental Shaman Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus-Key' })).toHaveCount(1)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+
+  await page.getByLabel('Specialization').selectOption('Restoration')
+
+  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
+  await expect(page.getByText('Restoration Shaman Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(0)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated healing/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
