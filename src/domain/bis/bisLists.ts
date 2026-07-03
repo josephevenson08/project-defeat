@@ -23,6 +23,9 @@ import { frostMagePhase2Bis } from './frostMagePhase2'
 import { assassinationRoguePhase2Bis } from './assassinationRoguePhase2'
 import { combatRoguePhase2Bis } from './combatRoguePhase2'
 import { subtletyRoguePhase2Bis } from './subtletyRoguePhase2'
+import { afflictionWarlockPhase2Bis } from './afflictionWarlockPhase2'
+import { demonologyWarlockPhase2Bis } from './demonologyWarlockPhase2'
+import { destructionWarlockPhase2Bis } from './destructionWarlockPhase2'
 
 export const bisLists = [
   enhancementShamanPhase2Bis,
@@ -49,6 +52,9 @@ export const bisLists = [
   assassinationRoguePhase2Bis,
   combatRoguePhase2Bis,
   subtletyRoguePhase2Bis,
+  afflictionWarlockPhase2Bis,
+  demonologyWarlockPhase2Bis,
+  destructionWarlockPhase2Bis,
 ] as const
 
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {

@@ -76,7 +76,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
       <Panel title="BiS / Ranked Gear" eyebrow="Guide list" className="bis-panel-shell">
         <div className="bis-empty" data-testid="bis-empty-state">
           <strong>No ranked list yet for {character.spec} {character.className}.</strong>
-          <p>Shaman, Warrior, Paladin, Priest, Druid, Hunter, Mage, and Rogue have a Phase 2 starter ranked list for every spec so far. More classes plug into this same panel as they are audited.</p>
+          <p>Every class and spec has a Phase 2 starter ranked list. Later phases plug into this same panel as they are audited.</p>
         </div>
       </Panel>
     )

@@ -29,6 +29,9 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Add legality checks for class, weapon, relic, and profession restrictions
 - Expand spec-aware recommendation filters beyond the Enhancement Shaman starter rules
 - Expand spec-aware slot labels and hidden-slot rules beyond the Enhancement Shaman Totem/Ranged treatment
+- Phase 2 starter BiS, weapon-legality rules, and spec-aware slot visibility now cover all nine
+  classes and all 27 specs; remaining Phase 2 work is reconciling `needsVerification` items against
+  real Wowhead tooltips and closing gem/enchant coverage gaps (tank meta gem, leg/shoulder/cloak enchants)
 
 ## Phase 3: Character Systems
 

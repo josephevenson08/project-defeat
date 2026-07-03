@@ -1,18 +1,22 @@
 import { expect, test } from '@playwright/test'
 import {
+  afflictionWarlockPhase2Bis,
   arcaneMagePhase2Bis,
   armsWarriorPhase2Bis,
   assassinationRoguePhase2Bis,
   balanceDruidPhase2Bis,
   beastMasteryHunterPhase2Bis,
   combatRoguePhase2Bis,
+  demonologyWarlockPhase2Bis,
   disciplinePriestPhase2Bis,
+  destructionWarlockPhase2Bis,
   elementalShamanPhase2Bis,
   enhancementShamanPhase2Bis,
   feralDruidPhase2Bis,
   fireMagePhase2Bis,
   frostMagePhase2Bis,
   furyWarriorPhase2Bis,
+  getBisListForSpec,
   holyPaladinPhase2Bis,
   holyPriestPhase2Bis,
   marksmanshipHunterPhase2Bis,
@@ -215,11 +219,6 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
-
-  // Fury Warrior (the default character) and the other audited classes now have real BiS lists, so
-  // check the empty state against a spec that hasn't been audited yet instead (Warlock still pending).
-  await page.getByLabel('Class').selectOption('Warlock')
-  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Affliction Warlock/i)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByLabel('Race').selectOption('Troll')
@@ -697,6 +696,15 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
+test('every class and spec now resolves to a Phase 2 BiS list', async () => {
+  for (const { className, specs } of tbcClasses) {
+    for (const spec of specs) {
+      const bisList = getBisListForSpec(className, spec)
+      expect(bisList, `missing a Phase 2 BiS list for ${spec} ${className}`).toBeTruthy()
+    }
+  }
+})
+
 test('Assassination, Combat, and Subtlety Rogue Phase 2 starter rankings resolve to catalog items', async () => {
   for (const bisList of [assassinationRoguePhase2Bis, combatRoguePhase2Bis, subtletyRoguePhase2Bis]) {
     // Rogue has no Relic slot (only Shaman/Paladin/Druid do); every spec dual-wields into Off Hand.
@@ -738,6 +746,52 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
   await expect(page.getByText('Subtlety Rogue Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Affliction, Demonology, and Destruction Warlock Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [afflictionWarlockPhase2Bis, demonologyWarlockPhase2Bis, destructionWarlockPhase2Bis]) {
+    // Warlock has no Relic slot (only Shaman/Paladin/Druid do); Ranged holds a wand.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Warlock ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Warlock')
+  await page.getByLabel('Specialization').selectOption('Affliction')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Affliction Warlock Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of the Leviathan' })).toHaveCount(1)
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Fathomstone' })).toHaveCount(1)
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Demonology')
+  await expect(page.getByText('Demonology Warlock Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Destruction')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Destruction Warlock Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Voidheart Cover' })).toBeVisible()
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()

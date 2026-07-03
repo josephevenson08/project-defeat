@@ -33,6 +33,9 @@ const mageIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weap
 // gate needed), plus Bows/Guns/Crossbows/Thrown for Ranged; no Axes, Polearms, Staves, Wands, or Shields.
 const rogueIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Polearm', 'Staff', 'Wand', 'Shield', 'Held In Off-hand', 'Totem', 'Libram', 'Idol']
 
+// Warlocks can use Daggers, Swords, Staves, and Wands; everything else is illegal for any Warlock spec.
+const warlockIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Shield', 'Totem', 'Libram', 'Idol']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -70,6 +73,8 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
   if (className === 'Mage' && item.weaponType && mageIllegalWeaponTypes.includes(item.weaponType)) return false
 
   if (className === 'Rogue' && item.weaponType && rogueIllegalWeaponTypes.includes(item.weaponType)) return false
+
+  if (className === 'Warlock' && item.weaponType && warlockIllegalWeaponTypes.includes(item.weaponType)) return false
 
   return true
 }
