@@ -51,6 +51,7 @@ export const holyPaladinPhase2Bis: BisList = {
       slot: 'Shoulders',
       rank: 1,
       itemId: 'crystalforge-pauldrons',
+      recommendedEnchantId: 'inscription-of-faith',
       notes: 'Tier 5 Holy set piece.',
       sourceName: 'Starter sample',
       source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'Void Reaver', phase: 2, needsVerification: true }),

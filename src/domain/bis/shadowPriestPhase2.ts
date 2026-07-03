@@ -49,6 +49,7 @@ export const shadowPriestPhase2Bis: BisList = {
       slot: 'Shoulders',
       rank: 1,
       itemId: 'frozen-shadoweave-shoulders',
+      recommendedEnchantId: 'inscription-of-discipline',
       notes: 'Crafted Shadoweave Tailoring shoulders.',
       sourceName: 'Starter sample',
       source: source({ type: 'Crafted', craftedBy: 'Tailoring', phase: 2, needsVerification: true }),

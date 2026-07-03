@@ -15,6 +15,7 @@ import {
   feralDruidPhase2Bis,
   fireMagePhase2Bis,
   frostMagePhase2Bis,
+  bisLists,
   furyWarriorPhase2Bis,
   getBisListForSpec,
   holyPaladinPhase2Bis,
@@ -32,9 +33,11 @@ import {
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import { tbcClasses } from '../src/domain/character/tbcClasses'
+import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
+import { getGemById } from '../src/domain/gems/sampleGems'
 
 function readStatValue(text: string) {
   const match = text.match(/-?\d+/)
@@ -702,6 +705,28 @@ test('every class and spec now resolves to a Phase 2 BiS list', async () => {
       const bisList = getBisListForSpec(className, spec)
       expect(bisList, `missing a Phase 2 BiS list for ${spec} ${className}`).toBeTruthy()
     }
+  }
+})
+
+test('every recommended gem and enchant across all BiS lists resolves to a real catalog entry', async () => {
+  for (const bisList of bisLists) {
+    for (const entry of bisList.entries) {
+      for (const gemId of entry.recommendedGemIds ?? []) {
+        expect(getGemById(gemId), `${gemId} recommended by ${bisList.id}/${entry.slot} should exist in sampleGems`).toBeTruthy()
+      }
+      if (entry.recommendedEnchantId) {
+        expect(getEnchantById(entry.recommendedEnchantId), `${entry.recommendedEnchantId} recommended by ${bisList.id}/${entry.slot} should exist in sampleEnchants`).toBeTruthy()
+      }
+    }
+  }
+})
+
+test('Tank BiS lists recommend a Meta-colored gem for their Head Meta socket', async () => {
+  for (const bisList of [protectionPaladinPhase2Bis, protectionWarriorPhase2Bis]) {
+    const headEntry = bisList.entries.find((entry) => entry.slot === 'Head')
+    const metaGemId = headEntry?.recommendedGemIds?.[0]
+    const metaGem = metaGemId ? getGemById(metaGemId) : undefined
+    expect(metaGem?.color, `${bisList.id} Head gem recommendation should be Meta-colored`).toBe('Meta')
   }
 })
 

@@ -52,6 +52,7 @@ export const restorationShamanPhase2Bis: BisList = {
       slot: 'Shoulders',
       rank: 1,
       itemId: 'cataclysm-shoulderplates',
+      recommendedEnchantId: 'inscription-of-faith',
       wowItemId: 30194,
       notes: 'Tier 5 package row; shared hybrid itemization across all three Shaman specs.',
       sourceName: 'Starter sample',

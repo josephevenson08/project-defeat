@@ -30,8 +30,9 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Expand spec-aware recommendation filters beyond the Enhancement Shaman starter rules
 - Expand spec-aware slot labels and hidden-slot rules beyond the Enhancement Shaman Totem/Ranged treatment
 - Phase 2 starter BiS, weapon-legality rules, and spec-aware slot visibility now cover all nine
-  classes and all 27 specs; remaining Phase 2 work is reconciling `needsVerification` items against
-  real Wowhead tooltips and closing gem/enchant coverage gaps (tank meta gem, leg/shoulder/cloak enchants)
+  classes and all 27 specs, including a tank meta gem, a healer meta gem, a caster meta gem, and
+  Shoulder/Back/Leg enchants for every role that historically had one in Phase 1/2 TBC; remaining
+  Phase 2 work is reconciling `needsVerification` items against real Wowhead tooltips
 
 ## Phase 3: Character Systems
 

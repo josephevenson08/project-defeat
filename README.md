@@ -91,7 +91,7 @@ npx playwright install --with-deps
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.
 - Recipe/material crafting detail exists on a handful of items as a proof of concept; most crafted items still need it filled in as each class's gear gets audited.
-- Gem and enchant coverage still has real gaps (no tank meta gem, no leg/shoulder/cloak enchants yet).
+- Tank/healer/caster meta gems and Shoulder/Back/Leg enchants are now covered for every role that had real Phase 1/2 TBC options (casters/healers historically had no cloak or leg armor enchant this early, so those are intentionally absent rather than missing); exact values are still `needsVerification` pending final tooltip audits.
 
 ## Roadmap
 
