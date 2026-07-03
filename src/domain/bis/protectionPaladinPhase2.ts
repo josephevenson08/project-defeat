@@ -156,9 +156,8 @@ export const protectionPaladinPhase2Bis: BisList = {
     entry({
       slot: 'Main Hand',
       rank: 1,
-      itemId: 'fang-of-the-leviathan',
-      recommendedEnchantId: 'major-agility-weapon',
-      notes: 'Weapon DPS/speed modeling is future work.',
+      itemId: 'justicars-warblade',
+      notes: "Weapon DPS/speed modeling is future work. No tank weapon enchant is modeled yet, so none is recommended here.",
       sourceName: 'Starter sample',
       source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Leotheras the Blind', phase: 2, needsVerification: true }),
       needsVerification: true,

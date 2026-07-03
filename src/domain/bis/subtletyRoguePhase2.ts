@@ -1,0 +1,190 @@
+import type { RankedGearEntry, RankedGearSource, BisList } from './bisTypes'
+
+const guideUrl = 'https://www.wowhead.com/tbc/guide/classes/rogue/dps-bis-gear-pve-phase-2'
+
+function source(source: RankedGearSource): RankedGearSource {
+  return source
+}
+
+function entry(values: Omit<RankedGearEntry, 'className' | 'spec' | 'phase' | 'sourceUrl'>): RankedGearEntry {
+  return {
+    className: 'Rogue',
+    spec: 'Subtlety',
+    phase: 2,
+    sourceUrl: guideUrl,
+    ...values,
+  }
+}
+
+const limitedCoverageNote =
+  'Subtlety had limited dedicated PvE guide coverage in Phase 2 TBC (it leaned more PvP/hybrid at this point); this list mirrors the Combat gearing pattern rather than a Subtlety-specific analysis, and should be treated as lower-confidence until independently audited.'
+const verifyNote = 'Starter row; verify exact final ranking/stats against current Wowhead/Icy Veins/wowtbc.gg data before treating as final.'
+
+export const subtletyRoguePhase2Bis: BisList = {
+  id: 'subtlety-rogue-phase-2-starter',
+  className: 'Rogue',
+  spec: 'Subtlety',
+  phase: 2,
+  title: 'Subtlety Rogue Phase 2 Starter Ranked List',
+  sourceName: 'Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows',
+  sourceUrl: guideUrl,
+  entries: [
+    entry({
+      slot: 'Head',
+      rank: 1,
+      itemId: 'deathmantle-helm',
+      recommendedGemIds: ['relentless-earthstorm-diamond', 'delicate-living-ruby'],
+      notes: `Tier 5 Rogue set piece; shared by all three specs. ${limitedCoverageNote}`,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Lady Vashj', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Neck',
+      rank: 1,
+      itemId: 'choker-of-vile-intent',
+      notes: 'Badge of Justice vendor neck.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Vendor', vendor: "G'eras", phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Shoulders',
+      rank: 1,
+      itemId: 'deathmantle-shoulderpads',
+      notes: 'Tier 5 Rogue set piece.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'Void Reaver', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Back',
+      rank: 1,
+      itemId: 'drape-of-the-dark-reavers',
+      wowItemId: 28672,
+      notes: 'Shared physical DPS cloak.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Karazhan', boss: 'Shade of Aran', phase: 1 }),
+    }),
+    entry({
+      slot: 'Chest',
+      rank: 1,
+      itemId: 'bloodsea-brigands-vest',
+      notes: verifyNote,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Fathom-Lord Karathress', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Wrists',
+      rank: 1,
+      itemId: 'vambraces-of-ending',
+      wowItemId: 28514,
+      notes: 'Shared physical DPS wrists.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'High Astromancer Solarian', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Hands',
+      rank: 1,
+      itemId: 'deathmantle-handguards',
+      notes: 'Tier 5 Rogue set piece.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Leotheras the Blind', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Waist',
+      rank: 1,
+      itemId: 'belt-of-one-hundred-deaths',
+      wowItemId: 30106,
+      notes: 'Shared physical DPS belt.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Lady Vashj', phase: 2 }),
+    }),
+    entry({
+      slot: 'Legs',
+      rank: 1,
+      itemId: 'deathmantle-legguards',
+      notes: 'Tier 5 Rogue set piece.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Fathom-Lord Karathress', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Feet',
+      rank: 1,
+      itemId: 'edgewalker-longboots',
+      wowItemId: 28545,
+      notes: 'Shared physical DPS boots.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Karazhan', boss: 'Moroes', phase: 1 }),
+    }),
+    entry({
+      slot: 'Finger 1',
+      rank: 1,
+      itemId: 'band-of-the-ranger-general',
+      notes: 'Shared physical DPS ring.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: "Kael'thas Sunstrider", phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Finger 2',
+      rank: 1,
+      itemId: 'ring-of-lethality',
+      notes: 'Shared physical DPS ring.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Hydross the Unstable', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Trinket 1',
+      rank: 1,
+      itemId: 'dragonspine-trophy',
+      wowItemId: 28830,
+      notes: 'Shared physical DPS trinket.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: "Gruul's Lair", boss: 'Gruul the Dragonkiller', phase: 1 }),
+    }),
+    entry({
+      slot: 'Trinket 2',
+      rank: 1,
+      itemId: 'warp-spring-coil',
+      notes: 'On-use haste proc is not modeled yet.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'Void Reaver', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Main Hand',
+      rank: 1,
+      itemId: 'warp-slicer',
+      recommendedEnchantId: 'mongoose-main-hand',
+      notes: `Shared weapon with Combat. ${limitedCoverageNote}`,
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'Void Reaver', phase: 2, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Off Hand',
+      rank: 1,
+      itemId: 'latros-shifting-sword',
+      recommendedEnchantId: 'mongoose-main-hand',
+      notes: 'Full dual-wield off-hand (no talent gate needed for Rogue). Weapon DPS/speed modeling is future work.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Heroic Dungeon', instance: 'The Black Morass', boss: 'Aeonus', phase: 1, needsVerification: true }),
+      needsVerification: true,
+    }),
+    entry({
+      slot: 'Ranged',
+      rank: 1,
+      itemId: 'arcanite-steam-pistol',
+      wowItemId: 29949,
+      notes: 'Shared physical DPS ranged filler.',
+      sourceName: 'Starter sample',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', phase: 2 }),
+    }),
+  ],
+}

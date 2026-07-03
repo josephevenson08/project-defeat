@@ -22,6 +22,17 @@ const priestIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Sword', 'Fist W
 // Druids can use Daggers, Maces, Staves, and Fist Weapons; everything else is illegal for any Druid spec.
 const druidIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Sword', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Wand', 'Totem', 'Libram']
 
+// Hunters can use Axes, Daggers, Fist Weapons, Swords, Polearms, and Staves for melee, plus Bows/Guns/
+// Crossbows/Thrown for Ranged; no Maces, Wands, Shields, or caster off-hand items.
+const hunterIllegalWeaponTypes: readonly WeaponType[] = ['Mace', 'Wand', 'Shield', 'Held In Off-hand', 'Totem', 'Libram', 'Idol']
+
+// Mages can use Daggers, Swords, Staves, and Wands; everything else is illegal for any Mage spec.
+const mageIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Shield', 'Totem', 'Libram', 'Idol']
+
+// Rogues can use Daggers, Fist Weapons, Swords, and Maces for melee (full dual-wield, no talent
+// gate needed), plus Bows/Guns/Crossbows/Thrown for Ranged; no Axes, Polearms, Staves, Wands, or Shields.
+const rogueIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Polearm', 'Staff', 'Wand', 'Shield', 'Held In Off-hand', 'Totem', 'Libram', 'Idol']
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -53,6 +64,12 @@ export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, s
     if (item.weaponType && druidIllegalWeaponTypes.includes(item.weaponType)) return false
     if (item.slot === 'Relic' && item.weaponType && item.weaponType !== 'Idol') return false
   }
+
+  if (className === 'Hunter' && item.weaponType && hunterIllegalWeaponTypes.includes(item.weaponType)) return false
+
+  if (className === 'Mage' && item.weaponType && mageIllegalWeaponTypes.includes(item.weaponType)) return false
+
+  if (className === 'Rogue' && item.weaponType && rogueIllegalWeaponTypes.includes(item.weaponType)) return false
 
   return true
 }

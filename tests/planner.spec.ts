@@ -1,20 +1,29 @@
 import { expect, test } from '@playwright/test'
 import {
+  arcaneMagePhase2Bis,
   armsWarriorPhase2Bis,
+  assassinationRoguePhase2Bis,
   balanceDruidPhase2Bis,
+  beastMasteryHunterPhase2Bis,
+  combatRoguePhase2Bis,
   disciplinePriestPhase2Bis,
   elementalShamanPhase2Bis,
   enhancementShamanPhase2Bis,
   feralDruidPhase2Bis,
+  fireMagePhase2Bis,
+  frostMagePhase2Bis,
   furyWarriorPhase2Bis,
   holyPaladinPhase2Bis,
   holyPriestPhase2Bis,
+  marksmanshipHunterPhase2Bis,
   protectionPaladinPhase2Bis,
   protectionWarriorPhase2Bis,
   restorationDruidPhase2Bis,
   restorationShamanPhase2Bis,
   retributionPaladinPhase2Bis,
   shadowPriestPhase2Bis,
+  subtletyRoguePhase2Bis,
+  survivalHunterPhase2Bis,
 } from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
@@ -207,10 +216,10 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
 
-  // Fury Warrior (the default character) now has a real BiS list, so check the empty state
-  // against a spec that hasn't been audited yet instead.
-  await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Arcane Mage/i)
+  // Fury Warrior (the default character) and the other audited classes now have real BiS lists, so
+  // check the empty state against a spec that hasn't been audited yet instead (Warlock still pending).
+  await page.getByLabel('Class').selectOption('Warlock')
+  await expect(page.getByTestId('bis-empty-state')).toContainText(/No ranked list yet for Affliction Warlock/i)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByLabel('Race').selectOption('Troll')
@@ -597,5 +606,140 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated healing/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Beast Mastery, Marksmanship, and Survival Hunter Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [beastMasteryHunterPhase2Bis, marksmanshipHunterPhase2Bis, survivalHunterPhase2Bis]) {
+    // Hunter has no Relic slot (only Shaman/Paladin/Druid do); Ranged is the primary damage slot.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Hunter ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  // Hunter is not legal for the default Human race; pick Dwarf first so Hunter is offered.
+  await page.getByLabel('Race').selectOption('Dwarf')
+  await page.getByLabel('Class').selectOption('Hunter')
+  await page.getByLabel('Specialization').selectOption('Beast Mastery')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Beast Mastery Hunter Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Marksmanship')
+  await expect(page.getByText('Marksmanship Hunter Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Survival')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Survival Hunter Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Hands', { exact: true }).locator('option', { hasText: 'Gloves of Dexterous Manipulation' })).toHaveCount(1)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Arcane, Fire, and Frost Mage Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [arcaneMagePhase2Bis, fireMagePhase2Bis, frostMagePhase2Bis]) {
+    // Mage has no Relic slot in TBC (only Shaman/Paladin/Druid do); Ranged holds a wand.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Mage ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Mage')
+  await page.getByLabel('Specialization').selectOption('Arcane')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Arcane Mage Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Fire')
+  await expect(page.getByText('Fire Mage Phase 2 Starter Ranked List')).toBeVisible()
+
+  await page.getByLabel('Specialization').selectOption('Frost')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Frost Mage Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+})
+
+test('Assassination, Combat, and Subtlety Rogue Phase 2 starter rankings resolve to catalog items', async () => {
+  for (const bisList of [assassinationRoguePhase2Bis, combatRoguePhase2Bis, subtletyRoguePhase2Bis]) {
+    // Rogue has no Relic slot (only Shaman/Paladin/Druid do); every spec dual-wields into Off Hand.
+    const expectedSlots = gearSlots.filter((slot) => slot !== 'Relic')
+    const rankedSlots = new Set(bisList.entries.map((entry) => entry.slot))
+
+    for (const slot of expectedSlots) {
+      expect(rankedSlots.has(slot), `missing ${bisList.spec} Rogue ranking for ${slot}`).toBe(true)
+    }
+
+    for (const entry of bisList.entries) {
+      const item = getItemById(entry.itemId)
+      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
+      if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
+    }
+  }
+})
+
+test('Rogue specs hide the Relic slot, support full dual-wield, and each get their own BiS list', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Rogue')
+  await page.getByLabel('Specialization').selectOption('Assassination')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Assassination Rogue Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of Vashj' })).toHaveCount(1)
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Heartrazor' })).toHaveCount(1)
+  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Combat')
+  await expect(page.getByText('Combat Rogue Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Warp Slicer' })).toHaveCount(1)
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+
+  await page.getByLabel('Specialization').selectOption('Subtlety')
+
+  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Subtlety Rogue Phase 2 Starter Ranked List')).toBeVisible()
+  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })

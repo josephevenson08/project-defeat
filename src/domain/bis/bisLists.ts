@@ -14,6 +14,15 @@ import { shadowPriestPhase2Bis } from './shadowPriestPhase2'
 import { balanceDruidPhase2Bis } from './balanceDruidPhase2'
 import { feralDruidPhase2Bis } from './feralDruidPhase2'
 import { restorationDruidPhase2Bis } from './restorationDruidPhase2'
+import { beastMasteryHunterPhase2Bis } from './beastMasteryHunterPhase2'
+import { marksmanshipHunterPhase2Bis } from './marksmanshipHunterPhase2'
+import { survivalHunterPhase2Bis } from './survivalHunterPhase2'
+import { arcaneMagePhase2Bis } from './arcaneMagePhase2'
+import { fireMagePhase2Bis } from './fireMagePhase2'
+import { frostMagePhase2Bis } from './frostMagePhase2'
+import { assassinationRoguePhase2Bis } from './assassinationRoguePhase2'
+import { combatRoguePhase2Bis } from './combatRoguePhase2'
+import { subtletyRoguePhase2Bis } from './subtletyRoguePhase2'
 
 export const bisLists = [
   enhancementShamanPhase2Bis,
@@ -31,6 +40,15 @@ export const bisLists = [
   balanceDruidPhase2Bis,
   feralDruidPhase2Bis,
   restorationDruidPhase2Bis,
+  beastMasteryHunterPhase2Bis,
+  marksmanshipHunterPhase2Bis,
+  survivalHunterPhase2Bis,
+  arcaneMagePhase2Bis,
+  fireMagePhase2Bis,
+  frostMagePhase2Bis,
+  assassinationRoguePhase2Bis,
+  combatRoguePhase2Bis,
+  subtletyRoguePhase2Bis,
 ] as const
 
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {
