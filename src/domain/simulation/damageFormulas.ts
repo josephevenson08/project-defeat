@@ -23,6 +23,12 @@ export function attackPowerToWhiteDps(attackPower: number) {
   return attackPower / AP_PER_DPS
 }
 
+/** Weapon-die contribution to white DPS: (avg damage) / speed. Speed-normalized, so this is additive with attackPowerToWhiteDps. */
+export function weaponDiceToWhiteDps(weaponDamageMin: number | undefined, weaponDamageMax: number | undefined, weaponSpeed: number | undefined) {
+  if (!weaponDamageMin || !weaponDamageMax || !weaponSpeed) return 0
+  return (weaponDamageMin + weaponDamageMax) / 2 / weaponSpeed
+}
+
 export function directSpellCoefficient(castTimeSeconds: number) {
   const effectiveCastTime = castTimeSeconds <= 0 ? SPELL_COEFFICIENT_INSTANT_BASELINE : castTimeSeconds
   return effectiveCastTime / SPELL_COEFFICIENT_BASE_CAST_TIME

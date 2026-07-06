@@ -65,10 +65,15 @@ unstarted.
 The simulator now uses real TBC attack-table/spell-table mechanics (`src/domain/simulation/`) —
 sourced miss/dodge/parry/glance/block/crit tables, rating-to-percent conversions, spell hit/crit,
 and armor mitigation — instead of flat stat-times-coefficient placeholders, and factors in a target
-model that active target debuffs actually modify. What's still missing: per-spell/per-ability
-rotation modeling (each role currently estimates from a generic filler-cast/white-damage assumption,
-not real rotation priority or cooldowns), per-weapon damage/speed data (white damage is AP-driven
-only), configurable encounter settings, multi-iteration variance, and result charts.
+model that active target debuffs actually modify (including a spell-crit-taken debuff, e.g. Winter's
+Chill). White-damage now also includes real per-weapon damage/speed dice (`GearItem.weaponSpeed` /
+`weaponDamageMin` / `weaponDamageMax`) for every weapon in the catalog, not just attack power — a
+handful of items have real Wowhead-sourced values, the rest are stat-budget-matched representative
+estimates flagged `needsVerification` (the catalog is largely non-canonical sample/placeholder gear,
+so most weapons don't have a real tooltip to source from in the first place). What's still missing:
+per-spell/per-ability rotation modeling (each role still estimates from a generic filler-cast
+assumption, not real rotation priority or cooldowns), configurable encounter settings, multi-iteration
+variance, and result charts.
 
 ## Phase 5: Planner Workflows
 
@@ -104,6 +109,8 @@ until it's been checked against an actual Wowhead item tooltip.
 
 - Simulation formulas use real TBC attack-table/spell-table mechanics, but still assume a generic
   filler cast/white-damage baseline rather than per-spell rotation modeling — see Phase 4 above.
-- Current item/gem/enchant data is sample data, not a real database.
+- Current item/gem/enchant data is sample data, not a real database. One known inconsistency:
+  `training-sword`'s `wowItemId` (28034) resolves to an unrelated real item, not the "Training Sword"
+  its name/stats describe — noticed while backfilling weapon damage data, not yet fixed.
 - Existing guide data under `src/data` remains disconnected from the active MVP foundation.
 - No backend is planned for the near term; the app should stay local-first.

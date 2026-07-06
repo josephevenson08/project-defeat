@@ -7,7 +7,7 @@ import {
   SPELL_CRIT_DAMAGE_MULTIPLIER,
   ratingToFraction,
 } from '../../domain/simulation/combatConstants'
-import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient } from '../../domain/simulation/damageFormulas'
+import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient, weaponDiceToWhiteDps } from '../../domain/simulation/damageFormulas'
 import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounters'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
@@ -66,18 +66,23 @@ function calculatePhysicalDps(
   let rawDps: number
 
   if (character.className === 'Hunter') {
+    const rangedItem = gear['Ranged']?.item
     const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
     const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance })
     const effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
-    rawDps = attackPowerToWhiteDps(stats.rangedAttackPower) * effectiveMultiplier
+    const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
+    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier
     breakdown = [
       { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
+      { label: 'Weapon damage', value: round(weaponDps) },
       { label: 'Hit chance', value: toPercent(table.hit) },
       { label: 'Crit chance', value: toPercent(table.crit) },
       { label: 'Miss chance', value: toPercent(table.miss) },
       { label: 'Armor mitigation', value: toPercent(armorMitigation) },
     ]
   } else {
+    const mainHandItem = gear['Main Hand']?.item
+    const offHandItem = gear['Off Hand']?.item
     const dualWield = isDualWield(gear)
     const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
     const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
@@ -87,12 +92,16 @@ function calculatePhysicalDps(
     const effectiveMultiplier =
       (fullTable.hit + fullTable.block) * 1 + fullTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER + fullTable.glance * avgGlanceMultiplier
 
-    const mainHandDps = attackPowerToWhiteDps(stats.attackPower) * effectiveMultiplier
-    const offHandDps = dualWield ? attackPowerToWhiteDps(stats.attackPower) * 0.5 * effectiveMultiplier : 0
+    const mainHandWeaponDps = weaponDiceToWhiteDps(mainHandItem?.weaponDamageMin, mainHandItem?.weaponDamageMax, mainHandItem?.weaponSpeed)
+    const offHandWeaponDps = weaponDiceToWhiteDps(offHandItem?.weaponDamageMin, offHandItem?.weaponDamageMax, offHandItem?.weaponSpeed)
+    const apDps = attackPowerToWhiteDps(stats.attackPower)
+    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier
+    const offHandDps = dualWield ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier : 0
     rawDps = mainHandDps + offHandDps
 
     breakdown = [
-      { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.attackPower)) },
+      { label: 'Attack power', value: round(apDps) },
+      { label: 'Weapon damage', value: round(mainHandWeaponDps + offHandWeaponDps) },
       { label: 'Hit chance', value: toPercent(fullTable.hit) },
       { label: 'Crit chance', value: toPercent(fullTable.crit) },
       { label: 'Miss chance', value: toPercent(fullTable.miss) },
@@ -108,7 +117,7 @@ function calculatePhysicalDps(
     role: 'Physical DPS',
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
-    summary: `White-damage attack-table estimate vs. a level ${target.level} target: attack power scaled by miss/dodge/parry/glance/crit outcomes, then reduced by armor mitigation. Special-ability/rotation damage isn't modeled yet.`,
+    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/parry/glance/crit outcomes, then reduced by armor mitigation. Special-ability/rotation damage isn't modeled yet.`,
     breakdown,
   }
 }
