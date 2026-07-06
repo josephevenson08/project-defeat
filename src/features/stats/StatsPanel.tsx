@@ -27,7 +27,7 @@ export function StatsPanel({ stats, role }: StatsPanelProps) {
         {statLabels.map(([key, label]) => (
           <div className="stat-tile" data-testid={testIdForStat(label)} key={key}>
             <span>{label}</span>
-            <strong>{stats[key]}</strong>
+            <strong>{Math.round(stats[key])}</strong>
           </div>
         ))}
       </div>

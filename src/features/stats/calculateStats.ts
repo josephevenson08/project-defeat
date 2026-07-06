@@ -44,13 +44,6 @@ export function calculateStats(
     total = addStats(total, getEnchantById(slot.enchantId)?.stats)
   })
 
-  total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
-  total.rangedAttackPower += Math.round(total.agility * 1.8)
-  total.spellPower += Math.round(total.intellect * 0.8 + total.spirit * 0.15)
-  total.healingPower += Math.round(total.intellect * 0.9 + total.spirit * 0.35)
-  total.critRating += Math.round(total.agility * 0.1)
-  total.spellCritRating += Math.round(total.intellect * 0.08)
-
   activeBuffIds.forEach((id) => {
     const buff = getBuffById(id)
     if (!buff) return
@@ -62,6 +55,13 @@ export function calculateStats(
     const consumable = getConsumableById(id)
     if (consumable) total = addStats(total, consumable.stats)
   })
+
+  total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
+  total.rangedAttackPower += Math.round(total.agility * 1.8)
+  total.spellPower += Math.round(total.intellect * 0.8 + total.spirit * 0.15)
+  total.healingPower += Math.round(total.intellect * 0.9 + total.spirit * 0.35)
+  total.critRating += Math.round(total.agility * 0.1)
+  total.spellCritRating += Math.round(total.intellect * 0.08)
 
   return total
 }

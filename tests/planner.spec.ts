@@ -75,8 +75,8 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await expect(page.getByLabel('Race')).toHaveValue('Orc')
-  await page.getByLabel('Race').selectOption('Blood Elf')
+  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Orc')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Blood Elf')
   await page.getByLabel('Class').selectOption('Mage')
   await expect(page.getByLabel('Specialization')).toHaveValue('Arcane')
   await page.getByLabel('Specialization').selectOption('Fire')
@@ -163,7 +163,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
 
@@ -190,7 +190,7 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
 
@@ -224,7 +224,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
 
@@ -252,7 +252,7 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
 
@@ -357,7 +357,7 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
   // Default is Alliance/Human; Human cannot be a Shaman, so Shaman should not be a selectable class yet.
   await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(0)
 
-  await page.getByLabel('Race').selectOption('Draenei')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
   await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(1)
 
   await page.getByLabel('Class').selectOption('Shaman')
@@ -366,7 +366,7 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
   // Switching faction should keep the class legal by picking a valid race for it (Draenei -> Horde has no Draenei,
   // so it should land on a Horde race that can still be a Shaman: Orc, Tauren, or Troll).
   await page.getByLabel('Faction').selectOption('Horde')
-  await expect(page.getByLabel('Race')).toHaveValue(/Orc|Tauren|Troll/)
+  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue(/Orc|Tauren|Troll/)
   await expect(page.getByLabel('Class')).toHaveValue('Shaman')
   await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
 })
@@ -390,7 +390,7 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
   await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Headguard' })
@@ -419,7 +419,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByLabel('Race').selectOption('Troll')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Elemental')
 
@@ -582,7 +582,7 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   await page.goto('/')
 
   // Druid is only legal for Night Elf (Alliance) and Tauren (Horde); pick Night Elf before Class so it's offered.
-  await page.getByLabel('Race').selectOption('Night Elf')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
   await page.getByLabel('Class').selectOption('Druid')
   await page.getByLabel('Specialization').selectOption('Balance')
 
@@ -634,7 +634,7 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
   await page.goto('/')
 
   // Hunter is not legal for the default Human race; pick Dwarf first so Hunter is offered.
-  await page.getByLabel('Race').selectOption('Dwarf')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
   await page.getByLabel('Class').selectOption('Hunter')
   await page.getByLabel('Specialization').selectOption('Beast Mastery')
 
