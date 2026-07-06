@@ -78,6 +78,12 @@ export type GearItem = {
   stats: Partial<StatBlock>
   armorType?: ArmorType
   weaponType?: WeaponType
+  /** Weapon swing speed in seconds (e.g. 2.60). Only meaningful for weapons with swing damage. */
+  weaponSpeed?: number
+  /** Minimum weapon damage roll for a single swing. Only meaningful for weapons with swing damage. */
+  weaponDamageMin?: number
+  /** Maximum weapon damage roll for a single swing. Only meaningful for weapons with swing damage. */
+  weaponDamageMax?: number
   sockets?: SocketColor[]
   socketBonus?: Partial<StatBlock>
   allowedClasses?: TbcClass[]
