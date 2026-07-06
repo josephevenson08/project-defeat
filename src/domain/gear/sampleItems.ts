@@ -2569,7 +2569,10 @@ export const sampleItems: readonly GearItem[] = [
     instance: 'Serpentshrine Cavern',
     boss: 'Morogrim Tidewalker',
     needsVerification: true,
-    notes: 'Stats are approximate pending final Wowhead audit.',
+    weaponSpeed: 1.7,
+    weaponDamageMin: 55,
+    weaponDamageMax: 103,
+    notes: 'Fictional placeholder item; stats, including weapon speed/damage, are a representative estimate for a Phase 2 raid-tier wand at this stat budget, not a real tooltip value.',
   },
 
   // Shadow Priest Phase 1/2 starter items (see src/domain/bis/shadowPriestPhase2.ts).
@@ -2740,7 +2743,10 @@ export const sampleItems: readonly GearItem[] = [
     instance: 'Karazhan',
     boss: 'Prince Malchezaar',
     needsVerification: true,
-    notes: 'Weapon DPS/speed modeling is future work; stats are approximate pending final Wowhead audit.',
+    weaponSpeed: 1.8,
+    weaponDamageMin: 42,
+    weaponDamageMax: 78,
+    notes: 'Fictional placeholder item; weapon speed/damage are a representative estimate for a Phase 1 raid-tier caster dagger at this stat budget, not a real tooltip value.',
   },
   {
     id: 'orb-of-the-soul-eater',
@@ -2771,7 +2777,10 @@ export const sampleItems: readonly GearItem[] = [
     instance: 'Tempest Keep',
     boss: 'High Astromancer Solarian',
     needsVerification: true,
-    notes: 'Stats are approximate pending final Wowhead audit.',
+    weaponSpeed: 1.6,
+    weaponDamageMin: 44,
+    weaponDamageMax: 83,
+    notes: 'Fictional placeholder item; weapon speed/damage are a representative estimate for a Phase 2 raid-tier wand at this stat budget, not a real tooltip value.',
   },
 
   // Balance Druid Phase 1/2 starter items (see src/domain/bis/balanceDruidPhase2.ts).
@@ -3035,7 +3044,10 @@ export const sampleItems: readonly GearItem[] = [
     instance: 'Karazhan',
     boss: 'Terestian Illhoof',
     needsVerification: true,
-    notes: 'Weapon damage does not apply in Cat Form; picked for the stat budget and on-equip effects. Weapon DPS/speed modeling is future work.',
+    weaponSpeed: 3.6,
+    weaponDamageMin: 152,
+    weaponDamageMax: 283,
+    notes: "Weapon damage does not apply in Cat Form; picked for the stat budget and on-equip effects. Relabeled from the real \"Terestian's Stranglestaff\" (item level 115, 3.60 speed) as a reference point for weapon speed, but stats/damage here are a representative estimate for this stat budget, not a confirmed tooltip value.",
   },
   {
     id: 'everbloom-idol',
