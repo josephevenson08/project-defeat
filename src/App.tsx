@@ -32,6 +32,7 @@ function App() {
   const [gear, setGear] = useState<EquippedGear>(() => normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec))
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
   const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>([])
+  const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>([])
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const role = getRoleForSpec(character.className, character.spec)
@@ -61,8 +62,13 @@ function App() {
     setSimulationResult(undefined)
   }
 
+  function toggleTargetDebuff(id: string) {
+    setActiveTargetDebuffIds((current) => toggleId(current, id))
+    setSimulationResult(undefined)
+  }
+
   function runSimulation() {
-    setSimulationResult(calculateSimulation(stats, role))
+    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds))
   }
 
   const completeIntro = useCallback(() => {
@@ -80,8 +86,10 @@ function App() {
         character={character}
         activeBuffIds={activeBuffIds}
         activeConsumableIds={activeConsumableIds}
+        activeTargetDebuffIds={activeTargetDebuffIds}
         onToggleBuff={toggleBuff}
         onToggleConsumable={toggleConsumable}
+        onToggleTargetDebuff={toggleTargetDebuff}
       />
       <StatsPanel stats={stats} role={role} />
       <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />

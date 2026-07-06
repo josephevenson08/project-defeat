@@ -93,8 +93,8 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText(/Estimated DPS/i)).toBeVisible()
-  await expect(page.getByText(/Prototype caster formula/i)).toBeVisible()
-  await expect(page.getByText('Spell power', { exact: true })).toBeVisible()
+  await expect(page.getByText(/Spell hit\/crit table/i)).toBeVisible()
+  await expect(page.getByText('Spell power scaling', { exact: true })).toBeVisible()
 })
 
 test('healer and tank roles produce role-specific results', async ({ page }) => {
@@ -109,7 +109,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText(/Estimated Healing/i)).toBeVisible()
-  await expect(page.getByText(/Prototype healer formula/i)).toBeVisible()
+  await expect(page.getByText(/Heal crit\/haste estimate/i)).toBeVisible()
 
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Protection')
@@ -119,7 +119,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText(/Survivability Score/i)).toBeVisible()
-  await expect(page.getByText(/Prototype tank formula/i)).toBeVisible()
+  await expect(page.getByText(/Avoidance \(dodge\/parry\/block/i)).toBeVisible()
 })
 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {

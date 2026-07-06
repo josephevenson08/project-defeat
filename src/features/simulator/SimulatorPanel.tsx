@@ -20,8 +20,9 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
   return (
     <Panel title="Simulation" eyebrow="Role-aware prototype" accentColor={getRoleAccentColor(role)}>
       <p className="panel-copy">
-        Run a deterministic prototype calculation using the current character role, gear, gems, enchants, and stat totals.
-        These formulas are intentionally simple placeholders.
+        Runs a TBC attack-table/spell-table simulation against a level 73 raid boss using the current character's stat
+        totals, active buffs/consumables, and any target debuffs toggled below. Auto-attack/base-spell-damage rotation
+        modeling is still a known gap — see the result summary for what each estimate does and doesn't cover yet.
       </p>
       <Button onClick={onRun}>Run Simulation</Button>
       {result ? (

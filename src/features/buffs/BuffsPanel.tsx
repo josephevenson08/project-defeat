@@ -1,7 +1,8 @@
 import { Panel } from '../../components/layout/Panel'
 import type { CharacterRole } from '../../domain/character/characterTypes'
-import type { Buff } from '../../domain/buffs/buffTypes'
+import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import { sampleBuffs } from '../../domain/buffs/sampleBuffs'
+import { sampleTargetDebuffs } from '../../domain/buffs/sampleTargetDebuffs'
 import type { BuildRole } from '../../domain/gear/itemTypes'
 import type { Consumable, ConsumableCategory } from '../../domain/consumables/consumableTypes'
 import { sampleConsumables } from '../../domain/consumables/sampleConsumables'
@@ -12,8 +13,10 @@ type BuffsPanelProps = {
   character: CharacterProfile
   activeBuffIds: readonly string[]
   activeConsumableIds: readonly string[]
+  activeTargetDebuffIds: readonly string[]
   onToggleBuff: (id: string) => void
   onToggleConsumable: (id: string) => void
+  onToggleTargetDebuff: (id: string) => void
 }
 
 const flaskExclusiveCategories: readonly ConsumableCategory[] = ['Battle Elixir', 'Guardian Elixir']
@@ -36,7 +39,23 @@ function multiplierSummary(multipliers: Buff['statMultipliers']) {
     .join(', ')
 }
 
-export function BuffsPanel({ character, activeBuffIds, activeConsumableIds, onToggleBuff, onToggleConsumable }: BuffsPanelProps) {
+function targetDebuffSummary(debuff: TargetDebuff) {
+  const parts: string[] = []
+  if (debuff.armorReductionPercent) parts.push(`-${Math.round(debuff.armorReductionPercent * 100)}% target armor`)
+  if (debuff.physicalCritTakenBonus) parts.push(`+${Math.round(debuff.physicalCritTakenBonus * 100)}% crit taken`)
+  if (debuff.spellDamageTakenMultiplier) parts.push(`+${Math.round(debuff.spellDamageTakenMultiplier * 100)}% spell damage taken`)
+  return parts.join(', ')
+}
+
+export function BuffsPanel({
+  character,
+  activeBuffIds,
+  activeConsumableIds,
+  activeTargetDebuffIds,
+  onToggleBuff,
+  onToggleConsumable,
+  onToggleTargetDebuff,
+}: BuffsPanelProps) {
   const role = getRoleForSpec(character.className, character.spec)
   const buffs = sampleBuffs.filter((buff) => fitsRole(buff, role))
   const consumables = sampleConsumables.filter((consumable) => fitsRole(consumable, role))
@@ -119,6 +138,29 @@ export function BuffsPanel({ character, activeBuffIds, activeConsumableIds, onTo
               </div>
             )
           })}
+        </section>
+
+        <section className="buffs-group" aria-label="Target debuffs">
+          <h3>Target Debuffs</h3>
+          <p className="buffs-hint">Raid debuffs applied to the simulated target, feeding the Simulation panel's armor/crit/spell-damage math.</p>
+          <div className="buffs-checkbox-list">
+            {sampleTargetDebuffs.map((debuff) => (
+              <label className="buffs-checkbox-row" key={debuff.id}>
+                <input
+                  type="checkbox"
+                  checked={activeTargetDebuffIds.includes(debuff.id)}
+                  onChange={() => onToggleTargetDebuff(debuff.id)}
+                  data-testid={`target-debuff-toggle-${debuff.id}`}
+                />
+                <span>
+                  <strong>{debuff.name}</strong>
+                  <small>
+                    {debuff.providedBy} · {targetDebuffSummary(debuff)}
+                  </small>
+                </span>
+              </label>
+            ))}
+          </div>
         </section>
       </div>
     </Panel>
