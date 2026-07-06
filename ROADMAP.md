@@ -43,6 +43,16 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Race/class-specific assumptions
 - Feral bear/cat mode split
 
+Buffs (flat stats + percentage multipliers), target debuffs (armor reduction, crit taken, spell
+damage taken), and consumables (flasks/elixirs/food with Alchemy/Cooking crafting provenance) are
+implemented and wired into `calculateStats`/`calculateSimulation`, with a Buffs & Consumables panel
+in the UI. A separate Professions domain (`src/domain/professions/`) covers all 13 TBC professions'
+skill tiers/trainer requirements and raw-material farm locations/leveling paths, surfaced in its own
+Professions tab — this is leveling/farming reference data, distinct from the still-unstarted
+"profession bonuses to stats" item above (e.g. extra sockets from Blacksmithing). Talent trees,
+race/class-specific assumptions beyond legality checks, and the Feral bear/cat mode split remain
+unstarted.
+
 ## Phase 4: Simulation
 
 - Class/spec-specific formulas
@@ -51,6 +61,14 @@ Build Project Defeat into a local-first TBC Classic Anniversary simulator/planne
 - Simulation iterations
 - Result variance
 - Result charts and breakdowns
+
+The simulator now uses real TBC attack-table/spell-table mechanics (`src/domain/simulation/`) —
+sourced miss/dodge/parry/glance/block/crit tables, rating-to-percent conversions, spell hit/crit,
+and armor mitigation — instead of flat stat-times-coefficient placeholders, and factors in a target
+model that active target debuffs actually modify. What's still missing: per-spell/per-ability
+rotation modeling (each role currently estimates from a generic filler-cast/white-damage assumption,
+not real rotation priority or cooldowns), per-weapon damage/speed data (white damage is AP-driven
+only), configurable encounter settings, multi-iteration variance, and result charts.
 
 ## Phase 5: Planner Workflows
 
@@ -84,7 +102,8 @@ until it's been checked against an actual Wowhead item tooltip.
 
 ## Current Known Limitations
 
-- Current formulas are useful only as deterministic placeholders.
+- Simulation formulas use real TBC attack-table/spell-table mechanics, but still assume a generic
+  filler cast/white-damage baseline rather than per-spell rotation modeling — see Phase 4 above.
 - Current item/gem/enchant data is sample data, not a real database.
 - Existing guide data under `src/data` remains disconnected from the active MVP foundation.
 - No backend is planned for the near term; the app should stay local-first.

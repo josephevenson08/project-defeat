@@ -275,7 +275,7 @@ select:focus,
   color: #e2e8f0;
 }
 
-.crafting-details .needs-verification {
+.needs-verification {
   color: #fcd34d;
   display: block;
 }
@@ -612,6 +612,131 @@ select:focus,
 .buffs-checkbox-row-disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tab-nav-button {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  color: #aeb9c9;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+}
+
+.tab-nav-button:hover {
+  color: #f8fafc;
+}
+
+.tab-nav-button-active {
+  background: var(--panel-accent, #f0abfc);
+  border-color: transparent;
+  color: #0b1120;
+}
+
+.professions-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.professions-picker {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.professions-picker-label {
+  color: #94a3b8;
+  display: block;
+  font-size: 12px;
+  font-weight: 750;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.professions-picker-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profession-detail-header {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.profession-detail-header h3 {
+  color: #ffffff;
+  font-size: 20px;
+  margin: 0;
+}
+
+.profession-detail-header span {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.profession-detail h4 {
+  color: #f8fafc;
+  font-size: 15px;
+  margin: 20px 0 10px;
+}
+
+.profession-tier-list,
+.profession-material-list {
+  display: grid;
+  gap: 8px;
+}
+
+.profession-tier-row,
+.profession-material-row {
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 6px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.profession-tier-row > div,
+.profession-material-row > div {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+}
+
+.profession-tier-row strong,
+.profession-material-row strong {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.profession-tier-row span,
+.profession-material-row span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.profession-tier-row p,
+.profession-material-row p {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.professions-empty {
+  color: #94a3b8;
 }
 
 @media (max-width: 820px) {

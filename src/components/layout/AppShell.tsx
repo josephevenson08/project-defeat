@@ -1,10 +1,14 @@
 import type { ReactNode } from 'react'
+import { TabNav, type TabDefinition } from './TabNav'
 
-type AppShellProps = {
+type AppShellProps<T extends string> = {
   children: ReactNode
+  tabs: readonly TabDefinition<T>[]
+  activeTab: T
+  onTabChange: (tab: T) => void
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell<T extends string>({ children, tabs, activeTab, onTabChange }: AppShellProps<T>) {
   return (
     <main className="app-shell">
       <header className="hero">
@@ -18,6 +22,7 @@ export function AppShell({ children }: AppShellProps) {
           <strong>Combat Lab</strong>
         </div>
       </header>
+      <TabNav tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
       <div className="dashboard-grid">{children}</div>
     </main>
   )

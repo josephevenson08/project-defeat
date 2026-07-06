@@ -822,3 +822,25 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
+
+test('Professions tab shows skill tiers and material farming, and switches between professions', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Professions', exact: true }).click()
+
+  await expect(page.getByRole('heading', { name: 'Professions', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Character', exact: true })).toHaveCount(0)
+
+  const detail = page.getByTestId('profession-detail')
+  await expect(detail.getByRole('heading', { name: 'Mining', exact: true })).toBeVisible()
+  await expect(detail.getByText('Master', { exact: true })).toBeVisible()
+  await expect(detail.getByText('Copper Ore')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Alchemy', exact: true }).click()
+  await expect(detail.getByRole('heading', { name: 'Alchemy', exact: true })).toBeVisible()
+  await expect(detail.getByText('Copper Ore')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
+})

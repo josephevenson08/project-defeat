@@ -14,6 +14,8 @@ import { SimulatorPanel } from './features/simulator/SimulatorPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsPanel } from './features/stats/StatsPanel'
+import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
+import type { TabDefinition } from './components/layout/TabNav'
 
 const initialCharacter: CharacterProfile = {
   faction: 'Alliance',
@@ -22,12 +24,20 @@ const initialCharacter: CharacterProfile = {
   spec: 'Fury',
 }
 
+type AppTab = 'planner' | 'professions'
+
+const APP_TABS: readonly TabDefinition<AppTab>[] = [
+  { id: 'planner', label: 'Character Planner' },
+  { id: 'professions', label: 'Professions' },
+]
+
 function toggleId(ids: readonly string[], id: string) {
   return ids.includes(id) ? ids.filter((existing) => existing !== id) : [...ids, id]
 }
 
 function App() {
   const [introComplete, setIntroComplete] = useState(false)
+  const [activeTab, setActiveTab] = useState<AppTab>('planner')
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
   const [gear, setGear] = useState<EquippedGear>(() => normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec))
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
@@ -78,21 +88,27 @@ function App() {
   if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
 
   return (
-    <AppShell>
-      <CharacterPanel character={character} onChange={updateCharacter} />
-      <GearPanel character={character} gear={gear} onChange={updateGear} />
-      <BisPanel character={character} gear={gear} onEquip={updateGear} />
-      <BuffsPanel
-        character={character}
-        activeBuffIds={activeBuffIds}
-        activeConsumableIds={activeConsumableIds}
-        activeTargetDebuffIds={activeTargetDebuffIds}
-        onToggleBuff={toggleBuff}
-        onToggleConsumable={toggleConsumable}
-        onToggleTargetDebuff={toggleTargetDebuff}
-      />
-      <StatsPanel stats={stats} role={role} />
-      <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
+    <AppShell tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
+      {activeTab === 'planner' ? (
+        <>
+          <CharacterPanel character={character} onChange={updateCharacter} />
+          <GearPanel character={character} gear={gear} onChange={updateGear} />
+          <BisPanel character={character} gear={gear} onEquip={updateGear} />
+          <BuffsPanel
+            character={character}
+            activeBuffIds={activeBuffIds}
+            activeConsumableIds={activeConsumableIds}
+            activeTargetDebuffIds={activeTargetDebuffIds}
+            onToggleBuff={toggleBuff}
+            onToggleConsumable={toggleConsumable}
+            onToggleTargetDebuff={toggleTargetDebuff}
+          />
+          <StatsPanel stats={stats} role={role} />
+          <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
+        </>
+      ) : (
+        <ProfessionsPanel />
+      )}
     </AppShell>
   )
 }
