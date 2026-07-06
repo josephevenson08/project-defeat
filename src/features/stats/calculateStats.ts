@@ -1,9 +1,11 @@
 import { getClassDefinition } from '../character/characterData'
 import type { CharacterProfile } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
+import { getBuffById } from '../../domain/buffs/sampleBuffs'
+import { getConsumableById } from '../../domain/consumables/sampleConsumables'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { getGemById } from '../../domain/gems/sampleGems'
-import { addStats } from '../../domain/stats/statUtils'
+import { addStats, applyStatMultipliers } from '../../domain/stats/statUtils'
 import type { SocketColor } from '../../domain/gear/itemTypes'
 import { type StatBlock } from './statsTypes'
 
@@ -18,7 +20,12 @@ function socketBonusIsActive(sockets: readonly SocketColor[] = [], gemIds: reado
   })
 }
 
-export function calculateStats(character: CharacterProfile, gear: EquippedGear): StatBlock {
+export function calculateStats(
+  character: CharacterProfile,
+  gear: EquippedGear,
+  activeBuffIds: readonly string[] = [],
+  activeConsumableIds: readonly string[] = [],
+): StatBlock {
   const classDefinition = getClassDefinition(character.className)
   let total: StatBlock = { ...classDefinition.baseStats }
 
@@ -43,6 +50,18 @@ export function calculateStats(character: CharacterProfile, gear: EquippedGear):
   total.healingPower += Math.round(total.intellect * 0.9 + total.spirit * 0.35)
   total.critRating += Math.round(total.agility * 0.1)
   total.spellCritRating += Math.round(total.intellect * 0.08)
+
+  activeBuffIds.forEach((id) => {
+    const buff = getBuffById(id)
+    if (!buff) return
+    total = addStats(total, buff.stats)
+    total = applyStatMultipliers(total, buff.statMultipliers)
+  })
+
+  activeConsumableIds.forEach((id) => {
+    const consumable = getConsumableById(id)
+    if (consumable) total = addStats(total, consumable.stats)
+  })
 
   return total
 }
