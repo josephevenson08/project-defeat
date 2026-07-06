@@ -1836,7 +1836,10 @@ export const sampleItems: readonly GearItem[] = [
     stats: { stamina: 14, defenseRating: 10, hitRating: 8 },
     craftedBy: 'Engineering',
     needsVerification: true,
-    notes: 'Protection ranged filler; stats are approximate pending final Wowhead audit.',
+    weaponSpeed: 2.8,
+    weaponDamageMin: 90,
+    weaponDamageMax: 168,
+    notes: 'Fictional placeholder item (Protection ranged filler); weapon speed/damage are a representative estimate for a Phase 2 crafted gun at this stat budget, not a real tooltip value.',
   },
   {
     id: 'no-relic-placeholder',
@@ -2215,7 +2218,10 @@ export const sampleItems: readonly GearItem[] = [
     instance: 'Serpentshrine Cavern',
     boss: 'Leotheras the Blind',
     needsVerification: true,
-    notes: 'Renamed from an earlier placeholder ("Fang of the Leviathan" turned out to be a real caster weapon used by Fire/Frost Mage, not a tank weapon) to avoid conflating the two. Weapon type and DPS/speed modeling are approximate pending final Wowhead audit.',
+    weaponSpeed: 2.6,
+    weaponDamageMin: 70,
+    weaponDamageMax: 130,
+    notes: 'Renamed from an earlier placeholder ("Fang of the Leviathan" turned out to be a real caster weapon used by Fire/Frost Mage, not a tank weapon) to avoid conflating the two. Weapon type, speed, and damage are a representative estimate for a Phase 2 one-handed tank sword at this stat budget, not a real tooltip value, pending final Wowhead audit.',
   },
   {
     id: 'libram-of-the-eternal-rest',
@@ -2348,7 +2354,10 @@ export const sampleItems: readonly GearItem[] = [
       notes: 'Recipe source and material list are a starter approximation pending final Wowhead audit.',
     },
     needsVerification: true,
-    notes: 'Crafted two-handed Blacksmithing weapon; weapon DPS/speed modeling is future work.',
+    weaponSpeed: 3.6,
+    weaponDamageMin: 210,
+    weaponDamageMax: 391,
+    notes: 'Fictional placeholder item (name resembles the real "Lionheart Executioner" two-handed sword, item level 136, but is not confirmed to be identical). Weapon speed/damage are a representative estimate for a Phase 2 crafted two-handed sword at this stat budget, using the real item\'s 3.60 speed as a reference point, not a confirmed tooltip value.',
   },
 
   // Holy Priest Phase 1/2 starter items (see src/domain/bis/holyPriestPhase2.ts; Discipline shares this
