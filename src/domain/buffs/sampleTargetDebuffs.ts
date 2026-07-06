@@ -41,6 +41,14 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     needsVerification: true,
     notes: 'Approximate pending final Wowhead audit.',
   },
+  {
+    id: 'winters-chill',
+    name: "Winter's Chill",
+    providedBy: 'Frost Mage',
+    spellCritTakenBonus: 0.1,
+    needsVerification: true,
+    notes: 'Models the full 5-stack total (2% per application) rather than per-stack buildup; approximate pending final Wowhead audit.',
+  },
 ]
 
 export function getTargetDebuffById(id: string) {

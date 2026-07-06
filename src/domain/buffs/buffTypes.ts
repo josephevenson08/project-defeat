@@ -23,6 +23,8 @@ export type TargetDebuff = {
   armorReductionPercent?: number
   /** Increases the target's chance to be critically struck by physical attacks, as a fraction (e.g. 0.03 for +3%). */
   physicalCritTakenBonus?: number
+  /** Increases the target's chance to be critically struck by spells, as a fraction (e.g. 0.1 for Winter's Chill at 5 stacks). */
+  spellCritTakenBonus?: number
   /** Increases spell damage the target takes, as a fraction (e.g. 0.1 for +10%). */
   spellDamageTakenMultiplier?: number
   needsVerification?: boolean

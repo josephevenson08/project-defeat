@@ -42,10 +42,11 @@ function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
       return {
         armorReductionPercent: totals.armorReductionPercent + (debuff.armorReductionPercent ?? 0),
         physicalCritTakenBonus: totals.physicalCritTakenBonus + (debuff.physicalCritTakenBonus ?? 0),
+        spellCritTakenBonus: totals.spellCritTakenBonus + (debuff.spellCritTakenBonus ?? 0),
         spellDamageTakenMultiplier: totals.spellDamageTakenMultiplier + (debuff.spellDamageTakenMultiplier ?? 0),
       }
     },
-    { armorReductionPercent: 0, physicalCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
+    { armorReductionPercent: 0, physicalCritTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
   )
 }
 
@@ -115,7 +116,7 @@ function calculatePhysicalDps(
 function calculateCasterDps(stats: StatBlock, target: SimulationTarget, debuffs: ReturnType<typeof aggregateTargetDebuffs>): SimulationResult {
   const levelDiff = target.level - PLAYER_LEVEL
   const spellHitChance = computeSpellHitChance(levelDiff, ratingToFraction(stats.spellHitRating, RATING_PER_PERCENT.spellHit))
-  const spellCritChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit))
+  const spellCritChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit)) + debuffs.spellCritTakenBonus
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
   const effectiveCastTime = GENERIC_NUKE_CAST_TIME / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime

@@ -42,7 +42,8 @@ function multiplierSummary(multipliers: Buff['statMultipliers']) {
 function targetDebuffSummary(debuff: TargetDebuff) {
   const parts: string[] = []
   if (debuff.armorReductionPercent) parts.push(`-${Math.round(debuff.armorReductionPercent * 100)}% target armor`)
-  if (debuff.physicalCritTakenBonus) parts.push(`+${Math.round(debuff.physicalCritTakenBonus * 100)}% crit taken`)
+  if (debuff.physicalCritTakenBonus) parts.push(`+${Math.round(debuff.physicalCritTakenBonus * 100)}% physical crit taken`)
+  if (debuff.spellCritTakenBonus) parts.push(`+${Math.round(debuff.spellCritTakenBonus * 100)}% spell crit taken`)
   if (debuff.spellDamageTakenMultiplier) parts.push(`+${Math.round(debuff.spellDamageTakenMultiplier * 100)}% spell damage taken`)
   return parts.join(', ')
 }
