@@ -6,7 +6,10 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'test-results', 'playwright-report']),
+  // `.claude/worktrees` holds throwaway git worktrees for background agents. They contain a full
+  // copy of the project (tsconfig included), which otherwise makes typescript-eslint see several
+  // competing TSConfig roots and fail to parse every file in the repo.
+  globalIgnores(['dist', 'test-results', 'playwright-report', '.claude/worktrees']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

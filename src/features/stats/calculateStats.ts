@@ -25,6 +25,12 @@ export function calculateStats(
   gear: EquippedGear,
   activeBuffIds: readonly string[] = [],
   activeConsumableIds: readonly string[] = [],
+  /**
+   * Extra stats folded in *before* the primary-stat derivations below, so that adding e.g. Strength
+   * correctly cascades into Attack Power. Used by the stat-weight engine to perturb one stat at a
+   * time; leave undefined for a normal character calculation.
+   */
+  bonusStats?: Partial<StatBlock>,
 ): StatBlock {
   const classDefinition = getClassDefinition(character.className)
   let total: StatBlock = { ...classDefinition.baseStats }
@@ -55,6 +61,8 @@ export function calculateStats(
     const consumable = getConsumableById(id)
     if (consumable) total = addStats(total, consumable.stats)
   })
+
+  if (bonusStats) total = addStats(total, bonusStats)
 
   total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
   total.rangedAttackPower += Math.round(total.agility * 1.8)

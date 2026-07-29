@@ -10,7 +10,9 @@ import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
+import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { SimulatorPanel } from './features/simulator/SimulatorPanel'
+import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsPanel } from './features/stats/StatsPanel'
@@ -49,6 +51,12 @@ function App() {
   const stats = useMemo(
     () => calculateStats(character, gear, activeBuffIds, activeConsumableIds),
     [character, gear, activeBuffIds, activeConsumableIds],
+  )
+  // Cheap enough to keep live (a handful of pure re-runs of the sim), and stat priority is reference
+  // information you want visible while gearing rather than something to press a button for.
+  const statWeights = useMemo(
+    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds),
+    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds],
   )
 
   function updateGear(slot: GearSlot, equippedSlot: EquippedSlot) {
@@ -105,6 +113,7 @@ function App() {
           />
           <StatsPanel stats={stats} role={role} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
+          <StatWeightsPanel weights={statWeights} role={role} />
         </>
       ) : (
         <ProfessionsPanel />
