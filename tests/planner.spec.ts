@@ -1043,3 +1043,36 @@ test('a build referencing a missing item still loads, reporting the dropped slot
   // The rest of the build must survive rather than the whole import failing.
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
 })
+
+test('melee specials are layered onto white damage, and unmodelled ones say so', async ({ page }) => {
+  await page.goto('/')
+
+  // Fury Warrior: Bloodthirst is cooldown-bound, so its rate is defensible and it is modelled.
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const withSpecial = Number(await page.getByTestId('simulation-score').innerText())
+  const breakdown = page.locator('.breakdown-list')
+  await expect(breakdown).toContainText(/Bloodthirst DPS/i)
+  await expect(page.locator('.simulation-result p')).toContainText(/used on its 6s cooldown/i)
+
+  // The special has to actually add damage rather than just appear in the breakdown.
+  const bloodthirstDps = Number(
+    (await breakdown.locator('div', { hasText: /Bloodthirst DPS/i }).innerText()).match(/[\d.]+$/)?.[0] ?? '0',
+  )
+  expect(bloodthirstDps).toBeGreaterThan(0)
+  expect(withSpecial).toBeGreaterThan(bloodthirstDps)
+
+  // Combat Rogue: no cooldown, but a fixed energy cost against a fixed regen rate is computable.
+  await page.getByLabel('Class').selectOption('Rogue')
+  await page.getByLabel('Specialization').selectOption('Combat')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(breakdown).toContainText(/Sinister Strike DPS/i)
+  await expect(page.locator('.simulation-result p')).toContainText(/energy against 10\/sec regen/i)
+
+  // Hunter: Steady Shot is mana-costed with no cooldown, so its sustained rate depends on auto-shot
+  // weaving that isn't modelled. It must be named as excluded rather than silently omitted.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
+  await page.getByLabel('Class').selectOption('Hunter')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
+  await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})

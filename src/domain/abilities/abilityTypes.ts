@@ -97,6 +97,12 @@ export type AbilityScaling = {
   normalizedWeaponDamage?: boolean
   /** Flat damage added on top of the weapon-damage portion (e.g. Sinister Strike's +98). */
   flatWeaponDamageBonus?: number
+  /**
+   * True for specials that strike once with EACH weapon (Mutilate, Stormstrike). The weapon-damage
+   * multiplier and flat bonus then apply per hand, so a consumer that applies them once halves the
+   * ability. Recorded as a flag rather than left in prose so the simulator can act on it.
+   */
+  hitsBothWeapons?: boolean
   /** Why the coefficient has the value it does, including any exception or cross-source conflict. */
   coefficientNotes?: string
 }

@@ -80,9 +80,17 @@ signature ability is a physical special keep the generic cast on the spell side,
 attack power and belong to the physical path. Configurable encounter settings and computed stat weights
 are also in.
 
-What's still missing: the physical path ignores signature abilities entirely and remains white-damage
-only, so melee specs are understated; there is no multi-ability rotation priority, cooldown usage,
-proc modeling, or talent scaling; and there is still no multi-iteration variance or result charts.
+The physical path now layers a spec's signature melee special on top of white damage, through a
+separate "yellow" attack table — specials can't glance and don't take the dual-wield miss penalty, and
+getting either wrong would misprice every melee spec. Usage rate is only claimed where it can be
+defended: an ability with a cooldown is used on cooldown, and an energy-costed ability is bounded by
+energy's fixed 10/sec regen. Rage-costed abilities without a cooldown, and Hunter's mana-costed Steady
+Shot, are deliberately excluded and named in the result summary, since rage income and auto-shot
+weaving aren't modelled.
+
+What's still missing: multi-ability rotation priority (only the single signature ability counts, so
+melee specs remain understated), proc modeling, talent scaling, multi-iteration variance, and result
+charts.
 
 ## Phase 5: Planner Workflows
 
@@ -149,8 +157,9 @@ written below each note's manual marker.
 
 ## Current Known Limitations
 
-- Simulation formulas use real TBC attack-table/spell-table mechanics. The caster and healer paths now
-  model one real ability per spec; the physical path is still white-damage only — see Phase 4 above.
+- Simulation formulas use real TBC attack-table/spell-table mechanics, and every path now models one
+  real ability per spec — but only one. No rotation priority, procs, or talent scaling anywhere; some
+  physical specials are excluded outright where their rate isn't computable. See Phase 4 above.
 - Current item/gem/enchant data is sample data, not a real database. One known inconsistency:
   `training-sword`'s `wowItemId` (28034) resolves to an unrelated real item, not the "Training Sword"
   its name/stats describe — noticed while backfilling weapon damage data, not yet fixed.

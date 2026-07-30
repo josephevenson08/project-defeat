@@ -112,6 +112,46 @@ export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAtta
   return { miss, dodge, parry, glance, block, crit, hit }
 }
 
+export type SpecialAttackTable = Pick<WhiteAttackTable, 'miss' | 'dodge' | 'parry' | 'block' | 'crit' | 'hit'>
+
+/**
+ * "Yellow" instant special attacks (Mortal Strike, Sinister Strike, Shield Slam...) differ from
+ * white swings in two ways that both matter a lot:
+ *
+ * 1. **They cannot glance.** Glancing blows only ever apply to auto-attacks, so a special keeps its
+ *    full damage on an ordinary hit where a white swing would have been reduced.
+ * 2. **They do not take the dual-wield miss penalty.** That penalty applies to white swings only, so
+ *    a dual-wielding rogue's specials miss at the normal single-weapon rate, not the ~24% white rate.
+ *
+ * Getting either wrong would systematically misprice every melee spec's yellow damage, so this is a
+ * separate table rather than a flag on the white one.
+ */
+export function buildSpecialAttackTable(inputs: Omit<WhiteAttackTableInputs, 'dualWield'>): SpecialAttackTable {
+  const { skillDiff, expertiseSkillPoints, missReduction, rawCritChance } = inputs
+
+  const missChance = Math.max(0, computeBaseMissChance(skillDiff) - missReduction)
+  const dodgeChance = computeDodgeChance(skillDiff, expertiseSkillPoints)
+  const parryChance = computeParryChance(skillDiff, expertiseSkillPoints)
+  const blockChance = computeTargetBlockChance(skillDiff)
+  const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)
+
+  let remaining = 1
+  const take = (amount: number) => {
+    const taken = Math.max(0, Math.min(amount, remaining))
+    remaining -= taken
+    return taken
+  }
+
+  const miss = take(missChance)
+  const dodge = take(dodgeChance)
+  const parry = take(parryChance)
+  const block = take(blockChance)
+  const crit = take(critChance)
+  const hit = remaining
+
+  return { miss, dodge, parry, block, crit, hit }
+}
+
 /**
  * Ranged attacks from outside melee range cannot be dodged, parried, or blocked; this models the
  * common "hunter kiting a raid boss" case as a simplified miss/crit/hit-only table.

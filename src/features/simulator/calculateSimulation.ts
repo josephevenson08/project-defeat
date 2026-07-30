@@ -1,7 +1,14 @@
 import { getSignatureAbility } from '../../domain/abilities'
 import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
-import { buildRangedAttackTable, buildWhiteAttackTable, computeGlanceDamageRange, computeSkillDiff } from '../../domain/simulation/attackTable'
+import {
+  buildRangedAttackTable,
+  buildSpecialAttackTable,
+  buildWhiteAttackTable,
+  computeGlanceDamageRange,
+  computeSkillDiff,
+} from '../../domain/simulation/attackTable'
+import { computeUsageRate, estimateSpecialAttack } from '../../domain/simulation/specialAttacks'
 import {
   EXPERTISE_RATING_PER_SKILL_POINT,
   MELEE_CRIT_DAMAGE_MULTIPLIER,
@@ -131,6 +138,54 @@ function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
   )
 }
 
+type ResolvedSpecial = {
+  name: string
+  dps: number
+  explanation: string
+}
+
+/**
+ * The yellow-damage layer for melee specs. Returns undefined when the spec's signature ability isn't
+ * a melee special, or when its sustained usage rate isn't something this simulator can defend —
+ * a rage-costed ability with no cooldown, for instance, depends on rage income that isn't tracked.
+ * Reporting nothing is the honest outcome there; inventing a rate would silently fabricate DPS.
+ */
+function resolveSpecialAttack(
+  character: CharacterProfile,
+  gear: EquippedGear,
+  stats: StatBlock,
+  skillDiff: number,
+  missReduction: number,
+  rawCritChance: number,
+): ResolvedSpecial | undefined {
+  const ability = getSignatureAbility(character.className, character.spec)
+  if (!ability || ability.effectType !== 'Melee Special') return undefined
+
+  const estimate = estimateSpecialAttack(ability, gear['Main Hand']?.item, gear['Off Hand']?.item, stats.attackPower)
+  if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) return undefined
+
+  const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
+  const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance })
+  // Blocked specials still land, just reduced; the block value itself isn't modelled, so a blocked
+  // hit is counted at full damage here rather than pretending to know the reduction.
+  const effectiveMultiplier = table.hit + table.block + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
+
+  return {
+    name: ability.name,
+    dps: estimate.damagePerUse * effectiveMultiplier * estimate.usesPerSecond,
+    explanation: estimate.explanation,
+  }
+}
+
+/** Says which special was skipped and why, so a missing yellow-damage layer is visible rather than silent. */
+function describeUnmodelledSpecial(character: CharacterProfile) {
+  const ability = getSignatureAbility(character.className, character.spec)
+  if (!ability) return "This spec's rotational ability isn't in the ability data yet, so no special-attack damage is included."
+
+  const { explanation } = computeUsageRate(ability)
+  return `${ability.name} is not included: ${explanation}. Its damage is therefore missing from this estimate.`
+}
+
 function calculatePhysicalDps(
   character: CharacterProfile,
   gear: EquippedGear,
@@ -142,13 +197,13 @@ function calculatePhysicalDps(
   const targetArmor = Math.max(0, target.armor * (1 - debuffs.armorReductionPercent))
   const armorMitigation = computeArmorMitigation(targetArmor, PLAYER_LEVEL)
   const rawCritChance = ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus
+  const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
 
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
-    const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
     const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance })
     const effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
     const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
@@ -165,7 +220,6 @@ function calculatePhysicalDps(
     const mainHandItem = gear['Main Hand']?.item
     const offHandItem = gear['Off Hand']?.item
     const dualWield = isDualWield(gear)
-    const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
     const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
     const fullTable = buildWhiteAttackTable({ skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance })
     const glanceRange = computeGlanceDamageRange(skillDiff)
@@ -192,13 +246,28 @@ function calculatePhysicalDps(
     ]
   }
 
-  const mitigatedDps = rawDps * (1 - armorMitigation)
+  // Yellow (special) damage, layered on top of the white swing model above. Only the melee path gets
+  // this: the ranged special (Steady Shot) is mana-costed with no cooldown, so its sustained rate
+  // depends on auto-shot weaving that isn't modelled.
+  const special = resolveSpecialAttack(character, gear, stats, skillDiff, missReduction, rawCritChance)
+  const specialRawDps = special ? special.dps : 0
+
+  const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
+
+  if (special) {
+    breakdown.push({ label: `${special.name} DPS`, value: round(special.dps * (1 - armorMitigation)) })
+  }
+
+  const specialSummary = special
+    ? ` ${special.name} is layered on top, ${special.explanation}, using the special-attack table (no glancing blows, and no dual-wield miss penalty).`
+    : ` ${describeUnmodelledSpecial(character)}`
 
   return {
     role: 'Physical DPS',
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
-    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/parry/glance/crit outcomes, then reduced by armor mitigation. Special-ability/rotation damage isn't modeled yet.`,
+    scoreExact: mitigatedDps,
+    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/parry/glance/crit outcomes, then reduced by armor mitigation.${specialSummary}`,
     breakdown,
   }
 }
@@ -236,6 +305,7 @@ function calculateCasterDps(
     role: 'Caster DPS',
     metricLabel: 'Estimated DPS',
     score: round(dps),
+    scoreExact: dps,
     summary,
     breakdown,
   }
@@ -267,6 +337,7 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
     role: 'Healer',
     metricLabel: 'Estimated Healing',
     score: round(hps),
+    scoreExact: hps,
     summary,
     breakdown,
   }
@@ -305,6 +376,7 @@ function calculateTankSurvivability(stats: StatBlock, target: SimulationTarget):
     role: 'Tank',
     metricLabel: 'Survivability Score',
     score,
+    scoreExact: score,
     summary: `Avoidance (dodge/parry/block vs. a level ${target.level} target) and armor mitigation from real TBC rating conversions, plus stamina. Uncrittable status still requires ~490 total Defense Skill regardless of this score.`,
     breakdown,
   }

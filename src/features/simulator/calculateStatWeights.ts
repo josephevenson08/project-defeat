@@ -7,7 +7,7 @@ import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 
 /**
  * How much of a stat to add when probing its value. Large enough that the resulting metric change
- * clears the simulation's 1-decimal rounding (a +1 probe would often round away to zero), small
+ * large enough to stay well clear of floating-point noise while small
  * enough to stay in a roughly linear part of the curve. Results are divided back down to per-point.
  */
 const PROBE_AMOUNT = 100
@@ -123,7 +123,7 @@ export function calculateStatWeights(
     return {
       stat,
       label: labelFor(stat),
-      perPoint: (probed.score - baseline.score) / PROBE_AMOUNT,
+      perPoint: (probed.scoreExact - baseline.scoreExact) / PROBE_AMOUNT,
       notModeledYet: !consumed.has(stat),
     }
   })

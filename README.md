@@ -109,8 +109,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 
 ## Known Limitations
 
-- The physical DPS path is white-damage only (weapon dice plus attack power through the attack table);
-  specials and rotation are not modeled, so melee specs are understated by varying amounts.
+- The physical DPS path models white damage plus **one** signature special per spec, and only when
+  that special's sustained rate is defensible: a cooldown, or an energy cost against energy's fixed
+  10/sec regen. Rage-costed abilities with no cooldown and Hunter's Steady Shot are excluded, because
+  rage income and auto-shot weaving aren't tracked — the simulation names what it left out rather than
+  guessing a rate. There is still no multi-ability priority, so melee specs remain understated.
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.

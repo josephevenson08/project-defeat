@@ -442,7 +442,7 @@ Slot *visibility* is therefore spec-aware rather than fixed, and slot *compatibi
 
 This is deliberately *not* a rotation model. It exists to replace the generic 3s-nuke and 2.5s-heal placeholders in the simulator with something spec-specific, and every entry's notes say how far that approximation sits from the spec's real rotation. Multi-ability priority, cooldown usage, proc modelling, and talent scaling are all still ahead.
 
-Specs whose signature ability is a physical special (Bloodthirst, Mutilate, Steady Shot) keep the generic cast on the spell side, because those scale off attack power and weapon damage and belong to the physical path instead.`,
+Specs whose signature ability is a physical special (Bloodthirst, Mutilate, Steady Shot) keep the generic cast on the spell side, because those scale off attack power and weapon damage and belong to the physical path instead — where the melee ones are now layered on through a separate yellow attack table.`,
     modules: ['domain/abilities/abilityTypes.ts', 'features/simulator/calculateSimulation.ts'],
     related: ['Spell Coefficients', 'Stat Weights'],
   },
@@ -1249,7 +1249,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       'Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:',
       '',
-      `1. **Rotation modelling** — ${link('Signature Abilities')} feed the caster and healer estimates, but the physical path still ignores them and remains white-damage only. Melee specs are therefore understated by however much of their damage is yellow, which varies by spec. That is the biggest remaining accuracy gap in ${link('Phase 4 - Simulation')}.`,
+      `1. **Multi-ability rotations** — every path now models exactly one ability per spec. Melee specs additionally lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated. Real rotation priority is the biggest remaining accuracy gap in ${link('Phase 4 - Simulation')}.`,
       `2. **Item catalog source errors** — cross-referencing the raid data against ${link('domain.gear.sampleItems')} surfaced several items recorded against the wrong boss or instance, and one (\`justicars-warblade\`) with no evidence it exists in TBC at all. The raid data flags the conflicts; the catalog has not been corrected.`,
       '',
       '## Related',
@@ -1299,7 +1299,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       '## Simulation',
       '',
-      `- The physical path is white-damage only: weapon dice plus attack power through the attack table. No specials, no rotation. Melee specs are therefore understated, and by different amounts depending on how much of their damage is yellow.`,
+      `- The physical path models white damage plus one signature melee special, and only where its rate is defensible (a cooldown, or an energy cost against energy's fixed 10/sec regen). Rage-costed abilities with no cooldown and Hunter's Steady Shot are excluded and named in the result summary. No multi-ability priority, so melee specs remain understated.`,
       `- The caster and healer paths model one real ability per spec (${link('Signature Abilities')}) — no cooldowns, procs, downranking, or multi-spell priority.`,
       '- No multi-iteration variance and no result charts, so every number is a point estimate with no error bar.',
       '- Tank avoidance reuses the player-attacks-target skill formulas symmetrically, which is an approximation flagged in the code.',

@@ -36,6 +36,7 @@ export const shamanSignatureAbilities: readonly SignatureAbility[] = [
       basis: 'weapon damage',
       weaponDamageMultiplier: 1,
       normalizedWeaponDamage: false,
+      hitsBothWeapons: true,
       coefficientNotes:
         'Attacks with BOTH weapons for 100% of un-normalized weapon damage each, so the multiplier applies once per hand. No flat bonus and no attack power coefficient of its own.',
     },

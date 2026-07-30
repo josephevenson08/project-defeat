@@ -87,7 +87,7 @@ export function findUpgrades(
         },
       }
 
-      const scoreDelta = scoreFor(candidateGear).score - baseline.score
+      const scoreDelta = scoreFor(candidateGear).scoreExact - baseline.scoreExact
       if (scoreDelta <= 0) continue
 
       candidates.push({
@@ -95,7 +95,7 @@ export function findUpgrades(
         item,
         replacesName: equipped.item.name,
         scoreDelta,
-        percentDelta: baseline.score === 0 ? 0 : (scoreDelta / baseline.score) * 100,
+        percentDelta: baseline.scoreExact === 0 ? 0 : (scoreDelta / baseline.scoreExact) * 100,
         hasUnfilledSockets: (item.sockets?.length ?? 0) > 0,
         enchantId: carriedEnchantId,
       })

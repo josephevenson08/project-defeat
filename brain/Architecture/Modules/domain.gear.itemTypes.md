@@ -38,6 +38,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`

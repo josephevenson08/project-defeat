@@ -21,7 +21,7 @@ The long-term goal: a local-first TBC Classic Anniversary simulator/planner cove
 
 Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:
 
-1. **Rotation modelling** — [[Signature Abilities]] feed the caster and healer estimates, but the physical path still ignores them and remains white-damage only. Melee specs are therefore understated by however much of their damage is yellow, which varies by spec. That is the biggest remaining accuracy gap in [[Phase 4 - Simulation]].
+1. **Multi-ability rotations** — every path now models exactly one ability per spec. Melee specs additionally lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated. Real rotation priority is the biggest remaining accuracy gap in [[Phase 4 - Simulation]].
 2. **Item catalog source errors** — cross-referencing the raid data against [[domain.gear.sampleItems]] surfaced several items recorded against the wrong boss or instance, and one (`justicars-warblade`) with no evidence it exists in TBC at all. The raid data flags the conflicts; the catalog has not been corrected.
 
 ## Related

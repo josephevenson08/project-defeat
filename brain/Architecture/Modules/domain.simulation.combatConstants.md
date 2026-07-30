@@ -33,6 +33,7 @@ _None._
 
 - [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
+- [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 
 ## Concepts & phases

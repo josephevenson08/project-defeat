@@ -10,7 +10,7 @@ Kept deliberately blunt. A planner that overstates its accuracy is worse than on
 
 ## Simulation
 
-- The physical path is white-damage only: weapon dice plus attack power through the attack table. No specials, no rotation. Melee specs are therefore understated, and by different amounts depending on how much of their damage is yellow.
+- The physical path models white damage plus one signature melee special, and only where its rate is defensible (a cooldown, or an energy cost against energy's fixed 10/sec regen). Rage-costed abilities with no cooldown and Hunter's Steady Shot are excluded and named in the result summary. No multi-ability priority, so melee specs remain understated.
 - The caster and healer paths model one real ability per spec ([[Signature Abilities]]) — no cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate with no error bar.
 - Tank avoidance reuses the player-attacks-target skill formulas symmetrically, which is an approximation flagged in the code.

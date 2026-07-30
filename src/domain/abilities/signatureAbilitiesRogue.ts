@@ -16,6 +16,7 @@ export const rogueSignatureAbilities: readonly SignatureAbility[] = [
       weaponDamageMultiplier: 1,
       normalizedWeaponDamage: true,
       flatWeaponDamageBonus: 101,
+      hitsBothWeapons: true,
       coefficientNotes:
         'Strikes with BOTH weapons: each hand deals its own normalized weapon damage plus 101, so the listed multiplier and flat bonus apply twice per cast. Damage is increased by 50% against a poisoned target, which in practice is always true with Deadly Poison up. Requires daggers.',
     },

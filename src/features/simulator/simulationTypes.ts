@@ -8,7 +8,14 @@ export type SimulationBreakdownEntry = {
 export type SimulationResult = {
   role: CharacterRole
   metricLabel: 'Estimated DPS' | 'Estimated Healing' | 'Survivability Score'
+  /** Rounded to one decimal for display. */
   score: number
+  /**
+   * The same value unrounded. Anything that *computes* with a result — stat weights, upgrade deltas —
+   * must use this: those take small differences between two runs, and rounding to one decimal first
+   * turns a 1.5% quantisation error into a visibly wrong weight.
+   */
+  scoreExact: number
   summary: string
   breakdown: SimulationBreakdownEntry[]
 }
