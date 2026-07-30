@@ -1,3 +1,5 @@
+import { getSignatureAbility } from '../../domain/abilities'
+import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
 import { buildRangedAttackTable, buildWhiteAttackTable, computeGlanceDamageRange, computeSkillDiff } from '../../domain/simulation/attackTable'
 import {
@@ -20,6 +22,85 @@ const PLAYER_LEVEL = 70
 const DUAL_WIELD_WEAPON_TYPES = new Set(['Axe', 'Dagger', 'Fist Weapon', 'Mace', 'Sword'])
 const GENERIC_NUKE_CAST_TIME = 3
 const GENERIC_HEAL_CAST_TIME = 2.5
+
+/**
+ * The cast profile the spell-side estimates actually run on: either a spec's real signature ability
+ * or the generic placeholder cast it replaces.
+ *
+ * `castTimeSeconds` is what haste divides into and what determines casts-per-second.
+ * `coefficient` is the spell-power/healing-power scaling for the modeled component — read from the
+ * ability's researched value where one exists rather than recomputed, because several TBC
+ * coefficients are hardcoded exceptions that the castTime/3.5 formula gets wrong (Fireball 1.0,
+ * Frostbolt 0.8143).
+ * `baseAmount` is the ability's flat base damage/healing before scaling — previously absent
+ * entirely, which is why the old summaries said "scales from spell power only".
+ */
+type CastProfile = {
+  label: string
+  castTimeSeconds: number
+  coefficient: number
+  baseAmount: number
+  /** Undefined for the generic fallback, so the summary can say so honestly. */
+  ability?: SignatureAbility
+}
+
+function averageBaseAmount(ability: SignatureAbility) {
+  if (!ability.baseAmount) return 0
+  return (ability.baseAmount.min + ability.baseAmount.max) / 2
+}
+
+/**
+ * A signature ability only replaces the placeholder when it is actually a cast the spell-side
+ * estimate can model. Physical specials (Bloodthirst, Mutilate, Steady Shot) scale off attack power
+ * and weapon damage, so they belong to the physical path, and a spec whose signature ability is one
+ * of those keeps the generic cast here rather than being modeled wrongly.
+ */
+function isSpellCast(ability: SignatureAbility) {
+  return (
+    ability.effectType === 'Direct Damage' ||
+    ability.effectType === 'DoT' ||
+    ability.effectType === 'Direct Heal' ||
+    ability.effectType === 'HoT'
+  )
+}
+
+function resolveCastProfile(character: CharacterProfile, fallbackCastTime: number): CastProfile {
+  const ability = getSignatureAbility(character.className, character.spec)
+
+  if (!ability || !isSpellCast(ability)) {
+    return {
+      label: `generic ${fallbackCastTime}s cast`,
+      castTimeSeconds: fallbackCastTime,
+      coefficient: directSpellCoefficient(fallbackCastTime),
+      baseAmount: 0,
+    }
+  }
+
+  // Periodic effects deliver over a duration rather than per cast, so the cast-time divisor for a
+  // DoT/HoT is its channel/duration rather than its cast time; an instant DoT would otherwise
+  // divide by zero and report infinite casts per second.
+  const periodicDuration = ability.periodic?.durationSeconds
+  const castTimeSeconds =
+    ability.castTimeSeconds > 0
+      ? ability.castTimeSeconds
+      : (ability.effectType === 'DoT' || ability.effectType === 'HoT') && periodicDuration
+        ? periodicDuration
+        : ability.gcdSeconds
+
+  const periodicTotal = ability.periodic?.totalBaseAmount ?? 0
+  const baseAmount =
+    ability.effectType === 'DoT' || ability.effectType === 'HoT'
+      ? periodicTotal || averageBaseAmount(ability)
+      : averageBaseAmount(ability)
+
+  return {
+    label: `${ability.name}${ability.rank ? ` (rank ${ability.rank})` : ''}`,
+    castTimeSeconds,
+    coefficient: ability.scaling.spellPowerCoefficient ?? directSpellCoefficient(castTimeSeconds),
+    baseAmount,
+    ability,
+  }
+}
 
 function round(value: number) {
   return Math.round(value * 10) / 10
@@ -122,56 +203,71 @@ function calculatePhysicalDps(
   }
 }
 
-function calculateCasterDps(stats: StatBlock, target: SimulationTarget, debuffs: ReturnType<typeof aggregateTargetDebuffs>): SimulationResult {
+function calculateCasterDps(
+  character: CharacterProfile,
+  stats: StatBlock,
+  target: SimulationTarget,
+  debuffs: ReturnType<typeof aggregateTargetDebuffs>,
+): SimulationResult {
+  const cast = resolveCastProfile(character, GENERIC_NUKE_CAST_TIME)
   const levelDiff = target.level - PLAYER_LEVEL
   const spellHitChance = computeSpellHitChance(levelDiff, ratingToFraction(stats.spellHitRating, RATING_PER_PERCENT.spellHit))
   const spellCritChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit)) + debuffs.spellCritTakenBonus
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
-  const effectiveCastTime = GENERIC_NUKE_CAST_TIME / (1 + hastePercent)
+  const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
-  const coefficient = directSpellCoefficient(GENERIC_NUKE_CAST_TIME)
-  const damagePerCast = stats.spellPower * coefficient * (1 + debuffs.spellDamageTakenMultiplier)
+  const damagePerCast = (cast.baseAmount + stats.spellPower * cast.coefficient) * (1 + debuffs.spellDamageTakenMultiplier)
   const expectedDamagePerCast = damagePerCast * (1 + spellCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
   const dps = expectedDamagePerCast * spellHitChance * castsPerSecond
 
   const breakdown: SimulationBreakdownEntry[] = [
-    { label: 'Spell power scaling', value: round(stats.spellPower * coefficient * castsPerSecond) },
+    { label: 'Base damage per cast', value: round(cast.baseAmount) },
+    { label: 'Spell power scaling', value: round(stats.spellPower * cast.coefficient * castsPerSecond) },
     { label: 'Spell hit chance', value: toPercent(spellHitChance) },
     { label: 'Spell crit chance', value: toPercent(spellCritChance) },
     { label: 'Casts per second', value: round(castsPerSecond) },
   ]
 
+  const summary = cast.ability
+    ? `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base damage, and ${cast.coefficient} spell-power coefficient. Single-ability approximation — cooldowns, procs, and multi-spell rotation priority aren't modeled.`
+    : `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, assuming a ${cast.label}. Scales from spell power only — this spec has no modeled signature cast.`
+
   return {
     role: 'Caster DPS',
     metricLabel: 'Estimated DPS',
     score: round(dps),
-    summary: `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, assuming a generic ${GENERIC_NUKE_CAST_TIME}s filler cast. Scales from spell power only — base spell damage per ability isn't modeled yet.`,
+    summary,
     breakdown,
   }
 }
 
-function calculateHealing(stats: StatBlock): SimulationResult {
+function calculateHealing(character: CharacterProfile, stats: StatBlock): SimulationResult {
+  const cast = resolveCastProfile(character, GENERIC_HEAL_CAST_TIME)
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
-  const effectiveCastTime = GENERIC_HEAL_CAST_TIME / (1 + hastePercent)
+  const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
-  const coefficient = directSpellCoefficient(GENERIC_HEAL_CAST_TIME)
   const critChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit))
-  const healPerCast = stats.healingPower * coefficient
+  const healPerCast = cast.baseAmount + stats.healingPower * cast.coefficient
   const expectedHealPerCast = healPerCast * (1 + critChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
   const hps = expectedHealPerCast * castsPerSecond
 
   const breakdown: SimulationBreakdownEntry[] = [
-    { label: 'Healing power scaling', value: round(stats.healingPower * coefficient * castsPerSecond) },
+    { label: 'Base healing per cast', value: round(cast.baseAmount) },
+    { label: 'Healing power scaling', value: round(stats.healingPower * cast.coefficient * castsPerSecond) },
     { label: 'Crit chance', value: toPercent(critChance) },
     { label: 'Casts per second', value: round(castsPerSecond) },
     { label: 'MP5', value: stats.mp5 },
   ]
 
+  const summary = cast.ability
+    ? `Heal crit/haste estimate modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base healing, and ${cast.coefficient} healing coefficient. Single-ability approximation — no downranking, HoT overlap, or triage decisions.`
+    : `Heal crit/haste estimate assuming a ${cast.label}. Scales from healing power only — this spec has no modeled signature cast.`
+
   return {
     role: 'Healer',
     metricLabel: 'Estimated Healing',
     score: round(hps),
-    summary: `Heal crit/haste estimate assuming a generic ${GENERIC_HEAL_CAST_TIME}s cast. Scales from healing power only — spell-specific base healing isn't modeled yet.`,
+    summary,
     breakdown,
   }
 }
@@ -224,8 +320,8 @@ export function calculateSimulation(
 ): SimulationResult {
   const debuffs = aggregateTargetDebuffs(activeTargetDebuffIds)
 
-  if (role === 'Caster DPS') return calculateCasterDps(stats, target, debuffs)
-  if (role === 'Healer') return calculateHealing(stats)
+  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs)
+  if (role === 'Healer') return calculateHealing(character, stats)
   if (role === 'Tank') return calculateTankSurvivability(stats, target)
   return calculatePhysicalDps(character, gear, stats, target, debuffs)
 }
