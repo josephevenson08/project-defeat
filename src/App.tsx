@@ -11,9 +11,12 @@ import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
+import { EncounterPanel } from './features/simulator/EncounterPanel'
 import { SimulatorPanel } from './features/simulator/SimulatorPanel'
 import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
+import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
+import type { SimulationTarget } from './domain/simulation/encounterTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsPanel } from './features/stats/StatsPanel'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
@@ -45,6 +48,7 @@ function App() {
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
   const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>([])
   const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>([])
+  const [target, setTarget] = useState<SimulationTarget>(defaultSimulationTarget)
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const role = getRoleForSpec(character.className, character.spec)
@@ -55,8 +59,8 @@ function App() {
   // Cheap enough to keep live (a handful of pure re-runs of the sim), and stat priority is reference
   // information you want visible while gearing rather than something to press a button for.
   const statWeights = useMemo(
-    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds),
-    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds],
+    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
+    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
   )
 
   function updateGear(slot: GearSlot, equippedSlot: EquippedSlot) {
@@ -85,8 +89,13 @@ function App() {
     setSimulationResult(undefined)
   }
 
+  function updateTarget(nextTarget: SimulationTarget) {
+    setTarget(nextTarget)
+    setSimulationResult(undefined)
+  }
+
   function runSimulation() {
-    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds))
+    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target))
   }
 
   const completeIntro = useCallback(() => {
@@ -112,6 +121,7 @@ function App() {
             onToggleTargetDebuff={toggleTargetDebuff}
           />
           <StatsPanel stats={stats} role={role} />
+          <EncounterPanel target={target} role={role} onChange={updateTarget} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
           <StatWeightsPanel weights={statWeights} role={role} />
         </>

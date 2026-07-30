@@ -901,3 +901,34 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await expect(page.getByTestId('stat-weight-stamina')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
 })
+
+test('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
+  await page.goto('/')
+
+  const mitigation = page.getByTestId('encounter-armor-mitigation')
+
+  // Default target is the heavily-armored 10643-armor boss. DR = armor / (armor + K) where
+  // K = 467.5 * 70 - 22167.5 = 10557.5, so 10643 / 21200.5 = 50.2%.
+  await expect(mitigation).toHaveText('50.2%')
+
+  // Dropping to the cloth-target preset must visibly reduce mitigation.
+  await page.getByRole('button', { name: /Cloth \/ caster target/ }).click()
+  await expect(mitigation).toHaveText('24.9%')
+
+  // ...and that has to actually reach the simulation, not just the encounter panel.
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const lowArmorScore = Number(await page.getByTestId('simulation-score').innerText())
+
+  await page.getByRole('button', { name: /Heavily armored boss/ }).click()
+  await expect(mitigation).toHaveText('50.2%')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const highArmorScore = Number(await page.getByTestId('simulation-score').innerText())
+
+  expect(lowArmorScore).toBeGreaterThan(highArmorScore)
+
+  // Target level drives the attack table, so it must move the result too.
+  await page.getByLabel('Target level').selectOption('70')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const evenLevelScore = Number(await page.getByTestId('simulation-score').innerText())
+  expect(evenLevelScore).toBeGreaterThan(highArmorScore)
+})
