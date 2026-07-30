@@ -35,7 +35,7 @@ export const priestSignatureAbilities: readonly SignatureAbility[] = [
     resource: { type: 'Mana', cost: 450 },
     baseAmount: { min: 409, max: 451 },
     scaling: {
-      basis: 'hardcoded exception',
+      basis: 'instant 1.5/3.5',
       spellPowerCoefficient: 0.2143,
       coefficientNotes:
         'Instant, so the cast time clamps to the 1.5s floor giving 1.5/3.5 = 0.4286 — then halved to 0.2143 because Circle of Healing is an area-effect spell, and TBC gives area effects only half the computed coefficient. The 0.2143 applies per target healed, so a full 5-target hit is worth ~1.07 total.',

@@ -63,10 +63,10 @@ export const mageSignatureAbilities: readonly SignatureAbility[] = [
     resource: { type: 'Mana', cost: 330 },
     baseAmount: { min: 600, max: 647 },
     scaling: {
-      basis: 'hardcoded exception',
+      basis: 'castTime/3.5',
       spellPowerCoefficient: 0.8143,
       coefficientNotes:
-        'The single best-known TBC coefficient exception: (3.0 / 3.5) * 0.95 = 0.8143. The 5% penalty is the standard "additional effect" tax, charged because Frostbolt also applies a movement slow. Confirmed identically by wowsims and by TBC server-side spell data.',
+        'The best-known TBC coefficient oddity, but not actually an exception: (3.0 / 3.5) * 0.95 = 0.8143, where the 5% penalty is the standard "additional effect" tax charged because Frostbolt also applies a movement slow. The formula reproduces it exactly, even though the game also stores it as an explicit override. Confirmed identically by wowsims and by TBC server-side spell data.',
     },
     notes:
       'Frost is a Frostbolt-spam spec and is the cleanest fit of any caster for a single-ability model. Frost was not a competitive raid DPS spec in Phase 1/2 (it is generally an Arcane or Fire mage that is brought), so accuracy here matters mostly for completeness. Frostbolt is a binary spell for resistance purposes, which is why Elemental Precision gives it double hit value.',
