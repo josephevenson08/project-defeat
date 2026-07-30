@@ -797,6 +797,75 @@ input[type='number']:focus {
   margin-top: 8px;
 }
 
+.upgrades-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.upgrade-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.upgrade-row {
+  align-items: center;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr auto auto;
+  padding: 12px 14px;
+}
+
+.upgrade-slot {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.upgrade-main h4 {
+  font-size: 15px;
+  margin: 3px 0 0;
+}
+
+.upgrade-main p {
+  color: #94a3b8;
+  margin: 4px 0 0;
+}
+
+.upgrade-socket-note {
+  color: #67e8f9;
+  display: block;
+  margin-top: 4px;
+}
+
+.upgrade-delta {
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+  min-width: 74px;
+}
+
+.upgrade-delta strong {
+  color: #4ade80;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.upgrade-delta span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.upgrade-equip-button {
+  gap: 8px;
+  min-height: 38px;
+  white-space: nowrap;
+}
+
 .stat-weights-panel-shell {
   grid-column: 1 / -1;
 }

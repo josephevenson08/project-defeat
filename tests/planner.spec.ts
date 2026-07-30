@@ -231,7 +231,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expect(page.getByText('Enhancement Shaman Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Cataclysm Headguard' })).toBeVisible()
+  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Headguard' })).toBeVisible()
   await expect(page.getByText(/Item ID 30190/i)).toBeVisible()
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
@@ -816,7 +816,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
   await expect(page.getByText('Destruction Warlock Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Voidheart Cover' })).toBeVisible()
+  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Voidheart Cover' })).toBeVisible()
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
@@ -931,4 +931,37 @@ test('encounter settings change armor mitigation and feed back into the simulati
   await page.getByRole('button', { name: /run simulation/i }).click()
   const evenLevelScore = Number(await page.getByTestId('simulation-score').innerText())
   expect(evenLevelScore).toBeGreaterThan(highArmorScore)
+})
+
+test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
+  await page.goto('/')
+
+  const list = page.getByTestId('upgrade-list')
+  await expect(list).toBeVisible()
+
+  const rows = list.locator('.upgrade-row')
+  await expect(rows.first()).toBeVisible()
+
+  // A single weak slot must not monopolise the list — the per-slot cap should surface several slots.
+  const slotLabels = await list.locator('.upgrade-slot').allInnerTexts()
+  expect(new Set(slotLabels).size).toBeGreaterThan(1)
+
+  // Deltas are strictly positive (only genuine upgrades are listed) and sorted descending.
+  const deltas = (await list.locator('.upgrade-delta strong').allInnerTexts()).map((text) => Number(text.replace('+', '')))
+  expect(deltas[0]).toBeGreaterThan(0)
+  expect([...deltas]).toEqual([...deltas].sort((a, b) => b - a))
+
+  // The headline claim has to hold: equipping the top pick should move the simulation by
+  // approximately the advertised amount.
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const before = Number(await page.getByTestId('simulation-score').innerText())
+
+  const topDelta = deltas[0]
+  await rows.first().getByRole('button', { name: /equip/i }).click()
+
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const after = Number(await page.getByTestId('simulation-score').innerText())
+
+  expect(after - before).toBeGreaterThan(0)
+  expect(Math.abs(after - before - topDelta)).toBeLessThan(0.5)
 })

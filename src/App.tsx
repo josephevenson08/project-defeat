@@ -12,8 +12,10 @@ import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearT
 import { calculateSimulation } from './features/simulator/calculateSimulation'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { EncounterPanel } from './features/simulator/EncounterPanel'
+import { findUpgrades } from './features/simulator/findUpgrades'
 import { SimulatorPanel } from './features/simulator/SimulatorPanel'
 import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
+import { UpgradesPanel } from './features/simulator/UpgradesPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import type { SimulationTarget } from './domain/simulation/encounterTypes'
@@ -89,6 +91,11 @@ function App() {
     setSimulationResult(undefined)
   }
 
+  const upgradeReport = useMemo(
+    () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
+    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
+  )
+
   function updateTarget(nextTarget: SimulationTarget) {
     setTarget(nextTarget)
     setSimulationResult(undefined)
@@ -124,6 +131,7 @@ function App() {
           <EncounterPanel target={target} role={role} onChange={updateTarget} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
           <StatWeightsPanel weights={statWeights} role={role} />
+          <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
         </>
       ) : (
         <ProfessionsPanel />

@@ -1,0 +1,83 @@
+import { CheckCircle2 } from 'lucide-react'
+import { Panel } from '../../components/layout/Panel'
+import { Button } from '../../components/ui/Button'
+import type { CharacterRole } from '../../domain/character/characterTypes'
+import { getRoleAccentColor } from '../../domain/character/roleTheme'
+import { getQualityColor } from '../../domain/gear/qualityColors'
+import { animateEquipFeedback } from '../../lib/animations'
+import type { CharacterProfile } from '../character/characterTypes'
+import { getGearSlotDisplayName } from '../gear/gearData'
+import type { EquippedSlot, GearItem, GearSlot } from '../gear/gearTypes'
+import type { UpgradeReport } from './findUpgrades'
+
+type UpgradesPanelProps = {
+  character: CharacterProfile
+  report: UpgradeReport
+  role: CharacterRole
+  onEquip: (slot: GearSlot, equippedSlot: EquippedSlot) => void
+}
+
+function itemOrigin(item: GearItem) {
+  return [item.instance, item.boss, item.vendor, item.reputation, item.craftedBy, item.zone].filter(Boolean).join(' · ')
+}
+
+export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPanelProps) {
+  return (
+    <Panel title="Upgrade Finder" eyebrow="Ranked gear swaps" accentColor={getRoleAccentColor(role)} className="upgrades-panel-shell">
+      <p className="panel-copy">
+        Every legal item for every slot, simulated as a straight swap and ranked by how much it moves the result.
+        Candidates are evaluated <strong>ungemmed</strong> — a socketed piece is usually worth more than shown — while
+        the slot&apos;s current enchant carries over whenever it stays legal.
+      </p>
+
+      {report.candidates.length === 0 ? (
+        <div className="simulation-empty" data-testid="upgrades-empty">
+          No item in the catalog beats what&apos;s already equipped for this spec. That usually means the current set is
+          already the best this (still sample-sized) catalog can offer, not that the character is finished.
+        </div>
+      ) : (
+        <div className="upgrade-list" data-testid="upgrade-list">
+          {report.candidates.map((candidate) => {
+            const displaySlot = getGearSlotDisplayName(candidate.slot, character.className, character.spec)
+
+            return (
+              <article className="upgrade-row" key={`${candidate.slot}-${candidate.item.id}`}>
+                <div className="upgrade-main">
+                  <span className="upgrade-slot">{displaySlot}</span>
+                  <h4 style={{ color: getQualityColor(candidate.item.quality) }}>{candidate.item.name}</h4>
+                  <p>
+                    replaces {candidate.replacesName}
+                    {itemOrigin(candidate.item) ? ` · ${itemOrigin(candidate.item)}` : ''}
+                  </p>
+                  {candidate.hasUnfilledSockets && <small className="upgrade-socket-note">Has empty sockets — gemming adds more.</small>}
+                </div>
+
+                <div className="upgrade-delta">
+                  <strong>+{Math.round(candidate.scoreDelta * 10) / 10}</strong>
+                  <span>+{candidate.percentDelta.toFixed(1)}%</span>
+                </div>
+
+                <Button
+                  className="upgrade-equip-button"
+                  onClick={(event) => {
+                    animateEquipFeedback(event.currentTarget)
+                    onEquip(candidate.slot, {
+                      item: candidate.item,
+                      gemIds: candidate.item.sockets?.map(() => '') ?? [],
+                      // Must match what findUpgrades scored, or the realised gain won't equal the
+                      // delta shown on this row.
+                      enchantId: candidate.enchantId,
+                    })
+                  }}
+                >
+                  <CheckCircle2 aria-hidden="true" size={16} />
+                  Equip
+                </Button>
+              </article>
+            )
+          })}
+        </div>
+      )}
+    </Panel>
+  )
+}
