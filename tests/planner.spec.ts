@@ -844,3 +844,60 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
 })
+
+test('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
+  await page.goto('/')
+
+  // Default character is a Fury Warrior (melee physical DPS).
+  const weights = page.getByTestId('stat-weights')
+  await expect(weights).toBeVisible()
+
+  // Strength grants exactly 2 attack power per point in calculateStats, so its weight relative to
+  // attack power must come out at exactly 2.00. This is the load-bearing assertion: it proves the
+  // probe is applied *before* the primary-stat derivations rather than after them, which is the
+  // whole reason `bonusStats` exists.
+  await expect(page.getByTestId('stat-weight-strength')).toContainText('2.00')
+  await expect(page.getByTestId('stat-weight-attackPower')).toContainText('1.00')
+
+  // Melee never reads ranged attack power, so it should not be probed at all for a Warrior.
+  await expect(page.getByTestId('stat-weight-rangedAttackPower')).toHaveCount(0)
+
+  // Haste and armor penetration aren't read by the engine yet; they must be called out as
+  // unmodeled rather than silently listed as worth zero.
+  const unmodeled = page.locator('.stat-weights-unmodeled')
+  await expect(unmodeled).toContainText('Haste Rating')
+  await expect(unmodeled).toContainText('Armor Pen')
+  await expect(page.getByTestId('stat-weight-hasteRating')).toHaveCount(0)
+})
+
+test('stat weights follow the character role and class', async ({ page }) => {
+  await page.goto('/')
+
+  // Hunters run the ranged attack table, so ranged attack power replaces melee AP as the reference.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
+  await page.getByLabel('Class').selectOption('Hunter')
+  await expect(page.getByTestId('stat-weight-rangedAttackPower')).toContainText('1.00')
+  await expect(page.getByTestId('stat-weight-strength')).toHaveCount(0)
+  await expect(page.getByTestId('stat-weight-agility')).toBeVisible()
+
+  // Casters switch to the spell stat set entirely.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByTestId('stat-weight-spellPower')).toContainText('1.00')
+  await expect(page.getByTestId('stat-weight-spellCritRating')).toBeVisible()
+  await expect(page.getByTestId('stat-weight-attackPower')).toHaveCount(0)
+
+  // Healers normalize against healing power and surface MP5 as not-yet-modeled. Gnomes can't be
+  // Priests in TBC, so the race has to move first — the Class dropdown genuinely won't offer it.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Human')
+  await page.getByLabel('Class').selectOption('Priest')
+  await page.getByLabel('Specialization').selectOption('Holy')
+  await expect(page.getByTestId('stat-weight-healingPower')).toContainText('1.00')
+  await expect(page.locator('.stat-weights-unmodeled')).toContainText('MP5')
+
+  // Tanks normalize against stamina and get the avoidance stat set.
+  await page.getByLabel('Class').selectOption('Warrior')
+  await page.getByLabel('Specialization').selectOption('Protection')
+  await expect(page.getByTestId('stat-weight-stamina')).toContainText('1.00')
+  await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
+})

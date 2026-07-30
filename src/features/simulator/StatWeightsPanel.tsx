@@ -23,10 +23,10 @@ export function StatWeightsPanel({ weights, role }: StatWeightsPanelProps) {
   return (
     <Panel title="Stat Priority" eyebrow="Stat weights (EP)" accentColor={getRoleAccentColor(role)} className="stat-weights-panel-shell">
       <p className="panel-copy">
-        Each stat is probed by adding {weights.probeAmount} of it, re-running the simulation, and measuring how far{' '}
-        {weights.metricLabel.toLowerCase()} moved. Values are per single point, normalized so 1 point of{' '}
-        {weights.referenceLabel} = 1.00. A stat sitting at 0 here is either already capped (extra points genuinely do
-        nothing) or not yet modeled — the two are listed separately below.
+        Each stat is probed by adding {weights.probeAmount} of it, re-running the simulation, and measuring how far the
+        result moved. Values are per single point, normalized so 1 point of {weights.referenceLabel} = 1.00. A stat
+        sitting at 0 here is either already capped (extra points genuinely do nothing) or not yet modeled — the two are
+        listed separately below.
       </p>
 
       <div className="stat-weights" data-testid="stat-weights">

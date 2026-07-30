@@ -12,24 +12,46 @@ import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
  */
 const PROBE_AMOUNT = 100
 
-/** Stats worth probing for each role, in rough "player cares about this" order. */
-const STATS_BY_ROLE: Record<CharacterRole, readonly (keyof StatBlock)[]> = {
-  'Physical DPS': ['strength', 'agility', 'attackPower', 'rangedAttackPower', 'critRating', 'hitRating', 'expertiseRating', 'hasteRating', 'armorPenetration'],
-  'Caster DPS': ['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating'],
-  Healer: ['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating', 'mp5'],
-  Tank: ['stamina', 'armor', 'defenseRating', 'dodgeRating', 'parryRating', 'blockRating', 'blockValue', 'agility'],
-}
+/** Melee physical DPS. Ranged attack power is deliberately absent — the melee path never reads it. */
+const MELEE_DPS_STATS: readonly (keyof StatBlock)[] = [
+  'strength',
+  'agility',
+  'attackPower',
+  'critRating',
+  'hitRating',
+  'expertiseRating',
+  'hasteRating',
+  'armorPenetration',
+]
 
 /**
- * Stats the simulation engine currently reads for each role, either directly or via a derived stat.
- * Anything probed but absent here scores zero because the model doesn't consider it *yet* — which is
- * a very different statement from "this stat is worthless", so the UI must not conflate the two.
+ * Hunters run the ranged attack table instead, which reads ranged attack power and never consults
+ * Strength, melee attack power, or Expertise — so probing those would only ever print a misleading
+ * row of zeroes.
  */
-const STATS_CONSUMED_BY_ROLE: Record<CharacterRole, ReadonlySet<keyof StatBlock>> = {
+const RANGED_DPS_STATS: readonly (keyof StatBlock)[] = ['agility', 'rangedAttackPower', 'critRating', 'hitRating', 'hasteRating', 'armorPenetration']
+
+const CASTER_DPS_STATS: readonly (keyof StatBlock)[] = ['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating']
+const HEALER_STATS: readonly (keyof StatBlock)[] = ['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating', 'mp5']
+const TANK_STATS: readonly (keyof StatBlock)[] = ['stamina', 'armor', 'defenseRating', 'dodgeRating', 'parryRating', 'blockRating', 'blockValue', 'agility']
+
+/**
+ * Stats the simulation engine currently reads, either directly or via a derived stat. Anything
+ * probed but absent here scores zero because the model doesn't consider it *yet* — a very different
+ * statement from "this stat is worthless in TBC", so the UI must not conflate the two.
+ */
+const CONSUMED_STATS: Record<CharacterRole, ReadonlySet<keyof StatBlock>> = {
   'Physical DPS': new Set<keyof StatBlock>(['strength', 'agility', 'attackPower', 'rangedAttackPower', 'critRating', 'hitRating', 'expertiseRating']),
   'Caster DPS': new Set<keyof StatBlock>(['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating']),
   Healer: new Set<keyof StatBlock>(['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating']),
   Tank: new Set<keyof StatBlock>(['stamina', 'armor', 'defenseRating', 'dodgeRating', 'parryRating', 'blockRating', 'agility']),
+}
+
+function statsToProbe(role: CharacterRole, character: CharacterProfile): readonly (keyof StatBlock)[] {
+  if (role === 'Caster DPS') return CASTER_DPS_STATS
+  if (role === 'Healer') return HEALER_STATS
+  if (role === 'Tank') return TANK_STATS
+  return character.className === 'Hunter' ? RANGED_DPS_STATS : MELEE_DPS_STATS
 }
 
 /** The stat each role's weights are normalized against, so 1.0 means "worth the same as one point of this". */
@@ -38,6 +60,11 @@ const REFERENCE_STAT_BY_ROLE: Record<CharacterRole, keyof StatBlock> = {
   'Caster DPS': 'spellPower',
   Healer: 'healingPower',
   Tank: 'stamina',
+}
+
+function referenceStatFor(role: CharacterRole, character: CharacterProfile): keyof StatBlock {
+  if (role === 'Physical DPS' && character.className === 'Hunter') return 'rangedAttackPower'
+  return REFERENCE_STAT_BY_ROLE[role]
 }
 
 const STAT_LABEL_LOOKUP = new Map<keyof StatBlock, string>(statLabels)
@@ -89,9 +116,9 @@ export function calculateStatWeights(
   }
 
   const baseline = runScore()
-  const consumed = STATS_CONSUMED_BY_ROLE[role]
+  const consumed = CONSUMED_STATS[role]
 
-  const rawEntries = STATS_BY_ROLE[role].map((stat) => {
+  const rawEntries = statsToProbe(role, character).map((stat) => {
     const probed = runScore({ [stat]: PROBE_AMOUNT })
     return {
       stat,
@@ -101,7 +128,7 @@ export function calculateStatWeights(
     }
   })
 
-  const referenceStat = REFERENCE_STAT_BY_ROLE[role]
+  const referenceStat = referenceStatFor(role, character)
   const referencePerPoint = rawEntries.find((entry) => entry.stat === referenceStat)?.perPoint ?? 0
 
   const entries = rawEntries
