@@ -22,7 +22,11 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 .idea
-.claude/
+# Agent scratch space (worktrees, locks, launch config) stays local, but the project's own
+# skills and agent definitions are part of the repo — they describe how to work on THIS project.
+.claude/*
+!.claude/skills/
+!.claude/agents/
 .DS_Store
 *.suo
 *.ntvs*
