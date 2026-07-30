@@ -27,6 +27,11 @@ Early MVP / foundation phase.
   - Healer
   - Tank
 - Result breakdown panel
+- Raids tab: all five Phase 1/2 raids boss by boss, with per-role callouts, notable drops colour-coded
+  by item quality where the drop exists in the catalog, and step-by-step attunement chains for
+  Serpentshrine Cavern and Tempest Keep
+- Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
+- Configurable encounter settings (target level, armor, duration)
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
 - Reduced-motion aware animation helpers
 - Playwright tests for physical, caster, healer, and tank flows
@@ -82,14 +87,40 @@ npx playwright install --with-deps
 - `npm run test:ui` opens Playwright's UI runner.
 - `npm run preview` previews the production build.
 
+## Project Brain (Obsidian vault)
+
+The repo root doubles as an Obsidian vault. `brain/` holds a generated, cross-linked note network that
+Obsidian's graph view renders as a live map of the project:
+
+- **Architecture/** — one note per source module with its real import and importer edges, so the graph
+  of that folder *is* the dependency graph.
+- **Domain/** — the TBC knowledge wiki: classes, specs, roles, races, raids, bosses, attunements,
+  professions, and concept notes for the mechanics (attack table, spell coefficients, stat weights).
+- **Project/** — roadmap phases, decision log, data provenance, known limitations.
+
+```bash
+npm run brain
+```
+
+Regenerate any time. The generator reads the actual source tree and the actual domain data, so the
+vault cannot drift from the code. It is idempotent, it fails on a broken wikilink, and anything you
+write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
+`brain/Project Defeat Brain.md`; see `brain/Project/Vault Guide.md` for the details.
+
 ## Known Limitations
 
-- Simulation formulas are placeholders and are not yet TBC-accurate.
+- The physical DPS path is white-damage only (weapon dice plus attack power through the attack table);
+  specials and rotation are not modeled, so melee specs are understated by varying amounts.
+- Caster and healer estimates model one real signature ability per spec rather than a rotation — no
+  cooldowns, procs, downranking, or multi-spell priority.
+- No multi-iteration variance and no result charts, so every number is a point estimate.
 - Gear, gems, and enchants are still starter datasets, not a complete audited TBC database.
 - Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending (items are flagged `needsVerification` where stats are approximate).
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
-- No talents, buffs, debuffs, consumables, professions, rotations, or encounter settings yet.
+- No talent trees, so no talent scaling anywhere in the simulation.
+- Build save/load is not reachable from the UI. `src/domain/builds/buildSerialization.ts` encodes and
+  decodes a full build; nothing calls it yet.
 - Recipe/material crafting detail exists on a handful of items as a proof of concept; most crafted items still need it filled in as each class's gear gets audited.
 - Tank/healer/caster meta gems and Shoulder/Back/Leg enchants are now covered for every role that had real Phase 1/2 TBC options (casters/healers historically had no cloak or leg armor enchant this early, so those are intentionally absent rather than missing); exact values are still `needsVerification` pending final tooltip audits.
 
