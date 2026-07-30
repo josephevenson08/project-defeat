@@ -1,0 +1,50 @@
+---
+type: module
+layer: domain
+source: src/domain/simulation/combatConstants.ts
+lines: 61
+generated: true
+tags: [brain/architecture, layer/domain]
+---
+
+# domain.simulation.combatConstants
+
+`src/domain/simulation/combatConstants.ts` · **domain** layer · 61 lines
+
+From the top of the file:
+
+> TBC Classic (Burning Crusade, level cap 70) combat-rating and attack-table constants.
+> Sourced from the official Blizzard "Combat Ratings: Level 70 Conversions" blue post plus
+> cross-referenced community math (see notes on individual exports for anything less certain).
+> Do NOT reuse Wrath/Cata-era numbers here — several of these constants changed across expansions
+> (e.g. avoidance diminishing returns did not exist until patch 3.0.2, well after TBC).
+
+## Exports
+
+**function** — `armorMitigationConstant`, `ratingToFraction`
+
+**const** — `AP_PER_DPS`, `ARMOR_MITIGATION_CAP`, `DOT_COEFFICIENT_BASE_DURATION`, `EXPERTISE_PERCENT_PER_SKILL_POINT`, `EXPERTISE_RATING_PER_SKILL_POINT`, `MELEE_CRIT_DAMAGE_MULTIPLIER`, `PLAYER_LEVEL_70_SKILL`, `RATING_PER_PERCENT`, `SPELL_COEFFICIENT_BASE_CAST_TIME`, `SPELL_COEFFICIENT_INSTANT_BASELINE`, `SPELL_CRIT_DAMAGE_MULTIPLIER`
+
+## Imports
+
+_None._
+
+## Imported by
+
+- [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
+- [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+
+## Concepts & phases
+
+- [[Attack Table]]
+- [[Spell Table]]
+- [[Armor Mitigation]]
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

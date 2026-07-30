@@ -1,0 +1,39 @@
+---
+type: module
+layer: domain
+source: src/domain/abilities/index.ts
+lines: 17
+generated: true
+tags: [brain/architecture, layer/domain]
+---
+
+# domain.abilities.index
+
+`src/domain/abilities/index.ts` · **domain** layer · 17 lines
+
+_No doc comment at the top of this file._
+
+## Exports
+
+**re-export** — `AbilityEffectType`, `AbilityResourceCost`, `AbilityResourceType`, `AbilityScaling`, `AmountRange`, `CoefficientBasis`, `getSignatureAbilitiesForClass`, `getSignatureAbility`, `getSignatureAbilityBySpellId`, `PeriodicEffect`, `sampleSignatureAbilities`, `SignatureAbility`
+
+## Imports
+
+- [[domain.abilities.abilityTypes]] — `src/domain/abilities/abilityTypes.ts`
+- [[domain.abilities.sampleSignatureAbilities]] — `src/domain/abilities/sampleSignatureAbilities.ts`
+
+## Imported by
+
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+
+## Concepts & phases
+
+_None._
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

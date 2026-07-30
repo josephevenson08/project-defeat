@@ -1,0 +1,58 @@
+---
+type: module
+layer: domain
+source: src/domain/gear/itemTypes.ts
+lines: 110
+generated: true
+tags: [brain/architecture, layer/domain]
+---
+
+# domain.gear.itemTypes
+
+`src/domain/gear/itemTypes.ts` · **domain** layer · 110 lines
+
+_No doc comment at the top of this file._
+
+## Exports
+
+**type** — `ArmorType`, `BuildRole`, `CraftingInfo`, `CraftingMaterial`, `EquippedGear`, `EquippedSlot`, `GearItem`, `ItemQuality`, `ItemSource`, `SocketColor`, `WeaponType`
+
+## Imports
+
+- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
+- [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
+- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
+
+## Imported by
+
+- [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
+- [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
+- [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
+- [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
+- [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
+- [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
+- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
+- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
+- [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
+- [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
+- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
+
+## Concepts & phases
+
+- [[Sockets and Gems]]
+- [[Content Phases]]
+- [[Needs Verification]]
+- [[Phase 2 - Gear Gems Enchants]]
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

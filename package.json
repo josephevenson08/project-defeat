@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:e2e": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "brain": "node tools/brain/generate-brain.mjs"
   },
   "dependencies": {
     "animejs": "^4.5.0",

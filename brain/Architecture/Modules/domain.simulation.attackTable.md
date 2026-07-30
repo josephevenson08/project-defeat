@@ -1,0 +1,41 @@
+---
+type: module
+layer: domain
+source: src/domain/simulation/attackTable.ts
+lines: 136
+generated: true
+tags: [brain/architecture, layer/domain]
+---
+
+# domain.simulation.attackTable
+
+`src/domain/simulation/attackTable.ts` · **domain** layer · 136 lines
+
+_No doc comment at the top of this file._
+
+## Exports
+
+**function** — `applyDualWieldMissPenalty`, `applyMeleeCritSuppression`, `buildRangedAttackTable`, `buildWhiteAttackTable`, `computeBaseMissChance`, `computeDodgeChance`, `computeGlanceChance`, `computeGlanceDamageRange`, `computeParryChance`, `computeSkillDiff`, `computeTargetBlockChance`
+
+**type** — `GlanceDamageRange`, `WhiteAttackTable`, `WhiteAttackTableInputs`
+
+## Imports
+
+- [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
+
+## Imported by
+
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+
+## Concepts & phases
+
+- [[Attack Table]]
+- [[Phase 4 - Simulation]]
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

@@ -1,0 +1,80 @@
+{
+  "collapse-filter": true,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:\"brain/Architecture/Modules\" layer/domain",
+      "color": {
+        "a": 1,
+        "rgb": 6534764
+      }
+    },
+    {
+      "query": "path:\"brain/Architecture/Modules\" layer/features",
+      "color": {
+        "a": 1,
+        "rgb": 15637086
+      }
+    },
+    {
+      "query": "path:\"brain/Architecture/Modules\" layer/components",
+      "color": {
+        "a": 1,
+        "rgb": 6799576
+      }
+    },
+    {
+      "query": "path:\"brain/Domain/Specs\"",
+      "color": {
+        "a": 1,
+        "rgb": 16755370
+      }
+    },
+    {
+      "query": "path:\"brain/Domain/Raids\" OR path:\"brain/Domain/Bosses\"",
+      "color": {
+        "a": 1,
+        "rgb": 15029510
+      }
+    },
+    {
+      "query": "path:\"brain/Domain/Concepts\"",
+      "color": {
+        "a": 1,
+        "rgb": 6803964
+      }
+    },
+    {
+      "query": "path:\"brain/Project\"",
+      "color": {
+        "a": 1,
+        "rgb": 16766720
+      }
+    },
+    {
+      "query": "tag:#moc",
+      "color": {
+        "a": 1,
+        "rgb": 16777215
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 14,
+  "linkStrength": 1,
+  "linkDistance": 120,
+  "scale": 0.25883865621816243,
+  "close": true,
+  "collapse_color_groups": false
+}
