@@ -1004,3 +1004,263 @@ input[type='number']:focus {
     scroll-behavior: auto !important;
   }
 }
+
+.raids-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.raids-picker,
+.raids-view-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.raids-picker {
+  margin-bottom: 20px;
+}
+
+.raids-view-toggle {
+  margin: 18px 0 14px;
+}
+
+.raids-view-toggle .tab-nav-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.raid-detail-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.raid-detail-header h3 {
+  color: #ffffff;
+  font-size: 20px;
+  margin: 0;
+}
+
+.raid-detail-header span {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.raid-section-heading {
+  color: #f8fafc;
+  font-size: 15px;
+  margin: 20px 0 10px;
+}
+
+.raid-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 4px;
+}
+
+.raid-facts dt {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.raid-facts dd {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 2px 0 0;
+}
+
+.raid-boss-list {
+  display: grid;
+  gap: 10px;
+}
+
+.raid-boss {
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-left: 3px solid var(--panel-accent, #f0abfc);
+  border-radius: 6px;
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.raid-boss-header {
+  align-items: baseline;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.raid-boss-header > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.raid-boss-header strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.raid-boss-header span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.raid-boss-loot-count {
+  color: var(--panel-accent, #f0abfc);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.raid-boss-mechanics,
+.raid-boss-note {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.raid-boss-role-notes {
+  display: grid;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raid-boss-role-notes li {
+  display: grid;
+  gap: 2px;
+}
+
+.raid-boss-role-notes strong {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.raid-boss-role-notes span {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.raid-loot-list {
+  display: grid;
+  gap: 6px;
+}
+
+.raid-loot-row {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 6px;
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+}
+
+.raid-loot-row > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.raid-loot-row strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.raid-loot-row span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.raid-loot-row p {
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.raid-attunement-prereqs {
+  color: #cbd5e1;
+  display: grid;
+  font-size: 13px;
+  gap: 4px;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.raid-attunement-steps {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raid-attunement-step {
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 6px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.raid-attunement-step > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.raid-attunement-step strong {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.raid-attunement-step span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.raid-attunement-step p {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.raid-attunement-step p.raid-attunement-quest {
+  color: var(--panel-accent, #f0abfc);
+  font-weight: 700;
+}
+
+.raid-attunement-step p.raid-attunement-step-note {
+  color: #94a3b8;
+}
+
+.raids-empty {
+  color: #94a3b8;
+}

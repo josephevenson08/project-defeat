@@ -22,6 +22,7 @@ import type { SimulationTarget } from './domain/simulation/encounterTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsPanel } from './features/stats/StatsPanel'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
+import { RaidsPanel } from './features/raids/RaidsPanel'
 import type { TabDefinition } from './components/layout/TabNav'
 
 const initialCharacter: CharacterProfile = {
@@ -31,10 +32,11 @@ const initialCharacter: CharacterProfile = {
   spec: 'Fury',
 }
 
-type AppTab = 'planner' | 'professions'
+type AppTab = 'planner' | 'raids' | 'professions'
 
 const APP_TABS: readonly TabDefinition<AppTab>[] = [
   { id: 'planner', label: 'Character Planner' },
+  { id: 'raids', label: 'Raids' },
   { id: 'professions', label: 'Professions' },
 ]
 
@@ -113,7 +115,7 @@ function App() {
 
   return (
     <AppShell tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
-      {activeTab === 'planner' ? (
+      {activeTab === 'planner' && (
         <>
           <CharacterPanel character={character} onChange={updateCharacter} />
           <GearPanel character={character} gear={gear} onChange={updateGear} />
@@ -133,9 +135,9 @@ function App() {
           <StatWeightsPanel weights={statWeights} role={role} />
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
         </>
-      ) : (
-        <ProfessionsPanel />
       )}
+      {activeTab === 'raids' && <RaidsPanel />}
+      {activeTab === 'professions' && <ProfessionsPanel />}
     </AppShell>
   )
 }
