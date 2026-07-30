@@ -15,7 +15,6 @@ const steadyShotBase = {
   castTimeSeconds: 1.5,
   gcdSeconds: 1.5,
   resource: { type: 'Mana', cost: 110 },
-  baseAmount: { min: 150, max: 150 },
   scaling: {
     basis: 'attack power',
     attackPowerCoefficient: 0.2,

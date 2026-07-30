@@ -126,10 +126,14 @@ export type SignatureAbility = {
   name: string
   /** In-game/Wowhead spell ID of the max rank at level 70. */
   spellId: number
-  /** Max rank trainable at 70. Omitted for single-rank talent abilities (Stormstrike, Bloodthirst...). */
+  /** Max rank trainable at 70. Omitted for single-rank talent abilities (Stormstrike, Mutilate...). */
   rank?: number
-  /** Character level at which the listed rank becomes available. */
-  requiredLevel: number
+  /**
+   * Character level at which the listed rank becomes available. Omitted for abilities with no
+   * intrinsic level requirement, which are gated only by having enough talent points to reach them
+   * (Crusader Strike, Stormstrike) — those record the real gate in `notes`.
+   */
+  requiredLevel?: number
   effectType: AbilityEffectType
   /** Base cast time in seconds; 0 for an instant-cast spell or a physical special attack. */
   castTimeSeconds: number

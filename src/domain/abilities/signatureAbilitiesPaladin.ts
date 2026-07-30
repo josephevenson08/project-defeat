@@ -57,7 +57,6 @@ export const paladinSignatureAbilities: readonly SignatureAbility[] = [
     spec: 'Retribution',
     name: 'Crusader Strike',
     spellId: 35395,
-    requiredLevel: 70,
     effectType: 'Melee Special',
     castTimeSeconds: 0,
     gcdSeconds: 1.5,
@@ -71,6 +70,6 @@ export const paladinSignatureAbilities: readonly SignatureAbility[] = [
         '110% of un-normalized main-hand weapon damage, so unlike most melee specials a slow two-hander is directly rewarded. No spell power or attack power coefficient of its own; attack power feeds in only through the weapon damage roll.',
     },
     notes:
-      'Crusader Strike is the 41-point Retribution talent and the spec\'s only real rotational button, but it is a 6s cooldown rather than a filler — Retribution\'s actual damage is dominated by auto attacks with Seal of Blood (Horde) or Seal of Command (Alliance) proccing on them, plus Judgement on cooldown, with Crusader Strike woven in and used to refresh Judgement debuffs. Because the simulator currently models white damage only for physical specs, Crusader Strike\'s numbers are not yet consumed; when they are, note that Ret is the physical spec where the special-attack share of damage is smallest.',
+      'Crusader Strike has no intrinsic level requirement — it is gated purely by spending 41 points in Retribution, so `requiredLevel` is omitted. It is the spec\'s only real rotational button, but it is a 6s cooldown rather than a filler — Retribution\'s actual damage is dominated by auto attacks with Seal of Blood (Horde) or Seal of Command (Alliance) proccing on them, plus Judgement on cooldown, with Crusader Strike woven in and used to refresh Judgement debuffs. Because the simulator currently models white damage only for physical specs, Crusader Strike\'s numbers are not yet consumed; when they are, note that Ret is the physical spec where the special-attack share of damage is smallest.',
   },
 ]
