@@ -1438,6 +1438,38 @@ async function writeHome(modules, counts) {
 }
 
 /**
+ * The Obsidian vault root is the repo root, not `brain/` — that is what lets notes link out to
+ * README.md and ROADMAP.md. The cost is that Obsidian would otherwise index the entire working tree:
+ * `node_modules` alone carries over a hundred package READMEs, which drown real notes in search and
+ * add a cloud of orphan nodes to the graph.
+ *
+ * These are the folders that are never notes. Source files are left visible on purpose — being able
+ * to jump from a module note to the file it documents is most of the point of rooting the vault here.
+ */
+const VAULT_IGNORE_FILTERS = ['node_modules/', 'dist/', 'test-results/', 'playwright-report/', '.claude/', 'coverage/']
+
+/**
+ * Owns only `userIgnoreFilters`, so a vault opened on a fresh machine is usable immediately rather
+ * than requiring someone to rediscover the exclusion list in settings. Anything else the user sets
+ * in app.json is preserved.
+ */
+async function updateAppConfig() {
+  const configPath = path.join(REPO_ROOT, '.obsidian', 'app.json')
+  if (!existsSync(configPath)) return
+
+  const config = JSON.parse(await readFile(configPath, 'utf8'))
+  const existing = Array.isArray(config.userIgnoreFilters) ? config.userIgnoreFilters : []
+  // Preserve anything the user added themselves; only guarantee ours are present.
+  const merged = [...new Set([...VAULT_IGNORE_FILTERS, ...existing])]
+
+  const unchanged = existing.length === merged.length && existing.every((entry, index) => entry === merged[index])
+  if (unchanged) return
+
+  config.userIgnoreFilters = merged
+  await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8')
+}
+
+/**
  * Obsidian's graph is unreadable without colour groups at this note count, so the generator owns
  * that part of the config. Everything else in graph.json is left as the user set it.
  */
@@ -1508,6 +1540,7 @@ async function main() {
   await writeProjectNotes(modules, counts)
   await writeHome(modules, counts)
   await updateGraphConfig()
+  await updateAppConfig()
 
   const { broken } = await checkLinks()
 
