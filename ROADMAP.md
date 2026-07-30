@@ -94,10 +94,20 @@ proc modeling, or talent scaling; and there is still no multi-iteration variance
 - Better responsive/mobile layout
 
 Upgrade planning is in: `findUpgrades` scans every candidate item per visible slot, re-scores it against
-the live simulation, and the Upgrades panel offers a one-click equip. The build serialization foundation
-(`src/domain/builds/`) is written and typed but **nothing in the UI calls it yet**, so save/load and
-import/export are still unavailable to a user. Gear comparison, source/cost planning, and a real mobile
-layout are unstarted.
+the live simulation, and the Upgrades panel offers a one-click equip.
+
+Save/load and import/export are now wired. The full build — character, gear, gems, enchants, buffs,
+consumables, target debuffs and encounter settings — autosaves to `localStorage` and is restored on
+load, and the Build panel exports a portable JSON snapshot that can be pasted back in. Imports are
+validated rather than trusted: a structurally invalid payload or an unknown format version is refused
+outright and changes nothing, while a build referencing an item that has since left the catalog still
+loads with the affected slots dropped and listed, so a catalog change can't render an old build
+unusable.
+
+The caveat worth stating plainly is that there is exactly **one** autosaved build. It is a "your work
+survives a refresh" feature, not a build library — switching character overwrites it, and keeping two
+setups side by side means exporting one by hand. Named build slots, gear comparison, source/cost
+planning, and a real mobile layout are all unstarted.
 
 ## Phase 6: In-Game Import (CurseForge Addon)
 

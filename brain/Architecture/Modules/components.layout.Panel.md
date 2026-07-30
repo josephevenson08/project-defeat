@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`

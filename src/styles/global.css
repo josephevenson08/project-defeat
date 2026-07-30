@@ -1264,3 +1264,70 @@ input[type='number']:focus {
 .raids-empty {
   color: #94a3b8;
 }
+
+.build-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.build-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.build-import-field {
+  margin-top: 16px;
+}
+
+textarea {
+  appearance: none;
+  background: #101827;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 6px;
+  color: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  outline: none;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+textarea:focus {
+  border-color: #f0abfc;
+  box-shadow: 0 0 0 3px rgba(240, 171, 252, 0.18);
+}
+
+.build-status {
+  margin-top: 16px;
+}
+
+.build-status-error strong {
+  color: #fca5a5;
+}
+
+.build-issue-list {
+  color: #fcd34d;
+  display: grid;
+  gap: 4px;
+  line-height: 1.45;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.build-export-details {
+  margin-top: 16px;
+}
+
+.build-export-details summary {
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.build-export-details textarea {
+  margin-top: 10px;
+}

@@ -30,7 +30,10 @@ From the top of the file:
 
 ## Imported by
 
+- [[App]] — `src/App.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
+- [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
 
 ## Concepts & phases
 

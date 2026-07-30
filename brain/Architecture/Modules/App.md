@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 146
+lines: 180
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 146 lines
+`src/App.tsx` · **app** layer · 180 lines
 
 _No doc comment at the top of this file._
 
@@ -22,10 +22,14 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.AppShell]] — `src/components/layout/AppShell.tsx`
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+- [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
+- [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`

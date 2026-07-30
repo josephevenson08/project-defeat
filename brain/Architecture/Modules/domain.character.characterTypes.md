@@ -39,6 +39,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`

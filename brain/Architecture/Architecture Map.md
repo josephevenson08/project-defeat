@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-125 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+127 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -17,17 +17,17 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 The modules everything else leans on — change these carefully.
 
 - [[domain.bis.bisTypes]] — 28 importers
-- [[domain.character.characterTypes]] — 22 importers
+- [[domain.character.characterTypes]] — 23 importers
 - [[domain.gear.itemTypes]] — 16 importers
 - [[domain.gear.gearSlots]] — 14 importers
-- [[components.layout.Panel]] — 11 importers
+- [[components.layout.Panel]] — 12 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
 - [[features.character.characterTypes]] — 11 importers
 - [[domain.raids.raidTypes]] — 9 importers
 - [[domain.stats.statTypes]] — 9 importers
 - [[features.gear.gearTypes]] — 8 importers
+- [[domain.character.roleTheme]] — 7 importers
 - [[domain.simulation.encounterTypes]] — 7 importers
-- [[features.gear.gearData]] — 7 importers
 
 ## By layer
 
@@ -46,17 +46,19 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.layout.AppShell]] · 1 importers
 - [[components.layout.ErrorBoundary]] · 1 importers
 - [[components.layout.LoadingIntro]] · 1 importers
-- [[components.layout.Panel]] · 11 importers
+- [[components.layout.Panel]] · 12 importers
 - [[components.layout.TabNav]] · 2 importers
-- [[components.ui.Button]] · 4 importers
+- [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (23)
+### features (25)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
 - [[features.bis.BisPanel]] · 1 importers
 - [[features.buffs.BuffsPanel]] · 1 importers
+- [[features.builds.BuildPanel]] · 1 importers
+- [[features.builds.buildStorage]] · 2 importers
 - [[features.character.characterData]] · 4 importers
 - [[features.character.CharacterPanel]] · 1 importers
 - [[features.character.characterTypes]] · 11 importers
@@ -128,11 +130,11 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.buffs.buffTypes]] · 3 importers
 - [[domain.buffs.sampleBuffs]] · 2 importers
 - [[domain.buffs.sampleTargetDebuffs]] · 2 importers
-- [[domain.builds.buildSerialization]] · 0 importers
-- [[domain.builds.buildTypes]] · 1 importers
-- [[domain.character.characterTypes]] · 22 importers
+- [[domain.builds.buildSerialization]] · 3 importers
+- [[domain.builds.buildTypes]] · 4 importers
+- [[domain.character.characterTypes]] · 23 importers
 - [[domain.character.races]] · 2 importers
-- [[domain.character.roleTheme]] · 6 importers
+- [[domain.character.roleTheme]] · 7 importers
 - [[domain.character.tbcClasses]] · 4 importers
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers

@@ -25,6 +25,7 @@ _None._
 
 - [[components.layout.ErrorBoundary]] — `src/components/layout/ErrorBoundary.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 

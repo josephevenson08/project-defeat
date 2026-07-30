@@ -14,15 +14,15 @@ The long-term goal: a local-first TBC Classic Anniversary simulator/planner cove
 | [[Phase 2 - Gear Gems Enchants]] | 🟢 mostly complete | 1 |
 | [[Phase 3 - Character Systems]] | 🟡 partial | 4 |
 | [[Phase 4 - Simulation]] | 🟡 partial | 4 |
-| [[Phase 5 - Planner Workflows]] | 🟡 partial | 5 |
+| [[Phase 5 - Planner Workflows]] | 🟡 partial | 4 |
 | [[Phase 6 - In-Game Import]] | ⬜ not started | 4 |
 
 ## Next honest step
 
-Two things are written but not reachable from the UI, which makes them the cheapest real progress available:
+Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:
 
-1. **Build save/load** — [[domain.builds.buildSerialization]] encodes and decodes a full build, and nothing calls it. Wiring it up closes the first [[Phase 5 - Planner Workflows]] item.
-2. **Rotation modelling** — [[Signature Abilities]] now feed the caster and healer estimates, but the physical path still ignores them, so melee specs are white-damage-only. That is the biggest remaining accuracy gap in [[Phase 4 - Simulation]].
+1. **Rotation modelling** — [[Signature Abilities]] feed the caster and healer estimates, but the physical path still ignores them and remains white-damage only. Melee specs are therefore understated by however much of their damage is yellow, which varies by spec. That is the biggest remaining accuracy gap in [[Phase 4 - Simulation]].
+2. **Item catalog source errors** — cross-referencing the raid data against [[domain.gear.sampleItems]] surfaced several items recorded against the wrong boss or instance, and one (`justicars-warblade`) with no evidence it exists in TBC at all. The raid data flags the conflicts; the catalog has not been corrected.
 
 ## Related
 

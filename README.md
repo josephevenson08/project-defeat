@@ -119,8 +119,8 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talent trees, so no talent scaling anywhere in the simulation.
-- Build save/load is not reachable from the UI. `src/domain/builds/buildSerialization.ts` encodes and
-  decodes a full build; nothing calls it yet.
+- There is exactly one autosaved build. Switching character overwrites it, so keeping two setups side
+  by side means exporting one of them by hand. Named build slots are not implemented.
 - Recipe/material crafting detail exists on a handful of items as a proof of concept; most crafted items still need it filled in as each class's gear gets audited.
 - Tank/healer/caster meta gems and Shoulder/Back/Leg enchants are now covered for every role that had real Phase 1/2 TBC options (casters/healers historically had no cloak or leg armor enchant this early, so those are intentionally absent rather than missing); exact values are still `needsVerification` pending final tooltip audits.
 

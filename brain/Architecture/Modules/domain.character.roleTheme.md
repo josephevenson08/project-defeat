@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
 - [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`

@@ -1,7 +1,11 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { BisPanel } from './features/bis/BisPanel'
+import { BuildPanel } from './features/builds/BuildPanel'
+import { loadBuildFromStorage, saveBuildToStorage } from './features/builds/buildStorage'
+import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
+import type { SavedBuild } from './domain/builds/buildTypes'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
 import { CharacterPanel } from './features/character/CharacterPanel'
 import { getRoleForSpec } from './features/character/characterData'
@@ -44,16 +48,45 @@ function toggleId(ids: readonly string[], id: string) {
   return ids.includes(id) ? ids.filter((existing) => existing !== id) : [...ids, id]
 }
 
+/** Rebuilds a full gear set from a saved build, normalized against the character it was saved for. */
+function gearFromBuild(build: SavedBuild): EquippedGear {
+  const baseline = normalizeGearForCharacter(defaultGear, build.character.className, build.character.spec)
+  return normalizeGearForCharacter(applySavedGear(baseline, build.gear), build.character.className, build.character.spec)
+}
+
 function App() {
+  // Read storage exactly once, and seed every piece of state from it via lazy initializers. Restoring
+  // in an effect instead would let the first autosave fire against the default state and overwrite
+  // the very build being restored.
+  const [restoredBuild] = useState(loadBuildFromStorage)
+
   const [introComplete, setIntroComplete] = useState(false)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
-  const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
-  const [gear, setGear] = useState<EquippedGear>(() => normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec))
-  const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
-  const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>([])
-  const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>([])
-  const [target, setTarget] = useState<SimulationTarget>(defaultSimulationTarget)
+  const [character, setCharacter] = useState<CharacterProfile>(() => restoredBuild?.character ?? initialCharacter)
+  const [gear, setGear] = useState<EquippedGear>(() =>
+    restoredBuild ? gearFromBuild(restoredBuild) : normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec),
+  )
+  const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>(() => restoredBuild?.activeBuffIds ?? [])
+  const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>(() => restoredBuild?.activeConsumableIds ?? [])
+  const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>(() => restoredBuild?.activeTargetDebuffIds ?? [])
+  const [target, setTarget] = useState<SimulationTarget>(() => restoredBuild?.target ?? defaultSimulationTarget)
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
+
+  const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target }
+
+  useEffect(() => {
+    saveBuildToStorage({ character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target })
+  }, [character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target])
+
+  function importBuild(build: SavedBuild) {
+    setCharacter(build.character)
+    setGear(gearFromBuild(build))
+    setActiveBuffIds(build.activeBuffIds)
+    setActiveConsumableIds(build.activeConsumableIds)
+    setActiveTargetDebuffIds(build.activeTargetDebuffIds)
+    setTarget(build.target)
+    setSimulationResult(undefined)
+  }
 
   const role = getRoleForSpec(character.className, character.spec)
   const stats = useMemo(
@@ -134,6 +167,7 @@ function App() {
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
           <StatWeightsPanel weights={statWeights} role={role} />
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
+          <BuildPanel state={buildState} role={role} onImport={importBuild} />
         </>
       )}
       {activeTab === 'raids' && <RaidsPanel />}

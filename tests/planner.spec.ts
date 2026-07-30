@@ -965,3 +965,81 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
   expect(after - before).toBeGreaterThan(0)
   expect(Math.abs(after - before - topDelta)).toBeLessThan(0.5)
 })
+
+test('a build autosaves and is restored after a reload', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+
+  await page.getByLabel('Class').selectOption('Mage')
+  await page.getByLabel('Specialization').selectOption('Fire')
+  await page.getByRole('button', { name: /Cloth \/ caster target/ }).click()
+
+  // The autosave runs in an effect, so wait for it to actually reach storage before reloading.
+  await expect
+    .poll(async () => {
+      const raw = await page.evaluate(() => localStorage.getItem('project-defeat:build:v1'))
+      return raw ? JSON.parse(raw).character.spec : null
+    })
+    .toBe('Fire')
+
+  await page.reload()
+
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('24.9%')
+})
+
+test('a build can be exported and imported back', async ({ page }) => {
+  await page.goto('/')
+
+  // Capture the default Warrior build, then change the character away from it.
+  const exported = await page.getByTestId('build-export-output').inputValue()
+  expect(JSON.parse(exported).version).toBe(1)
+  expect(JSON.parse(exported).character.className).toBe('Warrior')
+
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+
+  // Pasting the captured build back must restore the original character.
+  await page.getByTestId('build-import-input').fill(exported)
+  await page.getByTestId('build-import-button').click()
+
+  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(page.getByTestId('build-status')).toContainText(/Build loaded/i)
+})
+
+test('an invalid build is rejected without changing the current character', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+
+  await page.getByTestId('build-import-input').fill('this is not a build')
+  await page.getByTestId('build-import-button').click()
+
+  await expect(page.getByTestId('build-status')).toContainText(/Nothing was changed/i)
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+
+  // A structurally valid build from an unknown format version is refused too, rather than
+  // half-applied.
+  await page.getByTestId('build-import-input').fill(JSON.stringify({ version: 999, character: {} }))
+  await page.getByTestId('build-import-button').click()
+  await expect(page.getByTestId('build-status')).toContainText(/Unsupported build version/i)
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+})
+
+test('a build referencing a missing item still loads, reporting the dropped slot', async ({ page }) => {
+  await page.goto('/')
+
+  const exported = JSON.parse(await page.getByTestId('build-export-output').inputValue())
+  exported.gear.Head = { itemId: 'an-item-that-was-removed-from-the-catalog', gemIds: [] }
+
+  await page.getByTestId('build-import-input').fill(JSON.stringify(exported))
+  await page.getByTestId('build-import-button').click()
+
+  const status = page.getByTestId('build-status')
+  await expect(status).toContainText(/Build loaded/i)
+  await expect(status).toContainText(/no longer in the catalog/i)
+  // The rest of the build must survive rather than the whole import failing.
+  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+})

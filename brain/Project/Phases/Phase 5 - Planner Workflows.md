@@ -10,17 +10,18 @@ tags: [brain/project, project/phase, status/partial]
 
 **Status: partial**
 
-Upgrade planning and the serialization foundation exist. Save/load UI and comparison do not.
+Upgrade planning, build save/load and import/export all work. Comparison and cost planning do not.
 
 ## Done
 
 - Upgrade finder: per-slot candidate scan scored against the live sim
 - Build serialization foundation (types + encode/decode)
+- Autosave to localStorage and restore on load, seeded through lazy state initializers
+- Export to a portable JSON snapshot and import it back, with per-slot issues reported
 
 ## Remaining
 
-- Save/load builds in the UI — `buildSerialization` is written but nothing calls it yet
-- Import/export surface
+- Named build slots — there is exactly one autosaved build, so switching characters overwrites it
 - Side-by-side gear comparison
 - Source and cost planning
 - Better responsive/mobile layout
@@ -30,6 +31,8 @@ Upgrade planning and the serialization foundation exist. Save/load UI and compar
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 
 ## Neighbours
 
