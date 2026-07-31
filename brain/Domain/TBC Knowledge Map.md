@@ -15,7 +15,7 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **5** raids
 - **24** bosses
 - **13** professions
-- **231** items
+- **230** items
 - **11** gems
 - **22** enchants
 - **14** buffs

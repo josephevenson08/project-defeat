@@ -117,7 +117,12 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
-- Gear, gems, and enchants are still starter datasets, not a complete audited TBC database.
+- Gear, gems, and enchants are still starter datasets, not a complete audited TBC database. A few
+  items now carry real Wowhead tooltip values (Fang of the Leviathan, Vambraces of Ending, Talon of
+  the Phoenix) while most carry stat-budget estimates, and the real ones are numerically much
+  stronger — Fang of the Leviathan alone has 221 spell power against ~46 on the placeholder caster
+  weapons. Any comparison involving a sourced item against an estimated one is skewed in the sourced
+  item's favour until the rest of the catalog is audited the same way.
 - Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending (items are flagged `needsVerification` where stats are approximate).
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.

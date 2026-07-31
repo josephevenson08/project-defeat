@@ -158,11 +158,11 @@ export const protectionPaladinPhase2Bis: BisList = {
     entry({
       slot: 'Main Hand',
       rank: 1,
-      itemId: 'justicars-warblade',
-      notes: "Weapon DPS/speed modeling is future work. No tank weapon enchant is modeled yet, so none is recommended here.",
-      sourceName: 'Starter sample',
-      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Leotheras the Blind', phase: 2, needsVerification: true }),
-      needsVerification: true,
+      itemId: 'fang-of-the-leviathan',
+      notes:
+        "Reads as a caster weapon and is one — but it is also the Phase 2 Protection Paladin pick, because TBC prot threat (Consecration, Holy Shield, Judgement) scales off spell power. Two independent BiS aggregators list it here. This entry previously pointed at an invented item that does not exist in TBC. No tank weapon enchant is modeled yet, so none is recommended.",
+      sourceName: 'wowtbc.gg and tbc-bis-guide.com, cross-checked',
+      source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Leotheras the Blind', phase: 2 }),
     }),
     entry({
       slot: 'Off Hand',

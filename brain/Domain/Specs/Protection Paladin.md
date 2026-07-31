@@ -25,7 +25,7 @@ tags: [brain/domain, domain/spec, role/Tank]
 
 - **Phase 2** — 17 ranked entries across 17 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
 
-16 of 17 entries are flagged [[Needs Verification]].
+15 of 17 entries are flagged [[Needs Verification]].
 
 Sends you to: [[Gruul's Lair]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 
