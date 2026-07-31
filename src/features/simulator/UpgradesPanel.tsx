@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { getQualityColor } from '../../domain/gear/qualityColors'
+import { getGemById } from '../../domain/gems/sampleGems'
 import { animateEquipFeedback } from '../../lib/animations'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName } from '../gear/gearData'
@@ -26,8 +27,9 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
     <Panel title="Upgrade Finder" eyebrow="Ranked gear swaps" accentColor={getRoleAccentColor(role)} className="upgrades-panel-shell">
       <p className="panel-copy">
         Every legal item for every slot, simulated as a straight swap and ranked by how much it moves the result.
-        Candidates are evaluated <strong>ungemmed</strong> — a socketed piece is usually worth more than shown — while
-        the slot&apos;s current enchant carries over whenever it stays legal.
+        Sockets are filled with the best colour-matched gem for this character, so a delta is what the item is worth{' '}
+        <strong>once gemmed</strong>; the slot&apos;s current enchant carries over whenever it stays legal. Equipping
+        applies exactly the gems and enchant the score assumed.
       </p>
 
       {report.candidates.length === 0 ? (
@@ -49,7 +51,11 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
                     replaces {candidate.replacesName}
                     {itemOrigin(candidate.item) ? ` · ${itemOrigin(candidate.item)}` : ''}
                   </p>
-                  {candidate.hasUnfilledSockets && <small className="upgrade-socket-note">Has empty sockets — gemming adds more.</small>}
+                  {candidate.assumesGemming && (
+                    <small className="upgrade-socket-note">
+                      Assumes {candidate.gemIds.filter(Boolean).map((gemId) => getGemById(gemId)?.name ?? gemId).join(' + ')}
+                    </small>
+                  )}
                 </div>
 
                 <div className="upgrade-delta">
@@ -63,9 +69,9 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
                     animateEquipFeedback(event.currentTarget)
                     onEquip(candidate.slot, {
                       item: candidate.item,
-                      gemIds: candidate.item.sockets?.map(() => '') ?? [],
-                      // Must match what findUpgrades scored, or the realised gain won't equal the
-                      // delta shown on this row.
+                      // Gems and enchant must both match what findUpgrades scored, or the realised
+                      // gain won't equal the delta shown on this row.
+                      gemIds: [...candidate.gemIds],
                       enchantId: candidate.enchantId,
                     })
                   }}

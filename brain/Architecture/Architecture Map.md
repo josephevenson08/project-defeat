@@ -18,7 +18,7 @@ The modules everything else leans on — change these carefully.
 
 - [[domain.bis.bisTypes]] — 28 importers
 - [[domain.character.characterTypes]] — 23 importers
-- [[domain.gear.itemTypes]] — 17 importers
+- [[domain.gear.itemTypes]] — 18 importers
 - [[domain.gear.gearSlots]] — 14 importers
 - [[components.layout.Panel]] — 12 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
@@ -143,13 +143,13 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.characterItemRules]] · 2 importers
 - [[domain.gear.defaultGear]] · 1 importers
 - [[domain.gear.gearSlots]] · 14 importers
-- [[domain.gear.itemTypes]] · 17 importers
+- [[domain.gear.itemTypes]] · 18 importers
 - [[domain.gear.qualityColors]] · 4 importers
 - [[domain.gear.sampleItems]] · 4 importers
 - [[domain.gear.slotCompatibility]] · 4 importers
 - [[domain.gear.slotVisibility]] · 1 importers
 - [[domain.gems.gemTypes]] · 1 importers
-- [[domain.gems.sampleGems]] · 3 importers
+- [[domain.gems.sampleGems]] · 5 importers
 - [[domain.professions.index]] · 1 importers
 - [[domain.professions.professionTypes]] · 5 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers

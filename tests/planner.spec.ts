@@ -954,8 +954,16 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
   expect(deltas[0]).toBeGreaterThan(0)
   expect([...deltas]).toEqual([...deltas].sort((a, b) => b - a))
 
+  // Socketed candidates are scored gemmed, and the row has to say which gems it assumed — otherwise
+  // the delta silently depends on a decision the player never sees.
+  const gemNotes = list.locator('.upgrade-socket-note')
+  if ((await gemNotes.count()) > 0) {
+    await expect(gemNotes.first()).toContainText(/Assumes .+/)
+  }
+
   // The headline claim has to hold: equipping the top pick should move the simulation by
-  // approximately the advertised amount.
+  // approximately the advertised amount. Because equipping applies the same gems the score assumed,
+  // this also catches a candidate being scored gemmed but equipped bare.
   await page.getByRole('button', { name: /run simulation/i }).click()
   const before = Number(await page.getByTestId('simulation-score').innerText())
 

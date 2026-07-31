@@ -41,6 +41,7 @@ _No doc comment at the top of this file._
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
+- [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

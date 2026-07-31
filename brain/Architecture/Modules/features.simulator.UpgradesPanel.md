@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/UpgradesPanel.tsx
-lines: 84
+lines: 90
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.UpgradesPanel
 
-`src/features/simulator/UpgradesPanel.tsx` · **features** layer · 84 lines
+`src/features/simulator/UpgradesPanel.tsx` · **features** layer · 90 lines
 
 _No doc comment at the top of this file._
 
@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
+- [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
