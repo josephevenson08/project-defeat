@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/survivalHunterPhase2.ts
-lines: 191
+lines: 190
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.survivalHunterPhase2
 
-`src/domain/bis/survivalHunterPhase2.ts` · **domain** layer · 191 lines
+`src/domain/bis/survivalHunterPhase2.ts` · **domain** layer · 190 lines
 
 _No doc comment at the top of this file._
 

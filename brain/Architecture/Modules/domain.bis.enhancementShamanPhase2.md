@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/enhancementShamanPhase2.ts
-lines: 218
+lines: 217
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.enhancementShamanPhase2
 
-`src/domain/bis/enhancementShamanPhase2.ts` · **domain** layer · 218 lines
+`src/domain/bis/enhancementShamanPhase2.ts` · **domain** layer · 217 lines
 
 _No doc comment at the top of this file._
 

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/assassinationRoguePhase2.ts
-lines: 192
+lines: 191
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.assassinationRoguePhase2
 
-`src/domain/bis/assassinationRoguePhase2.ts` · **domain** layer · 192 lines
+`src/domain/bis/assassinationRoguePhase2.ts` · **domain** layer · 191 lines
 
 _No doc comment at the top of this file._
 

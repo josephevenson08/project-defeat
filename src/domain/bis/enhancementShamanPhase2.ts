@@ -179,7 +179,6 @@ export const enhancementShamanPhase2Bis: BisList = {
       slot: 'Main Hand',
       rank: 1,
       itemId: 'talon-of-the-phoenix',
-      wowItemId: 32944,
       recommendedEnchantId: 'mongoose-main-hand',
       notes: 'Enhancement-appropriate weapon sample; weapon speed/DPS modeling is future work.',
       sourceName: 'Wowhead-style guide sample',

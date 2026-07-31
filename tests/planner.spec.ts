@@ -38,6 +38,9 @@ import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { getGemById } from '../src/domain/gems/sampleGems'
+import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
+import { sampleRaids } from '../src/domain/raids/sampleRaids'
+import { sampleItems } from '../src/domain/gear/sampleItems'
 
 function readStatValue(text: string) {
   const match = text.match(/-?\d+/)
@@ -1075,4 +1078,39 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('the item catalog and the raid data agree on where every drop comes from', async () => {
+  // These two datasets were researched separately and drifted: six items named a boss or instance
+  // that the raid data contradicted, which made BiS lists double as *wrong* acquisition plans. This
+  // check is the reason that can't silently happen again.
+  const raidById = new Map(sampleRaids.map((raid) => [raid.id, raid]))
+  const disagreements: string[] = []
+
+  for (const boss of sampleRaidBosses) {
+    for (const loot of boss.loot) {
+      if (!loot.itemId) continue
+
+      const item = sampleItems.find((entry) => entry.id === loot.itemId)
+      expect(item, `raid loot references unknown item "${loot.itemId}"`).toBeTruthy()
+      if (!item) continue
+
+      const raid = raidById.get(boss.raidId)
+      expect(raid, `boss ${boss.name} references unknown raid "${boss.raidId}"`).toBeTruthy()
+      if (!raid) continue
+
+      // The catalog and the raid browser use different spellings of the same instance
+      // ("Tempest Keep" vs "The Eye"), which is why the raid carries every alias it goes by.
+      if (item.instance && !raid.instanceNames.includes(item.instance)) {
+        disagreements.push(`${item.id}: catalog instance "${item.instance}" is not one of ${raid.name}'s names`)
+      }
+
+      // Only boss drops pin a boss. A tier token or trash drop legitimately doesn't.
+      if (loot.dropType === 'Boss' && item.boss && item.boss !== boss.name) {
+        disagreements.push(`${item.id}: catalog boss "${item.boss}" but raid data says "${boss.name}"`)
+      }
+    }
+  }
+
+  expect(disagreements, `item catalog disagrees with raid data: ${disagreements.join(' | ')}`).toEqual([])
 })

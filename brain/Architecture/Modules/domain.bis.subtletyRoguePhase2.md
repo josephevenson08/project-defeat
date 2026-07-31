@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/subtletyRoguePhase2.ts
-lines: 194
+lines: 193
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.subtletyRoguePhase2
 
-`src/domain/bis/subtletyRoguePhase2.ts` · **domain** layer · 194 lines
+`src/domain/bis/subtletyRoguePhase2.ts` · **domain** layer · 193 lines
 
 _No doc comment at the top of this file._
 

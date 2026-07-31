@@ -81,7 +81,6 @@ export const subtletyRoguePhase2Bis: BisList = {
       slot: 'Wrists',
       rank: 1,
       itemId: 'vambraces-of-ending',
-      wowItemId: 28514,
       notes: 'Shared physical DPS wrists.',
       sourceName: 'Starter sample',
       source: source({ type: 'Raid', instance: 'Tempest Keep', boss: 'High Astromancer Solarian', phase: 2, needsVerification: true }),
