@@ -5,10 +5,16 @@
 Verify you're where this describes:
 
 ```bash
-git log --oneline -1     # expect the racial-sourcing commit at the top
+git log --oneline -1     # expect a4fbfee "Correct racial trait values against Wowhead TBC tooltips"
 git status               # expect clean except an untracked Untitled.canvas (user's own file, leave it)
 git rev-parse main origin/main   # expect identical — everything is pushed
 ```
+
+Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat` (also on GitHub as
+`josephevenson08/project-defeat`). It's a local-first React + TypeScript + Vite planner/simulator for
+**WoW TBC Classic Anniversary**, aiming to be one place that does what Wowhead, WoWSims and
+WarcraftLogs each do. The game is in **Phase 2** (Serpentshrine Cavern + Tempest Keep, Tier 5) and the
+user wants Phase 2 content only.
 
 ---
 
@@ -43,18 +49,34 @@ npm run brain                     # "0 written" — idempotent; this repo is in 
 
 ---
 
-## ⚠️ Outstanding
+## ⚠️ Outstanding — today's simulator math is UNVERIFIED
 
-A **`sim-verifier` audit of today's combat-math changes** was dispatched and had not reported back
-when this session ended. It was asked to check the new yellow attack table, `scoreExact`, the gem
-auto-fill in the upgrade finder, and racial ordering in `calculateStats`. Nothing from it has been
-applied. Re-run it (`sim-verifier` agent) or check its findings before trusting today's simulator
-changes.
+A `sim-verifier` audit was dispatched and **failed**: it was still running when the process exited,
+and it produced **no output at all**. Not "hasn't reported yet" — it never ran to completion. So a
+substantial amount of combat math shipped today with no independent check on it.
 
-The racial sourcing pass **has** landed and been applied — see below. A handful of racials still
-carry `needsVerification` where the research itself was inconclusive (Dwarf Stoneform's exact effect
-list, Draenei Gift of the Naaru's level-70 heal, Tauren War Stomp's cooldown). All three are
-non-modelled effects, so they don't touch any number.
+**Re-run that audit before trusting today's numbers.** Use the `sim-verifier` agent and point it at:
+
+- `src/domain/simulation/specialAttacks.ts` and `buildSpecialAttackTable` in `attackTable.ts` — the
+  new yellow-damage layer. Specifically: that specials can't glance and don't take the dual-wield
+  miss penalty; that `averageSwingDamage` folds attack power over the swing window correctly and
+  applies normalization only to the AP portion; that `normalizedSpeedForWeapon` inferring
+  one-hand vs two-hand from `weaponSpeed >= 3` is safe (`GearItem` has no handedness field); that
+  flat 10/sec energy regen and "cooldown abilities used exactly on cooldown" are defensible for TBC;
+  and how much counting blocked specials at full damage overstates things.
+- `scoreExact` on `SimulationResult` — every consumer that *computes* must use it, and only display
+  should use the rounded `score`.
+- `pickBestGemPerColor` in `findUpgrades.ts` — whether always choosing colour-matched gems is
+  actually optimal given that `socketBonusIsActive` requires a full colour match.
+- `applyRacialTraits` ordering inside `calculateStats`, and multiplier compounding when several hit
+  the same stat.
+- The tank avoidance baseline in `calculateTankSurvivability`, flagged in a code comment as the
+  least-verified part of the engine and never audited.
+
+The racial sourcing pass **did** land and has been applied. Three racials keep `needsVerification`
+where the research itself was inconclusive (Dwarf Stoneform's exact effect list, Draenei Gift of the
+Naaru's level-70 heal, Tauren War Stomp's cooldown) — all three are non-modelled, so no number
+depends on them.
 
 ## What this session did (26 commits, all pushed)
 
@@ -62,8 +84,9 @@ Newest first. Every one is verified green and pushed.
 
 | Commit | What |
 |---|---|
+| `a4fbfee` | Racial values corrected against Wowhead TBC tooltips; Draenei split into two class-gated racials |
+| `86b7ed9` | This handoff file |
 | `a5d4a12` | Named build slots — switching character no longer destroys your build |
-| (top) | Racial values corrected against Wowhead TBC tooltips; Draenei split into two class-gated racials |
 | `d3c73f9` | Racial traits made mechanically real |
 | `12c1902` | Replaced an invented item with sourced tooltip data for 3 items |
 | `ccae74d` | Upgrade candidates scored **gemmed** instead of bare |
