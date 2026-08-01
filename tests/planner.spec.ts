@@ -1167,3 +1167,33 @@ test('changing race changes the racial list and the resulting stats', async ({ p
 
   expect(readStatValue(await page.getByTestId('stat-intellect').innerText())).toBeLessThan(gnomeIntellect)
 })
+
+test('named build slots survive a character switch that would overwrite the autosave', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByTestId('build-slots-empty')).toBeVisible()
+
+  // Set up a Fury Warrior and save it under a name.
+  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await page.getByTestId('build-slot-name').fill('Fury main')
+  await page.getByTestId('build-slot-save').click()
+  await expect(page.getByTestId('build-status')).toContainText(/Saved as/i)
+  await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
+
+  // Switch to a completely different character. This is exactly what used to destroy the build,
+  // because the autosave holds only one and overwrites it on every change.
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+
+  // The named slot is untouched, and loading it restores the original character.
+  await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
+  await page.getByTestId('build-slot-load-Fury main').click()
+  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
+
+  // Slots persist across a reload, since they live in storage rather than component state.
+  await page.reload()
+  await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
+
+  await page.getByTestId('build-slot-delete-Fury main').click()
+  await expect(page.getByTestId('build-slots-empty')).toBeVisible()
+})

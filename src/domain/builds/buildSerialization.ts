@@ -75,6 +75,15 @@ export function parseBuild(raw: string): BuildImportResult {
     return { ok: false, error: "That doesn't look like a build — it isn't valid JSON." }
   }
 
+  return validateBuild(parsed)
+}
+
+/**
+ * The validation half of `parseBuild`, split out so already-parsed builds (named slots read back
+ * from storage as one JSON object) go through exactly the same checks as a pasted string, rather
+ * than a second, subtly different implementation that could drift.
+ */
+export function validateBuild(parsed: unknown): BuildImportResult {
   if (typeof parsed !== 'object' || parsed === null) {
     return { ok: false, error: 'A build must be a JSON object.' }
   }

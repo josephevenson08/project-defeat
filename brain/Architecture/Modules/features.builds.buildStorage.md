@@ -2,20 +2,24 @@
 type: module
 layer: features
 source: src/features/builds/buildStorage.ts
-lines: 65
+lines: 138
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.builds.buildStorage
 
-`src/features/builds/buildStorage.ts` · **features** layer · 65 lines
+`src/features/builds/buildStorage.ts` · **features** layer · 138 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `clearStoredBuild`, `exportBuildText`, `loadBuildFromStorage`, `saveBuildToStorage`
+**function** — `clearStoredBuild`, `deleteNamedBuild`, `exportBuildText`, `listNamedBuilds`, `loadBuildFromStorage`, `saveBuildToStorage`, `saveNamedBuild`
+
+**const** — `MAX_BUILD_NAME_LENGTH`
+
+**type** — `NamedBuild`
 
 ## Imports
 

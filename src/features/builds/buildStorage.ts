@@ -1,7 +1,17 @@
-import { parseBuild, serializeBuild, type BuildState } from '../../domain/builds/buildSerialization'
+import { parseBuild, serializeBuild, validateBuild, type BuildState } from '../../domain/builds/buildSerialization'
 import type { SavedBuild } from '../../domain/builds/buildTypes'
 
+/** The single working build, autosaved on every change so a refresh never loses anything. */
 const STORAGE_KEY = 'project-defeat:build:v1'
+
+/**
+ * Named slots, stored separately from the working build. Keeping them apart is what makes the
+ * autosave safe: it can keep overwriting the working build every keystroke without ever touching
+ * something the user deliberately saved.
+ */
+const NAMED_STORAGE_KEY = 'project-defeat:builds:v1'
+
+export const MAX_BUILD_NAME_LENGTH = 40
 
 /**
  * localStorage can throw rather than merely return null — private-browsing modes and storage quotas
@@ -61,4 +71,67 @@ export function clearStoredBuild() {
 /** Pretty-printed so an exported build stays readable and diffable when pasted into a gist or a ticket. */
 export function exportBuildText(state: BuildState) {
   return JSON.stringify(serializeBuild(state), null, 2)
+}
+
+export type NamedBuild = {
+  name: string
+  build: SavedBuild
+}
+
+function readNamedRecord(): Record<string, unknown> {
+  const storage = safeLocalStorage()
+  if (!storage) return {}
+
+  try {
+    const raw = storage.getItem(NAMED_STORAGE_KEY)
+    if (!raw) return {}
+    const parsed: unknown = JSON.parse(raw)
+    return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {}
+  } catch {
+    return {}
+  }
+}
+
+function writeNamedRecord(record: Record<string, SavedBuild>): boolean {
+  const storage = safeLocalStorage()
+  if (!storage) return false
+
+  try {
+    storage.setItem(NAMED_STORAGE_KEY, JSON.stringify(record))
+    return true
+  } catch {
+    // Almost always a quota failure. The caller reports it rather than pretending the save worked.
+    return false
+  }
+}
+
+/**
+ * Every stored slot, validated on the way out and sorted by name. A slot that no longer validates —
+ * because the item catalog moved under it, say — is dropped from the list rather than crashing the
+ * panel, which matches how a pasted build is treated.
+ */
+export function listNamedBuilds(): readonly NamedBuild[] {
+  return Object.entries(readNamedRecord())
+    .flatMap(([name, value]) => {
+      const result = validateBuild(value)
+      return result.ok ? [{ name, build: result.build }] : []
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export function saveNamedBuild(name: string, state: BuildState): boolean {
+  const trimmed = name.trim()
+  if (!trimmed) return false
+
+  const record = readNamedRecord() as Record<string, SavedBuild>
+  record[trimmed.slice(0, MAX_BUILD_NAME_LENGTH)] = serializeBuild(state)
+  return writeNamedRecord(record)
+}
+
+export function deleteNamedBuild(name: string): boolean {
+  const record = readNamedRecord() as Record<string, SavedBuild>
+  if (!(name in record)) return false
+
+  delete record[name]
+  return writeNamedRecord(record)
 }

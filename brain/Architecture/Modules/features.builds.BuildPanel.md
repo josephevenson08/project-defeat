@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/builds/BuildPanel.tsx
-lines: 120
+lines: 219
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.builds.BuildPanel
 
-`src/features/builds/BuildPanel.tsx` · **features** layer · 120 lines
+`src/features/builds/BuildPanel.tsx` · **features** layer · 219 lines
 
 _No doc comment at the top of this file._
 

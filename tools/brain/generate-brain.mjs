@@ -545,9 +545,10 @@ const PHASES = [
       'Build serialization foundation (types + encode/decode)',
       'Autosave to localStorage and restore on load, seeded through lazy state initializers',
       'Export to a portable JSON snapshot and import it back, with per-slot issues reported',
+      'Named build slots stored separately from the autosave, so switching character cannot destroy a saved build',
     ],
     remaining: [
-      'Named build slots — there is exactly one autosaved build, so switching characters overwrites it',
+      'Cloud/shareable builds — slots are browser-local, so they do not follow you to another machine',
       'Side-by-side gear comparison',
       'Source and cost planning',
       'Better responsive/mobile layout',

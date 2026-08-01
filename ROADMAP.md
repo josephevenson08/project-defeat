@@ -112,10 +112,14 @@ outright and changes nothing, while a build referencing an item that has since l
 loads with the affected slots dropped and listed, so a catalog change can't render an old build
 unusable.
 
-The caveat worth stating plainly is that there is exactly **one** autosaved build. It is a "your work
-survives a refresh" feature, not a build library — switching character overwrites it, and keeping two
-setups side by side means exporting one by hand. Named build slots, gear comparison, source/cost
-planning, and a real mobile layout are all unstarted.
+Named build slots sit alongside the autosave: the autosaved working build still exists and still
+overwrites itself on every change, but a build saved under a name is stored separately and is never
+touched by it, so switching character no longer destroys anything. Slots are validated on read, so a
+catalog change drops the affected slot from the list rather than breaking the panel.
+
+They are still browser-local — clearing site data loses them, and they do not follow you to another
+machine; export/import covers that. Gear comparison, source/cost planning, and a real mobile layout
+are unstarted.
 
 ## Phase 6: In-Game Import (CurseForge Addon)
 
