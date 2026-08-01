@@ -21,6 +21,17 @@ const SOCKET_COLORS: readonly SocketColor[] = ['Meta', 'Red', 'Yellow', 'Blue']
  * socket bonus only pays out when every socket is colour-matched, and `calculateStats` models that —
  * so mixing colours to chase a marginally better raw gem would usually lose more than it gains.
  *
+ * A colour whose gems are all worth nothing to this role still gets its best-scoring gem rather than
+ * no gem at all. `socketBonusIsActive` fails on an empty socket exactly as it fails on a mismatched
+ * one, so leaving it empty loses the socket bonus *and* the gem's stats, while a matched gem that
+ * happens to score zero keeps the bonus. That is the common case rather than an edge one: every Blue
+ * gem scores zero for both DPS roles and every Red gem scores zero for Healer, so slots like
+ * `vambraces-of-ending` used to be reported permanently ungemmed.
+ *
+ * Still an approximation: the genuinely optimal choice is per-item, since forfeiting a small socket
+ * bonus for a much stronger off-colour gem can win. Modelling that needs a per-candidate-item
+ * comparison rather than one map built per report, which is a different cost class.
+ *
  * This costs one simulation run per gem, once per report, not once per candidate item.
  */
 function pickBestGemPerColor(
@@ -42,7 +53,7 @@ function pickBestGemPerColor(
 
   for (const color of SOCKET_COLORS) {
     let bestId: string | undefined
-    let bestDelta = 0
+    let bestDelta = Number.NEGATIVE_INFINITY
 
     for (const gem of sampleGems.filter((entry) => entry.color === color)) {
       const delta = scoreWithBonus(gem.stats) - baseline
@@ -52,7 +63,9 @@ function pickBestGemPerColor(
       }
     }
 
-    // No entry when nothing in the catalog helps this role — an empty socket is then honest.
+    // No entry only when the catalog holds no gem of this colour at all. Gems are pure stat adds, so
+    // a delta is never negative and ties resolve to catalog order — arbitrary, but only ever among
+    // gems this role scores identically.
     if (bestId) best.set(color, bestId)
   }
 
