@@ -5,7 +5,9 @@
 Verify you're where this describes:
 
 ```bash
-git log --oneline -1     # expect 976c272 "Record the audit's tank finding in the brain, and unstick the roadmap"
+# Expect 3ac33a7 "Model the defender side of the attack table for tanks" at the tip, or one
+# commit below it if this file was updated afterwards. A handoff cannot name its own hash.
+git log --oneline -3
 git status               # expect clean except an untracked Untitled.canvas (user's own file, leave it)
 git rev-parse main origin/main   # expect identical — everything is pushed
 ```
@@ -61,7 +63,7 @@ long-run average is exactly right; and counting blocked specials at full damage 
 that ability's DPS in the worst case, realistically 0.1–1%. `applyRacialTraits` ordering is correct
 and deliberate.
 
-Three findings, outside that layer. Two are fixed:
+Three findings, all outside that layer, and **all three are now fixed**:
 
 - **Fixed** (`5e49673`) — Tank returned `scoreExact: score`, the *rounded* value, alone among the four
   role calculators. Both consumers difference that field, so tank stat weights and upgrade deltas were
@@ -69,22 +71,21 @@ Three findings, outside that layer. Two are fixed:
 - **Fixed** (`b14b4b3`) — `pickBestGemPerColor` left a socket empty when no gem of its colour helped
   the role. An empty socket forfeits the socket bonus *and* the stats, so it was strictly the worst
   option available.
+- **Fixed** (`3ac33a7`) — the tank avoidance baseline. `calculateTankSurvivability` reused the
+  attacker-side helpers for the player's own dodge and parry, so it handed the player the *boss's*
+  14% parry and made a wider level gap look like better tanking. TBC has two different tables and the
+  level gap enters them with opposite sign. Sourced from wowsims/tbc `sim/core/target.go` and written
+  up in `brain/Domain/Concepts/Tank Avoidance.md`.
 
-### ⚠️ Still outstanding — the tank avoidance baseline is confirmed wrong
+  Four things fell out of that research and are also fixed: `RATING_PER_PERCENT.parry` was **31.5**,
+  taken from a blue post dated *before TBC shipped*, when patch 2.1.0 cut parry rating cost 25% —
+  it's now 23.65, matching wowsims. Defense Skill is applied per-outcome instead of as one bonus
+  multiplied by 3. Parry is gated to classes that can parry and block to actually holding a shield.
+  Boss miss chance now counts as avoidance. Dodge from Agility is modelled for Warrior/Paladin/Druid,
+  the only three wowsims sources a ratio for.
 
-`calculateTankSurvivability` (`calculateSimulation.ts:351-352`) computes the player's own dodge and
-parry with formulas character-for-character identical to `computeDodgeChance` / `computeParryChance`
-in `attackTable.ts` — which are the **boss's** avoidance against the player. Against a level 73 target
-this hands the player 14% baseline parry and 6.5% dodge, with the level gap *raising* avoidance. Real
-TBC moves the other way off a ~5% base. Parry is roughly 3× too high before any gear, and because
-stat weights difference the score, tank stat weights inherit it.
-
-The old code comment called this a symmetric approximation pending sourcing. Symmetry is precisely
-what does not hold, so the comment understated it. Written up in `brain/Domain/Concepts/Tank
-Avoidance.md`.
-
-**Not fixed, because fixing it needs real sourcing and this repo's rule is that confident recall is
-not a source.** A `tbc-researcher` pass for real level-70 player avoidance was dispatched.
+  **The Survivability Score is not comparable across that commit** in either direction — the baseline
+  correction lowers it, the two new terms raise it more.
 
 ### Gotcha that probably explains the previous failure
 
@@ -110,6 +111,8 @@ Newest first. Every one is verified green and pushed.
 
 | Commit | What |
 |---|---|
+| `3ac33a7` | Defender-side attack table for tanks; parry rating corrected to the post-2.1 value |
+| `a77bf3c` | Handoff updated with the audit results and the agent-registration gotcha |
 | `976c272` | Tank avoidance finding recorded in the brain; stale roadmap prose corrected |
 | `b14b4b3` | Upgrade finder no longer reports sockets it left empty |
 | `5e49673` | Tank's `scoreExact` made actually exact |
@@ -136,11 +139,14 @@ Newest first. Every one is verified green and pushed.
 
 ## What's next, in priority order
 
-### 0. Correct the tank avoidance baseline — confirmed defect, needs sourcing first
-See the outstanding section above. This is the only *known-wrong* number in the engine, as opposed to
-the merely unverified ones, so it outranks everything below. It is small once the real values are in
-hand: the formulas live at `calculateSimulation.ts:351-353`, and the fix is a defender-side
-calculation rather than a reuse of the attacker-side helpers. Do not write the numbers from memory.
+### 0. Finish the tank model — crushing blows and the ordered table
+The avoidance baseline is now right, but two known gaps remain and both make the score read high.
+Avoidance is still *summed* rather than resolved against one ordered table the way the DPS path
+already does in `buildWhiteAttackTable`. And crushing blows aren't modelled at all: a flat 15% for
+150% damage from a three-levels-higher attacker, **not** reduced by Defense Rating — which is exactly
+why Paladins and Druids couldn't become uncrushable in TBC and Warriors could, via Shield Block. The
+constants are sourced in the research notes; the mechanic is what needs building. Both are named in
+the summary string, so the UI is honest in the meantime.
 
 ### 1. Multi-ability rotations — biggest remaining accuracy gap
 Every path models exactly **one** ability per spec. Melee additionally drops any special whose sustained rate isn't computable. So melee specs are understated, by different amounts per spec.
