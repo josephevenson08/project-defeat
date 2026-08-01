@@ -5,7 +5,7 @@
 Verify you're where this describes:
 
 ```bash
-git log --oneline -1     # expect a4fbfee "Correct racial trait values against Wowhead TBC tooltips"
+git log --oneline -1     # expect 976c272 "Record the audit's tank finding in the brain, and unstick the roadmap"
 git status               # expect clean except an untracked Untitled.canvas (user's own file, leave it)
 git rev-parse main origin/main   # expect identical — everything is pushed
 ```
@@ -49,41 +49,71 @@ npm run brain                     # "0 written" — idempotent; this repo is in 
 
 ---
 
-## ⚠️ Outstanding — today's simulator math is UNVERIFIED
+## ✅ The simulator audit has now been run
 
-A `sim-verifier` audit was dispatched and **failed**: it was still running when the process exited,
-and it produced **no output at all**. Not "hasn't reported yet" — it never ran to completion. So a
-substantial amount of combat math shipped today with no independent check on it.
+The re-run completed and covered everything the previous handoff listed. **The yellow-damage layer
+came back clean** — specials correctly cannot glance and correctly skip the dual-wield miss penalty;
+`averageSwingDamage` folds AP as `(AP/14)*speed` with normalization touching only that term and never
+the weapon's own dice average; all 22 catalogued weapons classify correctly under the
+`weaponSpeed >= 3` heuristic (fragile at the boundary for future entries, but currently inert); flat
+10/sec energy regen has **0.00%** mean-rate error against real quantized 20-per-2s ticks, because the
+long-run average is exactly right; and counting blocked specials at full damage is capped at ~4.7% of
+that ability's DPS in the worst case, realistically 0.1–1%. `applyRacialTraits` ordering is correct
+and deliberate.
 
-**Re-run that audit before trusting today's numbers.** Use the `sim-verifier` agent and point it at:
+Three findings, outside that layer. Two are fixed:
 
-- `src/domain/simulation/specialAttacks.ts` and `buildSpecialAttackTable` in `attackTable.ts` — the
-  new yellow-damage layer. Specifically: that specials can't glance and don't take the dual-wield
-  miss penalty; that `averageSwingDamage` folds attack power over the swing window correctly and
-  applies normalization only to the AP portion; that `normalizedSpeedForWeapon` inferring
-  one-hand vs two-hand from `weaponSpeed >= 3` is safe (`GearItem` has no handedness field); that
-  flat 10/sec energy regen and "cooldown abilities used exactly on cooldown" are defensible for TBC;
-  and how much counting blocked specials at full damage overstates things.
-- `scoreExact` on `SimulationResult` — every consumer that *computes* must use it, and only display
-  should use the rounded `score`.
-- `pickBestGemPerColor` in `findUpgrades.ts` — whether always choosing colour-matched gems is
-  actually optimal given that `socketBonusIsActive` requires a full colour match.
-- `applyRacialTraits` ordering inside `calculateStats`, and multiplier compounding when several hit
-  the same stat.
-- The tank avoidance baseline in `calculateTankSurvivability`, flagged in a code comment as the
-  least-verified part of the engine and never audited.
+- **Fixed** (`5e49673`) — Tank returned `scoreExact: score`, the *rounded* value, alone among the four
+  role calculators. Both consumers difference that field, so tank stat weights and upgrade deltas were
+  computed from display-rounded input. This was the original precision bug still live on one path.
+- **Fixed** (`b14b4b3`) — `pickBestGemPerColor` left a socket empty when no gem of its colour helped
+  the role. An empty socket forfeits the socket bonus *and* the stats, so it was strictly the worst
+  option available.
+
+### ⚠️ Still outstanding — the tank avoidance baseline is confirmed wrong
+
+`calculateTankSurvivability` (`calculateSimulation.ts:351-352`) computes the player's own dodge and
+parry with formulas character-for-character identical to `computeDodgeChance` / `computeParryChance`
+in `attackTable.ts` — which are the **boss's** avoidance against the player. Against a level 73 target
+this hands the player 14% baseline parry and 6.5% dodge, with the level gap *raising* avoidance. Real
+TBC moves the other way off a ~5% base. Parry is roughly 3× too high before any gear, and because
+stat weights difference the score, tank stat weights inherit it.
+
+The old code comment called this a symmetric approximation pending sourcing. Symmetry is precisely
+what does not hold, so the comment understated it. Written up in `brain/Domain/Concepts/Tank
+Avoidance.md`.
+
+**Not fixed, because fixing it needs real sourcing and this repo's rule is that confident recall is
+not a source.** A `tbc-researcher` pass for real level-70 player avoidance was dispatched.
+
+### Gotcha that probably explains the previous failure
+
+**`.claude/agents/` is not registered as agent types in every environment.** In this session
+`sim-verifier`, `tbc-researcher` and `worktree-reconciler` were all unavailable — only the built-in
+agents (`general-purpose`, `Explore`, `Plan`, ...) existed, and dispatching `sim-verifier` failed
+immediately with "agent type not found". That is a very plausible reason the earlier audit produced
+no output at all.
+
+The workaround, which works fine: dispatch a `general-purpose` agent and paste the contents of
+`.claude/agents/<name>.md` into the prompt verbatim as its brief. Also instruct it to append findings
+to a scratchpad file **as it goes** rather than only reporting at the end, so a cut-off run still
+leaves something behind.
 
 The racial sourcing pass **did** land and has been applied. Three racials keep `needsVerification`
 where the research itself was inconclusive (Dwarf Stoneform's exact effect list, Draenei Gift of the
 Naaru's level-70 heal, Tauren War Stomp's cooldown) — all three are non-modelled, so no number
 depends on them.
 
-## What this session did (26 commits, all pushed)
+## What the work so far did (all pushed)
 
 Newest first. Every one is verified green and pushed.
 
 | Commit | What |
 |---|---|
+| `976c272` | Tank avoidance finding recorded in the brain; stale roadmap prose corrected |
+| `b14b4b3` | Upgrade finder no longer reports sockets it left empty |
+| `5e49673` | Tank's `scoreExact` made actually exact |
+| `f4e4247` | Corrected the handoff: the simulator audit failed rather than lagged |
 | `a4fbfee` | Racial values corrected against Wowhead TBC tooltips; Draenei split into two class-gated racials |
 | `86b7ed9` | This handoff file |
 | `a5d4a12` | Named build slots — switching character no longer destroys your build |
@@ -105,6 +135,12 @@ Newest first. Every one is verified green and pushed.
 ---
 
 ## What's next, in priority order
+
+### 0. Correct the tank avoidance baseline — confirmed defect, needs sourcing first
+See the outstanding section above. This is the only *known-wrong* number in the engine, as opposed to
+the merely unverified ones, so it outranks everything below. It is small once the real values are in
+hand: the formulas live at `calculateSimulation.ts:351-353`, and the fix is a defender-side
+calculation rather than a reuse of the attacker-side helpers. Do not write the numbers from memory.
 
 ### 1. Multi-ability rotations — biggest remaining accuracy gap
 Every path models exactly **one** ability per spec. Melee additionally drops any special whose sustained rate isn't computable. So melee specs are understated, by different amounts per spec.
