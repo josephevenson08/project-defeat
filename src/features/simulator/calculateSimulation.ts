@@ -370,13 +370,13 @@ function calculateTankSurvivability(stats: StatBlock, target: SimulationTarget):
     { label: 'Crit-taken reduction from Defense', value: critTakenReduction },
   ]
 
-  const score = round(totalAvoidance * 100 * 2 + armorMitigation * 100 * 1.5 + stats.stamina * 0.1)
+  const survivabilityScore = totalAvoidance * 100 * 2 + armorMitigation * 100 * 1.5 + stats.stamina * 0.1
 
   return {
     role: 'Tank',
     metricLabel: 'Survivability Score',
-    score,
-    scoreExact: score,
+    score: round(survivabilityScore),
+    scoreExact: survivabilityScore,
     summary: `Avoidance (dodge/parry/block vs. a level ${target.level} target) and armor mitigation from real TBC rating conversions, plus stamina. Uncrittable status still requires ~490 total Defense Skill regardless of this score.`,
     breakdown,
   }
