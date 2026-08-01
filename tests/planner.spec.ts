@@ -122,7 +122,22 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText(/Survivability Score/i)).toBeVisible()
-  await expect(page.getByText(/Avoidance \(dodge\/parry\/block/i)).toBeVisible()
+
+  // The tank path has to use the *defender-side* base chances. It previously reused the
+  // attacker-side formulas symmetrically, which handed the player the boss's own 14% parry and made
+  // a bigger level gap *raise* the player's avoidance.
+  await expect(page.getByText(/defender-side base chances/i)).toBeVisible()
+
+  // Avoidance is broken out per outcome rather than lumped into one number, so a wrong term can be
+  // seen rather than hiding inside a total.
+  const tankBreakdown = page.locator('.breakdown-list')
+  await expect(tankBreakdown).toContainText(/Dodge/i)
+  await expect(tankBreakdown).toContainText(/Boss miss chance/i)
+
+  // A Paladin with the shield equipped above must have both parry and block credited — those are
+  // gated on class and on actually holding a shield.
+  await expect(tankBreakdown).not.toContainText(/cannot parry/i)
+  await expect(tankBreakdown).not.toContainText(/no shield equipped/i)
 })
 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {

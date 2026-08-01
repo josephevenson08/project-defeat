@@ -2,22 +2,22 @@
 type: module
 layer: domain
 source: src/domain/simulation/attackTable.ts
-lines: 176
+lines: 217
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.attackTable
 
-`src/domain/simulation/attackTable.ts` · **domain** layer · 176 lines
+`src/domain/simulation/attackTable.ts` · **domain** layer · 217 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `applyDualWieldMissPenalty`, `applyMeleeCritSuppression`, `buildRangedAttackTable`, `buildSpecialAttackTable`, `buildWhiteAttackTable`, `computeBaseMissChance`, `computeDodgeChance`, `computeGlanceChance`, `computeGlanceDamageRange`, `computeParryChance`, `computeSkillDiff`, `computeTargetBlockChance`
+**function** — `applyDualWieldMissPenalty`, `applyMeleeCritSuppression`, `buildDefenderAvoidanceBaseline`, `buildRangedAttackTable`, `buildSpecialAttackTable`, `buildWhiteAttackTable`, `computeBaseMissChance`, `computeDodgeChance`, `computeGlanceChance`, `computeGlanceDamageRange`, `computeParryChance`, `computeSkillDiff`, `computeTargetBlockChance`
 
-**type** — `GlanceDamageRange`, `SpecialAttackTable`, `WhiteAttackTable`, `WhiteAttackTableInputs`
+**type** — `DefenderAvoidanceBaseline`, `GlanceDamageRange`, `SpecialAttackTable`, `WhiteAttackTable`, `WhiteAttackTableInputs`
 
 ## Imports
 

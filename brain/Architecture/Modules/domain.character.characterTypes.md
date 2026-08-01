@@ -44,6 +44,7 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 - [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`

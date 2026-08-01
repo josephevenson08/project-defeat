@@ -15,10 +15,31 @@ export const RATING_PER_PERCENT = {
   meleeHaste: 15.8,
   spellHaste: 15.8,
   dodge: 18.9,
-  parry: 31.5,
+  /**
+   * NOT the blue post's 31.5. That post is dated October 2006, before original TBC shipped, and
+   * patch 2.1.0 then cut the parry rating cost by 25% — 31.5 * 0.75 = 23.625. TBC Classic ran on
+   * post-2.1 mechanics throughout, and wowsims/tbc hardcodes `ParryRatingPerParryChance = 23.6538`.
+   * Every other value in this table matches wowsims to a rounding; parry was the lone outlier at
+   * 33% too expensive, which is what gave it away.
+   */
+  parry: 23.65,
   block: 7.9,
   resilience: 39.4,
 } as const
+
+/**
+ * Defense Rating needed for one point of Defense Skill at level 70. The blue post's 2.4 is this
+ * number rounded; wowsims carries the exact 2.3654.
+ */
+export const DEFENSE_RATING_PER_SKILL_POINT = 2.3654
+
+/**
+ * One point of Defense Skill moves *five* things at once by this fraction: it adds to the player's
+ * dodge, parry and block, adds to the attacker's miss chance, and subtracts from the attacker's
+ * crit chance. Hence 490 Defense Skill for uncrittable against a level 73 boss — that boss crits
+ * for 5.6% raw, and 0.056 / 0.0004 = 140 points above the free 350 a level 70 already has.
+ */
+export const AVOIDANCE_PER_DEFENSE_SKILL_POINT = 0.0004
 
 /** Rating needed for one point of Expertise Skill (not directly a percent). Community math, not from the official blue post, but consistent across independent sources. */
 export const EXPERTISE_RATING_PER_SKILL_POINT = 3.9423

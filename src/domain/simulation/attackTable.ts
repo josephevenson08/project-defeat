@@ -112,6 +112,47 @@ export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAtta
   return { miss, dodge, parry, glance, block, crit, hit }
 }
 
+export type DefenderAvoidanceBaseline = {
+  /** The attacker's chance to miss the player outright. */
+  miss: number
+  /** Added to the player's Agility- and rating-derived dodge. Negative against a higher-level attacker — dodge has no flat base of its own. */
+  dodgeLevelPenalty: number
+  /** Only reachable by a parry-capable class. */
+  parry: number
+  /** Only reachable with a shield equipped. */
+  block: number
+}
+
+/**
+ * The **defender** side of the table: what happens when the boss swings at the player.
+ *
+ * This is deliberately not `computeDodgeChance`/`computeParryChance` run backwards. Those are the
+ * attacker-side helpers — the target's chance to avoid the *player's* swing — and reusing them here
+ * is exactly the bug this function replaces. The two directions are genuinely different tables in
+ * TBC, and the level gap enters them with **opposite sign**: a level 70 player fighting a level 73
+ * boss is the under-skilled party both ways, so the boss avoids more and the player avoids less.
+ *
+ * Miss, parry and block each start at a flat 5% and lose 0.2% per attacker level above the player,
+ * bottoming out at the +3 row (the game's table has no entries beyond that). Dodge has no flat base
+ * at all — it is built from Agility and dodge rating, and the level gap only ever subtracts.
+ *
+ * Sourced from wowsims/tbc `sim/core/target.go`, `NewAttackTable()`'s defender branch. The -0.2% per
+ * level is the same 0.04%-per-skill-point figure that Defense Skill uses, with the sign flipped
+ * (3 levels * 5 skill * 0.04% = 0.6%), which is a useful internal consistency check.
+ */
+export function buildDefenderAvoidanceBaseline(attackerLevel: number, defenderLevel = 70): DefenderAvoidanceBaseline {
+  const levelsAbove = Math.min(3, Math.max(0, attackerLevel - defenderLevel))
+  const perLevel = 0.002
+  const base = 0.05 - levelsAbove * perLevel
+
+  return {
+    miss: base,
+    dodgeLevelPenalty: -levelsAbove * perLevel,
+    parry: base,
+    block: base,
+  }
+}
+
 export type SpecialAttackTable = Pick<WhiteAttackTable, 'miss' | 'dodge' | 'parry' | 'block' | 'crit' | 'hit'>
 
 /**

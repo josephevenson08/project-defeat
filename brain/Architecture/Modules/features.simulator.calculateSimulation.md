@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateSimulation.ts
-lines: 400
+lines: 440
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateSimulation
 
-`src/features/simulator/calculateSimulation.ts` · **features** layer · 400 lines
+`src/features/simulator/calculateSimulation.ts` · **features** layer · 440 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,7 @@ _No doc comment at the top of this file._
 
 - [[domain.abilities.index]] — `src/domain/abilities/index.ts`
 - [[domain.buffs.sampleTargetDebuffs]] — `src/domain/buffs/sampleTargetDebuffs.ts`
+- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
 - [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`

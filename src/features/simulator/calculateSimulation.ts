@@ -2,6 +2,7 @@ import { getSignatureAbility } from '../../domain/abilities'
 import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
 import {
+  buildDefenderAvoidanceBaseline,
   buildRangedAttackTable,
   buildSpecialAttackTable,
   buildWhiteAttackTable,
@@ -10,6 +11,8 @@ import {
 } from '../../domain/simulation/attackTable'
 import { computeUsageRate, estimateSpecialAttack } from '../../domain/simulation/specialAttacks'
 import {
+  AVOIDANCE_PER_DEFENSE_SKILL_POINT,
+  DEFENSE_RATING_PER_SKILL_POINT,
   EXPERTISE_RATING_PER_SKILL_POINT,
   MELEE_CRIT_DAMAGE_MULTIPLIER,
   RATING_PER_PERCENT,
@@ -20,6 +23,7 @@ import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient, 
 import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounters'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
+import type { TbcClass } from '../../domain/character/characterTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
 import type { StatBlock } from '../stats/statsTypes'
@@ -343,27 +347,63 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
   }
 }
 
-function calculateTankSurvivability(stats: StatBlock, target: SimulationTarget): SimulationResult {
-  const skillDiff = computeSkillDiff(target.level)
-  // Approximation: player avoidance-vs-boss baseline chances aren't as firmly sourced as the
-  // player-attacks-target direction, so this reuses the same skill-differential formulas
-  // symmetrically. Flagged as needsVerification pending a dedicated tank-mechanics research pass.
-  const baselineDodge = 0.05 + skillDiff * 0.001
-  const baselineParry = 0.05 + skillDiff * (skillDiff >= 11 ? 0.006 : 0.001)
-  const baselineBlock = 0.05
+/** Sourced from wowsims/tbc: `CanParry` is set unconditionally for these four and never for Druid, Mage, Priest or Warlock. Shaman gets it only from the Enhancement talent Spirit Weapons, which this project does not model. */
+const PARRY_CAPABLE_CLASSES: ReadonlySet<TbcClass> = new Set<TbcClass>(['Warrior', 'Paladin', 'Rogue', 'Hunter'])
 
-  const dodgeChance = Math.max(0, baselineDodge) + ratingToFraction(stats.dodgeRating, RATING_PER_PERCENT.dodge)
-  const parryChance = Math.max(0, baselineParry) + ratingToFraction(stats.parryRating, RATING_PER_PERCENT.parry)
-  const blockChance = baselineBlock + ratingToFraction(stats.blockRating, RATING_PER_PERCENT.block)
-  const defenseSkillPoints = stats.defenseRating / 2.4
-  const defenseAvoidanceBonus = defenseSkillPoints * 0.0004 * 3
-  const totalAvoidance = Math.min(0.99, dodgeChance + parryChance + blockChance + defenseAvoidanceBonus)
+/** Agility for +1% dodge at level 70. Only the three classes TBC actually tanks with are sourced; the others have no Agility-to-dodge dependency in wowsims at all, so they are deliberately absent rather than guessed. */
+const AGILITY_PER_PERCENT_DODGE: Partial<Record<TbcClass, number>> = {
+  Warrior: 30,
+  Paladin: 25,
+  Druid: 14.7059,
+}
+
+function calculateTankSurvivability(
+  character: CharacterProfile,
+  gear: EquippedGear,
+  stats: StatBlock,
+  target: SimulationTarget,
+): SimulationResult {
+  const baseline = buildDefenderAvoidanceBaseline(target.level)
+  const defenseSkillPoints = stats.defenseRating / DEFENSE_RATING_PER_SKILL_POINT
+  // One Defense Skill point moves each outcome by the same 0.04%, so this is added to every
+  // avoidance term separately rather than summed once and scaled. The old code multiplied a single
+  // combined bonus by 3, which happened to land near the right total while making the per-outcome
+  // rows below meaningless.
+  const fromDefense = defenseSkillPoints * AVOIDANCE_PER_DEFENSE_SKILL_POINT
+
+  const agilityPerPercentDodge = AGILITY_PER_PERCENT_DODGE[character.className]
+  const dodgeFromAgility = agilityPerPercentDodge ? stats.agility / agilityPerPercentDodge / 100 : 0
+  const dodgeChance = Math.max(
+    0,
+    dodgeFromAgility + baseline.dodgeLevelPenalty + ratingToFraction(stats.dodgeRating, RATING_PER_PERCENT.dodge) + fromDefense,
+  )
+
+  const canParry = PARRY_CAPABLE_CLASSES.has(character.className)
+  const parryChance = canParry
+    ? Math.max(0, baseline.parry + ratingToFraction(stats.parryRating, RATING_PER_PERCENT.parry) + fromDefense)
+    : 0
+
+  // Block is unavailable without a shield no matter how much block rating is stacked.
+  const hasShield = gear['Off Hand']?.item.weaponType === 'Shield'
+  const blockChance = hasShield
+    ? Math.max(0, baseline.block + ratingToFraction(stats.blockRating, RATING_PER_PERCENT.block) + fromDefense)
+    : 0
+
+  // A swing that misses is avoided damage exactly as a dodge is, so it belongs in the total. The
+  // previous model left it out entirely.
+  const missChance = Math.max(0, baseline.miss + fromDefense)
+
+  const totalAvoidance = Math.min(0.99, missChance + dodgeChance + parryChance + blockChance)
 
   const armorMitigation = computeArmorMitigation(stats.armor, target.level)
-  const critTakenReduction = toPercent(defenseSkillPoints * 0.0004)
+  const critTakenReduction = toPercent(defenseSkillPoints * AVOIDANCE_PER_DEFENSE_SKILL_POINT)
 
   const breakdown: SimulationBreakdownEntry[] = [
     { label: 'Total avoidance', value: toPercent(totalAvoidance) },
+    { label: 'Dodge', value: toPercent(dodgeChance) },
+    { label: canParry ? 'Parry' : 'Parry (this class cannot parry)', value: toPercent(parryChance) },
+    { label: hasShield ? 'Block' : 'Block (no shield equipped)', value: toPercent(blockChance) },
+    { label: 'Boss miss chance', value: toPercent(missChance) },
     { label: 'Armor mitigation', value: toPercent(armorMitigation) },
     { label: 'Stamina', value: stats.stamina },
     { label: 'Block value', value: stats.blockValue },
@@ -377,7 +417,7 @@ function calculateTankSurvivability(stats: StatBlock, target: SimulationTarget):
     metricLabel: 'Survivability Score',
     score: round(survivabilityScore),
     scoreExact: survivabilityScore,
-    summary: `Avoidance (dodge/parry/block vs. a level ${target.level} target) and armor mitigation from real TBC rating conversions, plus stamina. Uncrittable status still requires ~490 total Defense Skill regardless of this score.`,
+    summary: `Miss/dodge/parry/block against a level ${target.level} attacker, using the defender-side base chances (a level gap lowers your avoidance, unlike the attacker-side table), plus armor mitigation and stamina. Uncrittable still requires 490 total Defense Skill. Crushing blows are not modeled, and neither is avoidance competing for one ordered table, so this reads high against a real boss.`,
     breakdown,
   }
 }
@@ -394,6 +434,6 @@ export function calculateSimulation(
 
   if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs)
   if (role === 'Healer') return calculateHealing(character, stats)
-  if (role === 'Tank') return calculateTankSurvivability(stats, target)
+  if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target)
   return calculatePhysicalDps(character, gear, stats, target, debuffs)
 }
