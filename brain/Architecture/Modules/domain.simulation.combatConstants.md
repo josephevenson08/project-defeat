@@ -31,6 +31,7 @@ _None._
 
 ## Imported by
 
+- [[domain.character.sampleRacialTraits]] — `src/domain/character/sampleRacialTraits.ts`
 - [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`

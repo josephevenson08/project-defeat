@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-128 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+131 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -17,15 +17,15 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 The modules everything else leans on — change these carefully.
 
 - [[domain.bis.bisTypes]] — 28 importers
-- [[domain.character.characterTypes]] — 23 importers
-- [[domain.gear.itemTypes]] — 18 importers
+- [[domain.character.characterTypes]] — 26 importers
+- [[domain.gear.itemTypes]] — 20 importers
 - [[domain.gear.gearSlots]] — 14 importers
 - [[components.layout.Panel]] — 12 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
+- [[domain.stats.statTypes]] — 11 importers
 - [[features.character.characterTypes]] — 11 importers
 - [[domain.raids.raidTypes]] — 9 importers
-- [[domain.stats.statTypes]] — 9 importers
-- [[features.gear.gearTypes]] — 8 importers
+- [[features.gear.gearTypes]] — 9 importers
 - [[domain.character.roleTheme]] — 7 importers
 - [[domain.simulation.encounterTypes]] — 7 importers
 
@@ -64,7 +64,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.character.characterTypes]] · 11 importers
 - [[features.gear.gearData]] · 7 importers
 - [[features.gear.GearPanel]] · 1 importers
-- [[features.gear.gearTypes]] · 8 importers
+- [[features.gear.gearTypes]] · 9 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.raids.RaidAttunementChain]] · 1 importers
 - [[features.raids.RaidLootList]] · 1 importers
@@ -81,7 +81,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.stats.StatsPanel]] · 1 importers
 - [[features.stats.statsTypes]] · 4 importers
 
-### domain (90)
+### domain (93)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -132,9 +132,12 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.buffs.sampleTargetDebuffs]] · 2 importers
 - [[domain.builds.buildSerialization]] · 3 importers
 - [[domain.builds.buildTypes]] · 4 importers
-- [[domain.character.characterTypes]] · 23 importers
+- [[domain.character.applyRacialTraits]] · 2 importers
+- [[domain.character.characterTypes]] · 26 importers
 - [[domain.character.races]] · 2 importers
+- [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 7 importers
+- [[domain.character.sampleRacialTraits]] · 2 importers
 - [[domain.character.tbcClasses]] · 4 importers
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers
@@ -143,7 +146,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.characterItemRules]] · 2 importers
 - [[domain.gear.defaultGear]] · 1 importers
 - [[domain.gear.gearSlots]] · 14 importers
-- [[domain.gear.itemTypes]] · 18 importers
+- [[domain.gear.itemTypes]] · 20 importers
 - [[domain.gear.qualityColors]] · 4 importers
 - [[domain.gear.sampleItems]] · 4 importers
 - [[domain.gear.slotCompatibility]] · 4 importers
@@ -167,14 +170,14 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.serpentshrineCavernBosses]] · 1 importers
 - [[domain.raids.tempestKeepBosses]] · 1 importers
 - [[domain.simulation.attackTable]] · 1 importers
-- [[domain.simulation.combatConstants]] · 4 importers
+- [[domain.simulation.combatConstants]] · 5 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
 - [[domain.simulation.encounterTypes]] · 7 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers
-- [[domain.stats.statTypes]] · 9 importers
-- [[domain.stats.statUtils]] · 1 importers
+- [[domain.stats.statTypes]] · 11 importers
+- [[domain.stats.statUtils]] · 2 importers
 
 ### data (2)
 

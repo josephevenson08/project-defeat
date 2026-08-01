@@ -150,7 +150,7 @@ function App() {
     <AppShell tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'planner' && (
         <>
-          <CharacterPanel character={character} onChange={updateCharacter} />
+          <CharacterPanel character={character} gear={gear} onChange={updateCharacter} />
           <GearPanel character={character} gear={gear} onChange={updateGear} />
           <BisPanel character={character} gear={gear} onEquip={updateGear} />
           <BuffsPanel

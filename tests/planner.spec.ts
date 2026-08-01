@@ -1122,3 +1122,48 @@ test('the item catalog and the raid data agree on where every drop comes from', 
 
   expect(disagreements, `item catalog disagrees with raid data: ${disagreements.join(' | ')}`).toEqual([])
 })
+
+test('racial traits apply to stats, and weapon-conditional ones follow the equipped weapon', async ({ page }) => {
+  await page.goto('/')
+
+  // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, and the
+  // default main hand IS a sword, so it should be active and contributing expertise.
+  await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('training-sword')
+  const swordSpec = page.getByTestId('racial-human-sword-specialization')
+  await expect(swordSpec).toContainText(/Included in your stats/i)
+
+  const expertiseWithSword = readStatValue(await page.getByTestId('stat-expertise').innerText())
+  expect(expertiseWithSword).toBeGreaterThan(0)
+
+  // Swap to a non-sword main hand: the racial must switch off and the expertise must actually drop.
+  await page.getByLabel('Main Hand', { exact: true }).selectOption('dragonstrike')
+  await expect(swordSpec).toContainText(/Only while wielding/i)
+  expect(readStatValue(await page.getByTestId('stat-expertise').innerText())).toBeLessThan(expertiseWithSword)
+
+  // Unconditional racials are always on. The Human Spirit is a percentage bonus, so it has to be
+  // applied before the derivations that read Spirit rather than bolted on afterwards.
+  await expect(page.getByTestId('racial-human-the-human-spirit')).toContainText(/Included in your stats/i)
+
+  // On-use and utility racials are listed but explicitly not modelled — a race showing nothing would
+  // be indistinguishable from a race that genuinely has nothing.
+  await expect(page.getByTestId('racial-human-perception')).toContainText(/Utility/i)
+})
+
+test('changing race changes the racial list and the resulting stats', async ({ page }) => {
+  await page.goto('/')
+
+  // Gnome's Expansive Mind is a flat +5% Intellect, so it should move Intellect for any class.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
+  await page.getByLabel('Class').selectOption('Mage')
+  const gnomeIntellect = readStatValue(await page.getByTestId('stat-intellect').innerText())
+  await expect(page.getByTestId('racial-gnome-expansive-mind')).toContainText(/Included in your stats/i)
+
+  // Undead has no passive stat racial at all, so the same Mage should end up with less Intellect.
+  await page.getByLabel('Faction').selectOption('Horde')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Undead')
+  await page.getByLabel('Class').selectOption('Mage')
+  await expect(page.getByTestId('racial-gnome-expansive-mind')).toHaveCount(0)
+  await expect(page.getByTestId('racial-undead-will-of-the-forsaken')).toContainText(/not modelled/i)
+
+  expect(readStatValue(await page.getByTestId('stat-intellect').innerText())).toBeLessThan(gnomeIntellect)
+})

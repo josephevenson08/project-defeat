@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

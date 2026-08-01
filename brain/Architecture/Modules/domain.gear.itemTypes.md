@@ -28,6 +28,8 @@ _No doc comment at the top of this file._
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
+- [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`

@@ -29,8 +29,11 @@ _No doc comment at the top of this file._
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
+- [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
+- [[domain.character.sampleRacialTraits]] — `src/domain/character/sampleRacialTraits.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`

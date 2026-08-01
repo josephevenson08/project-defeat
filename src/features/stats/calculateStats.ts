@@ -1,3 +1,4 @@
+import { applyRacialTraits } from '../../domain/character/applyRacialTraits'
 import { getClassDefinition } from '../character/characterData'
 import type { CharacterProfile } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
@@ -63,6 +64,10 @@ export function calculateStats(
   })
 
   if (bonusStats) total = addStats(total, bonusStats)
+
+  // Before the derivations below, so a percentage bonus to a primary stat (Gnome's Intellect,
+  // Human's Spirit) reaches the spell power and healing power that stat feeds.
+  total = applyRacialTraits(total, character.race, gear)
 
   total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
   total.rangedAttackPower += Math.round(total.agility * 1.8)

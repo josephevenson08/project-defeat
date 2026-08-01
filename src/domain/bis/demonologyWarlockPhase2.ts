@@ -162,7 +162,7 @@ export const demonologyWarlockPhase2Bis: BisList = {
       rank: 1,
       itemId: 'fang-of-the-leviathan',
       recommendedEnchantId: 'major-spellpower-weapon',
-      notes: 'Shared caster dagger (also picked by Fire/Frost Mage); weapon DPS/speed modeling is future work.',
+      notes: 'Shared caster sword (also picked by Fire/Frost Mage, and by Protection Paladin, whose threat scales off spell power).',
       sourceName: 'Starter sample',
       source: source({ type: 'Raid', instance: 'Serpentshrine Cavern', boss: 'Leotheras the Blind', phase: 2, needsVerification: true }),
       needsVerification: true,

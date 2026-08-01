@@ -1331,3 +1331,63 @@ textarea:focus {
 .build-export-details textarea {
   margin-top: 10px;
 }
+
+.racials {
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  margin-top: 18px;
+  padding-top: 14px;
+}
+
+.racials h3 {
+  color: #f8fafc;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.racials ul {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.racials li {
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-left: 3px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+}
+
+.racials li strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.racials li span {
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.racials li small {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.racial-active {
+  border-left-color: var(--panel-accent, #f0abfc);
+}
+
+.racial-active small {
+  color: #4ade80;
+}
+
+.racial-inactive {
+  opacity: 0.72;
+}

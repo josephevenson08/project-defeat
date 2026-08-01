@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/stats/calculateStats.ts
-lines: 76
+lines: 81
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.stats.calculateStats
 
-`src/features/stats/calculateStats.ts` · **features** layer · 76 lines
+`src/features/stats/calculateStats.ts` · **features** layer · 81 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
+- [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
