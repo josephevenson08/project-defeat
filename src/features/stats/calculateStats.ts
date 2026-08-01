@@ -67,7 +67,7 @@ export function calculateStats(
 
   // Before the derivations below, so a percentage bonus to a primary stat (Gnome's Intellect,
   // Human's Spirit) reaches the spell power and healing power that stat feeds.
-  total = applyRacialTraits(total, character.race, gear)
+  total = applyRacialTraits(total, character.race, character.className, gear)
 
   total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
   total.rangedAttackPower += Math.round(total.agility * 1.8)

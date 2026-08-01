@@ -1197,3 +1197,21 @@ test('named build slots survive a character switch that would overwrite the auto
   await page.getByTestId('build-slot-delete-Fury main').click()
   await expect(page.getByTestId('build-slots-empty')).toBeVisible()
 })
+
+test('Draenei get the hit racial matching their class, not both', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+
+  // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version.
+  await page.getByLabel('Class').selectOption('Warrior')
+  await expect(page.getByTestId('racial-draenei-heroic-presence')).toContainText(/Included in your stats/i)
+  await expect(page.getByTestId('racial-draenei-inspiring-presence')).toContainText(/Only for/i)
+  const warriorSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+
+  // Shamans get Inspiring Presence (spell hit) instead — the two are separate racials in TBC, and
+  // granting both would hand every Draenei twice the hit they actually have.
+  await page.getByLabel('Class').selectOption('Shaman')
+  await expect(page.getByTestId('racial-draenei-inspiring-presence')).toContainText(/Included in your stats/i)
+  await expect(page.getByTestId('racial-draenei-heroic-presence')).toContainText(/Only for/i)
+  expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText())).toBeGreaterThan(warriorSpellHit)
+})

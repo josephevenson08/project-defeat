@@ -70,7 +70,7 @@ export function CharacterPanel({ character, gear, onChange }: CharacterPanelProp
         <ul>
           {getRacialTraitsForRace(character.race).map((trait) => {
             const contributes = Boolean(trait.stats || trait.statMultipliers)
-            const active = contributes && isRacialTraitActive(trait, gear)
+            const active = contributes && isRacialTraitActive(trait, character.className, gear)
 
             return (
               <li className={active ? 'racial-active' : 'racial-inactive'} data-testid={`racial-${trait.id}`} key={trait.id}>
@@ -80,7 +80,9 @@ export function CharacterPanel({ character, gear, onChange }: CharacterPanelProp
                   {active
                     ? 'Included in your stats'
                     : trait.kind === 'conditional'
-                      ? `Only while wielding: ${(trait.requiresWeaponTypes ?? []).join(' or ')}`
+                      ? trait.requiresClasses && !trait.requiresClasses.includes(character.className)
+                        ? `Only for: ${trait.requiresClasses.join(', ')}`
+                        : `Only while wielding: ${(trait.requiresWeaponTypes ?? []).join(' or ')}`
                       : trait.kind === 'on-use'
                         ? 'On-use cooldown — not modelled'
                         : contributes

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/character/CharacterPanel.tsx
-lines: 98
+lines: 100
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.character.CharacterPanel
 
-`src/features/character/CharacterPanel.tsx` · **features** layer · 98 lines
+`src/features/character/CharacterPanel.tsx` · **features** layer · 100 lines
 
 _No doc comment at the top of this file._
 

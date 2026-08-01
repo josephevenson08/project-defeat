@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/character/applyRacialTraits.ts
-lines: 54
+lines: 57
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.applyRacialTraits
 
-`src/domain/character/applyRacialTraits.ts` · **domain** layer · 54 lines
+`src/domain/character/applyRacialTraits.ts` · **domain** layer · 57 lines
 
 From the top of the file:
 

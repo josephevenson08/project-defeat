@@ -1,7 +1,7 @@
 import type { EquippedGear, WeaponType } from '../gear/itemTypes'
 import { addStats, applyStatMultipliers } from '../stats/statUtils'
 import type { StatBlock } from '../stats/statTypes'
-import type { TbcRace } from './characterTypes'
+import type { TbcClass, TbcRace } from './characterTypes'
 import type { RacialTrait } from './racialTypes'
 import { getRacialTraitsForRace } from './sampleRacialTraits'
 
@@ -22,8 +22,9 @@ function equippedWeaponTypes(gear: EquippedGear | undefined): ReadonlySet<Weapon
   return types
 }
 
-export function isRacialTraitActive(trait: RacialTrait, gear: EquippedGear | undefined): boolean {
+export function isRacialTraitActive(trait: RacialTrait, className: TbcClass, gear: EquippedGear | undefined): boolean {
   if (trait.kind === 'on-use' || trait.kind === 'utility') return false
+  if (trait.requiresClasses && !trait.requiresClasses.includes(className)) return false
   if (!trait.requiresWeaponTypes) return true
 
   const equipped = equippedWeaponTypes(gear)
@@ -31,8 +32,10 @@ export function isRacialTraitActive(trait: RacialTrait, gear: EquippedGear | und
 }
 
 /** The racials currently contributing stats, for the UI to show alongside the ones that aren't. */
-export function getActiveRacialTraits(race: TbcRace, gear: EquippedGear | undefined): readonly RacialTrait[] {
-  return getRacialTraitsForRace(race).filter((trait) => isRacialTraitActive(trait, gear) && (trait.stats || trait.statMultipliers))
+export function getActiveRacialTraits(race: TbcRace, className: TbcClass, gear: EquippedGear | undefined): readonly RacialTrait[] {
+  return getRacialTraitsForRace(race).filter(
+    (trait) => isRacialTraitActive(trait, className, gear) && (trait.stats || trait.statMultipliers),
+  )
 }
 
 /**
@@ -40,11 +43,11 @@ export function getActiveRacialTraits(race: TbcRace, gear: EquippedGear | undefi
  * the primary-stat derivations so that a percentage bonus to a primary stat (Gnome's +5% Intellect,
  * Human's +10% Spirit) cascades into the spell power and healing power those stats feed.
  */
-export function applyRacialTraits(total: StatBlock, race: TbcRace, gear: EquippedGear | undefined): StatBlock {
+export function applyRacialTraits(total: StatBlock, race: TbcRace, className: TbcClass, gear: EquippedGear | undefined): StatBlock {
   let next = total
 
   for (const trait of getRacialTraitsForRace(race)) {
-    if (!isRacialTraitActive(trait, gear)) continue
+    if (!isRacialTraitActive(trait, className, gear)) continue
     next = addStats(next, trait.stats)
     next = applyStatMultipliers(next, trait.statMultipliers)
   }

@@ -1,6 +1,6 @@
 import type { WeaponType } from '../gear/itemTypes'
 import type { StatBlock } from '../stats/statTypes'
-import type { TbcRace } from './characterTypes'
+import type { TbcClass, TbcRace } from './characterTypes'
 
 /**
  * Why a racial is or isn't part of the stat/simulation model.
@@ -31,6 +31,13 @@ export type RacialTrait = {
   statMultipliers?: Partial<Record<keyof StatBlock, number>>
   /** For `conditional` traits: the trait applies only while one of these is equipped in the relevant slot. */
   requiresWeaponTypes?: readonly WeaponType[]
+  /**
+   * For `conditional` traits granted only to certain classes. Draenei is the case this exists for:
+   * Heroic Presence (melee/ranged hit) goes to Warrior/Paladin/Hunter, while Priest/Shaman get a
+   * separately-named racial, Inspiring Presence, that gives spell hit instead. Treating it as one
+   * trait granting both would hand every Draenei twice the hit they actually get.
+   */
+  requiresClasses?: readonly TbcClass[]
   needsVerification?: boolean
   notes?: string
 }

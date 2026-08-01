@@ -5,7 +5,7 @@
 Verify you're where this describes:
 
 ```bash
-git log --oneline -1     # expect a5d4a12 "Add named build slots so switching character can't destroy work"
+git log --oneline -1     # expect the racial-sourcing commit at the top
 git status               # expect clean except an untracked Untitled.canvas (user's own file, leave it)
 git rev-parse main origin/main   # expect identical — everything is pushed
 ```
@@ -36,26 +36,25 @@ The repo carries its own conventions, and they encode mistakes this project has 
 npx tsc -b                        # clean
 npm run lint                      # exit 0
 npm run build
-npx playwright test --reporter=line   # 50 passing. Use --reporter=line, not the default.
+npx playwright test --reporter=line   # 51 passing. Use --reporter=line, not the default.
 npm run brain                     # "all wikilinks resolve"
 npm run brain                     # "0 written" — idempotent; this repo is in OneDrive, churn matters
 ```
 
 ---
 
-## ⚠️ One thing is genuinely outstanding
+## ⚠️ Outstanding
 
-**A `tbc-researcher` agent was dispatched to source the racial trait numbers and had not reported back when this session ended.** Every numeric value in `src/domain/character/sampleRacialTraits.ts` is currently flagged `needsVerification: true` and was written from recall.
+A **`sim-verifier` audit of today's combat-math changes** was dispatched and had not reported back
+when this session ended. It was asked to check the new yellow attack table, `scoreExact`, the gem
+auto-fill in the upgrade finder, and racial ordering in `calculateStats`. Nothing from it has been
+applied. Re-run it (`sim-verifier` agent) or check its findings before trusting today's simulator
+changes.
 
-When those findings land (or if you re-run the research), reconcile them into that file and clear the flags on anything confirmed. The specific values most worth checking, because they change the maths:
-
-- Draenei **Heroic Presence** — exact hit %, and whether it covers melee/ranged/spell or only some
-- Human **Sword/Mace Specialization** and Orc **Axe Specialization** — Expertise vs weapon skill in TBC, exact value, which weapon types
-- Gnome **Expansive Mind** %, Human **The Human Spirit** %, Night Elf **Quickness** %
-
-Do not clear a `needsVerification` flag without an actual source.
-
----
+The racial sourcing pass **has** landed and been applied — see below. A handful of racials still
+carry `needsVerification` where the research itself was inconclusive (Dwarf Stoneform's exact effect
+list, Draenei Gift of the Naaru's level-70 heal, Tauren War Stomp's cooldown). All three are
+non-modelled effects, so they don't touch any number.
 
 ## What this session did (26 commits, all pushed)
 
@@ -64,7 +63,8 @@ Newest first. Every one is verified green and pushed.
 | Commit | What |
 |---|---|
 | `a5d4a12` | Named build slots — switching character no longer destroys your build |
-| `d3c73f9` | Racial traits made mechanically real (⚠️ values unsourced, see above) |
+| (top) | Racial values corrected against Wowhead TBC tooltips; Draenei split into two class-gated racials |
+| `d3c73f9` | Racial traits made mechanically real |
 | `12c1902` | Replaced an invented item with sourced tooltip data for 3 items |
 | `ccae74d` | Upgrade candidates scored **gemmed** instead of bare |
 | `b7e0958` | Reconciled item catalog against researched raid data + permanent cross-check test |

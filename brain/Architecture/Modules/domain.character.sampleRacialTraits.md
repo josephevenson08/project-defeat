@@ -2,20 +2,24 @@
 type: module
 layer: domain
 source: src/domain/character/sampleRacialTraits.ts
-lines: 251
+lines: 296
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.sampleRacialTraits
 
-`src/domain/character/sampleRacialTraits.ts` · **domain** layer · 251 lines
+`src/domain/character/sampleRacialTraits.ts` · **domain** layer · 296 lines
 
 From the top of the file:
 
-> Racials are written in the units the game states them in (percent hit, expertise *skill*) and
+> Racials are written in the units the game states them in (percent hit, Expertise *skill*) and
 > converted here into the rating units the stat model uses, via the same constants the simulator
 > uses. Writing "+15.8 hit rating" directly would hide what the racial actually says.
+> 
+> Values are read from Wowhead's TBC-scoped spell tooltips. Where a spell ID is given in a note it
+> is the TBC spell, not a later-expansion version of the same name — several racials were reworked
+> afterwards and the retail values are materially different.
 
 ## Exports
 
