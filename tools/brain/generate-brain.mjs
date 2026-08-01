@@ -329,6 +329,19 @@ A handful of abilities are hardcoded exceptions the formula gets wrong — Fireb
     related: ['Spell Table', 'Signature Abilities'],
   },
   {
+    title: 'Tank Avoidance',
+    summary: 'The defender side of the attack table — and the one place this project is knowingly wrong.',
+    body: `Avoidance is not symmetric. The chance a *boss* dodges or parries the player and the chance the *player* dodges or parries the boss come from the same family of formulas, but the skill differential enters them with opposite sign. A level-70 player fighting a level-73 boss is the under-skilled party in both directions: the boss avoids more of the player's attacks, and the player avoids less of the boss's.
+
+**This project currently gets that backwards.** \`calculateTankSurvivability\` reuses the attacker-side helpers for the player's own baseline, so the same 15-point skill gap that correctly raises the boss's parry against the player also raises the player's parry against the boss — to roughly 14% before any gear, where the real figure moves the other way off a ~5% base. A code comment described this as a symmetric approximation pending research, which understated it: symmetry is exactly the thing that does not hold. An audit confirmed it numerically.
+
+The consequence is that every tank Survivability Score is inflated at the avoidance term, and because stat weights are computed by differencing that score, tank stat weights inherit the error. Nothing on the DPS or healing paths is affected — those use the attacker-side helpers for their actual purpose.
+
+Two further mechanics the tank path does not model at all, and should not be assumed to: crushing blows from a higher-level attacker, and the fact that avoidance types compete for the same ordered table rather than summing freely.`,
+    modules: ['domain/simulation/attackTable.ts', 'features/simulator/calculateSimulation.ts'],
+    related: ['Attack Table', 'Armor Mitigation', 'Stat Weights'],
+  },
+  {
     title: 'Armor Mitigation',
     summary: 'Diminishing physical damage reduction, capped at 75%.',
     body: `Physical damage reduction from armor follows \`armor / (armor + K)\` where K depends on the attacker's level, and is hard-capped at 75%. The curve means each point of armor is worth less than the last, so stacking armor past raid-boss levels returns very little — which is why TBC tank gearing pushes stamina and avoidance rather than raw armor once uncrittable is met.
@@ -1251,7 +1264,8 @@ async function writeProjectNotes(modules, counts) {
       'Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:',
       '',
       `1. **Multi-ability rotations** — every path now models exactly one ability per spec. Melee specs additionally lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated. Real rotation priority is the biggest remaining accuracy gap in ${link('Phase 4 - Simulation')}.`,
-      `2. **Item catalog source errors** — cross-referencing the raid data against ${link('domain.gear.sampleItems')} surfaced several items recorded against the wrong boss or instance, and one (\`justicars-warblade\`) with no evidence it exists in TBC at all. The raid data flags the conflicts; the catalog has not been corrected.`,
+      `2. **Tank avoidance baseline** — an independent audit confirmed ${link('domain.simulation.attackTable')}'s skill-differential formulas are reused for the player's own dodge and parry in \`calculateTankSurvivability\`, where they belong to the *boss*. The level gap raises the player's avoidance when it should lower it, so every tank number is inflated before gear. See ${link('Tank Avoidance')}.`,
+      `3. **Item catalog verification** — the wrong-boss conflicts and the invented \`justicars-warblade\` are corrected, but 214 \`needsVerification\` flags remain in ${link('domain.gear.sampleItems')}. Three items now carry real sourced values and are markedly stronger than the estimates around them, so any sourced-vs-estimated comparison — which is exactly what the upgrade finder ranks — is skewed.`,
       '',
       '## Related',
       '',

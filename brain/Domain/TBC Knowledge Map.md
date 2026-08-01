@@ -72,6 +72,7 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - [[Attack Table]] — The ordered roll that decides what a physical swing does.
 - [[Spell Table]] — The spell-side equivalent: hit capped by level difference, then crit.
 - [[Spell Coefficients]] — How much of your spell power a given ability actually receives.
+- [[Tank Avoidance]] — The defender side of the attack table — and the one place this project is knowingly wrong.
 - [[Armor Mitigation]] — Diminishing physical damage reduction, capped at 75%.
 - [[Stat Weights]] — Marginal value of one point of a stat, measured by re-running the sim.
 - [[Best in Slot]] — Per-spec ranked item lists, phase-scoped.

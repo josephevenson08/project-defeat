@@ -22,7 +22,8 @@ The long-term goal: a local-first TBC Classic Anniversary simulator/planner cove
 Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:
 
 1. **Multi-ability rotations** — every path now models exactly one ability per spec. Melee specs additionally lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated. Real rotation priority is the biggest remaining accuracy gap in [[Phase 4 - Simulation]].
-2. **Item catalog source errors** — cross-referencing the raid data against [[domain.gear.sampleItems]] surfaced several items recorded against the wrong boss or instance, and one (`justicars-warblade`) with no evidence it exists in TBC at all. The raid data flags the conflicts; the catalog has not been corrected.
+2. **Tank avoidance baseline** — an independent audit confirmed [[domain.simulation.attackTable]]'s skill-differential formulas are reused for the player's own dodge and parry in `calculateTankSurvivability`, where they belong to the *boss*. The level gap raises the player's avoidance when it should lower it, so every tank number is inflated before gear. See [[Tank Avoidance]].
+3. **Item catalog verification** — the wrong-boss conflicts and the invented `justicars-warblade` are corrected, but 214 `needsVerification` flags remain in [[domain.gear.sampleItems]]. Three items now carry real sourced values and are markedly stronger than the estimates around them, so any sourced-vs-estimated comparison — which is exactly what the upgrade finder ranks — is skewed.
 
 ## Related
 
