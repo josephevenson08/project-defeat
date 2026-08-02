@@ -145,20 +145,24 @@ Newest first. Every one is verified green and pushed.
 
 ## What's next, in priority order
 
-### 0. Decide what the tank Survivability Score should actually measure
-The mechanics underneath it are now right — one ordered incoming table (miss, dodge, parry, block,
-crit, crushing blow, hit), crushing blows modelled, avoidance no longer summed. What's left is a
-judgement call rather than a defect, which is why it wasn't made unilaterally.
+### 0. Tank metric — decided and done. Two follow-ups remain.
+The headline is now **Effective Health**: health divided by the fraction of a swing that actually
+lands, i.e. the raw boss damage absorbed before dying. It replaced `avoidance*2 + armor*1.5 +
+stamina*0.1`, whose weights were invented. Effective Health has no free parameters, is what TBC tanks
+were really compared on, and stays higher-is-better so stat weights and the upgrade finder keep
+working unchanged.
 
-The headline score is still `avoidance*2 + armor*1.5 + stamina*0.1`. Those weights are invented, and
-the score treats a crit and a plain hit as equally bad once they land. The breakdown already carries
-a `Damage taken per swing vs. unmitigated` figure that does price crit and crush multipliers, and it
-is a better metric — it means something physical. Promoting it to the headline would make tank scores
-non-comparable with saved ones again, so it needs a deliberate call.
+**Tank scores are not comparable with anything saved before this.** Third change to the tank number.
 
-One known softness in that figure: a blocked swing counts as a full hit, because block subtracts a
-flat block value rather than a fraction and the swing damage isn't in scope at that point. It reads
-slightly pessimistic for a shield tank.
+Two known softnesses, both stated in the UI summary rather than hidden:
+- Avoidance is averaged into it. Classic Effective Health deliberately *excludes* avoidance, because
+  avoidance is random and doesn't save you from a burst — so this reads optimistic against exactly
+  the spike damage that kills tanks. A worst-case variant that drops avoidance would complement it.
+- Only Stamina-derived health is counted at 10 health per point. A level 70's **base health is not
+  modelled** — couldn't source per-class values. That understates the absolute number and slightly
+  overstates each point of Stamina. Two numbers (Warrior, Paladin) would fix it.
+- A blocked swing still counts as a full hit, since block subtracts a flat block value rather than a
+  fraction. Slightly pessimistic for a shield tank.
 
 ### 1. Multi-ability rotations — started, 2 specs of 27 done
 **Fury and Arms Warrior** now press Whirlwind on its 10s cooldown alongside Bloodthirst / Mortal
@@ -216,11 +220,17 @@ naively double-counts it: Shred at 60 energy plus Mangle at 45 would claim 20 en
 10 that exists, and nothing in the output would look wrong. `resolveRotation` now tracks an energy
 budget alongside the GCD budget to stop that.
 
-The guard is correct but it is **not the answer for Feral**. Priority-order allocation gives Shred
-the whole pool and leaves Mangle at zero, which is not how a cat rotation works — Mangle is pressed
-to maintain a debuff, not for its own damage, so it doesn't fit priority-by-position at all.
-Allocating a fixed energy pool between competing abilities is an optimisation problem. Adding Mangle
-today would produce a technically-guarded but still wrong answer, so it is held back.
+The guard is correct but it is **not the answer for Feral**, and this has now been researched rather
+than assumed. wowsims models the cat rotation as a *dynamic conditional priority system*: it tracks
+current energy and the time to the next energy tick, combo points, which debuffs are up, and how much
+fight remains, then picks an ability per decision point — including waiting for a tick rather than
+spending. That is a time-stepped simulation loop.
+
+This engine is closed-form: it computes sustained rates analytically and never advances a clock. A
+cat rotation cannot be approximated inside that shape — energy pooling and combo-point state are the
+whole mechanic, not details on top of one. **So Mangle and Rake stay out**, and the blocker is
+architectural rather than a missing number. Building a time-stepped rotation loop is a legitimate
+future direction, but it is a different engine, not an addition to this one.
 
 Note the guard does not bind with any current spec (every energy spec has exactly one energy
 ability), so it is preventive rather than exercised. The first spec that gets two will exercise it.

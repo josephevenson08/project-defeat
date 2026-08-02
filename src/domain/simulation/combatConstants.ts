@@ -53,6 +53,9 @@ export const CRUSHING_BLOW_DAMAGE_MULTIPLIER = 1.5
 /** An attacker must be at least this many levels above the defender to crush at all. */
 export const CRUSHING_BLOW_LEVEL_GAP = 3
 
+/** TBC converts one point of Stamina into 10 health. */
+export const HEALTH_PER_STAMINA = 10
+
 /** Rating needed for one point of Expertise Skill (not directly a percent). Community math, not from the official blue post, but consistent across independent sources. */
 export const EXPERTISE_RATING_PER_SKILL_POINT = 3.9423
 

@@ -132,7 +132,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Off Hand', { exact: true }).selectOption('Shield of Rehearsal')
   await page.getByRole('button', { name: /run simulation/i }).click()
 
-  await expect(page.getByText(/Survivability Score/i)).toBeVisible()
+  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
 
   // The tank path has to use the *defender-side* base chances. It previously reused the
   // attacker-side formulas symmetrically, which handed the player the boss's own 14% parry and made
@@ -174,6 +174,14 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   const perSwing = await percentRow(/Damage taken per swing/i)
   expect(perSwing).toBeGreaterThan(0)
   expect(perSwing).toBeLessThan(200)
+
+  // Effective Health is health divided by the fraction of a swing that actually lands, so it must
+  // come out at least as large as the health itself — mitigation and avoidance can only stretch a
+  // health pool, never shrink it. If this ever inverts, the multiplier has been applied upside down.
+  const healthFromStamina = await percentRow(/Health from Stamina/i)
+  const effectiveHealth = Number(await page.getByTestId('simulation-score').innerText())
+  expect(healthFromStamina).toBeGreaterThan(0)
+  expect(effectiveHealth).toBeGreaterThanOrEqual(healthFromStamina)
 })
 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {
@@ -517,7 +525,7 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
 
   await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Destroyer Chestguard' })
   await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/Survivability Score/i)).toBeVisible()
+  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
 })
 
 test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve to catalog items', async () => {
@@ -557,7 +565,7 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
   await expect(page.getByText('Protection Paladin Phase 2 Starter Ranked List')).toBeVisible()
 
   await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/Survivability Score/i)).toBeVisible()
+  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Retribution')
 

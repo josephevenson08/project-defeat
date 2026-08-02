@@ -25,6 +25,7 @@ import {
   CRUSHING_BLOW_LEVEL_GAP,
   DEFENSE_RATING_PER_SKILL_POINT,
   EXPERTISE_RATING_PER_SKILL_POINT,
+  HEALTH_PER_STAMINA,
   MELEE_CRIT_DAMAGE_MULTIPLIER,
   RATING_PER_PERCENT,
   SPELL_CRIT_DAMAGE_MULTIPLIER,
@@ -159,12 +160,6 @@ type ResolvedSpecial = {
   explanation: string
 }
 
-/**
- * The yellow-damage layer for melee specs. Returns undefined when the spec's signature ability isn't
- * a melee special, or when its sustained usage rate isn't something this simulator can defend —
- * a rage-costed ability with no cooldown, for instance, depends on rage income that isn't tracked.
- * Reporting nothing is the honest outcome there; inventing a rate would silently fabricate DPS.
- */
 type ResolvedRotation = {
   specials: ResolvedSpecial[]
   /** Abilities in the spec's rotation whose sustained rate can't be defended, named so their absence is visible. */
@@ -544,19 +539,37 @@ function calculateTankSurvivability(
     { label: canBeCrushed ? 'Crushing blows taken' : 'Crushing blows (target too low to crush)', value: toPercent(table.crush) },
     { label: 'Armor mitigation', value: toPercent(armorMitigation) },
     { label: 'Damage taken per swing vs. unmitigated', value: toPercent(damagePerSwing) },
+    { label: 'Health from Stamina', value: stats.stamina * HEALTH_PER_STAMINA },
     { label: 'Stamina', value: stats.stamina },
     { label: 'Block value', value: stats.blockValue },
     { label: 'Crit-taken reduction from Defense', value: critTakenReduction },
   ]
 
-  const survivabilityScore = totalAvoidance * 100 * 2 + armorMitigation * 100 * 1.5 + stats.stamina * 0.1
+  /**
+   * Effective Health: how much raw boss damage this character absorbs before dying, once avoidance,
+   * block, armor and the severity of crits and crushes are all accounted for. Health divided by the
+   * fraction of a swing that actually lands.
+   *
+   * This replaced a composite of `avoidance*2 + armor*1.5 + stamina*0.1`, whose weights were
+   * invented. Effective Health is the metric TBC tanks were actually compared on, it has no free
+   * parameters, and every tank stat earns its place in it rather than being assigned an importance.
+   *
+   * Two honest caveats. Classic Effective Health deliberately *excludes* avoidance, because avoidance
+   * is random and does not save you from a burst sequence — including it here makes this an
+   * average-case figure rather than a worst-case one, so it reads optimistic against exactly the
+   * spike damage that kills tanks. And only Stamina-derived health is counted; a level 70's base
+   * health is not modelled, which understates the absolute number and slightly overstates how much
+   * each point of Stamina is worth.
+   */
+  const healthFromStamina = stats.stamina * HEALTH_PER_STAMINA
+  const effectiveHealth = damagePerSwing > 0 ? healthFromStamina / damagePerSwing : healthFromStamina
 
   return {
     role: 'Tank',
-    metricLabel: 'Survivability Score',
-    score: round(survivabilityScore),
-    scoreExact: survivabilityScore,
-    summary: `Resolved as one ordered roll against a level ${target.level} attacker — miss, dodge, parry, block, crit, crushing blow, hit — using the defender-side base chances, so a level gap lowers your avoidance rather than raising it. Crushing blows can only be pushed off the bottom of that table, never reduced directly. Uncrittable still requires 490 total Defense Skill. The score itself weights avoidance, armor and stamina; it does not yet price how much worse a crit or a crush is than a plain hit, so read the damage-per-swing row for that.`,
+    metricLabel: 'Effective Health',
+    score: round(effectiveHealth),
+    scoreExact: effectiveHealth,
+    summary: `Effective Health — the raw boss damage you absorb before dying — against a level ${target.level} attacker. Swings resolve as one ordered roll (miss, dodge, parry, block, crit, crushing blow, hit) using the defender-side base chances, so a level gap lowers your avoidance rather than raising it, and crushing blows can only be pushed off the bottom of that table rather than reduced directly. Uncrittable still requires 490 total Defense Skill. Two caveats: avoidance is averaged in, where the classic metric excludes it because avoidance doesn't save you from a burst, so this reads optimistic against spike damage; and only Stamina-derived health is counted, since a level 70's base health isn't modelled.`,
     breakdown,
   }
 }

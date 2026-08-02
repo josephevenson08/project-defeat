@@ -7,7 +7,7 @@ export type SimulationBreakdownEntry = {
 
 export type SimulationResult = {
   role: CharacterRole
-  metricLabel: 'Estimated DPS' | 'Estimated Healing' | 'Survivability Score'
+  metricLabel: 'Estimated DPS' | 'Estimated Healing' | 'Effective Health'
   /** Rounded to one decimal for display. */
   score: number
   /**
