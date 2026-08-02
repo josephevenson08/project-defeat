@@ -66,4 +66,52 @@ export const warriorSignatureAbilities: readonly SignatureAbility[] = [
     notes:
       'Shield Slam is the 31-point Protection talent and the top of the tanking threat priority, cast on its 6s cooldown ahead of Revenge and Devastate, with Heroic Strike as a rage dump and Sunder Armor/Thunder Clap for debuffs. As with the Protection Paladin entry, this is a cooldown rather than a filler — a model that casts it every GCD will overstate Protection warrior threat several-fold. The block-value dependency is the important modeling note: Shield Slam is the main reason a tank\'s shield choice affects threat output at all.',
   },
+
+  // Whirlwind is shared by both DPS specs, so it appears once per spec. These sit after the
+  // signature entries above because `getSignatureAbility` returns the FIRST match for a class/spec —
+  // moving them earlier would silently change which ability the headline estimate is built around.
+  {
+    className: 'Warrior',
+    spec: 'Fury',
+    name: 'Whirlwind',
+    spellId: 1680,
+    effectType: 'Melee Special',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    cooldownSeconds: 10,
+    resource: { type: 'Rage', cost: 25 },
+    scaling: {
+      basis: 'weapon damage',
+      weaponDamageMultiplier: 1,
+      normalizedWeaponDamage: true,
+      hitsBothWeapons: true,
+      coefficientNotes:
+        '100% of normalized weapon damage with no flat bonus and no attack power coefficient of its own. Strikes with both weapons when dual-wielding, and the off-hand strike carries the standard off-hand penalty rather than mirroring the main hand. Whirlwind also hits up to 4 targets, but this project models a single target, so the AoE component contributes nothing here.',
+    },
+    needsVerification: true,
+    notes:
+      'Second button in the Fury priority behind Bloodthirst, pressed on its 10s cooldown. `rank` and `requiredLevel` are deliberately omitted rather than guessed: Wowhead\'s tooltip pages returned JavaScript shells with no rank data, and wowsims does not track ranks at all, only level-70 spell IDs. Flagged needsVerification for that reason — the cooldown, rage cost and scaling are cross-checked between Wowhead and wowsims, but the rank metadata is unsourced.',
+  },
+  {
+    className: 'Warrior',
+    spec: 'Arms',
+    name: 'Whirlwind',
+    spellId: 1680,
+    effectType: 'Melee Special',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    cooldownSeconds: 10,
+    resource: { type: 'Rage', cost: 25 },
+    scaling: {
+      basis: 'weapon damage',
+      weaponDamageMultiplier: 1,
+      normalizedWeaponDamage: true,
+      hitsBothWeapons: true,
+      coefficientNotes:
+        'Identical to the Fury entry — the ability does not differ by spec. An Arms warrior wields a two-hander, so `hitsBothWeapons` has no effect there: there is no off-hand weapon to strike with, and the flag is simply inert rather than wrong.',
+    },
+    needsVerification: true,
+    notes:
+      'Pressed on its 10s cooldown alongside Mortal Strike. Same unsourced `rank`/`requiredLevel` caveat as the Fury entry.',
+  },
 ]

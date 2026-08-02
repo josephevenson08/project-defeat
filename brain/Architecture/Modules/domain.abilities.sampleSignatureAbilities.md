@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/abilities/sampleSignatureAbilities.ts
-lines: 54
+lines: 67
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.sampleSignatureAbilities
 
-`src/domain/abilities/sampleSignatureAbilities.ts` · **domain** layer · 54 lines
+`src/domain/abilities/sampleSignatureAbilities.ts` · **domain** layer · 67 lines
 
 From the top of the file:
 
@@ -20,7 +20,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `getSignatureAbilitiesForClass`, `getSignatureAbility`, `getSignatureAbilityBySpellId`
+**function** — `getRotationAbilities`, `getSignatureAbilitiesForClass`, `getSignatureAbility`, `getSignatureAbilityBySpellId`
 
 **const** — `sampleSignatureAbilities`
 

@@ -113,7 +113,10 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   that special's sustained rate is defensible: a cooldown, or an energy cost against energy's fixed
   10/sec regen. Rage-costed abilities with no cooldown and Hunter's Steady Shot are excluded, because
   rage income and auto-shot weaving aren't tracked — the simulation names what it left out rather than
-  guessing a rate. There is still no multi-ability priority, so melee specs remain understated.
+  guessing a rate. Multi-ability rotations have started but cover **only Fury and Arms Warrior**,
+  which press Whirlwind alongside their signature button against a shared global-cooldown budget.
+  Every other spec still models a single ability, so melee specs remain understated by differing
+  amounts.
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.

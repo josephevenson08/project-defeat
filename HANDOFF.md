@@ -154,8 +154,20 @@ One known softness in that figure: a blocked swing counts as a full hit, because
 flat block value rather than a fraction and the swing damage isn't in scope at that point. It reads
 slightly pessimistic for a shield tank.
 
-### 1. Multi-ability rotations — biggest remaining accuracy gap
-Every path models exactly **one** ability per spec. Melee additionally drops any special whose sustained rate isn't computable. So melee specs are understated, by different amounts per spec.
+### 1. Multi-ability rotations — started, 2 specs of 27 done
+**Fury and Arms Warrior** now press Whirlwind on its 10s cooldown alongside Bloodthirst / Mortal
+Strike. **Every other spec still models exactly one ability.** All specs still drop any special whose
+sustained rate isn't computable, so melee remains understated by differing amounts.
+
+The machinery is done and is not the constraint: `getRotationAbilities(class, spec)` returns a spec's
+ability list, `resolveRotation` sums the computable ones against a shared GCD budget so a spec can't
+press more buttons per second than the global cooldown allows, and excluded abilities are named in the
+UI rather than dropped. Adding a spec is now purely a matter of sourcing its abilities and appending
+them to that class's file — **after** the signature entry, since `getSignatureAbility` returns the
+first match for a class/spec.
+
+The GCD cap doesn't bind at present (Bloodthirst + Whirlwind is ~0.27 casts/sec against a 0.67
+budget). It's there because the first modellable rage or energy filler would hit it immediately.
 
 This needs per-spec ability *lists* (`src/domain/abilities/` currently holds one signature ability each). It's a multi-hour feature done honestly — **don't half-do it**, that's this repo's recurring failure mode.
 

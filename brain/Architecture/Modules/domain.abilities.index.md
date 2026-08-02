@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/abilities/index.ts
-lines: 17
+lines: 18
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.index
 
-`src/domain/abilities/index.ts` · **domain** layer · 17 lines
+`src/domain/abilities/index.ts` · **domain** layer · 18 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `AbilityEffectType`, `AbilityResourceCost`, `AbilityResourceType`, `AbilityScaling`, `AmountRange`, `CoefficientBasis`, `getSignatureAbilitiesForClass`, `getSignatureAbility`, `getSignatureAbilityBySpellId`, `PeriodicEffect`, `sampleSignatureAbilities`, `SignatureAbility`
+**re-export** — `AbilityEffectType`, `AbilityResourceCost`, `AbilityResourceType`, `AbilityScaling`, `AmountRange`, `CoefficientBasis`, `getRotationAbilities`, `getSignatureAbilitiesForClass`, `getSignatureAbility`, `getSignatureAbilityBySpellId`, `PeriodicEffect`, `sampleSignatureAbilities`, `SignatureAbility`
 
 ## Imports
 

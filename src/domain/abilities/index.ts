@@ -11,6 +11,7 @@ export type {
 export {
   sampleSignatureAbilities,
   getSignatureAbility,
+  getRotationAbilities,
   getSignatureAbilitiesForClass,
   getSignatureAbilityBySpellId,
 } from './sampleSignatureAbilities'

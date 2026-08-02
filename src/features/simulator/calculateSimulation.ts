@@ -1,4 +1,4 @@
-import { getSignatureAbility } from '../../domain/abilities'
+import { getRotationAbilities, getSignatureAbility } from '../../domain/abilities'
 import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
 import {
@@ -159,19 +159,39 @@ type ResolvedSpecial = {
  * a rage-costed ability with no cooldown, for instance, depends on rage income that isn't tracked.
  * Reporting nothing is the honest outcome there; inventing a rate would silently fabricate DPS.
  */
-function resolveSpecialAttack(
+type ResolvedRotation = {
+  specials: ResolvedSpecial[]
+  /** Abilities in the spec's rotation whose sustained rate can't be defended, named so their absence is visible. */
+  excluded: { name: string; explanation: string }[]
+  /** True when the GCD, not the abilities' own cooldowns, is what limited the modelled rate. */
+  gcdLimited: boolean
+}
+
+/**
+ * Resolves every ability in the spec's rotation whose sustained rate is computable, and reports the
+ * rest by name rather than dropping them silently.
+ *
+ * The abilities compete for a shared global cooldown, so their rates cannot simply be added: a spec
+ * cannot press more buttons per second than the GCD allows, however many cooldowns happen to be up.
+ * Higher-priority abilities (earlier in the rotation list) claim GCDs first and a lower-priority one
+ * gets whatever is left, which is what a real priority rotation does.
+ *
+ * In practice Phase 2 melee rotations sit well under that ceiling — Bloodthirst on 6s plus Whirlwind
+ * on 10s is about 0.27 casts/sec against a budget of 0.67 — so the cap rarely binds today. It is here
+ * because the moment a rage or energy filler becomes modellable it would bind immediately, and a
+ * model that lets it be exceeded overstates DPS without anything looking wrong.
+ */
+function resolveRotation(
   character: CharacterProfile,
   gear: EquippedGear,
   stats: StatBlock,
   skillDiff: number,
   missReduction: number,
   rawCritChance: number,
-): ResolvedSpecial | undefined {
-  const ability = getSignatureAbility(character.className, character.spec)
-  if (!ability || ability.effectType !== 'Melee Special') return undefined
-
-  const estimate = estimateSpecialAttack(ability, gear['Main Hand']?.item, gear['Off Hand']?.item, stats.attackPower)
-  if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) return undefined
+): ResolvedRotation {
+  const abilities = getRotationAbilities(character.className, character.spec).filter(
+    (ability) => ability.effectType === 'Melee Special',
+  )
 
   const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
   const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance })
@@ -179,20 +199,46 @@ function resolveSpecialAttack(
   // hit is counted at full damage here rather than pretending to know the reduction.
   const effectiveMultiplier = table.hit + table.block + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
 
-  return {
-    name: ability.name,
-    dps: estimate.damagePerUse * effectiveMultiplier * estimate.usesPerSecond,
-    explanation: estimate.explanation,
+  const specials: ResolvedSpecial[] = []
+  const excluded: ResolvedRotation['excluded'] = []
+  let gcdBudget = 1 / (abilities[0]?.gcdSeconds || 1.5)
+  let gcdLimited = false
+
+  for (const ability of abilities) {
+    const estimate = estimateSpecialAttack(ability, gear['Main Hand']?.item, gear['Off Hand']?.item, stats.attackPower)
+
+    if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) {
+      excluded.push({ name: ability.name, explanation: estimate.explanation })
+      continue
+    }
+
+    const usesPerSecond = Math.min(estimate.usesPerSecond, gcdBudget)
+    if (usesPerSecond < estimate.usesPerSecond) gcdLimited = true
+    gcdBudget -= usesPerSecond
+
+    if (usesPerSecond > 0) {
+      specials.push({
+        name: ability.name,
+        dps: estimate.damagePerUse * effectiveMultiplier * usesPerSecond,
+        explanation: estimate.explanation,
+      })
+    }
   }
+
+  return { specials, excluded, gcdLimited }
 }
 
-/** Says which special was skipped and why, so a missing yellow-damage layer is visible rather than silent. */
-function describeUnmodelledSpecial(character: CharacterProfile) {
-  const ability = getSignatureAbility(character.className, character.spec)
-  if (!ability) return "This spec's rotational ability isn't in the ability data yet, so no special-attack damage is included."
+/** Says which specials were skipped and why, so a missing yellow-damage layer is visible rather than silent. */
+function describeUnmodelledSpecials(character: CharacterProfile, excluded: ResolvedRotation['excluded']) {
+  if (excluded.length === 0) {
+    const ability = getSignatureAbility(character.className, character.spec)
+    if (!ability) return "This spec's rotational ability isn't in the ability data yet, so no special-attack damage is included."
+    const { explanation } = computeUsageRate(ability)
+    return `${ability.name} is not included: ${explanation}. Its damage is therefore missing from this estimate.`
+  }
 
-  const { explanation } = computeUsageRate(ability)
-  return `${ability.name} is not included: ${explanation}. Its damage is therefore missing from this estimate.`
+  const named = excluded.map((entry) => `${entry.name} (${entry.explanation})`).join('; ')
+  return `Not included: ${named}. That damage is missing from this estimate.`
 }
 
 function calculatePhysicalDps(
@@ -258,18 +304,25 @@ function calculatePhysicalDps(
   // Yellow (special) damage, layered on top of the white swing model above. Only the melee path gets
   // this: the ranged special (Steady Shot) is mana-costed with no cooldown, so its sustained rate
   // depends on auto-shot weaving that isn't modelled.
-  const special = resolveSpecialAttack(character, gear, stats, skillDiff, missReduction, rawCritChance)
-  const specialRawDps = special ? special.dps : 0
+  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance)
+  const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
 
-  if (special) {
-    breakdown.push({ label: `${special.name} DPS`, value: round(special.dps * (1 - armorMitigation)) })
+  for (const entry of rotation.specials) {
+    breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
   }
 
-  const specialSummary = special
-    ? ` ${special.name} is layered on top, ${special.explanation}, using the special-attack table (no glancing blows, and no dual-wield miss penalty).`
-    : ` ${describeUnmodelledSpecial(character)}`
+  const modelled = rotation.specials.map((entry) => `${entry.name} (${entry.explanation})`).join(', ')
+  const gcdNote = rotation.gcdLimited
+    ? ' The global cooldown, not their own cooldowns, is what caps how often these can be used together.'
+    : ''
+  const excludedNote = rotation.excluded.length > 0 ? ` ${describeUnmodelledSpecials(character, rotation.excluded)}` : ''
+
+  const specialSummary =
+    rotation.specials.length > 0
+      ? ` Layered on top: ${modelled}, using the special-attack table (no glancing blows, and no dual-wield miss penalty).${gcdNote}${excludedNote}`
+      : ` ${describeUnmodelledSpecials(character, rotation.excluded)}`
 
   return {
     role: 'Physical DPS',

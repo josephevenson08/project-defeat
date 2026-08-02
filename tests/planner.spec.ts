@@ -1098,6 +1098,18 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   expect(bloodthirstDps).toBeGreaterThan(0)
   expect(withSpecial).toBeGreaterThan(bloodthirstDps)
 
+  // Fury presses more than one computable button. Whirlwind has its own 10s cooldown and must be
+  // layered on alongside Bloodthirst — modelling only the signature ability understates the spec,
+  // which is the gap the rotation work exists to close.
+  await expect(breakdown).toContainText(/Whirlwind DPS/i)
+  await expect(page.locator('.simulation-result p')).toContainText(/used on its 10s cooldown/i)
+  const whirlwindDps = Number(
+    (await breakdown.locator('div', { hasText: /Whirlwind DPS/i }).innerText()).match(/[\d.]+$/)?.[0] ?? '0',
+  )
+  expect(whirlwindDps).toBeGreaterThan(0)
+  // Both are real contributions on top of white damage, and neither may swallow the whole estimate.
+  expect(withSpecial).toBeGreaterThan(bloodthirstDps + whirlwindDps)
+
   // Combat Rogue: no cooldown, but a fixed energy cost against a fixed regen rate is computable.
   await page.getByLabel('Class').selectOption('Rogue')
   await page.getByLabel('Specialization').selectOption('Combat')

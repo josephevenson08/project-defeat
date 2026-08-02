@@ -42,6 +42,19 @@ export function getSignatureAbility(
   )
 }
 
+/**
+ * Every ability a spec presses that this project has data for, in rotation priority order — the
+ * signature ability first, then anything else recorded for that spec.
+ *
+ * Most specs still return exactly one entry. Where a spec has more, the simulator sums the ones whose
+ * sustained rate is actually computable and names the rest as excluded, rather than guessing a rate.
+ * Ordering is file order, so an ability added to a spec must go *after* that spec's signature entry
+ * or `getSignatureAbility` starts returning something different.
+ */
+export function getRotationAbilities(className: TbcClass, spec: TbcSpec): readonly SignatureAbility[] {
+  return sampleSignatureAbilities.filter((ability) => ability.className === className && ability.spec === spec)
+}
+
 /** Every signature ability belonging to a class, in spec order. */
 export function getSignatureAbilitiesForClass(className: TbcClass): readonly SignatureAbility[] {
   return sampleSignatureAbilities.filter((ability) => ability.className === className)
