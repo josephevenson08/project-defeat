@@ -258,6 +258,33 @@ Gotchas already discovered and recorded in the ability data's notes:
 - Tank/cooldown abilities (Consecration, Shield Slam, Crusader Strike, Mortal Strike, Bloodthirst) are 6–10s cooldowns, not fillers. Modelling them per-GCD overstates output several-fold.
 - Mutilate and Stormstrike strike with **both** weapons (`hitsBothWeapons` flag exists for this).
 
+### 1.5 Catalog sourcing — 7 items done, 10 more already researched and waiting
+A first sourcing pass corrected 7 caster/healer weapons against real tooltips, dropping the flag count
+from 214 to 207. The largest error found: `lightfathom-scepter` carried 95 healing power against a
+real **443**.
+
+**10 more items are already researched — do not re-research them.** Full reports with URLs are in the
+session scratchpad (`caster-weapons.md`, `healer-weapons.md`). They were not applied because each
+needs a *modelling* decision rather than a value:
+
+- **School-restricted spell power** — `flametongue-seal` (49 fire-only), `orb-of-the-soul-eater`
+  (51 shadow-only), `sapphirons-wing-bone` (51 frost-only), `totem-of-the-void` (55, but only for
+  Chain Lightning and Lightning Bolt). `StatBlock` has one flat `spellPower`, so writing these in
+  would overstate them for any caster of the wrong school. The values are sourced and correct; the
+  schema can't express the restriction.
+- **Relics that aren't stat sticks at all** — `idol-of-the-emerald-queen`, `blessed-book-of-nagrand`,
+  `totem-of-healing-rains`, `idol-of-the-raven-goddess`. All confirmed to have **zero stats**; each
+  grants a spell-specific effect (e.g. Lifebloom periodic healing +88) or a party aura. The catalog
+  currently models them as flat healing/spell power, which is a category error rather than an
+  imprecise number.
+- **Two wands** — `eredar-wand-of-obliteration`, `wand-of-the-forgotten-star`. Real items whose damage
+  is understated roughly threefold, but the reports gave damage without a complete stat block.
+
+Also worth knowing: `sapphirons-wing-bone` is **not** a Naxxramas-era item as its name suggests — it's
+a legitimate TBC Phase 1 G'eras vendor off-hand. And three items carried a "fictional placeholder
+item" note that was factually wrong for all three, which looks like boilerplate copied without
+per-item checking — treat that note as unreliable wherever it appears.
+
 ### 2. Item catalog audit — now has a visible reference point
 214 `needsVerification` flags remain in `sampleItems.ts`. Three items now carry real Wowhead values and are **markedly stronger** than the estimated ones around them (Fang of the Leviathan: 221 spell power vs ~46 on placeholder caster weapons). Any sourced-vs-estimated comparison is skewed, and the upgrade finder ranks exactly those comparisons. Documented in README limitations. The `tbc-researcher` agent is the right tool.
 
