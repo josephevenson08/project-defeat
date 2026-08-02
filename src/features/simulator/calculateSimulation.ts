@@ -11,7 +11,13 @@ import {
   computeGlanceDamageRange,
   computeSkillDiff,
 } from '../../domain/simulation/attackTable'
-import { CAT_FORM_WEAPON, computeUsageRate, estimateSpecialAttack, usesCatFormWeapon } from '../../domain/simulation/specialAttacks'
+import {
+  CAT_FORM_WEAPON,
+  ENERGY_PER_SECOND,
+  computeUsageRate,
+  estimateSpecialAttack,
+  usesCatFormWeapon,
+} from '../../domain/simulation/specialAttacks'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
   CRUSHING_BLOW_CHANCE,
@@ -163,23 +169,32 @@ type ResolvedRotation = {
   specials: ResolvedSpecial[]
   /** Abilities in the spec's rotation whose sustained rate can't be defended, named so their absence is visible. */
   excluded: { name: string; explanation: string }[]
-  /** True when the GCD, not the abilities' own cooldowns, is what limited the modelled rate. */
-  gcdLimited: boolean
+  /** True when a shared budget — the GCD or energy — rather than an ability's own cooldown limited the modelled rate. */
+  contended: boolean
 }
 
 /**
  * Resolves every ability in the spec's rotation whose sustained rate is computable, and reports the
  * rest by name rather than dropping them silently.
  *
- * The abilities compete for a shared global cooldown, so their rates cannot simply be added: a spec
- * cannot press more buttons per second than the GCD allows, however many cooldowns happen to be up.
- * Higher-priority abilities (earlier in the rotation list) claim GCDs first and a lower-priority one
- * gets whatever is left, which is what a real priority rotation does.
+ * The abilities compete for two shared budgets, so their rates cannot simply be added.
  *
- * In practice Phase 2 melee rotations sit well under that ceiling — Bloodthirst on 6s plus Whirlwind
- * on 10s is about 0.27 casts/sec against a budget of 0.67 — so the cap rarely binds today. It is here
- * because the moment a rage or energy filler becomes modellable it would bind immediately, and a
- * model that lets it be exceeded overstates DPS without anything looking wrong.
+ * **The global cooldown.** A spec cannot press more buttons per second than the GCD allows, however
+ * many cooldowns happen to be up. Phase 2 melee sits well under this today — Bloodthirst on 6s plus
+ * Whirlwind on 10s is about 0.27 casts/sec against a budget of 0.67.
+ *
+ * **Energy.** This one binds hard and immediately. `computeUsageRate` derives an energy ability's
+ * rate as `10 / cost`, which by construction spends the entire 10/sec regen — so a single energy
+ * ability already consumes the whole budget, and a second one added naively would double-count it.
+ * Shred at 60 energy plus Mangle at 45 would claim 20 energy/sec against the 10 that exists, and
+ * nothing in the output would look wrong.
+ *
+ * Higher-priority abilities (earlier in the rotation list) claim from both budgets first and a
+ * lower-priority one gets whatever is left. That is what a real priority rotation does for cooldowns,
+ * but it is only an approximation for energy: allocating a fixed energy pool between competing
+ * abilities is an optimisation, and an ability pressed to maintain a debuff rather than for its own
+ * damage (Mangle) does not fit priority-by-damage at all. Hence Feral is still one ability — the
+ * guard below keeps a second from silently overstating it, but it does not make the answer right.
  */
 function resolveRotation(
   character: CharacterProfile,
@@ -202,7 +217,8 @@ function resolveRotation(
   const specials: ResolvedSpecial[] = []
   const excluded: ResolvedRotation['excluded'] = []
   let gcdBudget = 1 / (abilities[0]?.gcdSeconds || 1.5)
-  let gcdLimited = false
+  let energyBudget = ENERGY_PER_SECOND
+  let contended = false
 
   // Cat form swings its own internal weapon, so a Feral druid's specials must not read the equipped
   // item's damage dice — and it has no off-hand to strike with.
@@ -218,9 +234,14 @@ function resolveRotation(
       continue
     }
 
-    const usesPerSecond = Math.min(estimate.usesPerSecond, gcdBudget)
-    if (usesPerSecond < estimate.usesPerSecond) gcdLimited = true
+    const energyCost = ability.resource?.type === 'Energy' ? ability.resource.cost : 0
+    const energyCeiling = energyCost > 0 ? energyBudget / energyCost : Number.POSITIVE_INFINITY
+
+    const usesPerSecond = Math.max(0, Math.min(estimate.usesPerSecond, gcdBudget, energyCeiling))
+    if (usesPerSecond < estimate.usesPerSecond) contended = true
+
     gcdBudget -= usesPerSecond
+    energyBudget -= usesPerSecond * energyCost
 
     if (usesPerSecond > 0) {
       specials.push({
@@ -228,10 +249,17 @@ function resolveRotation(
         dps: estimate.damagePerUse * effectiveMultiplier * usesPerSecond,
         explanation: estimate.explanation,
       })
+    } else {
+      // Reached only when a higher-priority ability has already spent the shared budget. Naming it
+      // keeps a dropped ability visible instead of it quietly contributing nothing.
+      excluded.push({
+        name: ability.name,
+        explanation: 'the abilities ahead of it already spend the available energy and global cooldowns',
+      })
     }
   }
 
-  return { specials, excluded, gcdLimited }
+  return { specials, excluded, contended }
 }
 
 /** Says which specials were skipped and why, so a missing yellow-damage layer is visible rather than silent. */
@@ -324,8 +352,8 @@ function calculatePhysicalDps(
   }
 
   const modelled = rotation.specials.map((entry) => `${entry.name} (${entry.explanation})`).join(', ')
-  const gcdNote = rotation.gcdLimited
-    ? ' The global cooldown, not their own cooldowns, is what caps how often these can be used together.'
+  const gcdNote = rotation.contended
+    ? ' A shared budget — the global cooldown, or energy — rather than their own cooldowns is what caps how often these can be used together.'
     : ''
   const excludedNote = rotation.excluded.length > 0 ? ` ${describeUnmodelledSpecials(character, rotation.excluded)}` : ''
 

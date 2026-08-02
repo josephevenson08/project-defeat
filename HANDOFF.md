@@ -197,8 +197,24 @@ budget). It's there because the first modellable rage or energy filler would hit
   under-differentiate. Adding that stat is the single highest-value thing for Feral accuracy.
 
   Mangle (Cat) (45 energy, 160% weapon damage + 264) and Rake (spell 27003, 40 energy, 78 + 0.01xAP
-  plus a 9s bleed) are both sourced and computable, and are now the obvious next additions — the
-  weapon model underneath them is finally correct.
+  plus a 9s bleed) are both sourced and computable. **They are still not added, and the reason has
+  changed** — see the energy note below.
+
+**Energy contention — read before adding a second energy ability to any spec.**
+`computeUsageRate` derives an energy ability's rate as `10 / cost`, which by construction spends the
+*entire* 10/sec regen. So one energy ability already consumes the whole budget, and adding a second
+naively double-counts it: Shred at 60 energy plus Mangle at 45 would claim 20 energy/sec against the
+10 that exists, and nothing in the output would look wrong. `resolveRotation` now tracks an energy
+budget alongside the GCD budget to stop that.
+
+The guard is correct but it is **not the answer for Feral**. Priority-order allocation gives Shred
+the whole pool and leaves Mangle at zero, which is not how a cat rotation works — Mangle is pressed
+to maintain a debuff, not for its own damage, so it doesn't fit priority-by-position at all.
+Allocating a fixed energy pool between competing abilities is an optimisation problem. Adding Mangle
+today would produce a technically-guarded but still wrong answer, so it is held back.
+
+Note the guard does not bind with any current spec (every energy spec has exactly one energy
+ability), so it is preventive rather than exercised. The first spec that gets two will exercise it.
 
 Rip, Ferocious Bite, Heroic Strike, Slam and Execute are all correctly excluded and should stay that
 way until rage/combo-point income is simulated. Rampage and Tiger's Fury are pure self-buffs with no
