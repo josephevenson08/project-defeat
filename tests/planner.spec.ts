@@ -1012,6 +1012,15 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
     await expect(gemNotes.first()).toContainText(/Assumes .+/)
   }
 
+  // Most of this catalog is still stat-budget estimates, and the few sourced items are markedly
+  // stronger than the estimates around them — so a ranking built on those comparisons has to say
+  // which rows rest on estimated data rather than presenting every delta as equally solid.
+  const dataNotes = list.locator('.upgrade-data-note')
+  expect(await dataNotes.count(), 'a catalog this unverified should flag at least one row').toBeGreaterThan(0)
+  for (const text of await dataNotes.allInnerTexts()) {
+    expect(text).toMatch(/likely overstated|approximate/)
+  }
+
   // The headline claim has to hold: equipping the top pick should move the simulation by
   // approximately the advertised amount. Because equipping applies the same gems the score assumed,
   // this also catches a candidate being scored gemmed but equipped bare.

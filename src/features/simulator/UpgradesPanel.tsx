@@ -29,7 +29,9 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
         Every legal item for every slot, simulated as a straight swap and ranked by how much it moves the result.
         Sockets are filled with the best colour-matched gem for this character, so a delta is what the item is worth{' '}
         <strong>once gemmed</strong>; the slot&apos;s current enchant carries over whenever it stays legal. Equipping
-        applies exactly the gems and enchant the score assumed.
+        applies exactly the gems and enchant the score assumed. Most of this catalog is still stat-budget estimates
+        rather than real tooltip values, and a row says so when its comparison rests on them — a sourced item measured
+        against an estimated one is flagged, because those gains read high in a predictable direction.
       </p>
 
       {report.candidates.length === 0 ? (
@@ -54,6 +56,14 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
                   {candidate.assumesGemming && (
                     <small className="upgrade-socket-note">
                       Assumes {candidate.gemIds.filter(Boolean).map((gemId) => getGemById(gemId)?.name ?? gemId).join(' + ')}
+                    </small>
+                  )}
+
+                  {candidate.dataQuality !== 'sourced' && (
+                    <small className={`upgrade-data-note upgrade-data-note-${candidate.dataQuality}`}>
+                      {candidate.dataQuality === 'skewed'
+                        ? 'Compares a sourced item against an estimated one — this gain is likely overstated'
+                        : 'Both items carry estimated stats, so this gain is approximate'}
                     </small>
                   )}
                 </div>

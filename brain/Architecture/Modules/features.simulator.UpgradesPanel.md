@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/UpgradesPanel.tsx
-lines: 90
+lines: 100
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.UpgradesPanel
 
-`src/features/simulator/UpgradesPanel.tsx` · **features** layer · 90 lines
+`src/features/simulator/UpgradesPanel.tsx` · **features** layer · 100 lines
 
 _No doc comment at the top of this file._
 

@@ -131,7 +131,10 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   the Phoenix) while most carry stat-budget estimates, and the real ones are numerically much
   stronger — Fang of the Leviathan alone has 221 spell power against ~46 on the placeholder caster
   weapons. Any comparison involving a sourced item against an estimated one is skewed in the sourced
-  item's favour until the rest of the catalog is audited the same way.
+  item's favour until the rest of the catalog is audited the same way. 16 of 230 items are sourced,
+  so this is the common case rather than a corner one — the Upgrade Finder now marks every row whose
+  delta rests on estimated data, and marks the sourced-versus-estimated rows specifically, since those
+  read high in a predictable direction.
 - Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending (items are flagged `needsVerification` where stats are approximate).
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.

@@ -86,6 +86,16 @@ export type UpgradeCandidate = {
   /** True when the score assumes gemming, so the delta is "once gemmed", not "the moment you equip it". */
   assumesGemming: boolean
   /**
+   * How far this row's delta can be trusted, given the data behind the two items.
+   *
+   * `sourced` — both sides carry real tooltip values, so the delta is as good as the model.
+   * `estimated` — one or both are stat-budget estimates, so the delta is soft in an unknown direction.
+   * `skewed` — the worst case: a **sourced** item measured against an **estimated** one. The sourced
+   * items catalogued so far are markedly stronger than the estimates around them, so these deltas are
+   * inflated in a *known* direction and this is exactly the comparison the ranking is built on.
+   */
+  dataQuality: 'sourced' | 'estimated' | 'skewed'
+  /**
    * The enchant the score was computed with — the slot's existing one where it stayed legal,
    * otherwise none. Equipping must reuse this or the realised result won't match the shown delta.
    */
@@ -161,6 +171,11 @@ export function findUpgrades(
       const scoreDelta = scoreFor(candidateGear).scoreExact - baseline.scoreExact
       if (scoreDelta <= 0) continue
 
+      const candidateEstimated = item.needsVerification === true
+      const equippedEstimated = equipped.item.needsVerification === true
+      const dataQuality: UpgradeCandidate['dataQuality'] =
+        candidateEstimated === equippedEstimated ? (candidateEstimated ? 'estimated' : 'sourced') : 'skewed'
+
       candidates.push({
         slot,
         item,
@@ -170,6 +185,7 @@ export function findUpgrades(
         gemIds,
         assumesGemming: gemIds.some((gemId) => gemId !== ''),
         enchantId: carriedEnchantId,
+        dataQuality,
       })
     }
   }

@@ -1486,3 +1486,16 @@ input[type='text']:focus {
 .build-slot-delete:hover {
   border-color: rgba(248, 113, 113, 0.7);
 }
+
+.upgrade-data-note {
+  display: block;
+  margin-top: 4px;
+}
+
+.upgrade-data-note-skewed {
+  color: #fbbf24;
+}
+
+.upgrade-data-note-estimated {
+  color: #94a3b8;
+}
