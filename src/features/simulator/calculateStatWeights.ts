@@ -31,6 +31,14 @@ const MELEE_DPS_STATS: readonly (keyof StatBlock)[] = [
  */
 const RANGED_DPS_STATS: readonly (keyof StatBlock)[] = ['agility', 'rangedAttackPower', 'critRating', 'hitRating', 'hasteRating', 'armorPenetration']
 
+/**
+ * Feral reads everything melee does plus Feral Attack Power, which is only worth anything to a
+ * shapeshifted druid. It stays out of `MELEE_DPS_STATS` deliberately: for a Warrior it is not an
+ * unmodeled stat, it is a genuinely worthless one, and probing it there would print a zero the UI
+ * would then explain as "not modeled yet".
+ */
+const FERAL_DPS_STATS: readonly (keyof StatBlock)[] = [...MELEE_DPS_STATS, 'feralAttackPower']
+
 const CASTER_DPS_STATS: readonly (keyof StatBlock)[] = ['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating']
 const HEALER_STATS: readonly (keyof StatBlock)[] = ['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating', 'mp5']
 const TANK_STATS: readonly (keyof StatBlock)[] = ['stamina', 'armor', 'defenseRating', 'dodgeRating', 'parryRating', 'blockRating', 'blockValue', 'agility']
@@ -41,7 +49,16 @@ const TANK_STATS: readonly (keyof StatBlock)[] = ['stamina', 'armor', 'defenseRa
  * statement from "this stat is worthless in TBC", so the UI must not conflate the two.
  */
 const CONSUMED_STATS: Record<CharacterRole, ReadonlySet<keyof StatBlock>> = {
-  'Physical DPS': new Set<keyof StatBlock>(['strength', 'agility', 'attackPower', 'rangedAttackPower', 'critRating', 'hitRating', 'expertiseRating']),
+  'Physical DPS': new Set<keyof StatBlock>([
+    'strength',
+    'agility',
+    'attackPower',
+    'rangedAttackPower',
+    'feralAttackPower',
+    'critRating',
+    'hitRating',
+    'expertiseRating',
+  ]),
   'Caster DPS': new Set<keyof StatBlock>(['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating']),
   Healer: new Set<keyof StatBlock>(['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating']),
   Tank: new Set<keyof StatBlock>(['stamina', 'armor', 'defenseRating', 'dodgeRating', 'parryRating', 'blockRating', 'agility']),
@@ -51,7 +68,9 @@ function statsToProbe(role: CharacterRole, character: CharacterProfile): readonl
   if (role === 'Caster DPS') return CASTER_DPS_STATS
   if (role === 'Healer') return HEALER_STATS
   if (role === 'Tank') return TANK_STATS
-  return character.className === 'Hunter' ? RANGED_DPS_STATS : MELEE_DPS_STATS
+  if (character.className === 'Hunter') return RANGED_DPS_STATS
+  if (character.className === 'Druid' && character.spec === 'Feral') return FERAL_DPS_STATS
+  return MELEE_DPS_STATS
 }
 
 /** The stat each role's weights are normalized against, so 1.0 means "worth the same as one point of this". */

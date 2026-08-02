@@ -70,6 +70,15 @@ export function calculateStats(
   total = applyRacialTraits(total, character.race, character.className, gear)
 
   total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
+
+  // Feral Attack Power adds 1:1 into attack power, but only while shapeshifted. The stat's own
+  // wording is "in Cat, Bear, Dire Bear and Moonkin forms only", and of the specs this app models
+  // only Feral both shapeshifts and reads attack power — a Moonkin has no use for it. Applying it
+  // unconditionally would hand it to every class wearing a druid weapon.
+  if (character.className === 'Druid' && character.spec === 'Feral') {
+    total.attackPower += total.feralAttackPower
+  }
+
   total.rangedAttackPower += Math.round(total.agility * 1.8)
   total.spellPower += Math.round(total.intellect * 0.8 + total.spirit * 0.15)
   total.healingPower += Math.round(total.intellect * 0.9 + total.spirit * 0.35)

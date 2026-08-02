@@ -6,6 +6,8 @@ export type StatBlock = {
   spirit: number
   attackPower: number
   rangedAttackPower: number
+  /** TBC prints this on druid weapons as "increases attack power in Cat, Bear, Dire Bear and Moonkin forms only". It is an explicit item stat, NOT derived from weapon DPS — that formula arrived in patch 3.0.8 and is WotLK-only. */
+  feralAttackPower: number
   spellPower: number
   healingPower: number
   hitRating: number
@@ -34,6 +36,7 @@ export const emptyStats: StatBlock = {
   spirit: 0,
   attackPower: 0,
   rangedAttackPower: 0,
+  feralAttackPower: 0,
   spellPower: 0,
   healingPower: 0,
   hitRating: 0,
@@ -62,6 +65,7 @@ export const statLabels: Array<[keyof StatBlock, string]> = [
   ['spirit', 'Spirit'],
   ['attackPower', 'Attack Power'],
   ['rangedAttackPower', 'Ranged AP'],
+  ['feralAttackPower', 'Feral AP'],
   ['spellPower', 'Spell Power'],
   ['healingPower', 'Healing Power'],
   ['hitRating', 'Hit Rating'],

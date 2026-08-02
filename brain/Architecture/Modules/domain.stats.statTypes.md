@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/stats/statTypes.ts
-lines: 84
+lines: 88
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.stats.statTypes
 
-`src/domain/stats/statTypes.ts` · **domain** layer · 84 lines
+`src/domain/stats/statTypes.ts` · **domain** layer · 88 lines
 
 _No doc comment at the top of this file._
 

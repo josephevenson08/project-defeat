@@ -1167,6 +1167,16 @@ test('a feral druid swings cat form\'s own weapon, not the equipped one', async 
     (await breakdown.locator('div', { hasText: /Weapon damage/i }).first().innerText()).match(/[\d.]+$/)?.[0] ?? '0',
   )
   expect(weaponDamage).toBeCloseTo(55, 1)
+
+  // What the equipped weapon *does* give a Feral druid is Feral Attack Power, an explicit stat TBC
+  // prints on druid weapons. It adds 1:1 into attack power, so its weight must land exactly on the
+  // reference stat's 1.00 — anything else means the conversion picked up a stray multiplier.
+  await expect(page.getByTestId('stat-weight-feralAttackPower')).toContainText('1.00')
+
+  // And it must not be offered to classes that can't shapeshift. For them it isn't an unmodeled
+  // stat the sim might learn later, it's genuinely worthless, so it should not be probed at all.
+  await page.getByLabel('Class').selectOption('Warrior')
+  await expect(page.getByTestId('stat-weight-feralAttackPower')).toHaveCount(0)
 })
 
 test('a both-weapons special halves its off-hand swing but not its flat bonus', async () => {

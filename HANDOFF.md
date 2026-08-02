@@ -190,11 +190,20 @@ budget). It's there because the first modellable rage or energy filler would hit
   `averageSwingDamage` was reading the equipped item's dice, so Feral damage scaled off a staff the
   form never swings — in both the white and the special paths. Now modelled via `CAT_FORM_WEAPON`.
 
-  The thing that made this look like a hard decision turned out to be a false premise: Feral Attack
-  Power is **an explicit item stat** added 1:1 into attack power, not a derived DPS conversion, so
-  there was no unverifiable constant to agonise over. **The remaining gap is item data, not the
-  model** — no item in the catalog records Feral Attack Power, so Feral weapon comparisons
-  under-differentiate. Adding that stat is the single highest-value thing for Feral accuracy.
+  Feral Attack Power is now modelled: `StatBlock.feralAttackPower`, added 1:1 into attack power for
+  Feral only, probed in its own stat-weight list so it isn't offered to classes that can't shapeshift.
+
+  **The contradiction that made this look hard is settled, and worth not re-litigating.** Two accounts
+  circulate: that Feral AP is an explicit item stat, and that it's derived from weapon DPS via
+  `(DPS - 54.8) * 14`. Both are true — of different expansions. TBC uses the explicit item stat;
+  wowsims parses it straight off the tooltip text with a regex and never computes it. The DPS formula
+  arrived in **patch 3.0.8**, the WotLK pre-patch, and was removed in Cataclysm. Guides conflate them
+  because the stat kept its name. If a future session sees the 54.8 formula quoted, it is out of era.
+
+  **The remaining gap is item data.** Only Terestian's Stranglestaff (829) carries a real value.
+  Sourced but not yet catalogued: Earthwarden 712 (cross-checked, the only one of these that is),
+  Staff of Natural Fury 712, Braxxis' Staff of Slumber 292 — all single-sourced, so flag them.
+  Apolyon the Soul-Render is *not* druid-legal and has no Feral AP, despite appearing on such lists.
 
   Mangle (Cat) (45 energy, 160% weapon damage + 264) and Rake (spell 27003, 40 energy, 78 + 0.01xAP
   plus a 9s bleed) are both sourced and computable. **They are still not added, and the reason has

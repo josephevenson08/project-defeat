@@ -118,10 +118,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   Every other spec still models a single ability, so melee specs remain understated by differing
   amounts.
 - Feral Druid is modelled in cat form, which in TBC swings a fixed internal weapon rather than the
-  equipped one — so weapon damage and speed genuinely don't matter for Feral. What does matter is
-  Feral Attack Power, an explicit stat TBC puts on druid weapons, and **no item in this catalog
-  records it yet**. Feral weapon comparisons therefore under-differentiate: swapping weapons moves
-  only the Agility and Strength on them.
+  equipped one — so weapon damage and speed genuinely don't matter for Feral. What matters is Feral
+  Attack Power, an explicit stat TBC prints on druid weapons, which is now modelled and adds 1:1 into
+  attack power. Only **one** catalogued weapon carries a real value for it so far
+  (Terestian's Stranglestaff, 829), so Feral weapon comparisons still under-differentiate against the
+  rest of the catalog.
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
