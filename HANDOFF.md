@@ -157,7 +157,22 @@ slightly pessimistic for a shield tank.
 ### 1. Multi-ability rotations — biggest remaining accuracy gap
 Every path models exactly **one** ability per spec. Melee additionally drops any special whose sustained rate isn't computable. So melee specs are understated, by different amounts per spec.
 
-This needs per-spec ability *lists* (`src/domain/abilities/` currently holds one signature ability each). It's a multi-hour feature done honestly — **don't half-do it**, that's this repo's recurring failure mode. Gotchas already discovered and recorded in the ability data's notes:
+This needs per-spec ability *lists* (`src/domain/abilities/` currently holds one signature ability each). It's a multi-hour feature done honestly — **don't half-do it**, that's this repo's recurring failure mode.
+
+**Where the cost actually is — worth knowing before you plan this.** The engine is *already*
+ability-agnostic. `estimateSpecialAttack`, `computeUsageRate` and `computeSpecialDamagePerUse` in
+`specialAttacks.ts` all take a `SignatureAbility` and work for any ability you hand them; the only
+thing that is single-ability is `getSignatureAbility(class, spec)` returning exactly one, and the DPS
+path calling it once. So the engine work is small — an ability list plus a GCD-contention model, since
+summing `usesPerSecond` across abilities would otherwise let a spec press more buttons per second than
+the GCD allows.
+
+The real cost is **data**. Every additional ability needs sourced base damage, coefficients, cooldowns
+and rage costs, and the `needsVerification` rule means none of it can come from recall. Build it one
+spec at a time — source that spec's abilities, wire it, ship it, and state plainly which specs are
+still single-ability. An engine merged ahead of its data is a module nothing renders.
+
+Gotchas already discovered and recorded in the ability data's notes:
 - Tank/cooldown abilities (Consecration, Shield Slam, Crusader Strike, Mortal Strike, Bloodthirst) are 6–10s cooldowns, not fillers. Modelling them per-GCD overstates output several-fold.
 - Mutilate and Stormstrike strike with **both** weapons (`hitsBothWeapons` flag exists for this).
 
