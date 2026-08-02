@@ -19,7 +19,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Scaling basis: weapon damage
 - Cost: 45 Energy (reduced to 42/40 by Improved Sinister Strike)
 
-> Combat is the Phase 1/2 rogue raiding spec and Sinister Strike is its filler: spam it to build combo points, keep Slice and Dice up, and spend the rest on Rupture/Eviscerate. This is the cleanest single-ability fit of the three rogue specs. Note that a large share of Combat's damage comes from off-hand white swings and Blade Flurry/Adrenaline Rush windows rather than from Sinister Strike itself, and that the simulator currently models white damage only for physical specs, so these numbers are staged for later use.
+> Combat is the Phase 1/2 rogue raiding spec and Sinister Strike is its filler: spam it to build combo points, keep Slice and Dice up, and spend the rest on Rupture/Eviscerate. This is the cleanest single-ability fit of the three rogue specs. Note that a large share of Combat's damage comes from off-hand white swings and Blade Flurry/Adrenaline Rush windows rather than from Sinister Strike itself, and that the simulator now layers computable specials on top of white damage, so these numbers are in use.
 
 ## Best in slot
 

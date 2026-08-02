@@ -19,7 +19,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Scaling basis: weapon damage
 - Cost: 35 Energy
 
-> Hemorrhage is Subtlety's combo-point builder and the reason the spec is ever brought to a raid: it applies a debuff giving the target +42 physical damage taken for 10 charges or 15s, which any melee in the group consumes. Subtlety is the weakest rogue tree for personal DPS in TBC and the Hemorrhage build only holds up in earlier tiers, so a personal-DPS-only model will make Subtlety look worse than its raid value. Because the simulator currently models white damage only for physical specs, these numbers are staged for later use.
+> Hemorrhage is Subtlety's combo-point builder and the reason the spec is ever brought to a raid: it applies a debuff giving the target +42 physical damage taken for 10 charges or 15s, which any melee in the group consumes. Subtlety is the weakest rogue tree for personal DPS in TBC and the Hemorrhage build only holds up in earlier tiers, so a personal-DPS-only model will make Subtlety look worse than its raid value. Because the simulator now layers computable specials on top of white damage, these numbers are in use.
 
 ## Best in slot
 

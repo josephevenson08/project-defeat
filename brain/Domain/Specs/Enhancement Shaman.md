@@ -19,7 +19,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Scaling basis: weapon damage
 - Cost: 237 Mana (8% of base mana)
 
-> Stormstrike has no intrinsic level requirement — it is gated purely by talent points spent in Enhancement, so `requiredLevel` is omitted. It is the Enhancement signature button, but on a 10s cooldown it is a small share of the spec's output — Enhancement damage is dominated by Windfury Weapon procs on white swings, with Flametongue on the off-hand and Shamanistic Rage for sustain. It also applies a debuff increasing the target's Nature damage taken by 20% for the next 2 Nature hits, which is worth real DPS to Elemental shamans in the group. Because the simulator currently models white damage only for physical specs, these numbers are staged for later use; note that Enhancement is the spec where white damage alone comes closest to being the right answer, provided Windfury is modeled.
+> Stormstrike has no intrinsic level requirement — it is gated purely by talent points spent in Enhancement, so `requiredLevel` is omitted. It is the Enhancement signature button, but on a 10s cooldown it is a small share of the spec's output — Enhancement damage is dominated by Windfury Weapon procs on white swings, with Flametongue on the off-hand and Shamanistic Rage for sustain. It also applies a debuff increasing the target's Nature damage taken by 20% for the next 2 Nature hits, which is worth real DPS to Elemental shamans in the group. Because the simulator now layers computable specials on top of white damage, these numbers are in use; note that Enhancement is the spec where white damage alone comes closest to being the right answer, provided Windfury is modeled.
 
 ## Best in slot
 

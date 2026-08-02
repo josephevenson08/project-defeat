@@ -19,7 +19,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Scaling basis: weapon damage
 - Cost: 30 Rage
 
-> Mortal Strike is the 31-point Arms talent and the button the spec is named for, fired on its 6s cooldown alongside Whirlwind, Slam, Execute in the sub-20% phase, and Heroic Strike as a rage dump. Arms was primarily brought to Phase 1/2 raids for the Mortal Strike healing debuff and Blood Frenzy rather than for raw DPS, where Fury outperforms it. Because the simulator currently models white damage only for physical specs, these numbers are staged for later use.
+> Mortal Strike is the 31-point Arms talent and the button the spec is named for, fired on its 6s cooldown alongside Whirlwind, Slam, Execute in the sub-20% phase, and Heroic Strike as a rage dump. Arms was primarily brought to Phase 1/2 raids for the Mortal Strike healing debuff and Blood Frenzy rather than for raw DPS, where Fury outperforms it. Because the simulator now layers computable specials on top of white damage, these numbers are in use.
 
 ## Best in slot
 

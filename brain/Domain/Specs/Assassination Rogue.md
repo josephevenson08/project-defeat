@@ -19,7 +19,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Scaling basis: weapon damage
 - Cost: 60 Energy
 
-> Mutilate is the 41-point Assassination talent and the spec's combo-point builder, awarding 2 points per cast and requiring the rogue to be behind the target. Assassination was not the Phase 1/2 raiding meta — Combat with swords was — so this spec matters more for completeness than for representative raid DPS. The two-weapon structure is the main modeling trap: naively applying `weaponDamageMultiplier` once will halve Mutilate's damage. Because the simulator currently models white damage only for physical specs, none of this is consumed yet.
+> Mutilate is the 41-point Assassination talent and the spec's combo-point builder, awarding 2 points per cast and requiring the rogue to be behind the target. Assassination was not the Phase 1/2 raiding meta — Combat with swords was — so this spec matters more for completeness than for representative raid DPS. The two-weapon structure is the main modeling trap: naively applying `weaponDamageMultiplier` once will halve Mutilate's damage. Because the simulator now layers computable specials on top of white damage, this is consumed.
 
 ## Best in slot
 

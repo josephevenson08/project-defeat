@@ -22,7 +22,7 @@ export const warriorSignatureAbilities: readonly SignatureAbility[] = [
         '100% of NORMALIZED two-handed weapon damage plus a flat 210. Normalization values the swing at 3.3s for a two-hander regardless of the weapon\'s real speed, so an Arms warrior gains nothing on Mortal Strike from a slower weapon even though white damage still favours one.',
     },
     notes:
-      'Mortal Strike is the 31-point Arms talent and the button the spec is named for, fired on its 6s cooldown alongside Whirlwind, Slam, Execute in the sub-20% phase, and Heroic Strike as a rage dump. Arms was primarily brought to Phase 1/2 raids for the Mortal Strike healing debuff and Blood Frenzy rather than for raw DPS, where Fury outperforms it. Because the simulator currently models white damage only for physical specs, these numbers are staged for later use.',
+      'Mortal Strike is the 31-point Arms talent and the button the spec is named for, fired on its 6s cooldown alongside Whirlwind, Slam, Execute in the sub-20% phase, and Heroic Strike as a rage dump. Arms was primarily brought to Phase 1/2 raids for the Mortal Strike healing debuff and Blood Frenzy rather than for raw DPS, where Fury outperforms it. Because the simulator now layers computable specials on top of white damage, these numbers are in use.',
   },
   {
     className: 'Warrior',
@@ -43,7 +43,7 @@ export const warriorSignatureAbilities: readonly SignatureAbility[] = [
         'Pure attack power scaling: damage is exactly 45% of melee attack power, with NO weapon damage component and no flat base at all. This makes Bloodthirst unusual among melee specials and means it is the one ability here whose damage can be computed from a stat block alone, without knowing the equipped weapon.',
     },
     notes:
-      'Fury is the Phase 1/2 warrior DPS spec and Bloodthirst is its highest-priority button, used on cooldown with Whirlwind, and Heroic Strike/Cleave dumping surplus rage between them. Because Bloodthirst ignores weapon damage entirely, dual-wielding fast weapons costs it nothing while maximising white swings and Flurry/Rampage uptime — which is why Fury gears the way it does. Note the simulator currently models white damage only for physical specs; Bloodthirst is the easiest special to layer on first, since it needs no weapon data.',
+      'Fury is the Phase 1/2 warrior DPS spec and Bloodthirst is its highest-priority button, used on cooldown with Whirlwind, and Heroic Strike/Cleave dumping surplus rage between them. Because Bloodthirst ignores weapon damage entirely, dual-wielding fast weapons costs it nothing while maximising white swings and Flurry/Rampage uptime — which is why Fury gears the way it does. Note the simulator now layers computable specials on top of white damage; Bloodthirst is the easiest special to layer on first, since it needs no weapon data.',
   },
   {
     className: 'Warrior',

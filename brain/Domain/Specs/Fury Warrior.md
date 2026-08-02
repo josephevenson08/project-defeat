@@ -20,7 +20,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 - Attack power coefficient: 0.45
 - Cost: 30 Rage
 
-> Fury is the Phase 1/2 warrior DPS spec and Bloodthirst is its highest-priority button, used on cooldown with Whirlwind, and Heroic Strike/Cleave dumping surplus rage between them. Because Bloodthirst ignores weapon damage entirely, dual-wielding fast weapons costs it nothing while maximising white swings and Flurry/Rampage uptime — which is why Fury gears the way it does. Note the simulator currently models white damage only for physical specs; Bloodthirst is the easiest special to layer on first, since it needs no weapon data.
+> Fury is the Phase 1/2 warrior DPS spec and Bloodthirst is its highest-priority button, used on cooldown with Whirlwind, and Heroic Strike/Cleave dumping surplus rage between them. Because Bloodthirst ignores weapon damage entirely, dual-wielding fast weapons costs it nothing while maximising white swings and Flurry/Rampage uptime — which is why Fury gears the way it does. Note the simulator now layers computable specials on top of white damage; Bloodthirst is the easiest special to layer on first, since it needs no weapon data.
 
 ## Best in slot
 

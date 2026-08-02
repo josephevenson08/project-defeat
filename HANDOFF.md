@@ -175,6 +175,30 @@ first match for a class/spec.
 The GCD cap doesn't bind at present (Bloodthirst + Whirlwind is ~0.27 casts/sec against a 0.67
 budget). It's there because the first modellable rage or energy filler would hit it immediately.
 
+**Two specs were researched and deliberately not added. Read this before picking the next one —
+"source the abilities and append them" is not always the whole job.**
+
+- **Retribution Paladin.** Its only computable addition is Judgement of Blood (10s cooldown, and it
+  doesn't even trigger the GCD). But it's Holy-school damage scaling off spell power *while rolling
+  crit off the melee crit table* — neither a clean `Melee Special` nor a clean `Direct Damage`.
+  `resolveRotation` filters to `Melee Special`, so adding it today is data nothing consumes. **The
+  engine gap: a physical spec with a computable non-physical rotational ability has nowhere to go.**
+  Everything else Ret presses is genuinely out of scope — the Seals are passive auras that proc on
+  auto-attacks rather than buttons, and Exorcism only works on Undead and Demons.
+- **Feral Druid — this one is a live bug, not just a gap.** Cat form doesn't use the equipped
+  weapon's damage at all. TBC substitutes a fixed synthetic "paw" weapon (43.5-66.5 at 1.0s) and every
+  cat ability reads that; the equipped weapon only contributes a flat Feral Attack Power conversion
+  from its DPS. `averageSwingDamage` reads the equipped item's dice directly, so **Shred is already
+  being mismodelled today**. Mangle (Cat) and Rake are both sourced and computable and were held back
+  on purpose: adding them on top of a wrong weapon model multiplies the error. Fix the paw weapon
+  first — but note the DPS-to-FeralAP conversion constant could not be verified in the wowsims source,
+  and modelling the paw *without* it would make every weapon equivalent for Feral, which breaks the
+  upgrade finder for that spec. That trade-off needs a decision, not just an edit.
+
+Rip, Ferocious Bite, Heroic Strike, Slam and Execute are all correctly excluded and should stay that
+way until rage/combo-point income is simulated. Rampage and Tiger's Fury are pure self-buffs with no
+damage component. Savage Roar does not exist in TBC.
+
 This needs per-spec ability *lists* (`src/domain/abilities/` currently holds one signature ability each). It's a multi-hour feature done honestly — **don't half-do it**, that's this repo's recurring failure mode.
 
 **Where the cost actually is — worth knowing before you plan this.** The engine is *already*
