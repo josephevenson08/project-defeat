@@ -44,7 +44,7 @@ The repo carries its own conventions, and they encode mistakes this project has 
 npx tsc -b                        # clean
 npm run lint                      # exit 0
 npm run build
-npx playwright test --reporter=line   # 51 passing. Use --reporter=line, not the default.
+npx playwright test --reporter=line   # 52 passing. Use --reporter=line, not the default.
 npm run brain                     # "all wikilinks resolve"
 npm run brain                     # "0 written" — idempotent; this repo is in OneDrive, churn matters
 ```
@@ -139,14 +139,20 @@ Newest first. Every one is verified green and pushed.
 
 ## What's next, in priority order
 
-### 0. Finish the tank model — crushing blows and the ordered table
-The avoidance baseline is now right, but two known gaps remain and both make the score read high.
-Avoidance is still *summed* rather than resolved against one ordered table the way the DPS path
-already does in `buildWhiteAttackTable`. And crushing blows aren't modelled at all: a flat 15% for
-150% damage from a three-levels-higher attacker, **not** reduced by Defense Rating — which is exactly
-why Paladins and Druids couldn't become uncrushable in TBC and Warriors could, via Shield Block. The
-constants are sourced in the research notes; the mechanic is what needs building. Both are named in
-the summary string, so the UI is honest in the meantime.
+### 0. Decide what the tank Survivability Score should actually measure
+The mechanics underneath it are now right — one ordered incoming table (miss, dodge, parry, block,
+crit, crushing blow, hit), crushing blows modelled, avoidance no longer summed. What's left is a
+judgement call rather than a defect, which is why it wasn't made unilaterally.
+
+The headline score is still `avoidance*2 + armor*1.5 + stamina*0.1`. Those weights are invented, and
+the score treats a crit and a plain hit as equally bad once they land. The breakdown already carries
+a `Damage taken per swing vs. unmitigated` figure that does price crit and crush multipliers, and it
+is a better metric — it means something physical. Promoting it to the headline would make tank scores
+non-comparable with saved ones again, so it needs a deliberate call.
+
+One known softness in that figure: a blocked swing counts as a full hit, because block subtracts a
+flat block value rather than a fraction and the swing damage isn't in scope at that point. It reads
+slightly pessimistic for a shield tank.
 
 ### 1. Multi-ability rotations — biggest remaining accuracy gap
 Every path models exactly **one** ability per spec. Melee additionally drops any special whose sustained rate isn't computable. So melee specs are understated, by different amounts per spec.

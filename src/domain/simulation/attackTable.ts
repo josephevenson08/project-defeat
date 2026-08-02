@@ -69,6 +69,27 @@ export function applyMeleeCritSuppression(rawCritChance: number, skillDiff: numb
   return Math.max(0, rawCritChance - skillDiff * 0.0004)
 }
 
+/**
+ * An ordered table consumes a single 100% roll from the top down, so each outcome only gets what the
+ * ones above it left behind. Once the running total reaches 100% everything below is truncated to
+ * zero — which is the whole point: adding avoidance pushes the bottom entries off rather than
+ * scaling every outcome down proportionally.
+ */
+function createOutcomeTaker() {
+  let remaining = 1
+
+  return {
+    take(amount: number) {
+      const taken = Math.max(0, Math.min(amount, remaining))
+      remaining -= taken
+      return taken
+    },
+    rest() {
+      return remaining
+    },
+  }
+}
+
 export type WhiteAttackTableInputs = {
   skillDiff: number
   dualWield: boolean
@@ -94,12 +115,7 @@ export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAtta
   const blockChance = computeTargetBlockChance(skillDiff)
   const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)
 
-  let remaining = 1
-  const take = (amount: number) => {
-    const taken = Math.max(0, Math.min(amount, remaining))
-    remaining -= taken
-    return taken
-  }
+  const { take, rest } = createOutcomeTaker()
 
   const miss = take(missChance)
   const dodge = take(dodgeChance)
@@ -107,7 +123,7 @@ export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAtta
   const glance = take(glanceChance)
   const block = take(blockChance)
   const crit = take(critChance)
-  const hit = remaining
+  const hit = rest()
 
   return { miss, dodge, parry, glance, block, crit, hit }
 }
@@ -176,19 +192,14 @@ export function buildSpecialAttackTable(inputs: Omit<WhiteAttackTableInputs, 'du
   const blockChance = computeTargetBlockChance(skillDiff)
   const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)
 
-  let remaining = 1
-  const take = (amount: number) => {
-    const taken = Math.max(0, Math.min(amount, remaining))
-    remaining -= taken
-    return taken
-  }
+  const { take, rest } = createOutcomeTaker()
 
   const miss = take(missChance)
   const dodge = take(dodgeChance)
   const parry = take(parryChance)
   const block = take(blockChance)
   const crit = take(critChance)
-  const hit = remaining
+  const hit = rest()
 
   return { miss, dodge, parry, block, crit, hit }
 }
@@ -201,16 +212,70 @@ export function buildRangedAttackTable(inputs: { skillDiff: number; missReductio
   const missChance = Math.max(0, computeBaseMissChance(inputs.skillDiff) - inputs.missReduction)
   const critChance = applyMeleeCritSuppression(inputs.rawCritChance, inputs.skillDiff)
 
-  let remaining = 1
-  const take = (amount: number) => {
-    const taken = Math.max(0, Math.min(amount, remaining))
-    remaining -= taken
-    return taken
-  }
+  const { take, rest } = createOutcomeTaker()
 
   const miss = take(missChance)
   const crit = take(critChance)
-  const hit = remaining
+  const hit = rest()
 
   return { miss, crit, hit }
+}
+
+export type IncomingAttackTable = {
+  miss: number
+  dodge: number
+  parry: number
+  block: number
+  crit: number
+  crush: number
+  hit: number
+}
+
+export type IncomingAttackTableInputs = {
+  missChance: number
+  dodgeChance: number
+  parryChance: number
+  blockChance: number
+  critChance: number
+  crushChance: number
+}
+
+/**
+ * The **incoming** table: what happens when the boss swings at the player. Resolved in TBC's fixed
+ * order — miss, dodge, parry, block, crit, crushing blow, hit — taken from wowsims/tbc
+ * `sim/core/spell_outcome.go`, `OutcomeFuncEnemyMeleeWhite()`.
+ *
+ * The ordering is the entire mechanic behind "uncrushable". Crushing blows sit second from the
+ * bottom, so they cannot be reduced directly — Defense Rating does nothing to them — but enough
+ * miss/dodge/parry/block pushes them off the end of the table entirely. That is why a Warrior could
+ * reach uncrushable through Shield Block while a Paladin or Druid could not.
+ *
+ * Summing these chances instead of resolving them in order overstates survivability, because it lets
+ * the totals exceed what one roll can actually produce.
+ */
+export function buildIncomingAttackTable(inputs: IncomingAttackTableInputs): IncomingAttackTable {
+  const { take, rest } = createOutcomeTaker()
+
+  const miss = take(inputs.missChance)
+  const dodge = take(inputs.dodgeChance)
+  const parry = take(inputs.parryChance)
+  const block = take(inputs.blockChance)
+  const crit = take(inputs.critChance)
+  const crush = take(inputs.crushChance)
+  const hit = rest()
+
+  return { miss, dodge, parry, block, crit, crush, hit }
+}
+
+/**
+ * The attacker's own crit chance before the defender's Defense Skill and resilience reduce it: 5% at
+ * equal level, rising 0.2% per level above and capping three levels up at 5.6%.
+ *
+ * That 5.6% is where the 490 Defense Skill uncrittable figure comes from — 0.056 divided by the
+ * 0.04% each Defense Skill point removes is 140 points above the 350 a level 70 already has.
+ * Sourced from wowsims/tbc `sim/core/target.go`, `NewTarget()`.
+ */
+export function computeAttackerBaseCritChance(attackerLevel: number, defenderLevel = 70) {
+  const levelsAbove = Math.min(3, Math.max(0, attackerLevel - defenderLevel))
+  return 0.05 + levelsAbove * 0.002
 }

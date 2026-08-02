@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/combatConstants.ts
-lines: 82
+lines: 94
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.combatConstants
 
-`src/domain/simulation/combatConstants.ts` · **domain** layer · 82 lines
+`src/domain/simulation/combatConstants.ts` · **domain** layer · 94 lines
 
 From the top of the file:
 
@@ -23,7 +23,7 @@ From the top of the file:
 
 **function** — `armorMitigationConstant`, `ratingToFraction`
 
-**const** — `AP_PER_DPS`, `ARMOR_MITIGATION_CAP`, `AVOIDANCE_PER_DEFENSE_SKILL_POINT`, `DEFENSE_RATING_PER_SKILL_POINT`, `DOT_COEFFICIENT_BASE_DURATION`, `EXPERTISE_PERCENT_PER_SKILL_POINT`, `EXPERTISE_RATING_PER_SKILL_POINT`, `MELEE_CRIT_DAMAGE_MULTIPLIER`, `PLAYER_LEVEL_70_SKILL`, `RATING_PER_PERCENT`, `SPELL_COEFFICIENT_BASE_CAST_TIME`, `SPELL_COEFFICIENT_INSTANT_BASELINE`, `SPELL_CRIT_DAMAGE_MULTIPLIER`
+**const** — `AP_PER_DPS`, `ARMOR_MITIGATION_CAP`, `AVOIDANCE_PER_DEFENSE_SKILL_POINT`, `CRUSHING_BLOW_CHANCE`, `CRUSHING_BLOW_DAMAGE_MULTIPLIER`, `CRUSHING_BLOW_LEVEL_GAP`, `DEFENSE_RATING_PER_SKILL_POINT`, `DOT_COEFFICIENT_BASE_DURATION`, `EXPERTISE_PERCENT_PER_SKILL_POINT`, `EXPERTISE_RATING_PER_SKILL_POINT`, `MELEE_CRIT_DAMAGE_MULTIPLIER`, `PLAYER_LEVEL_70_SKILL`, `RATING_PER_PERCENT`, `SPELL_COEFFICIENT_BASE_CAST_TIME`, `SPELL_COEFFICIENT_INSTANT_BASELINE`, `SPELL_CRIT_DAMAGE_MULTIPLIER`
 
 ## Imports
 

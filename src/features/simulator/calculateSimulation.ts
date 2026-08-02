@@ -3,15 +3,20 @@ import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
 import {
   buildDefenderAvoidanceBaseline,
+  buildIncomingAttackTable,
   buildRangedAttackTable,
   buildSpecialAttackTable,
   buildWhiteAttackTable,
+  computeAttackerBaseCritChance,
   computeGlanceDamageRange,
   computeSkillDiff,
 } from '../../domain/simulation/attackTable'
 import { computeUsageRate, estimateSpecialAttack } from '../../domain/simulation/specialAttacks'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
+  CRUSHING_BLOW_CHANCE,
+  CRUSHING_BLOW_DAMAGE_MULTIPLIER,
+  CRUSHING_BLOW_LEVEL_GAP,
   DEFENSE_RATING_PER_SKILL_POINT,
   EXPERTISE_RATING_PER_SKILL_POINT,
   MELEE_CRIT_DAMAGE_MULTIPLIER,
@@ -393,18 +398,52 @@ function calculateTankSurvivability(
   // previous model left it out entirely.
   const missChance = Math.max(0, baseline.miss + fromDefense)
 
-  const totalAvoidance = Math.min(0.99, missChance + dodgeChance + parryChance + blockChance)
+  // Defense Skill and resilience both eat into the boss's crit; neither touches crushing blows.
+  const bossCritChance = Math.max(
+    0,
+    computeAttackerBaseCritChance(target.level) -
+      fromDefense -
+      ratingToFraction(stats.resilienceRating, RATING_PER_PERCENT.resilience),
+  )
+  const canBeCrushed = target.level - PLAYER_LEVEL >= CRUSHING_BLOW_LEVEL_GAP
+
+  // Resolved as one ordered roll rather than summed. Summing let the parts total more than a single
+  // swing can actually produce, and hid the fact that piling on avoidance is what pushes crushing
+  // blows off the bottom of the table.
+  const table = buildIncomingAttackTable({
+    missChance,
+    dodgeChance,
+    parryChance,
+    blockChance,
+    critChance: bossCritChance,
+    crushChance: canBeCrushed ? CRUSHING_BLOW_CHANCE : 0,
+  })
+
+  const totalAvoidance = table.miss + table.dodge + table.parry + table.block
 
   const armorMitigation = computeArmorMitigation(stats.armor, target.level)
   const critTakenReduction = toPercent(defenseSkillPoints * AVOIDANCE_PER_DEFENSE_SKILL_POINT)
 
+  // What an average swing actually lands for, relative to an unmitigated hit. A blocked swing still
+  // connects — block reduces it by a flat block value rather than a fraction — so it counts here as
+  // a full hit, which makes this a slight overestimate for a shield tank.
+  const damagePerSwing =
+    (table.hit +
+      table.block +
+      table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER +
+      table.crush * CRUSHING_BLOW_DAMAGE_MULTIPLIER) *
+    (1 - armorMitigation)
+
   const breakdown: SimulationBreakdownEntry[] = [
     { label: 'Total avoidance', value: toPercent(totalAvoidance) },
-    { label: 'Dodge', value: toPercent(dodgeChance) },
-    { label: canParry ? 'Parry' : 'Parry (this class cannot parry)', value: toPercent(parryChance) },
-    { label: hasShield ? 'Block' : 'Block (no shield equipped)', value: toPercent(blockChance) },
-    { label: 'Boss miss chance', value: toPercent(missChance) },
+    { label: 'Dodge', value: toPercent(table.dodge) },
+    { label: canParry ? 'Parry' : 'Parry (this class cannot parry)', value: toPercent(table.parry) },
+    { label: hasShield ? 'Block' : 'Block (no shield equipped)', value: toPercent(table.block) },
+    { label: 'Boss miss chance', value: toPercent(table.miss) },
+    { label: 'Crit taken', value: toPercent(table.crit) },
+    { label: canBeCrushed ? 'Crushing blows taken' : 'Crushing blows (target too low to crush)', value: toPercent(table.crush) },
     { label: 'Armor mitigation', value: toPercent(armorMitigation) },
+    { label: 'Damage taken per swing vs. unmitigated', value: toPercent(damagePerSwing) },
     { label: 'Stamina', value: stats.stamina },
     { label: 'Block value', value: stats.blockValue },
     { label: 'Crit-taken reduction from Defense', value: critTakenReduction },
@@ -417,7 +456,7 @@ function calculateTankSurvivability(
     metricLabel: 'Survivability Score',
     score: round(survivabilityScore),
     scoreExact: survivabilityScore,
-    summary: `Miss/dodge/parry/block against a level ${target.level} attacker, using the defender-side base chances (a level gap lowers your avoidance, unlike the attacker-side table), plus armor mitigation and stamina. Uncrittable still requires 490 total Defense Skill. Crushing blows are not modeled, and neither is avoidance competing for one ordered table, so this reads high against a real boss.`,
+    summary: `Resolved as one ordered roll against a level ${target.level} attacker — miss, dodge, parry, block, crit, crushing blow, hit — using the defender-side base chances, so a level gap lowers your avoidance rather than raising it. Crushing blows can only be pushed off the bottom of that table, never reduced directly. Uncrittable still requires 490 total Defense Skill. The score itself weights avoidance, armor and stamina; it does not yet price how much worse a crit or a crush is than a plain hit, so read the damage-per-swing row for that.`,
     breakdown,
   }
 }

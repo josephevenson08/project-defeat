@@ -35,6 +35,11 @@ import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../
 import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { gearSlots } from '../src/domain/gear/gearSlots'
+import {
+  buildDefenderAvoidanceBaseline,
+  buildIncomingAttackTable,
+  computeAttackerBaseCritChance,
+} from '../src/domain/simulation/attackTable'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { getGemById } from '../src/domain/gems/sampleGems'
@@ -1101,6 +1106,56 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('the incoming attack table is ordered, and avoidance is what pushes crushing blows off it', async () => {
+  // The engine spent a while summing these chances instead of resolving them in order, which let the
+  // parts total more than a single swing can produce. These assertions are why that can't come back.
+  const total = (table: { miss: number; dodge: number; parry: number; block: number; crit: number; crush: number; hit: number }) =>
+    table.miss + table.dodge + table.parry + table.block + table.crit + table.crush + table.hit
+
+  // An under-geared tank reaches the bottom of the table, so a crush lands on its full flat 15%.
+  // Defense Rating cannot reduce that number directly — nothing can.
+  const undergeared = buildIncomingAttackTable({
+    missChance: 0.044,
+    dodgeChance: 0.05,
+    parryChance: 0.044,
+    blockChance: 0.044,
+    critChance: 0.056,
+    crushChance: 0.15,
+  })
+  expect(undergeared.crush).toBeCloseTo(0.15, 10)
+  expect(total(undergeared)).toBeCloseTo(1, 10)
+
+  // Stack enough avoidance and the roll is exhausted before crushing blows are reached. This is the
+  // only route to uncrushable in TBC, and it's why a Warrior could get there via Shield Block while
+  // a Paladin or Druid could not.
+  const uncrushable = buildIncomingAttackTable({
+    missChance: 0.1,
+    dodgeChance: 0.35,
+    parryChance: 0.3,
+    blockChance: 0.3,
+    critChance: 0.056,
+    crushChance: 0.15,
+  })
+  expect(uncrushable.crush).toBe(0)
+  expect(uncrushable.crit).toBe(0)
+  expect(uncrushable.hit).toBe(0)
+  expect(total(uncrushable)).toBeCloseTo(1, 10)
+
+  // The defender-side baseline must fall as the attacker out-levels the player. Reusing the
+  // attacker-side formulas made it rise, handing the player the boss's own 14% parry.
+  const equalLevel = buildDefenderAvoidanceBaseline(70)
+  const raidBoss = buildDefenderAvoidanceBaseline(73)
+  expect(equalLevel.parry).toBeCloseTo(0.05, 10)
+  expect(raidBoss.parry).toBeCloseTo(0.044, 10)
+  expect(raidBoss.parry).toBeLessThan(equalLevel.parry)
+  expect(raidBoss.dodgeLevelPenalty).toBeCloseTo(-0.006, 10)
+
+  // 5.6% raw boss crit is what makes 490 the uncrittable number: 0.056 / 0.0004 = 140 over the 350
+  // a level 70 already has.
+  expect(computeAttackerBaseCritChance(73)).toBeCloseTo(0.056, 10)
+  expect(computeAttackerBaseCritChance(70)).toBeCloseTo(0.05, 10)
 })
 
 test('the item catalog and the raid data agree on where every drop comes from', async () => {

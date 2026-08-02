@@ -41,6 +41,18 @@ export const DEFENSE_RATING_PER_SKILL_POINT = 2.3654
  */
 export const AVOIDANCE_PER_DEFENSE_SKILL_POINT = 0.0004
 
+/**
+ * A crushing blow lands for 150% damage on a flat 15% of swings, and — unlike every other outcome —
+ * **no amount of Defense Rating reduces it**. The only defence is pushing it off the bottom of the
+ * ordered table with miss/dodge/parry/block, which is precisely why TBC Warriors could reach
+ * uncrushable through Shield Block and Paladins and Druids could not.
+ */
+export const CRUSHING_BLOW_CHANCE = 0.15
+export const CRUSHING_BLOW_DAMAGE_MULTIPLIER = 1.5
+
+/** An attacker must be at least this many levels above the defender to crush at all. */
+export const CRUSHING_BLOW_LEVEL_GAP = 3
+
 /** Rating needed for one point of Expertise Skill (not directly a percent). Community math, not from the official blue post, but consistent across independent sources. */
 export const EXPERTISE_RATING_PER_SKILL_POINT = 3.9423
 

@@ -339,7 +339,11 @@ This project reused the attacker-side helpers for both directions until an audit
 
 Defense Skill is the other half. One point moves five things at once by 0.04%: it adds to dodge, parry and block, adds to the attacker's miss chance, and subtracts from the attacker's crit chance. That last term is where 490 Defense Skill for uncrittable comes from — a level-73 boss crits for 5.6% raw, and 0.056 / 0.0004 is 140 points above the 350 a level 70 already has.
 
-What is still not modelled, and should not be read into the score: crushing blows (a flat 15% for 150% damage from a three-level-higher attacker, and notably *not* reduced by Defense Rating, which is why Paladins and Druids could not become uncrushable in TBC), and the fact that these outcomes compete for one ordered table rather than summing freely. Both mean the reported avoidance reads high against a real boss.`,
+All of it resolves as **one ordered roll**, not a sum: miss, dodge, parry, block, crit, crushing blow, hit. That ordering is the whole mechanic behind uncrushable. A crushing blow is a flat 15% for 150% damage from a three-level-higher attacker, and Defense Rating does nothing to it — the only defence is stacking enough miss/dodge/parry/block that the roll is exhausted before it reaches the crush row. That is why TBC Warriors could become uncrushable through Shield Block and Paladins and Druids could not.
+
+Summing the outcomes instead, which this project did at first, quietly overstates survivability: the parts add up to more than one swing can produce, and the reason avoidance is valuable stops being visible.
+
+What the score still does not do is price *severity*. It weights avoidance, armor and stamina, so it treats a crit and a plain hit as equally bad once they land. The damage-per-swing figure in the breakdown is the number that accounts for crit and crush multipliers, and it counts a blocked swing as a full hit because block subtracts a flat block value rather than a fraction — a slight overestimate for a shield tank.`,
     modules: ['domain/simulation/attackTable.ts', 'features/simulator/calculateSimulation.ts'],
     related: ['Attack Table', 'Armor Mitigation', 'Stat Weights'],
   },
@@ -1266,7 +1270,7 @@ async function writeProjectNotes(modules, counts) {
       'Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:',
       '',
       `1. **Multi-ability rotations** — every path now models exactly one ability per spec. Melee specs additionally lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated. Real rotation priority is the biggest remaining accuracy gap in ${link('Phase 4 - Simulation')}.`,
-      `2. **Crushing blows and the ordered tank table** — the tank path now uses the correct defender-side base chances (see ${link('Tank Avoidance')}), but still sums avoidance freely instead of resolving it against one ordered table, and does not model crushing blows at all. Both make the Survivability Score read high against a real boss, and the summary string says so rather than hiding it.`,
+      `2. **Tank score severity weighting** — the tank path now resolves one ordered incoming table including crushing blows (see ${link('Tank Avoidance')}), but the headline Survivability Score still weights avoidance, armor and stamina without pricing how much worse a crit or a crush is than a plain hit. The breakdown carries a damage-per-swing figure that does account for it; folding that into the score is a metric redesign and deliberately hasn't been done unilaterally.`,
       `3. **Item catalog verification** — the wrong-boss conflicts and the invented \`justicars-warblade\` are corrected, but 214 \`needsVerification\` flags remain in ${link('domain.gear.sampleItems')}. Three items now carry real sourced values and are markedly stronger than the estimates around them, so any sourced-vs-estimated comparison — which is exactly what the upgrade finder ranks — is skewed.`,
       '',
       '## Related',
