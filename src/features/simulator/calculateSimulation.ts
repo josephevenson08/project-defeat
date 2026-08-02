@@ -355,7 +355,16 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
 /** Sourced from wowsims/tbc: `CanParry` is set unconditionally for these four and never for Druid, Mage, Priest or Warlock. Shaman gets it only from the Enhancement talent Spirit Weapons, which this project does not model. */
 const PARRY_CAPABLE_CLASSES: ReadonlySet<TbcClass> = new Set<TbcClass>(['Warrior', 'Paladin', 'Rogue', 'Hunter'])
 
-/** Agility for +1% dodge at level 70. Only the three classes TBC actually tanks with are sourced; the others have no Agility-to-dodge dependency in wowsims at all, so they are deliberately absent rather than guessed. */
+/**
+ * Agility for +1% dodge at level 70. Only the three classes TBC actually tanks with have an
+ * Agility-to-dodge dependency in wowsims at all; Rogue, Hunter and Shaman are absent rather than
+ * guessed at.
+ *
+ * **Druid is not reachable today.** `roleForSpec` maps only Protection Warrior and Protection
+ * Paladin to Tank, so no Druid spec reaches this calculation — the entry is here because the value
+ * is sourced and it goes live unchanged when the Feral bear/cat split lands. Note also that Druids
+ * cannot parry in any form, including Dire Bear, which `PARRY_CAPABLE_CLASSES` already handles.
+ */
 const AGILITY_PER_PERCENT_DODGE: Partial<Record<TbcClass, number>> = {
   Warrior: 30,
   Paladin: 25,
