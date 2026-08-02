@@ -35,11 +35,17 @@ import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../
 import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { gearSlots } from '../src/domain/gear/gearSlots'
+import { getSignatureAbility } from '../src/domain/abilities'
 import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
   computeAttackerBaseCritChance,
 } from '../src/domain/simulation/attackTable'
+import {
+  OFF_HAND_DAMAGE_PENALTY,
+  averageSwingDamage,
+  computeSpecialDamagePerUse,
+} from '../src/domain/simulation/specialAttacks'
 import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { getGemById } from '../src/domain/gems/sampleGems'
@@ -1106,6 +1112,33 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('a both-weapons special halves its off-hand swing but not its flat bonus', async () => {
+  // Mutilate and Stormstrike strike with each hand, and the engine used to treat the off-hand as a
+  // straight mirror of the main hand. TBC halves the off-hand's weapon damage — including the attack
+  // power folded into the swing window — while leaving the ability's flat bonus intact.
+  const mutilate = getSignatureAbility('Rogue', 'Assassination')
+  expect(mutilate?.scaling.hitsBothWeapons, 'Mutilate must still be flagged as striking both weapons').toBe(true)
+
+  const dagger = getItemById('nathrezim-mindblade')
+  expect(dagger?.weaponDamageMin, 'test needs a catalogued dagger with real weapon damage').toBeTruthy()
+  if (!mutilate || !dagger) return
+
+  const attackPower = 1200
+  const mainHandOnly = computeSpecialDamagePerUse(mutilate, dagger, undefined, attackPower)
+  const bothHands = computeSpecialDamagePerUse(mutilate, dagger, dagger, attackPower)
+  const offHandContribution = bothHands - mainHandOnly
+
+  // Identical weapons in both hands, so an unpenalised off-hand would contribute exactly as much as
+  // the main hand. It must contribute strictly less.
+  expect(offHandContribution).toBeLessThan(mainHandOnly)
+
+  // Specifically: half the swing, plus the whole flat bonus.
+  const flatBonus = mutilate.scaling.flatWeaponDamageBonus ?? 0
+  const swing = averageSwingDamage(dagger, attackPower, mutilate.scaling.normalizedWeaponDamage === true)
+  expect(offHandContribution).toBeCloseTo(swing * OFF_HAND_DAMAGE_PENALTY + flatBonus, 6)
+  expect(mainHandOnly).toBeCloseTo(swing + flatBonus, 6)
 })
 
 test('the incoming attack table is ordered, and avoidance is what pushes crushing blows off it', async () => {

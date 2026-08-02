@@ -50,6 +50,17 @@ export function averageSwingDamage(item: GearItem | undefined, attackPower: numb
   return weaponRoll + (attackPower / AP_PER_DPS) * speed
 }
 
+/**
+ * An off-hand weapon contributes half its swing to a special that strikes with both hands. The
+ * halving covers the weapon roll *and* the attack power folded into the swing window, but **not** any
+ * flat bonus the ability adds — wowsims/tbc computes it as `damage*0.5 + flatBonus`, in that order.
+ *
+ * (wowsims also doubles a *target-specific* AP bonus before halving so it nets out at full value.
+ * That term is a debuff-supplied modifier this project has no equivalent of, so there is nothing to
+ * double here.)
+ */
+export const OFF_HAND_DAMAGE_PENALTY = 0.5
+
 export type SpecialUsageBasis = 'cooldown' | 'energy' | 'unmodelled'
 
 export type SpecialAttackEstimate = {
@@ -110,6 +121,10 @@ export function computeUsageRate(ability: SignatureAbility): { usesPerSecond: nu
  * Abilities flagged `hitsBothWeapons` (Mutilate, Stormstrike) strike once with each hand, and the
  * weapon-damage portion and flat bonus therefore apply per hand. Applying them once would halve those
  * abilities.
+ *
+ * The off-hand strike is not a mirror of the main-hand one: its weapon damage is halved by
+ * `OFF_HAND_DAMAGE_PENALTY`, while its flat bonus is not. Treating the two hands identically
+ * overstated every `hitsBothWeapons` ability.
  */
 export function computeSpecialDamagePerUse(
   ability: SignatureAbility,
@@ -125,10 +140,14 @@ export function computeSpecialDamagePerUse(
   let damage = 0
 
   if (weaponMultiplier > 0 || flatBonus > 0) {
-    const perHand = (weapon: GearItem | undefined) => averageSwingDamage(weapon, attackPower, normalized) * weaponMultiplier + flatBonus
+    const perHand = (weapon: GearItem | undefined, isOffHand: boolean) => {
+      const swing = averageSwingDamage(weapon, attackPower, normalized)
+      const weaponPortion = isOffHand ? swing * OFF_HAND_DAMAGE_PENALTY : swing
+      return weaponPortion * weaponMultiplier + flatBonus
+    }
 
-    damage += perHand(mainHand)
-    if (scaling.hitsBothWeapons && offHand) damage += perHand(offHand)
+    damage += perHand(mainHand, false)
+    if (scaling.hitsBothWeapons && offHand) damage += perHand(offHand, true)
   }
 
   if (scaling.attackPowerCoefficient) damage += attackPower * scaling.attackPowerCoefficient

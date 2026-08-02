@@ -18,7 +18,7 @@ export const rogueSignatureAbilities: readonly SignatureAbility[] = [
       flatWeaponDamageBonus: 101,
       hitsBothWeapons: true,
       coefficientNotes:
-        'Strikes with BOTH weapons: each hand deals its own normalized weapon damage plus 101, so the listed multiplier and flat bonus apply twice per cast. Damage is increased by 50% against a poisoned target, which in practice is always true with Deadly Poison up. Requires daggers.',
+        'Strikes with BOTH weapons, so the listed multiplier and flat bonus apply twice per cast — but the hands are NOT symmetric. The off-hand contributes only half its weapon damage (the standard off-hand penalty, which covers the attack power folded into the swing window as well as the weapon roll), while the flat 101 is added to each hand in full. Damage is increased by 50% against a poisoned target, which in practice is always true with Deadly Poison up. Requires daggers.',
     },
     notes:
       'Mutilate is the 41-point Assassination talent and the spec\'s combo-point builder, awarding 2 points per cast and requiring the rogue to be behind the target. Assassination was not the Phase 1/2 raiding meta — Combat with swords was — so this spec matters more for completeness than for representative raid DPS. The two-weapon structure is the main modeling trap: naively applying `weaponDamageMultiplier` once will halve Mutilate\'s damage. Because the simulator currently models white damage only for physical specs, none of this is consumed yet.',

@@ -38,7 +38,7 @@ export const shamanSignatureAbilities: readonly SignatureAbility[] = [
       normalizedWeaponDamage: false,
       hitsBothWeapons: true,
       coefficientNotes:
-        'Attacks with BOTH weapons for 100% of un-normalized weapon damage each, so the multiplier applies once per hand. No flat bonus and no attack power coefficient of its own.',
+        'Attacks with BOTH weapons for 100% of un-normalized weapon damage, so the multiplier applies once per hand — but the hands are not equal even with identical weapons: the off-hand strike carries the standard off-hand penalty and contributes only half its swing. No flat bonus and no attack power coefficient of its own.',
     },
     notes:
       'Stormstrike has no intrinsic level requirement — it is gated purely by talent points spent in Enhancement, so `requiredLevel` is omitted. It is the Enhancement signature button, but on a 10s cooldown it is a small share of the spec\'s output — Enhancement damage is dominated by Windfury Weapon procs on white swings, with Flametongue on the off-hand and Shamanistic Rage for sustain. It also applies a debuff increasing the target\'s Nature damage taken by 20% for the next 2 Nature hits, which is worth real DPS to Elemental shamans in the group. Because the simulator currently models white damage only for physical specs, these numbers are staged for later use; note that Enhancement is the spec where white damage alone comes closest to being the right answer, provided Windfury is modeled.',
