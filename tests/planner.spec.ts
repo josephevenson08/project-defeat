@@ -149,6 +149,31 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   // gated on class and on actually holding a shield.
   await expect(tankBreakdown).not.toContainText(/cannot parry/i)
   await expect(tankBreakdown).not.toContainText(/no shield equipped/i)
+
+  // Range sanity. The tank model has now been rewritten twice, and the failure mode of a bad
+  // avoidance term is not a missing row — it is a plausible-looking row with an impossible number in
+  // it. These are invariants of the mechanic, not of any particular model, so they should hold
+  // through future changes too.
+  const percentRow = async (label: RegExp) => {
+    const text = await tankBreakdown.locator('div', { hasText: label }).first().innerText()
+    return Number(text.match(/(-?[\d.]+)\s*%?\s*$/)?.[1] ?? 'NaN')
+  }
+
+  const totalAvoidance = await percentRow(/Total avoidance/i)
+  expect(totalAvoidance).toBeGreaterThan(0)
+  // One swing produces one outcome, so avoidance cannot exceed the whole roll.
+  expect(totalAvoidance).toBeLessThanOrEqual(100)
+
+  // Crushing blows are a flat 15% at most, and only what survives the rest of the ordered table.
+  const crushing = await percentRow(/Crushing blows/i)
+  expect(crushing).toBeGreaterThanOrEqual(0)
+  expect(crushing).toBeLessThanOrEqual(15)
+
+  // A swing that lands can crit for 2x, so this can exceed 100% — but not by an order of magnitude,
+  // and it can never be negative.
+  const perSwing = await percentRow(/Damage taken per swing/i)
+  expect(perSwing).toBeGreaterThan(0)
+  expect(perSwing).toBeLessThan(200)
 })
 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {
