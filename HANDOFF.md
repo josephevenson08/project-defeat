@@ -5,10 +5,11 @@
 Verify you're where this describes:
 
 ```bash
-# Expect 3ac33a7 "Model the defender side of the attack table for tanks" at the tip, or one
-# commit below it if this file was updated afterwards. A handoff cannot name its own hash.
-git log --oneline -3
-git status               # expect clean except an untracked Untitled.canvas (user's own file, leave it)
+# A handoff cannot name its own hash, and naming the tip goes stale on the next commit. So check
+# the shape instead: the tip should be one of the commits in the table below, everything should be
+# pushed, and the suite should be green.
+git log --oneline -5
+git status                       # clean except an untracked Untitled.canvas (user's own file, leave it)
 git rev-parse main origin/main   # expect identical — everything is pushed
 ```
 
@@ -111,6 +112,11 @@ Newest first. Every one is verified green and pushed.
 
 | Commit | What |
 |---|---|
+| `0f5ccd5` | Fury and Arms Warrior get a real two-ability rotation (Whirlwind) |
+| `ace8c52` | Off-hand swing halved on both-weapons specials — a live bug, found by research not the audit |
+| `fbd3389` | Recorded where the cost of multi-ability rotations actually sits |
+| `a27d8c8` | Druid dodge ratio marked unreachable until the Feral split |
+| `59708c6` | Tank incoming attacks resolved as one ordered table; crushing blows modelled |
 | `3ac33a7` | Defender-side attack table for tanks; parry rating corrected to the post-2.1 value |
 | `a77bf3c` | Handoff updated with the audit results and the agent-registration gotcha |
 | `976c272` | Tank avoidance finding recorded in the brain; stale roadmap prose corrected |
