@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/specialAttacks.ts
-lines: 174
+lines: 206
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.specialAttacks
 
-`src/domain/simulation/specialAttacks.ts` · **domain** layer · 174 lines
+`src/domain/simulation/specialAttacks.ts` · **domain** layer · 206 lines
 
 From the top of the file:
 
@@ -19,11 +19,11 @@ From the top of the file:
 
 ## Exports
 
-**function** — `averageSwingDamage`, `computeSpecialDamagePerUse`, `computeUsageRate`, `estimateSpecialAttack`, `normalizedSpeedForWeapon`
+**function** — `averageSwingDamage`, `computeSpecialDamagePerUse`, `computeUsageRate`, `estimateSpecialAttack`, `normalizedSpeedForWeapon`, `usesCatFormWeapon`
 
-**const** — `ENERGY_PER_SECOND`, `NORMALIZED_SPEEDS`, `OFF_HAND_DAMAGE_PENALTY`
+**const** — `CAT_FORM_WEAPON`, `ENERGY_PER_SECOND`, `NORMALIZED_SPEEDS`, `OFF_HAND_DAMAGE_PENALTY`
 
-**type** — `SpecialAttackEstimate`, `SpecialUsageBasis`
+**type** — `SpecialAttackEstimate`, `SpecialUsageBasis`, `WeaponDamageProfile`
 
 ## Imports
 

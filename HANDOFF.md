@@ -45,7 +45,7 @@ The repo carries its own conventions, and they encode mistakes this project has 
 npx tsc -b                        # clean
 npm run lint                      # exit 0
 npm run build
-npx playwright test --reporter=line   # 53 passing. Use --reporter=line, not the default.
+npx playwright test --reporter=line   # 54 passing. Use --reporter=line, not the default.
 npm run brain                     # "all wikilinks resolve"
 npm run brain                     # "0 written" — idempotent; this repo is in OneDrive, churn matters
 ```
@@ -185,15 +185,20 @@ budget). It's there because the first modellable rage or energy filler would hit
   engine gap: a physical spec with a computable non-physical rotational ability has nowhere to go.**
   Everything else Ret presses is genuinely out of scope — the Seals are passive auras that proc on
   auto-attacks rather than buttons, and Exorcism only works on Undead and Demons.
-- **Feral Druid — this one is a live bug, not just a gap.** Cat form doesn't use the equipped
-  weapon's damage at all. TBC substitutes a fixed synthetic "paw" weapon (43.5-66.5 at 1.0s) and every
-  cat ability reads that; the equipped weapon only contributes a flat Feral Attack Power conversion
-  from its DPS. `averageSwingDamage` reads the equipped item's dice directly, so **Shred is already
-  being mismodelled today**. Mangle (Cat) and Rake are both sourced and computable and were held back
-  on purpose: adding them on top of a wrong weapon model multiplies the error. Fix the paw weapon
-  first — but note the DPS-to-FeralAP conversion constant could not be verified in the wowsims source,
-  and modelling the paw *without* it would make every weapon equivalent for Feral, which breaks the
-  upgrade finder for that spec. That trade-off needs a decision, not just an edit.
+- **Feral Druid — was a live bug, now fixed.** Cat form doesn't use the equipped weapon's damage at
+  all; TBC substitutes a fixed internal weapon (43.5-66.5 at 1.0s) that every cat ability reads.
+  `averageSwingDamage` was reading the equipped item's dice, so Feral damage scaled off a staff the
+  form never swings — in both the white and the special paths. Now modelled via `CAT_FORM_WEAPON`.
+
+  The thing that made this look like a hard decision turned out to be a false premise: Feral Attack
+  Power is **an explicit item stat** added 1:1 into attack power, not a derived DPS conversion, so
+  there was no unverifiable constant to agonise over. **The remaining gap is item data, not the
+  model** — no item in the catalog records Feral Attack Power, so Feral weapon comparisons
+  under-differentiate. Adding that stat is the single highest-value thing for Feral accuracy.
+
+  Mangle (Cat) (45 energy, 160% weapon damage + 264) and Rake (spell 27003, 40 energy, 78 + 0.01xAP
+  plus a 9s bleed) are both sourced and computable, and are now the obvious next additions — the
+  weapon model underneath them is finally correct.
 
 Rip, Ferocious Bite, Heroic Strike, Slam and Execute are all correctly excluded and should stay that
 way until rage/combo-point income is simulated. Rampage and Tiger's Fury are pure self-buffs with no

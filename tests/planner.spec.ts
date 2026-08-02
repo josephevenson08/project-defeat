@@ -1151,6 +1151,24 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
 })
 
+test('a feral druid swings cat form\'s own weapon, not the equipped one', async ({ page }) => {
+  await page.goto('/')
+  // Night Elf first — Druid isn't offered to the default race, so the class list wouldn't contain it.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
+  await page.getByLabel('Class').selectOption('Druid')
+  await page.getByLabel('Specialization').selectOption('Feral')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+
+  // TBC substitutes a fixed internal weapon in cat form — 43.5-66.5 damage on a 1.0s swing, so 55
+  // weapon DPS — and every cat ability reads that rather than the equipped item. Reading the equipped
+  // weapon's dice meant a Feral druid's damage scaled off a staff the form never actually swings.
+  const breakdown = page.locator('.breakdown-list')
+  const weaponDamage = Number(
+    (await breakdown.locator('div', { hasText: /Weapon damage/i }).first().innerText()).match(/[\d.]+$/)?.[0] ?? '0',
+  )
+  expect(weaponDamage).toBeCloseTo(55, 1)
+})
+
 test('a both-weapons special halves its off-hand swing but not its flat bonus', async () => {
   // Mutilate and Stormstrike strike with each hand, and the engine used to treat the off-hand as a
   // straight mirror of the main hand. TBC halves the off-hand's weapon damage — including the attack

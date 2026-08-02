@@ -22,6 +22,38 @@ export const NORMALIZED_SPEEDS = {
 } as const
 
 /**
+ * Everything the damage formulas actually read off a weapon. Narrower than `GearItem` so a form's
+ * substituted weapon can be expressed without inventing a catalog entry for it; a real `GearItem`
+ * satisfies this structurally.
+ */
+export type WeaponDamageProfile = Pick<GearItem, 'weaponType' | 'weaponSpeed' | 'weaponDamageMin' | 'weaponDamageMax'>
+
+/**
+ * Cat form does not swing the equipped weapon. TBC substitutes a fixed internal weapon and every cat
+ * ability reads that instead, so a Feral druid's damage is completely independent of the equipped
+ * weapon's damage dice and speed.
+ *
+ * Values are the ones wowsims/tbc hands `EnableAutoAttacks` in `sim/druid/feral/feral.go`:
+ * 43.5-66.5 damage on a 1.0s swing.
+ *
+ * The equipped weapon still matters, but only as a stat stick — its Agility, Strength and especially
+ * its **Feral Attack Power**, which TBC puts on druid weapons as an explicit item stat and which adds
+ * 1:1 into attack power. This project's catalog does not record Feral Attack Power yet, so Feral
+ * weapon comparisons currently under-differentiate. That is a gap in the item data, not in this model.
+ */
+export const CAT_FORM_WEAPON: WeaponDamageProfile = {
+  weaponType: undefined,
+  weaponSpeed: 1,
+  weaponDamageMin: 43.5,
+  weaponDamageMax: 66.5,
+}
+
+/** Feral is modelled as cat DPS, and cat form swings `CAT_FORM_WEAPON` rather than the equipped item. */
+export function usesCatFormWeapon(className: string, spec: string) {
+  return className === 'Druid' && spec === 'Feral'
+}
+
+/**
  * `GearItem` records a weapon's type and speed but not its handedness, and one-handed and two-handed
  * swords/axes/maces share a `weaponType`. Speed is the available proxy: TBC one-handers sit at or
  * below ~2.8 and two-handers at or above ~3.0. Polearms and staves are always two-handed.
@@ -29,7 +61,7 @@ export const NORMALIZED_SPEEDS = {
  * This is an approximation and it only affects the AP portion of a normalized special, so an
  * occasional misclassification shifts that ability's damage by a few percent rather than breaking it.
  */
-export function normalizedSpeedForWeapon(item: GearItem): number {
+export function normalizedSpeedForWeapon(item: WeaponDamageProfile): number {
   if (item.weaponType === 'Dagger') return NORMALIZED_SPEEDS.dagger
   if (item.weaponType === 'Bow' || item.weaponType === 'Gun' || item.weaponType === 'Crossbow') return NORMALIZED_SPEEDS.ranged
   if (item.weaponType === 'Polearm' || item.weaponType === 'Staff') return NORMALIZED_SPEEDS.twoHand
@@ -42,7 +74,7 @@ export function normalizedSpeedForWeapon(item: GearItem): number {
  * A swing is the weapon's own damage roll plus the attack power contribution over the swing window —
  * normalized specials value that window at the weapon class's fixed speed instead of the real one.
  */
-export function averageSwingDamage(item: GearItem | undefined, attackPower: number, normalized: boolean): number {
+export function averageSwingDamage(item: WeaponDamageProfile | undefined, attackPower: number, normalized: boolean): number {
   if (!item?.weaponDamageMin || !item.weaponDamageMax || !item.weaponSpeed) return 0
 
   const weaponRoll = (item.weaponDamageMin + item.weaponDamageMax) / 2
@@ -128,8 +160,8 @@ export function computeUsageRate(ability: SignatureAbility): { usesPerSecond: nu
  */
 export function computeSpecialDamagePerUse(
   ability: SignatureAbility,
-  mainHand: GearItem | undefined,
-  offHand: GearItem | undefined,
+  mainHand: WeaponDamageProfile | undefined,
+  offHand: WeaponDamageProfile | undefined,
   attackPower: number,
 ): number {
   const { scaling } = ability
@@ -140,7 +172,7 @@ export function computeSpecialDamagePerUse(
   let damage = 0
 
   if (weaponMultiplier > 0 || flatBonus > 0) {
-    const perHand = (weapon: GearItem | undefined, isOffHand: boolean) => {
+    const perHand = (weapon: WeaponDamageProfile | undefined, isOffHand: boolean) => {
       const swing = averageSwingDamage(weapon, attackPower, normalized)
       const weaponPortion = isOffHand ? swing * OFF_HAND_DAMAGE_PENALTY : swing
       return weaponPortion * weaponMultiplier + flatBonus
@@ -159,8 +191,8 @@ export function computeSpecialDamagePerUse(
 
 export function estimateSpecialAttack(
   ability: SignatureAbility,
-  mainHand: GearItem | undefined,
-  offHand: GearItem | undefined,
+  mainHand: WeaponDamageProfile | undefined,
+  offHand: WeaponDamageProfile | undefined,
   attackPower: number,
 ): SpecialAttackEstimate {
   const { usesPerSecond, basis, explanation } = computeUsageRate(ability)

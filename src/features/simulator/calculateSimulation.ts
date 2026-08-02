@@ -11,7 +11,7 @@ import {
   computeGlanceDamageRange,
   computeSkillDiff,
 } from '../../domain/simulation/attackTable'
-import { computeUsageRate, estimateSpecialAttack } from '../../domain/simulation/specialAttacks'
+import { CAT_FORM_WEAPON, computeUsageRate, estimateSpecialAttack, usesCatFormWeapon } from '../../domain/simulation/specialAttacks'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
   CRUSHING_BLOW_CHANCE,
@@ -204,8 +204,14 @@ function resolveRotation(
   let gcdBudget = 1 / (abilities[0]?.gcdSeconds || 1.5)
   let gcdLimited = false
 
+  // Cat form swings its own internal weapon, so a Feral druid's specials must not read the equipped
+  // item's damage dice — and it has no off-hand to strike with.
+  const catForm = usesCatFormWeapon(character.className, character.spec)
+  const mainHandProfile = catForm ? CAT_FORM_WEAPON : gear['Main Hand']?.item
+  const offHandProfile = catForm ? undefined : gear['Off Hand']?.item
+
   for (const ability of abilities) {
-    const estimate = estimateSpecialAttack(ability, gear['Main Hand']?.item, gear['Off Hand']?.item, stats.attackPower)
+    const estimate = estimateSpecialAttack(ability, mainHandProfile, offHandProfile, stats.attackPower)
 
     if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) {
       excluded.push({ name: ability.name, explanation: estimate.explanation })
@@ -272,9 +278,13 @@ function calculatePhysicalDps(
       { label: 'Armor mitigation', value: toPercent(armorMitigation) },
     ]
   } else {
-    const mainHandItem = gear['Main Hand']?.item
-    const offHandItem = gear['Off Hand']?.item
-    const dualWield = isDualWield(gear)
+    // Cat form replaces the equipped weapon entirely for white damage too, and cannot dual wield.
+    // Without this a Feral druid's auto attacks scale off a staff's damage dice that the form never
+    // swings; the equipped weapon's real contribution is its stats, not its weapon damage.
+    const catForm = usesCatFormWeapon(character.className, character.spec)
+    const mainHandItem = catForm ? CAT_FORM_WEAPON : gear['Main Hand']?.item
+    const offHandItem = catForm ? undefined : gear['Off Hand']?.item
+    const dualWield = catForm ? false : isDualWield(gear)
     const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
     const fullTable = buildWhiteAttackTable({ skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance })
     const glanceRange = computeGlanceDamageRange(skillDiff)

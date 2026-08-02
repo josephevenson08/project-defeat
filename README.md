@@ -117,6 +117,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   which press Whirlwind alongside their signature button against a shared global-cooldown budget.
   Every other spec still models a single ability, so melee specs remain understated by differing
   amounts.
+- Feral Druid is modelled in cat form, which in TBC swings a fixed internal weapon rather than the
+  equipped one — so weapon damage and speed genuinely don't matter for Feral. What does matter is
+  Feral Attack Power, an explicit stat TBC puts on druid weapons, and **no item in this catalog
+  records it yet**. Feral weapon comparisons therefore under-differentiate: swapping weapons moves
+  only the Agility and Strength on them.
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
