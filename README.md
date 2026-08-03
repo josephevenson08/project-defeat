@@ -135,7 +135,12 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   so this is the common case rather than a corner one — the Upgrade Finder now marks every row whose
   delta rests on estimated data, and marks the sourced-versus-estimated rows specifically, since those
   read high in a predictable direction.
-- Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims reconciliation is still pending (items are flagged `needsVerification` where stats are approximate).
+- Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims
+  reconciliation is still pending. Put concretely: **163 of the 166 items still carrying
+  `needsVerification` appear in a BiS list**, so the recommendations are overwhelmingly built on
+  stat-budget estimates rather than confirmed tooltips. The item *choices* come from community guides
+  and are broadly right; it is the stat numbers behind them, and therefore the sizes of the gaps
+  between options, that are not yet audited.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talent trees, so no talent scaling anywhere in the simulation.
