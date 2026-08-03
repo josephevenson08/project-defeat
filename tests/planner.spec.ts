@@ -130,7 +130,9 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Specialization').selectOption('Protection')
   await expect(page.getByText('Tank', { exact: true })).toBeVisible()
   await page.getByLabel('Chest', { exact: true }).selectOption('Bulwark Chestguard')
-  await page.getByLabel('Off Hand', { exact: true }).selectOption('Shield of Rehearsal')
+    // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
+  // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
+  await page.getByLabel('Off Hand', { exact: true }).selectOption('Aldori Legacy Defender')
   await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
