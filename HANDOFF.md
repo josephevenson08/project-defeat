@@ -263,22 +263,30 @@ A first sourcing pass corrected 7 caster/healer weapons against real tooltips, d
 from 214 to 207. The largest error found: `lightfathom-scepter` carried 95 healing power against a
 real **443**.
 
-**10 more items are already researched — do not re-research them.** Full reports with URLs are in the
-session scratchpad (`caster-weapons.md`, `healer-weapons.md`). They were not applied because each
-needs a *modelling* decision rather than a value:
+A second pass then resolved 8 of the 10 items that needed modelling decisions, taking the count to
+**203**. Two techniques worth reusing:
 
-- **School-restricted spell power** — `flametongue-seal` (49 fire-only), `orb-of-the-soul-eater`
-  (51 shadow-only), `sapphirons-wing-bone` (51 frost-only), `totem-of-the-void` (55, but only for
-  Chain Lightning and Lightning Bolt). `StatBlock` has one flat `spellPower`, so writing these in
-  would overstate them for any caster of the wrong school. The values are sourced and correct; the
-  schema can't express the restriction.
-- **Relics that aren't stat sticks at all** — `idol-of-the-emerald-queen`, `blessed-book-of-nagrand`,
-  `totem-of-healing-rains`, `idol-of-the-raven-goddess`. All confirmed to have **zero stats**; each
-  grants a spell-specific effect (e.g. Lifebloom periodic healing +88) or a party aura. The catalog
-  currently models them as flat healing/spell power, which is a category error rather than an
-  imprecise number.
-- **Two wands** — `eredar-wand-of-obliteration`, `wand-of-the-forgotten-star`. Real items whose damage
-  is understated roughly threefold, but the reports gave damage without a complete stat block.
+- **School-restricted spell power solved by spec-gating.** `flametongue-seal` (49 fire-only),
+  `orb-of-the-soul-eater` (51 shadow-only), `sapphirons-wing-bone` (51 frost-only) and
+  `totem-of-the-void` (55, Chain Lightning and Lightning Bolt only) all carry spell power a single
+  flat `spellPower` field cannot express. Rather than add a schema field, each is gated with
+  `allowedClasses` / `allowedSpecs` to the specs whose **modelled ability is actually that school** —
+  checked against the ability data, not assumed: Fire Mage casts Fireball, Destruction casts
+  Incinerate (Fire, not Shadow), Affliction and Demonology are both Shadow, Elemental casts Lightning
+  Bolt. For every spec that can now see the item the flat value is exactly right, so these are
+  unflagged. Reuse this before adding per-school stat fields.
+- **Relics zeroed rather than approximated.** `idol-of-the-emerald-queen`,
+  `blessed-book-of-nagrand`, `totem-of-healing-rains` and `idol-of-the-raven-goddess` have **no stats
+  at all** — each grants a spell-specific effect (Lifebloom +88 periodic, Flash of Light +79, Chain
+  Heal +87) or a party aura. Modelling those as flat healing power credited the bonus to every spell
+  cast, a category error rather than a bad number. Their stats are now `{}`, so they contribute
+  nothing instead of contributing something wrong. **Their flag now means "the schema can't express
+  this", not "the value is unverified"** — the notes say so on each.
+
+**Still waiting, and already researched — do not re-research:** `eredar-wand-of-obliteration` and
+`wand-of-the-forgotten-star`. Both are real (their "fictional placeholder" notes are wrong) and their
+wand damage is understated roughly threefold, but the reports gave damage without a complete stat
+block. Full reports with URLs are in the session scratchpad (`caster-weapons.md`, `healer-weapons.md`).
 
 Also worth knowing: `sapphirons-wing-bone` is **not** a Naxxramas-era item as its name suggests — it's
 a legitimate TBC Phase 1 G'eras vendor off-hand. And three items carried a "fictional placeholder
