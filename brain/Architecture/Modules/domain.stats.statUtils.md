@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/stats/statUtils.ts
-lines: 28
+lines: 43
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.stats.statUtils
 
-`src/domain/stats/statUtils.ts` · **domain** layer · 28 lines
+`src/domain/stats/statUtils.ts` · **domain** layer · 43 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `addStats`, `applyStatMultipliers`, `createEmptyStats`
+**function** — `addStats`, `applyStatMultipliers`, `createEmptyStats`, `scaleStats`
 
 ## Imports
 

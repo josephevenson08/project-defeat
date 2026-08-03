@@ -170,7 +170,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.serpentshrineCavernBosses]] · 1 importers
 - [[domain.raids.tempestKeepBosses]] · 1 importers
 - [[domain.simulation.attackTable]] · 1 importers
-- [[domain.simulation.combatConstants]] · 5 importers
+- [[domain.simulation.combatConstants]] · 6 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
 - [[domain.simulation.encounterTypes]] · 7 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers

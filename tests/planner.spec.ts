@@ -36,6 +36,7 @@ import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getSignatureAbility } from '../src/domain/abilities'
+import { effectUptime } from '../src/domain/simulation/combatConstants'
 import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
@@ -1166,6 +1167,38 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('item procs and on-use effects contribute at their average uptime', async () => {
+  // An on-use is pressed the moment it is available, so uptime is duration over cooldown. Icon of
+  // the Silver Crescent is 20s on a 2 minute cooldown — a sixth of the fight.
+  expect(effectUptime(20, 120)).toBeCloseTo(1 / 6, 10)
+
+  // A proc's internal cooldown starts when it FIRES and runs concurrently with the buff, so the
+  // denominator is the cooldown alone, not cooldown plus duration. Sextant of Unstable Currents is
+  // 15s against a 45s internal cooldown — a third of the fight, not a quarter.
+  expect(effectUptime(15, 45)).toBeCloseTo(1 / 3, 10)
+
+  // An effect that outlasts its own cooldown is simply always up, and can never exceed that. This
+  // case is the one that caught the original formula: it had procs asymptotically approaching full
+  // uptime but never reaching it, which is wrong once the cooldown runs concurrently with the buff.
+  expect(effectUptime(30, 20)).toBe(1)
+  expect(effectUptime(60, 10)).toBe(1)
+
+  // No duration means nothing to average — this is how effects that cannot be expressed as a stat
+  // bonus at all are recorded without silently contributing.
+  expect(effectUptime(0, 45)).toBe(0)
+
+  // The catalog's trinkets must actually carry these, or the model is wired to nothing. Every
+  // trinket audited turned out to be effect-driven, so this is the item class that depends on it.
+  const sextant = getItemById('sextant-of-unstable-currents')
+  expect(sextant?.effect?.kind).toBe('proc')
+  expect(sextant?.effect?.statBonus.spellPower).toBe(190)
+
+  // And an effect with no stat bonus must say why, rather than looking like an oversight.
+  const capacitor = getItemById('the-lightning-capacitor')
+  expect(capacitor?.effect?.notModelled, 'a non-stat effect must explain itself').toBeTruthy()
+  expect(Object.keys(capacitor?.effect?.statBonus ?? {})).toHaveLength(0)
 })
 
 test('a feral druid swings cat form\'s own weapon, not the equipped one', async ({ page }) => {

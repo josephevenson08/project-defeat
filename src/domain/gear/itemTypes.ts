@@ -63,12 +63,46 @@ export type CraftingInfo = {
   notes?: string
 }
 
+/**
+ * A trinket or weapon effect granting stats temporarily rather than permanently.
+ *
+ * Recording these matters more than it looks: an audit of all 14 catalogued trinkets found that
+ * **not one is a pure stat stick** — every one carries a proc or an on-use, and two have no flat
+ * stats at all. A model reading only `stats` prices that entire item class at close to zero.
+ *
+ * `kind` decides how uptime is derived, and the two are not equally trustworthy:
+ *
+ * - `onUse` — pressed on cooldown, so uptime is exactly `duration / cooldown`. This is the same
+ *   assumption the ability model already makes for cooldown abilities, and is as solid as that one.
+ * - `proc` — fires from combat, so true uptime depends on how often the trigger happens. Uptime is
+ *   approximated as `duration / (duration + cooldownSeconds)`, i.e. assuming the trigger comes often
+ *   enough to re-proc the moment the internal cooldown expires. That is an **optimistic bound**:
+ *   close for a raid boss fight where casts and swings are near-constant, too generous for anything
+ *   slower.
+ */
+export type ItemEffect = {
+  kind: 'proc' | 'onUse'
+  /** Stats granted while active, at full value. Averaged by uptime before being applied. */
+  statBonus: Partial<StatBlock>
+  durationSeconds: number
+  /** Use cooldown for `onUse`; internal cooldown for `proc`. */
+  cooldownSeconds: number
+  /** Proc chance where the tooltip gives one. Recorded for provenance — the uptime approximation does not read it. */
+  chancePercent?: number
+  /** What sets it off ("on spell crit", "on special attack"). Procs vary a lot here, and it is the main reason the approximation can be wrong. */
+  trigger?: string
+  /** For effects whose value is not a stat bonus at all — a damage proc, a mana return, a heal. Set this and leave `statBonus` empty. */
+  notModelled?: string
+}
+
 export type GearItem = {
   id: string
   wowItemId?: number
   name: string
   slot: GearSlot
   quality: ItemQuality
+  /** A temporary-stat proc or on-use effect. See `ItemEffect` — trinkets are effect-driven almost without exception. */
+  effect?: ItemEffect
   source: ItemSource
   phase?: number
   requiredLevel?: number

@@ -56,6 +56,37 @@ export const CRUSHING_BLOW_LEVEL_GAP = 3
 /** TBC converts one point of Stamina into 10 health. */
 export const HEALTH_PER_STAMINA = 10
 
+/**
+ * Average uptime of a temporary item effect, as a fraction of the fight: `duration / cooldown`,
+ * capped at 1.
+ *
+ * The same formula covers both kinds, because both cooldowns start at the same moment the effect
+ * does and run **concurrently with it**. A proc's internal cooldown begins when the proc fires, not
+ * when the buff falls off — so an effect lasting at least as long as its own cooldown is simply
+ * always up, and one lasting less is up for `duration / cooldown` of the time.
+ *
+ * (An earlier version of this used `duration / (duration + internalCooldown)` for procs, which
+ * assumed the cooldown started *after* the buff expired. That is not how internal cooldowns work,
+ * and it understated every proc. A test asserting a long-duration proc reaches full uptime is what
+ * caught it.)
+ *
+ * `kind` is deliberately NOT a parameter here — it does not change the arithmetic. It stays on
+ * `ItemEffect` because it changes how far to trust the result:
+ *
+ * - `onUse` is under the player's control and pressed on cooldown, so this is as exact as the
+ *   "used on cooldown" assumption the ability model already makes.
+ * - `proc` is an **upper bound**. It assumes the trigger is available the instant the internal
+ *   cooldown expires, which a raid fight of near-continuous casts and swings approaches but never
+ *   quite reaches. A narrow trigger makes it read high: a proc gated on spell *crits* has to wait
+ *   for a crit, and this does not model crit chance.
+ */
+export function effectUptime(durationSeconds: number, cooldownSeconds: number) {
+  if (durationSeconds <= 0) return 0
+  if (cooldownSeconds <= 0) return 1
+
+  return Math.min(1, durationSeconds / cooldownSeconds)
+}
+
 /** Rating needed for one point of Expertise Skill (not directly a percent). Community math, not from the official blue post, but consistent across independent sources. */
 export const EXPERTISE_RATING_PER_SKILL_POINT = 3.9423
 

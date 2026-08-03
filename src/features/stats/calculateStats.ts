@@ -6,7 +6,8 @@ import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import { getConsumableById } from '../../domain/consumables/sampleConsumables'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { getGemById } from '../../domain/gems/sampleGems'
-import { addStats, applyStatMultipliers } from '../../domain/stats/statUtils'
+import { effectUptime } from '../../domain/simulation/combatConstants'
+import { addStats, applyStatMultipliers, scaleStats } from '../../domain/stats/statUtils'
 import type { SocketColor } from '../../domain/gear/itemTypes'
 import { type StatBlock } from './statsTypes'
 
@@ -38,6 +39,15 @@ export function calculateStats(
 
   Object.values(gear).forEach((slot) => {
     total = addStats(total, slot.item.stats)
+
+    // A proc or on-use contributes its stats only while active, so it is folded in at its average
+    // uptime rather than at face value. Without this, trinkets price at nearly zero — an audit of
+    // every catalogued trinket found not one is a pure stat stick, and two have no flat stats at all.
+    const effect = slot.item.effect
+    if (effect) {
+      const uptime = effectUptime(effect.durationSeconds, effect.cooldownSeconds)
+      total = addStats(total, scaleStats(effect.statBonus, uptime))
+    }
 
     slot.gemIds.forEach((gemId) => {
       const gem = getGemById(gemId)

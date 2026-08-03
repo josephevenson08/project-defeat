@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/combatConstants.ts
-lines: 97
+lines: 128
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.combatConstants
 
-`src/domain/simulation/combatConstants.ts` · **domain** layer · 97 lines
+`src/domain/simulation/combatConstants.ts` · **domain** layer · 128 lines
 
 From the top of the file:
 
@@ -21,7 +21,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `armorMitigationConstant`, `ratingToFraction`
+**function** — `armorMitigationConstant`, `effectUptime`, `ratingToFraction`
 
 **const** — `AP_PER_DPS`, `ARMOR_MITIGATION_CAP`, `AVOIDANCE_PER_DEFENSE_SKILL_POINT`, `CRUSHING_BLOW_CHANCE`, `CRUSHING_BLOW_DAMAGE_MULTIPLIER`, `CRUSHING_BLOW_LEVEL_GAP`, `DEFENSE_RATING_PER_SKILL_POINT`, `DOT_COEFFICIENT_BASE_DURATION`, `EXPERTISE_PERCENT_PER_SKILL_POINT`, `EXPERTISE_RATING_PER_SKILL_POINT`, `HEALTH_PER_STAMINA`, `MELEE_CRIT_DAMAGE_MULTIPLIER`, `PLAYER_LEVEL_70_SKILL`, `RATING_PER_PERCENT`, `SPELL_COEFFICIENT_BASE_CAST_TIME`, `SPELL_COEFFICIENT_INSTANT_BASELINE`, `SPELL_CRIT_DAMAGE_MULTIPLIER`
 
@@ -36,6 +36,7 @@ _None._
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 

@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/gear/itemTypes.ts
-lines: 110
+lines: 144
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemTypes
 
-`src/domain/gear/itemTypes.ts` · **domain** layer · 110 lines
+`src/domain/gear/itemTypes.ts` · **domain** layer · 144 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**type** — `ArmorType`, `BuildRole`, `CraftingInfo`, `CraftingMaterial`, `EquippedGear`, `EquippedSlot`, `GearItem`, `ItemQuality`, `ItemSource`, `SocketColor`, `WeaponType`
+**type** — `ArmorType`, `BuildRole`, `CraftingInfo`, `CraftingMaterial`, `EquippedGear`, `EquippedSlot`, `GearItem`, `ItemEffect`, `ItemQuality`, `ItemSource`, `SocketColor`, `WeaponType`
 
 ## Imports
 
