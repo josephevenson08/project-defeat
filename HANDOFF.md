@@ -1,6 +1,7 @@
 # Project Defeat — session handoff
 
-**Point-in-time snapshot.** Written 2026-08-01. If `git log` disagrees with anything below, trust git.
+**Point-in-time snapshot.** Written 2026-08-01, substantially rewritten 2026-08-03 — most of what
+follows postdates the original. If `git log` disagrees with anything below, trust git.
 
 Verify you're where this describes:
 
