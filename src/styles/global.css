@@ -1499,3 +1499,37 @@ input[type='text']:focus {
 .upgrade-data-note-estimated {
   color: #94a3b8;
 }
+
+.set-bonus-list {
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  margin-top: 16px;
+  padding-top: 12px;
+}
+
+.set-bonus-list h4 {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+}
+
+.set-bonus-entry {
+  margin-top: 10px;
+}
+
+.set-bonus-name {
+  color: #f8fafc;
+  display: block;
+  font-weight: 600;
+}
+
+.set-bonus-active {
+  color: #fbbf24;
+  display: block;
+  margin-top: 3px;
+}
+
+.set-bonus-inactive {
+  color: #64748b;
+  display: block;
+  margin-top: 3px;
+}

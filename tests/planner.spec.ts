@@ -1171,6 +1171,30 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
 })
 
+test('equipped tier pieces surface their set bonuses, and say they are not scored', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel('Class').selectOption('Warrior')
+  await page.getByLabel('Specialization').selectOption('Fury')
+
+  // Two pieces of the same set, which is the most a player can currently assemble — only Head and
+  // Chest of each Tier 5 set are catalogued so far, so the 4-piece bonus is unreachable by design.
+  await page.getByLabel('Head', { exact: true }).selectOption('Destroyer Battle-Helm')
+  await page.getByLabel('Chest', { exact: true }).selectOption('Destroyer Breastplate')
+
+  const sets = page.getByTestId('set-bonuses')
+  await expect(sets).toBeVisible()
+  await expect(sets).toContainText('Destroyer Battlegear (2/5)')
+
+  // The 2-piece is met and must be shown as active; the 4-piece is not and must not claim to be.
+  await expect(sets.locator('.set-bonus-active')).toContainText(/Overpower/)
+  await expect(sets.locator('.set-bonus-inactive')).toContainText(/5 less rage/)
+
+  // The whole point of showing these is that the score does NOT include them. If that caveat ever
+  // disappears, the panel starts implying tier pieces are being valued when they are not.
+  await expect(sets).toContainText(/None of these bonuses are applied to the score/i)
+  await expect(sets).toContainText(/undervalues tier pieces/i)
+})
+
 test('item procs and on-use effects contribute at their average uptime', async () => {
   // An on-use is pressed the moment it is available, so uptime is duration over cooldown. Icon of
   // the Silver Crescent is 20s on a 2 minute cooldown — a sixth of the fight.

@@ -74,11 +74,11 @@ export type CraftingInfo = {
  *
  * - `onUse` — pressed on cooldown, so uptime is exactly `duration / cooldown`. This is the same
  *   assumption the ability model already makes for cooldown abilities, and is as solid as that one.
- * - `proc` — fires from combat, so true uptime depends on how often the trigger happens. Uptime is
- *   approximated as `duration / (duration + cooldownSeconds)`, i.e. assuming the trigger comes often
- *   enough to re-proc the moment the internal cooldown expires. That is an **optimistic bound**:
- *   close for a raid boss fight where casts and swings are near-constant, too generous for anything
- *   slower.
+ * - `proc` — fires from combat, so true uptime depends on how often the trigger happens. An internal
+ *   cooldown starts when the proc FIRES and runs concurrently with the buff, so uptime is the same
+ *   `duration / cooldown`. That is an **optimistic bound**: it assumes the trigger is ready the
+ *   instant the cooldown expires, which a raid fight of near-continuous casts and swings approaches
+ *   but never reaches, and a proc gated on spell crits has to wait for a crit this does not model.
  */
 export type ItemEffect = {
   kind: 'proc' | 'onUse'
@@ -120,6 +120,8 @@ export type GearItem = {
   weaponDamageMax?: number
   sockets?: SocketColor[]
   socketBonus?: Partial<StatBlock>
+  /** Tier set this piece belongs to, keyed to `sampleItemSets`. Set bonuses are recorded and surfaced but not yet applied — see `ItemSet`. */
+  setId?: string
   allowedClasses?: TbcClass[]
   allowedSpecs?: TbcSpec[]
   roles?: BuildRole[]

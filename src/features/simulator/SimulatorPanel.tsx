@@ -3,16 +3,19 @@ import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
+import type { ActiveSet } from '../../domain/gear/itemSets'
 import { animateResultCard } from '../../lib/animations'
 import type { SimulationResult } from './simulationTypes'
 
 type SimulatorPanelProps = {
   result: SimulationResult | undefined
   role: CharacterRole
+  /** Sets the equipped gear has pieces of. Surfaced because none of their bonuses are applied to the score. */
+  activeSets: readonly ActiveSet[]
   onRun: () => void
 }
 
-export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
+export function SimulatorPanel({ result, role, activeSets, onRun }: SimulatorPanelProps) {
   useEffect(() => {
     if (result) animateResultCard('.simulation-result')
   }, [result])
@@ -41,6 +44,34 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
         </div>
       ) : (
         <div className="simulation-empty">No run yet. Configure a character and start a simulation.</div>
+      )}
+
+      {activeSets.length > 0 && (
+        <div className="set-bonus-list" data-testid="set-bonuses">
+          <h4>Tier set pieces equipped</h4>
+          <p className="panel-copy">
+            None of these bonuses are applied to the score above. Almost every TBC set bonus attaches to a named
+            ability, a resource cost, or the party rather than to stats, so folding them in as a stat total would
+            invent value rather than estimate it. They are listed so the gap is visible: any ranking built from
+            itemised stats alone <strong>undervalues tier pieces</strong>.
+          </p>
+          {activeSets.map(({ set, equippedPieces, activeBonuses }) => (
+            <div className="set-bonus-entry" key={set.id}>
+              <span className="set-bonus-name">
+                {set.name} ({equippedPieces}/{set.totalPieces})
+              </span>
+              {set.bonuses.map((bonus) => {
+                const live = activeBonuses.includes(bonus)
+                return (
+                  <small className={live ? 'set-bonus-active' : 'set-bonus-inactive'} key={bonus.pieces}>
+                    ({bonus.pieces}) {bonus.description}
+                    {live ? ' — active, not modelled' : ''}
+                  </small>
+                )
+              })}
+            </div>
+          ))}
+        </div>
       )}
     </Panel>
   )

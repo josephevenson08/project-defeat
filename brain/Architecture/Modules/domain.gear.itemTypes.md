@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/itemTypes.ts
-lines: 144
+lines: 146
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemTypes
 
-`src/domain/gear/itemTypes.ts` · **domain** layer · 144 lines
+`src/domain/gear/itemTypes.ts` · **domain** layer · 146 lines
 
 _No doc comment at the top of this file._
 
@@ -35,6 +35,7 @@ _No doc comment at the top of this file._
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
+- [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`

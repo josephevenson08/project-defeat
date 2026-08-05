@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/SimulatorPanel.tsx
-lines: 48
+lines: 79
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.SimulatorPanel
 
-`src/features/simulator/SimulatorPanel.tsx` · **features** layer · 48 lines
+`src/features/simulator/SimulatorPanel.tsx` · **features** layer · 79 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 - [[components.ui.Button]] — `src/components/ui/Button.tsx`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
+- [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[features.simulator.simulationTypes]] — `src/features/simulator/simulationTypes.ts`
 - [[lib.animations]] — `src/lib/animations.ts`
 

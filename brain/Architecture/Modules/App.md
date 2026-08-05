@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 180
+lines: 185
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 180 lines
+`src/App.tsx` · **app** layer · 185 lines
 
 _No doc comment at the top of this file._
 
@@ -24,6 +24,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
+- [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
