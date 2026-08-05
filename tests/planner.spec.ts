@@ -34,6 +34,7 @@ import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
+import { deriveItemArmor } from '../src/domain/gear/armorValues'
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getSignatureAbility } from '../src/domain/abilities'
 import { effectUptime } from '../src/domain/simulation/combatConstants'
@@ -1169,6 +1170,31 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('armor is derived for pieces that do not record it, and matches real tooltips', async () => {
+  // The catalog records armor on 5 of ~143 armour pieces, which left tank mitigation systematically
+  // understated. TBC armor is deterministic given item level, armour class, slot and quality, so the
+  // rest is derived — and these anchors are real items whose tooltip armor is known, so drift in the
+  // fitted coefficients fails here rather than quietly shifting every tank's Effective Health.
+  const clothHelm = getItemById('cowl-of-tirisfal')
+  expect(clothHelm?.itemLevel).toBe(133)
+  expect(deriveItemArmor(clothHelm!)).toBe(181)
+
+  const mailHelm = getItemById('rift-stalker-helm')
+  expect(mailHelm?.itemLevel).toBe(133)
+  expect(deriveItemArmor(mailHelm!)).toBe(759)
+
+  // An item stating its own armor must never be overridden — a sourced value has to beat the
+  // formula, or verifying an item would stop being an improvement.
+  const shield = getItemById('aldori-legacy-defender')
+  expect(shield?.stats.armor).toBe(5279)
+  expect(deriveItemArmor(shield!)).toBeUndefined()
+
+  // Feral druid tank leather sits on a separate, inflated armor track that was never fitted.
+  // Deriving it from the ordinary leather line would understate it badly, so it declines to guess.
+  const feralTank = { ...clothHelm!, armorType: 'Leather' as const, roles: ['Tank' as const], stats: {} }
+  expect(deriveItemArmor(feralTank)).toBeUndefined()
 })
 
 test('equipped tier pieces surface their set bonuses, and say they are not scored', async ({ page }) => {

@@ -5,6 +5,7 @@ import type { EquippedGear } from '../gear/gearTypes'
 import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import { getConsumableById } from '../../domain/consumables/sampleConsumables'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
+import { deriveItemArmor } from '../../domain/gear/armorValues'
 import { getGemById } from '../../domain/gems/sampleGems'
 import { effectUptime } from '../../domain/simulation/combatConstants'
 import { addStats, applyStatMultipliers, scaleStats } from '../../domain/stats/statUtils'
@@ -39,6 +40,13 @@ export function calculateStats(
 
   Object.values(gear).forEach((slot) => {
     total = addStats(total, slot.item.stats)
+
+    // Almost no armour piece in this catalog records its own armor, which left tank mitigation —
+    // and therefore Effective Health — systematically understated. TBC armor is deterministic given
+    // item level, armour class, slot and quality, so it is derived where an item does not state it.
+    // An item's own recorded armor always wins, so sourcing one later simply replaces this.
+    const derivedArmor = deriveItemArmor(slot.item)
+    if (derivedArmor !== undefined) total = addStats(total, { armor: derivedArmor })
 
     // A proc or on-use contributes its stats only while active, so it is folded in at its average
     // uptime rather than at face value. Without this, trinkets price at nearly zero — an audit of

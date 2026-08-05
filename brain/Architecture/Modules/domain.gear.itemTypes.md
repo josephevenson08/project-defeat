@@ -33,6 +33,7 @@ _No doc comment at the top of this file._
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
