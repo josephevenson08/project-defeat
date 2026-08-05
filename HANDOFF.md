@@ -46,7 +46,7 @@ The repo carries its own conventions, and they encode mistakes this project has 
 npx tsc -b                        # clean
 npm run lint                      # exit 0
 npm run build
-npx playwright test --reporter=line   # 54 passing. Use --reporter=line, not the default.
+npx playwright test --reporter=line   # 57 passing. Use --reporter=line, not the default.
 npm run brain                     # "all wikilinks resolve"
 npm run brain                     # "0 written" — idempotent; this repo is in OneDrive, churn matters
 ```
@@ -313,20 +313,28 @@ is uniformly plausible and frequently wrong in ways no amount of eyeballing woul
 **Do not trust an entry because it looks right for its slot and role.** That is precisely the
 property this data already has.
 
-**Three systematic gaps, each bigger than any single item:**
+**Three systematic gaps were identified. All three have since been addressed — here is what each
+turned into, because the *shape* of each answer generalises:**
 
-1. **Armor is missing from almost every armour piece.** Only 5 items in the catalog record `armor`,
-   and they are mostly shields; no buff, enchant or consumable supplies any either. Since the tank's
-   Effective Health divides health by damage taken *after* armor mitigation, and armor mitigation is
-   a large term for a real tank, **the tank path is systematically understating survivability** and
-   will keep doing so no matter how good the rest of the model gets. This probably outranks further
-   per-item sourcing. Armor in TBC is largely determined by item level and armour class, so this may
-   be derivable rather than needing 119 lookups — worth checking before grinding it out by hand.
-2. **Set bonuses are not modelled at all.** Every Tier 5 piece belongs to a 5-piece set with real
-   2pc/4pc bonuses, so tier pieces are undervalued against off-set items in every ranking.
-3. **Effects are not modelled at all**, and trinkets are where that bites hardest — **not one of the
-   14 trinkets audited is a pure stat stick.** Two have no stats whatsoever. A flat-stats model will
-   undervalue that entire item class regardless of how accurate the numbers become.
+1. **Armor — CLOSED by derivation, not by sourcing.** Only 5 of ~143 armour pieces recorded `armor`,
+   which had the tank's Effective Health reading far too low. TBC armor turns out to be deterministic
+   given item level, armour class, slot and quality, so `domain/gear/armorValues.ts` derives it and
+   58 items now get one. Illustratively that moves a full plate set from ~31% to ~55% mitigation,
+   about **1.5x Effective Health**. An item's own recorded armor always wins, so verification
+   progressively replaces the formula. Three refusals to guess are built in and should stay: feral
+   druid tank leather (a separate inflated track, never fitted), anything below item level 100
+   (different curve), and any item that states its own value.
+2. **Set bonuses — SURFACED, deliberately not scored.** Of sixteen Tier 5 bonuses researched, **not
+   one is a flat stat addition**; they attach to named abilities, resource costs, or the party. So
+   `domain/gear/itemSets.ts` records them, the simulator panel lists which are live, and each says
+   plainly it is not applied. Modelling them as stats would have invented value. Nordrassil's 4pc
+   (Starfire) and Tirisfal's 2pc (Arcane Blast) are the two that would become expressible if
+   per-ability modifiers ever land — but Tirisfal also raises Arcane Blast's mana cost, and mana is
+   not a modelled constraint, so applying only the damage half would flatter it.
+3. **Effects — MODELLED for trinkets.** `ItemEffect` plus `effectUptime` fold a proc or on-use in at
+   `duration / cooldown`. Eight trinkets are modelled; six keep a `notModelled` reason because their
+   value is not a stat bonus at all. **Weapon and armour procs are still unpopulated** — Heartrazor's
+   +270 attack power proc is the known one. The schema is there; the data is not.
 
 **One caution against over-correcting.** The Tier 5 helms had every socket colour wrong because they
 had been assigned by role. I checked whether that rule was applied catalog-wide and it was **not** —
