@@ -438,19 +438,33 @@ select:focus,
   justify-content: space-between;
 }
 
+.bis-slot-heading {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+/* Slot names read as column headers, the way a Wowhead or Icy Veins BiS table labels its rows.
+   Small, tracked and uppercase rather than large and bold — the item names are what should carry
+   weight here, and they already do it with quality colour. */
 .bis-slot-heading h3 {
-  color: #f8fafc;
-  font-size: 16px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: 500;
+  letter-spacing: var(--label-tracking);
   margin: 0;
+  text-transform: uppercase;
 }
 
 .bis-slot-heading span,
 .bis-entry-main p,
 .bis-entry-details dt,
 .bis-missing-item {
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 750;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -459,15 +473,23 @@ select:focus,
   gap: 10px;
 }
 
+/* Rows, not cards. A BiS list is a table of options per slot, and the reference sites all present
+   it as one — separated by a rule rather than boxed, so a slot with three ranked options reads as
+   three lines rather than three floating panels. */
 .bis-entry {
   align-items: start;
-  background: rgba(15, 23, 42, 0.54);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: 12px;
+  padding: 10px 0;
+}
+
+.bis-entry:last-child {
+  border-bottom: 0;
 }
 
 .bis-entry-main {
@@ -476,19 +498,26 @@ select:focus,
   gap: 12px;
 }
 
+/* The rank is data, so it is set in mono at a fixed width — ranks line up down the column instead
+   of shifting with the digit, which is what makes a ranked list scannable. The gradient pill it
+   replaces was competing with item quality colour for attention. */
 .bis-rank {
-  background: linear-gradient(135deg, rgba(240, 171, 252, 0.18), rgba(124, 58, 237, 0.2));
-  border: 1px solid rgba(240, 171, 252, 0.28);
-  border-radius: 6px;
-  color: #f5d0fe;
+  background: transparent;
+  border: 0;
+  color: var(--text-faint);
   flex: 0 0 auto;
-  font-weight: 850;
-  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 2.5ch;
+  padding: 2px 0;
 }
 
+/* Item names keep their quality colour inline — it is the only colour in this interface that
+   carries meaning, so it gets to be the thing your eye lands on. */
 .bis-entry h4 {
-  color: #ffffff;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 600;
   margin: 0;
 }
 
