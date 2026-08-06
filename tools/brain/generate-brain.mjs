@@ -1149,6 +1149,15 @@ async function writeDomainNotes(data, modules) {
     bosses: sampleRaidBosses.length,
     professions: allProfessions.length,
     items: sampleItems.length,
+    // Computed, not written down. A hardcoded count here went stale the moment the next sourcing
+    // batch landed, while the README promised the vault "cannot drift from the code" — which was
+    // only true of the parts that were actually derived from it.
+    itemsFlagged: sampleItems.filter((item) => item.needsVerification).length,
+    bisEntries: bisLists.reduce((total, list) => total + list.entries.length, 0),
+    bisEntriesRankedDeeperThanOne: bisLists.reduce(
+      (total, list) => total + list.entries.filter((entry) => entry.rank > 1).length,
+      0,
+    ),
     gems: sampleGems.length,
     enchants: sampleEnchants.length,
     buffs: sampleBuffs.length,
@@ -1271,7 +1280,8 @@ async function writeProjectNotes(modules, counts) {
       '',
       `1. **Multi-ability rotations** — started, and **only Fury and Arms Warrior have more than one ability**. Both now press Whirlwind on its 10s cooldown alongside their signature button, resolved against a shared global-cooldown budget. Every other spec still models exactly one ability, and all specs still lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated by differing amounts. The engine handles arbitrary ability lists; what gates the rest is sourced ability data. Still the biggest accuracy gap in ${link('Phase 4 - Simulation')}.`,
       `2. **Tank score severity weighting** — the tank path now resolves one ordered incoming table including crushing blows (see ${link('Tank Avoidance')}), but the headline Survivability Score still weights avoidance, armor and stamina without pricing how much worse a crit or a crush is than a plain hit. The breakdown carries a damage-per-swing figure that does account for it; folding that into the score is a metric redesign and deliberately hasn't been done unilaterally.`,
-      `3. **Item catalog verification** — the wrong-boss conflicts and the invented \`justicars-warblade\` are corrected, but 214 \`needsVerification\` flags remain in ${link('domain.gear.sampleItems')}. Three items now carry real sourced values and are markedly stronger than the estimates around them, so any sourced-vs-estimated comparison — which is exactly what the upgrade finder ranks — is skewed.`,
+      `3. **Item catalog verification** — ${counts.itemsFlagged} of ${counts.items} items in ${link('domain.gear.sampleItems')} still carry \`needsVerification\`, so ${counts.items - counts.itemsFlagged} are now sourced against real tooltips. Every audited batch so far has found real errors — invented stats, fabricated sockets, placeholder item levels — so an unflagged item is meaningfully different from a flagged one, and a sourced-versus-estimated comparison is skewed in the sourced item's favour until the rest catch up.`,
+      `4. **BiS lists are one item deep** — ${counts.bisEntries} ranked entries exist across all 27 specs, but only ${counts.bisEntriesRankedDeeperThanOne} of them sit at rank 2 or lower. Every other slot offers a single option while the UI labels it "1 ranked", which presents one guess as a considered ranking. This is a larger gap than the verification backlog and it is the core promise of the planner.`,
       '',
       '## Related',
       '',
