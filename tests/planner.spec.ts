@@ -35,7 +35,9 @@ import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../
 import { tbcClasses } from '../src/domain/character/tbcClasses'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { deriveItemArmor } from '../src/domain/gear/armorValues'
+import { getItemsForSlotAndCharacter } from '../src/domain/gear/characterItemRules'
 import { gearSlots } from '../src/domain/gear/gearSlots'
+import { getVisibleGearSlotsForSpec } from '../src/domain/gear/slotVisibility'
 import { getSignatureAbility } from '../src/domain/abilities'
 import { effectUptime } from '../src/domain/simulation/combatConstants'
 import {
@@ -1170,6 +1172,32 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+})
+
+test('every spec can fill every gear slot the UI shows it', async () => {
+  // A slot the interface offers but has nothing to put in is a dead end the user hits, not a
+  // limitation they can read about. This walks all 27 specs against their own visible slot list —
+  // slot visibility is spec-aware (Rogues hide Relic, Warlocks hide it, Hunters keep Ranged), so a
+  // hole only counts where the app actually asks the player to choose something.
+  const empty: string[] = []
+  const single: string[] = []
+
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      for (const slot of getVisibleGearSlotsForSpec(entry.className, spec)) {
+        const count = getItemsForSlotAndCharacter(slot, entry.className, spec).length
+        if (count === 0) empty.push(`${entry.className} ${spec} ${slot}`)
+        else if (count === 1) single.push(`${entry.className} ${spec} ${slot}`)
+      }
+    }
+  }
+
+  expect(empty, `gear slots offered with nothing to equip: ${empty.join(' | ')}`).toEqual([])
+
+  // Slots with exactly one option are not a failure — the catalog is still small — but a planner
+  // whose "choice" is forced everywhere is not planning anything. Recorded rather than asserted so
+  // this test reports the shape of the gap instead of blocking on it.
+  console.log(`slots with only one option (${single.length}): ${single.join(", ")}`)
 })
 
 test('armor is derived for pieces that do not record it, and matches real tooltips', async () => {
