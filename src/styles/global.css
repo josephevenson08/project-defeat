@@ -579,10 +579,17 @@ select:focus,
   opacity: 1;
 }
 
+/* The headline figure is instrument output, so it is set in mono and tabular. Without tabular
+   figures the number jitters horizontally every time it changes, which is distracting on a value
+   you re-run repeatedly to compare. */
 .simulation-result strong {
-  color: var(--panel-accent, #f5d0fe);
+  color: var(--text);
   display: block;
+  font-family: var(--font-mono);
   font-size: 44px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 1;
   margin: 8px 0;
 }
@@ -599,20 +606,31 @@ select:focus,
   margin-top: 16px;
 }
 
+/* Breakdown rows are a two-column readout: label left, value right, separated by a hairline. Boxing
+   each one made a ten-row breakdown look like ten separate components rather than one table. */
 .breakdown-list div {
   align-items: center;
-  background: rgba(2, 6, 23, 0.42);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 6px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
   display: flex;
   justify-content: space-between;
   padding: 8px 10px;
 }
 
 .breakdown-list strong {
-  color: #ffffff;
-  font-size: 14px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
   margin: 0;
+}
+
+.breakdown-list span {
+  color: var(--text-dim);
+  font-size: 13px;
 }
 
 .buffs-panel {
@@ -920,9 +938,14 @@ input[type='number']:focus {
   min-width: 74px;
 }
 
+/* Upgrade deltas stay green — a gain is a direction, not decoration, and it is the one other place
+   colour is load-bearing. Tabular so a column of deltas can be compared down the list. */
 .upgrade-delta strong {
   color: #4ade80;
-  font-size: 19px;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
   line-height: 1;
 }
 
