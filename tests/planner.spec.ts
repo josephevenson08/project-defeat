@@ -1174,6 +1174,55 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
 })
 
+test('the Raids tab renders a raid, its bosses and an attunement chain', async ({ page }) => {
+  // The raids panel is one of three things this repo has historically shipped that nothing rendered,
+  // and it was the only part of the app with that history and no test confirming it still renders.
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Raids', exact: true }).click()
+
+  const detail = page.getByTestId('raid-detail')
+  await expect(detail).toBeVisible()
+
+  // A raid with no bosses would still render a panel, so assert the content and not just the shell.
+  await expect(detail.getByRole('heading').first()).toBeVisible()
+  await expect(detail).toContainText(/Serpentshrine Cavern|Tempest Keep|Karazhan|Gruul|Magtheridon/)
+
+  // Attunement chains only exist for Serpentshrine Cavern and Tempest Keep, and only render under the
+  // Attunement view — so the toggle has to be reachable and the chain has to survive the switch.
+  // This is the part most likely to disappear silently, since nothing else links to it.
+  await page.getByRole('button', { name: 'Serpentshrine Cavern', exact: true }).click()
+  await page.getByRole('button', { name: 'Attunement', exact: true }).click()
+  const attunement = page.getByTestId('raid-attunement')
+  await expect(attunement).toBeVisible()
+  await expect(attunement.locator('li').first()).toBeVisible()
+})
+
+test('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
+  // The buffs panel is fully wired into calculateStats, calculateSimulation, stat weights and the
+  // upgrade finder, and had no test at all — a regression that silently stopped applying buffs would
+  // have passed the whole suite.
+  await page.goto('/')
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const before = Number(await page.getByTestId('simulation-score').innerText())
+
+  await page.getByTestId('buff-toggle-battle-shout').click()
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const withBuff = Number(await page.getByTestId('simulation-score').innerText())
+  expect(withBuff, 'Battle Shout is attack power, so a Fury Warrior must gain from it').toBeGreaterThan(before)
+
+  await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const withFlask = Number(await page.getByTestId('simulation-score').innerText())
+  expect(withFlask, 'a flask stacks on top of the buff rather than replacing it').toBeGreaterThan(withBuff)
+
+  // Toggling back off must return the original number exactly — a buff that applies but never clears
+  // would otherwise look correct on the way up and be wrong for the rest of the session.
+  await page.getByTestId('buff-toggle-battle-shout').click()
+  await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  expect(Number(await page.getByTestId('simulation-score').innerText())).toBe(before)
+})
+
 test('every spec can fill every gear slot the UI shows it', async () => {
   // A slot the interface offers but has nothing to put in is a dead end the user hits, not a
   // limitation they can read about. This walks all 27 specs against their own visible slot list —
