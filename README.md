@@ -103,7 +103,9 @@ npm run brain
 ```
 
 Regenerate any time. The generator reads the actual source tree and the actual domain data, so the
-vault cannot drift from the code. It is idempotent, it fails on a broken wikilink, and anything you
+vault cannot drift from the code — for anything it actually derives. Prose written *into* the
+generator is not derived and has gone stale before, so counts and coverage figures there are
+computed rather than typed. It is idempotent, it fails on a broken wikilink, and anything you
 write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 `brain/Project Defeat Brain.md`; see `brain/Project/Vault Guide.md` for the details.
 
@@ -131,7 +133,8 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   the Phoenix) while most carry stat-budget estimates, and the real ones are numerically much
   stronger — Fang of the Leviathan alone has 221 spell power against ~46 on the placeholder caster
   weapons. Any comparison involving a sourced item against an estimated one is skewed in the sourced
-  item's favour until the rest of the catalog is audited the same way. 16 of 230 items are sourced,
+  item's favour until the rest of the catalog is audited the same way. 106 of 230 items are now
+  sourced against real tooltips,
   so this is the common case rather than a corner one — the Upgrade Finder now marks every row whose
   delta rests on estimated data, and marks the sourced-versus-estimated rows specifically, since those
   read high in a predictable direction.

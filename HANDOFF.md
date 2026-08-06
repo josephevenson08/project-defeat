@@ -342,7 +342,7 @@ socket colours across the other 62 socketed items are varied rather than role-un
 sockets per item; do not bulk-rewrite them on the assumption the head-slot pattern generalises.
 
 ### 2. Item catalog audit — now has a visible reference point
-214 `needsVerification` flags remain in `sampleItems.ts`. Three items now carry real Wowhead values and are **markedly stronger** than the estimated ones around them (Fang of the Leviathan: 221 spell power vs ~46 on placeholder caster weapons). Any sourced-vs-estimated comparison is skewed, and the upgrade finder ranks exactly those comparisons. Documented in README limitations. The `tbc-researcher` agent is the right tool.
+**124 of 230 items still carry `needsVerification`; 106 are sourced.** Do not trust any figure for this written in prose — `brain/Project/Roadmap Board.md` computes it from the data, and every hand-written copy of it has gone stale within a batch or two. Six slot batches are done (caster/healer weapons, relics, trinkets, Head, Chest, Shoulders, Hands, Legs) and **every one of the 48 items audited so far was wrong**, so treat an unaudited entry as wrong until checked rather than probably fine. Sourced-versus-estimated comparisons remain skewed in the sourced item's favour, and the upgrade finder marks the rows where that applies.
 
 ### 3. Smaller, well-scoped
 - **Profession bonuses** (Phase 3) — Blacksmithing sockets, Enchanting ring enchants, JC gems, LW drums/fur lining, Tailoring sets, Engineering goggles. Needs sourcing. The professions *reference* data already exists and is separate from this.
