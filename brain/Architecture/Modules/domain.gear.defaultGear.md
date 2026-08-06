@@ -20,8 +20,8 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
-- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 
 ## Imported by

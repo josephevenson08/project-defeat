@@ -1,6 +1,6 @@
 import { gearSlots } from './gearSlots'
 import type { EquippedGear } from './itemTypes'
-import { getItemsForSlot } from './sampleItems'
+import { getItemsForSlot } from './itemCatalogue'
 import { getDefaultItemForSlot } from './slotCompatibility'
 
 export const defaultGear = gearSlots.reduce((gear, slot) => {

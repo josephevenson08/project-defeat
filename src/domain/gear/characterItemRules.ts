@@ -2,7 +2,7 @@ import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
-import { getItemsForSlot } from './sampleItems'
+import { getItemsForSlot } from './itemCatalogue'
 
 const enhancementExcludedWeaponTypes: readonly WeaponType[] = ['Bow', 'Gun', 'Crossbow', 'Wand', 'Libram', 'Idol', 'Shield', 'Staff', 'Sword']
 const enhancementMainHandTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger']

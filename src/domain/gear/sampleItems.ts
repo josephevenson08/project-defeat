@@ -1,7 +1,16 @@
-import type { GearSlot } from './gearSlots'
 import type { GearItem } from './itemTypes'
-import { isItemCompatibleWithGearSlot } from './slotCompatibility'
 
+/**
+ * Hand-written item entries, now a **provenance layer** rather than the catalogue itself.
+ *
+ * Read `src/domain/gear/itemCatalogue.ts` before trusting anything here. Reconciling these entries
+ * against ingested wowsims data and then against live Wowhead tooltips scored curated 0 / ingested 119
+ * across every verifiable conflict — so the stats, sockets and item levels below are superseded and no
+ * longer reach the UI. What survives the merge is the information wowsims has none of: drop location,
+ * roles, crafting materials, trinket effects.
+ *
+ * Do not add mechanical data here. Re-run `node tools/ingest/ingest-items.mjs` instead.
+ */
 export const sampleItems: readonly GearItem[] = [
   {
     id: 'prototype-adventurer-helm',
@@ -3974,11 +3983,3 @@ boss: "Al'ar",
     notes: 'Caster off-hand frill (not a weapon); stats are approximate pending final Wowhead audit.',
   },
 ]
-
-export function getItemsForSlot(slot: GearSlot) {
-  return sampleItems.filter((item) => isItemCompatibleWithGearSlot(item, slot))
-}
-
-export function getItemById(id: string) {
-  return sampleItems.find((item) => item.id === id)
-}

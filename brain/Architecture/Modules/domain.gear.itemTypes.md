@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/gear/itemTypes.ts
-lines: 146
+lines: 160
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemTypes
 
-`src/domain/gear/itemTypes.ts` · **domain** layer · 146 lines
+`src/domain/gear/itemTypes.ts` · **domain** layer · 160 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**type** — `ArmorType`, `BuildRole`, `CraftingInfo`, `CraftingMaterial`, `EquippedGear`, `EquippedSlot`, `GearItem`, `ItemEffect`, `ItemQuality`, `ItemSource`, `SocketColor`, `WeaponType`
+**type** — `ArmorType`, `BuildRole`, `CraftingInfo`, `CraftingMaterial`, `EquippedGear`, `EquippedSlot`, `GearItem`, `ItemEffect`, `ItemQuality`, `ItemSource`, `SocketColor`, `WeaponHandType`, `WeaponType`
 
 ## Imports
 
@@ -34,8 +34,10 @@ _No doc comment at the top of this file._
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`
+- [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`

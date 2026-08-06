@@ -31,10 +31,11 @@ _None._
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`
+- [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
-- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`

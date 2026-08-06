@@ -40,6 +40,13 @@ export type WeaponType =
   | 'Idol'
   | 'Other'
 
+/**
+ * Which hand a weapon can occupy. Recorded because it decides slot legality: a one-hander is legal in
+ * either hand for a dual-wielding spec, while a main-hand-only weapon is not, and the item's slot
+ * alone cannot express that.
+ */
+export type WeaponHandType = 'One Hand' | 'Two Hand' | 'Main Hand' | 'Off Hand'
+
 export type BuildRole = CharacterRole | 'Hybrid'
 
 export type CraftingMaterial = {
@@ -103,7 +110,12 @@ export type GearItem = {
   quality: ItemQuality
   /** A temporary-stat proc or on-use effect. See `ItemEffect` — trinkets are effect-driven almost without exception. */
   effect?: ItemEffect
-  source: ItemSource
+  /**
+   * Where the item comes from. Optional because the bulk-ingested catalogue carries no source data,
+   * and stamping thousands of items with a guessed `'Other'` would be exactly the invented-value
+   * problem that made the previous catalogue untrustworthy. Absent means unknown, not "Other".
+   */
+  source?: ItemSource
   phase?: number
   requiredLevel?: number
   itemLevel?: number
@@ -112,6 +124,8 @@ export type GearItem = {
   stats: Partial<StatBlock>
   armorType?: ArmorType
   weaponType?: WeaponType
+  /** Which hand(s) the weapon may occupy. Drives off-hand legality; see `WeaponHandType`. */
+  handType?: WeaponHandType
   /** Weapon swing speed in seconds (e.g. 2.60). Only meaningful for weapons with swing damage. */
   weaponSpeed?: number
   /** Minimum weapon damage roll for a single swing. Only meaningful for weapons with swing damage. */

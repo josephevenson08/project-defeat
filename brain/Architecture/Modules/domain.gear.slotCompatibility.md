@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/slotCompatibility.ts
-lines: 34
+lines: 46
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.slotCompatibility
 
-`src/domain/gear/slotCompatibility.ts` · **domain** layer · 34 lines
+`src/domain/gear/slotCompatibility.ts` · **domain** layer · 46 lines
 
 _No doc comment at the top of this file._
 
@@ -25,7 +25,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
-- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 

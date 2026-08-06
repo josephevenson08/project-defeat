@@ -32,6 +32,7 @@ _None._
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
+- [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`

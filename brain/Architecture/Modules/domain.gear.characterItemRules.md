@@ -22,8 +22,8 @@ _No doc comment at the top of this file._
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
-- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 
 ## Imported by
 

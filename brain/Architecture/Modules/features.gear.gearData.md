@@ -22,7 +22,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
-- [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 

@@ -1,6 +1,6 @@
 export { defaultGear } from '../../domain/gear/defaultGear'
 export { gearSlots } from '../../domain/gear/gearSlots'
-export { getItemById, getItemsForSlot, sampleItems as placeholderGear } from '../../domain/gear/sampleItems'
+export { allItems as placeholderGear, getItemById, getItemsForSlot } from '../../domain/gear/itemCatalogue'
 export { getItemsForSlotAndCharacter, isItemAllowedForCharacter, normalizeGearForCharacter } from '../../domain/gear/characterItemRules'
 export { getGearSlotDisplayName, getVisibleGearSlotsForSpec } from '../../domain/gear/slotVisibility'
 export {

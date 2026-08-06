@@ -50,12 +50,14 @@ import {
   averageSwingDamage,
   computeSpecialDamagePerUse,
 } from '../src/domain/simulation/specialAttacks'
-import { getItemById, getItemsForSlot } from '../src/domain/gear/sampleItems'
+import { allItems, getItemById, getItemsForSlot } from '../src/domain/gear/itemCatalogue'
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
+import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
+import { defaultGear } from '../src/domain/gear/defaultGear'
 import { getGemById } from '../src/domain/gems/sampleGems'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
-import { sampleItems } from '../src/domain/gear/sampleItems'
+
 
 function readStatValue(text: string) {
   const match = text.match(/-?\d+/)
@@ -74,13 +76,26 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
   await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('training-sword')
+  // Deliberately not pinned to a specific item. The default is whichever legal item the catalogue
+  // offers first, which legitimately moves whenever the catalogue is re-ingested; what this test
+  // actually cares about is that a legal weapon is equipped at all.
+  await expect(page.getByLabel('Main Hand', { exact: true })).not.toHaveValue('')
 
   // Regression check: Warriors have no Relic slot, and the default gear should not silently
   // inherit phantom spell/healing power from an illegally-equipped Totem/Libram/Idol.
   await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
-  expect(readStatValue(await page.getByTestId('stat-spell-power').innerText())).toBe(0)
-  expect(readStatValue(await page.getByTestId('stat-healing-power').innerText())).toBe(0)
+  // This used to assert zero spell power on the page. That stopped isolating the bug it was written
+  // for once the catalogue grew to ~4,500 items: the first legal item for a slot can now be a caster
+  // piece a warrior may legitimately wear, so a non-zero reading is no longer evidence of anything.
+  // The real invariant — no relic ever reaches a warrior's gear — is asserted against the domain.
+  // Warriors do legitimately hold the zero-stat "No Relic Recommended" placeholder, so the invariant
+  // is not "no relic" but "no stats from a relic" — a real totem/libram/idol must never survive here.
+  const warriorDefaults = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const relicStats = Object.values(warriorDefaults)
+    .filter((slot) => slot.item.armorType === 'Relic')
+    .flatMap((slot) => Object.values(slot.item.stats ?? {}))
+    .filter((value) => value !== 0)
+  expect(relicStats, 'a warrior must not inherit stats from a totem/libram/idol').toEqual([])
 
   await page.getByRole('button', { name: /run simulation/i }).click()
 
@@ -104,6 +119,9 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
 
   await page.getByLabel('Chest', { exact: true }).selectOption('Spellfire Training Robe')
   await page.getByLabel('Main Hand', { exact: true }).selectOption('Apprentice Focus Staff')
+  // Equip a head piece known to have a red socket rather than assuming the default one does — the
+  // default moved when the catalogue was re-ingested, and socketing is the point of this test.
+  await page.getByLabel('Head', { exact: true }).selectOption('flamebane-helm')
   await page.getByLabel('Head Red socket').selectOption('Runed Living Ruby')
   await page.getByLabel('Head enchant').selectOption('Glyph of Power')
 
@@ -216,7 +234,7 @@ test('Enhancement Shaman Phase 2 starter ranking resolves to catalog items', asy
 
   for (const entry of enhancementShamanPhase2Bis.entries) {
     const item = getItemById(entry.itemId)
-    expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+    expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
     expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
     if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
   }
@@ -237,7 +255,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
 
-  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Headguard' })
+  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Helm' })
   await page.getByLabel('Wrists', { exact: true }).selectOption({ label: 'True-Aim Stalker Bands' })
   await page.getByLabel('Main Hand', { exact: true }).selectOption({ label: 'Talon of the Phoenix' })
   await page.getByLabel('Off Hand', { exact: true }).selectOption({ label: 'Rod of the Sun King' })
@@ -299,11 +317,11 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expect(page.getByText('Enhancement Shaman Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
-  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Headguard' })).toBeVisible()
+  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Helm' })).toBeVisible()
   await expect(page.getByText(/Item ID 30190/i)).toBeVisible()
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
-  await page.getByRole('button', { name: /Equip Cataclysm Headguard/i }).click()
+  await page.getByRole('button', { name: /Equip Cataclysm Helm/i }).click()
 
   await expect(page.getByLabel('Head', { exact: true })).toHaveValue('cataclysm-helm')
   await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
@@ -379,7 +397,7 @@ test('Elemental and Restoration Shaman Phase 2 starter rankings resolve to catal
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -412,7 +430,7 @@ test('Arms, Fury, and Protection Warrior Phase 2 starter rankings resolve to cat
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -461,7 +479,7 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
-  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Headguard' })
+  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Helm' })
 
   const qualityLabel = page.locator('.gear-row', { has: page.getByLabel('Head', { exact: true }) }).locator('small strong')
   await expect(qualityLabel).toHaveText('Epic')
@@ -494,7 +512,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
   await expect(page.getByText('Elemental Shaman Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus-Key' })).toHaveCount(1)
+  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
 
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
@@ -546,7 +564,7 @@ test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -596,7 +614,7 @@ test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to ca
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -639,7 +657,7 @@ test('Balance, Feral, and Restoration Druid Phase 2 starter rankings resolve to 
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -691,7 +709,7 @@ test('Beast Mastery, Marksmanship, and Survival Hunter Phase 2 starter rankings 
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -736,7 +754,7 @@ test('Arcane, Fire, and Frost Mage Phase 2 starter rankings resolve to catalog i
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -810,7 +828,7 @@ test('Assassination, Combat, and Subtlety Rogue Phase 2 starter rankings resolve
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -857,7 +875,7 @@ test('Affliction, Demonology, and Destruction Warlock Phase 2 starter rankings r
 
     for (const entry of bisList.entries) {
       const item = getItemById(entry.itemId)
-      expect(item, `${entry.itemId} should exist in sampleItems`).toBeTruthy()
+      expect(item, `${entry.itemId} should exist in the item catalogue`).toBeTruthy()
       expect(item && isItemCompatibleWithGearSlot(item, entry.slot), `${entry.itemId} should fit ${entry.slot}`).toBe(true)
       if (entry.wowItemId) expect(item?.wowItemId).toBe(entry.wowItemId)
     }
@@ -1249,24 +1267,33 @@ test('every spec can fill every gear slot the UI shows it', async () => {
   console.log(`slots with only one option (${single.length}): ${single.join(", ")}`)
 })
 
-test('armor is derived for pieces that do not record it, and matches real tooltips', async () => {
-  // The catalog records armor on 5 of ~143 armour pieces, which left tank mitigation systematically
-  // understated. TBC armor is deterministic given item level, armour class, slot and quality, so the
-  // rest is derived — and these anchors are real items whose tooltip armor is known, so drift in the
-  // fitted coefficients fails here rather than quietly shifting every tank's Effective Health.
+test('armor comes from the catalogue, and the derivation only fills genuine gaps', async () => {
+  // History: the old catalogue recorded armor on 5 of ~143 armour pieces, so it was derived from item
+  // level, armour class, slot and quality instead. The ingested catalogue carries real armor on all
+  // 2,899 armour pieces, which retires that gap — and independently vindicates the formula, because
+  // the values it predicted for these two anchors (181 and 759) are exactly what the real data says.
   const clothHelm = getItemById('cowl-of-tirisfal')
   expect(clothHelm?.itemLevel).toBe(133)
-  expect(deriveItemArmor(clothHelm!)).toBe(181)
+  expect(clothHelm?.stats.armor).toBe(181)
 
   const mailHelm = getItemById('rift-stalker-helm')
   expect(mailHelm?.itemLevel).toBe(133)
-  expect(deriveItemArmor(mailHelm!)).toBe(759)
+  expect(mailHelm?.stats.armor).toBe(759)
 
   // An item stating its own armor must never be overridden — a sourced value has to beat the
-  // formula, or verifying an item would stop being an improvement.
+  // formula, or verifying an item would stop being an improvement. Now that every ingested armour
+  // piece states its armor, this is the path that actually runs in production.
+  expect(deriveItemArmor(clothHelm!)).toBeUndefined()
+  expect(deriveItemArmor(mailHelm!)).toBeUndefined()
+
   const shield = getItemById('aldori-legacy-defender')
   expect(shield?.stats.armor).toBe(5279)
   expect(deriveItemArmor(shield!)).toBeUndefined()
+
+  // The formula still has to work for anything that reaches the UI without an armor value, such as
+  // the curated entries that never matched an ingested item.
+  const noArmor = { ...clothHelm!, stats: {} }
+  expect(deriveItemArmor(noArmor)).toBe(181)
 
   // Feral druid tank leather sits on a separate, inflated armor track that was never fitted.
   // Deriving it from the ordinary leather line would understate it badly, so it declines to guess.
@@ -1451,7 +1478,7 @@ test('the item catalog and the raid data agree on where every drop comes from', 
     for (const loot of boss.loot) {
       if (!loot.itemId) continue
 
-      const item = sampleItems.find((entry) => entry.id === loot.itemId)
+      const item = allItems.find((entry) => entry.id === loot.itemId)
       expect(item, `raid loot references unknown item "${loot.itemId}"`).toBeTruthy()
       if (!item) continue
 
@@ -1478,9 +1505,10 @@ test('the item catalog and the raid data agree on where every drop comes from', 
 test('racial traits apply to stats, and weapon-conditional ones follow the equipped weapon', async ({ page }) => {
   await page.goto('/')
 
-  // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, and the
-  // default main hand IS a sword, so it should be active and contributing expertise.
-  await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('training-sword')
+  // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, so equip
+  // one explicitly — this used to lean on the default main hand happening to be a sword, which
+  // stopped being true when the catalogue was re-ingested.
+  await page.getByLabel('Main Hand', { exact: true }).selectOption('iblis-blade-of-the-fallen-seraph')
   const swordSpec = page.getByTestId('racial-human-sword-specialization')
   await expect(swordSpec).toContainText(/Included in your stats/i)
 
@@ -1488,7 +1516,9 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
   expect(expertiseWithSword).toBeGreaterThan(0)
 
   // Swap to a non-sword main hand: the racial must switch off and the expertise must actually drop.
-  await page.getByLabel('Main Hand', { exact: true }).selectOption('dragonstrike')
+  // It has to be an axe, not the mace this once used — Humans get Mace Specialization too, so a mace
+  // keeps expertise up and hides the very regression this assertion exists to catch.
+  await page.getByLabel('Main Hand', { exact: true }).selectOption('crulshorukh-edge-of-chaos')
   await expect(swordSpec).toContainText(/Only while wielding/i)
   expect(readStatValue(await page.getByTestId('stat-expertise').innerText())).toBeLessThan(expertiseWithSword)
 

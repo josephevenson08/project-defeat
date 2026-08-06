@@ -2,35 +2,38 @@
 type: module
 layer: domain
 source: src/domain/gear/sampleItems.ts
-lines: 3985
+lines: 3986
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.sampleItems
 
-`src/domain/gear/sampleItems.ts` · **domain** layer · 3985 lines
+`src/domain/gear/sampleItems.ts` · **domain** layer · 3986 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> Hand-written item entries, now a **provenance layer** rather than the catalogue itself.
+> 
+> Read `src/domain/gear/itemCatalogue.ts` before trusting anything here. Reconciling these entries
+> against ingested wowsims data and then against live Wowhead tooltips scored curated 0 / ingested 119
+> across every verifiable conflict — so the stats, sockets and item levels below are superseded and no
+> longer reach the UI. What survives the merge is the information wowsims has none of: drop location,
+> roles, crafting materials, trinket effects.
+> 
+> Do not add mechanical data here. Re-run `node tools/ingest/ingest-items.mjs` instead.
 
 ## Exports
-
-**function** — `getItemById`, `getItemsForSlot`
 
 **const** — `sampleItems`
 
 ## Imports
 
-- [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
-- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 
 ## Imported by
 
-- [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
-- [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
-- [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
-- [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 
 ## Concepts & phases
 

@@ -14,7 +14,19 @@ export function isPairedGearSlot(slot: GearSlot) {
   return getPairedGearSlots(slot).length > 1
 }
 
+/**
+ * A one-handed weapon lives in the catalogue under `Main Hand`, but a dual-wielding spec can equip it
+ * in either hand, so it has to be offered for the off hand too. Only genuine one-handers qualify:
+ * two-handers, main-hand-only weapons and shields must not leak across.
+ *
+ * Whether the character may dual-wield at all is decided by slot visibility for the spec, not here.
+ */
+function isOffHandEligible(item: GearItem) {
+  return item.slot === 'Main Hand' && item.handType === 'One Hand'
+}
+
 export function isItemCompatibleWithGearSlot(item: GearItem, gearSlot: GearSlot) {
+  if (gearSlot === 'Off Hand' && isOffHandEligible(item)) return true
   return getPairedGearSlots(gearSlot).includes(item.slot)
 }
 
