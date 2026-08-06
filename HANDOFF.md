@@ -46,7 +46,7 @@ The repo carries its own conventions, and they encode mistakes this project has 
 npx tsc -b                        # clean
 npm run lint                      # exit 0
 npm run build
-npx playwright test --reporter=line   # 57 passing. Use --reporter=line, not the default.
+npx playwright test --reporter=line   # 58 passing. Use --reporter=line, not the default.
 npm run brain                     # "all wikilinks resolve"
 npm run brain                     # "0 written" — idempotent; this repo is in OneDrive, churn matters
 ```

@@ -31,7 +31,7 @@ Early MVP / foundation phase.
   by item quality where the drop exists in the catalog, and step-by-step attunement chains for
   Serpentshrine Cavern and Tempest Keep
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
-- Configurable encounter settings (target level, armor, duration)
+- Configurable encounter settings (target level, armor)
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
 - Reduced-motion aware animation helpers
 - Playwright tests for physical, caster, healer, and tank flows
@@ -139,11 +139,14 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   delta rests on estimated data, and marks the sourced-versus-estimated rows specifically, since those
   read high in a predictable direction.
 - Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims
-  reconciliation is still pending. Put concretely: **163 of the 166 items still carrying
-  `needsVerification` appear in a BiS list**, so the recommendations are overwhelmingly built on
-  stat-budget estimates rather than confirmed tooltips. The item *choices* come from community guides
-  and are broadly right; it is the stat numbers behind them, and therefore the sizes of the gaps
-  between options, that are not yet audited.
+  reconciliation is still pending, and nearly every item still flagged appears in a BiS list — so the
+  recommendations lean heavily on stat-budget estimates rather than confirmed tooltips. See the
+  generated `brain/Project/Roadmap Board.md` for the current counts; it computes them, and every
+  hand-written copy in prose has gone stale within a batch or two.
+- **The BiS lists are one item deep.** 463 ranked entries exist across all 27 specs and only 2 sit at
+  rank 2 or lower, so almost every slot offers a single option while the panel labels it "1 ranked".
+  That presents one guess as a considered ranking, and it is the largest gap in the planner right
+  now — larger than the verification backlog.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
 - No talent trees, so no talent scaling anywhere in the simulation.
