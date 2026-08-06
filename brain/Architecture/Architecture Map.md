@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-136 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+138 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -20,14 +20,14 @@ The modules everything else leans on — change these carefully.
 - [[domain.character.characterTypes]] — 28 importers
 - [[domain.gear.itemTypes]] — 24 importers
 - [[domain.gear.gearSlots]] — 16 importers
-- [[components.layout.Panel]] — 12 importers
 - [[domain.stats.statTypes]] — 12 importers
+- [[features.character.characterTypes]] — 12 importers
+- [[components.layout.Panel]] — 11 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
-- [[features.character.characterTypes]] — 11 importers
+- [[features.gear.gearTypes]] — 10 importers
 - [[domain.raids.raidTypes]] — 9 importers
-- [[features.gear.gearTypes]] — 9 importers
+- [[features.gear.gearData]] — 8 importers
 - [[domain.character.roleTheme]] — 7 importers
-- [[domain.simulation.encounterTypes]] — 7 importers
 
 ## By layer
 
@@ -46,12 +46,12 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.layout.AppShell]] · 1 importers
 - [[components.layout.ErrorBoundary]] · 1 importers
 - [[components.layout.LoadingIntro]] · 1 importers
-- [[components.layout.Panel]] · 12 importers
+- [[components.layout.Panel]] · 11 importers
 - [[components.layout.TabNav]] · 2 importers
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (25)
+### features (27)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -61,10 +61,11 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.builds.buildStorage]] · 2 importers
 - [[features.character.characterData]] · 4 importers
 - [[features.character.CharacterPanel]] · 1 importers
-- [[features.character.characterTypes]] · 11 importers
-- [[features.gear.gearData]] · 7 importers
+- [[features.character.characterTypes]] · 12 importers
+- [[features.gear.gearData]] · 8 importers
 - [[features.gear.GearPanel]] · 1 importers
-- [[features.gear.gearTypes]] · 9 importers
+- [[features.gear.gearTypes]] · 10 importers
+- [[features.gear.ItemPopup]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.raids.RaidAttunementChain]] · 1 importers
 - [[features.raids.RaidLootList]] · 1 importers
@@ -78,8 +79,9 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.simulator.StatWeightsPanel]] · 1 importers
 - [[features.simulator.UpgradesPanel]] · 1 importers
 - [[features.stats.calculateStats]] · 3 importers
-- [[features.stats.StatsPanel]] · 1 importers
-- [[features.stats.statsTypes]] · 4 importers
+- [[features.stats.StatsPanel]] · 0 importers
+- [[features.stats.StatsRail]] · 1 importers
+- [[features.stats.statsTypes]] · 5 importers
 
 ### domain (98)
 
@@ -142,7 +144,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers
 - [[domain.enchants.enchantTypes]] · 1 importers
-- [[domain.enchants.sampleEnchants]] · 4 importers
+- [[domain.enchants.sampleEnchants]] · 5 importers
 - [[domain.gear.armorValues]] · 1 importers
 - [[domain.gear.catalogueJson.d]] · 0 importers
 - [[domain.gear.catalogueTypes]] · 1 importers
@@ -152,9 +154,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.itemCatalogue]] · 4 importers
 - [[domain.gear.itemSets]] · 2 importers
 - [[domain.gear.itemTypes]] · 24 importers
-- [[domain.gear.qualityColors]] · 4 importers
+- [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
-- [[domain.gear.slotCompatibility]] · 4 importers
+- [[domain.gear.slotCompatibility]] · 5 importers
 - [[domain.gear.slotVisibility]] · 1 importers
 - [[domain.gems.gemTypes]] · 1 importers
 - [[domain.gems.sampleGems]] · 5 importers
@@ -195,7 +197,7 @@ Older guide-oriented data that predates the domain model and is not yet migrated
 
 Cross-cutting helpers with no domain meaning.
 
-- [[lib.animations]] · 6 importers
+- [[lib.animations]] · 7 importers
 
 Up: [[Project Defeat Brain]]
 

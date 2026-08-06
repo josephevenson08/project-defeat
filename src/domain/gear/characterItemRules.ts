@@ -3,6 +3,7 @@ import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
 import { getItemsForSlot } from './itemCatalogue'
+import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
 
 const enhancementExcludedWeaponTypes: readonly WeaponType[] = ['Bow', 'Gun', 'Crossbow', 'Wand', 'Libram', 'Idol', 'Shield', 'Staff', 'Sword']
 const enhancementMainHandTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger']
@@ -83,17 +84,34 @@ export function getItemsForSlotAndCharacter(slot: GearSlot, className: TbcClass,
   return getItemsForSlot(slot).filter((item) => isItemAllowedForCharacter(item, className, spec))
 }
 
+/**
+ * Replacement for an item the character cannot legally wear. Shares `getDefaultItemForSlot`'s
+ * highest-item-level rule rather than taking the first match — otherwise switching class silently
+ * dropped the affected slots back to Classic-era greens while the untouched slots stayed at Tier 5.
+ */
 export function getFallbackItemForCharacter(slot: GearSlot, className: TbcClass, spec: TbcSpec) {
-  return getItemsForSlotAndCharacter(slot, className, spec)[0]
+  return getDefaultItemForSlot(slot, getItemsForSlotAndCharacter(slot, className, spec))
 }
 
 export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClass, spec: TbcSpec): EquippedGear {
+  // Unique items already surviving the switch are withheld from the fallbacks. Two illegal paired
+  // slots would otherwise both fall back to the same highest-item-level option and produce a doubled
+  // unique — a state the gear panel refuses to let a player build by hand.
+  const usedUniqueIds = new Set(
+    Object.values(gear)
+      .filter((equipped) => isItemAllowedForCharacter(equipped.item, className, spec) && isUniqueRestricted(equipped.item))
+      .map((equipped) => equipped.item.id),
+  )
+
   return Object.fromEntries(
     Object.entries(gear).map(([slot, equippedSlot]) => {
       const gearSlot = slot as GearSlot
       if (isItemAllowedForCharacter(equippedSlot.item, className, spec)) return [gearSlot, equippedSlot]
 
-      const fallback = getFallbackItemForCharacter(gearSlot, className, spec)
+      const options = getItemsForSlotAndCharacter(gearSlot, className, spec).filter((item) => !usedUniqueIds.has(item.id))
+      const fallback = getDefaultItemForSlot(gearSlot, options)
+      if (fallback && isUniqueRestricted(fallback)) usedUniqueIds.add(fallback.id)
+
       return [
         gearSlot,
         fallback

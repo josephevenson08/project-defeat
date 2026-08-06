@@ -40,6 +40,20 @@ export function isItemBlockedByUniqueInGear(item: GearItem, targetSlot: GearSlot
   return getPairedGearSlots(targetSlot).some((slot) => slot !== targetSlot && gear[slot].item.id === item.id)
 }
 
+/**
+ * Picks the starting item for a slot: the highest item level among the legal options.
+ *
+ * "First match" was fine against a 230-item hand-written catalogue, but the ingested one spans all of
+ * Classic as well as TBC, and first-match handed a Phase 2 TBC planner a Molten Core helm at item
+ * level 76. Highest item level is not a claim about what is best — set bonuses, sockets and stat
+ * weights all matter more — it just guarantees the starting state is era-appropriate rather than
+ * whatever happens to sort first.
+ */
 export function getDefaultItemForSlot(slot: GearSlot, items: readonly GearItem[]) {
-  return items.find((item) => item.slot === slot) ?? items.find((item) => isItemCompatibleWithGearSlot(item, slot))
+  let best: GearItem | undefined
+  for (const item of items) {
+    if (!isItemCompatibleWithGearSlot(item, slot)) continue
+    if (!best || (item.itemLevel ?? 0) > (best.itemLevel ?? 0)) best = item
+  }
+  return best
 }

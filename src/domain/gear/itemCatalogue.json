@@ -7,7 +7,7 @@
     "license": "MIT"
   },
   "generatedBy": "tools/ingest/ingest-items.mjs",
-  "itemCount": 4513,
+  "itemCount": 4505,
   "sets": {
     "absolution-regalia": "Absolution Regalia",
     "adamantite-battlegear": "Adamantite Battlegear",
@@ -21735,22 +21735,6 @@
       "unique": true
     },
     {
-      "id": "monster-sword-iblis-blade-of-the-fallen-seraph",
-      "wowItemId": 28087,
-      "name": "Monster - Sword, Iblis, Blade of the Fallen Seraph",
-      "slot": "Main Hand",
-      "quality": "Epic",
-      "itemLevel": 81,
-      "phase": 1,
-      "stats": {},
-      "weaponType": "Sword",
-      "handType": "One Hand",
-      "weaponSpeed": 1.6,
-      "weaponDamageMin": 70,
-      "weaponDamageMax": 131,
-      "unique": true
-    },
-    {
       "id": "icon-of-unyielding-courage",
       "wowItemId": 28121,
       "name": "Icon of Unyielding Courage",
@@ -41472,27 +41456,6 @@
       },
       "armorType": "Leather",
       "setId": "primal-intent"
-    },
-    {
-      "id": "monster-staff-blooming-druid-staff",
-      "wowItemId": 29748,
-      "name": "Monster - Staff, Blooming Druid Staff",
-      "slot": "Main Hand",
-      "quality": "Rare",
-      "itemLevel": 115,
-      "phase": 1,
-      "stats": {
-        "strength": 34,
-        "agility": 32,
-        "stamina": 33,
-        "hitRating": 22,
-        "feralAttackPower": 423
-      },
-      "weaponType": "Staff",
-      "handType": "Two Hand",
-      "weaponSpeed": 2.4,
-      "weaponDamageMin": 106,
-      "weaponDamageMax": 196
     },
     {
       "id": "kirinvar-journeymans-belt",
@@ -69224,126 +69187,6 @@
       "weaponDamageMin": 30,
       "weaponDamageMax": 95,
       "unique": true
-    },
-    {
-      "id": "toms-legs-a",
-      "wowItemId": 32414,
-      "name": "Tom's Legs A",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 105,
-      "phase": 0,
-      "stats": {
-        "strength": 37,
-        "stamina": 54,
-        "hitRating": 18,
-        "critRating": 29,
-        "armor": 1163
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
-    },
-    {
-      "id": "toms-legs-b",
-      "wowItemId": 32415,
-      "name": "Tom's Legs B",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 120,
-      "phase": 0,
-      "stats": {
-        "strength": 40,
-        "stamina": 58,
-        "hitRating": 19,
-        "critRating": 30,
-        "armor": 1322
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
-    },
-    {
-      "id": "toms-legs-c",
-      "wowItemId": 32416,
-      "name": "Tom's Legs C",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 138,
-      "phase": 0,
-      "stats": {
-        "strength": 45,
-        "stamina": 66,
-        "hitRating": 22,
-        "critRating": 35,
-        "armor": 1512
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
-    },
-    {
-      "id": "toms-legs-1",
-      "wowItemId": 32417,
-      "name": "Tom's Legs 1",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 115,
-      "phase": 0,
-      "stats": {
-        "strength": 41,
-        "stamina": 60,
-        "hitRating": 20,
-        "critRating": 31,
-        "armor": 1269
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
-    },
-    {
-      "id": "toms-legs-2",
-      "wowItemId": 32418,
-      "name": "Tom's Legs 2",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 130,
-      "phase": 0,
-      "stats": {
-        "strength": 46,
-        "stamina": 69,
-        "hitRating": 23,
-        "critRating": 35,
-        "armor": 1428
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
-    },
-    {
-      "id": "toms-legs-3",
-      "wowItemId": 32419,
-      "name": "Tom's Legs 3",
-      "slot": "Legs",
-      "quality": "Epic",
-      "itemLevel": 145,
-      "phase": 0,
-      "stats": {
-        "strength": 54,
-        "stamina": 79,
-        "hitRating": 26,
-        "critRating": 41,
-        "armor": 1587
-      },
-      "armorType": "Plate",
-      "allowedClasses": [
-        "Warrior"
-      ]
     },
     {
       "id": "nights-end",

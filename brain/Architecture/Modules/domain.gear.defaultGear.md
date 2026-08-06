@@ -2,16 +2,22 @@
 type: module
 layer: domain
 source: src/domain/gear/defaultGear.ts
-lines: 12
+lines: 28
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.defaultGear
 
-`src/domain/gear/defaultGear.ts` · **domain** layer · 12 lines
+`src/domain/gear/defaultGear.ts` · **domain** layer · 28 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> The starting gear set.
+> 
+> Slots are filled in order, and any unique item already placed is withheld from later slots. Without
+> that, the paired slots both take the single highest-item-level option and the app opens in a state
+> it will not let you create by hand — two copies of a unique ring, trinket or weapon.
 
 ## Exports
 

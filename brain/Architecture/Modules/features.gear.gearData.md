@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[App]] — `src/App.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

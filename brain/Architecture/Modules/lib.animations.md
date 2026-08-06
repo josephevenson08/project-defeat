@@ -29,6 +29,7 @@ _None._
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
+- [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases
 

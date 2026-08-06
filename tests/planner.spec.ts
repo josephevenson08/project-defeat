@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import {
   afflictionWarlockPhase2Bis,
   arcaneMagePhase2Bis,
@@ -54,6 +54,52 @@ import { allItems, getItemById, getItemsForSlot } from '../src/domain/gear/itemC
 import { isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
+
+/*
+ * Gear editing moved into a popup, so a slot's controls only exist while its overlay is open. These
+ * helpers open the slot, act, and close again, which keeps the call sites in the tests one line long
+ * and stops a stray open overlay from blocking the next click behind its backdrop.
+ */
+
+/** The slot's row in the gear grid. Slot *presence* is now this button, not a select. */
+function slotCell(page: Page, slot: string) {
+  return page.getByRole('button', { name: `${slot} slot`, exact: true })
+}
+
+async function openSlot(page: Page, slot: string) {
+  await slotCell(page, slot).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+}
+
+async function closeSlot(page: Page) {
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+}
+
+async function selectSlotItem(page: Page, slot: string, value: string) {
+  await openSlot(page, slot)
+  await page.getByLabel(slot, { exact: true }).selectOption(value)
+  await closeSlot(page)
+}
+
+async function selectSlotEnchant(page: Page, slot: string, value: string) {
+  await openSlot(page, slot)
+  await page.getByLabel(`${slot} enchant`).selectOption(value)
+  await closeSlot(page)
+}
+
+async function selectSlotGem(page: Page, slot: string, colour: string, value: string) {
+  await openSlot(page, slot)
+  await page.getByLabel(`${slot} ${colour} socket`).selectOption(value)
+  await closeSlot(page)
+}
+
+/** Runs assertions against a slot's open popup, then closes it. */
+async function withSlotOpen(page: Page, slot: string, assertions: () => Promise<void>) {
+  await openSlot(page, slot)
+  await assertions()
+  await closeSlot(page)
+}
 import { getGemById } from '../src/domain/gems/sampleGems'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
@@ -64,7 +110,11 @@ function readStatValue(text: string) {
   return match ? Number(match[0]) : 0
 }
 
-test('user can run a basic local physical DPS simulation', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('user can run a basic local physical DPS simulation', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
@@ -79,11 +129,13 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   // Deliberately not pinned to a specific item. The default is whichever legal item the catalogue
   // offers first, which legitimately moves whenever the catalogue is re-ingested; what this test
   // actually cares about is that a legal weapon is equipped at all.
-  await expect(page.getByLabel('Main Hand', { exact: true })).not.toHaveValue('')
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true })).not.toHaveValue('')
+  })
 
   // Regression check: Warriors have no Relic slot, and the default gear should not silently
   // inherit phantom spell/healing power from an illegally-equipped Totem/Libram/Idol.
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   // This used to assert zero spell power on the page. That stopped isolating the bug it was written
   // for once the catalogue grew to ~4,500 items: the first legal item for a slot can now be a caster
   // piece a warrior may legitimately wear, so a non-zero reading is no longer evidence of anything.
@@ -96,15 +148,13 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
     .flatMap((slot) => Object.values(slot.item.stats ?? {}))
     .filter((value) => value !== 0)
   expect(relicStats, 'a warrior must not inherit stats from a totem/libram/idol').toEqual([])
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
-  await expect(page.getByText('Attack power', { exact: true })).toBeVisible()
 })
 
-test('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
@@ -117,32 +167,34 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await expect(page.getByText(/Blood Elf Fire Mage/i)).toBeVisible()
   await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
 
-  await page.getByLabel('Chest', { exact: true }).selectOption('Spellfire Training Robe')
-  await page.getByLabel('Main Hand', { exact: true }).selectOption('Apprentice Focus Staff')
+  await selectSlotItem(page, 'Chest', 'Spellfire Training Robe')
+  await selectSlotItem(page, 'Main Hand', 'Apprentice Focus Staff')
   // Equip a head piece known to have a red socket rather than assuming the default one does — the
   // default moved when the catalogue was re-ingested, and socketing is the point of this test.
-  await page.getByLabel('Head', { exact: true }).selectOption('flamebane-helm')
-  await page.getByLabel('Head Red socket').selectOption('Runed Living Ruby')
-  await page.getByLabel('Head enchant').selectOption('Glyph of Power')
+  await selectSlotItem(page, 'Head', 'flamebane-helm')
+  await selectSlotGem(page, 'Head', 'Red', 'Runed Living Ruby')
+  await selectSlotEnchant(page, 'Head', 'Glyph of Power')
 
   await expect(page.getByTestId('stat-spell-power')).toBeVisible()
-  await page.getByRole('button', { name: /run simulation/i }).click()
 
   await expect(page.getByText(/Estimated DPS/i)).toBeVisible()
   await expect(page.getByText(/Spell hit\/crit table/i)).toBeVisible()
   await expect(page.getByText('Spell power scaling', { exact: true })).toBeVisible()
 })
 
-test('healer and tank roles produce role-specific results', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('healer and tank roles produce role-specific results', async ({ page }) => {
   await page.goto('/')
 
   await page.getByLabel('Class').selectOption('Priest')
   await expect(page.getByLabel('Specialization')).toHaveValue('Discipline')
   await page.getByLabel('Specialization').selectOption('Holy')
   await expect(page.getByText('Healer', { exact: true })).toBeVisible()
-  await page.getByLabel('Hands', { exact: true }).selectOption("Healer's Grace Gloves")
-  await page.getByLabel('Hands enchant').selectOption('Enchant Gloves - Major Healing')
-  await page.getByRole('button', { name: /run simulation/i }).click()
+  await selectSlotItem(page, 'Hands', "Healer's Grace Gloves")
+  await selectSlotEnchant(page, 'Hands', 'Enchant Gloves - Major Healing')
 
   await expect(page.getByText(/Estimated Healing/i)).toBeVisible()
   await expect(page.getByText(/Heal crit\/haste estimate/i)).toBeVisible()
@@ -150,13 +202,10 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Protection')
   await expect(page.getByText('Tank', { exact: true })).toBeVisible()
-  await page.getByLabel('Chest', { exact: true }).selectOption('Bulwark Chestguard')
+  await selectSlotItem(page, 'Chest', 'Bulwark Chestguard')
     // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
   // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
-  await page.getByLabel('Off Hand', { exact: true }).selectOption('Aldori Legacy Defender')
-  await page.getByRole('button', { name: /run simulation/i }).click()
-
-  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
+  await selectSlotItem(page, 'Off Hand', 'Aldori Legacy Defender')
 
   // The tank path has to use the *defender-side* base chances. It previously reused the
   // attacker-side formulas symmetrically, which handed the player the boss's own 14% parry and made
@@ -255,21 +304,21 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
 
-  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Helm' })
-  await page.getByLabel('Wrists', { exact: true }).selectOption({ label: 'True-Aim Stalker Bands' })
-  await page.getByLabel('Main Hand', { exact: true }).selectOption({ label: 'Talon of the Phoenix' })
-  await page.getByLabel('Off Hand', { exact: true }).selectOption({ label: 'Rod of the Sun King' })
-  await page.getByLabel('Totem', { exact: true }).selectOption({ label: 'Totem of the Astral Winds' })
+  await selectSlotItem(page, 'Head', { label: 'Cataclysm Helm' })
+  await selectSlotItem(page, 'Wrists', { label: 'True-Aim Stalker Bands' })
+  await selectSlotItem(page, 'Main Hand', { label: 'Talon of the Phoenix' })
+  await selectSlotItem(page, 'Off Hand', { label: 'Rod of the Sun King' })
+  await selectSlotItem(page, 'Totem', { label: 'Totem of the Astral Winds' })
 
-  await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('talon-of-the-phoenix')
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Dragonstrike' })).toHaveCount(1)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('talon-of-the-phoenix')
+  })
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Dragonstrike' })).toHaveCount(1)
+  })
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   expect(after).toBeGreaterThan(before)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('Enhancement Shaman filters gear, relics, enchants, and source details by spec', async ({ page }) => {
@@ -280,28 +329,40 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
 
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Shield of Rehearsal' })).toHaveCount(0)
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Shield of Rehearsal' })).toHaveCount(0)
+  })
 
-  await expect(page.getByLabel('Main Hand enchant')).toContainText('Enchant Weapon - Mongoose')
-  await expect(page.getByLabel('Off Hand enchant')).toContainText('Enchant Weapon - Mongoose')
-  await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Enchant Shield - Defense')
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Enchant Shield - Defense')
+  })
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByText('No Ranged Weapon Recommended')).toHaveCount(0)
 
-  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Totem of the Astral Winds' })).toHaveCount(1)
-  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Idol of Testing' })).toHaveCount(0)
-  await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
+  await withSlotOpen(page, 'Totem', async () => {
+    await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Totem of the Astral Winds' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Totem', async () => {
+    await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Idol of Testing' })).toHaveCount(0)
+  })
+  await withSlotOpen(page, 'Totem', async () => {
+    await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
+  })
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Ranged', exact: true })).toHaveCount(0)
 
   await expect(page.getByText('Serpentshrine Cavern · Leotheras the Blind · Phase 2')).toBeVisible()
   await expect(page.getByText(/Needs source\/rank verification/i).first()).toBeVisible()
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('BiS panel shows Enhancement Shaman rankings and equips a listed item', async ({ page }) => {
@@ -323,15 +384,13 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   await page.getByRole('button', { name: /Equip Cataclysm Helm/i }).click()
 
-  await expect(page.getByLabel('Head', { exact: true })).toHaveValue('cataclysm-helm')
+  await withSlotOpen(page, 'Head', async () => {
+    await expect(page.getByLabel('Head', { exact: true })).toHaveValue('cataclysm-helm')
+  })
   await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   expect(after).toBeGreaterThan(before)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('BiS panel can equip paired trinket targets without duplicating unique items', async ({ page }) => {
@@ -346,45 +405,65 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
   const bloodlustRow = page.locator('.bis-entry', { hasText: 'Bloodlust Brooch' })
 
   await dragonspineRow.getByRole('button', { name: 'Equip Trinket 1' }).click()
-  await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
+  await withSlotOpen(page, 'Trinket 1', async () => {
+    await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
+  })
   await expect(dragonspineRow.getByRole('button', { name: 'Unique equipped' })).toBeDisabled()
 
   await bloodlustRow.getByRole('button', { name: 'Equip Trinket 2' }).click()
-  await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Trinket 2', async () => {
+    await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
+  })
 })
 
 test('paired ring and trinket slots share compatible options and block duplicate unique items', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
-  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
-  await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
-  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
+  await withSlotOpen(page, 'Trinket 1', async () => {
+    await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Trinket 2', async () => {
+    await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Trinket 1', async () => {
+    await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Trinket 2', async () => {
+    await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option', { hasText: 'Bloodlust Brooch' })).toHaveCount(1)
+  })
 
-  await page.getByLabel('Trinket 1', { exact: true }).selectOption('dragonspine-trophy')
-  await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option[value="dragonspine-trophy"]')).toHaveAttribute('disabled', '')
-  await page.getByLabel('Trinket 2', { exact: true }).selectOption('bloodlust-brooch')
+  await selectSlotItem(page, 'Trinket 1', 'dragonspine-trophy')
+  await withSlotOpen(page, 'Trinket 2', async () => {
+    await expect(page.getByLabel('Trinket 2', { exact: true }).locator('option[value="dragonspine-trophy"]')).toHaveAttribute('disabled', '')
+  })
+  await selectSlotItem(page, 'Trinket 2', 'bloodlust-brooch')
 
-  await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
-  await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
+  await withSlotOpen(page, 'Trinket 1', async () => {
+    await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
+  })
+  await withSlotOpen(page, 'Trinket 2', async () => {
+    await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
+  })
 
-  await expect(page.getByLabel('Finger 1', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
-  await expect(page.getByLabel('Finger 2', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
+  await withSlotOpen(page, 'Finger 1', async () => {
+    await expect(page.getByLabel('Finger 1', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Finger 2', async () => {
+    await expect(page.getByLabel('Finger 2', { exact: true }).locator('option', { hasText: 'Ring of a Thousand Marks' })).toHaveCount(1)
+  })
 
-  await page.getByLabel('Finger 1', { exact: true }).selectOption('ring-of-a-thousand-marks')
-  await expect(page.getByLabel('Finger 2', { exact: true }).locator('option[value="ring-of-a-thousand-marks"]')).toHaveAttribute('disabled', '')
-  await page.getByLabel('Finger 2', { exact: true }).selectOption('garonas-signet-ring')
+  await selectSlotItem(page, 'Finger 1', 'ring-of-a-thousand-marks')
+  await withSlotOpen(page, 'Finger 2', async () => {
+    await expect(page.getByLabel('Finger 2', { exact: true }).locator('option[value="ring-of-a-thousand-marks"]')).toHaveAttribute('disabled', '')
+  })
+  await selectSlotItem(page, 'Finger 2', 'garonas-signet-ring')
 
-  await expect(page.getByLabel('Finger 1', { exact: true })).toHaveValue('ring-of-a-thousand-marks')
-  await expect(page.getByLabel('Finger 2', { exact: true })).toHaveValue('garonas-signet-ring')
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Finger 1', async () => {
+    await expect(page.getByLabel('Finger 1', { exact: true })).toHaveValue('ring-of-a-thousand-marks')
+  })
+  await withSlotOpen(page, 'Finger 2', async () => {
+    await expect(page.getByLabel('Finger 2', { exact: true })).toHaveValue('garonas-signet-ring')
+  })
 })
 
 test('Elemental and Restoration Shaman Phase 2 starter rankings resolve to catalog items', async () => {
@@ -461,8 +540,9 @@ test('crafted items show recipe source, required skill, and material farm locati
   await page.goto('/')
 
   await page.getByLabel('Class').selectOption('Mage')
-  await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Spellfire Training Robe' })
+  await selectSlotItem(page, 'Chest', { label: 'Spellfire Training Robe' })
 
+  await openSlot(page, 'Chest')
   const craftingDetails = page.getByLabel('Chest crafting details')
   await expect(craftingDetails).toContainText('Tailoring')
   await expect(craftingDetails).toContainText('350 skill')
@@ -479,14 +559,21 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
-  await page.getByLabel('Head', { exact: true }).selectOption({ label: 'Cataclysm Helm' })
+  await selectSlotItem(page, 'Head', { label: 'Cataclysm Helm' })
 
-  const qualityLabel = page.locator('.gear-row', { has: page.getByLabel('Head', { exact: true }) }).locator('small strong')
-  await expect(qualityLabel).toHaveText('Epic')
-  await expect(qualityLabel).toHaveCSS('color', 'rgb(163, 53, 238)')
+  // Quality is carried by colour on the item name itself now, rather than spelled out in a caption.
+  // That is the whole reason quality is the one chromatic signal left in the interface, so the colour
+  // is the assertion that matters.
+  const itemName = page.getByRole('button', { name: 'Head slot', exact: true }).locator('.gear-item-name')
+  await expect(itemName).toHaveText('Cataclysm Helm')
+  await expect(itemName).toHaveCSS('color', 'rgb(163, 53, 238)')
 })
 
-test('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
   await page.goto('/')
 
   // Default Warrior/Fury is Physical DPS -> amber accent.
@@ -509,26 +596,24 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Elemental')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
   await expect(page.getByText('Elemental Shaman Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Restoration')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
   await expect(page.getByText('Restoration Shaman Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(0)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated healing/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(0)
+  })
 })
 
 test('Warrior specs hide the Relic slot and each get their own BiS list', async ({ page }) => {
@@ -537,19 +622,21 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByLabel('Specialization').selectOption('Arms')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Arms Warrior Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Protection')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Protection Warrior Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(1)
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(1)
+  })
 
-  await page.getByLabel('Chest', { exact: true }).selectOption({ label: 'Destroyer Chestguard' })
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
+  await selectSlotItem(page, 'Chest', { label: 'Destroyer Chestguard' })
 })
 
 test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve to catalog items', async () => {
@@ -577,29 +664,24 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Holy')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
   await expect(page.getByText('Holy Paladin Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Protection')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
   await expect(page.getByText('Protection Paladin Phase 2 Starter Ranked List')).toBeVisible()
 
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText('Effective Health', { exact: true })).toBeVisible()
-
   await page.getByLabel('Specialization').selectOption('Retribution')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
   await expect(page.getByText('Retribution Paladin Phase 2 Starter Ranked List')).toBeVisible()
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to catalog items', async () => {
@@ -627,22 +709,22 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByLabel('Specialization').selectOption('Holy')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Holy Priest Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Discipline')
   await expect(page.getByText('Discipline Priest Phase 2 Starter Ranked List')).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Shadow')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Shadow Priest Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+  })
 })
 
 test('Balance, Feral, and Restoration Druid Phase 2 starter rankings resolve to catalog items', async () => {
@@ -672,29 +754,22 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   await page.getByLabel('Class').selectOption('Druid')
   await page.getByLabel('Specialization').selectOption('Balance')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Balance Druid Phase 2 Starter Ranked List')).toBeVisible()
 
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-
   await page.getByLabel('Specialization').selectOption('Feral')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Feral Druid (Cat DPS) Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Restoration')
 
-  await expect(page.getByLabel('Ranged', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Restoration Druid Phase 2 Starter Ranked List')).toBeVisible()
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated healing/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('Beast Mastery, Marksmanship, and Survival Hunter Phase 2 starter rankings resolve to catalog items', async () => {
@@ -724,22 +799,22 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
   await page.getByLabel('Class').selectOption('Hunter')
   await page.getByLabel('Specialization').selectOption('Beast Mastery')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Beast Mastery Hunter Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Marksmanship')
   await expect(page.getByText('Marksmanship Hunter Phase 2 Starter Ranked List')).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Survival')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Survival Hunter Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Hands', { exact: true }).locator('option', { hasText: 'Gloves of Dexterous Manipulation' })).toHaveCount(1)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Hands', async () => {
+    await expect(page.getByLabel('Hands', { exact: true }).locator('option', { hasText: 'Gloves of Dexterous Manipulation' })).toHaveCount(1)
+  })
 })
 
 test('Arcane, Fire, and Frost Mage Phase 2 starter rankings resolve to catalog items', async () => {
@@ -767,22 +842,22 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
   await page.getByLabel('Class').selectOption('Mage')
   await page.getByLabel('Specialization').selectOption('Arcane')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Arcane Mage Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Fire')
   await expect(page.getByText('Fire Mage Phase 2 Starter Ranked List')).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Frost')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Frost Mage Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+  })
 })
 
 test('every class and spec now resolves to a Phase 2 BiS list', async () => {
@@ -841,26 +916,34 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   await page.getByLabel('Class').selectOption('Rogue')
   await page.getByLabel('Specialization').selectOption('Assassination')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Assassination Rogue Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of Vashj' })).toHaveCount(1)
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Heartrazor' })).toHaveCount(1)
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(1)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of Vashj' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Heartrazor' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Combat')
   await expect(page.getByText('Combat Rogue Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Warp Slicer' })).toHaveCount(1)
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Warp Slicer' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Subtlety')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Subtlety Rogue Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
+  })
 })
 
 test('Affliction, Demonology, and Destruction Warlock Phase 2 starter rankings resolve to catalog items', async () => {
@@ -888,25 +971,27 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await page.getByLabel('Class').selectOption('Warlock')
   await page.getByLabel('Specialization').selectOption('Affliction')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Affliction Warlock Phase 2 Starter Ranked List')).toBeVisible()
-  await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of the Leviathan' })).toHaveCount(1)
-  await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Fathomstone' })).toHaveCount(1)
-  await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+  await withSlotOpen(page, 'Main Hand', async () => {
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of the Leviathan' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Off Hand', async () => {
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Fathomstone' })).toHaveCount(1)
+  })
+  await withSlotOpen(page, 'Ranged', async () => {
+    await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
+  })
 
   await page.getByLabel('Specialization').selectOption('Demonology')
   await expect(page.getByText('Demonology Warlock Phase 2 Starter Ranked List')).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Destruction')
 
-  await expect(page.getByLabel('Relic', { exact: true })).toHaveCount(0)
+  await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Destruction Warlock Phase 2 Starter Ranked List')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
   await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Voidheart Cover' })).toBeVisible()
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  await expect(page.getByText(/estimated dps/i)).toBeVisible()
-  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('Professions tab shows skill tiers and material farming, and switches between professions', async ({ page }) => {
@@ -931,7 +1016,11 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
 })
 
-test('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
   await page.goto('/')
 
   // Default character is a Fury Warrior (melee physical DPS).
@@ -956,7 +1045,11 @@ test('stat weights rank stats correctly and separate unmodeled stats from capped
   await expect(page.getByTestId('stat-weight-hasteRating')).toHaveCount(0)
 })
 
-test('stat weights follow the character role and class', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('stat weights follow the character role and class', async ({ page }) => {
   await page.goto('/')
 
   // Hunters run the ranged attack table, so ranged attack power replaces melee AP as the reference.
@@ -988,7 +1081,11 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
 })
 
-test('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
   await page.goto('/')
 
   const mitigation = page.getByTestId('encounter-armor-mitigation')
@@ -1002,24 +1099,25 @@ test('encounter settings change armor mitigation and feed back into the simulati
   await expect(mitigation).toHaveText('24.9%')
 
   // ...and that has to actually reach the simulation, not just the encounter panel.
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const lowArmorScore = Number(await page.getByTestId('simulation-score').innerText())
 
   await page.getByRole('button', { name: /Heavily armored boss/ }).click()
   await expect(mitigation).toHaveText('50.2%')
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const highArmorScore = Number(await page.getByTestId('simulation-score').innerText())
 
   expect(lowArmorScore).toBeGreaterThan(highArmorScore)
 
   // Target level drives the attack table, so it must move the result too.
   await page.getByLabel('Target level').selectOption('70')
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const evenLevelScore = Number(await page.getByTestId('simulation-score').innerText())
   expect(evenLevelScore).toBeGreaterThan(highArmorScore)
 })
 
-test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
   await page.goto('/')
 
   const list = page.getByTestId('upgrade-list')
@@ -1056,13 +1154,10 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
   // The headline claim has to hold: equipping the top pick should move the simulation by
   // approximately the advertised amount. Because equipping applies the same gems the score assumed,
   // this also catches a candidate being scored gemmed but equipped bare.
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const before = Number(await page.getByTestId('simulation-score').innerText())
 
   const topDelta = deltas[0]
   await rows.first().getByRole('button', { name: /equip/i }).click()
-
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const after = Number(await page.getByTestId('simulation-score').innerText())
 
   expect(after - before).toBeGreaterThan(0)
@@ -1151,7 +1246,6 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   await page.goto('/')
 
   // Fury Warrior: Bloodthirst is cooldown-bound, so its rate is defensible and it is modelled.
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const withSpecial = Number(await page.getByTestId('simulation-score').innerText())
   const breakdown = page.locator('.breakdown-list')
   await expect(breakdown).toContainText(/Bloodthirst DPS/i)
@@ -1179,7 +1273,6 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   // Combat Rogue: no cooldown, but a fixed energy cost against a fixed regen rate is computable.
   await page.getByLabel('Class').selectOption('Rogue')
   await page.getByLabel('Specialization').selectOption('Combat')
-  await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).toContainText(/Sinister Strike DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/energy against 10\/sec regen/i)
 
@@ -1187,7 +1280,6 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   // weaving that isn't modelled. It must be named as excluded rather than silently omitted.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
   await page.getByLabel('Class').selectOption('Hunter')
-  await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
   await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
 })
@@ -1215,21 +1307,22 @@ test('the Raids tab renders a raid, its bosses and an attunement chain', async (
   await expect(attunement.locator('li').first()).toBeVisible()
 })
 
-test('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
+// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
+// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
+// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
+// in the project, and this coverage should come back with it.
+test.skip('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
   // The buffs panel is fully wired into calculateStats, calculateSimulation, stat weights and the
   // upgrade finder, and had no test at all — a regression that silently stopped applying buffs would
   // have passed the whole suite.
   await page.goto('/')
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const before = Number(await page.getByTestId('simulation-score').innerText())
 
   await page.getByTestId('buff-toggle-battle-shout').click()
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const withBuff = Number(await page.getByTestId('simulation-score').innerText())
   expect(withBuff, 'Battle Shout is attack power, so a Fury Warrior must gain from it').toBeGreaterThan(before)
 
   await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  await page.getByRole('button', { name: /run simulation/i }).click()
   const withFlask = Number(await page.getByTestId('simulation-score').innerText())
   expect(withFlask, 'a flask stacks on top of the buff rather than replacing it').toBeGreaterThan(withBuff)
 
@@ -1237,7 +1330,6 @@ test('toggling a buff and a consumable actually moves the simulated result', asy
   // would otherwise look correct on the way up and be wrong for the rest of the session.
   await page.getByTestId('buff-toggle-battle-shout').click()
   await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  await page.getByRole('button', { name: /run simulation/i }).click()
   expect(Number(await page.getByTestId('simulation-score').innerText())).toBe(before)
 })
 
@@ -1308,8 +1400,8 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
 
   // Two pieces of the same set, which is the most a player can currently assemble — only Head and
   // Chest of each Tier 5 set are catalogued so far, so the 4-piece bonus is unreachable by design.
-  await page.getByLabel('Head', { exact: true }).selectOption('Destroyer Battle-Helm')
-  await page.getByLabel('Chest', { exact: true }).selectOption('Destroyer Breastplate')
+  await selectSlotItem(page, 'Head', 'Destroyer Battle-Helm')
+  await selectSlotItem(page, 'Chest', 'Destroyer Breastplate')
 
   const sets = page.getByTestId('set-bonuses')
   await expect(sets).toBeVisible()
@@ -1368,7 +1460,6 @@ test('a feral druid swings cat form\'s own weapon, not the equipped one', async 
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
   await page.getByLabel('Class').selectOption('Druid')
   await page.getByLabel('Specialization').selectOption('Feral')
-  await page.getByRole('button', { name: /run simulation/i }).click()
 
   // TBC substitutes a fixed internal weapon in cat form — 43.5-66.5 damage on a 1.0s swing, so 55
   // weapon DPS — and every cat ability reads that rather than the equipped item. Reading the equipped
@@ -1508,7 +1599,7 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
   // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, so equip
   // one explicitly — this used to lean on the default main hand happening to be a sword, which
   // stopped being true when the catalogue was re-ingested.
-  await page.getByLabel('Main Hand', { exact: true }).selectOption('iblis-blade-of-the-fallen-seraph')
+  await selectSlotItem(page, 'Main Hand', 'iblis-blade-of-the-fallen-seraph')
   const swordSpec = page.getByTestId('racial-human-sword-specialization')
   await expect(swordSpec).toContainText(/Included in your stats/i)
 
@@ -1518,7 +1609,7 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
   // Swap to a non-sword main hand: the racial must switch off and the expertise must actually drop.
   // It has to be an axe, not the mace this once used — Humans get Mace Specialization too, so a mace
   // keeps expertise up and hides the very regression this assertion exists to catch.
-  await page.getByLabel('Main Hand', { exact: true }).selectOption('crulshorukh-edge-of-chaos')
+  await selectSlotItem(page, 'Main Hand', 'crulshorukh-edge-of-chaos')
   await expect(swordSpec).toContainText(/Only while wielding/i)
   expect(readStatValue(await page.getByTestId('stat-expertise').innerText())).toBeLessThan(expertiseWithSword)
 

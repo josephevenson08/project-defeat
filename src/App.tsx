@@ -25,7 +25,7 @@ import type { SimulationResult } from './features/simulator/simulationTypes'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import type { SimulationTarget } from './domain/simulation/encounterTypes'
 import { calculateStats } from './features/stats/calculateStats'
-import { StatsPanel } from './features/stats/StatsPanel'
+import { StatsRail } from './features/stats/StatsRail'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import type { TabDefinition } from './components/layout/TabNav'
@@ -36,6 +36,19 @@ const initialCharacter: CharacterProfile = {
   className: 'Warrior',
   spec: 'Fury',
 }
+
+/**
+ * The simulator is hidden, not deleted.
+ *
+ * `src/domain/simulation/` and `src/features/simulator/` hold the most carefully sourced work in the
+ * project — the attack tables, the defender-side avoidance research, Effective Health, the armor
+ * derivation. Deleting that would throw away research that took real effort to get right, so it stays
+ * compiled and type-checked behind this flag until it is brought back deliberately.
+ *
+ * Consequence: stat weights and the upgrade finder are built on the simulation, so they are hidden
+ * with it, and the rail shows plain stat totals rather than weighted values.
+ */
+const SHOW_SIMULATOR = false
 
 type AppTab = 'planner' | 'raids' | 'professions'
 
@@ -152,7 +165,7 @@ function App() {
   if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
 
   return (
-    <AppShell tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
+    <AppShell rail={<StatsRail stats={stats} />} tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'planner' && (
         <>
           <CharacterPanel character={character} gear={gear} onChange={updateCharacter} />
@@ -167,11 +180,14 @@ function App() {
             onToggleConsumable={toggleConsumable}
             onToggleTargetDebuff={toggleTargetDebuff}
           />
-          <StatsPanel stats={stats} role={role} />
-          <EncounterPanel target={target} role={role} onChange={updateTarget} />
-          <SimulatorPanel result={simulationResult} role={role} activeSets={activeSets} onRun={runSimulation} />
-          <StatWeightsPanel weights={statWeights} role={role} />
-          <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
+          {SHOW_SIMULATOR && (
+            <>
+              <EncounterPanel target={target} role={role} onChange={updateTarget} />
+              <SimulatorPanel result={simulationResult} role={role} activeSets={activeSets} onRun={runSimulation} />
+              <StatWeightsPanel weights={statWeights} role={role} />
+              <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
+            </>
+          )}
           <BuildPanel state={buildState} role={role} onImport={importBuild} />
         </>
       )}

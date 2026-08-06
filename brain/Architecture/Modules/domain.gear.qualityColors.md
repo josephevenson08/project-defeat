@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 

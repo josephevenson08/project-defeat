@@ -3,27 +3,36 @@ import { TabNav, type TabDefinition } from './TabNav'
 
 type AppShellProps<T extends string> = {
   children: ReactNode
+  /** Persistent left-rail content. This is where the stat readout lives. */
+  rail: ReactNode
   tabs: readonly TabDefinition<T>[]
   activeTab: T
   onTabChange: (tab: T) => void
 }
 
-export function AppShell<T extends string>({ children, tabs, activeTab, onTabChange }: AppShellProps<T>) {
+/**
+ * Discord's skeleton: a persistent left rail that never navigates away, one main pane that swaps
+ * content, and popups layered over the top rather than modes you travel between.
+ *
+ * The rail holds the stat readout deliberately — totals are the thing you keep glancing at while
+ * changing gear, so they must not be a tab you have to leave the gear behind to reach.
+ */
+export function AppShell<T extends string>({ children, rail, tabs, activeTab, onTabChange }: AppShellProps<T>) {
   return (
-    <main className="app-shell">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">Local MVP</p>
+    <div className="app-shell">
+      <aside className="rail" aria-label="Character summary">
+        <div className="rail-brand">
           <h1>Project Defeat</h1>
-          <p>A local simulator and planning prototype for MMO-style character builds.</p>
+          <p className="rail-brand-sub">TBC Classic · Phase 2</p>
         </div>
-        <div className="hero-badge">
-          <span>Prototype</span>
-          <strong>Combat Lab</strong>
-        </div>
-      </header>
-      <TabNav tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
-      <div className="dashboard-grid">{children}</div>
-    </main>
+        {rail}
+      </aside>
+      <main className="app-main">
+        <header className="topbar">
+          <TabNav tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
+        </header>
+        <div className="content">{children}</div>
+      </main>
+    </div>
   )
 }

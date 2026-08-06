@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
+- [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases
 

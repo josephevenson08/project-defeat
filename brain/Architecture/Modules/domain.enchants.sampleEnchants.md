@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 

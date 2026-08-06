@@ -1,33 +1,30 @@
 ---
 type: module
 layer: features
-source: src/features/stats/StatsPanel.tsx
-lines: 37
+source: src/features/stats/StatsRail.tsx
+lines: 66
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.stats.StatsPanel
+# features.stats.StatsRail
 
-`src/features/stats/StatsPanel.tsx` · **features** layer · 37 lines
+`src/features/stats/StatsRail.tsx` · **features** layer · 66 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `StatsPanel`
+**function** — `StatsRail`
 
 ## Imports
 
-- [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`
 - [[lib.animations]] — `src/lib/animations.ts`
 
 ## Imported by
 
-_None._
+- [[App]] — `src/App.tsx`
 
 ## Concepts & phases
 

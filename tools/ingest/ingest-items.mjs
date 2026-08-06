@@ -129,6 +129,13 @@ const CLASS_MAP = {
 // Parsing
 // ---------------------------------------------------------------------------
 
+/**
+ * Blizzard's own test and NPC-only entries. They are real rows in the item database — and Wowhead
+ * serves them — but they are not obtainable, and "Tom's Legs 3" at item level 145 outranked every
+ * real Tier 5 legging and became the default gear for every class.
+ */
+const EXCLUDED_NAME = /^Tom's Legs |^Monster - |^OLD |^zz|\[PH\]|^Deprecated|^NPC /i
+
 const rx = {
   name: /(?:^|\{)Name: "((?:[^"\\]|\\.)*)"/,
   id: /[,{]\s*ID: (\d+)/,
@@ -201,6 +208,7 @@ function parseLine(line, unmappedTally) {
   const name = match(line, rx.name)
   const id = match(line, rx.id, Number)
   if (!name || !id) return undefined
+  if (EXCLUDED_NAME.test(name)) return { skipped: { name, id, reason: 'test/NPC-only item' } }
 
   const type = match(line, rx.type)
   const handType = match(line, rx.handType)
