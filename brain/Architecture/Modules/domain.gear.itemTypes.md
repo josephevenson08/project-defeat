@@ -43,6 +43,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
+- [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
-import { sampleGems } from '../../domain/gems/sampleGems'
+import { getGemsForSocket } from '../../domain/gems/sampleGems'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
@@ -118,7 +118,10 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
                     onChange={(event) => onChangeGem(index, event.target.value)}
                   >
                     <option value="">No gem</option>
-                    {sampleGems.map((gem) => (
+                    {/* Only gems that fit this socket, hybrids included — an Orange gem is legal in
+                        a red socket and satisfies its bonus, so filtering to exact colour would hide
+                        more than half the catalogue. */}
+                    {getGemsForSocket(socket).map((gem) => (
                       <option key={gem.id} value={gem.id}>
                         {gem.name}
                       </option>

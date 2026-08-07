@@ -2,25 +2,31 @@
 type: module
 layer: domain
 source: src/domain/gems/sampleGems.ts
-lines: 41
+lines: 30
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gems.sampleGems
 
-`src/domain/gems/sampleGems.ts` · **domain** layer · 41 lines
+`src/domain/gems/sampleGems.ts` · **domain** layer · 30 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> The gem catalogue, ingested from wowsims/tbc by `tools/ingest/ingest-gems-enchants.mjs`.
+> 
+> This was 11 hand-written gems against 4,528 items, which made every socket dropdown in the app
+> offer the same dozen options regardless of colour. It is now the full 212.
 
 ## Exports
 
-**function** — `getGemById`
+**function** — `getGemById`, `getGemsForSocket`
 
 **const** — `sampleGems`
 
 ## Imports
 
+- [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 
 ## Imported by

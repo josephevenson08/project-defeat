@@ -19,8 +19,8 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **124** itemsFlagged
 - **1440** bisEntries
 - **1040** bisEntriesRankedDeeperThanOne
-- **11** gems
-- **22** enchants
+- **212** gems
+- **79** enchants
 - **14** buffs
 - **6** debuffs
 - **14** consumables

@@ -1,0 +1,905 @@
+{
+  "$schema": "wowsims-tbc enchant ingestion",
+  "upstream": {
+    "repo": "wowsims/tbc",
+    "sha": "3301fca59306a747e521274c36e073e69acc7b77",
+    "path": "sim/core/items/all_enchants.go",
+    "license": "MIT"
+  },
+  "generatedBy": "tools/ingest/ingest-gems-enchants.mjs",
+  "enchantCount": 79,
+  "enchants": [
+    {
+      "id": "enchant-cloak-lesser-agility",
+      "wowEnchantId": 11206,
+      "name": "Enchant Cloak - Lesser Agility",
+      "slot": "Back",
+      "stats": {
+        "agility": 3
+      },
+      "effectId": 849
+    },
+    {
+      "id": "enchant-boots-spirit",
+      "wowEnchantId": 16220,
+      "name": "Enchant Boots - Spirit",
+      "slot": "Feet",
+      "stats": {
+        "spirit": 5
+      },
+      "effectId": 851
+    },
+    {
+      "id": "weapon-superior-striking",
+      "wowEnchantId": 16250,
+      "name": "Weapon - Superior Striking",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 1897,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "weapon-crusader",
+      "wowEnchantId": 16252,
+      "name": "Weapon - Crusader",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 1900,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "biznicks-247x128-accurascope",
+      "wowEnchantId": 18283,
+      "name": "Biznicks 247x128 Accurascope",
+      "slot": "Ranged",
+      "stats": {},
+      "effectId": 2523,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "weapon-agility",
+      "wowEnchantId": 19445,
+      "name": "Weapon - Agility",
+      "slot": "Main Hand",
+      "stats": {
+        "agility": 15
+      },
+      "effectId": 2564,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "presence-of-might",
+      "wowEnchantId": 19782,
+      "name": "Presence of Might",
+      "slot": "Head",
+      "stats": {
+        "stamina": 10,
+        "defenseRating": 10,
+        "blockValue": 15
+      },
+      "effectId": 2583,
+      "allowedClasses": [
+        "Warrior"
+      ]
+    },
+    {
+      "id": "zandalar-signet-of-mojo",
+      "wowEnchantId": 20076,
+      "name": "Zandalar Signet of Mojo",
+      "slot": "Shoulders",
+      "stats": {
+        "spellPower": 18
+      },
+      "effectId": 2605
+    },
+    {
+      "id": "gloves-shadow-power",
+      "wowEnchantId": 20727,
+      "name": "Gloves - Shadow Power",
+      "slot": "Hands",
+      "stats": {},
+      "effectId": 2614,
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "ShadowSpellPower": 20
+      }
+    },
+    {
+      "id": "major-defense",
+      "wowEnchantId": 22530,
+      "name": "Major Defense",
+      "slot": "Wrists",
+      "stats": {
+        "defenseRating": 12
+      },
+      "effectId": 2648
+    },
+    {
+      "id": "bracer-fortitude",
+      "wowEnchantId": 22533,
+      "name": "Bracer - Fortitude",
+      "slot": "Wrists",
+      "stats": {
+        "stamina": 12
+      },
+      "effectId": 2649
+    },
+    {
+      "id": "bracer-spellpower",
+      "wowEnchantId": 22534,
+      "name": "Bracer - Spellpower",
+      "slot": "Wrists",
+      "stats": {
+        "spellPower": 15
+      },
+      "effectId": 2650
+    },
+    {
+      "id": "ring-striking",
+      "wowEnchantId": 22535,
+      "name": "Ring - Striking",
+      "slot": "Finger 1",
+      "stats": {},
+      "effectId": 2929,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "ring-spellpower",
+      "wowEnchantId": 22536,
+      "name": "Ring - Spellpower",
+      "slot": "Finger 1",
+      "stats": {
+        "spellPower": 12
+      },
+      "effectId": 2928
+    },
+    {
+      "id": "ring-stats",
+      "wowEnchantId": 22538,
+      "name": "Ring - Stats",
+      "slot": "Finger 1",
+      "stats": {
+        "stamina": 4,
+        "intellect": 4,
+        "spirit": 4,
+        "strength": 4,
+        "agility": 4
+      },
+      "effectId": 2931
+    },
+    {
+      "id": "shield-intellect",
+      "wowEnchantId": 22539,
+      "name": "Shield - Intellect",
+      "slot": "Off Hand",
+      "stats": {
+        "intellect": 12
+      },
+      "effectId": 2654,
+      "requiresShield": true
+    },
+    {
+      "id": "enchant-boots-fortitude",
+      "wowEnchantId": 22543,
+      "name": "Enchant Boots - Fortitude",
+      "slot": "Feet",
+      "stats": {
+        "stamina": 12
+      },
+      "effectId": 2649
+    },
+    {
+      "id": "enchant-boots-dexterity",
+      "wowEnchantId": 22544,
+      "name": "Enchant Boots - Dexterity",
+      "slot": "Feet",
+      "stats": {
+        "agility": 12
+      },
+      "effectId": 2657
+    },
+    {
+      "id": "enchant-boots-surefooted",
+      "wowEnchantId": 22545,
+      "name": "Enchant Boots - Surefooted",
+      "slot": "Feet",
+      "stats": {
+        "hitRating": 10
+      },
+      "effectId": 2658
+    },
+    {
+      "id": "chest-exceptional-mana",
+      "wowEnchantId": 22546,
+      "name": "Chest - Exceptional Mana",
+      "slot": "Chest",
+      "stats": {},
+      "effectId": 2660,
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "Mana": 150
+      }
+    },
+    {
+      "id": "weapon-major-intellect",
+      "wowEnchantId": 22551,
+      "name": "Weapon - Major Intellect",
+      "slot": "Main Hand",
+      "stats": {
+        "intellect": 30
+      },
+      "effectId": 2666,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "weapon-major-striking",
+      "wowEnchantId": 22552,
+      "name": "Weapon - Major Striking",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 963,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "savagery",
+      "wowEnchantId": 22554,
+      "name": "Savagery",
+      "slot": "Main Hand",
+      "stats": {
+        "attackPower": 70,
+        "rangedAttackPower": 70
+      },
+      "effectId": 2667,
+      "requiresTwoHand": true
+    },
+    {
+      "id": "weapon-major-spellpower",
+      "wowEnchantId": 22555,
+      "name": "Weapon - Major Spellpower",
+      "slot": "Main Hand",
+      "stats": {
+        "spellPower": 40
+      },
+      "effectId": 2669,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "2h-weapon-major-agility",
+      "wowEnchantId": 22556,
+      "name": "2H Weapon - Major Agility",
+      "slot": "Main Hand",
+      "stats": {
+        "agility": 35
+      },
+      "effectId": 2670,
+      "requiresTwoHand": true
+    },
+    {
+      "id": "weapon-mongoose",
+      "wowEnchantId": 22559,
+      "name": "Weapon - Mongoose",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 2673,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "sunfire",
+      "wowEnchantId": 22560,
+      "name": "Sunfire",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 2671,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "ArcaneSpellPower": 50,
+        "FireSpellPower": 50
+      }
+    },
+    {
+      "id": "soulfrost",
+      "wowEnchantId": 22561,
+      "name": "Soulfrost",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 2672,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "FrostSpellPower": 54,
+        "ShadowSpellPower": 54
+      }
+    },
+    {
+      "id": "power-of-the-scourge",
+      "wowEnchantId": 23545,
+      "name": "Power of the Scourge",
+      "slot": "Shoulders",
+      "stats": {
+        "spellPower": 15,
+        "spellCritRating": 14
+      },
+      "effectId": 2721
+    },
+    {
+      "id": "might-of-the-scourge",
+      "wowEnchantId": 23548,
+      "name": "Might of the Scourge",
+      "slot": "Shoulders",
+      "stats": {
+        "attackPower": 26,
+        "rangedAttackPower": 26,
+        "critRating": 14
+      },
+      "effectId": 2717
+    },
+    {
+      "id": "fortitude-of-the-scourge",
+      "wowEnchantId": 23549,
+      "name": "Fortitude of the Scourge",
+      "slot": "Shoulders",
+      "stats": {
+        "stamina": 16,
+        "armor": 100
+      },
+      "effectId": 2716
+    },
+    {
+      "id": "khorium-scope",
+      "wowEnchantId": 23765,
+      "name": "Khorium Scope",
+      "slot": "Ranged",
+      "stats": {},
+      "effectId": 2723,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "stabilized-eternium-scope",
+      "wowEnchantId": 23766,
+      "name": "Stabilized Eternium Scope",
+      "slot": "Ranged",
+      "stats": {},
+      "effectId": 2724,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "chest-exceptional-stats",
+      "wowEnchantId": 24003,
+      "name": "Chest - Exceptional Stats",
+      "slot": "Chest",
+      "stats": {
+        "stamina": 6,
+        "intellect": 6,
+        "spirit": 6,
+        "strength": 6,
+        "agility": 6
+      },
+      "effectId": 2661
+    },
+    {
+      "id": "mystic-spellthread",
+      "wowEnchantId": 24273,
+      "name": "Mystic Spellthread",
+      "slot": "Legs",
+      "stats": {
+        "spellPower": 25,
+        "stamina": 15
+      },
+      "effectId": 2747
+    },
+    {
+      "id": "runic-spellthread",
+      "wowEnchantId": 24274,
+      "name": "Runic Spellthread",
+      "slot": "Legs",
+      "stats": {
+        "spellPower": 35,
+        "stamina": 20
+      },
+      "effectId": 2748
+    },
+    {
+      "id": "bracer-brawn",
+      "wowEnchantId": 27899,
+      "name": "Bracer - Brawn",
+      "slot": "Wrists",
+      "stats": {
+        "strength": 12
+      },
+      "effectId": 2647
+    },
+    {
+      "id": "bracer-stats",
+      "wowEnchantId": 27905,
+      "name": "Bracer - Stats",
+      "slot": "Wrists",
+      "stats": {
+        "stamina": 4,
+        "intellect": 4,
+        "spirit": 4,
+        "strength": 4,
+        "agility": 4
+      },
+      "effectId": 1891
+    },
+    {
+      "id": "chest-exceptional-health",
+      "wowEnchantId": 27957,
+      "name": "Chest - Exceptional Health",
+      "slot": "Chest",
+      "stats": {},
+      "effectId": 2659,
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "Health": 150
+      }
+    },
+    {
+      "id": "chest-major-resilience",
+      "wowEnchantId": 28270,
+      "name": "Chest - Major Resilience",
+      "slot": "Chest",
+      "stats": {
+        "resilienceRating": 15
+      },
+      "effectId": 2933
+    },
+    {
+      "id": "gloves-spell-strike",
+      "wowEnchantId": 28271,
+      "name": "Gloves - Spell Strike",
+      "slot": "Hands",
+      "stats": {
+        "spellHitRating": 15
+      },
+      "effectId": 2935
+    },
+    {
+      "id": "gloves-major-spellpower",
+      "wowEnchantId": 28272,
+      "name": "Gloves - Major Spellpower",
+      "slot": "Hands",
+      "stats": {
+        "spellPower": 20
+      },
+      "effectId": 2937
+    },
+    {
+      "id": "enchant-cloak-spell-penetration",
+      "wowEnchantId": 28274,
+      "name": "Enchant Cloak - Spell Penetration",
+      "slot": "Back",
+      "stats": {},
+      "effectId": 2938,
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "SpellPenetration": 20
+      }
+    },
+    {
+      "id": "enchant-cloak-greater-shadow-resistance",
+      "wowEnchantId": 28277,
+      "name": "Enchant Cloak - Greater Shadow Resistance",
+      "slot": "Back",
+      "stats": {},
+      "effectId": 1441,
+      "notModelled": "Proc or on-use effect; no flat stats to add.",
+      "extraStats": {
+        "ShadowResistance": 15
+      }
+    },
+    {
+      "id": "enchant-boots-cats-swiftness",
+      "wowEnchantId": 28279,
+      "name": "Enchant Boots - Cat's Swiftness",
+      "slot": "Feet",
+      "stats": {
+        "agility": 6
+      },
+      "effectId": 2939
+    },
+    {
+      "id": "shield-major-stamina",
+      "wowEnchantId": 28282,
+      "name": "Shield - Major Stamina",
+      "slot": "Off Hand",
+      "stats": {
+        "stamina": 18
+      },
+      "effectId": 1071,
+      "requiresShield": true
+    },
+    {
+      "id": "greater-inscription-of-discipline",
+      "wowEnchantId": 28886,
+      "name": "Greater Inscription of Discipline",
+      "slot": "Shoulders",
+      "stats": {
+        "spellPower": 18,
+        "spellCritRating": 10
+      },
+      "effectId": 2982
+    },
+    {
+      "id": "greater-inscription-of-vengeance",
+      "wowEnchantId": 28888,
+      "name": "Greater Inscription of Vengeance",
+      "slot": "Shoulders",
+      "stats": {
+        "attackPower": 30,
+        "rangedAttackPower": 30,
+        "critRating": 10
+      },
+      "effectId": 2986
+    },
+    {
+      "id": "greater-inscription-of-warding",
+      "wowEnchantId": 28889,
+      "name": "Greater Inscription of Warding",
+      "slot": "Shoulders",
+      "stats": {
+        "defenseRating": 10,
+        "dodgeRating": 15
+      },
+      "effectId": 2978
+    },
+    {
+      "id": "greater-inscription-of-the-orb",
+      "wowEnchantId": 28909,
+      "name": "Greater Inscription of the Orb",
+      "slot": "Shoulders",
+      "stats": {
+        "spellPower": 12,
+        "spellCritRating": 15
+      },
+      "effectId": 2995
+    },
+    {
+      "id": "greater-inscription-of-the-blade",
+      "wowEnchantId": 28910,
+      "name": "Greater Inscription of the Blade",
+      "slot": "Shoulders",
+      "stats": {
+        "attackPower": 20,
+        "rangedAttackPower": 20,
+        "critRating": 15
+      },
+      "effectId": 2997
+    },
+    {
+      "id": "greater-inscription-of-the-knight",
+      "wowEnchantId": 28911,
+      "name": "Greater Inscription of the Knight",
+      "slot": "Shoulders",
+      "stats": {
+        "defenseRating": 15,
+        "dodgeRating": 10
+      },
+      "effectId": 2991
+    },
+    {
+      "id": "glyph-of-the-defender",
+      "wowEnchantId": 29186,
+      "name": "Glyph of the Defender",
+      "slot": "Head",
+      "stats": {
+        "defenseRating": 16,
+        "dodgeRating": 17
+      },
+      "effectId": 2999
+    },
+    {
+      "id": "glyph-of-power",
+      "wowEnchantId": 29191,
+      "name": "Glyph of Power",
+      "slot": "Head",
+      "stats": {
+        "spellPower": 22,
+        "spellHitRating": 14
+      },
+      "effectId": 3002
+    },
+    {
+      "id": "glyph-of-ferocity",
+      "wowEnchantId": 29192,
+      "name": "Glyph of Ferocity",
+      "slot": "Head",
+      "stats": {
+        "attackPower": 34,
+        "rangedAttackPower": 34,
+        "hitRating": 16
+      },
+      "effectId": 3003
+    },
+    {
+      "id": "glyph-of-the-gladiator",
+      "wowEnchantId": 29193,
+      "name": "Glyph of the Gladiator",
+      "slot": "Head",
+      "stats": {
+        "stamina": 18,
+        "resilienceRating": 20
+      },
+      "effectId": 3004
+    },
+    {
+      "id": "cobrahide-leg-armor",
+      "wowEnchantId": 29533,
+      "name": "Cobrahide Leg Armor",
+      "slot": "Legs",
+      "stats": {
+        "attackPower": 40,
+        "rangedAttackPower": 40,
+        "critRating": 10
+      },
+      "effectId": 3010
+    },
+    {
+      "id": "clefthide-leg-armor",
+      "wowEnchantId": 29534,
+      "name": "Clefthide Leg Armor",
+      "slot": "Legs",
+      "stats": {
+        "stamina": 30,
+        "agility": 10
+      },
+      "effectId": 3011
+    },
+    {
+      "id": "nethercobra-leg-armor",
+      "wowEnchantId": 29535,
+      "name": "Nethercobra Leg Armor",
+      "slot": "Legs",
+      "stats": {
+        "attackPower": 50,
+        "rangedAttackPower": 50,
+        "critRating": 12
+      },
+      "effectId": 3012
+    },
+    {
+      "id": "nethercleft-leg-armor",
+      "wowEnchantId": 29536,
+      "name": "Nethercleft Leg Armor",
+      "slot": "Legs",
+      "stats": {
+        "stamina": 40,
+        "agility": 12
+      },
+      "effectId": 3013
+    },
+    {
+      "id": "glyph-of-the-outcast",
+      "wowEnchantId": 30846,
+      "name": "Glyph of the Outcast",
+      "slot": "Head",
+      "stats": {
+        "strength": 17,
+        "intellect": 16
+      },
+      "effectId": 3096
+    },
+    {
+      "id": "enchant-cloak-dodge",
+      "wowEnchantId": 33148,
+      "name": "Enchant Cloak - Dodge",
+      "slot": "Back",
+      "stats": {
+        "dodgeRating": 12
+      },
+      "effectId": 2622
+    },
+    {
+      "id": "enchant-cloak-subtlety",
+      "wowEnchantId": 33150,
+      "name": "Enchant Cloak - Subtlety",
+      "slot": "Back",
+      "stats": {},
+      "effectId": 2621,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "gloves-major-agility",
+      "wowEnchantId": 33152,
+      "name": "Gloves - Major Agility",
+      "slot": "Hands",
+      "stats": {
+        "agility": 15
+      },
+      "effectId": 2564
+    },
+    {
+      "id": "gloves-threat",
+      "wowEnchantId": 33153,
+      "name": "Gloves - Threat",
+      "slot": "Hands",
+      "stats": {},
+      "effectId": 2613,
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "weapon-greater-agility",
+      "wowEnchantId": 33165,
+      "name": "Weapon - Greater Agility",
+      "slot": "Main Hand",
+      "stats": {
+        "agility": 20
+      },
+      "effectId": 3222,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "weapon-executioner",
+      "wowEnchantId": 33307,
+      "name": "Weapon - Executioner",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 3225,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "chest-major-spirit",
+      "wowEnchantId": 33990,
+      "name": "Chest - Major Spirit",
+      "slot": "Chest",
+      "stats": {
+        "spirit": 15
+      },
+      "effectId": 1144
+    },
+    {
+      "id": "chest-restore-mana-prime",
+      "wowEnchantId": 33991,
+      "name": "Chest - Restore Mana Prime",
+      "slot": "Chest",
+      "stats": {
+        "mp5": 6
+      },
+      "effectId": 3150
+    },
+    {
+      "id": "gloves-major-strength",
+      "wowEnchantId": 33995,
+      "name": "Gloves - Major Strength",
+      "slot": "Hands",
+      "stats": {
+        "strength": 15
+      },
+      "effectId": 684
+    },
+    {
+      "id": "bracer-major-intellect",
+      "wowEnchantId": 34001,
+      "name": "Bracer - Major Intellect",
+      "slot": "Wrists",
+      "stats": {
+        "intellect": 12
+      },
+      "effectId": 369
+    },
+    {
+      "id": "bracer-assault",
+      "wowEnchantId": 34002,
+      "name": "Bracer - Assault",
+      "slot": "Wrists",
+      "stats": {
+        "attackPower": 24,
+        "rangedAttackPower": 24
+      },
+      "effectId": 1593
+    },
+    {
+      "id": "enchant-cloak-greater-agility",
+      "wowEnchantId": 34004,
+      "name": "Enchant Cloak - Greater Agility",
+      "slot": "Back",
+      "stats": {
+        "agility": 12
+      },
+      "effectId": 368
+    },
+    {
+      "id": "enchant-boots-boars-speed",
+      "wowEnchantId": 35297,
+      "name": "Enchant Boots - Boar's Speed",
+      "slot": "Feet",
+      "stats": {
+        "stamina": 9
+      },
+      "effectId": 2940
+    },
+    {
+      "id": "enchant-boots-vitality",
+      "wowEnchantId": 35298,
+      "name": "Enchant Boots - Vitality",
+      "slot": "Feet",
+      "stats": {
+        "mp5": 4
+      },
+      "effectId": 2656
+    },
+    {
+      "id": "deathfrost",
+      "wowEnchantId": 35498,
+      "name": "Deathfrost",
+      "slot": "Main Hand",
+      "stats": {},
+      "effectId": 3273,
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ],
+      "notModelled": "Proc or on-use effect; no flat stats to add."
+    },
+    {
+      "id": "chest-defense",
+      "wowEnchantId": 35500,
+      "name": "Chest - Defense",
+      "slot": "Chest",
+      "stats": {
+        "defenseRating": 15
+      },
+      "effectId": 1950
+    },
+    {
+      "id": "enchant-cloak-steelweave",
+      "wowEnchantId": 35756,
+      "name": "Enchant Cloak - Steelweave",
+      "slot": "Back",
+      "stats": {
+        "defenseRating": 12
+      },
+      "effectId": 2648
+    },
+    {
+      "id": "shield-resilience",
+      "wowEnchantId": 44383,
+      "name": "Shield - Resilience",
+      "slot": "Off Hand",
+      "stats": {
+        "resilienceRating": 12
+      },
+      "effectId": 3229,
+      "requiresShield": true
+    }
+  ]
+}

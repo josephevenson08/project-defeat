@@ -27,7 +27,6 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
-- [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 

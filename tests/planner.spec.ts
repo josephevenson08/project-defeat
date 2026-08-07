@@ -391,13 +391,13 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   })
 
   await withSlotOpen(page, 'Main Hand', async () => {
-    await expect(page.getByLabel('Main Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+    await expect(page.getByLabel('Main Hand enchant')).toContainText('Weapon - Mongoose')
   })
   await withSlotOpen(page, 'Off Hand', async () => {
-    await expect(page.getByLabel('Off Hand enchant')).toContainText('Enchant Weapon - Mongoose')
+    await expect(page.getByLabel('Off Hand enchant')).toContainText('Weapon - Mongoose')
   })
   await withSlotOpen(page, 'Off Hand', async () => {
-    await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Enchant Shield - Defense')
+    await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Shield - Major Stamina')
   })
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)

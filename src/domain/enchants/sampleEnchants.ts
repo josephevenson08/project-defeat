@@ -1,140 +1,24 @@
+import rawEnchants from './enchantCatalogue.json' with { type: 'json' }
 import type { CharacterProfile } from '../character/characterTypes'
-import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from '../gear/gearSlots'
 import type { GearItem } from '../gear/itemTypes'
 import type { Enchant } from './enchantTypes'
 
-export const sampleEnchants: readonly Enchant[] = [
-  { id: 'glyph-of-ferocity', name: 'Glyph of Ferocity', slot: 'Head', source: 'Reputation', roles: ['Physical DPS'], stats: { attackPower: 34, hitRating: 16 } },
-  { id: 'glyph-of-power', name: 'Glyph of Power', slot: 'Head', source: 'Reputation', roles: ['Caster DPS'], stats: { spellPower: 22, spellHitRating: 14 } },
-  { id: 'glyph-of-renewal', name: 'Glyph of Renewal', slot: 'Head', source: 'Reputation', roles: ['Healer'], stats: { healingPower: 28, mp5: 4 } },
-  { id: 'greater-stats-chest', name: 'Enchant Chest - Exceptional Stats', slot: 'Chest', source: 'Other', stats: { strength: 6, agility: 6, stamina: 6, intellect: 6, spirit: 6 } },
-  { id: 'assault-wrists', name: 'Enchant Bracer - Assault', slot: 'Wrists', source: 'Other', roles: ['Physical DPS'], stats: { attackPower: 24 } },
-  { id: 'spellpower-wrists', name: 'Enchant Bracer - Spellpower', slot: 'Wrists', source: 'Other', roles: ['Caster DPS'], stats: { spellPower: 15 } },
-  { id: 'superior-healing-wrists', name: 'Enchant Bracer - Superior Healing', slot: 'Wrists', source: 'Other', roles: ['Healer'], stats: { healingPower: 20 } },
-  {
-    id: 'major-spellpower-weapon',
-    name: 'Enchant Weapon - Major Spellpower',
-    slot: 'Main Hand',
-    source: 'Other',
-    roles: ['Caster DPS', 'Healer'],
-    allowedSlots: ['Main Hand', 'Off Hand'],
-    allowedWeaponTypes: ['Dagger', 'Mace', 'Sword', 'Staff'],
-    stats: { spellPower: 40 },
-  },
-  {
-    id: 'major-healing-weapon',
-    name: 'Enchant Weapon - Major Healing',
-    slot: 'Main Hand',
-    source: 'Other',
-    roles: ['Healer'],
-    allowedSlots: ['Main Hand', 'Off Hand'],
-    allowedWeaponTypes: ['Dagger', 'Mace', 'Sword', 'Staff'],
-    stats: { healingPower: 55 },
-  },
-  {
-    id: 'mongoose-main-hand',
-    name: 'Enchant Weapon - Mongoose',
-    slot: 'Main Hand',
-    source: 'Other',
-    roles: ['Physical DPS'],
-    allowedSlots: ['Main Hand', 'Off Hand'],
-    allowedWeaponTypes: ['Axe', 'Dagger', 'Fist Weapon', 'Mace', 'Sword'],
-    stats: { agility: 20, hasteRating: 10 },
-  },
-  {
-    id: 'major-agility-weapon',
-    name: 'Enchant Weapon - Major Agility',
-    slot: 'Main Hand',
-    source: 'Other',
-    roles: ['Physical DPS'],
-    allowedSlots: ['Main Hand', 'Off Hand'],
-    allowedWeaponTypes: ['Axe', 'Dagger', 'Fist Weapon', 'Mace', 'Sword'],
-    needsVerification: true,
-    notes: 'Starter enchant option; verify final TBC source and ranking before treating as BiS.',
-    stats: { agility: 20 },
-  },
-  { id: 'surefooted-feet', name: 'Enchant Boots - Surefooted', slot: 'Feet', source: 'Other', roles: ['Physical DPS'], stats: { hitRating: 10, critRating: 5 } },
-  { id: 'healing-hands', name: 'Enchant Gloves - Major Healing', slot: 'Hands', source: 'Other', roles: ['Healer'], stats: { healingPower: 35 } },
-  {
-    id: 'defense-shield',
-    name: 'Enchant Shield - Defense',
-    slot: 'Off Hand',
-    source: 'Other',
-    roles: ['Tank'],
-    allowedWeaponTypes: ['Shield'],
-    stats: { defenseRating: 18 },
-  },
-  {
-    id: 'intellect-shield',
-    name: 'Enchant Shield - Intellect',
-    slot: 'Off Hand',
-    source: 'Other',
-    roles: ['Healer'],
-    allowedWeaponTypes: ['Shield'],
-    needsVerification: true,
-    notes: 'Starter enchant option; verify final TBC value before treating as BiS.',
-    stats: { intellect: 12 },
-  },
-  {
-    id: 'inscription-of-vengeance',
-    name: 'Greater Inscription of Vengeance',
-    slot: 'Shoulders',
-    source: 'Reputation',
-    roles: ['Physical DPS'],
-    stats: { attackPower: 30, critRating: 15 },
-  },
-  {
-    id: 'inscription-of-discipline',
-    name: 'Greater Inscription of Discipline',
-    slot: 'Shoulders',
-    source: 'Reputation',
-    roles: ['Caster DPS'],
-    stats: { spellPower: 20, spellCritRating: 10 },
-  },
-  {
-    id: 'inscription-of-faith',
-    name: 'Greater Inscription of Faith',
-    slot: 'Shoulders',
-    source: 'Reputation',
-    roles: ['Healer'],
-    stats: { healingPower: 35, mp5: 3 },
-  },
-  {
-    id: 'inscription-of-warding',
-    name: 'Greater Inscription of Warding',
-    slot: 'Shoulders',
-    source: 'Reputation',
-    roles: ['Tank'],
-    stats: { defenseRating: 15, stamina: 15 },
-  },
-  {
-    id: 'enchant-cloak-greater-agility',
-    name: 'Enchant Cloak - Greater Agility',
-    slot: 'Back',
-    source: 'Other',
-    roles: ['Physical DPS'],
-    stats: { agility: 12 },
-  },
-  {
-    id: 'nethercobra-leg-armor',
-    name: 'Nethercobra Leg Armor',
-    slot: 'Legs',
-    source: 'Crafted',
-    roles: ['Physical DPS'],
-    stats: { agility: 18, attackPower: 22 },
-    notes: "Leatherworking Leg Armor patch; usable regardless of the wearer's own profession.",
-  },
-  {
-    id: 'clefthide-leg-armor',
-    name: 'Clefthide Leg Armor',
-    slot: 'Legs',
-    source: 'Crafted',
-    roles: ['Tank'],
-    stats: { stamina: 28, defenseRating: 15 },
-    notes: "Leatherworking Leg Armor patch; usable regardless of the wearer's own profession.",
-  },
-]
+/**
+ * The enchant catalogue, ingested from wowsims/tbc by `tools/ingest/ingest-gems-enchants.mjs`.
+ *
+ * This was 22 hand-written entries covering a handful of slots — glove and boot enchants existed for
+ * one role each — and is now the full 79.
+ *
+ * What the ingested data does *not* carry is the old hand-written role and spec tagging, which used
+ * to hide, say, spell-power enchants from a warrior. That filtering is gone deliberately: the game
+ * does not restrict enchants by role, and with 3-14 options per slot the list is short enough to
+ * read. What survives is the filtering the game really does impose — class restrictions, and shield
+ * or two-hand only weapon enchants.
+ */
+export const sampleEnchants: readonly Enchant[] = rawEnchants.enchants as Enchant[]
+
+const byId = new Map(sampleEnchants.map((enchant) => [enchant.id, enchant]))
 
 function enchantFitsSlot(enchant: Enchant, slot: GearSlot) {
   return (enchant.allowedSlots ?? [enchant.slot]).includes(slot)
@@ -144,19 +28,33 @@ function enchantFitsCharacter(enchant: Enchant, character: CharacterProfile | un
   if (!character) return true
   if (enchant.allowedClasses && !enchant.allowedClasses.includes(character.className)) return false
   if (enchant.allowedSpecs && !enchant.allowedSpecs.includes(character.spec)) return false
-  if (enchant.roles && !enchant.roles.includes(getRoleForSpec(character.className, character.spec))) return false
   return true
 }
 
+/**
+ * Weapon enchants that only go on a shield, or only on a two-hander, must not be offered elsewhere —
+ * a dual-wielding shaman should never see "Shield - Intellect" against a fist weapon.
+ */
 function enchantFitsItem(enchant: Enchant, item: GearItem | undefined) {
-  if (!item || !enchant.allowedWeaponTypes) return true
-  return item.weaponType ? enchant.allowedWeaponTypes.includes(item.weaponType) : true
+  if (!item) return true
+  if (enchant.requiresShield && item.weaponType !== 'Shield') return false
+  if (enchant.requiresTwoHand && item.handType !== 'Two Hand') return false
+  // A plain weapon enchant is legal on any weapon but not on a shield or a held-in-off-hand frill.
+  if (enchant.allowedSlots?.includes('Off Hand') && (item.weaponType === 'Shield' || item.weaponType === 'Held In Off-hand')) {
+    return false
+  }
+  if (enchant.allowedWeaponTypes) {
+    return item.weaponType ? enchant.allowedWeaponTypes.includes(item.weaponType) : true
+  }
+  return true
 }
 
 export function getEnchantsForSlot(slot: GearSlot, character?: CharacterProfile, item?: GearItem) {
-  return sampleEnchants.filter((enchant) => enchantFitsSlot(enchant, slot) && enchantFitsCharacter(enchant, character) && enchantFitsItem(enchant, item))
+  return sampleEnchants.filter(
+    (enchant) => enchantFitsSlot(enchant, slot) && enchantFitsCharacter(enchant, character) && enchantFitsItem(enchant, item),
+  )
 }
 
 export function getEnchantById(id: string | undefined) {
-  return sampleEnchants.find((enchant) => enchant.id === id)
+  return id ? byId.get(id) : undefined
 }

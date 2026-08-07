@@ -1,40 +1,29 @@
+import rawGems from './gemCatalogue.json' with { type: 'json' }
+import type { SocketColor } from '../gear/itemTypes'
 import type { Gem } from './gemTypes'
+import { gemFitsSocket } from './gemTypes'
 
-export const sampleGems: readonly Gem[] = [
-  { id: 'bold-living-ruby', name: 'Bold Living Ruby', color: 'Red', quality: 'Rare', stats: { strength: 8 } },
-  { id: 'delicate-living-ruby', name: 'Delicate Living Ruby', color: 'Red', quality: 'Rare', stats: { agility: 8 } },
-  { id: 'runed-living-ruby', name: 'Runed Living Ruby', color: 'Red', quality: 'Rare', stats: { spellPower: 9 } },
-  { id: 'gleaming-dawnstone', name: 'Gleaming Dawnstone', color: 'Yellow', quality: 'Rare', stats: { spellCritRating: 8 } },
-  { id: 'rigid-dawnstone', name: 'Rigid Dawnstone', color: 'Yellow', quality: 'Rare', stats: { hitRating: 8 } },
-  { id: 'solid-star-of-elune', name: 'Solid Star of Elune', color: 'Blue', quality: 'Rare', stats: { stamina: 12 } },
-  { id: 'royal-nightseye', name: 'Royal Nightseye', color: 'Blue', quality: 'Rare', stats: { healingPower: 9, mp5: 2 } },
-  { id: 'relentless-earthstorm-diamond', name: 'Relentless Earthstorm Diamond', color: 'Meta', quality: 'Epic', stats: { agility: 12, critRating: 6 }, uniqueEquipped: true },
-  {
-    id: 'insightful-earthstorm-diamond',
-    name: 'Insightful Earthstorm Diamond',
-    color: 'Meta',
-    quality: 'Epic',
-    stats: { intellect: 12 },
-    uniqueEquipped: true,
-  },
-  {
-    id: 'chaotic-skyfire-diamond',
-    name: 'Chaotic Skyfire Diamond',
-    color: 'Meta',
-    quality: 'Epic',
-    stats: { spellCritRating: 12 },
-    uniqueEquipped: true,
-  },
-  {
-    id: 'powerful-earthstorm-diamond',
-    name: 'Powerful Earthstorm Diamond',
-    color: 'Meta',
-    quality: 'Epic',
-    stats: { stamina: 18 },
-    uniqueEquipped: true,
-  },
-]
+/**
+ * The gem catalogue, ingested from wowsims/tbc by `tools/ingest/ingest-gems-enchants.mjs`.
+ *
+ * This was 11 hand-written gems against 4,528 items, which made every socket dropdown in the app
+ * offer the same dozen options regardless of colour. It is now the full 212.
+ */
+export const sampleGems: readonly Gem[] = rawGems.gems as Gem[]
 
-export function getGemById(id: string) {
-  return sampleGems.find((gem) => gem.id === id)
+const byId = new Map(sampleGems.map((gem) => [gem.id, gem]))
+
+export function getGemById(id: string | undefined) {
+  return id ? byId.get(id) : undefined
+}
+
+/**
+ * Gems that may go in a socket of this colour.
+ *
+ * Includes the hybrids: an Orange gem is offered for both red and yellow sockets, because it is legal
+ * in both and satisfies either socket bonus. Filtering to exact colour matches would hide the
+ * majority of the catalogue — 118 of 212 gems are hybrid-coloured.
+ */
+export function getGemsForSocket(socket: SocketColor): readonly Gem[] {
+  return sampleGems.filter((gem) => gemFitsSocket(gem, socket))
 }

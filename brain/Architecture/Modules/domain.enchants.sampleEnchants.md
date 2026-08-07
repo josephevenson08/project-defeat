@@ -2,16 +2,27 @@
 type: module
 layer: domain
 source: src/domain/enchants/sampleEnchants.ts
-lines: 163
+lines: 61
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.enchants.sampleEnchants
 
-`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 163 lines
+`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 61 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> The enchant catalogue, ingested from wowsims/tbc by `tools/ingest/ingest-gems-enchants.mjs`.
+> 
+> This was 22 hand-written entries covering a handful of slots — glove and boot enchants existed for
+> one role each — and is now the full 79.
+> 
+> What the ingested data does *not* carry is the old hand-written role and spec tagging, which used
+> to hide, say, spell-power enchants from a warrior. That filtering is gone deliberately: the game
+> does not restrict enchants by role, and with 3-14 options per slot the list is short enough to
+> read. What survives is the filtering the game really does impose — class restrictions, and shield
+> or two-hand only weapon enchants.
 
 ## Exports
 
@@ -22,7 +33,6 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`

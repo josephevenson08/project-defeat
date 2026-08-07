@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/enchants/enchantTypes.ts
-lines: 20
+lines: 36
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.enchants.enchantTypes
 
-`src/domain/enchants/enchantTypes.ts` · **domain** layer · 20 lines
+`src/domain/enchants/enchantTypes.ts` · **domain** layer · 36 lines
 
 _No doc comment at the top of this file._
 

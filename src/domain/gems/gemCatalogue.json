@@ -1,0 +1,2630 @@
+{
+  "$schema": "wowsims-tbc gem ingestion",
+  "upstream": {
+    "repo": "wowsims/tbc",
+    "sha": "3301fca59306a747e521274c36e073e69acc7b77",
+    "path": "sim/core/items/all_gems.go",
+    "license": "MIT"
+  },
+  "generatedBy": "tools/ingest/ingest-gems-enchants.mjs",
+  "gemCount": 212,
+  "gems": [
+    {
+      "id": "void-sphere",
+      "wowItemId": 22459,
+      "name": "Void Sphere",
+      "color": "Prismatic",
+      "quality": "Epic",
+      "stats": {},
+      "phase": 1,
+      "extraStats": {
+        "ArcaneResistance": 4,
+        "FireResistance": 4,
+        "FrostResistance": 4,
+        "NatureResistance": 4,
+        "ShadowResistance": 4
+      }
+    },
+    {
+      "id": "prismatic-sphere",
+      "wowItemId": 22460,
+      "name": "Prismatic Sphere",
+      "color": "Prismatic",
+      "quality": "Rare",
+      "stats": {},
+      "phase": 1,
+      "extraStats": {
+        "ArcaneResistance": 3,
+        "FireResistance": 3,
+        "FrostResistance": 3,
+        "NatureResistance": 3,
+        "ShadowResistance": 3
+      }
+    },
+    {
+      "id": "teardrop-blood-garnet",
+      "wowItemId": 23094,
+      "name": "Teardrop Blood Garnet",
+      "color": "Red",
+      "quality": "Uncommon",
+      "stats": {
+        "spellPower": 5,
+        "healingPower": 13
+      },
+      "phase": 1
+    },
+    {
+      "id": "bold-blood-garnet",
+      "wowItemId": 23095,
+      "name": "Bold Blood Garnet",
+      "color": "Red",
+      "quality": "Uncommon",
+      "stats": {
+        "strength": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "runed-blood-garnet",
+      "wowItemId": 23096,
+      "name": "Runed Blood Garnet",
+      "color": "Red",
+      "quality": "Uncommon",
+      "stats": {
+        "spellPower": 7,
+        "healingPower": 7
+      },
+      "phase": 1
+    },
+    {
+      "id": "delicate-blood-garnet",
+      "wowItemId": 23097,
+      "name": "Delicate Blood Garnet",
+      "color": "Red",
+      "quality": "Uncommon",
+      "stats": {
+        "agility": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "inscribed-flame-spessarite",
+      "wowItemId": 23098,
+      "name": "Inscribed Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "strength": 3,
+        "critRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "luminous-flame-spessarite",
+      "wowItemId": 23099,
+      "name": "Luminous Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "intellect": 3,
+        "spellPower": 3,
+        "healingPower": 7
+      },
+      "phase": 1
+    },
+    {
+      "id": "glinting-flame-spessarite",
+      "wowItemId": 23100,
+      "name": "Glinting Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "agility": 3,
+        "hitRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "potent-flame-spessarite",
+      "wowItemId": 23101,
+      "name": "Potent Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 4,
+        "spellCritRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "radiant-deep-peridot",
+      "wowItemId": 23103,
+      "name": "Radiant Deep Peridot",
+      "color": "Green",
+      "quality": "Uncommon",
+      "stats": {
+        "spellCritRating": 3
+      },
+      "phase": 1,
+      "extraStats": {
+        "SpellPenetration": 4
+      }
+    },
+    {
+      "id": "jagged-deep-peridot",
+      "wowItemId": 23104,
+      "name": "Jagged Deep Peridot",
+      "color": "Green",
+      "quality": "Uncommon",
+      "stats": {
+        "stamina": 4,
+        "critRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "enduring-deep-peridot",
+      "wowItemId": 23105,
+      "name": "Enduring Deep Peridot",
+      "color": "Green",
+      "quality": "Uncommon",
+      "stats": {
+        "stamina": 4,
+        "defenseRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "dazzling-deep-peridot",
+      "wowItemId": 23106,
+      "name": "Dazzling Deep Peridot",
+      "color": "Green",
+      "quality": "Uncommon",
+      "stats": {
+        "intellect": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "glowing-shadow-draenite",
+      "wowItemId": 23108,
+      "name": "Glowing Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "stamina": 4,
+        "spellPower": 4,
+        "healingPower": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "royal-shadow-draenite",
+      "wowItemId": 23109,
+      "name": "Royal Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "spellPower": 3,
+        "healingPower": 7
+      },
+      "phase": 1
+    },
+    {
+      "id": "shifting-shadow-draenite",
+      "wowItemId": 23110,
+      "name": "Shifting Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "agility": 3,
+        "stamina": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "sovereign-shadow-draenite",
+      "wowItemId": 23111,
+      "name": "Sovereign Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "strength": 3,
+        "stamina": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "brilliant-golden-draenite",
+      "wowItemId": 23113,
+      "name": "Brilliant Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "intellect": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "gleaming-golden-draenite",
+      "wowItemId": 23114,
+      "name": "Gleaming Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "spellCritRating": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "thick-golden-draenite",
+      "wowItemId": 23115,
+      "name": "Thick Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "defenseRating": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "rigid-golden-draenite",
+      "wowItemId": 23116,
+      "name": "Rigid Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "hitRating": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "solid-azure-moonstone",
+      "wowItemId": 23118,
+      "name": "Solid Azure Moonstone",
+      "color": "Blue",
+      "quality": "Uncommon",
+      "stats": {
+        "stamina": 9
+      },
+      "phase": 1
+    },
+    {
+      "id": "sparkling-azure-moonstone",
+      "wowItemId": 23119,
+      "name": "Sparkling Azure Moonstone",
+      "color": "Blue",
+      "quality": "Uncommon",
+      "stats": {
+        "spirit": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "stormy-azure-moonstone",
+      "wowItemId": 23120,
+      "name": "Stormy Azure Moonstone",
+      "color": "Blue",
+      "quality": "Uncommon",
+      "stats": {},
+      "phase": 1,
+      "extraStats": {
+        "SpellPenetration": 8
+      }
+    },
+    {
+      "id": "lustrous-azure-moonstone",
+      "wowItemId": 23121,
+      "name": "Lustrous Azure Moonstone",
+      "color": "Blue",
+      "quality": "Uncommon",
+      "stats": {
+        "mp5": 2
+      },
+      "phase": 1
+    },
+    {
+      "id": "bold-living-ruby",
+      "wowItemId": 24027,
+      "name": "Bold Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "strength": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "delicate-living-ruby",
+      "wowItemId": 24028,
+      "name": "Delicate Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "agility": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "teardrop-living-ruby",
+      "wowItemId": 24029,
+      "name": "Teardrop Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 18
+      },
+      "phase": 1
+    },
+    {
+      "id": "runed-living-ruby",
+      "wowItemId": 24030,
+      "name": "Runed Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 9,
+        "healingPower": 9
+      },
+      "phase": 1
+    },
+    {
+      "id": "bright-living-ruby",
+      "wowItemId": 24031,
+      "name": "Bright Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 16,
+        "rangedAttackPower": 16
+      },
+      "phase": 1
+    },
+    {
+      "id": "subtle-living-ruby",
+      "wowItemId": 24032,
+      "name": "Subtle Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "dodgeRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "solid-star-of-elune",
+      "wowItemId": 24033,
+      "name": "Solid Star of Elune",
+      "color": "Blue",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "sparkling-star-of-elune",
+      "wowItemId": 24035,
+      "name": "Sparkling Star of Elune",
+      "color": "Blue",
+      "quality": "Rare",
+      "stats": {
+        "spirit": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "flashing-living-ruby",
+      "wowItemId": 24036,
+      "name": "Flashing Living Ruby",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "parryRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "lustrous-star-of-elune",
+      "wowItemId": 24037,
+      "name": "Lustrous Star of Elune",
+      "color": "Blue",
+      "quality": "Rare",
+      "stats": {
+        "mp5": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "stormy-star-of-elune",
+      "wowItemId": 24039,
+      "name": "Stormy Star of Elune",
+      "color": "Blue",
+      "quality": "Rare",
+      "stats": {},
+      "phase": 1,
+      "extraStats": {
+        "SpellPenetration": 10
+      }
+    },
+    {
+      "id": "brilliant-dawnstone",
+      "wowItemId": 24047,
+      "name": "Brilliant Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "intellect": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "smooth-dawnstone",
+      "wowItemId": 24048,
+      "name": "Smooth Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "critRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "gleaming-dawnstone",
+      "wowItemId": 24050,
+      "name": "Gleaming Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "spellCritRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "rigid-dawnstone",
+      "wowItemId": 24051,
+      "name": "Rigid Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "hitRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "thick-dawnstone",
+      "wowItemId": 24052,
+      "name": "Thick Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "defenseRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "mystic-dawnstone",
+      "wowItemId": 24053,
+      "name": "Mystic Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "resilienceRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "sovereign-nightseye",
+      "wowItemId": 24054,
+      "name": "Sovereign Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "strength": 4,
+        "stamina": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "shifting-nightseye",
+      "wowItemId": 24055,
+      "name": "Shifting Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "agility": 4,
+        "stamina": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "glowing-nightseye",
+      "wowItemId": 24056,
+      "name": "Glowing Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "spellPower": 5,
+        "healingPower": 5
+      },
+      "phase": 1
+    },
+    {
+      "id": "royal-nightseye",
+      "wowItemId": 24057,
+      "name": "Royal Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 3,
+        "healingPower": 9,
+        "mp5": 2
+      },
+      "phase": 1
+    },
+    {
+      "id": "inscribed-noble-topaz",
+      "wowItemId": 24058,
+      "name": "Inscribed Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "strength": 4,
+        "critRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "potent-noble-topaz",
+      "wowItemId": 24059,
+      "name": "Potent Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 5,
+        "healingPower": 5,
+        "spellCritRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "luminous-noble-topaz",
+      "wowItemId": 24060,
+      "name": "Luminous Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "intellect": 4,
+        "spellPower": 3,
+        "healingPower": 9
+      },
+      "phase": 1
+    },
+    {
+      "id": "glinting-noble-topaz",
+      "wowItemId": 24061,
+      "name": "Glinting Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "agility": 4,
+        "hitRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "enduring-talasite",
+      "wowItemId": 24062,
+      "name": "Enduring Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "defenseRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "dazzling-talasite",
+      "wowItemId": 24065,
+      "name": "Dazzling Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "intellect": 4,
+        "mp5": 2
+      },
+      "phase": 1
+    },
+    {
+      "id": "radiant-talasite",
+      "wowItemId": 24066,
+      "name": "Radiant Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "spellCritRating": 4
+      },
+      "phase": 1,
+      "extraStats": {
+        "SpellPenetration": 5
+      }
+    },
+    {
+      "id": "jagged-talasite",
+      "wowItemId": 24067,
+      "name": "Jagged Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "critRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "destructive-skyfire-diamond",
+      "wowItemId": 25890,
+      "name": "Destructive Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellCritRating": 14
+      },
+      "phase": 1
+    },
+    {
+      "id": "mystical-skyfire-diamond",
+      "wowItemId": 25893,
+      "name": "Mystical Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {},
+      "phase": 1
+    },
+    {
+      "id": "swift-skyfire-diamond",
+      "wowItemId": 25894,
+      "name": "Swift Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 24,
+        "rangedAttackPower": 24
+      },
+      "phase": 1
+    },
+    {
+      "id": "enigmatic-skyfire-diamond",
+      "wowItemId": 25895,
+      "name": "Enigmatic Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "critRating": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "powerful-earthstorm-diamond",
+      "wowItemId": 25896,
+      "name": "Powerful Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 18
+      },
+      "phase": 1
+    },
+    {
+      "id": "bracing-earthstorm-diamond",
+      "wowItemId": 25897,
+      "name": "Bracing Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 9,
+        "healingPower": 26
+      },
+      "phase": 1
+    },
+    {
+      "id": "tenacious-earthstorm-diamond",
+      "wowItemId": 25898,
+      "name": "Tenacious Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "defenseRating": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "brutal-earthstorm-diamond",
+      "wowItemId": 25899,
+      "name": "Brutal Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {},
+      "phase": 1
+    },
+    {
+      "id": "insightful-earthstorm-diamond",
+      "wowItemId": 25901,
+      "name": "Insightful Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "intellect": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "sublime-mystic-dawnstone",
+      "wowItemId": 27679,
+      "name": "Sublime Mystic Dawnstone",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "resilienceRating": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "stark-blood-garnet-27777",
+      "wowItemId": 27777,
+      "name": "Stark Blood Garnet",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 8,
+        "healingPower": 8
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "notched-deep-peridot-27785",
+      "wowItemId": 27785,
+      "name": "Notched Deep Peridot",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 3,
+        "spellCritRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "barbed-deep-peridot-27786",
+      "wowItemId": 27786,
+      "name": "Barbed Deep Peridot",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 3,
+        "critRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "barbed-deep-peridot",
+      "wowItemId": 27809,
+      "name": "Barbed Deep Peridot",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 3,
+        "critRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "stark-blood-garnet",
+      "wowItemId": 27812,
+      "name": "Stark Blood Garnet",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 8,
+        "healingPower": 8
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "notched-deep-peridot",
+      "wowItemId": 27820,
+      "name": "Notched Deep Peridot",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 3,
+        "spellCritRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "runed-ornate-ruby",
+      "wowItemId": 28118,
+      "name": "Runed Ornate Ruby",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 12,
+        "healingPower": 12
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "smooth-ornate-dawnstone",
+      "wowItemId": 28119,
+      "name": "Smooth Ornate Dawnstone",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "critRating": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "gleaming-ornate-dawnstone",
+      "wowItemId": 28120,
+      "name": "Gleaming Ornate Dawnstone",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "spellCritRating": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "potent-ornate-topaz",
+      "wowItemId": 28123,
+      "name": "Potent Ornate Topaz",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellCritRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "smooth-golden-draenite",
+      "wowItemId": 28290,
+      "name": "Smooth Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "critRating": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "mighty-blood-garnet-28360",
+      "wowItemId": 28360,
+      "name": "Mighty Blood Garnet",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 14,
+        "rangedAttackPower": 14
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "mighty-blood-garnet",
+      "wowItemId": 28361,
+      "name": "Mighty Blood Garnet",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 14,
+        "rangedAttackPower": 14
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "bold-ornate-ruby",
+      "wowItemId": 28362,
+      "name": "Bold Ornate Ruby",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 20,
+        "rangedAttackPower": 20
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "inscribed-ornate-topaz",
+      "wowItemId": 28363,
+      "name": "Inscribed Ornate Topaz",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 10,
+        "critRating": 5,
+        "rangedAttackPower": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "swift-windfire-diamond",
+      "wowItemId": 28556,
+      "name": "Swift Windfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 20,
+        "rangedAttackPower": 20
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "swift-starfire-diamond",
+      "wowItemId": 28557,
+      "name": "Swift Starfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 12,
+        "healingPower": 12
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "bright-blood-garnet",
+      "wowItemId": 28595,
+      "name": "Bright Blood Garnet",
+      "color": "Red",
+      "quality": "Uncommon",
+      "stats": {
+        "attackPower": 12,
+        "rangedAttackPower": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "sovereign-tanzanite",
+      "wowItemId": 30546,
+      "name": "Sovereign Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "stamina": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "luminous-fire-opal",
+      "wowItemId": 30547,
+      "name": "Luminous Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 4,
+        "spellPower": 4,
+        "healingPower": 11
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "polished-chrysoprase",
+      "wowItemId": 30548,
+      "name": "Polished Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellCritRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "shifting-tanzanite",
+      "wowItemId": 30549,
+      "name": "Shifting Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "agility": 5,
+        "stamina": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "sundered-chrysoprase",
+      "wowItemId": 30550,
+      "name": "Sundered Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "mp5": 2,
+        "critRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "infused-fire-opal",
+      "wowItemId": 30551,
+      "name": "Infused Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 4,
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "blessed-tanzanite",
+      "wowItemId": 30552,
+      "name": "Blessed Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellPower": 4,
+        "healingPower": 11
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "pristine-fire-opal",
+      "wowItemId": 30553,
+      "name": "Pristine Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 10,
+        "hitRating": 4,
+        "rangedAttackPower": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "stalwart-fire-opal",
+      "wowItemId": 30554,
+      "name": "Stalwart Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "defenseRating": 5,
+        "dodgeRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "glowing-tanzanite",
+      "wowItemId": 30555,
+      "name": "Glowing Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "glinting-fire-opal",
+      "wowItemId": 30556,
+      "name": "Glinting Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "agility": 5,
+        "hitRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "glimmering-fire-opal",
+      "wowItemId": 30558,
+      "name": "Glimmering Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "defenseRating": 4,
+        "parryRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "etched-fire-opal",
+      "wowItemId": 30559,
+      "name": "Etched Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "hitRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "rune-covered-chrysoprase",
+      "wowItemId": 30560,
+      "name": "Rune Covered Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "mp5": 2,
+        "spellCritRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "regal-tanzanite",
+      "wowItemId": 30563,
+      "name": "Regal Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "dodgeRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "shining-fire-opal",
+      "wowItemId": 30564,
+      "name": "Shining Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellHitRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "assassins-fire-opal",
+      "wowItemId": 30565,
+      "name": "Assassin's Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "critRating": 6,
+        "dodgeRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "defenders-tanzanite",
+      "wowItemId": 30566,
+      "name": "Defender's Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "parryRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "don-rodrigos-heart",
+      "wowItemId": 30571,
+      "name": "Don Rodrigo's Heart",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "strength": 8
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "imperial-tanzanite",
+      "wowItemId": 30572,
+      "name": "Imperial Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "spirit": 5,
+        "spellPower": 3,
+        "healingPower": 9
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "mysterious-fire-opal",
+      "wowItemId": 30573,
+      "name": "Mysterious Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true,
+      "extraStats": {
+        "SpellPenetration": 5
+      }
+    },
+    {
+      "id": "brutal-tanzanite",
+      "wowItemId": 30574,
+      "name": "Brutal Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "attackPower": 10,
+        "rangedAttackPower": 10
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "nimble-fire-opal",
+      "wowItemId": 30575,
+      "name": "Nimble Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "hitRating": 4,
+        "dodgeRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "durable-fire-opal",
+      "wowItemId": 30581,
+      "name": "Durable Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 11,
+        "resilienceRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "deadly-fire-opal",
+      "wowItemId": 30582,
+      "name": "Deadly Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 8,
+        "critRating": 5,
+        "rangedAttackPower": 8
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "timeless-chrysoprase",
+      "wowItemId": 30583,
+      "name": "Timeless Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "intellect": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "enscribed-fire-opal",
+      "wowItemId": 30584,
+      "name": "Enscribed Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "critRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "glistening-fire-opal",
+      "wowItemId": 30585,
+      "name": "Glistening Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "agility": 4,
+        "defenseRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "seers-chrysoprase",
+      "wowItemId": 30586,
+      "name": "Seer's Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 4,
+        "spirit": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "champions-fire-opal",
+      "wowItemId": 30587,
+      "name": "Champion's Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "defenseRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "potent-fire-opal",
+      "wowItemId": 30588,
+      "name": "Potent Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellCritRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "dazzling-chrysoprase",
+      "wowItemId": 30589,
+      "name": "Dazzling Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 5,
+        "mp5": 2
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "enduring-chrysoprase",
+      "wowItemId": 30590,
+      "name": "Enduring Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "defenseRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "empowered-fire-opal",
+      "wowItemId": 30591,
+      "name": "Empowered Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 8,
+        "rangedAttackPower": 8,
+        "resilienceRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "steady-chrysoprase",
+      "wowItemId": 30592,
+      "name": "Steady Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "resilienceRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "iridescent-fire-opal",
+      "wowItemId": 30593,
+      "name": "Iridescent Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 11,
+        "spellCritRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "effulgent-chrysoprase",
+      "wowItemId": 30594,
+      "name": "Effulgent Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "mp5": 2,
+        "defenseRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "don-amancios-heart",
+      "wowItemId": 30598,
+      "name": "Don Amancio's Heart",
+      "color": "Red",
+      "quality": "Rare",
+      "stats": {
+        "strength": 8
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "fluorescent-tanzanite",
+      "wowItemId": 30600,
+      "name": "Fluorescent Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "spirit": 4,
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "beaming-fire-opal",
+      "wowItemId": 30601,
+      "name": "Beaming Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "dodgeRating": 5,
+        "resilienceRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "jagged-chrysoprase",
+      "wowItemId": 30602,
+      "name": "Jagged Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "royal-tanzanite",
+      "wowItemId": 30603,
+      "name": "Royal Tanzanite",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 11,
+        "mp5": 2
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "resplendent-fire-opal",
+      "wowItemId": 30604,
+      "name": "Resplendent Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "resilienceRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "vivid-chrysoprase",
+      "wowItemId": 30605,
+      "name": "Vivid Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellHitRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "lambent-chrysoprase",
+      "wowItemId": 30606,
+      "name": "Lambent Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "mp5": 2,
+        "spellHitRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "splendid-fire-opal",
+      "wowItemId": 30607,
+      "name": "Splendid Fire Opal",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "parryRating": 5,
+        "resilienceRating": 4
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "radiant-chrysoprase",
+      "wowItemId": 30608,
+      "name": "Radiant Chrysoprase",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "spellCritRating": 5
+      },
+      "phase": 1,
+      "uniqueEquipped": true,
+      "extraStats": {
+        "SpellPenetration": 5
+      }
+    },
+    {
+      "id": "infused-amethyst",
+      "wowItemId": 31116,
+      "name": "Infused Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "soothing-amethyst",
+      "wowItemId": 31117,
+      "name": "Soothing Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "spellPower": 4,
+        "healingPower": 11
+      },
+      "phase": 1
+    },
+    {
+      "id": "pulsing-amethyst",
+      "wowItemId": 31118,
+      "name": "Pulsing Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 6,
+        "attackPower": 10,
+        "rangedAttackPower": 10
+      },
+      "phase": 1
+    },
+    {
+      "id": "great-golden-draenite",
+      "wowItemId": 31860,
+      "name": "Great Golden Draenite",
+      "color": "Yellow",
+      "quality": "Uncommon",
+      "stats": {
+        "spellHitRating": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "great-dawnstone",
+      "wowItemId": 31861,
+      "name": "Great Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "spellHitRating": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "balanced-shadow-draenite",
+      "wowItemId": 31862,
+      "name": "Balanced Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "stamina": 4,
+        "attackPower": 6,
+        "rangedAttackPower": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "balanced-nightseye",
+      "wowItemId": 31863,
+      "name": "Balanced Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "attackPower": 8,
+        "rangedAttackPower": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "infused-shadow-draenite",
+      "wowItemId": 31864,
+      "name": "Infused Shadow Draenite",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "attackPower": 6,
+        "rangedAttackPower": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "infused-nightseye",
+      "wowItemId": 31865,
+      "name": "Infused Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "mp5": 2,
+        "attackPower": 8,
+        "rangedAttackPower": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "veiled-flame-spessarite",
+      "wowItemId": 31866,
+      "name": "Veiled Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 4,
+        "spellHitRating": 3
+      },
+      "phase": 1
+    },
+    {
+      "id": "veiled-noble-topaz",
+      "wowItemId": 31867,
+      "name": "Veiled Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 5,
+        "healingPower": 5,
+        "spellHitRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "wicked-noble-topaz",
+      "wowItemId": 31868,
+      "name": "Wicked Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 8,
+        "critRating": 4,
+        "rangedAttackPower": 8
+      },
+      "phase": 1
+    },
+    {
+      "id": "wicked-flame-spessarite",
+      "wowItemId": 31869,
+      "name": "Wicked Flame Spessarite",
+      "color": "Orange",
+      "quality": "Uncommon",
+      "stats": {
+        "attackPower": 6,
+        "critRating": 3,
+        "rangedAttackPower": 6
+      },
+      "phase": 1
+    },
+    {
+      "id": "bold-crimson-spinel",
+      "wowItemId": 32193,
+      "name": "Bold Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "strength": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "delicate-crimson-spinel",
+      "wowItemId": 32194,
+      "name": "Delicate Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "agility": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "teardrop-crimson-spinel",
+      "wowItemId": 32195,
+      "name": "Teardrop Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 8,
+        "healingPower": 22
+      },
+      "phase": 3
+    },
+    {
+      "id": "runed-crimson-spinel-32196",
+      "wowItemId": 32196,
+      "name": "Runed Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 12,
+        "healingPower": 12
+      },
+      "phase": 3
+    },
+    {
+      "id": "bright-crimson-spinel-32197",
+      "wowItemId": 32197,
+      "name": "Bright Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 20,
+        "rangedAttackPower": 20
+      },
+      "phase": 3
+    },
+    {
+      "id": "subtle-crimson-spinel",
+      "wowItemId": 32198,
+      "name": "Subtle Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "dodgeRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "flashing-crimson-spinel",
+      "wowItemId": 32199,
+      "name": "Flashing Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "parryRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "solid-empyrean-sapphire",
+      "wowItemId": 32200,
+      "name": "Solid Empyrean Sapphire",
+      "color": "Blue",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 15
+      },
+      "phase": 3
+    },
+    {
+      "id": "sparkling-empyrean-sapphire",
+      "wowItemId": 32201,
+      "name": "Sparkling Empyrean Sapphire",
+      "color": "Blue",
+      "quality": "Epic",
+      "stats": {
+        "spirit": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "lustrous-empyrean-sapphire",
+      "wowItemId": 32202,
+      "name": "Lustrous Empyrean Sapphire",
+      "color": "Blue",
+      "quality": "Epic",
+      "stats": {
+        "mp5": 4
+      },
+      "phase": 3
+    },
+    {
+      "id": "stormy-empyrean-sapphire",
+      "wowItemId": 32203,
+      "name": "Stormy Empyrean Sapphire",
+      "color": "Blue",
+      "quality": "Epic",
+      "stats": {},
+      "phase": 3,
+      "extraStats": {
+        "SpellPenetration": 13
+      }
+    },
+    {
+      "id": "brilliant-lionseye",
+      "wowItemId": 32204,
+      "name": "Brilliant Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "smooth-lionseye",
+      "wowItemId": 32205,
+      "name": "Smooth Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "critRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "rigid-lionseye",
+      "wowItemId": 32206,
+      "name": "Rigid Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "hitRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "gleaming-lionseye",
+      "wowItemId": 32207,
+      "name": "Gleaming Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "spellCritRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "thick-lionseye",
+      "wowItemId": 32208,
+      "name": "Thick Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "defenseRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "mystic-lionseye",
+      "wowItemId": 32209,
+      "name": "Mystic Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "resilienceRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "great-lionseye",
+      "wowItemId": 32210,
+      "name": "Great Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "spellHitRating": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "sovereign-shadowsong-amethyst",
+      "wowItemId": 32211,
+      "name": "Sovereign Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "stamina": 7
+      },
+      "phase": 3
+    },
+    {
+      "id": "shifting-shadowsong-amethyst",
+      "wowItemId": 32212,
+      "name": "Shifting Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "agility": 5,
+        "stamina": 7
+      },
+      "phase": 3
+    },
+    {
+      "id": "balanced-shadowsong-amethyst",
+      "wowItemId": 32213,
+      "name": "Balanced Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "attackPower": 10,
+        "rangedAttackPower": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "infused-shadowsong-amethyst",
+      "wowItemId": 32214,
+      "name": "Infused Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 10,
+        "rangedAttackPower": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "glowing-shadowsong-amethyst",
+      "wowItemId": 32215,
+      "name": "Glowing Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "spellPower": 6,
+        "healingPower": 6
+      },
+      "phase": 3
+    },
+    {
+      "id": "royal-shadowsong-amethyst",
+      "wowItemId": 32216,
+      "name": "Royal Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 4,
+        "healingPower": 11,
+        "mp5": 2
+      },
+      "phase": 3
+    },
+    {
+      "id": "inscribed-pyrestone",
+      "wowItemId": 32217,
+      "name": "Inscribed Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "strength": 5,
+        "critRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "potent-pyrestone",
+      "wowItemId": 32218,
+      "name": "Potent Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellCritRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "luminous-pyrestone",
+      "wowItemId": 32219,
+      "name": "Luminous Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 5,
+        "spellPower": 4,
+        "healingPower": 11
+      },
+      "phase": 3
+    },
+    {
+      "id": "glinting-pyrestone",
+      "wowItemId": 32220,
+      "name": "Glinting Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "agility": 5,
+        "hitRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "veiled-pyrestone",
+      "wowItemId": 32221,
+      "name": "Veiled Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellHitRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "wicked-pyrestone",
+      "wowItemId": 32222,
+      "name": "Wicked Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 10,
+        "critRating": 5,
+        "rangedAttackPower": 10
+      },
+      "phase": 3
+    },
+    {
+      "id": "enduring-seaspray-emerald",
+      "wowItemId": 32223,
+      "name": "Enduring Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "defenseRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "radiant-seaspray-emerald",
+      "wowItemId": 32224,
+      "name": "Radiant Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "spellCritRating": 5
+      },
+      "phase": 3,
+      "extraStats": {
+        "SpellPenetration": 6
+      }
+    },
+    {
+      "id": "dazzling-seaspray-emerald",
+      "wowItemId": 32225,
+      "name": "Dazzling Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "intellect": 5,
+        "mp5": 2
+      },
+      "phase": 3
+    },
+    {
+      "id": "jagged-seaspray-emerald",
+      "wowItemId": 32226,
+      "name": "Jagged Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "critRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "relentless-earthstorm-diamond",
+      "wowItemId": 32409,
+      "name": "Relentless Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "agility": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "thundering-skyfire-diamond",
+      "wowItemId": 32410,
+      "name": "Thundering Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {},
+      "phase": 1
+    },
+    {
+      "id": "unstable-amethyst",
+      "wowItemId": 32634,
+      "name": "Unstable Amethyst",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "attackPower": 8,
+        "rangedAttackPower": 8
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "unstable-peridot",
+      "wowItemId": 32635,
+      "name": "Unstable Peridot",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "intellect": 4
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "unstable-sapphire",
+      "wowItemId": 32636,
+      "name": "Unstable Sapphire",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "spirit": 4,
+        "spellPower": 3,
+        "healingPower": 9
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "unstable-citrine",
+      "wowItemId": 32637,
+      "name": "Unstable Citrine",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 8,
+        "critRating": 4,
+        "rangedAttackPower": 8
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "unstable-topaz",
+      "wowItemId": 32638,
+      "name": "Unstable Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "intellect": 4,
+        "spellPower": 5,
+        "healingPower": 5
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "unstable-talasite",
+      "wowItemId": 32639,
+      "name": "Unstable Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 4,
+        "spellCritRating": 4
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "potent-unstable-diamond",
+      "wowItemId": 32640,
+      "name": "Potent Unstable Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "attackPower": 24,
+        "rangedAttackPower": 24
+      },
+      "phase": 2
+    },
+    {
+      "id": "imbued-unstable-diamond",
+      "wowItemId": 32641,
+      "name": "Imbued Unstable Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 14,
+        "healingPower": 14
+      },
+      "phase": 2
+    },
+    {
+      "id": "purified-jaggal-pearl",
+      "wowItemId": 32833,
+      "name": "Purified Jaggal Pearl",
+      "color": "Purple",
+      "quality": "Uncommon",
+      "stats": {
+        "spirit": 3,
+        "spellPower": 3,
+        "healingPower": 7
+      },
+      "phase": 1
+    },
+    {
+      "id": "purified-shadow-pearl",
+      "wowItemId": 32836,
+      "name": "Purified Shadow Pearl",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "spirit": 4,
+        "spellPower": 3,
+        "healingPower": 9
+      },
+      "phase": 1
+    },
+    {
+      "id": "crimson-sun",
+      "wowItemId": 33131,
+      "name": "Crimson Sun",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 32,
+        "rangedAttackPower": 32
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "don-julios-heart",
+      "wowItemId": 33133,
+      "name": "Don Julio's Heart",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 14,
+        "healingPower": 14
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "kailees-rose",
+      "wowItemId": 33134,
+      "name": "Kailee's Rose",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 9,
+        "healingPower": 26
+      },
+      "phase": 2,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "falling-star",
+      "wowItemId": 33135,
+      "name": "Falling Star",
+      "color": "Blue",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 18
+      },
+      "uniqueEquipped": true
+    },
+    {
+      "id": "blood-of-amber",
+      "wowItemId": 33140,
+      "name": "Blood of Amber",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "spellCritRating": 12
+      },
+      "uniqueEquipped": true
+    },
+    {
+      "id": "stone-of-blades",
+      "wowItemId": 33143,
+      "name": "Stone of Blades",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "critRating": 12
+      },
+      "uniqueEquipped": true
+    },
+    {
+      "id": "facet-of-eternity",
+      "wowItemId": 33144,
+      "name": "Facet of Eternity",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "defenseRating": 12
+      },
+      "uniqueEquipped": true
+    },
+    {
+      "id": "steady-talasite",
+      "wowItemId": 33782,
+      "name": "Steady Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "resilienceRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "chaotic-skyfire-diamond",
+      "wowItemId": 34220,
+      "name": "Chaotic Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellCritRating": 12
+      },
+      "phase": 1
+    },
+    {
+      "id": "eye-of-the-sea",
+      "wowItemId": 34831,
+      "name": "Eye of the Sea",
+      "color": "Blue",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 15
+      },
+      "phase": 1,
+      "uniqueEquipped": true
+    },
+    {
+      "id": "quick-dawnstone",
+      "wowItemId": 35315,
+      "name": "Quick Dawnstone",
+      "color": "Yellow",
+      "quality": "Rare",
+      "stats": {
+        "spellHasteRating": 8
+      },
+      "phase": 5
+    },
+    {
+      "id": "reckless-noble-topaz",
+      "wowItemId": 35316,
+      "name": "Reckless Noble Topaz",
+      "color": "Orange",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 5,
+        "healingPower": 5,
+        "spellHasteRating": 4
+      },
+      "phase": 5
+    },
+    {
+      "id": "forceful-talasite",
+      "wowItemId": 35318,
+      "name": "Forceful Talasite",
+      "color": "Green",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "spellHasteRating": 4
+      },
+      "phase": 5
+    },
+    {
+      "id": "bright-crimson-spinel",
+      "wowItemId": 35487,
+      "name": "Bright Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "attackPower": 20,
+        "rangedAttackPower": 20
+      },
+      "phase": 5
+    },
+    {
+      "id": "runed-crimson-spinel",
+      "wowItemId": 35488,
+      "name": "Runed Crimson Spinel",
+      "color": "Red",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 12,
+        "healingPower": 12
+      },
+      "phase": 5
+    },
+    {
+      "id": "eternal-earthstorm-diamond",
+      "wowItemId": 35501,
+      "name": "Eternal Earthstorm Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "defenseRating": 12
+      },
+      "phase": 5
+    },
+    {
+      "id": "ember-skyfire-diamond",
+      "wowItemId": 35503,
+      "name": "Ember Skyfire Diamond",
+      "color": "Meta",
+      "quality": "Rare",
+      "stats": {
+        "spellPower": 14,
+        "healingPower": 14
+      },
+      "phase": 5
+    },
+    {
+      "id": "regal-nightseye",
+      "wowItemId": 35707,
+      "name": "Regal Nightseye",
+      "color": "Purple",
+      "quality": "Rare",
+      "stats": {
+        "stamina": 6,
+        "dodgeRating": 4
+      },
+      "phase": 1
+    },
+    {
+      "id": "steady-seaspray-emerald",
+      "wowItemId": 35758,
+      "name": "Steady Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "resilienceRating": 5
+      },
+      "phase": 3
+    },
+    {
+      "id": "forceful-seaspray-emerald",
+      "wowItemId": 35759,
+      "name": "Forceful Seaspray Emerald",
+      "color": "Green",
+      "quality": "Epic",
+      "stats": {
+        "stamina": 7,
+        "spellHasteRating": 5
+      },
+      "phase": 5
+    },
+    {
+      "id": "reckless-pyrestone",
+      "wowItemId": 35760,
+      "name": "Reckless Pyrestone",
+      "color": "Orange",
+      "quality": "Epic",
+      "stats": {
+        "spellPower": 6,
+        "healingPower": 6,
+        "spellHasteRating": 5
+      },
+      "phase": 5
+    },
+    {
+      "id": "quick-lionseye",
+      "wowItemId": 35761,
+      "name": "Quick Lionseye",
+      "color": "Yellow",
+      "quality": "Epic",
+      "stats": {
+        "spellHasteRating": 10
+      },
+      "phase": 5
+    },
+    {
+      "id": "purified-shadowsong-amethyst",
+      "wowItemId": 37503,
+      "name": "Purified Shadowsong Amethyst",
+      "color": "Purple",
+      "quality": "Epic",
+      "stats": {
+        "spirit": 5,
+        "spellPower": 4,
+        "healingPower": 11
+      },
+      "phase": 5
+    }
+  ]
+}

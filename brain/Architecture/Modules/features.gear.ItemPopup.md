@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/ItemPopup.tsx
-lines: 195
+lines: 198
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.ItemPopup
 
-`src/features/gear/ItemPopup.tsx` · **features** layer · 195 lines
+`src/features/gear/ItemPopup.tsx` · **features** layer · 198 lines
 
 _No doc comment at the top of this file._
 
