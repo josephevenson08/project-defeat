@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemsForSocket } from '../../domain/gems/sampleGems'
@@ -30,10 +30,35 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
   const dialogRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
 
+  const [filter, setFilter] = useState('')
+
   const equipped = gear[slot]
   const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
-  const options = getItemsForSlotAndCharacter(slot, character.className, character.spec)
   const enchants = getEnchantsForSlot(slot, character, equipped.item)
+
+  /**
+   * Highest item level first, then alphabetical.
+   *
+   * The catalogue's own order is by item id, which is close to release order and means the first
+   * thing a player sees in a 400-option list is a Classic-era green. Item level is not a ranking —
+   * sockets, set bonuses and stat weights all matter more — but it is a far better opening guess than
+   * whatever Blizzard happened to number first.
+   */
+  const allOptions = useMemo(
+    () =>
+      [...getItemsForSlotAndCharacter(slot, character.className, character.spec)].sort(
+        (a, b) => (b.itemLevel ?? 0) - (a.itemLevel ?? 0) || a.name.localeCompare(b.name),
+      ),
+    [slot, character.className, character.spec],
+  )
+
+  // The equipped item always stays in the list, so filtering can never leave the select showing a
+  // value with no matching option — which browsers render as blank.
+  const options = useMemo(() => {
+    const needle = filter.trim().toLowerCase()
+    if (!needle) return allOptions
+    return allOptions.filter((item) => item.name.toLowerCase().includes(needle) || item.id === equipped.item.id)
+  }, [allOptions, filter, equipped.item.id])
 
   useEffect(() => {
     closeRef.current?.focus()
@@ -62,11 +87,29 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
 
         <div className="popup-body">
           <label className="popup-field">
-            <span className="popup-field-label">Item</span>
+            <span className="popup-field-label">
+              Item
+              <span className="popup-field-count">
+                {options.length === allOptions.length
+                  ? `${allOptions.length}`
+                  : `${options.length} of ${allOptions.length}`}
+              </span>
+            </span>
+            <input
+              type="search"
+              className="popup-filter"
+              aria-label={`Filter ${displayName} items`}
+              placeholder="Filter by name"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            />
             <select
               aria-label={displayName}
+              // A list box rather than a drop-down: the point of this popup is browsing a few hundred
+              // items, and a collapsed select shows one at a time.
+              size={10}
               value={equipped.item.id}
-              disabled={options.length === 0}
+              disabled={allOptions.length === 0}
               onChange={(event) => {
                 const next = options.find((item) => item.id === event.target.value)
                 if (next) onChangeItem(next)

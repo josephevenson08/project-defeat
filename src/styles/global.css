@@ -485,6 +485,48 @@ select {
   text-transform: uppercase;
 }
 
+/* How many items the filter is showing, so a narrowed list never looks like a broken one. */
+.popup-field-count {
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.popup-filter {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 9px;
+  width: 100%;
+}
+
+.popup-filter:focus-visible {
+  border-color: var(--line-strong);
+  outline: none;
+}
+
+.popup-filter::placeholder {
+  color: var(--text-faint);
+}
+
+/* The item picker is a list box, not a drop-down: it exists to browse a few hundred items. */
+.popup-field select[size] {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 4px;
+}
+
+.popup-field select[size] option {
+  padding: 3px 5px;
+}
+
 .popup-sockets {
   display: grid;
   gap: 12px;
