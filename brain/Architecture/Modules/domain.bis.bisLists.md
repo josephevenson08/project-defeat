@@ -2,53 +2,41 @@
 type: module
 layer: domain
 source: src/domain/bis/bisLists.ts
-lines: 63
+lines: 123
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisLists
 
-`src/domain/bis/bisLists.ts` · **domain** layer · 63 lines
+`src/domain/bis/bisLists.ts` · **domain** layer · 123 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> Phase 2 BiS rankings, generated from the Wowhead class guides by `tools/ingest/ingest-bis.mjs`.
+> 
+> These replace 27 hand-written files that were one item deep — nearly every slot offered a single
+> option while the panel labelled it "1 ranked", presenting one guess as a considered ranking. The
+> guides carry four or five real options per slot, which is what the feature was missing.
+> 
+> Entries are keyed by `wowItemId` in the generated data and resolved to catalogue ids here, so a
+> ranking survives the catalogue being re-ingested under different slugs. An entry whose item is not
+> in the catalogue is dropped rather than rendered as a dead id — `tools/ingest/supplement-items.mjs`
+> exists to keep that count at zero, and the test suite asserts it.
 
 ## Exports
 
-**function** — `getBisListForSpec`
+**function** — `getBisListForSpec`, `requireBisList`
 
 **const** — `bisLists`
 
 ## Imports
 
-- [[domain.bis.afflictionWarlockPhase2]] — `src/domain/bis/afflictionWarlockPhase2.ts`
-- [[domain.bis.arcaneMagePhase2]] — `src/domain/bis/arcaneMagePhase2.ts`
-- [[domain.bis.armsWarriorPhase2]] — `src/domain/bis/armsWarriorPhase2.ts`
-- [[domain.bis.assassinationRoguePhase2]] — `src/domain/bis/assassinationRoguePhase2.ts`
-- [[domain.bis.balanceDruidPhase2]] — `src/domain/bis/balanceDruidPhase2.ts`
-- [[domain.bis.beastMasteryHunterPhase2]] — `src/domain/bis/beastMasteryHunterPhase2.ts`
-- [[domain.bis.combatRoguePhase2]] — `src/domain/bis/combatRoguePhase2.ts`
-- [[domain.bis.demonologyWarlockPhase2]] — `src/domain/bis/demonologyWarlockPhase2.ts`
-- [[domain.bis.destructionWarlockPhase2]] — `src/domain/bis/destructionWarlockPhase2.ts`
-- [[domain.bis.disciplinePriestPhase2]] — `src/domain/bis/disciplinePriestPhase2.ts`
-- [[domain.bis.elementalShamanPhase2]] — `src/domain/bis/elementalShamanPhase2.ts`
-- [[domain.bis.enhancementShamanPhase2]] — `src/domain/bis/enhancementShamanPhase2.ts`
-- [[domain.bis.feralDruidPhase2]] — `src/domain/bis/feralDruidPhase2.ts`
-- [[domain.bis.fireMagePhase2]] — `src/domain/bis/fireMagePhase2.ts`
-- [[domain.bis.frostMagePhase2]] — `src/domain/bis/frostMagePhase2.ts`
-- [[domain.bis.furyWarriorPhase2]] — `src/domain/bis/furyWarriorPhase2.ts`
-- [[domain.bis.holyPaladinPhase2]] — `src/domain/bis/holyPaladinPhase2.ts`
-- [[domain.bis.holyPriestPhase2]] — `src/domain/bis/holyPriestPhase2.ts`
-- [[domain.bis.marksmanshipHunterPhase2]] — `src/domain/bis/marksmanshipHunterPhase2.ts`
-- [[domain.bis.protectionPaladinPhase2]] — `src/domain/bis/protectionPaladinPhase2.ts`
-- [[domain.bis.protectionWarriorPhase2]] — `src/domain/bis/protectionWarriorPhase2.ts`
-- [[domain.bis.restorationDruidPhase2]] — `src/domain/bis/restorationDruidPhase2.ts`
-- [[domain.bis.restorationShamanPhase2]] — `src/domain/bis/restorationShamanPhase2.ts`
-- [[domain.bis.retributionPaladinPhase2]] — `src/domain/bis/retributionPaladinPhase2.ts`
-- [[domain.bis.shadowPriestPhase2]] — `src/domain/bis/shadowPriestPhase2.ts`
-- [[domain.bis.subtletyRoguePhase2]] — `src/domain/bis/subtletyRoguePhase2.ts`
-- [[domain.bis.survivalHunterPhase2]] — `src/domain/bis/survivalHunterPhase2.ts`
+- [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
+- [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
+- [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
+- [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 
 ## Imported by
 

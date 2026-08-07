@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/itemCatalogue.ts
-lines: 196
+lines: 212
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemCatalogue
 
-`src/domain/gear/itemCatalogue.ts` · **domain** layer · 196 lines
+`src/domain/gear/itemCatalogue.ts` · **domain** layer · 212 lines
 
 From the top of the file:
 
@@ -48,6 +48,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`

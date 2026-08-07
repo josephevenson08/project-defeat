@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/catalogueTypes.ts
-lines: 54
+lines: 66
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.catalogueTypes
 
-`src/domain/gear/catalogueTypes.ts` · **domain** layer · 54 lines
+`src/domain/gear/catalogueTypes.ts` · **domain** layer · 66 lines
 
 From the top of the file:
 
@@ -19,7 +19,7 @@ From the top of the file:
 
 ## Exports
 
-**type** — `CatalogueConflict`, `RawCatalogue`, `RawCatalogueItem`
+**type** — `CatalogueConflict`, `RawCatalogue`, `RawCatalogueItem`, `RawSupplement`
 
 ## Imports
 

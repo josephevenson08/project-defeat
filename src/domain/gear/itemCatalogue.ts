@@ -2,6 +2,7 @@
 // Playwright tests import this module through Node's ESM loader, which refuses a JSON import that
 // does not declare its type.
 import rawCatalogue from './itemCatalogue.json' with { type: 'json' }
+import rawSupplement from './itemSupplement.json' with { type: 'json' }
 import type { CatalogueConflict, RawCatalogueItem } from './catalogueTypes'
 import type { TbcClass } from '../character/characterTypes'
 import type { GearSlot } from './gearSlots'
@@ -127,6 +128,21 @@ for (const raw of rawCatalogue.items) {
     if (!usedIds.has(curated.id)) item.id = curated.id
   }
 
+  if (usedIds.has(item.id)) item.id = `${item.id}-${item.wowItemId}`
+  usedIds.add(item.id)
+  merged.push(item)
+}
+
+/**
+ * Items the BiS guides reference that the wowsims database has no row for — its coverage is
+ * sim-driven rather than exhaustive. Read off Wowhead tooltips by `tools/ingest/supplement-items.mjs`
+ * and added here so a real ranking is never silently shortened to hide a gap in the bulk source.
+ */
+const ingestedWowIds = new Set(merged.map((item) => item.wowItemId))
+for (const raw of rawSupplement.items) {
+  if (ingestedWowIds.has(raw.wowItemId)) continue
+  const item = toGearItem(raw as RawCatalogueItem)
+  if (raw.needsVerification) item.needsVerification = true
   if (usedIds.has(item.id)) item.id = `${item.id}-${item.wowItemId}`
   usedIds.add(item.id)
   merged.push(item)

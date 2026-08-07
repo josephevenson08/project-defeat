@@ -23,11 +23,11 @@ tags: [brain/domain, domain/spec, role/Caster-DPS]
 
 ## Best in slot
 
-- **Phase 2** — 17 ranked entries across 17 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
+- **Phase 2** — 65 ranked entries across 15 slots · source: Affliction Warlock DPS Best in Slot (BiS) Phase 2 Gear Guide
 
-16 of 17 entries are flagged [[Needs Verification]].
 
-Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 
 ## Where this lives in the code
 

@@ -1,0 +1,301 @@
+{
+  "$schema": "wowhead item supplement",
+  "note": "Items referenced by the Wowhead BiS guides that the wowsims database does not carry.",
+  "generatedBy": "tools/ingest/supplement-items.mjs",
+  "itemCount": 23,
+  "items": [
+    {
+      "id": "master-firestone",
+      "wowItemId": 22128,
+      "name": "Master Firestone",
+      "slot": "Ranged",
+      "quality": "Common",
+      "itemLevel": 66,
+      "stats": {},
+      "armorType": "Other",
+      "extraStats": {
+        "firsplpwr": 30
+      },
+      "needsVerification": true
+    },
+    {
+      "id": "libram-of-hope",
+      "wowItemId": 22401,
+      "name": "Libram of Hope",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 62,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Libram",
+      "needsVerification": true
+    },
+    {
+      "id": "totem-of-the-storm",
+      "wowItemId": 23199,
+      "name": "Totem of the Storm",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 65,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Totem",
+      "needsVerification": true
+    },
+    {
+      "id": "libram-of-fervor",
+      "wowItemId": 23203,
+      "name": "Libram of Fervor",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 65,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Libram",
+      "needsVerification": true
+    },
+    {
+      "id": "elementalist-bracelets",
+      "wowItemId": 24692,
+      "name": "Elementalist Bracelets",
+      "slot": "Wrists",
+      "quality": "Uncommon",
+      "itemLevel": 120,
+      "stats": {
+        "armor": 65
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "amber-cape",
+      "wowItemId": 25043,
+      "name": "Amber Cape",
+      "slot": "Back",
+      "quality": "Uncommon",
+      "itemLevel": 120,
+      "stats": {
+        "armor": 74
+      },
+      "needsVerification": true
+    },
+    {
+      "id": "dragonscale-wand",
+      "wowItemId": 25294,
+      "name": "Dragonscale Wand",
+      "slot": "Ranged",
+      "quality": "Uncommon",
+      "itemLevel": 117,
+      "stats": {},
+      "weaponType": "Wand",
+      "weaponSpeed": 1.7,
+      "needsVerification": true
+    },
+    {
+      "id": "flawless-wand",
+      "wowItemId": 25295,
+      "name": "Flawless Wand",
+      "slot": "Ranged",
+      "quality": "Uncommon",
+      "itemLevel": 120,
+      "stats": {},
+      "weaponType": "Wand",
+      "weaponSpeed": 1.7,
+      "needsVerification": true
+    },
+    {
+      "id": "harolds-rejuvenating-broach",
+      "wowItemId": 25643,
+      "name": "Harold's Rejuvenating Broach",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Idol",
+      "needsVerification": true
+    },
+    {
+      "id": "totem-of-the-plains",
+      "wowItemId": 25645,
+      "name": "Totem of the Plains",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Totem",
+      "needsVerification": true
+    },
+    {
+      "id": "idol-of-the-wild",
+      "wowItemId": 28064,
+      "name": "Idol of the Wild",
+      "slot": "Relic",
+      "quality": "Uncommon",
+      "itemLevel": 93,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Idol",
+      "needsVerification": true
+    },
+    {
+      "id": "lurkers-cord",
+      "wowItemId": 30675,
+      "name": "Lurker's Cord",
+      "slot": "Waist",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 109
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "lurkers-grasp",
+      "wowItemId": 30676,
+      "name": "Lurker's Grasp",
+      "slot": "Waist",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 205
+      },
+      "armorType": "Leather",
+      "needsVerification": true
+    },
+    {
+      "id": "lurkers-belt",
+      "wowItemId": 30677,
+      "name": "Lurker's Belt",
+      "slot": "Waist",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 457
+      },
+      "armorType": "Mail",
+      "needsVerification": true
+    },
+    {
+      "id": "gliders-foot-wraps",
+      "wowItemId": 30680,
+      "name": "Glider's Foot-Wraps",
+      "slot": "Feet",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 134
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "gliders-sabatons",
+      "wowItemId": 30682,
+      "name": "Glider's Sabatons",
+      "slot": "Feet",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 558
+      },
+      "armorType": "Mail",
+      "needsVerification": true
+    },
+    {
+      "id": "ravagers-cuffs",
+      "wowItemId": 30684,
+      "name": "Ravager's Cuffs",
+      "slot": "Wrists",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 85
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "ravagers-wrist-wraps",
+      "wowItemId": 30685,
+      "name": "Ravager's Wrist-Wraps",
+      "slot": "Wrists",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 159
+      },
+      "armorType": "Leather",
+      "needsVerification": true
+    },
+    {
+      "id": "ravagers-bands",
+      "wowItemId": 30686,
+      "name": "Ravager's Bands",
+      "slot": "Wrists",
+      "quality": "Epic",
+      "itemLevel": 115,
+      "stats": {
+        "armor": 355
+      },
+      "armorType": "Mail",
+      "needsVerification": true
+    },
+    {
+      "id": "nethersteel-lined-handwraps",
+      "wowItemId": 31166,
+      "name": "Nethersteel-Lined Handwraps",
+      "slot": "Hands",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {
+        "armor": 88
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "illidari-cloak",
+      "wowItemId": 31201,
+      "name": "Illidari Cloak",
+      "slot": "Back",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {
+        "armor": 70
+      },
+      "needsVerification": true
+    },
+    {
+      "id": "illidari-bindings",
+      "wowItemId": 31225,
+      "name": "Illidari Bindings",
+      "slot": "Wrists",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {
+        "armor": 61
+      },
+      "armorType": "Cloth",
+      "needsVerification": true
+    },
+    {
+      "id": "cloak-of-the-craft",
+      "wowItemId": 31255,
+      "name": "Cloak of the Craft",
+      "slot": "Back",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {
+        "agility": 25,
+        "armor": 70,
+        "attackPower": 20,
+        "rangedAttackPower": 20,
+        "hitRating": 26
+      },
+      "needsVerification": true
+    }
+  ]
+}

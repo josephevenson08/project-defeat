@@ -24,11 +24,11 @@ tags: [brain/domain, domain/spec, role/Healer]
 
 ## Best in slot
 
-- **Phase 2** — 18 ranked entries across 18 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
+- **Phase 2** — 60 ranked entries across 15 slots · source: Restoration Shaman Healing Best in Slot (BiS) Phase 2 Gear Guide
 
-16 of 18 entries are flagged [[Needs Verification]].
 
-Sends you to: [[Karazhan]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 
 ## Where this lives in the code
 

@@ -4,3 +4,8 @@ declare module '*/itemCatalogue.json' {
   const catalogue: import('./catalogueTypes').RawCatalogue
   export default catalogue
 }
+
+declare module '*/itemSupplement.json' {
+  const supplement: import('./catalogueTypes').RawSupplement
+  export default supplement
+}

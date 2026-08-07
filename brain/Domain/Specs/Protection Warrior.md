@@ -24,11 +24,11 @@ tags: [brain/domain, domain/spec, role/Tank]
 
 ## Best in slot
 
-- **Phase 2** — 17 ranked entries across 17 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
+- **Phase 2** — 57 ranked entries across 15 slots · source: Protection Warrior Tank Best in Slot (BiS) Phase 2 Gear Guide
 
-15 of 17 entries are flagged [[Needs Verification]].
 
-Sends you to: [[Gruul's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 
 ## Where this lives in the code
 

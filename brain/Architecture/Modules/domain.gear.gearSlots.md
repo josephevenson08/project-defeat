@@ -25,6 +25,7 @@ _None._
 
 ## Imported by
 
+- [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`

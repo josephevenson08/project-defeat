@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 
 ## Concepts & phases

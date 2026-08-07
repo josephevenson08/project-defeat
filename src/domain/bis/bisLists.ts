@@ -1,62 +1,122 @@
+import rawRankings from './bisRankings.json' with { type: 'json' }
 import type { TbcClass, TbcSpec } from '../character/characterTypes'
-import { enhancementShamanPhase2Bis } from './enhancementShamanPhase2'
-import { elementalShamanPhase2Bis } from './elementalShamanPhase2'
-import { restorationShamanPhase2Bis } from './restorationShamanPhase2'
-import { armsWarriorPhase2Bis } from './armsWarriorPhase2'
-import { furyWarriorPhase2Bis } from './furyWarriorPhase2'
-import { protectionWarriorPhase2Bis } from './protectionWarriorPhase2'
-import { holyPaladinPhase2Bis } from './holyPaladinPhase2'
-import { protectionPaladinPhase2Bis } from './protectionPaladinPhase2'
-import { retributionPaladinPhase2Bis } from './retributionPaladinPhase2'
-import { disciplinePriestPhase2Bis } from './disciplinePriestPhase2'
-import { holyPriestPhase2Bis } from './holyPriestPhase2'
-import { shadowPriestPhase2Bis } from './shadowPriestPhase2'
-import { balanceDruidPhase2Bis } from './balanceDruidPhase2'
-import { feralDruidPhase2Bis } from './feralDruidPhase2'
-import { restorationDruidPhase2Bis } from './restorationDruidPhase2'
-import { beastMasteryHunterPhase2Bis } from './beastMasteryHunterPhase2'
-import { marksmanshipHunterPhase2Bis } from './marksmanshipHunterPhase2'
-import { survivalHunterPhase2Bis } from './survivalHunterPhase2'
-import { arcaneMagePhase2Bis } from './arcaneMagePhase2'
-import { fireMagePhase2Bis } from './fireMagePhase2'
-import { frostMagePhase2Bis } from './frostMagePhase2'
-import { assassinationRoguePhase2Bis } from './assassinationRoguePhase2'
-import { combatRoguePhase2Bis } from './combatRoguePhase2'
-import { subtletyRoguePhase2Bis } from './subtletyRoguePhase2'
-import { afflictionWarlockPhase2Bis } from './afflictionWarlockPhase2'
-import { demonologyWarlockPhase2Bis } from './demonologyWarlockPhase2'
-import { destructionWarlockPhase2Bis } from './destructionWarlockPhase2'
+import type { GearSlot } from '../gear/gearSlots'
+import { getItemByWowItemId } from '../gear/itemCatalogue'
+import { getVisibleGearSlotsForSpec } from '../gear/slotVisibility'
+import type { BisList, RankedGearEntry } from './bisTypes'
 
-export const bisLists = [
-  enhancementShamanPhase2Bis,
-  elementalShamanPhase2Bis,
-  restorationShamanPhase2Bis,
-  armsWarriorPhase2Bis,
-  furyWarriorPhase2Bis,
-  protectionWarriorPhase2Bis,
-  holyPaladinPhase2Bis,
-  protectionPaladinPhase2Bis,
-  retributionPaladinPhase2Bis,
-  disciplinePriestPhase2Bis,
-  holyPriestPhase2Bis,
-  shadowPriestPhase2Bis,
-  balanceDruidPhase2Bis,
-  feralDruidPhase2Bis,
-  restorationDruidPhase2Bis,
-  beastMasteryHunterPhase2Bis,
-  marksmanshipHunterPhase2Bis,
-  survivalHunterPhase2Bis,
-  arcaneMagePhase2Bis,
-  fireMagePhase2Bis,
-  frostMagePhase2Bis,
-  assassinationRoguePhase2Bis,
-  combatRoguePhase2Bis,
-  subtletyRoguePhase2Bis,
-  afflictionWarlockPhase2Bis,
-  demonologyWarlockPhase2Bis,
-  destructionWarlockPhase2Bis,
-] as const
+/**
+ * Phase 2 BiS rankings, generated from the Wowhead class guides by `tools/ingest/ingest-bis.mjs`.
+ *
+ * These replace 27 hand-written files that were one item deep — nearly every slot offered a single
+ * option while the panel labelled it "1 ranked", presenting one guess as a considered ranking. The
+ * guides carry four or five real options per slot, which is what the feature was missing.
+ *
+ * Entries are keyed by `wowItemId` in the generated data and resolved to catalogue ids here, so a
+ * ranking survives the catalogue being re-ingested under different slugs. An entry whose item is not
+ * in the catalogue is dropped rather than rendered as a dead id — `tools/ingest/supplement-items.mjs`
+ * exists to keep that count at zero, and the test suite asserts it.
+ */
+
+type RawEntry = {
+  rank: number
+  wowItemId: number
+  note?: string
+  source?: string
+  section: string
+}
+
+type RawSpec = {
+  className: string
+  spec: string
+  phase: number
+  sourceName: string
+  sourceUrl: string
+  slots: Record<string, RawEntry[]>
+}
+
+function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry | undefined {
+  const item = getItemByWowItemId(raw.wowItemId)
+  if (!item) return undefined
+
+  // The guide's own label ("Best Overall", "Threat Alternative") is kept verbatim: it carries the
+  // reason a pick sits where it does, which a bare rank number throws away.
+  const notes = [raw.note, raw.source].filter(Boolean).join(' — ') || undefined
+
+  return {
+    className: spec.className as TbcClass,
+    spec: spec.spec as TbcSpec,
+    phase: spec.phase,
+    slot,
+    rank: raw.rank,
+    itemId: item.id,
+    wowItemId: raw.wowItemId,
+    sourceName: spec.sourceName,
+    sourceUrl: spec.sourceUrl,
+    notes,
+  }
+}
+
+function buildLists(): BisList[] {
+  const lists: BisList[] = []
+
+  for (const spec of Object.values(rawRankings.specs) as RawSpec[]) {
+    const entries: RankedGearEntry[] = []
+    for (const rows of Object.values(spec.slots)) {
+      for (const row of rows) {
+        const item = getItemByWowItemId(row.wowItemId)
+        if (!item) continue
+
+        // The item's own slot wins over the guide's section, because the sections are editorial and
+        // the catalogue's slot is not. Wowhead files "Claw of the Phoenix" under a Hunter melee
+        // weapons heading, but the item is off-hand only — trusting the heading would have offered it
+        // as a main hand it can never occupy.
+        //
+        // Paired slots are deliberately *not* duplicated. The guides publish one "Ring Jewelry" or
+        // "Trinkets" list because a player picks two from it, and the BiS panel already renders an
+        // equip button per paired slot on each row. Listing the entry under both Trinket 1 and
+        // Trinket 2 showed every trinket twice for no added information.
+        const entry = toEntry(row, item.slot, spec)
+        if (entry) entries.push(entry)
+      }
+    }
+
+    // The guides publish a single "Weapons" section for dual-wielding specs, covering both hands. If
+    // the spec shows an off-hand slot and the guide gave it no list of its own, the one-handers it
+    // ranked for the main hand are legitimate off-hand picks — a two-hander or a main-hand-only
+    // weapon is not, so those are left out rather than fanned across.
+    const hasOffHand = entries.some((entry) => entry.slot === 'Off Hand')
+    if (!hasOffHand && getVisibleGearSlotsForSpec(spec.className as TbcClass, spec.spec as TbcSpec).includes('Off Hand')) {
+      const oneHanders = entries.filter(
+        (entry) => entry.slot === 'Main Hand' && getItemByWowItemId(entry.wowItemId ?? 0)?.handType === 'One Hand',
+      )
+      entries.push(...oneHanders.map((entry, index) => ({ ...entry, slot: 'Off Hand' as GearSlot, rank: index + 1 })))
+    }
+
+    lists.push({
+      id: `${spec.className}-${spec.spec}-phase-${spec.phase}`.toLowerCase().replaceAll(' ', '-'),
+      className: spec.className as TbcClass,
+      spec: spec.spec as TbcSpec,
+      phase: spec.phase,
+      title: `${spec.spec} ${spec.className} Phase ${spec.phase} Ranked List`,
+      sourceName: spec.sourceName,
+      sourceUrl: spec.sourceUrl,
+      entries,
+    })
+  }
+
+  return lists.sort((a, b) => a.className.localeCompare(b.className) || a.spec.localeCompare(b.spec))
+}
+
+export const bisLists: readonly BisList[] = buildLists()
 
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {
   return bisLists.find((list) => list.className === className && list.spec === spec)
+}
+
+/** Throws rather than returning undefined, so a missing spec fails at import instead of rendering empty. */
+export function requireBisList(className: TbcClass, spec: TbcSpec): BisList {
+  const list = getBisListForSpec(className, spec)
+  if (!list) throw new Error(`No Phase 2 BiS list for ${className} ${spec}`)
+  return list
 }

@@ -23,9 +23,9 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 
 ## Best in slot
 
-- **Phase 2** — 17 ranked entries across 17 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
+- **Phase 2** — 20 ranked entries across 15 slots · source: Rogue DPS Best in Slot (BiS) Phase 2 Gear Guide
 
-12 of 17 entries are flagged [[Needs Verification]].
+
 
 Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 

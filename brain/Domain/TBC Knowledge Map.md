@@ -17,8 +17,8 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **13** professions
 - **230** items
 - **124** itemsFlagged
-- **463** bisEntries
-- **2** bisEntriesRankedDeeperThanOne
+- **1440** bisEntries
+- **1040** bisEntriesRankedDeeperThanOne
 - **11** gems
 - **22** enchants
 - **14** buffs

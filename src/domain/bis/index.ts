@@ -1,29 +1,49 @@
 export type { BisList, RankedGearEntry } from './bisTypes'
-export { bisLists, getBisListForSpec } from './bisLists'
-export { enhancementShamanPhase2Bis } from './enhancementShamanPhase2'
-export { elementalShamanPhase2Bis } from './elementalShamanPhase2'
-export { restorationShamanPhase2Bis } from './restorationShamanPhase2'
-export { armsWarriorPhase2Bis } from './armsWarriorPhase2'
-export { furyWarriorPhase2Bis } from './furyWarriorPhase2'
-export { protectionWarriorPhase2Bis } from './protectionWarriorPhase2'
-export { holyPaladinPhase2Bis } from './holyPaladinPhase2'
-export { protectionPaladinPhase2Bis } from './protectionPaladinPhase2'
-export { retributionPaladinPhase2Bis } from './retributionPaladinPhase2'
-export { disciplinePriestPhase2Bis } from './disciplinePriestPhase2'
-export { holyPriestPhase2Bis } from './holyPriestPhase2'
-export { shadowPriestPhase2Bis } from './shadowPriestPhase2'
-export { balanceDruidPhase2Bis } from './balanceDruidPhase2'
-export { feralDruidPhase2Bis } from './feralDruidPhase2'
-export { restorationDruidPhase2Bis } from './restorationDruidPhase2'
-export { beastMasteryHunterPhase2Bis } from './beastMasteryHunterPhase2'
-export { marksmanshipHunterPhase2Bis } from './marksmanshipHunterPhase2'
-export { survivalHunterPhase2Bis } from './survivalHunterPhase2'
-export { arcaneMagePhase2Bis } from './arcaneMagePhase2'
-export { fireMagePhase2Bis } from './fireMagePhase2'
-export { frostMagePhase2Bis } from './frostMagePhase2'
-export { assassinationRoguePhase2Bis } from './assassinationRoguePhase2'
-export { combatRoguePhase2Bis } from './combatRoguePhase2'
-export { subtletyRoguePhase2Bis } from './subtletyRoguePhase2'
-export { afflictionWarlockPhase2Bis } from './afflictionWarlockPhase2'
-export { demonologyWarlockPhase2Bis } from './demonologyWarlockPhase2'
-export { destructionWarlockPhase2Bis } from './destructionWarlockPhase2'
+export { bisLists, getBisListForSpec, requireBisList } from './bisLists'
+
+import { requireBisList } from './bisLists'
+
+/**
+ * Per-spec named exports.
+ *
+ * These used to be 27 hand-written files. The lists are now generated from the Wowhead guides (see
+ * `bisLists.ts`), but the named exports are kept because they read far better at a call site than
+ * `getBisListForSpec('Shaman', 'Enhancement')`, and because they fail loudly at import if a spec ever
+ * drops out of the ingested data.
+ */
+
+export const armsWarriorPhase2Bis = requireBisList('Warrior', 'Arms')
+export const furyWarriorPhase2Bis = requireBisList('Warrior', 'Fury')
+export const protectionWarriorPhase2Bis = requireBisList('Warrior', 'Protection')
+
+export const holyPaladinPhase2Bis = requireBisList('Paladin', 'Holy')
+export const protectionPaladinPhase2Bis = requireBisList('Paladin', 'Protection')
+export const retributionPaladinPhase2Bis = requireBisList('Paladin', 'Retribution')
+
+export const beastMasteryHunterPhase2Bis = requireBisList('Hunter', 'Beast Mastery')
+export const marksmanshipHunterPhase2Bis = requireBisList('Hunter', 'Marksmanship')
+export const survivalHunterPhase2Bis = requireBisList('Hunter', 'Survival')
+
+export const assassinationRoguePhase2Bis = requireBisList('Rogue', 'Assassination')
+export const combatRoguePhase2Bis = requireBisList('Rogue', 'Combat')
+export const subtletyRoguePhase2Bis = requireBisList('Rogue', 'Subtlety')
+
+export const disciplinePriestPhase2Bis = requireBisList('Priest', 'Discipline')
+export const holyPriestPhase2Bis = requireBisList('Priest', 'Holy')
+export const shadowPriestPhase2Bis = requireBisList('Priest', 'Shadow')
+
+export const elementalShamanPhase2Bis = requireBisList('Shaman', 'Elemental')
+export const enhancementShamanPhase2Bis = requireBisList('Shaman', 'Enhancement')
+export const restorationShamanPhase2Bis = requireBisList('Shaman', 'Restoration')
+
+export const arcaneMagePhase2Bis = requireBisList('Mage', 'Arcane')
+export const fireMagePhase2Bis = requireBisList('Mage', 'Fire')
+export const frostMagePhase2Bis = requireBisList('Mage', 'Frost')
+
+export const afflictionWarlockPhase2Bis = requireBisList('Warlock', 'Affliction')
+export const demonologyWarlockPhase2Bis = requireBisList('Warlock', 'Demonology')
+export const destructionWarlockPhase2Bis = requireBisList('Warlock', 'Destruction')
+
+export const balanceDruidPhase2Bis = requireBisList('Druid', 'Balance')
+export const feralDruidPhase2Bis = requireBisList('Druid', 'Feral')
+export const restorationDruidPhase2Bis = requireBisList('Druid', 'Restoration')

@@ -24,11 +24,11 @@ tags: [brain/domain, domain/spec, role/Healer]
 
 ## Best in slot
 
-- **Phase 2** — 17 ranked entries across 17 slots · source: Starter guide-structured sample inspired by Wowhead/wowtbc.gg workflows
+- **Phase 2** — 53 ranked entries across 15 slots · source: Priest Healing Best in Slot (BiS) Phase 2 Gear Guide
 
-16 of 17 entries are flagged [[Needs Verification]].
 
-Sends you to: [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+
+Sends you to: [[Karazhan]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
 
 ## Where this lives in the code
 

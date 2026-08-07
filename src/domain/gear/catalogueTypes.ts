@@ -43,6 +43,18 @@ export type RawCatalogue = {
   items: RawCatalogueItem[]
 }
 
+/**
+ * Items the wowsims database does not carry, read off Wowhead tooltips instead. Same shape as a
+ * catalogue item minus the fields a tooltip cannot supply — notably `phase`, which is why every
+ * supplement entry arrives flagged `needsVerification`.
+ */
+export type RawSupplement = {
+  note: string
+  generatedBy: string
+  itemCount: number
+  items: (Omit<RawCatalogueItem, 'phase' | 'setId' | 'allowedClasses'> & { needsVerification?: boolean })[]
+}
+
 /** One field where the curated entry disagreed with the ingested source. Kept for diagnostics. */
 export type CatalogueConflict = {
   wowItemId: number

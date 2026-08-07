@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-139 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+113 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,10 +16,9 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.bis.bisTypes]] — 28 importers
 - [[domain.character.characterTypes]] — 28 importers
 - [[domain.gear.itemTypes]] — 24 importers
-- [[domain.gear.gearSlots]] — 16 importers
+- [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 12 importers
 - [[features.character.characterTypes]] — 12 importers
 - [[components.layout.Panel]] — 11 importers
@@ -28,6 +27,7 @@ The modules everything else leans on — change these carefully.
 - [[domain.raids.raidTypes]] — 9 importers
 - [[features.gear.gearData]] — 8 importers
 - [[domain.character.roleTheme]] — 7 importers
+- [[domain.simulation.encounterTypes]] — 7 importers
 
 ## By layer
 
@@ -84,7 +84,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.stats.StatsRail]] · 1 importers
 - [[features.stats.statsTypes]] · 5 importers
 
-### domain (98)
+### domain (72)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -100,36 +100,10 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.abilities.signatureAbilitiesShaman]] · 1 importers
 - [[domain.abilities.signatureAbilitiesWarlock]] · 1 importers
 - [[domain.abilities.signatureAbilitiesWarrior]] · 1 importers
-- [[domain.bis.afflictionWarlockPhase2]] · 2 importers
-- [[domain.bis.arcaneMagePhase2]] · 2 importers
-- [[domain.bis.armsWarriorPhase2]] · 2 importers
-- [[domain.bis.assassinationRoguePhase2]] · 2 importers
-- [[domain.bis.balanceDruidPhase2]] · 2 importers
-- [[domain.bis.beastMasteryHunterPhase2]] · 2 importers
 - [[domain.bis.bisLists]] · 1 importers
-- [[domain.bis.bisTypes]] · 28 importers
-- [[domain.bis.combatRoguePhase2]] · 2 importers
-- [[domain.bis.demonologyWarlockPhase2]] · 2 importers
-- [[domain.bis.destructionWarlockPhase2]] · 2 importers
-- [[domain.bis.disciplinePriestPhase2]] · 2 importers
-- [[domain.bis.elementalShamanPhase2]] · 2 importers
-- [[domain.bis.enhancementShamanPhase2]] · 2 importers
-- [[domain.bis.feralDruidPhase2]] · 2 importers
-- [[domain.bis.fireMagePhase2]] · 2 importers
-- [[domain.bis.frostMagePhase2]] · 2 importers
-- [[domain.bis.furyWarriorPhase2]] · 2 importers
-- [[domain.bis.holyPaladinPhase2]] · 2 importers
-- [[domain.bis.holyPriestPhase2]] · 2 importers
+- [[domain.bis.bisRankingsJson.d]] · 0 importers
+- [[domain.bis.bisTypes]] · 2 importers
 - [[domain.bis.index]] · 1 importers
-- [[domain.bis.marksmanshipHunterPhase2]] · 2 importers
-- [[domain.bis.protectionPaladinPhase2]] · 2 importers
-- [[domain.bis.protectionWarriorPhase2]] · 2 importers
-- [[domain.bis.restorationDruidPhase2]] · 2 importers
-- [[domain.bis.restorationShamanPhase2]] · 2 importers
-- [[domain.bis.retributionPaladinPhase2]] · 2 importers
-- [[domain.bis.shadowPriestPhase2]] · 2 importers
-- [[domain.bis.subtletyRoguePhase2]] · 2 importers
-- [[domain.bis.survivalHunterPhase2]] · 2 importers
 - [[domain.buffs.buffTypes]] · 3 importers
 - [[domain.buffs.sampleBuffs]] · 2 importers
 - [[domain.buffs.sampleTargetDebuffs]] · 2 importers
@@ -151,14 +125,14 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.catalogueTypes]] · 1 importers
 - [[domain.gear.characterItemRules]] · 2 importers
 - [[domain.gear.defaultGear]] · 1 importers
-- [[domain.gear.gearSlots]] · 16 importers
-- [[domain.gear.itemCatalogue]] · 4 importers
+- [[domain.gear.gearSlots]] · 17 importers
+- [[domain.gear.itemCatalogue]] · 5 importers
 - [[domain.gear.itemSets]] · 2 importers
 - [[domain.gear.itemTypes]] · 24 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
 - [[domain.gear.slotCompatibility]] · 5 importers
-- [[domain.gear.slotVisibility]] · 1 importers
+- [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemTypes]] · 1 importers
 - [[domain.gems.sampleGems]] · 5 importers
 - [[domain.professions.index]] · 1 importers
