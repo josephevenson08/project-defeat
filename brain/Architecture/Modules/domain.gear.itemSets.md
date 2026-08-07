@@ -39,8 +39,8 @@ From the top of the file:
 
 ## Imported by
 
-- [[App]] — `src/App.tsx`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
+- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.SetBonuses]] — `src/features/gear/SetBonuses.tsx`
 
 ## Concepts & phases
 

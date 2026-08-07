@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-138 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+139 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -51,7 +51,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (27)
+### features (28)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -66,6 +66,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.gear.GearPanel]] · 1 importers
 - [[features.gear.gearTypes]] · 10 importers
 - [[features.gear.ItemPopup]] · 1 importers
+- [[features.gear.SetBonuses]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.raids.RaidAttunementChain]] · 1 importers
 - [[features.raids.RaidLootList]] · 1 importers

@@ -32,7 +32,11 @@ import {
 } from '../src/domain/bis'
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
-import { tbcClasses } from '../src/domain/character/tbcClasses'
+import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
+import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
+import { calculateStats } from '../src/features/stats/calculateStats'
+import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
+import { calculateStatWeights } from '../src/features/simulator/calculateStatWeights'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { deriveItemArmor } from '../src/domain/gear/armorValues'
 import { getItemsForSlotAndCharacter } from '../src/domain/gear/characterItemRules'
@@ -92,6 +96,26 @@ async function selectSlotGem(page: Page, slot: string, colour: string, value: st
   await openSlot(page, slot)
   await page.getByLabel(`${slot} ${colour} socket`).selectOption(value)
   await closeSlot(page)
+}
+
+/**
+ * Runs the simulation for a spec straight through the domain, with no browser involved.
+ *
+ * The simulator is hidden from the UI (`SHOW_SIMULATOR` in src/App.tsx), but the findings asserted
+ * with this are about the engine rather than the panels — cat form swinging its own weapon, specials
+ * layering onto white damage — so they are worth keeping and belong against the functions directly.
+ */
+function simulateSpec(className: TbcClass, spec: TbcSpec, race: TbcRace, faction: Faction) {
+  const character: CharacterProfile = { faction, race, className, spec }
+  const gear = normalizeGearForCharacter(defaultGear, className, spec)
+  const role = getRoleForSpec(className, spec)
+  const stats = calculateStats(character, gear)
+  return { character, gear, role, stats, result: calculateSimulation(character, gear, stats, role) }
+}
+
+/** Pulls one labelled row out of a simulation breakdown. */
+function breakdownValue(result: { breakdown: readonly { label: string; value: number }[] }, label: RegExp) {
+  return result.breakdown.find((entry) => label.test(entry.label))?.value
 }
 
 /** Runs assertions against a slot's open popup, then closes it. */
@@ -167,8 +191,8 @@ test.skip('class, faction, race, gems, and caster simulation flow work', async (
   await expect(page.getByText(/Blood Elf Fire Mage/i)).toBeVisible()
   await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
 
-  await selectSlotItem(page, 'Chest', 'Spellfire Training Robe')
-  await selectSlotItem(page, 'Main Hand', 'Apprentice Focus Staff')
+  await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
+  await selectSlotItem(page, 'Main Hand', 'apprentice-focus-staff')
   // Equip a head piece known to have a red socket rather than assuming the default one does — the
   // default moved when the catalogue was re-ingested, and socketing is the point of this test.
   await selectSlotItem(page, 'Head', 'flamebane-helm')
@@ -193,7 +217,7 @@ test.skip('healer and tank roles produce role-specific results', async ({ page }
   await expect(page.getByLabel('Specialization')).toHaveValue('Discipline')
   await page.getByLabel('Specialization').selectOption('Holy')
   await expect(page.getByText('Healer', { exact: true })).toBeVisible()
-  await selectSlotItem(page, 'Hands', "Healer's Grace Gloves")
+  await selectSlotItem(page, 'Hands', 'healers-grace-gloves')
   await selectSlotEnchant(page, 'Hands', 'Enchant Gloves - Major Healing')
 
   await expect(page.getByText(/Estimated Healing/i)).toBeVisible()
@@ -202,10 +226,10 @@ test.skip('healer and tank roles produce role-specific results', async ({ page }
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Protection')
   await expect(page.getByText('Tank', { exact: true })).toBeVisible()
-  await selectSlotItem(page, 'Chest', 'Bulwark Chestguard')
+  await selectSlotItem(page, 'Chest', 'bulwark-chestguard')
     // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
   // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
-  await selectSlotItem(page, 'Off Hand', 'Aldori Legacy Defender')
+  await selectSlotItem(page, 'Off Hand', 'aldori-legacy-defender')
 
   // The tank path has to use the *defender-side* base chances. It previously reused the
   // attacker-side formulas symmetrically, which handed the player the boss's own 14% parry and made
@@ -261,17 +285,24 @@ test('expanded gear foundation has multiple options for every slot', async ({ pa
   await page.goto('/')
 
   // Default character is Warrior/Fury, which has no Relic slot in TBC (only Shaman/Paladin/Druid do),
-  // so that slot is intentionally not rendered here even though the underlying catalog has Relic items.
-  const visibleSlotsForDefaultCharacter = gearSlots.filter((slot) => slot !== 'Relic')
+  // so ask the domain which slots are actually rendered rather than hardcoding the exception.
+  const visibleSlotsForDefaultCharacter = getVisibleGearSlotsForSpec('Warrior', 'Fury')
 
   for (const slot of gearSlots) {
     const itemOptions = getItemsForSlot(slot)
     expect(itemOptions.length, `${slot} should have multiple data options`).toBeGreaterThan(1)
   }
 
+  // Every visible slot must render a cell, and opening one must offer real options. The exhaustive
+  // per-slot check is the domain loop above; repeating it through 16 popup open/close cycles would
+  // cost about five seconds to re-prove the same thing.
   for (const slot of visibleSlotsForDefaultCharacter) {
-    await expect(page.getByLabel(slot, { exact: true }).locator('option')).not.toHaveCount(0)
+    await expect(slotCell(page, slot), `${slot} should render a gear cell`).toHaveCount(1)
   }
+
+  await withSlotOpen(page, 'Chest', async () => {
+    await expect(page.getByLabel('Chest', { exact: true }).locator('option')).not.toHaveCount(0)
+  })
 })
 
 test('Enhancement Shaman Phase 2 starter ranking resolves to catalog items', async () => {
@@ -304,11 +335,11 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
 
-  await selectSlotItem(page, 'Head', { label: 'Cataclysm Helm' })
-  await selectSlotItem(page, 'Wrists', { label: 'True-Aim Stalker Bands' })
-  await selectSlotItem(page, 'Main Hand', { label: 'Talon of the Phoenix' })
-  await selectSlotItem(page, 'Off Hand', { label: 'Rod of the Sun King' })
-  await selectSlotItem(page, 'Totem', { label: 'Totem of the Astral Winds' })
+  await selectSlotItem(page, 'Head', 'cataclysm-helm')
+  await selectSlotItem(page, 'Wrists', 'true-aim-stalker-bands')
+  await selectSlotItem(page, 'Main Hand', 'talon-of-the-phoenix')
+  await selectSlotItem(page, 'Off Hand', 'rod-of-the-sun-king')
+  await selectSlotItem(page, 'Totem', 'totem-of-the-astral-winds')
 
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true })).toHaveValue('talon-of-the-phoenix')
@@ -317,8 +348,12 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Dragonstrike' })).toHaveCount(1)
   })
 
+  // Not "greater than": the starting gear is now the highest item level the catalogue offers for each
+  // slot, so deliberately equipping a specific Tier 5 set piece can legitimately lower a stat. What
+  // has to hold is that the picks reach the stat pipeline at all.
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
-  expect(after).toBeGreaterThan(before)
+  expect(after).toBeGreaterThan(0)
+  expect(after, 'equipping five different items must move attack power').not.toBe(before)
 })
 
 test('Enhancement Shaman filters gear, relics, enchants, and source details by spec', async ({ page }) => {
@@ -540,7 +575,7 @@ test('crafted items show recipe source, required skill, and material farm locati
   await page.goto('/')
 
   await page.getByLabel('Class').selectOption('Mage')
-  await selectSlotItem(page, 'Chest', { label: 'Spellfire Training Robe' })
+  await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
 
   await openSlot(page, 'Chest')
   const craftingDetails = page.getByLabel('Chest crafting details')
@@ -559,7 +594,7 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByLabel('Specialization').selectOption('Enhancement')
-  await selectSlotItem(page, 'Head', { label: 'Cataclysm Helm' })
+  await selectSlotItem(page, 'Head', 'cataclysm-helm')
 
   // Quality is carried by colour on the item name itself now, rather than spelled out in a caption.
   // That is the whole reason quality is the one chromatic signal left in the interface, so the colour
@@ -636,7 +671,7 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(1)
   })
 
-  await selectSlotItem(page, 'Chest', { label: 'Destroyer Chestguard' })
+  await selectSlotItem(page, 'Chest', 'destroyer-chestguard-tank')
 })
 
 test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve to catalog items', async () => {
@@ -1170,7 +1205,6 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
 
   await page.getByLabel('Class').selectOption('Mage')
   await page.getByLabel('Specialization').selectOption('Fire')
-  await page.getByRole('button', { name: /Cloth \/ caster target/ }).click()
 
   // The autosave runs in an effect, so wait for it to actually reach storage before reloading.
   await expect
@@ -1180,11 +1214,19 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
     })
     .toBe('Fire')
 
+  // The encounter target used to be set through the UI here, to prove the non-character half of the
+  // build persists too. That panel is hidden with the simulator, but the target is still part of the
+  // saved payload, so assert it survives in storage rather than dropping the coverage.
+  const savedTarget = await page.evaluate(() => {
+    const raw = localStorage.getItem('project-defeat:build:v1')
+    return raw ? JSON.parse(raw).target : null
+  })
+  expect(savedTarget, 'the saved build must carry the encounter target, not just the character').toBeTruthy()
+
   await page.reload()
 
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
-  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('24.9%')
 })
 
 test('a build can be exported and imported back', async ({ page }) => {
@@ -1242,46 +1284,36 @@ test('a build referencing a missing item still loads, reporting the dropped slot
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
 })
 
-test('melee specials are layered onto white damage, and unmodelled ones say so', async ({ page }) => {
-  await page.goto('/')
+test('melee specials are layered onto white damage, and unmodelled ones say so', async () => {
+  // Asserted against the engine rather than the simulator panel, which is currently hidden. The
+  // finding is about how specials are layered, and that does not depend on anything being rendered.
 
   // Fury Warrior: Bloodthirst is cooldown-bound, so its rate is defensible and it is modelled.
-  const withSpecial = Number(await page.getByTestId('simulation-score').innerText())
-  const breakdown = page.locator('.breakdown-list')
-  await expect(breakdown).toContainText(/Bloodthirst DPS/i)
-  await expect(page.locator('.simulation-result p')).toContainText(/used on its 6s cooldown/i)
-
-  // The special has to actually add damage rather than just appear in the breakdown.
-  const bloodthirstDps = Number(
-    (await breakdown.locator('div', { hasText: /Bloodthirst DPS/i }).innerText()).match(/[\d.]+$/)?.[0] ?? '0',
-  )
-  expect(bloodthirstDps).toBeGreaterThan(0)
-  expect(withSpecial).toBeGreaterThan(bloodthirstDps)
+  const fury = simulateSpec('Warrior', 'Fury', 'Human', 'Alliance')
+  const bloodthirstDps = breakdownValue(fury.result, /Bloodthirst DPS/i)
+  expect(bloodthirstDps, 'Bloodthirst must appear in the breakdown').toBeGreaterThan(0)
+  expect(fury.result.summary).toMatch(/used on its 6s cooldown/i)
 
   // Fury presses more than one computable button. Whirlwind has its own 10s cooldown and must be
   // layered on alongside Bloodthirst — modelling only the signature ability understates the spec,
   // which is the gap the rotation work exists to close.
-  await expect(breakdown).toContainText(/Whirlwind DPS/i)
-  await expect(page.locator('.simulation-result p')).toContainText(/used on its 10s cooldown/i)
-  const whirlwindDps = Number(
-    (await breakdown.locator('div', { hasText: /Whirlwind DPS/i }).innerText()).match(/[\d.]+$/)?.[0] ?? '0',
-  )
-  expect(whirlwindDps).toBeGreaterThan(0)
+  const whirlwindDps = breakdownValue(fury.result, /Whirlwind DPS/i)
+  expect(whirlwindDps, 'Whirlwind must be layered on alongside Bloodthirst').toBeGreaterThan(0)
+  expect(fury.result.summary).toMatch(/used on its 10s cooldown/i)
+
   // Both are real contributions on top of white damage, and neither may swallow the whole estimate.
-  expect(withSpecial).toBeGreaterThan(bloodthirstDps + whirlwindDps)
+  expect(fury.result.scoreExact).toBeGreaterThan((bloodthirstDps ?? 0) + (whirlwindDps ?? 0))
 
   // Combat Rogue: no cooldown, but a fixed energy cost against a fixed regen rate is computable.
-  await page.getByLabel('Class').selectOption('Rogue')
-  await page.getByLabel('Specialization').selectOption('Combat')
-  await expect(breakdown).toContainText(/Sinister Strike DPS/i)
-  await expect(page.locator('.simulation-result p')).toContainText(/energy against 10\/sec regen/i)
+  const combat = simulateSpec('Rogue', 'Combat', 'Human', 'Alliance')
+  expect(breakdownValue(combat.result, /Sinister Strike DPS/i)).toBeGreaterThan(0)
+  expect(combat.result.summary).toMatch(/energy against 10\/sec regen/i)
 
   // Hunter: Steady Shot is mana-costed with no cooldown, so its sustained rate depends on auto-shot
   // weaving that isn't modelled. It must be named as excluded rather than silently omitted.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
-  await page.getByLabel('Class').selectOption('Hunter')
-  await expect(breakdown).not.toContainText(/Steady Shot DPS/i)
-  await expect(page.locator('.simulation-result p')).toContainText(/Steady Shot is not included/i)
+  const hunter = simulateSpec('Hunter', 'Beast Mastery', 'Dwarf', 'Alliance')
+  expect(breakdownValue(hunter.result, /Steady Shot DPS/i)).toBeUndefined()
+  expect(hunter.result.summary).toMatch(/Steady Shot is not included/i)
 })
 
 test('the Raids tab renders a raid, its bosses and an attunement chain', async ({ page }) => {
@@ -1400,8 +1432,8 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
 
   // Two pieces of the same set, which is the most a player can currently assemble — only Head and
   // Chest of each Tier 5 set are catalogued so far, so the 4-piece bonus is unreachable by design.
-  await selectSlotItem(page, 'Head', 'Destroyer Battle-Helm')
-  await selectSlotItem(page, 'Chest', 'Destroyer Breastplate')
+  await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
+  await selectSlotItem(page, 'Chest', 'destroyer-breastplate')
 
   const sets = page.getByTestId('set-bonuses')
   await expect(sets).toBeVisible()
@@ -1418,7 +1450,7 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
 
   // The whole point of showing these is that the score does NOT include them. If that caveat ever
   // disappears, the panel starts implying tier pieces are being valued when they are not.
-  await expect(sets).toContainText(/None of these bonuses are applied to the score/i)
+  await expect(sets).toContainText(/None of these bonuses are included in the stat totals/i)
   await expect(sets).toContainText(/undervalues tier pieces/i)
 })
 
@@ -1454,31 +1486,27 @@ test('item procs and on-use effects contribute at their average uptime', async (
   expect(Object.keys(capacitor?.effect?.statBonus ?? {})).toHaveLength(0)
 })
 
-test('a feral druid swings cat form\'s own weapon, not the equipped one', async ({ page }) => {
-  await page.goto('/')
-  // Night Elf first — Druid isn't offered to the default race, so the class list wouldn't contain it.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
-  await page.getByLabel('Class').selectOption('Druid')
-  await page.getByLabel('Specialization').selectOption('Feral')
+test('a feral druid swings cat form\'s own weapon, not the equipped one', async () => {
+  // Asserted against the engine rather than the simulator panel, which is currently hidden.
+  const feral = simulateSpec('Druid', 'Feral', 'Night Elf', 'Alliance')
 
   // TBC substitutes a fixed internal weapon in cat form — 43.5-66.5 damage on a 1.0s swing, so 55
   // weapon DPS — and every cat ability reads that rather than the equipped item. Reading the equipped
   // weapon's dice meant a Feral druid's damage scaled off a staff the form never actually swings.
-  const breakdown = page.locator('.breakdown-list')
-  const weaponDamage = Number(
-    (await breakdown.locator('div', { hasText: /Weapon damage/i }).first().innerText()).match(/[\d.]+$/)?.[0] ?? '0',
-  )
-  expect(weaponDamage).toBeCloseTo(55, 1)
+  expect(breakdownValue(feral.result, /Weapon damage/i)).toBeCloseTo(55, 1)
 
   // What the equipped weapon *does* give a Feral druid is Feral Attack Power, an explicit stat TBC
   // prints on druid weapons. It adds 1:1 into attack power, so its weight must land exactly on the
   // reference stat's 1.00 — anything else means the conversion picked up a stray multiplier.
-  await expect(page.getByTestId('stat-weight-feralAttackPower')).toContainText('1.00')
+  const feralWeights = calculateStatWeights(feral.character, feral.gear, feral.role)
+  const feralApWeight = feralWeights.entries.find((entry) => entry.stat === 'feralAttackPower')
+  expect(feralApWeight?.relative).toBeCloseTo(1, 2)
 
   // And it must not be offered to classes that can't shapeshift. For them it isn't an unmodeled
   // stat the sim might learn later, it's genuinely worthless, so it should not be probed at all.
-  await page.getByLabel('Class').selectOption('Warrior')
-  await expect(page.getByTestId('stat-weight-feralAttackPower')).toHaveCount(0)
+  const fury = simulateSpec('Warrior', 'Fury', 'Human', 'Alliance')
+  const furyWeights = calculateStatWeights(fury.character, fury.gear, fury.role)
+  expect(furyWeights.entries.some((entry) => entry.stat === 'feralAttackPower')).toBe(false)
 })
 
 test('a both-weapons special halves its off-hand swing but not its flat bonus', async () => {

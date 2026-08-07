@@ -17,7 +17,6 @@ import { calculateSimulation } from './features/simulator/calculateSimulation'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { EncounterPanel } from './features/simulator/EncounterPanel'
 import { findUpgrades } from './features/simulator/findUpgrades'
-import { getActiveSets } from './domain/gear/itemSets'
 import { SimulatorPanel } from './features/simulator/SimulatorPanel'
 import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
 import { UpgradesPanel } from './features/simulator/UpgradesPanel'
@@ -104,9 +103,6 @@ function App() {
 
   const role = getRoleForSpec(character.className, character.spec)
 
-  // Tier set membership of whatever is equipped. Surfaced in the simulator panel because none of
-  // these bonuses reach the score — see `sampleItemSets` for why almost none of them can.
-  const activeSets = useMemo(() => getActiveSets(Object.values(gear).map((slot) => slot.item)), [gear])
   const stats = useMemo(
     () => calculateStats(character, gear, activeBuffIds, activeConsumableIds),
     [character, gear, activeBuffIds, activeConsumableIds],
@@ -183,7 +179,7 @@ function App() {
           {SHOW_SIMULATOR && (
             <>
               <EncounterPanel target={target} role={role} onChange={updateTarget} />
-              <SimulatorPanel result={simulationResult} role={role} activeSets={activeSets} onRun={runSimulation} />
+              <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
               <StatWeightsPanel weights={statWeights} role={role} />
               <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
             </>

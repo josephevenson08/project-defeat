@@ -1965,15 +1965,27 @@ input[type='text']:focus {
 }
 
 .set-bonus-list {
-  border-top: 1px solid rgba(148, 163, 184, 0.25);
-  margin-top: 16px;
-  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 16px;
 }
 
-.set-bonus-list h4 {
-  color: #e2e8f0;
-  font-size: 0.95rem;
-  margin: 0 0 6px;
+.set-bonus-heading {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  font-weight: 500;
+  letter-spacing: var(--label-tracking);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.set-bonus-caveat {
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 4px;
+  max-width: 70ch;
 }
 
 .set-bonus-entry {

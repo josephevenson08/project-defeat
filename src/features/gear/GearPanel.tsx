@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
+import { getActiveSets } from '../../domain/gear/itemSets'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import type { CharacterProfile } from '../character/characterTypes'
+import { SetBonuses } from './SetBonuses'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 import { ItemPopup } from './ItemPopup'
@@ -51,6 +53,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
   }
 
   const slots = getVisibleGearSlotsForSpec(character.className, character.spec)
+  const activeSets = useMemo(() => getActiveSets(Object.values(gear).map((slot) => slot.item)), [gear])
 
   return (
     <section className="panel gear-panel" aria-label="Gear">
@@ -106,6 +109,8 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
           )
         })}
       </div>
+
+      <SetBonuses activeSets={activeSets} />
 
       {openSlot && (
         <ItemPopup
