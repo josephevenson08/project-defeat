@@ -101,14 +101,28 @@ all clean; brain idempotent on a second run.
 The 10 skips are the simulator tests, quarantined with the feature (`SHOW_SIMULATOR` in `src/App.tsx`),
 plus one gem test — see below.
 
+## Gems and enchants are ingested too
+
+`node tools/ingest/ingest-gems-enchants.mjs` → **212 gems, 79 enchants**, from the same pinned
+wowsims commit as the items.
+
+The important part is a schema fix, not the volume. **TBC gem colours are not socket colours.**
+Sockets are only Red/Yellow/Blue/Meta; gems add three hybrids, and the hybrids are the majority (46
+Orange, 37 Purple, 35 Green — 118 against 74 single-colour). `GemColor` is now its own type and
+`gemFitsSocket` in `src/domain/gems/gemTypes.ts` encodes the rule: a hybrid counts as *both* its
+component colours. Red sockets therefore offer 117 gems, blue 88, Meta its own 18.
+
+Enchants keep the restrictions the game imposes (shield-only, two-hand-only, class) and drop the
+hand-written role/spec tagging, which the game does not impose. 19 are pure procs carrying no flat
+stats and are marked `notModelled`.
+
 ## Next, in order
 
-1. **Gem and enchant recommendations.** The generated BiS entries carry none: the guides publish
-   gemming and enchanting in prose sections, not in the ranked tables the ingester reads. One test is
-   skipped waiting on this (`Tank BiS lists recommend a Meta-colored gem`). This is also the moment to
-   deal with the catalogue being **11 gems and 22 enchants** against 4,528 items — the thinnest part
-   of the app now. wowsims carries `all_gems.go` (~43 KB) and `all_enchants.go` (~16 KB), which is the
-   same shape of source as the item ingestion and would replace both wholesale.
+1. **Gem and enchant *recommendations* per BiS entry.** Still missing — the guides publish gemming and
+   enchanting in prose sections, not in the ranked tables the ingester reads, so `recommendedGemIds`
+   is empty on every entry. One test is skipped waiting on it
+   (`Tank BiS lists recommend a Meta-colored gem`). Now worth doing, since the gem pool behind it is
+   real rather than 11 entries.
 2. **Consumables and raid buffs.** Agreed shape: model by **role** (6–8 profiles) with per-spec
    overrides, not 27 separate ingestions.
 3. **Remaining panels in the new design language.** BiS, Buffs, Raids, Professions and Builds still use
@@ -120,6 +134,8 @@ plus one gem test — see below.
 - The item dropdown in the gear popup is a flat list of up to ~400 options ordered by item id, with an
   item level prefix. It works, but it is the weakest interaction in the new UI — it wants sorting and
   filtering before the app is pleasant for a real gearing session.
+- The gem and enchant dropdowns are now real, but the *item* dropdown remains a flat list ordered by
+  item id. That is the weakest interaction left in the new UI.
 - Only 9 tier sets have bonus definitions against 222 set names in the ingested catalogue, so most
   sets show nothing rather than inventing bonuses. That is the known "tier data covers 5 of 9 classes"
   gap, now quantified.
