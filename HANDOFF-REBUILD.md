@@ -8,9 +8,45 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 
 ---
 
-# Part 1 — what changed this session
+# Part 1 — what changed
 
-Two commits: `8364ccf` (catalogue) and `ac82afc` (UI).
+Five commits: `8364ccf` (catalogue), `ac82afc` (UI), `2971cfc` (handoff), `c8285f6` (tests + set
+bonuses), `0c2a70f` (BiS rankings).
+
+## BiS rankings are real now
+
+The one-deep lists are gone. 27 hand-written spec files, each offering a single option per slot while
+the panel labelled it "1 ranked", are replaced by **1,646 ranked entries generated from the 25 Wowhead
+Phase 2 guides** — 3 to 5 real options per slot.
+
+```bash
+node tools/ingest/discover-bis-sections.mjs   # report the guides' section vocabulary
+node tools/ingest/ingest-bis.mjs              # -> src/domain/bis/bisRankings.json
+node tools/ingest/supplement-items.mjs        # -> src/domain/gear/itemSupplement.json
+```
+
+Wowhead renders these guides client-side, so a plain fetch looks empty — but the source markup is
+already in the served HTML as escaped BBCode inside the page's JSON payload. Parsing that is cheaper
+than driving a browser 25 times and, unlike a browser session, reproducible from a committed script.
+
+Findings worth not rediscovering:
+
+- **25 guides for 27 specs.** The Rogue specs share one list and so do Discipline and Holy — confirmed
+  by their spec-specific URLs answering 301, not assumed. Arms and Fury, which the pre-raid index
+  implies share a guide, have separate Phase 2 pages.
+- **The pre-raid index is not a source of phase-2 paths.** Four classes publish a spec-less
+  `<class>/dps-...` guide for pre-raid that 404s for phase 2.
+- **23 items the guides reference are absent from wowsims**, whose coverage is sim-driven rather than
+  exhaustive. They are read off Wowhead tooltips by `supplement-items.mjs`, so all 1,430 raw entries
+  resolve. Re-run the ingester if the missing-id list in that script goes stale.
+- **The item's own slot beats the guide's section**, which is editorial. Wowhead files "Claw of the
+  Phoenix" under a Hunter melee-weapons heading; its own tooltip says off-hand only.
+- **Paired slots are not duplicated.** The BiS panel renders an equip button per socket already, so
+  listing each trinket under both showed it twice.
+
+Three slots have no ranking, correctly: Feral druids and Retribution paladins swing two-handers, so an
+off-hand ranking would be meaningless, and the Holy Paladin guide publishes no Libram section. These
+are recorded as documented gaps in `RANKING_GAPS` in the test file.
 
 ## The catalogue was replaced, not repaired
 
@@ -59,46 +95,34 @@ rows ("Tom's Legs 3", item level 145) outranked every real Tier 5 legging.
 
 # Part 2 — pick up here
 
-## Immediate: 8 failing UI tests
+`npx playwright test --reporter=line` → **50 passed, 10 skipped, 0 failed.** tsc, lint, build and brain
+all clean; brain idempotent on a second run.
 
-`npx playwright test --reporter=line` → **43 passed, 9 skipped, 8 failed.** tsc, lint, build and brain
-are all clean. The 9 skips are the simulator tests, quarantined with the feature.
+The 10 skips are the simulator tests, quarantined with the feature (`SHOW_SIMULATOR` in `src/App.tsx`),
+plus one gem test — see below.
 
-The 8 failures are UI assertions still pointing at the old inline gear rows. Gear editing moved into a
-popup, so a slot's controls only exist while its overlay is open. `tests/planner.spec.ts` already has
-the helpers — use them rather than hand-rolling:
+## Next, in order
 
-`slotCell`, `openSlot`, `closeSlot`, `selectSlotItem`, `selectSlotEnchant`, `selectSlotGem`,
-`withSlotOpen`.
-
-Failing tests, with the cause:
-
-| Test | Cause |
-|---|---|
-| expanded gear foundation has multiple options for every slot | bare `getByLabel('Head').locator('option')` — wrap in `withSlotOpen` |
-| Enhancement Shaman can pick expanded Phase 2 options | bare slot `getByLabel` |
-| item quality renders with the standard WoW rarity color | bare slot `getByLabel` |
-| Warrior specs hide the Relic slot | bare `getByLabel('Chest')` |
-| equipped tier pieces surface their set bonuses | bare `getByLabel('Head')` |
-| a build autosaves and is restored after a reload | `Cloth / caster target` button was an encounter control — simulator is hidden |
-| melee specials are layered onto white damage | asserts `simulation-score` — simulator is hidden |
-| a feral druid swings cat form's own weapon | asserts `.breakdown-list` — simulator is hidden |
-
-The last three are simulator-dependent and probably belong with the 9 already skipped, *except* the
-feral/melee ones encode real findings (cat form swings its own weapon; a both-weapons special halves
-the off-hand). Those assertions should be re-pointed at the domain functions directly rather than the
-hidden UI — they are worth keeping as pure-data tests.
-
-## Then, in order
-
-1. **BiS rankings.** The agreed source is browser-rendering the Wowhead BiS guides (a plain fetch
-   returns a shell). This fixes the product's largest gap: 463 ranked entries of which only 2 sit at
-   rank 2 or lower. All 199 existing BiS item ids currently resolve — keep it that way.
+1. **Gem and enchant recommendations.** The generated BiS entries carry none: the guides publish
+   gemming and enchanting in prose sections, not in the ranked tables the ingester reads. One test is
+   skipped waiting on this (`Tank BiS lists recommend a Meta-colored gem`). This is also the moment to
+   deal with the catalogue being **11 gems and 22 enchants** against 4,528 items — the thinnest part
+   of the app now. wowsims carries `all_gems.go` (~43 KB) and `all_enchants.go` (~16 KB), which is the
+   same shape of source as the item ingestion and would replace both wholesale.
 2. **Consumables and raid buffs.** Agreed shape: model by **role** (6–8 profiles) with per-spec
-   overrides, not 27 separate guide ingestions.
+   overrides, not 27 separate ingestions.
 3. **Remaining panels in the new design language.** BiS, Buffs, Raids, Professions and Builds still use
-   the old panel styling and will look inconsistent next to the new gear panel.
+   the old panel styling and look inconsistent next to the new gear panel and stat rail.
 4. **Simulator last**, unhidden and re-pointed once the rest is stable.
+
+## Known rough edges
+
+- The item dropdown in the gear popup is a flat list of up to ~400 options ordered by item id, with an
+  item level prefix. It works, but it is the weakest interaction in the new UI — it wants sorting and
+  filtering before the app is pleasant for a real gearing session.
+- Only 9 tier sets have bonus definitions against 222 set names in the ingested catalogue, so most
+  sets show nothing rather than inventing bonuses. That is the known "tier data covers 5 of 9 classes"
+  gap, now quantified.
 
 ---
 
