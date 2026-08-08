@@ -2,16 +2,24 @@
 type: module
 layer: domain
 source: src/domain/character/roleTheme.ts
-lines: 13
+lines: 22
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.roleTheme
 
-`src/domain/character/roleTheme.ts` · **domain** layer · 13 lines
+`src/domain/character/roleTheme.ts` · **domain** layer · 22 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> A muted hue per role, used for the hairline that tells you which role a panel is showing.
+> 
+> These are deliberately desaturated. Role is real information, so it keeps a colour — but item
+> quality is the signal a player reads first, and the previous saturated set (amber-500, violet-500,
+> teal-400, blue-400) competed directly with epic purple and rare blue for attention. Muting them
+> keeps the four roles distinguishable from each other while leaving quality the loudest colour on
+> the page, which is the whole point of an otherwise near-monochrome interface.
 
 ## Exports
 
