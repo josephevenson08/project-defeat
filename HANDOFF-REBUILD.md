@@ -125,6 +125,35 @@ keyboard behaviour and the ~30 tests that drive gear by aria-label. The equipped
 filtered list even when it does not match the text, because a select whose value has no matching
 option renders blank.
 
+## Consumables are ingested; raid buffs are not
+
+`node tools/ingest/ingest-consumables.mjs` -> **31 flasks, elixirs and foods**. Stats from wowsims,
+names and item ids from Wowhead, because wowsims carries only protobuf enum names -- that lookup is
+what turned `AdeptsElixir` into "Adept's Elixir" and caught `ElixirOfMajorFirePower`, which the game
+calls "Elixir of Major Firepower".
+
+Roles are derived from the stats granted, not assigned per spec. Three rules, each added because a
+real entry landed wrong without it: stamina and health imply no role (they imply all of them); only
+positive gains count (Fel Strength Elixir trades stamina for attack power); and spirit only decides a
+role when it beats every other stat, because every TBC food carries a flat +20 spirit rider. A
+tank-only stat settles it regardless -- Flask of Fortification is 500 health and 10 defence, and the
+defence is what makes it the tank flask.
+
+**Raid buffs were deliberately not ingested.** Unlike the other five datasets there is no clean
+structured source: in wowsims `buffs.go`, 29 of 36 stat values are expressions rather than literals
+(tristate lookups encoding regular-vs-talented versions), and attributing them to buffs means parsing
+Go control flow. Wowhead's spell XML returns nothing usable. Building a parser there risks exactly
+the silently mis-assigned data this rebuild removed. The app has 14 buffs covering the core
+stat-givers; roughly 20 are missing, including Bloodlust, Windfury Totem, Sanctity Aura, Ferocious
+Inspiration, Drums, Blessing of Salvation and Sanctuary, Divine Spirit, Shadow Protection and Thorns.
+
+## Every panel is on the design tokens
+
+The slate palette, fuchsia focus rings, 6-8px card radii and the last gradient are gone. Audited in
+the browser across all three tabs: the only saturated colours anywhere are **item quality** and the
+**warn amber**, every surface is one of the three token greys, every radius is 2px. Role accents keep
+a muted hue because role is real information.
+
 ## Next, in order
 
 1. **Gem and enchant *recommendations* per BiS entry.** Still missing — the guides publish gemming and
@@ -134,14 +163,13 @@ option renders blank.
    real rather than 11 entries.
 2. **Consumables and raid buffs.** Agreed shape: model by **role** (6–8 profiles) with per-spec
    overrides, not 27 separate ingestions.
-3. **Remaining panels in the new design language.** BiS, Buffs, Raids, Professions and Builds still use
-   the old panel styling and look inconsistent next to the new gear panel and stat rail.
+3. **Raid buffs**, if you want them: extend the 14 by hand with each value verified against a real
+   source, the way the 23 supplement items were done. Slower than a parser, but the parser is the
+   thing that would put wrong numbers in.
 4. **Simulator last**, unhidden and re-pointed once the rest is stable.
 
 ## Known rough edges
 
-- BiS, Buffs, Raids, Professions and Builds still use the old panel styling and look like the previous
-  app next to the rebuilt gear panel and stat rail. That is the most visible remaining inconsistency.
 - Only 9 tier sets have bonus definitions against 222 set names in the ingested catalogue, so most
   sets show nothing rather than inventing bonuses. That is the known "tier data covers 5 of 9 classes"
   gap, now quantified.
