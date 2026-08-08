@@ -139,84 +139,31 @@ role when it beats every other stat, because every TBC food carries a flat +20 s
 tank-only stat settles it regardless -- Flask of Fortification is 500 health and 10 defence, and the
 defence is what makes it the tank flask.
 
-**Raid buffs were deliberately not ingested.** Unlike the other five datasets there is no clean
-structured source: in wowsims `buffs.go`, 29 of 36 stat values are expressions rather than literals
-(tristate lookups encoding regular-vs-talented versions), and attributing them to buffs means parsing
-Go control flow. Wowhead's spell XML returns nothing usable. Building a parser there risks exactly
-the silently mis-assigned data this rebuild removed. The app has 14 buffs covering the core
-stat-givers; roughly 20 are missing, including Bloodlust, Windfury Totem, Sanctity Aura, Ferocious
-Inspiration, Drums, Blessing of Salvation and Sanctuary, Divine Spirit, Shadow Protection and Thorns.
+**Raid buffs were deliberately not ingested, and a second attempt confirmed why.** Three separate
+routes were tried and all three fail:
 
-## Every panel is on the design tokens
+1. wowsims `buffs.go` — only 7 of 36 stat values are literals. The rest are expressions, several of
+   them tristate lookups encoding regular-versus-talented versions, and attributing them to buffs
+   means parsing Go control flow.
+2. Wowhead spell tooltips — the prose parses for some buffs and not others, because 33 buffs are
+   written 33 different ways: "increasing **their** Intellect by 40", "**Gives** 861 additional
+   armor", "attack power of party members within 45 yards **by** 125". A tolerant-enough regex starts
+   matching the wrong number — "Summons a totem with **5** health ... increases strength ... by 86".
+   A working parser got 6 of 33.
+3. Picking the spell at all is ambiguous. The lowest exact-name match is often rank 1 (Power Word:
+   Fortitude 1243 grants 3 stamina); the highest is often a monster's copy (Battle Shout 30635 sits
+   in "NPC Abilities" and grants 4). Filtering on the category printed on the page fixes that much,
+   but not the prose problem above.
 
-The slate palette, fuchsia focus rings, 6-8px card radii and the last gradient are gone. Audited in
-the browser across all three tabs: the only saturated colours anywhere are **item quality** and the
-**warn amber**, every surface is one of the three token greys, every radius is 2px. Role accents keep
-a muted hue because role is real information.
+Wowhead also rate-limits (HTTP 403) once a run starts checking several candidate spells per buff, so
+this is not a route to retry harder at.
 
-## Next, in order
+The half-working ingester was **deleted rather than committed**: a tool that produces 6 of 33 buffs
+and looks authoritative is worse than none. If raid buffs are wanted, add them by hand with each
+value checked, the way the item and enchant supplements were done.
 
-1. **Gem and enchant *recommendations* per BiS entry.** Still missing — the guides publish gemming and
-   enchanting in prose sections, not in the ranked tables the ingester reads, so `recommendedGemIds`
-   is empty on every entry. One test is skipped waiting on it
-   (`Tank BiS lists recommend a Meta-colored gem`). Now worth doing, since the gem pool behind it is
-   real rather than 11 entries.
-2. **Consumables and raid buffs.** Agreed shape: model by **role** (6–8 profiles) with per-spec
-   overrides, not 27 separate ingestions.
-3. **Raid buffs**, if you want them: extend the 14 by hand with each value verified against a real
-   source, the way the 23 supplement items were done. Slower than a parser, but the parser is the
-   thing that would put wrong numbers in.
-4. **Simulator last**, unhidden and re-pointed once the rest is stable.
-
-## Known rough edges
-
-- Only 9 tier sets have bonus definitions against 222 set names in the ingested catalogue, so most
-  sets show nothing rather than inventing bonuses. That is the known "tier data covers 5 of 9 classes"
-  gap, now quantified.
-
----
-
-# Part 3 — settled decisions, worth not re-arguing
-
-1. **No MongoDB yet.** Stay local-first. When MERN returns, Mongo + Express are the *authoring* side
-   that produces the static bundle, not a runtime dependency. Data access already sits behind
-   `src/domain/gear/itemCatalogue.ts` so swapping a static import for a fetch is a one-file change.
-2. **Design.** Discord's skeleton, Tesla's palette and restraint, Nothing's detailing. Mostly dark.
-3. **Colour.** Item quality colour stays — it is information, not decoration. Socket colours likewise.
-   Everything else stays near-monochrome so quality reads first.
-4. **Catalogue: replace, don't repair.** Done, and the override direction reversed on evidence above.
-5. **Simulator: hide, don't delete.** Done.
-6. **Item scope.** All 4,505 items ingested; UI filters to Phase ≤2 via `defaultMaxPhase`. Opening up
-   later phases is a one-line change.
-
----
-
-# Part 4 — repo conventions that encode real, repeated mistakes
-
-- `domain/` never imports from `features/` or `components/`. The only architectural invariant.
-- **Never ship a module nothing renders.** This repo has done it three times.
-- Any value not read off a real source gets `needsVerification: true`. Confident recall is not a source.
-- `src/styles/global.css` is **CRLF**. Edit with CRLF or the diff shows the whole file changed.
-- **Gate commits on the actual test exit code.** `npm test | tail && git commit` commits even when the
-  suite fails, because the pipe's status is the tail's. A red commit was pushed this way once.
-- Counts are computed, never written down. `brain/Project/Roadmap Board.md` computes them;
-  `npm run brain` must stay idempotent (second run reports `0 written`) because the repo lives in
-  OneDrive and churn matters.
-- `.claude/agents/` is not registered as agent types in every environment. Dispatch a
-  `general-purpose` agent and paste the agent file's contents into the prompt instead. Tell it to
-  append findings to a scratchpad **as it goes** — agents on this repo have died mid-run four times.
-- Node ESM cannot resolve this repo's extensionless imports. The ingest scripts use
-  `registerHooks` to retry with `.ts`, and `pathToFileURL` because Windows drive letters parse as a
-  URL scheme. Copy that pattern for any new script that imports app code.
-
-## Known-wrong or missing
-
-Healer HPS has no mana constraint. Meta gem activation requirements are never checked. Tier set data
-covers 5 of 9 classes. Weapon and armour procs are unpopulated (schema exists, data does not).
-`src/data/phase2Enhancements.ts` and `phase2SpecGuides.ts` are ~1460 lines imported by nothing.
-Rotations cover 2 specs of 27. Gems (11) and enchants (22) are thin — thin enough that they are now
-the weakest part of the gear popup, since the item list behind it has 4,505 entries.
-
-Resistances and school-specific spell power are ingested into `extraStats` but have no `StatBlock`
-field, so they are carried but not surfaced. Adding those fields later is a display change, not a
-re-ingestion.
+The roster is known, at least. wowsims' proto models 33 raid buffs a raid actually brings; the app
+has 14. Missing: Commanding Shout, Blessing of Salvation, Blessing of Sanctuary, Devotion Aura,
+Retribution Aura, Sanctity Aura, Arcane Brilliance, Prayer of Spirit, Shadow Protection, Power
+Infusion, Thorns, Innervate, Ferocious Inspiration, Bloodlust, Windfury Totem, Mana Spring Totem,
+Mana Tide Totem, Tranquil Air Totem, Unleashed Rage, Blood Pact.
