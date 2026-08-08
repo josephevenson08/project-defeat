@@ -1,4 +1,5 @@
 import rawEnchants from './enchantCatalogue.json' with { type: 'json' }
+import rawEnchantSupplement from './enchantSupplement.json' with { type: 'json' }
 import type { CharacterProfile } from '../character/characterTypes'
 import type { GearSlot } from '../gear/gearSlots'
 import type { GearItem } from '../gear/itemTypes'
@@ -15,8 +16,25 @@ import type { Enchant } from './enchantTypes'
  * does not restrict enchants by role, and with 3-14 options per slot the list is short enough to
  * read. What survives is the filtering the game really does impose — class restrictions, and shield
  * or two-hand only weapon enchants.
+ *
+ * A further 15 come from `tools/ingest/supplement-enchants.mjs`: enchants the Wowhead guides
+ * recommend that wowsims does not model, mostly healer ones. A BiS recommendation the gear popup
+ * cannot apply is worse than no recommendation at all.
  */
-export const sampleEnchants: readonly Enchant[] = rawEnchants.enchants as Enchant[]
+const supplementEnchants = rawEnchantSupplement.enchants as Enchant[]
+
+export const sampleEnchants: readonly Enchant[] = [
+  // Where an enchant is in both, merge the ids rather than letting one entry win: "Bracer -
+  // Spellpower" is 22534 to wowsims and 46498 to the guides, and either alone leaves a BiS
+  // recommendation citing an id nothing answers to.
+  ...(rawEnchants.enchants as Enchant[]).map((base) => {
+    const extra = supplementEnchants.find((e) => e.id === base.id)
+    if (!extra) return base
+    const ids = [base.effectId, ...(base.effectIds ?? []), extra.effectId, ...(extra.effectIds ?? [])]
+    return { ...base, effectIds: [...new Set(ids.filter((id): id is number => id !== undefined))].sort((a, b) => a - b) }
+  }),
+  ...supplementEnchants.filter((extra) => !rawEnchants.enchants.some((base) => base.id === extra.id)),
+]
 
 const byId = new Map(sampleEnchants.map((enchant) => [enchant.id, enchant]))
 

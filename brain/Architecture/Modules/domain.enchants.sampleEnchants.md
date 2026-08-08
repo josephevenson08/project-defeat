@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/enchants/sampleEnchants.ts
-lines: 61
+lines: 79
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.enchants.sampleEnchants
 
-`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 61 lines
+`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 79 lines
 
 From the top of the file:
 
@@ -23,6 +23,10 @@ From the top of the file:
 > does not restrict enchants by role, and with 3-14 options per slot the list is short enough to
 > read. What survives is the filtering the game really does impose — class restrictions, and shield
 > or two-hand only weapon enchants.
+> 
+> A further 15 come from `tools/ingest/supplement-enchants.mjs`: enchants the Wowhead guides
+> recommend that wowsims does not model, mostly healer ones. A BiS recommendation the gear popup
+> cannot apply is worse than no recommendation at all.
 
 ## Exports
 

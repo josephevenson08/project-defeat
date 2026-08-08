@@ -9,6 +9,12 @@ export type Enchant = {
   wowEnchantId?: number
   /** The spell effect the enchant applies. Distinct from the item id and useful for cross-referencing. */
   effectId?: number
+  /**
+   * Every spell id that applies this enchant. TBC re-issued several enchants under fresh ids in 2.4,
+   * so "Ring - Spellpower" is both 27924 and 46518 — one enchant, two ids, and a guide may cite
+   * either.
+   */
+  effectIds?: number[]
   name: string
   slot: GearSlot
   stats: Partial<StatBlock>

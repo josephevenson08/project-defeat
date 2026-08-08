@@ -906,17 +906,27 @@ test('every recommended gem and enchant across all BiS lists resolves to a real 
   }
 })
 
-// Skipped: the generated rankings carry no gem or enchant recommendations yet. The Wowhead BiS guides
-// publish gemming and enchanting in separate prose sections rather than in the ranked tables the
-// ingester reads, so `recommendedGemIds` is currently empty for every entry. Kept rather than deleted
-// because the requirement is real — a Meta socket needs a Meta gem — and this is the assertion that
-// will hold the ingester to it once those sections are parsed.
-test.skip('Tank BiS lists recommend a Meta-colored gem for their Head Meta socket', async () => {
+// The recommendations now come from the separate enchants-and-gems guides, so this runs again.
+test('Tank BiS lists recommend a Meta-colored gem for their Head Meta socket', async () => {
   for (const bisList of [protectionPaladinPhase2Bis, protectionWarriorPhase2Bis]) {
-    const headEntry = bisList.entries.find((entry) => entry.slot === 'Head')
-    const metaGemId = headEntry?.recommendedGemIds?.[0]
-    const metaGem = metaGemId ? getGemById(metaGemId) : undefined
-    expect(metaGem?.color, `${bisList.id} Head gem recommendation should be Meta-colored`).toBe('Meta')
+    const headEntry = bisList.entries.find((entry) => entry.slot === 'Head' && entry.rank === 1)
+    const item = headEntry ? getItemById(headEntry.itemId) : undefined
+    const sockets = item?.sockets ?? []
+
+    // Gems are recommended per socket, in the item's own socket order, so the meta gem sits wherever
+    // the meta socket is — not necessarily first. Asserting index 0 only worked by luck.
+    const metaIndex = sockets.indexOf('Meta')
+    expect(metaIndex, `${bisList.id} head piece should have a Meta socket`).toBeGreaterThanOrEqual(0)
+
+    const metaGem = getGemById(headEntry?.recommendedGemIds?.[metaIndex])
+    expect(metaGem?.color, `${bisList.id} Meta socket should get a Meta gem`).toBe('Meta')
+
+    // And the other sockets must not be given a meta gem, which fits nothing else.
+    sockets.forEach((socket, index) => {
+      if (socket === 'Meta') return
+      const gem = getGemById(headEntry?.recommendedGemIds?.[index])
+      if (gem) expect(gem.color, `${bisList.id} ${socket} socket should not get a Meta gem`).not.toBe('Meta')
+    })
   }
 })
 

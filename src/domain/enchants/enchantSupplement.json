@@ -1,0 +1,229 @@
+{
+  "$schema": "wowhead enchant supplement",
+  "note": "Enchants the Wowhead guides recommend that the wowsims database does not model.",
+  "generatedBy": "tools/ingest/supplement-enchants.mjs",
+  "enchantCount": 15,
+  "enchants": [
+    {
+      "id": "bracer-spellpower",
+      "name": "Bracer - Spellpower",
+      "slot": "Wrists",
+      "stats": {
+        "spellPower": 15,
+        "healingPower": 15
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        27917,
+        46498
+      ]
+    },
+    {
+      "id": "bracer-superior-healing",
+      "name": "Bracer - Superior Healing",
+      "slot": "Wrists",
+      "stats": {
+        "healingPower": 30,
+        "spellPower": 10
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        46500
+      ]
+    },
+    {
+      "id": "cloak-major-resistance",
+      "name": "Cloak - Major Resistance",
+      "slot": "Back",
+      "stats": {},
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        27962
+      ],
+      "extraStats": {
+        "AllResistances": 7
+      }
+    },
+    {
+      "id": "cloak-spell-penetration",
+      "name": "Cloak - Spell Penetration",
+      "slot": "Back",
+      "stats": {},
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        34003
+      ],
+      "extraStats": {
+        "SpellPenetration": 20
+      }
+    },
+    {
+      "id": "gloves-major-healing",
+      "name": "Gloves - Major Healing",
+      "slot": "Hands",
+      "stats": {
+        "healingPower": 35,
+        "spellPower": 12
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        33999,
+        46513
+      ]
+    },
+    {
+      "id": "gloves-spell-strike",
+      "name": "Gloves - Spell Strike",
+      "slot": "Hands",
+      "stats": {
+        "spellHitRating": 15
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        33994
+      ]
+    },
+    {
+      "id": "gloves-superior-agility",
+      "name": "Gloves - Superior Agility",
+      "slot": "Hands",
+      "stats": {
+        "agility": 15
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        25080
+      ]
+    },
+    {
+      "id": "glyph-of-renewal",
+      "name": "Glyph of Renewal",
+      "slot": "Head",
+      "stats": {
+        "healingPower": 35,
+        "spellPower": 12,
+        "mp5": 7
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "wowEnchantId": 29190
+    },
+    {
+      "id": "golden-spellthread",
+      "name": "Golden Spellthread",
+      "slot": "Legs",
+      "stats": {
+        "healingPower": 66,
+        "spellPower": 22,
+        "stamina": 20
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "wowEnchantId": 24276
+    },
+    {
+      "id": "greater-inscription-of-faith",
+      "name": "Greater Inscription of Faith",
+      "slot": "Shoulders",
+      "stats": {
+        "healingPower": 33,
+        "spellPower": 11,
+        "mp5": 4
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "wowEnchantId": 28887
+    },
+    {
+      "id": "ring-healing-power",
+      "name": "Ring - Healing Power",
+      "slot": "Finger 1",
+      "stats": {
+        "healingPower": 20,
+        "spellPower": 7
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        27926,
+        46517
+      ]
+    },
+    {
+      "id": "ring-spellpower",
+      "name": "Ring - Spellpower",
+      "slot": "Finger 1",
+      "stats": {
+        "spellPower": 12,
+        "healingPower": 12
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        27924,
+        46518
+      ]
+    },
+    {
+      "id": "weapon-major-healing",
+      "name": "Weapon - Major Healing",
+      "slot": "Main Hand",
+      "stats": {
+        "healingPower": 81,
+        "spellPower": 27
+      },
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        46531
+      ],
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "weapon-soulfrost",
+      "name": "Weapon - Soulfrost",
+      "slot": "Main Hand",
+      "stats": {},
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        27982
+      ],
+      "extraStats": {
+        "FrostShadowSpellPower": 54
+      },
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    },
+    {
+      "id": "weapon-sunfire",
+      "name": "Weapon - Sunfire",
+      "slot": "Main Hand",
+      "stats": {},
+      "needsVerification": true,
+      "notes": "Read from a Wowhead description rather than a structured table.",
+      "effectIds": [
+        46540
+      ],
+      "extraStats": {
+        "FireArcaneSpellPower": 50
+      },
+      "allowedSlots": [
+        "Main Hand",
+        "Off Hand"
+      ]
+    }
+  ]
+}

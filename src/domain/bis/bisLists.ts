@@ -1,4 +1,5 @@
 import rawRankings from './bisRankings.json' with { type: 'json' }
+import rawRecommendations from './bisRecommendations.json' with { type: 'json' }
 import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import type { GearSlot } from '../gear/gearSlots'
 import { getItemByWowItemId } from '../gear/itemCatalogue'
@@ -35,9 +36,34 @@ type RawSpec = {
   slots: Record<string, RawEntry[]>
 }
 
+type RawRecommendation = { gems: Record<string, string>; enchants: Record<string, string> }
+
+/**
+ * Gem and enchant picks per spec, from the Wowhead enchants-and-gems guides.
+ *
+ * These are published separately from the BiS gear guides — a discovery pass over all 24 of those
+ * found no gem or enchant section at all — so they arrive as their own dataset and are attached here.
+ */
+const recommendationsBySpec = rawRecommendations.specs as Record<string, RawRecommendation>
+
+function recommendationFor(spec: RawSpec): RawRecommendation | undefined {
+  return recommendationsBySpec[`${spec.className}|${spec.spec}`]
+}
+
 function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry | undefined {
   const item = getItemByWowItemId(raw.wowItemId)
   if (!item) return undefined
+
+  const recommended = recommendationFor(spec)
+
+  // Only the top pick carries the gem and enchant advice. The guides recommend one enchant per slot
+  // and one gem per socket colour for the spec as a whole, not per ranked alternative, so hanging
+  // them off every row would imply a precision the source does not have.
+  const enchantId = raw.rank === 1 ? recommended?.enchants[slot] : undefined
+  const gemIds =
+    raw.rank === 1 && item.sockets?.length
+      ? item.sockets.map((socket) => recommended?.gems[socket] ?? '')
+      : undefined
 
   // The guide's own label ("Best Overall", "Threat Alternative") is kept verbatim: it carries the
   // reason a pick sits where it does, which a bare rank number throws away.
@@ -54,6 +80,8 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
     sourceName: spec.sourceName,
     sourceUrl: spec.sourceUrl,
     notes,
+    ...(enchantId ? { recommendedEnchantId: enchantId } : {}),
+    ...(gemIds?.some(Boolean) ? { recommendedGemIds: gemIds } : {}),
   }
 }
 

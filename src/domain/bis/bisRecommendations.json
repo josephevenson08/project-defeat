@@ -1,0 +1,630 @@
+{
+  "$schema": "wowhead tbc phase 2 gem and enchant recommendations",
+  "generatedBy": "tools/ingest/ingest-bis-recommendations.mjs",
+  "specCount": 27,
+  "specs": {
+    "Druid|Balance": {
+      "className": "Druid",
+      "spec": "Balance",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/druid/balance/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-the-orb",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Druid|Feral": {
+      "className": "Druid",
+      "spec": "Feral",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/druid/feral/dps-enchants-gems-pve",
+      "gems": {
+        "Red": "delicate-living-ruby",
+        "Yellow": "glinting-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "2h-weapon-major-agility",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Druid|Restoration": {
+      "className": "Druid",
+      "spec": "Restoration",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/druid/healer-enchants-gems-pve",
+      "gems": {
+        "Meta": "bracing-earthstorm-diamond",
+        "Red": "teardrop-living-ruby",
+        "Yellow": "luminous-noble-topaz",
+        "Blue": "purified-shadow-pearl"
+      },
+      "enchants": {
+        "Head": "glyph-of-renewal",
+        "Shoulders": "greater-inscription-of-faith",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-major-spirit",
+        "Wrists": "bracer-superior-healing",
+        "Hands": "gloves-major-healing",
+        "Legs": "golden-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-healing",
+        "Finger 1": "ring-healing-power"
+      }
+    },
+    "Hunter|Beast Mastery": {
+      "className": "Hunter",
+      "spec": "Beast Mastery",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/hunter/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "wicked-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-agility",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Hunter|Marksmanship": {
+      "className": "Hunter",
+      "spec": "Marksmanship",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/hunter/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "wicked-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-agility",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Hunter|Survival": {
+      "className": "Hunter",
+      "spec": "Survival",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/hunter/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "wicked-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-agility",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Mage|Arcane": {
+      "className": "Mage",
+      "spec": "Arcane",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/mage/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Mage|Fire": {
+      "className": "Mage",
+      "spec": "Fire",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/mage/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Mage|Frost": {
+      "className": "Mage",
+      "spec": "Frost",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/mage/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Paladin|Holy": {
+      "className": "Paladin",
+      "spec": "Holy",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/paladin/holy/healer-enchants-gems-pve",
+      "gems": {
+        "Meta": "insightful-earthstorm-diamond",
+        "Red": "teardrop-living-ruby",
+        "Yellow": "brilliant-dawnstone",
+        "Blue": "royal-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-renewal",
+        "Shoulders": "greater-inscription-of-faith",
+        "Back": "cloak-major-resistance",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-major-intellect",
+        "Hands": "gloves-major-healing",
+        "Legs": "golden-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-intellect",
+        "Off Hand": "shield-intellect",
+        "Finger 1": "ring-healing-power"
+      }
+    },
+    "Paladin|Protection": {
+      "className": "Paladin",
+      "spec": "Protection",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/paladin/tank-enchants-gems-pve",
+      "gems": {
+        "Meta": "powerful-earthstorm-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "solid-star-of-elune"
+      },
+      "enchants": {
+        "Head": "glyph-of-the-defender",
+        "Shoulders": "greater-inscription-of-the-knight",
+        "Back": "enchant-cloak-dodge",
+        "Chest": "chest-exceptional-health",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-threat",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-fortitude",
+        "Main Hand": "weapon-major-spellpower",
+        "Off Hand": "shield-major-stamina",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Paladin|Retribution": {
+      "className": "Paladin",
+      "spec": "Retribution",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/paladin/retribution/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "bold-living-ruby",
+        "Yellow": "inscribed-noble-topaz",
+        "Blue": "sovereign-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-brawn",
+        "Hands": "gloves-major-strength",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-dexterity",
+        "Main Hand": "weapon-mongoose",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Priest|Discipline": {
+      "className": "Priest",
+      "spec": "Discipline",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/priest/healer-enchants-gems-pve",
+      "gems": {
+        "Meta": "insightful-earthstorm-diamond",
+        "Red": "teardrop-living-ruby",
+        "Yellow": "luminous-noble-topaz",
+        "Blue": "purified-shadow-pearl"
+      },
+      "enchants": {
+        "Head": "glyph-of-renewal",
+        "Shoulders": "greater-inscription-of-faith",
+        "Back": "cloak-major-resistance",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-superior-healing",
+        "Hands": "gloves-major-healing",
+        "Legs": "golden-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-healing",
+        "Finger 1": "ring-healing-power"
+      }
+    },
+    "Priest|Holy": {
+      "className": "Priest",
+      "spec": "Holy",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/priest/healer-enchants-gems-pve",
+      "gems": {
+        "Meta": "insightful-earthstorm-diamond",
+        "Red": "teardrop-living-ruby",
+        "Yellow": "luminous-noble-topaz",
+        "Blue": "purified-shadow-pearl"
+      },
+      "enchants": {
+        "Head": "glyph-of-renewal",
+        "Shoulders": "greater-inscription-of-faith",
+        "Back": "cloak-major-resistance",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-superior-healing",
+        "Hands": "gloves-major-healing",
+        "Legs": "golden-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-healing",
+        "Finger 1": "ring-healing-power"
+      }
+    },
+    "Priest|Shadow": {
+      "className": "Priest",
+      "spec": "Shadow",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/priest/shadow/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "mystical-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "potent-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-soulfrost",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Rogue|Assassination": {
+      "className": "Rogue",
+      "spec": "Assassination",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/rogue/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "glinting-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Rogue|Combat": {
+      "className": "Rogue",
+      "spec": "Combat",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/rogue/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "glinting-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Rogue|Subtlety": {
+      "className": "Rogue",
+      "spec": "Subtlety",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/rogue/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "delicate-living-ruby",
+        "Yellow": "glinting-noble-topaz",
+        "Blue": "shifting-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-assault",
+        "Hands": "gloves-superior-agility",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Shaman|Elemental": {
+      "className": "Shaman",
+      "spec": "Elemental",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/shaman/elemental/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "potent-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "cloak-spell-penetration",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-major-spellpower",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-spellpower",
+        "Off Hand": "shield-intellect",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Shaman|Enhancement": {
+      "className": "Shaman",
+      "spec": "Enhancement",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/shaman/enhancement/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "bold-living-ruby",
+        "Yellow": "inscribed-noble-topaz",
+        "Blue": "sovereign-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "greater-inscription-of-vengeance",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-brawn",
+        "Hands": "gloves-major-strength",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Shaman|Restoration": {
+      "className": "Shaman",
+      "spec": "Restoration",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/shaman/healer-enchants-gems-pve",
+      "gems": {
+        "Meta": "bracing-earthstorm-diamond",
+        "Red": "teardrop-living-ruby",
+        "Yellow": "quick-dawnstone",
+        "Blue": "royal-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-renewal",
+        "Shoulders": "greater-inscription-of-faith",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-restore-mana-prime",
+        "Wrists": "bracer-superior-healing",
+        "Hands": "gloves-major-healing",
+        "Legs": "golden-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-major-healing",
+        "Off Hand": "shield-intellect",
+        "Finger 1": "ring-healing-power"
+      }
+    },
+    "Warlock|Affliction": {
+      "className": "Warlock",
+      "spec": "Affliction",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warlock/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-spell-strike",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Warlock|Demonology": {
+      "className": "Warlock",
+      "spec": "Demonology",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warlock/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-spell-strike",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Warlock|Destruction": {
+      "className": "Warlock",
+      "spec": "Destruction",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warlock/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "chaotic-skyfire-diamond",
+        "Red": "runed-living-ruby",
+        "Yellow": "veiled-noble-topaz",
+        "Blue": "glowing-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-power",
+        "Shoulders": "greater-inscription-of-discipline",
+        "Back": "enchant-cloak-subtlety",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-spellpower",
+        "Hands": "gloves-spell-strike",
+        "Legs": "runic-spellthread",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-sunfire",
+        "Finger 1": "ring-spellpower"
+      }
+    },
+    "Warrior|Arms": {
+      "className": "Warrior",
+      "spec": "Arms",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warrior/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "bold-living-ruby",
+        "Yellow": "inscribed-noble-topaz",
+        "Blue": "sovereign-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "might-of-the-scourge",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-brawn",
+        "Hands": "gloves-major-strength",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Warrior|Fury": {
+      "className": "Warrior",
+      "spec": "Fury",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warrior/dps-enchants-gems-pve",
+      "gems": {
+        "Meta": "relentless-earthstorm-diamond",
+        "Red": "bold-living-ruby",
+        "Yellow": "inscribed-noble-topaz",
+        "Blue": "sovereign-nightseye"
+      },
+      "enchants": {
+        "Head": "glyph-of-ferocity",
+        "Shoulders": "might-of-the-scourge",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-brawn",
+        "Hands": "gloves-major-strength",
+        "Legs": "nethercobra-leg-armor",
+        "Feet": "enchant-boots-cats-swiftness",
+        "Finger 1": "ring-stats"
+      }
+    },
+    "Warrior|Protection": {
+      "className": "Warrior",
+      "spec": "Protection",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/classes/warrior/protection/tank-enchants-gems-pve",
+      "gems": {
+        "Meta": "powerful-earthstorm-diamond",
+        "Red": "solid-star-of-elune",
+        "Yellow": "solid-star-of-elune",
+        "Blue": "solid-star-of-elune"
+      },
+      "enchants": {
+        "Head": "presence-of-might",
+        "Shoulders": "greater-inscription-of-the-knight",
+        "Back": "enchant-cloak-greater-agility",
+        "Chest": "chest-exceptional-stats",
+        "Wrists": "bracer-fortitude",
+        "Hands": "gloves-threat",
+        "Legs": "nethercleft-leg-armor",
+        "Feet": "enchant-boots-boars-speed",
+        "Main Hand": "weapon-mongoose",
+        "Off Hand": "shield-major-stamina",
+        "Finger 1": "ring-stats"
+      }
+    }
+  }
+}

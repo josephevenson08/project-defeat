@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-116 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+118 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -84,7 +84,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.stats.StatsRail]] · 1 importers
 - [[features.stats.statsTypes]] · 5 importers
 
-### domain (75)
+### domain (77)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -102,6 +102,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.abilities.signatureAbilitiesWarrior]] · 1 importers
 - [[domain.bis.bisLists]] · 1 importers
 - [[domain.bis.bisRankingsJson.d]] · 0 importers
+- [[domain.bis.bisRecommendationsJson.d]] · 0 importers
 - [[domain.bis.bisTypes]] · 2 importers
 - [[domain.bis.index]] · 1 importers
 - [[domain.buffs.buffTypes]] · 3 importers
@@ -120,6 +121,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers
 - [[domain.enchants.enchantCatalogueJson.d]] · 0 importers
+- [[domain.enchants.enchantSupplementJson.d]] · 0 importers
 - [[domain.enchants.enchantTypes]] · 1 importers
 - [[domain.enchants.sampleEnchants]] · 5 importers
 - [[domain.gear.armorValues]] · 1 importers
