@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
 - [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
+- [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`

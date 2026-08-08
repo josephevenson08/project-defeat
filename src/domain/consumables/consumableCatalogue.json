@@ -1,0 +1,468 @@
+{
+  "$schema": "tbc consumable ingestion",
+  "upstream": {
+    "repo": "wowsims/tbc",
+    "sha": "3301fca59306a747e521274c36e073e69acc7b77",
+    "path": "sim/core/consumes.go",
+    "license": "MIT"
+  },
+  "namesFrom": "wowhead.com search suggestions",
+  "generatedBy": "tools/ingest/ingest-consumables.mjs",
+  "consumableCount": 31,
+  "consumables": [
+    {
+      "id": "adepts-elixir",
+      "wowItemId": 28103,
+      "name": "Adept's Elixir",
+      "category": "Battle Elixir",
+      "stats": {
+        "spellCritRating": 24,
+        "spellPower": 24,
+        "healingPower": 24
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS",
+        "Healer"
+      ]
+    },
+    {
+      "id": "elixir-of-demonslaying",
+      "wowItemId": 9224,
+      "name": "Elixir of Demonslaying",
+      "category": "Battle Elixir",
+      "stats": {},
+      "source": "Other",
+      "notes": "No flat stats; its value is an effect the stat model does not represent."
+    },
+    {
+      "id": "elixir-of-major-agility",
+      "wowItemId": 22831,
+      "name": "Elixir of Major Agility",
+      "category": "Battle Elixir",
+      "stats": {
+        "agility": 35,
+        "critRating": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "elixir-of-major-firepower",
+      "wowItemId": 22833,
+      "name": "Elixir of Major Firepower",
+      "category": "Battle Elixir",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ],
+      "extraStats": {
+        "FireSpellPower": 55
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "elixir-of-major-frost-power",
+      "wowItemId": 22827,
+      "name": "Elixir of Major Frost Power",
+      "category": "Battle Elixir",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ],
+      "extraStats": {
+        "FrostSpellPower": 55
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "elixir-of-major-shadow-power",
+      "wowItemId": 22835,
+      "name": "Elixir of Major Shadow Power",
+      "category": "Battle Elixir",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ],
+      "extraStats": {
+        "ShadowSpellPower": 55
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "elixir-of-major-strength",
+      "wowItemId": 22824,
+      "name": "Elixir of Major Strength",
+      "category": "Battle Elixir",
+      "stats": {
+        "strength": 35
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "elixir-of-mastery",
+      "wowItemId": 28104,
+      "name": "Elixir of Mastery",
+      "category": "Battle Elixir",
+      "stats": {
+        "stamina": 15,
+        "strength": 15,
+        "agility": 15,
+        "intellect": 15,
+        "spirit": 15
+      },
+      "source": "Other"
+    },
+    {
+      "id": "elixir-of-the-mongoose",
+      "wowItemId": 13452,
+      "name": "Elixir of the Mongoose",
+      "category": "Battle Elixir",
+      "stats": {
+        "agility": 25,
+        "critRating": 28
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "fel-strength-elixir",
+      "wowItemId": 31679,
+      "name": "Fel Strength Elixir",
+      "category": "Battle Elixir",
+      "stats": {
+        "attackPower": 90,
+        "rangedAttackPower": 90,
+        "stamina": -10
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "greater-arcane-elixir",
+      "wowItemId": 13454,
+      "name": "Greater Arcane Elixir",
+      "category": "Battle Elixir",
+      "stats": {
+        "spellPower": 35
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ]
+    },
+    {
+      "id": "flask-of-blinding-light",
+      "wowItemId": 22861,
+      "name": "Flask of Blinding Light",
+      "category": "Flask",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Caster DPS",
+        "Healer"
+      ],
+      "extraStats": {
+        "NatureSpellPower": 80,
+        "ArcaneSpellPower": 80,
+        "HolySpellPower": 80
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "flask-of-chromatic-wonder",
+      "wowItemId": 33208,
+      "name": "Flask of Chromatic Wonder",
+      "category": "Flask",
+      "stats": {
+        "stamina": 18,
+        "strength": 18,
+        "agility": 18,
+        "intellect": 18,
+        "spirit": 18
+      },
+      "source": "Other",
+      "extraStats": {
+        "ArcaneResistance": 35,
+        "FireResistance": 35,
+        "FrostResistance": 35,
+        "NatureResistance": 35,
+        "ShadowResistance": 35
+      }
+    },
+    {
+      "id": "flask-of-fortification",
+      "wowItemId": 22851,
+      "name": "Flask of Fortification",
+      "category": "Flask",
+      "stats": {
+        "defenseRating": 10
+      },
+      "source": "Other",
+      "roles": [
+        "Tank"
+      ],
+      "extraStats": {
+        "Health": 500
+      }
+    },
+    {
+      "id": "flask-of-mighty-restoration",
+      "wowItemId": 22853,
+      "name": "Flask of Mighty Restoration",
+      "category": "Flask",
+      "stats": {
+        "mp5": 25
+      },
+      "source": "Other",
+      "roles": [
+        "Healer"
+      ]
+    },
+    {
+      "id": "flask-of-pure-death",
+      "wowItemId": 22866,
+      "name": "Flask of Pure Death",
+      "category": "Flask",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ],
+      "extraStats": {
+        "FireSpellPower": 80,
+        "FrostSpellPower": 80,
+        "ShadowSpellPower": 80
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "flask-of-relentless-assault",
+      "wowItemId": 22854,
+      "name": "Flask of Relentless Assault",
+      "category": "Flask",
+      "stats": {
+        "attackPower": 120,
+        "rangedAttackPower": 120
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "flask-of-supreme-power",
+      "wowItemId": 13512,
+      "name": "Flask of Supreme Power",
+      "category": "Flask",
+      "stats": {
+        "spellPower": 70
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS"
+      ]
+    },
+    {
+      "id": "blackened-basilisk",
+      "wowItemId": 27657,
+      "name": "Blackened Basilisk",
+      "category": "Food",
+      "stats": {
+        "spellPower": 23,
+        "healingPower": 23,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS",
+        "Healer"
+      ]
+    },
+    {
+      "id": "fishermans-feast",
+      "wowItemId": 33052,
+      "name": "Fisherman's Feast",
+      "category": "Food",
+      "stats": {
+        "stamina": 30,
+        "spirit": 20
+      },
+      "source": "Other"
+    },
+    {
+      "id": "grilled-mudfish",
+      "wowItemId": 27664,
+      "name": "Grilled Mudfish",
+      "category": "Food",
+      "stats": {
+        "agility": 20,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "ravager-dog",
+      "wowItemId": 27655,
+      "name": "Ravager Dog",
+      "category": "Food",
+      "stats": {
+        "attackPower": 40,
+        "rangedAttackPower": 40,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "roasted-clefthoof",
+      "wowItemId": 27658,
+      "name": "Roasted Clefthoof",
+      "category": "Food",
+      "stats": {
+        "strength": 20,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "skullfish-soup",
+      "wowItemId": 33825,
+      "name": "Skullfish Soup",
+      "category": "Food",
+      "stats": {
+        "spellCritRating": 20,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS",
+        "Healer"
+      ]
+    },
+    {
+      "id": "spicy-hot-talbuk",
+      "wowItemId": 33872,
+      "name": "Spicy Hot Talbuk",
+      "category": "Food",
+      "stats": {
+        "hitRating": 20,
+        "spirit": 20
+      },
+      "source": "Other",
+      "roles": [
+        "Physical DPS",
+        "Tank"
+      ]
+    },
+    {
+      "id": "elixir-of-draenic-wisdom",
+      "wowItemId": 32067,
+      "name": "Elixir of Draenic Wisdom",
+      "category": "Guardian Elixir",
+      "stats": {
+        "intellect": 30,
+        "spirit": 30
+      },
+      "source": "Other",
+      "roles": [
+        "Caster DPS",
+        "Healer"
+      ]
+    },
+    {
+      "id": "elixir-of-ironskin",
+      "wowItemId": 32068,
+      "name": "Elixir of Ironskin",
+      "category": "Guardian Elixir",
+      "stats": {
+        "resilienceRating": 30
+      },
+      "source": "Other",
+      "roles": [
+        "Tank"
+      ]
+    },
+    {
+      "id": "elixir-of-major-defense",
+      "wowItemId": 22834,
+      "name": "Elixir of Major Defense",
+      "category": "Guardian Elixir",
+      "stats": {
+        "armor": 550
+      },
+      "source": "Other",
+      "roles": [
+        "Tank"
+      ]
+    },
+    {
+      "id": "elixir-of-major-fortitude",
+      "wowItemId": 32062,
+      "name": "Elixir of Major Fortitude",
+      "category": "Guardian Elixir",
+      "stats": {},
+      "source": "Other",
+      "extraStats": {
+        "Health": 250
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    },
+    {
+      "id": "elixir-of-major-mageblood",
+      "wowItemId": 22840,
+      "name": "Elixir of Major Mageblood",
+      "category": "Guardian Elixir",
+      "stats": {
+        "mp5": 16
+      },
+      "source": "Other",
+      "roles": [
+        "Healer"
+      ]
+    },
+    {
+      "id": "gift-of-arthas",
+      "wowItemId": 9088,
+      "name": "Gift of Arthas",
+      "category": "Guardian Elixir",
+      "stats": {},
+      "source": "Other",
+      "roles": [
+        "Tank"
+      ],
+      "extraStats": {
+        "ShadowResistance": 10
+      },
+      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+    }
+  ]
+}

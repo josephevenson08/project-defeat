@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/consumables/consumableTypes.ts
-lines: 22
+lines: 30
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.consumables.consumableTypes
 
-`src/domain/consumables/consumableTypes.ts` · **domain** layer · 22 lines
+`src/domain/consumables/consumableTypes.ts` · **domain** layer · 30 lines
 
 _No doc comment at the top of this file._
 
