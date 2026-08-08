@@ -4,7 +4,8 @@
 `git log` disagrees with this file, trust git.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`. **Local-only — do not push or open PRs unless told to.**
+`josephevenson08/project-defeat`. **Push to `origin/main` after each completed feature** (changed
+2026-08-07; it was local-only before). No branches or PRs unless asked.
 
 ---
 
@@ -116,6 +117,14 @@ Enchants keep the restrictions the game imposes (shield-only, two-hand-only, cla
 hand-written role/spec tagging, which the game does not impose. 19 are pure procs carrying no flat
 stats and are marked `notModelled`.
 
+## The item picker is browsable
+
+Sorted by item level descending, with a name filter and a count that reads "2 of 165" when narrowed.
+The select is a list box (`size=10`), not a drop-down. Deliberately still a `<select>`: it keeps the
+keyboard behaviour and the ~30 tests that drive gear by aria-label. The equipped item stays in the
+filtered list even when it does not match the text, because a select whose value has no matching
+option renders blank.
+
 ## Next, in order
 
 1. **Gem and enchant *recommendations* per BiS entry.** Still missing — the guides publish gemming and
@@ -131,11 +140,8 @@ stats and are marked `notModelled`.
 
 ## Known rough edges
 
-- The item dropdown in the gear popup is a flat list of up to ~400 options ordered by item id, with an
-  item level prefix. It works, but it is the weakest interaction in the new UI — it wants sorting and
-  filtering before the app is pleasant for a real gearing session.
-- The gem and enchant dropdowns are now real, but the *item* dropdown remains a flat list ordered by
-  item id. That is the weakest interaction left in the new UI.
+- BiS, Buffs, Raids, Professions and Builds still use the old panel styling and look like the previous
+  app next to the rebuilt gear panel and stat rail. That is the most visible remaining inconsistency.
 - Only 9 tier sets have bonus definitions against 222 set names in the ingested catalogue, so most
   sets show nothing rather than inventing bonuses. That is the known "tier data covers 5 of 9 classes"
   gap, now quantified.
