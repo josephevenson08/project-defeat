@@ -19,7 +19,6 @@ Kept deliberately blunt. A planner that overstates its accuracy is worse than on
 
 - The item catalog is largely representative sample gear, not an audited TBC database. See [[Data Provenance]].
 - [[Needs Verification]] is set on a large fraction of item stats and BiS placements.
-- Guide data under [[data.phase2Enhancements]] and [[data.phase2SpecGuides]] predates the domain model and is still disconnected from it.
 
 ## Scope
 

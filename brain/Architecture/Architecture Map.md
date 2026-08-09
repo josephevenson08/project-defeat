@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-118 modules across 6 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+116 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -165,13 +165,6 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.spellTable]] · 1 importers
 - [[domain.stats.statTypes]] · 13 importers
 - [[domain.stats.statUtils]] · 2 importers
-
-### data (2)
-
-Older guide-oriented data that predates the domain model and is not yet migrated into it.
-
-- [[data.phase2Enhancements]] · 0 importers
-- [[data.phase2SpecGuides]] · 0 importers
 
 ### lib (1)
 

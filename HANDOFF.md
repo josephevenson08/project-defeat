@@ -137,7 +137,6 @@ and armour procs are unpopulated (schema exists, data does not), and rotations c
   correctly show nothing rather than inventing bonuses.
 - The BiS and Buffs panels are on the design tokens but still use the older layout shapes; they'd
   benefit from the treatment the gear panel got.
-- `src/data/phase2Enhancements.ts` and `phase2SpecGuides.ts` are ~1460 lines imported by nothing.
 
 ---
 
@@ -148,6 +147,11 @@ and armour procs are unpopulated (schema exists, data does not), and rotations c
 - When `npx tsc -b` flags an unused import, find out what it was for before deleting it — that is how
   half-finished work gets discovered here.
 - Counts are computed, never written into prose. `brain/Project/Roadmap Board.md` computes them.
+- **`npm run brain` does not prune orphaned notes.** Delete a source file and its
+  `brain/Architecture/Modules/*.md` stays on disk describing a file that no longer exists — the run
+  still reports "all wikilinks resolve", because nothing links to it any more. Delete the note by
+  hand. A blanket prune would be wrong: the generator manages 240 of the 269 notes in the vault and
+  the rest are hand-written.
 - Node ESM cannot resolve this repo's extensionless imports. Scripts that import app code use
   `registerHooks` to retry with `.ts`, and `pathToFileURL` because Windows drive letters parse as a
   URL scheme. Copy that pattern.

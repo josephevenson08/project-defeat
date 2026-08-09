@@ -1339,7 +1339,6 @@ async function writeProjectNotes(modules, counts) {
       '',
       `- The item catalog is largely representative sample gear, not an audited TBC database. See ${link('Data Provenance')}.`,
       `- ${link('Needs Verification')} is set on a large fraction of item stats and BiS placements.`,
-      `- Guide data under ${link('data.phase2Enhancements')} and ${link('data.phase2SpecGuides')} predates the domain model and is still disconnected from it.`,
       '',
       '## Scope',
       '',
