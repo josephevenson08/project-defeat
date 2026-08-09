@@ -57,6 +57,7 @@ import {
   computeSpecialDamagePerUse,
 } from '../src/domain/simulation/specialAttacks'
 import { allItems, getItemById, getItemsForSlot } from '../src/domain/gear/itemCatalogue'
+import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
@@ -1567,8 +1568,6 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByLabel('Specialization').selectOption('Fury')
 
-  // Two pieces of the same set, which is the most a player can currently assemble — only Head and
-  // Chest of each Tier 5 set are catalogued so far, so the 4-piece bonus is unreachable by design.
   await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
   await selectSlotItem(page, 'Chest', 'destroyer-breastplate')
 
@@ -1581,14 +1580,61 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
   expect(Number(equipped), 'the two pieces selected above must at least be counted').toBeGreaterThanOrEqual(2)
   expect(Number(total)).toBe(5)
 
-  // The 2-piece is met and must be shown as active; the 4-piece is not and must not claim to be.
+  // The 2-piece is met and must be shown as active; the 4-piece is not yet and must not claim to be.
   await expect(sets.locator('.set-bonus-active')).toContainText(/Overpower/)
   await expect(sets.locator('.set-bonus-inactive')).toContainText(/5 less rage/)
+
+  // Four pieces was unreachable while only Head and Chest of each set were catalogued. All five
+  // slots of all seventeen Tier 5 sets now carry a setId, so the 4-piece threshold is real and the
+  // bonus has to cross from inactive to active when it is met.
+  await selectSlotItem(page, 'Hands', 'destroyer-gauntlets')
+  await selectSlotItem(page, 'Legs', 'destroyer-greaves')
+  // Filtered rather than asserted against the whole locator, which now matches both bonuses at once.
+  await expect(sets.locator('.set-bonus-active').filter({ hasText: '5 less rage' })).toHaveCount(1)
+  await expect(sets.locator('.set-bonus-inactive').filter({ hasText: '5 less rage' })).toHaveCount(0)
 
   // The whole point of showing these is that the score does NOT include them. If that caveat ever
   // disappears, the panel starts implying tier pieces are being valued when they are not.
   await expect(sets).toContainText(/None of these bonuses are included in the stat totals/i)
   await expect(sets).toContainText(/undervalues tier pieces/i)
+})
+
+test('every tier set bonus is sourced, reachable, and honest about not being scored', async () => {
+  // The set list went from 9 sets to all 17 of Tier 5, each bonus read verbatim off the Wowhead item
+  // page in `sourcedFrom`. Three things have to stay true together, and each has failed somewhere in
+  // this repo's history: the text must be traceable, the set must actually exist in the catalogue
+  // (a bonus for a set nothing can equip is a dead entry), and nothing may claim to be scored when
+  // the simulator applies none of them.
+  const problems: string[] = []
+  const setIdsInCatalogue = new Set(allItems.filter((item) => item.setId).map((item) => item.setId))
+
+  for (const set of sampleItemSets) {
+    if (!set.sourcedFrom && !set.needsVerification) {
+      problems.push(`${set.id}: no sourcedFrom and not flagged needsVerification`)
+    }
+    if (!setIdsInCatalogue.has(set.id)) {
+      problems.push(`${set.id}: no catalogued item carries this setId, so the set is unreachable`)
+    }
+
+    const pieceCounts = set.bonuses.map((bonus) => bonus.pieces)
+    expect(pieceCounts, `${set.id} should define a 2- and 4-piece bonus`).toEqual([2, 4])
+
+    for (const bonus of set.bonuses) {
+      if (bonus.modelled) problems.push(`${set.id} ${bonus.pieces}pc: claims to be modelled, but nothing applies set bonuses`)
+      if (!bonus.modelled && !bonus.whyNotModelled) problems.push(`${set.id} ${bonus.pieces}pc: unmodelled without saying why`)
+      if (!bonus.description.trim()) problems.push(`${set.id} ${bonus.pieces}pc: empty description`)
+    }
+  }
+
+  expect(problems, problems.join(' | ')).toEqual([])
+  expect(sampleItemSets.length, 'TBC Tier 5 is 17 sets, one per class per role').toBe(17)
+
+  // A full set must be assemblable, or the 4-piece bonus can never fire. Five distinct slots.
+  for (const set of sampleItemSets) {
+    const pieces = allItems.filter((item) => item.setId === set.id)
+    const slots = new Set(pieces.map((item) => item.slot))
+    expect(slots.size, `${set.id} has ${slots.size} distinct slots, so ${set.totalPieces} pieces cannot be worn at once`).toBe(set.totalPieces)
+  }
 })
 
 test('item procs and on-use effects contribute at their average uptime', async () => {

@@ -30,7 +30,7 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 64 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 65 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -133,8 +133,10 @@ and armour procs are unpopulated (schema exists, data does not), and rotations c
 
 ### 2. Polish
 
-- Tier set bonuses are defined for only **9 sets against 222** ingested set names, so most sets
-  correctly show nothing rather than inventing bonuses.
+- Tier set bonuses now cover **all 17 Tier 5 sets**, each read verbatim off the Wowhead item page in
+  `sourcedFrom`. The other 205 ingested set names (Tier 4, Tier 6, dungeon, PvP) are deliberately
+  undefined and show nothing rather than inventing bonuses — Tier 4 is the obvious next batch, since
+  a Phase 2 raider is still wearing pieces of it.
 - The BiS and Buffs panels are on the design tokens but still use the older layout shapes; they'd
   benefit from the treatment the gear panel got.
 
