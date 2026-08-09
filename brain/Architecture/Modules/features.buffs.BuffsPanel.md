@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/buffs/BuffsPanel.tsx
-lines: 170
+lines: 207
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.buffs.BuffsPanel
 
-`src/features/buffs/BuffsPanel.tsx` · **features** layer · 170 lines
+`src/features/buffs/BuffsPanel.tsx` · **features** layer · 207 lines
 
 _No doc comment at the top of this file._
 
@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 

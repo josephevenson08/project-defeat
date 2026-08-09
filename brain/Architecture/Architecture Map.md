@@ -19,7 +19,7 @@ The modules everything else leans on — change these carefully.
 - [[domain.character.characterTypes]] — 28 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
-- [[domain.stats.statTypes]] — 12 importers
+- [[domain.stats.statTypes]] — 13 importers
 - [[features.character.characterTypes]] — 12 importers
 - [[components.layout.Panel]] — 11 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
@@ -27,7 +27,7 @@ The modules everything else leans on — change these carefully.
 - [[domain.raids.raidTypes]] — 9 importers
 - [[features.gear.gearData]] — 8 importers
 - [[domain.character.roleTheme]] — 7 importers
-- [[domain.simulation.encounterTypes]] — 7 importers
+- [[domain.simulation.combatConstants]] — 7 importers
 
 ## By layer
 
@@ -157,13 +157,13 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.serpentshrineCavernBosses]] · 1 importers
 - [[domain.raids.tempestKeepBosses]] · 1 importers
 - [[domain.simulation.attackTable]] · 1 importers
-- [[domain.simulation.combatConstants]] · 6 importers
+- [[domain.simulation.combatConstants]] · 7 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
 - [[domain.simulation.encounterTypes]] · 7 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers
-- [[domain.stats.statTypes]] · 12 importers
+- [[domain.stats.statTypes]] · 13 importers
 - [[domain.stats.statUtils]] · 2 importers
 
 ### data (2)

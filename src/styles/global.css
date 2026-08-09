@@ -1114,6 +1114,17 @@ select:focus,
   opacity: 0.45;
 }
 
+/*
+ * Buffs listed for completeness with no checkbox: real raid buffs this app cannot apply. Held at
+ * full opacity rather than dimmed like a disabled row — the information is accurate and worth
+ * reading, it is just not actionable. The left rule is what marks it as a different kind of entry.
+ */
+.buffs-checkbox-row-static {
+  border-left: 2px solid var(--line-strong);
+  cursor: default;
+  padding-left: 12px;
+}
+
 .tab-nav {
   border-bottom: 1px solid var(--line);
   display: flex;

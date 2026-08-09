@@ -1,130 +1,374 @@
+import { RATING_PER_PERCENT } from '../simulation/combatConstants'
 import type { Buff } from './buffTypes'
 
+/**
+ * The thirty-three raid buffs of TBC Phase 2.
+ *
+ * Every number below was read by hand off the Wowhead tooltip of the spell rank named in `spellId`,
+ * then cross-checked against wowsims/tbc `sim/core/buffs.go` @3301fca5 — the same commit the item,
+ * gem and enchant catalogues come from. Nothing here is inferred. This replaces fourteen entries
+ * that were all flagged `needsVerification`, and rightly so: five of them were materially wrong.
+ *
+ * **Why this was done by hand.** Three automated routes were tried and abandoned before this
+ * (recorded in HANDOFF.md), and the tooltips show exactly why: Mana Spring Totem reads "Summons a
+ * Mana Spring Totem with 5 health ... that restores 20 mana every 2 seconds", so a parser takes 5,
+ * a careful reader takes 20-per-2s and converts it to 50 mp5. The ambiguity is only ambiguous to a
+ * regex. What made the by-hand pass tractable was resolving each spell through Wowhead's *listing*
+ * page first, which carries rank, level and required class — enough to pick the max rank a raid
+ * actually uses and to reject the NPC copies that made id selection ambiguous before.
+ *
+ * **Where the two sources disagree, the tooltip wins.** wowsims models Blessing of Wisdom at 42 mp5;
+ * spells 27142 and 27143 both say "restoring 41 mana every 5 seconds". 41 is used here. That is the
+ * only outright conflict — everything else agreed to the digit.
+ *
+ * **Base ranks, not talented ranks.** Values are the untalented tooltip figure, which is what can be
+ * cited. Where a talent or an idol raises it, the improved value is named in `notes` and attributed,
+ * rather than being silently baked into a number nobody can check.
+ *
+ * **Fifteen of the thirty-three carry `notModelled` instead of stats** — threat, maximum health,
+ * resistances, damage multipliers, weapon procs and timed cooldowns have nowhere to go in
+ * `StatBlock`. They are listed anyway, with their real effect, because a raid planner that silently
+ * omits Bloodlust reads as an oversight rather than a stated limit.
+ */
 export const sampleBuffs: readonly Buff[] = [
+  // ---- Warrior ----
   {
     id: 'battle-shout',
     name: 'Battle Shout',
     providedBy: 'Warrior',
+    spellId: 2048,
     roles: ['Physical DPS', 'Tank'],
     stats: { attackPower: 306 },
-    needsVerification: true,
-    notes: 'Max-rank raid Battle Shout; stats are approximate pending final Wowhead audit.',
+    notes:
+      'Rank 8: "increasing the melee attack power of all party members within 20 yards by 306". Melee only — it does not touch ranged attack power, which is why a Hunter gains nothing here. Commanding Presence 5/5 raises it to 382 (wowsims applies a flat 1.25).',
   },
   {
+    id: 'commanding-shout',
+    name: 'Commanding Shout',
+    providedBy: 'Warrior',
+    spellId: 469,
+    extraStats: { Health: 1080 },
+    notModelled:
+      'Increases maximum health of all party members by 1080. Flat maximum health, which StatBlock has no field for — it carries Stamina, and converting 1080 health into 108 Stamina would be wrong, because Stamina then gets multiplied again by Blessing of Kings and Gift of the Wild.',
+    notes: 'Rank 1, the only rank in TBC. Improved Commanding Shout 5/5 raises it to 1350.',
+  },
+
+  // ---- Paladin ----
+  {
     id: 'blessing-of-might',
-    name: 'Blessing of Might',
+    name: 'Greater Blessing of Might',
     providedBy: 'Paladin',
+    spellId: 27141,
     roles: ['Physical DPS', 'Tank'],
-    stats: { attackPower: 220 },
-    needsVerification: true,
-    notes: 'Approximate pending final Wowhead audit.',
+    stats: { attackPower: 220, rangedAttackPower: 220 },
+    notes:
+      'Rank 3: "increasing attack power by 220". The tooltip says attack power without qualification and wowsims applies it to melee and ranged alike, unlike Battle Shout. Improved Blessing of Might 5/5 raises it to 264.',
   },
   {
     id: 'blessing-of-kings',
-    name: 'Blessing of Kings',
+    name: 'Greater Blessing of Kings',
     providedBy: 'Paladin',
+    spellId: 25898,
     statMultipliers: { strength: 0.1, agility: 0.1, stamina: 0.1, intellect: 0.1, spirit: 0.1 },
-    notes: 'Universal +10% to all five primary stats, applied after gear/gems/enchants are totaled.',
+    notes:
+      '"increasing total stats by 10%". Applied after gear, gems and enchants are totaled and before Attack Power and Spell Power are derived, so the 10% correctly cascades into both.',
   },
   {
     id: 'blessing-of-wisdom',
-    name: 'Blessing of Wisdom',
+    name: 'Greater Blessing of Wisdom',
     providedBy: 'Paladin',
+    spellId: 27143,
     roles: ['Caster DPS', 'Healer'],
     stats: { mp5: 41 },
-    needsVerification: true,
-    notes: 'Approximate pending final Wowhead audit.',
+    notes:
+      'Rank 3: "restoring 41 mana every 5 seconds". wowsims uses 42; spells 27142 and 27143 both say 41, so 41 is used. Improved Blessing of Wisdom 2/2 raises it by 20%, to 49.',
   },
   {
+    id: 'blessing-of-salvation',
+    name: 'Greater Blessing of Salvation',
+    providedBy: 'Paladin',
+    spellId: 25895,
+    roles: ['Physical DPS', 'Caster DPS', 'Healer'],
+    notModelled:
+      'Reduces all threat generated by 30%. This simulator does not model threat at all, so there is no quantity for it to reduce.',
+  },
+  {
+    id: 'blessing-of-sanctuary',
+    name: 'Greater Blessing of Sanctuary',
+    providedBy: 'Paladin',
+    spellId: 27169,
+    roles: ['Tank'],
+    notModelled:
+      'Reduces damage dealt from all sources by up to 80, and deals 46 Holy damage to an attacker whose melee attack the target blocks. Flat damage reduction applies after mitigation rather than as a stat, and the block component is a damage proc.',
+  },
+  {
+    id: 'devotion-aura',
+    name: 'Devotion Aura',
+    providedBy: 'Paladin',
+    spellId: 27149,
+    stats: { armor: 861 },
+    notes:
+      'Rank 8: "Gives 861 additional armor to party members within 30 yards". Improved Devotion Aura 5/5 raises it to 1205. Only one Paladin aura can be active per Paladin, so this and the two below compete for the same slot.',
+  },
+  {
+    id: 'retribution-aura',
+    name: 'Retribution Aura',
+    providedBy: 'Paladin',
+    spellId: 27150,
+    notModelled:
+      'Causes 26 Holy damage to any creature that strikes a party member. Damage returned to the attacker, not a stat on the wearer. Improved Retribution Aura 2/2 raises it to 39.',
+  },
+  {
+    id: 'sanctity-aura',
+    name: 'Sanctity Aura',
+    providedBy: 'Paladin',
+    spellId: 20218,
+    notModelled:
+      'Increases Holy damage done by party members by 10%. A school-specific damage multiplier, and this simulator applies no school multipliers. Improved Sanctity Aura 2/2 adds a further 2% to damage of all schools.',
+  },
+
+  // ---- Mage ----
+  {
     id: 'arcane-intellect',
-    name: 'Arcane Intellect',
+    name: 'Arcane Brilliance',
     providedBy: 'Mage',
+    spellId: 27127,
     roles: ['Caster DPS', 'Healer'],
     stats: { intellect: 40 },
-    needsVerification: true,
-    notes: 'Approximate pending final Wowhead audit.',
+    notes:
+      'Rank 2: "increasing their Intellect by 40". Single-target Arcane Intellect (rank 6, spell 27126) gives the same 40 and does not stack with it, so the two are one entry rather than two that could both be ticked. The id predates the rename and is left alone so saved builds keep resolving.',
   },
+
+  // ---- Priest ----
   {
     id: 'prayer-of-fortitude',
     name: 'Prayer of Fortitude',
     providedBy: 'Priest',
-    stats: { stamina: 66 },
-    needsVerification: true,
-    notes: 'Universal; approximate pending final Wowhead audit.',
+    spellId: 25392,
+    stats: { stamina: 79 },
+    notes:
+      'Rank 3: "increasing their Stamina by 79". Improved Power Word: Fortitude 2/2 raises it to 102.',
   },
+  {
+    id: 'prayer-of-spirit',
+    name: 'Prayer of Spirit',
+    providedBy: 'Priest',
+    spellId: 32999,
+    roles: ['Caster DPS', 'Healer'],
+    stats: { spirit: 50 },
+    notes:
+      'Rank 2: "increasing their Spirit by 50". Improved Divine Spirit additionally grants spell power equal to 10% of Spirit, which is a stat dependency rather than a flat bonus and is not applied here.',
+  },
+  {
+    id: 'shadow-protection',
+    name: 'Shadow Protection',
+    providedBy: 'Priest',
+    spellId: 25433,
+    extraStats: { ShadowResistance: 70 },
+    notModelled:
+      "Increases the target's resistance to Shadow spells by 70. StatBlock carries no resistances, and this simulator models no incoming spell damage for them to reduce.",
+    notes: 'Rank 4. Prayer of Shadow Protection (rank 2, spell 39374) is the group version.',
+  },
+  {
+    id: 'power-infusion',
+    name: 'Power Infusion',
+    providedBy: 'Priest',
+    spellId: 10060,
+    roles: ['Caster DPS', 'Healer'],
+    notModelled:
+      'Increases spell casting speed by 20% and reduces the mana cost of all spells by 20% for 15 sec, on a 3 min cooldown. A timed cooldown from another player: averaging it over the fight would misstate it in both directions, and the mana half has nothing to act on while healer mana is unconstrained.',
+  },
+
+  // ---- Druid ----
   {
     id: 'mark-of-the-wild',
     name: 'Gift of the Wild',
     providedBy: 'Druid',
-    statMultipliers: { strength: 0.05, agility: 0.05, stamina: 0.05, intellect: 0.05, spirit: 0.05 },
-    needsVerification: true,
-    notes: 'Universal small percentage bonus to all five primary stats; also grants resistances (not modeled).',
+    spellId: 26991,
+    stats: { strength: 14, agility: 14, stamina: 14, intellect: 14, spirit: 14, armor: 340 },
+    extraStats: { ArcaneResistance: 25, FireResistance: 25, FrostResistance: 25, NatureResistance: 25, ShadowResistance: 25 },
+    notes:
+      'Rank 3: "increasing armor by 340, all attributes by 14 and all resistances by 25". Flat, not a percentage — this entry previously modelled it as +5% to every primary stat, which is not a TBC effect at any rank. Improved Mark of the Wild 5/5 raises it to 18 and 459. The resistances have no home in StatBlock and sit in `extraStats`; the armor does, so it is applied.',
   },
   {
-    id: 'trueshot-aura',
-    name: 'Trueshot Aura',
-    providedBy: 'Hunter',
-    roles: ['Physical DPS'],
-    stats: { attackPower: 125 },
-    needsVerification: true,
-    notes: 'Passive raid-wide aura; approximate pending final Wowhead audit.',
+    id: 'thorns',
+    name: 'Thorns',
+    providedBy: 'Druid',
+    spellId: 26992,
+    roles: ['Tank'],
+    notModelled:
+      'Causes 25 Nature damage to attackers when hit. Damage returned to the attacker, not a stat. Improved Thorns 3/3 raises it to 43.',
+  },
+  {
+    id: 'innervate',
+    name: 'Innervate',
+    providedBy: 'Druid',
+    spellId: 29166,
+    roles: ['Caster DPS', 'Healer'],
+    notModelled:
+      "Increases the target's Spirit-based mana regeneration by 400% and allows full regeneration while casting, for 20 sec on a 6 min cooldown. A timed mana cooldown, and this simulator does not model mana as a constraint.",
   },
   {
     id: 'leader-of-the-pack',
     name: 'Leader of the Pack',
     providedBy: 'Feral Druid',
+    spellId: 17007,
     roles: ['Physical DPS'],
-    stats: { critRating: 34 },
-    needsVerification: true,
-    notes: 'Talent-driven raid aura; approximate crit rating conversion pending final Wowhead audit.',
-  },
-  {
-    id: 'strength-of-earth-totem',
-    name: 'Strength of Earth Totem',
-    providedBy: 'Shaman',
-    roles: ['Physical DPS', 'Tank'],
-    stats: { strength: 86 },
-    needsVerification: true,
-    notes: 'Approximate pending final Wowhead audit.',
-  },
-  {
-    id: 'grace-of-air-totem',
-    name: 'Grace of Air Totem',
-    providedBy: 'Shaman',
-    roles: ['Physical DPS'],
-    stats: { agility: 77 },
-    needsVerification: true,
-    notes: 'Approximate pending final Wowhead audit.',
-  },
-  {
-    id: 'totem-of-wrath',
-    name: 'Totem of Wrath',
-    providedBy: 'Shaman',
-    roles: ['Caster DPS', 'Healer'],
-    stats: { spellPower: 141, spellHitRating: 60 },
-    needsVerification: true,
-    notes: 'Spell power scales with totem rank and stacks with Improved variant; approximate pending final Wowhead audit.',
-  },
-  {
-    id: 'wrath-of-air-totem',
-    name: 'Wrath of Air Totem',
-    providedBy: 'Shaman',
-    roles: ['Caster DPS', 'Healer'],
-    stats: { spellHasteRating: 101 },
-    needsVerification: true,
-    notes: 'Approximate spell haste rating conversion pending final Wowhead audit.',
+    stats: { critRating: 5 * RATING_PER_PERCENT.meleeCrit },
+    notes:
+      '"increases ranged and melee critical chance of all party members within 45 yards by 5%". Stored as the rating that buys 5% at level 70 rather than as a flat 5, because everything downstream reads rating. The previous 34 was neither the percentage nor its rating. Idol of the Raven Goddess adds a further 20 crit rating to the aura.',
   },
   {
     id: 'moonkin-aura',
     name: 'Moonkin Aura',
     providedBy: 'Balance Druid',
+    spellId: 24858,
     roles: ['Caster DPS', 'Healer'],
-    stats: { spellCritRating: 34 },
-    needsVerification: true,
-    notes: 'Talent-driven raid aura; approximate crit rating conversion pending final Wowhead audit.',
+    stats: { spellCritRating: 5 * RATING_PER_PERCENT.spellCrit },
+    notes:
+      'Moonkin Form: "all party members within 30 yards have their spell critical chance increased by 5%". Converted to rating at level 70, as with Leader of the Pack. Idol of the Raven Goddess adds a further 20 spell crit rating.',
+  },
+
+  // ---- Hunter ----
+  {
+    id: 'trueshot-aura',
+    name: 'Trueshot Aura',
+    providedBy: 'Hunter',
+    spellId: 27066,
+    roles: ['Physical DPS'],
+    stats: { attackPower: 125, rangedAttackPower: 125 },
+    notes:
+      'Rank 4: "Increases the attack power of party members within 45 yards by 125". Unqualified attack power, so it applies to ranged as well — the ranged half was missing before, which understated every Hunter.',
+  },
+  {
+    id: 'ferocious-inspiration',
+    name: 'Ferocious Inspiration',
+    providedBy: 'Beast Mastery Hunter',
+    spellId: 34460,
+    roles: ['Physical DPS', 'Caster DPS'],
+    notModelled:
+      'When the Hunter\'s pet scores a critical hit, all party members have all damage increased by 3% for 10 sec. A whole-damage multiplier gated on someone else\'s pet critting, so it has no fixed uptime to average over.',
+  },
+
+  // ---- Shaman ----
+  {
+    id: 'strength-of-earth-totem',
+    name: 'Strength of Earth Totem',
+    providedBy: 'Shaman',
+    spellId: 25528,
+    roles: ['Physical DPS', 'Tank'],
+    stats: { strength: 86 },
+    notes:
+      'Rank 6: "increases the strength of party members within 20 yards by 86". Enhancing Totems 5/5 raises it to 98, and the Cyclone 4-piece bonus does the same; both together give 112.',
+  },
+  {
+    id: 'grace-of-air-totem',
+    name: 'Grace of Air Totem',
+    providedBy: 'Shaman',
+    spellId: 25359,
+    roles: ['Physical DPS'],
+    stats: { agility: 77 },
+    notes:
+      'Rank 3, the highest in TBC: "increases the agility of party members within 20 yards by 77". Enhancing Totems 5/5 raises it to 88.',
+  },
+  {
+    id: 'mana-spring-totem',
+    name: 'Mana Spring Totem',
+    providedBy: 'Shaman',
+    spellId: 25570,
+    roles: ['Caster DPS', 'Healer'],
+    stats: { mp5: 50 },
+    notes:
+      'Rank 5: "restores 20 mana every 2 seconds", which is 50 per 5 seconds. Improved Mana Spring Totem 5/5 raises it to 62.5.',
+  },
+  {
+    id: 'totem-of-wrath',
+    name: 'Totem of Wrath',
+    providedBy: 'Elemental Shaman',
+    spellId: 30706,
+    roles: ['Caster DPS', 'Healer'],
+    stats: {
+      spellCritRating: 3 * RATING_PER_PERCENT.spellCrit,
+      spellHitRating: 3 * RATING_PER_PERCENT.spellHit,
+    },
+    notes:
+      '"increases the chance to hit and critically strike with spells by 3% for all party members". Both are percentages, converted to rating at level 70. This entry previously read 141 spell power and 60 spell hit; Totem of Wrath grants no spell power in TBC at all.',
+  },
+  {
+    id: 'wrath-of-air-totem',
+    name: 'Wrath of Air Totem',
+    providedBy: 'Shaman',
+    spellId: 3738,
+    roles: ['Caster DPS', 'Healer'],
+    stats: { spellPower: 101 },
+    notes:
+      '"Party members within 20 yards of the totem have their spell damage and healing increased by up to 101". Spell power, not haste — the haste version of this totem is a Wrath of the Lich King change, and this entry previously carried 101 spell haste rating. Improved Wrath of Air Totem 2/2 raises it to 121.',
+  },
+  {
+    id: 'windfury-totem',
+    name: 'Windfury Totem',
+    providedBy: 'Shaman',
+    spellId: 25587,
+    roles: ['Physical DPS'],
+    notModelled:
+      'Enchants party members\' main-hand weapons; each hit has a 20% chance of granting the attacker one extra attack with 445 extra attack power. An extra swing rather than a stat, and it is suppressed entirely by any self-applied main-hand imbue.',
+  },
+  {
+    id: 'mana-tide-totem',
+    name: 'Mana Tide Totem',
+    providedBy: 'Restoration Shaman',
+    spellId: 16190,
+    roles: ['Caster DPS', 'Healer'],
+    notModelled:
+      'Restores 6% of total mana every 3 seconds for 12 sec — 24% in total — on a 5 min cooldown. A timed mana cooldown, and this simulator does not model mana as a constraint.',
+  },
+  {
+    id: 'tranquil-air-totem',
+    name: 'Tranquil Air Totem',
+    providedBy: 'Shaman',
+    spellId: 25908,
+    roles: ['Physical DPS', 'Caster DPS', 'Healer'],
+    notModelled:
+      'Reduces the threat caused by all party members within 20 yards by 20%. This simulator does not model threat. Shares the air totem slot with Wrath of Air and Grace of Air.',
+  },
+  {
+    id: 'unleashed-rage',
+    name: 'Unleashed Rage',
+    providedBy: 'Enhancement Shaman',
+    spellId: 30806,
+    roles: ['Physical DPS'],
+    notModelled:
+      "Rank 5: the Shaman's melee critical hits increase all party members' melee attack power by 10% for 10 sec. Two reasons it is not applied: it is a proc with no fixed uptime, and a percentage multiplier on attack power would be applied before attack power is derived from Strength and Agility, so it would multiply only the flat portion from gear.",
+  },
+
+  {
+    id: 'bloodlust',
+    name: 'Bloodlust',
+    providedBy: 'Shaman',
+    spellId: 2825,
+    notModelled:
+      'Increases melee, ranged and spell casting speed by 30% for all party members for 40 sec, on a 10 min cooldown. A raid cooldown rather than a sustained buff: applying 30% haste for the whole fight would overstate it by an order of magnitude, and averaging it over the cooldown understates a burst everyone times deliberately.',
+    notes: 'Horde only; the Alliance equivalent is Heroism (spell 32182), identical in every value.',
+  },
+
+  // ---- Warlock ----
+  {
+    id: 'blood-pact',
+    name: 'Blood Pact',
+    providedBy: 'Warlock',
+    spellId: 27268,
+    stats: { stamina: 70 },
+    notes:
+      "Rank 6: \"Increases party members' Stamina by 70\". Requires the Warlock's Imp to be out. Improved Imp 3/3 raises it to 91.",
   },
 ]
 
 export function getBuffById(id: string) {
   return sampleBuffs.find((buff) => buff.id === id)
 }
+
+/** Buffs this app actually applies to a character's stats. */
+export const modelledBuffs = sampleBuffs.filter((buff) => !buff.notModelled)
+
+/** Buffs listed for completeness whose effect has nowhere to go in `StatBlock`. */
+export const unmodelledBuffs = sampleBuffs.filter((buff) => buff.notModelled)

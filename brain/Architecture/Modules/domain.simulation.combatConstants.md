@@ -31,6 +31,7 @@ _None._
 
 ## Imported by
 
+- [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.character.sampleRacialTraits]] — `src/domain/character/sampleRacialTraits.ts`
 - [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`

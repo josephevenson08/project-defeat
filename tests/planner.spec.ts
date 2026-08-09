@@ -44,7 +44,8 @@ import { getItemsForSlotAndCharacter } from '../src/domain/gear/characterItemRul
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getVisibleGearSlotsForSpec } from '../src/domain/gear/slotVisibility'
 import { getSignatureAbility } from '../src/domain/abilities'
-import { effectUptime } from '../src/domain/simulation/combatConstants'
+import { RATING_PER_PERCENT, effectUptime } from '../src/domain/simulation/combatConstants'
+import { getBuffById, modelledBuffs, sampleBuffs, unmodelledBuffs } from '../src/domain/buffs/sampleBuffs'
 import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
@@ -1399,6 +1400,106 @@ test('toggling a buff and a consumable actually moves the simulated result', asy
   await page.getByTestId('buff-toggle-battle-shout').click()
   await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
   expect(await readSimulationScore(page)).toBe(before)
+})
+
+test('every raid buff is sourced to a spell rank and is either applied or explicitly not modelled', async () => {
+  // All 33 buffs were rebuilt by hand off Wowhead tooltips, replacing 14 entries that carried
+  // `needsVerification` and invented numbers. This is the check that stops the file drifting back:
+  // a buff must cite the spell rank its numbers came from, and must either contribute stats or say
+  // in words why it cannot. An entry that does neither is the failure mode this repo keeps hitting —
+  // it looks like data and applies nothing.
+  const problems: string[] = []
+  const seen = new Set<string>()
+
+  for (const buff of sampleBuffs) {
+    if (seen.has(buff.id)) problems.push(`${buff.id}: duplicate id`)
+    seen.add(buff.id)
+
+    if (!buff.spellId) problems.push(`${buff.id}: no spellId, so its numbers cannot be traced to a rank`)
+    if (buff.needsVerification) problems.push(`${buff.id}: still flagged needsVerification`)
+
+    const applies = Boolean(buff.stats || buff.statMultipliers)
+    if (applies && buff.notModelled) problems.push(`${buff.id}: both applies stats and claims to be unmodelled`)
+    if (!applies && !buff.notModelled) problems.push(`${buff.id}: contributes nothing and does not say why`)
+  }
+
+  expect(problems, problems.join(' | ')).toEqual([])
+  expect(modelledBuffs.length + unmodelledBuffs.length).toBe(sampleBuffs.length)
+  expect(sampleBuffs.length, 'TBC Phase 2 has 33 raid buffs').toBe(33)
+})
+
+test('the percentage auras are stored as the rating that actually buys that percentage', async () => {
+  // Moonkin Aura, Leader of the Pack and Totem of Wrath are written in the tooltip as flat
+  // percentages, but everything downstream reads rating — so they are stored converted. Reversing
+  // the conversion has to land back on the tooltip number, or the aura is quietly worth something
+  // else. The old values (34 crit rating for a 5% aura) were neither one thing nor the other.
+  const backToPercent = (rating: number, perPercent: number) => rating / perPercent
+
+  expect(backToPercent(getBuffById('moonkin-aura')?.stats?.spellCritRating ?? 0, RATING_PER_PERCENT.spellCrit)).toBeCloseTo(5, 10)
+  expect(backToPercent(getBuffById('leader-of-the-pack')?.stats?.critRating ?? 0, RATING_PER_PERCENT.meleeCrit)).toBeCloseTo(5, 10)
+
+  const totemOfWrath = getBuffById('totem-of-wrath')
+  expect(backToPercent(totemOfWrath?.stats?.spellCritRating ?? 0, RATING_PER_PERCENT.spellCrit)).toBeCloseTo(3, 10)
+  expect(backToPercent(totemOfWrath?.stats?.spellHitRating ?? 0, RATING_PER_PERCENT.spellHit)).toBeCloseTo(3, 10)
+
+  // Totem of Wrath grants no spell power in TBC. It used to carry 141, which is the shape of the
+  // Wrath of the Lich King version of the totem, not this one.
+  expect(totemOfWrath?.stats?.spellPower ?? 0).toBe(0)
+})
+
+test('the buff corrections that had real wrong values stay corrected', async () => {
+  // Each assertion here is a value that was wrong in the shipped data and was fixed against a named
+  // Wowhead spell. They are pinned individually because each was wrong in a different way, and a
+  // careless re-ingest could reintroduce any one of them alone.
+
+  // Spell 26991: flat +14 to all attributes and +340 armor. Was modelled as +5% to every primary
+  // stat, which is not a TBC effect at any rank of this spell.
+  const giftOfTheWild = getBuffById('mark-of-the-wild')
+  expect(giftOfTheWild?.statMultipliers, 'Gift of the Wild is flat, not a percentage').toBeUndefined()
+  expect(giftOfTheWild?.stats?.strength).toBe(14)
+  expect(giftOfTheWild?.stats?.spirit).toBe(14)
+  expect(giftOfTheWild?.stats?.armor).toBe(340)
+
+  // Spell 3738: "spell damage and healing increased by up to 101" — spell power. The haste version
+  // of this totem is a Wrath of the Lich King change.
+  const wrathOfAir = getBuffById('wrath-of-air-totem')
+  expect(wrathOfAir?.stats?.spellPower).toBe(101)
+  expect(wrathOfAir?.stats?.spellHasteRating ?? 0).toBe(0)
+
+  // Spell 25392: 79 stamina, not 66.
+  expect(getBuffById('prayer-of-fortitude')?.stats?.stamina).toBe(79)
+
+  // Spells 27142 and 27143 both read 41 mana every 5 seconds. wowsims models 42; the tooltip wins.
+  expect(getBuffById('blessing-of-wisdom')?.stats?.mp5).toBe(41)
+
+  // Both of these read "attack power" unqualified and so apply to ranged as well. The missing ranged
+  // half understated every Hunter.
+  expect(getBuffById('trueshot-aura')?.stats?.rangedAttackPower).toBe(125)
+  expect(getBuffById('blessing-of-might')?.stats?.rangedAttackPower).toBe(220)
+
+  // Battle Shout is the counter-example and is deliberately melee-only: "increasing the melee attack
+  // power of all party members". A ranged half here would be an invention.
+  expect(getBuffById('battle-shout')?.stats?.attackPower).toBe(306)
+  expect(getBuffById('battle-shout')?.stats?.rangedAttackPower ?? 0).toBe(0)
+})
+
+test('buffs that cannot be modelled are listed in the panel without a checkbox', async ({ page }) => {
+  // The alternative was leaving 15 real raid buffs out of the app entirely, which reads as an
+  // oversight rather than a stated limit. They must actually reach the screen — and must not offer a
+  // control that does nothing when clicked.
+  await page.goto('/')
+
+  const bloodlust = page.getByTestId('buff-unmodelled-bloodlust')
+  await expect(bloodlust).toBeVisible()
+  await expect(bloodlust).toContainText('30%')
+  expect(await bloodlust.locator('input').count(), 'an unmodelled buff must not offer a checkbox').toBe(0)
+
+  // And the modelled ones keep theirs.
+  await expect(page.getByTestId('buff-toggle-battle-shout')).toBeVisible()
+
+  // Role filtering still applies to both groups: Innervate is a caster/healer buff and this is a
+  // Fury Warrior, so it should not be on screen at all.
+  await expect(page.getByTestId('buff-unmodelled-innervate')).toHaveCount(0)
 })
 
 test('every spec can fill every gear slot the UI shows it', async () => {
