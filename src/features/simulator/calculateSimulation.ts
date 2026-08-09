@@ -138,19 +138,28 @@ function isDualWield(gear: EquippedGear) {
   return Boolean(offHand?.weaponType && DUAL_WIELD_WEAPON_TYPES.has(offHand.weaponType))
 }
 
+/**
+ * Sums the active debuffs. Armor reduction is summed in **flat armor points**, which is both how
+ * the values are stored and how they combine in game — wowsims applies each as its own
+ * `AddStatDynamic(stats.Armor, -x)`, so Sunder, Faerie Fire and Curse of Recklessness add up.
+ *
+ * A debuff carrying `notModelled` contributes nothing by construction: it has no numeric fields to
+ * contribute. It stays reachable through `getTargetDebuffById` so a saved build that has one ticked
+ * still loads.
+ */
 function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
   return activeTargetDebuffIds.reduce(
     (totals, id) => {
       const debuff = getTargetDebuffById(id)
       if (!debuff) return totals
       return {
-        armorReductionPercent: totals.armorReductionPercent + (debuff.armorReductionPercent ?? 0),
+        armorReduction: totals.armorReduction + (debuff.armorReduction ?? 0),
         physicalCritTakenBonus: totals.physicalCritTakenBonus + (debuff.physicalCritTakenBonus ?? 0),
         spellCritTakenBonus: totals.spellCritTakenBonus + (debuff.spellCritTakenBonus ?? 0),
         spellDamageTakenMultiplier: totals.spellDamageTakenMultiplier + (debuff.spellDamageTakenMultiplier ?? 0),
       }
     },
-    { armorReductionPercent: 0, physicalCritTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
+    { armorReduction: 0, physicalCritTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
   )
 }
 
@@ -278,7 +287,7 @@ function calculatePhysicalDps(
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
 ): SimulationResult {
   const skillDiff = computeSkillDiff(target.level)
-  const targetArmor = Math.max(0, target.armor * (1 - debuffs.armorReductionPercent))
+  const targetArmor = Math.max(0, target.armor - debuffs.armorReduction)
   const armorMitigation = computeArmorMitigation(targetArmor, PLAYER_LEVEL)
   const rawCritChance = ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus
   const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)

@@ -37,14 +37,43 @@ export type TargetDebuff = {
   id: string
   name: string
   providedBy: string
-  /** Reduces the simulation target's armor by this fraction (e.g. 0.2 for a 20% reduction). Approximates real per-stack flat armor reduction. */
-  armorReductionPercent?: number
+  /**
+   * Wowhead spell id of the *exact rank* every number on this entry was read from — the same
+   * contract as `Buff.spellId`, and for the same reason. For a debuff delivered by a talent the id
+   * is the talent rank that states the number, not the spell that applies it.
+   */
+  spellId?: number
+  /**
+   * **Flat armor points** removed from the target, not a fraction.
+   *
+   * This field used to be `armorReductionPercent` and every entry was a guess in the wrong unit.
+   * All three of TBC's raid armor debuffs are flat: Sunder Armor is 520 *per stack*, Faerie Fire is
+   * 610, Curse of Recklessness is 800. A percentage was not merely imprecise — it scaled with the
+   * target's armor, so the same debuff was worth a different amount against every boss, which is
+   * not how any of them work.
+   *
+   * Sunder's value here is the full 5-stack total, because the app has no notion of a stack count
+   * ramping up over a fight.
+   *
+   * These sum. wowsims applies each as its own `AddStatDynamic(stats.Armor, -x)`, and only Sunder
+   * Armor and Expose Armor are exclusive with each other (they share its `SunderExpose` tag).
+   */
+  armorReduction?: number
   /** Increases the target's chance to be critically struck by physical attacks, as a fraction (e.g. 0.03 for +3%). */
   physicalCritTakenBonus?: number
-  /** Increases the target's chance to be critically struck by spells, as a fraction (e.g. 0.1 for Winter's Chill at 5 stacks). */
+  /** Increases the target's chance to be critically struck by spells, as a fraction (e.g. 0.03 for +3%). */
   spellCritTakenBonus?: number
   /** Increases spell damage the target takes, as a fraction (e.g. 0.1 for +10%). */
   spellDamageTakenMultiplier?: number
+  /**
+   * Set on a debuff whose real scope this app cannot express, holding the actual effect so it can be
+   * listed and read without being applied. Same contract as `Buff.notModelled`.
+   *
+   * For debuffs the limit is specifically **spell school**: nothing in `SignatureAbility` or the
+   * simulation records whether a cast is Frost or Shadow, so a school-scoped debuff can only be
+   * applied to every spell or to none.
+   */
+  notModelled?: string
   needsVerification?: boolean
   notes?: string
 }

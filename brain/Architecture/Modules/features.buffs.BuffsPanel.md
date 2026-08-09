@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/buffs/BuffsPanel.tsx
-lines: 207
+lines: 235
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.buffs.BuffsPanel
 
-`src/features/buffs/BuffsPanel.tsx` · **features** layer · 207 lines
+`src/features/buffs/BuffsPanel.tsx` · **features** layer · 235 lines
 
 _No doc comment at the top of this file._
 

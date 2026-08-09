@@ -3,7 +3,7 @@ import type { CharacterRole } from '../../domain/character/characterTypes'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import { modelledBuffs, unmodelledBuffs } from '../../domain/buffs/sampleBuffs'
 import { statLabels } from '../../domain/stats/statTypes'
-import { sampleTargetDebuffs } from '../../domain/buffs/sampleTargetDebuffs'
+import { modelledTargetDebuffs, unmodelledTargetDebuffs } from '../../domain/buffs/sampleTargetDebuffs'
 import type { BuildRole } from '../../domain/gear/itemTypes'
 import type { Consumable, ConsumableCategory } from '../../domain/consumables/consumableTypes'
 import { sampleConsumables } from '../../domain/consumables/sampleConsumables'
@@ -54,7 +54,9 @@ function multiplierSummary(multipliers: Buff['statMultipliers']) {
 
 function targetDebuffSummary(debuff: TargetDebuff) {
   const parts: string[] = []
-  if (debuff.armorReductionPercent) parts.push(`-${Math.round(debuff.armorReductionPercent * 100)}% target armor`)
+  // Flat armor points, not a percentage — every TBC raid armor debuff is a flat value, and reading
+  // one back as "-24%" is how the wrong unit survived in this data for as long as it did.
+  if (debuff.armorReduction) parts.push(`-${debuff.armorReduction} target armor`)
   if (debuff.physicalCritTakenBonus) parts.push(`+${Math.round(debuff.physicalCritTakenBonus * 100)}% physical crit taken`)
   if (debuff.spellCritTakenBonus) parts.push(`+${Math.round(debuff.spellCritTakenBonus * 100)}% spell crit taken`)
   if (debuff.spellDamageTakenMultiplier) parts.push(`+${Math.round(debuff.spellDamageTakenMultiplier * 100)}% spell damage taken`)
@@ -182,7 +184,7 @@ export function BuffsPanel({
           <h3>Target Debuffs</h3>
           <p className="buffs-hint">Raid debuffs applied to the simulated target, feeding the Simulation panel's armor/crit/spell-damage math.</p>
           <div className="buffs-checkbox-list">
-            {sampleTargetDebuffs.map((debuff) => (
+            {modelledTargetDebuffs.map((debuff) => (
               <label className="buffs-checkbox-row" key={debuff.id}>
                 <input
                   type="checkbox"
@@ -199,6 +201,32 @@ export function BuffsPanel({
               </label>
             ))}
           </div>
+
+          {unmodelledTargetDebuffs.length > 0 && (
+            <>
+              <p className="buffs-hint">
+                Below: a real raid debuff whose effect is scoped to one spell school. Nothing in this app records whether a
+                cast is Frost or Shadow, so it could only be applied to every spell or to none — and applying it to every
+                spell is the error this listing replaces.
+              </p>
+              <div className="buffs-checkbox-list">
+                {unmodelledTargetDebuffs.map((debuff) => (
+                  <div
+                    className="buffs-checkbox-row buffs-checkbox-row-static"
+                    key={debuff.id}
+                    data-testid={`target-debuff-unmodelled-${debuff.id}`}
+                  >
+                    <span>
+                      <strong>{debuff.name}</strong>
+                      <small>
+                        {debuff.providedBy} · {debuff.notModelled}
+                      </small>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </section>
       </div>
     </Panel>
