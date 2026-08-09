@@ -66,6 +66,46 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
  * and stops a stray open overlay from blocking the next click behind its backdrop.
  */
 
+/**
+ * Simulation lives on its own tab, so anything asserting on the simulator, the encounter settings,
+ * stat weights or the upgrade finder has to go there first.
+ */
+async function openSimulationTab(page: Page) {
+  await page.getByRole('button', { name: 'Simulation', exact: true }).click()
+  await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
+}
+
+/**
+ * Back to the planner. Several tests interleave the two — change a stat, read the result, change
+ * another — so the switch has to work in both directions rather than once per test.
+ */
+async function openPlannerTab(page: Page) {
+  await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
+}
+
+/**
+ * Runs the simulation and returns the score, then goes back to the planner so a caller toggling
+ * buffs keeps its place.
+ *
+ * The run is not optional: `simulationResult` starts undefined and App clears it on every character,
+ * gear or buff change, so there is no score to read until the button is pressed. That is deliberate —
+ * a stale number next to changed gear would be worse than none.
+ */
+async function readSimulationScore(page: Page) {
+  await openSimulationTab(page)
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  const score = Number(await page.getByTestId('simulation-score').innerText())
+  await openPlannerTab(page)
+  return score
+}
+
+/** Switches to the simulation tab and produces a fresh result there. */
+async function runSimulation(page: Page) {
+  await openSimulationTab(page)
+  await page.getByRole('button', { name: /run simulation/i }).click()
+}
+
 /** The slot's row in the gear grid. Slot *presence* is now this button, not a select. */
 function slotCell(page: Page, slot: string) {
   return page.getByRole('button', { name: `${slot} slot`, exact: true })
@@ -157,18 +197,16 @@ function readStatValue(text: string) {
   return match ? Number(match[0]) : 0
 }
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('user can run a basic local physical DPS simulation', async ({ page }) => {
+test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
-  await expect(page.getByRole('heading', { name: /simulation/i })).toBeVisible()
+  // Simulation is a tab now rather than a panel on this one, so what belongs here is that the way in
+  // exists. The panel itself is asserted at the end, after the character is set up.
+  await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toBeVisible()
 
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
@@ -195,13 +233,15 @@ test.skip('user can run a basic local physical DPS simulation', async ({ page })
     .flatMap((slot) => Object.values(slot.item.stats ?? {}))
     .filter((value) => value !== 0)
   expect(relicStats, 'a warrior must not inherit stats from a totem/libram/idol').toEqual([])
+
+  // And the simulation itself still runs for the default character.
+  await openSimulationTab(page)
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/estimated dps/i)).toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
+test('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
   await page.goto('/')
 
   await page.getByLabel('Faction').selectOption('Horde')
@@ -222,18 +262,15 @@ test.skip('class, faction, race, gems, and caster simulation flow work', async (
   await selectSlotGem(page, 'Head', 'Red', 'Runed Living Ruby')
   await selectSlotEnchant(page, 'Head', 'Glyph of Power')
 
+  // The rail is always on screen; the simulation result is a tab away.
   await expect(page.getByTestId('stat-spell-power')).toBeVisible()
-
+  await runSimulation(page)
   await expect(page.getByText(/Estimated DPS/i)).toBeVisible()
   await expect(page.getByText(/Spell hit\/crit table/i)).toBeVisible()
   await expect(page.getByText('Spell power scaling', { exact: true })).toBeVisible()
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('healer and tank roles produce role-specific results', async ({ page }) => {
+test('healer and tank roles produce role-specific results', async ({ page }) => {
   await page.goto('/')
 
   await page.getByLabel('Class').selectOption('Priest')
@@ -241,11 +278,14 @@ test.skip('healer and tank roles produce role-specific results', async ({ page }
   await page.getByLabel('Specialization').selectOption('Holy')
   await expect(page.getByText('Healer', { exact: true })).toBeVisible()
   await selectSlotItem(page, 'Hands', 'healers-grace-gloves')
-  await selectSlotEnchant(page, 'Hands', 'Enchant Gloves - Major Healing')
+  await selectSlotEnchant(page, 'Hands', 'Gloves - Major Healing')
 
+  // Gear on the planner, results on the simulation tab, and back again for the tank half.
+  await runSimulation(page)
   await expect(page.getByText(/Estimated Healing/i)).toBeVisible()
   await expect(page.getByText(/Heal crit\/haste estimate/i)).toBeVisible()
 
+  await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Protection')
   await expect(page.getByText('Tank', { exact: true })).toBeVisible()
@@ -253,6 +293,8 @@ test.skip('healer and tank roles produce role-specific results', async ({ page }
     // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
   // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
   await selectSlotItem(page, 'Off Hand', 'aldori-legacy-defender')
+
+  await runSimulation(page)
 
   // The tank path has to use the *defender-side* base chances. It previously reused the
   // attacker-side formulas symmetrically, which handed the player the boss's own 14% parry and made
@@ -616,23 +658,27 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await expect(itemName).toHaveCSS('color', 'rgb(163, 53, 238)')
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
+test('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
   await page.goto('/')
 
-  // Default Warrior/Fury is Physical DPS -> amber accent.
-  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(245, 158, 11)')
+  // The accents are the muted set now. They were amber-500/violet-500/teal-400/blue-400, which
+  // competed with epic purple and rare blue for attention; role is real information, but item quality
+  // has to stay the loudest colour on screen. Values come from roleAccentColors.
+  const physicalDps = 'rgb(156, 115, 70)'
+  const healer = 'rgb(77, 138, 128)'
+
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', physicalDps)
 
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByLabel('Specialization').selectOption('Holy')
 
-  // Holy Priest is a Healer -> teal accent, and it should carry through to the Stats and Simulator panels too.
-  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', 'rgb(45, 212, 191)')
-  await expect(page.getByRole('region', { name: 'Stats' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
-  await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', 'rgb(45, 212, 191)')
+  // Holy Priest is a Healer, and the accent carries to the rail and the simulator too.
+  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', healer)
+  // The rail is deliberately not accented — it is chrome, not a panel, and an accent bar down the
+  // side of the whole app would be the loudest thing on screen.
+
+  await openSimulationTab(page)
+  await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', healer)
 })
 
 test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatment and their own BiS list', async ({ page }) => {
@@ -1048,14 +1094,11 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
+test('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
   await page.goto('/')
 
   // Default character is a Fury Warrior (melee physical DPS).
+  await openSimulationTab(page)
   const weights = page.getByTestId('stat-weights')
   await expect(weights).toBeVisible()
 
@@ -1077,49 +1120,48 @@ test.skip('stat weights rank stats correctly and separate unmodeled stats from c
   await expect(page.getByTestId('stat-weight-hasteRating')).toHaveCount(0)
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('stat weights follow the character role and class', async ({ page }) => {
+test('stat weights follow the character role and class', async ({ page }) => {
   await page.goto('/')
 
   // Hunters run the ranged attack table, so ranged attack power replaces melee AP as the reference.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
   await page.getByLabel('Class').selectOption('Hunter')
+  await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-rangedAttackPower')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-strength')).toHaveCount(0)
   await expect(page.getByTestId('stat-weight-agility')).toBeVisible()
 
   // Casters switch to the spell stat set entirely.
+  await openPlannerTab(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
   await page.getByLabel('Class').selectOption('Mage')
+  await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-spellPower')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-spellCritRating')).toBeVisible()
   await expect(page.getByTestId('stat-weight-attackPower')).toHaveCount(0)
 
   // Healers normalize against healing power and surface MP5 as not-yet-modeled. Gnomes can't be
   // Priests in TBC, so the race has to move first — the Class dropdown genuinely won't offer it.
+  await openPlannerTab(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Human')
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByLabel('Specialization').selectOption('Holy')
+  await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-healingPower')).toContainText('1.00')
   await expect(page.locator('.stat-weights-unmodeled')).toContainText('MP5')
 
   // Tanks normalize against stamina and get the avoidance stat set.
+  await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByLabel('Specialization').selectOption('Protection')
+  await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-stamina')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
+test('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
   await page.goto('/')
-
+  await openSimulationTab(page)
   const mitigation = page.getByTestId('encounter-armor-mitigation')
 
   // Default target is the heavily-armored 10643-armor boss. DR = armor / (armor + K) where
@@ -1131,27 +1173,26 @@ test.skip('encounter settings change armor mitigation and feed back into the sim
   await expect(mitigation).toHaveText('24.9%')
 
   // ...and that has to actually reach the simulation, not just the encounter panel.
+  await page.getByRole('button', { name: /run simulation/i }).click()
   const lowArmorScore = Number(await page.getByTestId('simulation-score').innerText())
 
   await page.getByRole('button', { name: /Heavily armored boss/ }).click()
   await expect(mitigation).toHaveText('50.2%')
+  await page.getByRole('button', { name: /run simulation/i }).click()
   const highArmorScore = Number(await page.getByTestId('simulation-score').innerText())
 
   expect(lowArmorScore).toBeGreaterThan(highArmorScore)
 
   // Target level drives the attack table, so it must move the result too.
   await page.getByLabel('Target level').selectOption('70')
+  await page.getByRole('button', { name: /run simulation/i }).click()
   const evenLevelScore = Number(await page.getByTestId('simulation-score').innerText())
   expect(evenLevelScore).toBeGreaterThan(highArmorScore)
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
+test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
   await page.goto('/')
-
+  await openSimulationTab(page)
   const list = page.getByTestId('upgrade-list')
   await expect(list).toBeVisible()
 
@@ -1186,10 +1227,12 @@ test.skip('upgrade finder ranks real swaps, spans slots, and equipping delivers 
   // The headline claim has to hold: equipping the top pick should move the simulation by
   // approximately the advertised amount. Because equipping applies the same gems the score assumed,
   // this also catches a candidate being scored gemmed but equipped bare.
+  await page.getByRole('button', { name: /run simulation/i }).click()
   const before = Number(await page.getByTestId('simulation-score').innerText())
 
   const topDelta = deltas[0]
   await rows.first().getByRole('button', { name: /equip/i }).click()
+  await page.getByRole('button', { name: /run simulation/i }).click()
   const after = Number(await page.getByTestId('simulation-score').innerText())
 
   expect(after - before).toBeGreaterThan(0)
@@ -1336,30 +1379,26 @@ test('the Raids tab renders a raid, its bosses and an attunement chain', async (
   await expect(attunement.locator('li').first()).toBeVisible()
 })
 
-// Skipped while the simulator is hidden (see SHOW_SIMULATOR in src/App.tsx). The panels this
-// drives are not rendered, so this asserts against a feature the UI deliberately does not show.
-// Kept rather than deleted: the simulation research behind it is the most carefully sourced work
-// in the project, and this coverage should come back with it.
-test.skip('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
+test('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
   // The buffs panel is fully wired into calculateStats, calculateSimulation, stat weights and the
   // upgrade finder, and had no test at all — a regression that silently stopped applying buffs would
   // have passed the whole suite.
   await page.goto('/')
-  const before = Number(await page.getByTestId('simulation-score').innerText())
+  const before = await readSimulationScore(page)
 
   await page.getByTestId('buff-toggle-battle-shout').click()
-  const withBuff = Number(await page.getByTestId('simulation-score').innerText())
+  const withBuff = await readSimulationScore(page)
   expect(withBuff, 'Battle Shout is attack power, so a Fury Warrior must gain from it').toBeGreaterThan(before)
 
   await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  const withFlask = Number(await page.getByTestId('simulation-score').innerText())
+  const withFlask = await readSimulationScore(page)
   expect(withFlask, 'a flask stacks on top of the buff rather than replacing it').toBeGreaterThan(withBuff)
 
   // Toggling back off must return the original number exactly — a buff that applies but never clears
   // would otherwise look correct on the way up and be wrong for the rest of the session.
   await page.getByTestId('buff-toggle-battle-shout').click()
   await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  expect(Number(await page.getByTestId('simulation-score').innerText())).toBe(before)
+  expect(await readSimulationScore(page)).toBe(before)
 })
 
 test('every spec can fill every gear slot the UI shows it', async () => {

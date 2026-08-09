@@ -36,23 +36,22 @@ const initialCharacter: CharacterProfile = {
   spec: 'Fury',
 }
 
+type AppTab = 'planner' | 'simulation' | 'raids' | 'professions'
+
 /**
- * The simulator is hidden, not deleted.
+ * Simulation is its own tab rather than more panels under the planner.
  *
- * `src/domain/simulation/` and `src/features/simulator/` hold the most carefully sourced work in the
- * project — the attack tables, the defender-side avoidance research, Effective Health, the armor
- * derivation. Deleting that would throw away research that took real effort to get right, so it stays
- * compiled and type-checked behind this flag until it is brought back deliberately.
+ * It is a different activity from gearing — you gear for a while, then ask what the gear is worth —
+ * and the planner tab already carries five panels. Splitting them is what the persistent rail makes
+ * affordable: the stat totals stay on screen while you simulate, so moving between the two does not
+ * cost you the numbers you were reading.
  *
- * Consequence: stat weights and the upgrade finder are built on the simulation, so they are hidden
- * with it, and the rail shows plain stat totals rather than weighted values.
+ * Everything the simulator computes lives here together: the encounter it runs against, the result,
+ * the stat weights derived from re-running it, and the upgrade finder built on those.
  */
-const SHOW_SIMULATOR = false
-
-type AppTab = 'planner' | 'raids' | 'professions'
-
 const APP_TABS: readonly TabDefinition<AppTab>[] = [
   { id: 'planner', label: 'Character Planner' },
+  { id: 'simulation', label: 'Simulation' },
   { id: 'raids', label: 'Raids' },
   { id: 'professions', label: 'Professions' },
 ]
@@ -176,15 +175,15 @@ function App() {
             onToggleConsumable={toggleConsumable}
             onToggleTargetDebuff={toggleTargetDebuff}
           />
-          {SHOW_SIMULATOR && (
-            <>
-              <EncounterPanel target={target} role={role} onChange={updateTarget} />
-              <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
-              <StatWeightsPanel weights={statWeights} role={role} />
-              <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
-            </>
-          )}
           <BuildPanel state={buildState} role={role} onImport={importBuild} />
+        </>
+      )}
+      {activeTab === 'simulation' && (
+        <>
+          <EncounterPanel target={target} role={role} onChange={updateTarget} />
+          <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
+          <StatWeightsPanel weights={statWeights} role={role} />
+          <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
         </>
       )}
       {activeTab === 'raids' && <RaidsPanel />}
