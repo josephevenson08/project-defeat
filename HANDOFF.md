@@ -4,7 +4,7 @@
 disagrees with this file, trust git.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`88cf69b`**, everything pushed.
+`josephevenson08/project-defeat`, currently at **`0cfefb6`**, everything pushed.
 
 ---
 
@@ -30,7 +30,7 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 60 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 64 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -75,7 +75,7 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
 | Enchants | 22 | **91** |
 | Consumables | 14 | **31** |
 | Gem/enchant recommendations | none | **107 + 274** |
-| Raid buffs | 14 | 14 — see below |
+| Raid buffs | 14, all unverified | **33**, each cited to a spell rank |
 
 ---
 
@@ -98,40 +98,40 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
   "Elixir of Major Fire Power" → *Elixir of Major Firepower*.
 - **Three BiS slots have no ranking, correctly** — Feral and Retribution swing two-handers, and the
   Holy Paladin guide publishes no Libram section. Recorded in `RANKING_GAPS` in the test file.
+- **The raid buffs were the last invented dataset, and five of the fourteen were wrong** — not
+  approximate, wrong. Gift of the Wild was modelled as +5% to all stats when it is a flat +14; Wrath
+  of Air Totem as spell haste when it is spell power (haste is the WotLK version of that totem);
+  Totem of Wrath as 141 spell power when it grants none at all. Now 33 entries, each with the
+  `spellId` of the rank its numbers were read from.
+- **Wowhead's *listing* page is what makes spell selection unambiguous.** The earlier attempt failed
+  partly on picking the right spell. `/tbc/spells/name:X` carries rank, level and required class per
+  row, which is enough to take the max rank a raid uses and reject the NPC copies. The rows live in
+  a `var listviewspells = [...]` assignment in the served HTML — the `new Listview({...})` call
+  further down only references the variable, so reading that call gets you an identifier, not data.
+  The rows are JS object literals, not JSON (`quality:-1` is unquoted), and spell names contain
+  colons, so bare keys have to be quoted with a scanner rather than a regex.
+- **Individual spell pages carry the tooltip in `g_spells[<id>].tooltip_enus`**, which is far more
+  reliable than the prose the old parser was fighting.
+- **wowsims is not infallible where it disagrees with a tooltip.** It models Blessing of Wisdom at
+  42 mp5; spells 27142 and 27143 both say 41. That was the only outright conflict across all 33 —
+  everything else agreed to the digit — but it is the reason the tooltip is the tie-breaker.
+- **Fifteen of the 33 buffs cannot be expressed as stats at all** (threat, maximum health,
+  resistances, damage multipliers, weapon procs, timed cooldowns). They carry `notModelled` and
+  render without a checkbox rather than being omitted. Adding any of them to the model properly
+  means new `StatBlock` fields or simulation plumbing, not a data edit.
 
 ---
 
 ## What's left
 
-### 1. Raid buffs — 14 of 33, and automation does not work
-
-Three routes were tried and all three fail. **Do not try to parse them again.**
-
-1. wowsims `buffs.go` — only 7 of 36 stat values are literals; the rest are expressions, several
-   tristate lookups encoding talented-vs-not, needing Go control-flow parsing to attribute.
-2. Wowhead tooltips — 33 buffs written 33 different ways ("increasing **their** Intellect by 40",
-   "**Gives** 861 additional armor"). A working parser got **6 of 33**, and widening it starts
-   matching wrong numbers: "Summons a totem with **5** health … increases strength … by 86".
-3. Spell selection is ambiguous in both directions — the lowest exact-name match is often rank 1
-   (Power Word: Fortitude 1243 = 3 stamina), the highest is often a monster's copy (Battle Shout
-   30635, "NPC Abilities", = 4 attack power).
-
-The half-working ingester was deleted rather than committed. **If you want these, add them by hand**
-with each value checked, the way the 23 item and 15 enchant supplements were done.
-
-Missing: Commanding Shout, Blessing of Salvation, Blessing of Sanctuary, Devotion Aura, Retribution
-Aura, Sanctity Aura, Arcane Brilliance, Prayer of Spirit, Shadow Protection, Power Infusion, Thorns,
-Innervate, Ferocious Inspiration, Bloodlust, Windfury Totem, Mana Spring Totem, Mana Tide Totem,
-Tranquil Air Totem, Unleashed Rage, Blood Pact.
-
-### 2. The simulation's own known gaps
+### 1. The simulation's own known gaps
 
 Now visible on the Simulation tab, so its limitations are visible too. A geared Fury warrior reads
 ~158 DPS, which is low — rotation modelling is the acknowledged gap and the panel says so. Also:
 healer HPS has **no mana constraint**, meta gem activation requirements are **never checked**, weapon
 and armour procs are unpopulated (schema exists, data does not), and rotations cover 2 specs of 27.
 
-### 3. Polish
+### 2. Polish
 
 - Tier set bonuses are defined for only **9 sets against 222** ingested set names, so most sets
   correctly show nothing rather than inventing bonuses.
