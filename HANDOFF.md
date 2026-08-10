@@ -8,6 +8,17 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 
 ---
 
+## Live site
+
+**https://josephevenson08.github.io/project-defeat/** — deployed by `.github/workflows/deploy.yml`
+on every push to `main`, gated on `tsc`/`lint`/`build`. Playwright is deliberately not run in CI (it
+needs browser downloads and a dev server); it runs locally before a push, which is what the commit
+gate rule below is about.
+
+`vite.config.ts` sets `base` **for builds only**. Pages serves this as a project site under
+`/project-defeat/`, but the dev server and the whole Playwright suite address the app at `/`, so
+setting `base` globally sends every test to a path nothing serves.
+
 ## Rules
 
 - **Push to `origin/main` after each completed feature.** No branches or PRs unless asked.
@@ -155,7 +166,42 @@ and Fury already layers Bloodthirst and Whirlwind onto white damage. What it can
 Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
 for melee, not a priority-list engine, which is mostly already there.
 
-### 2. Polish
+### 2. UI — audited, three fixes applied, two findings retracted
+
+A measured audit of the running app (not a stylesheet read) found and fixed:
+
+- **`--text-faint` failed WCAG AA.** `#6e6e6e` measured **3.88:1** on `--surface-0`, and it carries
+  every uppercase eyebrow plus the rail's group headers — all 11-12px, none large text. Now
+  `#858585`, 5.37:1 on `--surface-0` and 5.08:1 on the rail.
+- **14 hardcoded `color: #ffffff`** bypassed the token system — an undocumented fourth text level.
+  Named as `--text-strong` rather than flattened, because the emphasis was doing real work.
+- **`small` was the browser default** 0.8333em → 13.3333px, a size nobody chose. Pinned to 13px.
+- **Panel section headings** were 14px in two places and 15px in a third. Unified to 15px.
+
+**Two findings did not survive verification, and are recorded so they are not "re-found":**
+
+- The buff checkboxes look like 31 sub-minimum tap targets at 13x13, but the `<label>` wraps the
+  input and *is* the target, at 405x58 with a pointer cursor. WCAG 2.2 SC 2.5.8 already passed.
+- Apparent 158-character line lengths were short labels in wide containers. Only one element
+  (`.panel-copy`) genuinely ran long, at ~117 chars/line; it is now capped at `72ch`.
+
+Still open, and deliberately left for a design decision rather than guessed at:
+
+- **The planner tab is a single ~25,000px scroll column** — about 35 screen-heights — stacking
+  Character, Gear, BiS, Buffs and Build. Reaching Buffs means scrolling past 19 gear slots. The rail
+  solved "don't lose your numbers when you move between tabs"; nothing solves moving *within* the
+  planner. Sub-tabs, a jump nav, or collapsible panels are all plausible; it is not a styling fix.
+- **The rail shows stats the spec cannot use.** On a Fury Warrior: Feral AP, Ranged AP, the entire
+  six-row Spell group, and six rows reading 0 — roughly 12 of 27 rows carrying no information, on
+  the one surface that is always visible.
+- **`h3` is styled at five sizes** (11, 13, 15, 20px and a mono label variant). The 11px mono
+  uppercase one is a deliberate label pattern, not a smaller heading, so this is not purely a bug —
+  but the tag is doing two different jobs and that is worth resolving deliberately.
+- Base surface is `#0a0a0a`, near-pure black. Material and Smashing both recommend ~`#121212`;
+  pure black maximises halation and spends the darkest value available. Left alone — it is a
+  deliberate part of the stated aesthetic and the contrast measurements all pass.
+
+### 3. Polish
 
 - Tier set bonuses now cover **all 34 sets of Tier 4 and Tier 5** — 17 each, 71 bonuses — read
   verbatim off the Wowhead item page in `sourcedFrom`. The other 188 ingested set names (Tier 6,
