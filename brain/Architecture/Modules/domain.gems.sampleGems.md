@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gems/sampleGems.ts
-lines: 30
+lines: 52
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gems.sampleGems
 
-`src/domain/gems/sampleGems.ts` · **domain** layer · 30 lines
+`src/domain/gems/sampleGems.ts` · **domain** layer · 52 lines
 
 From the top of the file:
 
@@ -20,7 +20,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `getGemById`, `getGemsForSocket`
+**function** — `getGemById`, `getGemsForSocket`, `socketBonusIsActive`
 
 **const** — `sampleGems`
 

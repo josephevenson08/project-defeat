@@ -6,22 +6,10 @@ import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import { getConsumableById } from '../../domain/consumables/sampleConsumables'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { deriveItemArmor } from '../../domain/gear/armorValues'
-import { getGemById } from '../../domain/gems/sampleGems'
+import { getGemById, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { effectUptime } from '../../domain/simulation/combatConstants'
 import { addStats, applyStatMultipliers, scaleStats } from '../../domain/stats/statUtils'
-import type { SocketColor } from '../../domain/gear/itemTypes'
 import { type StatBlock } from './statsTypes'
-
-function socketBonusIsActive(sockets: readonly SocketColor[] = [], gemIds: readonly string[]) {
-  if (sockets.length === 0) return false
-
-  return sockets.every((socket, index) => {
-    const gem = getGemById(gemIds[index])
-    if (!gem) return false
-    if (socket === 'Meta') return gem.color === 'Meta'
-    return gem.color === socket
-  })
-}
 
 export function calculateStats(
   character: CharacterProfile,

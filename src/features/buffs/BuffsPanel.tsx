@@ -3,6 +3,7 @@ import type { CharacterRole } from '../../domain/character/characterTypes'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import { modelledBuffs, unmodelledBuffs } from '../../domain/buffs/sampleBuffs'
 import { statLabels } from '../../domain/stats/statTypes'
+import { describeStats } from '../../domain/stats/describeStats'
 import { sampleTargetDebuffs } from '../../domain/buffs/sampleTargetDebuffs'
 import type { BuildRole } from '../../domain/gear/itemTypes'
 import type { Consumable, ConsumableCategory } from '../../domain/consumables/consumableTypes'
@@ -28,19 +29,10 @@ function fitsRole(entry: { roles?: BuildRole[] }, role: CharacterRole) {
 
 const statLabelsByKey = new Map<string, string>(statLabels)
 
-function statSummary(stats: Buff['stats'] | Consumable['stats']) {
-  if (!stats) return ''
-  return Object.entries(stats)
-    .map(([key, value]) => {
-      // Rounded because the percentage-based auras are stored as the rating that buys them at level
-      // 70 — Moonkin Aura's 5% is 110.5 spell crit rating, and a readout is not the place for that
-      // decimal. The unrounded value is what actually reaches the stat total.
-      return `${signed(Math.round(value ?? 0))} ${statLabelsByKey.get(key) ?? key}`
-    })
-    .join(', ')
-}
+/** Shared with the gear popup — see `describeStats`, which is where the rounding is explained. */
+const statSummary = describeStats
 
-/** Fel Strength Elixir really does cost 10 Stamina, and it used to read "+-10". */
+/** A negative contribution is real, and must not read "+-10". */
 function signed(value: number) {
   return value < 0 ? String(value) : `+${value}`
 }

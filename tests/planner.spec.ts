@@ -216,7 +216,8 @@ async function withSlotOpen(page: Page, slot: string, assertions: () => Promise<
   await assertions()
   await closeSlot(page)
 }
-import { getGemById } from '../src/domain/gems/sampleGems'
+import { getGemById, sampleGems, socketBonusIsActive } from '../src/domain/gems/sampleGems'
+import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 
@@ -1409,6 +1410,35 @@ test('the Raids tab renders a raid, its bosses and an attunement chain', async (
   const attunement = page.getByTestId('raid-attunement')
   await expect(attunement).toBeVisible()
   await expect(attunement.locator('li').first()).toBeVisible()
+})
+
+test('a hybrid gem earns the socket bonus it satisfies', async () => {
+  // The gem dropdown offers hybrids for a socket — an Orange gem is legal in a red socket and, per
+  // TBC's rules, satisfies a red socket bonus. calculateStats disagreed: it kept a private copy of
+  // this check that compared `gem.color === socket` outright, so every hybrid was offered, accepted,
+  // and then silently denied the bonus. Hybrids are 118 of the 212 gems, so this was the common case.
+  const red: SocketColor[] = ['Red']
+
+  const orange = sampleGems.find((gem) => gem.color === 'Orange')
+  const yellow = sampleGems.find((gem) => gem.color === 'Yellow')
+  const pureRed = sampleGems.find((gem) => gem.color === 'Red')
+  expect(orange && yellow && pureRed, 'catalogue must carry all three colours to test this').toBeTruthy()
+
+  expect(socketBonusIsActive(red, [pureRed!.id]), 'a red gem in a red socket').toBe(true)
+  expect(socketBonusIsActive(red, [orange!.id]), 'an Orange gem counts as red — this was the bug').toBe(true)
+  expect(socketBonusIsActive(red, [yellow!.id]), 'a yellow gem does not satisfy a red socket').toBe(false)
+  expect(socketBonusIsActive(red, ['']), 'an empty socket earns nothing').toBe(false)
+  expect(socketBonusIsActive([], []), 'an item with no sockets has no bonus to earn').toBe(false)
+
+  // Meta is exclusive in both directions, and is the one case the old exact-match check got right.
+  const meta = sampleGems.find((gem) => gem.color === 'Meta')
+  expect(socketBonusIsActive(['Meta'], [meta!.id])).toBe(true)
+  expect(socketBonusIsActive(['Meta'], [pureRed!.id])).toBe(false)
+  expect(socketBonusIsActive(red, [meta!.id])).toBe(false)
+
+  // Every socket must be satisfied, not just the first.
+  expect(socketBonusIsActive(['Red', 'Yellow'], [orange!.id, yellow!.id])).toBe(true)
+  expect(socketBonusIsActive(['Red', 'Yellow'], [orange!.id, pureRed!.id])).toBe(false)
 })
 
 test('the app opens on a section picker, and the rail follows the character', async ({ page }) => {

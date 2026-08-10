@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/stats/calculateStats.ts
-lines: 108
+lines: 96
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.stats.calculateStats
 
-`src/features/stats/calculateStats.ts` · **features** layer · 108 lines
+`src/features/stats/calculateStats.ts` · **features** layer · 96 lines
 
 _No doc comment at the top of this file._
 
@@ -24,7 +24,6 @@ _No doc comment at the top of this file._
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`
-- [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`

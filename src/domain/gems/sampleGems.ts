@@ -27,3 +27,25 @@ export function getGemById(id: string | undefined) {
 export function getGemsForSocket(socket: SocketColor): readonly Gem[] {
   return sampleGems.filter((gem) => gemFitsSocket(gem, socket))
 }
+
+/**
+ * Whether an item's socket bonus is earned: every socket filled, and every gem satisfying the colour
+ * of the socket it sits in.
+ *
+ * Lives here, next to `gemFitsSocket`, because it was previously a private copy inside
+ * `calculateStats` that compared `gem.color === socket` directly — an exact-colour test. That quietly
+ * denied the bonus to every hybrid: an Orange gem in a red socket was offered by the gem dropdown,
+ * accepted, and then failed the check, so the socket bonus vanished with no explanation. Hybrids are
+ * 118 of the 212 gems, so this was the common case rather than an edge one.
+ *
+ * An empty socket fails for the same reason a mismatched one does, which is what the upgrade finder
+ * already assumed.
+ */
+export function socketBonusIsActive(sockets: readonly SocketColor[] = [], gemIds: readonly string[] = []) {
+  if (sockets.length === 0) return false
+
+  return sockets.every((socket, index) => {
+    const gem = getGemById(gemIds[index])
+    return gem ? gemFitsSocket(gem, socket) : false
+  })
+}

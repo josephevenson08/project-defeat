@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
-import { getGemsForSocket } from '../../domain/gems/sampleGems'
+import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
+import { describeStats } from '../../domain/stats/describeStats'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
@@ -34,6 +35,8 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
 
   const equipped = gear[slot]
   const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
+  // The same function calculateStats uses, so the panel can never claim a bonus the totals withheld.
+  const socketBonusMet = socketBonusIsActive(equipped.item.sockets, equipped.gemIds)
   const enchants = getEnchantsForSlot(slot, character, equipped.item)
 
   /**
@@ -149,30 +152,74 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
 
           {equipped.item.sockets?.length ? (
             <div className="popup-sockets" aria-label={`${displayName} sockets`}>
-              {equipped.item.sockets.map((socket, index) => (
-                <label className="popup-field" key={`${slot}-${socket}-${index}`}>
-                  <span className="popup-field-label">
-                    <i className={`socket-dot socket-${socket.toLowerCase()}`} aria-hidden="true" />
-                    {socket} Socket
-                  </span>
-                  <select
-                    aria-label={`${displayName} ${socket} socket`}
-                    value={equipped.gemIds[index] ?? ''}
-                    onChange={(event) => onChangeGem(index, event.target.value)}
-                  >
-                    <option value="">No gem</option>
-                    {/* Only gems that fit this socket, hybrids included — an Orange gem is legal in
-                        a red socket and satisfies its bonus, so filtering to exact colour would hide
-                        more than half the catalogue. */}
-                    {getGemsForSocket(socket).map((gem) => (
-                      <option key={gem.id} value={gem.id}>
-                        {gem.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ))}
-              {equipped.item.socketBonus && <p className="popup-note">Socket bonus applies when gem colours match.</p>}
+              {equipped.item.sockets.map((socket, index) => {
+                const gem = getGemById(equipped.gemIds[index])
+                return (
+                  <div className="popup-socket" key={`${slot}-${socket}-${index}`}>
+                    <label className="popup-field">
+                      <span className="popup-field-label">
+                        <i className={`socket-dot socket-${socket.toLowerCase()}`} aria-hidden="true" />
+                        {socket} Socket
+                      </span>
+                      <select
+                        aria-label={`${displayName} ${socket} socket`}
+                        value={equipped.gemIds[index] ?? ''}
+                        onChange={(event) => onChangeGem(index, event.target.value)}
+                      >
+                        <option value="">No gem</option>
+                        {/* Only gems that fit this socket, hybrids included — an Orange gem is legal in
+                            a red socket and satisfies its bonus, so filtering to exact colour would hide
+                            more than half the catalogue. */}
+                        {getGemsForSocket(socket).map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {/* The socketed gem, as a frame plus what it actually gives you. A dropdown alone
+                        names the gem but hides the reason you picked it. */}
+                    {gem ? (
+                      <div className="gem-chip" data-testid={`gem-chip-${slot}-${index}`}>
+                        <span className={`gem-frame gem-frame-${gem.color.toLowerCase()}`} aria-hidden="true" />
+                        <span className="gem-chip-text">
+                          <span className="gem-chip-name" style={{ color: getQualityColor(gem.quality) }}>
+                            {gem.name}
+                          </span>
+                          {/*
+                            Some gems carry only resistances or spell penetration, which StatBlock
+                            has no fields for — they live in `extraStats` and reach no total. Saying
+                            so beats an empty line, which reads as a rendering fault rather than as
+                            the gem genuinely giving this app nothing to work with.
+                          */}
+                          <span className="gem-chip-stats">
+                            {describeStats(gem.stats) ||
+                              (gem.extraStats
+                                ? `${Object.entries(gem.extraStats)
+                                    .map(([key, value]) => `+${value} ${key.replace(/([a-z])([A-Z])/g, '$1 $2')}`)
+                                    .join(', ')} — not counted in your totals`
+                                : 'No stats this app models')}
+                          </span>
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="gem-chip gem-chip-empty">Empty — this socket contributes nothing.</p>
+                    )}
+                  </div>
+                )
+              })}
+
+              {equipped.item.socketBonus && (
+                /*
+                 * Whether the bonus is *currently* earned, not just what would earn it. The old copy
+                 * ("applies when gem colours match") left you to work out whether yours did.
+                 */
+                <p className={`popup-socket-bonus ${socketBonusMet ? 'popup-socket-bonus-active' : ''}`.trim()} data-testid="socket-bonus-status">
+                  <strong>Socket bonus</strong> {describeStats(equipped.item.socketBonus)} —{' '}
+                  {socketBonusMet ? 'active' : 'not earned: every socket needs a gem whose colour matches it'}
+                </p>
+              )}
             </div>
           ) : null}
 

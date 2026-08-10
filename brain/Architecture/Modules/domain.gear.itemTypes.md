@@ -50,7 +50,6 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 
