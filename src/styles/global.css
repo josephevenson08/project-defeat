@@ -577,10 +577,80 @@ select {
 }
 
 /* Two columns of slots, as in the WoWSims gear panel this is modelled on. */
-.gear-grid {
+/*
+ * The paperdoll: armour down the left, everything else down the right, weapons across the bottom —
+ * the arrangement of the in-game character sheet, so the position of a slot is itself the label.
+ *
+ * Collapses to one column under 760px, where two columns of slot rows would be too narrow to read
+ * an item name in. The order still reads left column, then right, then weapons, which is the same
+ * order the DOM is in — so the mobile layout is the source order and needs no reshuffling.
+ */
+.gear-paperdoll {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-areas:
+    'left right'
+    'weapons weapons';
+  grid-template-columns: 1fr 1fr;
+}
+
+.gear-column-left {
+  grid-area: left;
+}
+
+.gear-column-right {
+  grid-area: right;
+}
+
+.gear-weapons {
+  grid-area: weapons;
+}
+
+.gear-column,
+.gear-weapons {
+  display: grid;
+  gap: 8px;
+}
+
+/* Weapons sit in a row of their own, as they do on the character sheet. */
+.gear-weapons {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 4px;
+}
+
+/*
+ * The right column is mirrored so its glyphs sit on the outside edge, pointing in at the character —
+ * again matching the game. It is a visual reversal only: the DOM order is unchanged, so tab order
+ * and screen-reader order still run top to bottom.
+ */
+.gear-column-right .gear-cell {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+/* `.gear-cell-text` is a grid, so end-alignment is justify-items rather than align-items. */
+.gear-column-right .gear-cell-text {
+  justify-items: end;
+}
+
+@media (max-width: 760px) {
+  .gear-paperdoll {
+    grid-template-areas:
+      'left'
+      'right'
+      'weapons';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Mirroring only makes sense with two columns flanking something. */
+  .gear-column-right .gear-cell {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .gear-column-right .gear-cell-text {
+    justify-items: start;
+  }
 }
 
 .gear-cell {

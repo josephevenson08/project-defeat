@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearPanel.tsx
-lines: 133
+lines: 147
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearPanel
 
-`src/features/gear/GearPanel.tsx` · **features** layer · 133 lines
+`src/features/gear/GearPanel.tsx` · **features** layer · 147 lines
 
 _No doc comment at the top of this file._
 
