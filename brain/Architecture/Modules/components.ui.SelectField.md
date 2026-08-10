@@ -23,7 +23,7 @@ _None._
 
 ## Imported by
 
-- [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
+- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
 
 ## Concepts & phases
 

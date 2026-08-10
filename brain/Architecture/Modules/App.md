@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 211
+lines: 241
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 211 lines
+`src/App.tsx` · **app** layer · 241 lines
 
 _No doc comment at the top of this file._
 
@@ -31,8 +31,9 @@ _Nothing exported (side-effect or style module)._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
+- [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
-- [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
+- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`

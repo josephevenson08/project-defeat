@@ -7,7 +7,8 @@ import { BuildPanel } from './features/builds/BuildPanel'
 import { loadBuildFromStorage, saveBuildToStorage } from './features/builds/buildStorage'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
 import type { SavedBuild } from './domain/builds/buildTypes'
-import { CharacterPanel } from './features/character/CharacterPanel'
+import { CharacterCreator } from './features/character/CharacterCreator'
+import { CharacterRail } from './features/character/CharacterRail'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
 import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
@@ -79,6 +80,12 @@ function App() {
 
   const [introComplete, setIntroComplete] = useState(false)
   const [sectionChosen, setSectionChosen] = useState(false)
+  /*
+   * Whether the character has been chosen deliberately this session. A restored build counts — being
+   * walked through creation again every time you reload, having already made the choices, would be a
+   * ceremony rather than a journey.
+   */
+  const [characterChosen, setCharacterChosen] = useState(() => Boolean(loadBuildFromStorage()))
   // Read once at mount: the flag comes from the URL and nothing in-session changes it.
   const [simulationEnabled] = useState(isSimulationEnabled)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
@@ -176,18 +183,41 @@ function App() {
     )
   }
 
+  // Creation runs before the planner rather than inside it: the whole tab is about a character, so
+  // there is nothing worth showing until there is one. Reachable again from the rail's "Start over".
+  if (activeTab === 'planner' && !characterChosen) {
+    return (
+      <CharacterCreator
+        initial={character}
+        onComplete={(chosen) => {
+          updateCharacter(chosen)
+          setCharacterChosen(true)
+        }}
+        onCancel={() => setSectionChosen(false)}
+      />
+    )
+  }
+
   return (
     <AppShell
       // Stats belong to a character, and only the planner has one in play. A rail of numbers next to
       // a raid's loot table would be describing something that is not on screen.
-      rail={activeTab === 'planner' ? <StatsRail stats={stats} /> : undefined}
+      rail={
+        activeTab === 'planner' ? (
+          <>
+            <CharacterRail character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
+            <StatsRail stats={stats} />
+          </>
+        ) : undefined
+      }
       tabs={visibleTabs(simulationEnabled)}
       activeTab={activeTab}
       onTabChange={setActiveTab}
     >
       {activeTab === 'planner' && (
         <>
-          <CharacterPanel character={character} onChange={updateCharacter} />
+          {/* The character selects live in the rail now — see CharacterRail. This tab is what you
+              are doing, not who you are. */}
           <GearPanel character={character} gear={gear} onChange={updateGear} />
           <BisPanel character={character} gear={gear} onEquip={updateGear} />
           <BuildPanel state={buildState} role={role} onImport={importBuild} />

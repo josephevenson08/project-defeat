@@ -85,6 +85,15 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
 async function openApp(page: Page, section: 'planner' | 'raids' | 'professions' = 'planner') {
   await page.goto('/')
   await page.getByTestId(`section-${section}`).click()
+
+  // The planner runs character creation first, and every test starts with empty storage so it always
+  // appears. The four steps open on the defaults — Alliance, Human, Warrior, Fury — which is the
+  // character the suite has always assumed, so this walks through without choosing anything. Tests
+  // that want a different character change it afterwards through the rail, exactly as before.
+  if (section === 'planner') {
+    for (let step = 0; step < 3; step++) await page.getByTestId('creator-next').click()
+    await page.getByTestId('creator-confirm').click()
+  }
 }
 
 async function openSimulationTab(page: Page) {
@@ -1419,7 +1428,13 @@ test('the app opens on a section picker, and the rail follows the character', as
   await expect(page.getByRole('region', { name: 'Character summary' }), 'no character is in play on Raids, so no stat rail').toHaveCount(0)
 
   // The rail is stats, and stats belong to a character — so it appears on the planner and only there.
+  // Reaching the planner means creating a character first, which is the point of the creator: the
+  // tab is about a character, so there is nothing to show until there is one.
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
+  await expect(page.getByTestId('character-creator')).toBeVisible()
+  for (let step = 0; step < 3; step++) await page.getByTestId('creator-next').click()
+  await page.getByTestId('creator-confirm').click()
+
   await expect(page.locator('.rail')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
 

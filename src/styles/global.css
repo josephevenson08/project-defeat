@@ -138,6 +138,196 @@ select {
   min-height: 100vh;
 }
 
+/*
+ * Character creation, stepped. Full-bleed like the section picker, because it is a decision you make
+ * once with nothing else competing for attention.
+ */
+.creator {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+.creator-inner {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  max-width: 940px;
+  width: 100%;
+}
+
+/* The steps already answered, kept on screen with their answers so the path stays readable. */
+.creator-progress {
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0 24px 0 0;
+}
+
+.creator-progress li {
+  display: grid;
+  gap: 2px;
+}
+
+.creator-step-index {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+}
+
+.creator-step-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.creator-step-answer {
+  color: var(--creator-accent);
+  font-size: 12px;
+  min-height: 14px;
+}
+
+.creator-step-todo .creator-step-title {
+  color: var(--text-faint);
+}
+
+.creator-step-current .creator-step-title {
+  color: var(--text-strong);
+}
+
+.creator-step-current .creator-step-index {
+  color: var(--creator-accent);
+}
+
+.creator-eyebrow {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.creator-stage h2 {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+  margin: 6px 0 0;
+}
+
+.creator-prompt {
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 8px 0 24px;
+  max-width: 60ch;
+}
+
+.creator-options {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  margin-bottom: 28px;
+}
+
+.creator-option {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  padding: 12px 14px;
+  text-align: left;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.creator-option:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+
+.creator-option-selected {
+  border-color: var(--creator-accent);
+  color: var(--text-strong);
+}
+
+.creator-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.creator-next {
+  background: var(--creator-accent);
+  border: 1px solid var(--creator-accent);
+  border-radius: var(--radius);
+  color: #0a0a0a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 18px;
+}
+
+.creator-back {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  padding: 11px 18px;
+}
+
+.creator-back:hover {
+  color: var(--text);
+}
+
+/*
+ * Who the character is, above the numbers they produce.
+ *
+ * Carries the role accent on its top rule, the same way a panel does. That accent is the one piece
+ * of colour tied to what the character *is* rather than to an item, so it belongs on the block that
+ * states it — and it is the only thing on the rail that changes colour when the spec changes.
+ */
+.rail-character {
+  border-bottom: 1px solid var(--line);
+  border-top: 2px solid var(--rail-accent);
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  padding-top: 16px;
+}
+
+.rail-character-head {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rail-character-restart {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rail-character-restart:hover {
+  color: var(--rail-accent);
+}
+
 /* Raids and Professions have no character in play, so no rail. The main pane takes the full width
    rather than leaving a 288px gap where the stats used to be. */
 .app-shell-no-rail {

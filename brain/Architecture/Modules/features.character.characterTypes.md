@@ -26,7 +26,8 @@ _No doc comment at the top of this file._
 - [[App]] — `src/App.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
-- [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
+- [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
+- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
