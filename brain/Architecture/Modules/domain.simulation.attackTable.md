@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/attackTable.ts
-lines: 282
+lines: 295
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.attackTable
 
-`src/domain/simulation/attackTable.ts` · **domain** layer · 282 lines
+`src/domain/simulation/attackTable.ts` · **domain** layer · 295 lines
 
 _No doc comment at the top of this file._
 

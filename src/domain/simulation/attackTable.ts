@@ -96,6 +96,17 @@ export type WhiteAttackTableInputs = {
   expertiseSkillPoints: number
   missReduction: number
   rawCritChance: number
+  /**
+   * Whether the attacker is behind the target. **Parry and block both require the defender to be
+   * facing the attacker**, so from behind they are simply impossible — not reduced, zero.
+   *
+   * This matters more than it sounds. Against a level 73 boss the parry row alone is 14% and block
+   * is another 5%, so applying them to a melee DPS removes nearly a fifth of its swings for a
+   * positional reason that never happens: a melee DPS is behind the boss for the entire fight. It is
+   * required rather than defaulted because the answer differs by role — a tank holding threat is in
+   * front of the boss and really can be parried.
+   */
+  attacksFromBehind: boolean
 }
 
 /**
@@ -103,16 +114,18 @@ export type WhiteAttackTableInputs = {
  * Glance, Block, Crit, Hit — truncating lower-precedence entries once the running total reaches 100%.
  */
 export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAttackTable {
-  const { skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance } = inputs
+  const { skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind } = inputs
 
   let missChance = computeBaseMissChance(skillDiff)
   if (dualWield) missChance = applyDualWieldMissPenalty(missChance)
   missChance = Math.max(0, missChance - missReduction)
 
   const dodgeChance = computeDodgeChance(skillDiff, expertiseSkillPoints)
-  const parryChance = computeParryChance(skillDiff, expertiseSkillPoints)
+  // Dodge survives from behind; parry and block do not. Expertise therefore keeps working on the
+  // dodge row for a melee DPS, which is why it stays valuable even once parry is off the table.
+  const parryChance = attacksFromBehind ? 0 : computeParryChance(skillDiff, expertiseSkillPoints)
   const glanceChance = computeGlanceChance(skillDiff)
-  const blockChance = computeTargetBlockChance(skillDiff)
+  const blockChance = attacksFromBehind ? 0 : computeTargetBlockChance(skillDiff)
   const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)
 
   const { take, rest } = createOutcomeTaker()
@@ -184,12 +197,12 @@ export type SpecialAttackTable = Pick<WhiteAttackTable, 'miss' | 'dodge' | 'parr
  * separate table rather than a flag on the white one.
  */
 export function buildSpecialAttackTable(inputs: Omit<WhiteAttackTableInputs, 'dualWield'>): SpecialAttackTable {
-  const { skillDiff, expertiseSkillPoints, missReduction, rawCritChance } = inputs
+  const { skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind } = inputs
 
   const missChance = Math.max(0, computeBaseMissChance(skillDiff) - missReduction)
   const dodgeChance = computeDodgeChance(skillDiff, expertiseSkillPoints)
-  const parryChance = computeParryChance(skillDiff, expertiseSkillPoints)
-  const blockChance = computeTargetBlockChance(skillDiff)
+  const parryChance = attacksFromBehind ? 0 : computeParryChance(skillDiff, expertiseSkillPoints)
+  const blockChance = attacksFromBehind ? 0 : computeTargetBlockChance(skillDiff)
   const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)
 
   const { take, rest } = createOutcomeTaker()

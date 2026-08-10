@@ -204,7 +204,8 @@ function resolveRotation(
   )
 
   const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
-  const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance })
+  // A melee DPS spends the whole fight behind the boss, where parry and block cannot happen.
+  const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
   // Blocked specials still land, just reduced; the block value itself isn't modelled, so a blocked
   // hit is counted at full damage here rather than pretending to know the reduction.
   const effectiveMultiplier = table.hit + table.block + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
@@ -309,7 +310,7 @@ function calculatePhysicalDps(
     const offHandItem = catForm ? undefined : gear['Off Hand']?.item
     const dualWield = catForm ? false : isDualWield(gear)
     const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
-    const fullTable = buildWhiteAttackTable({ skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance })
+    const fullTable = buildWhiteAttackTable({ skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
     const glanceRange = computeGlanceDamageRange(skillDiff)
     const avgGlanceMultiplier = (glanceRange.low + glanceRange.high) / 2
     const effectiveMultiplier =
@@ -328,7 +329,10 @@ function calculatePhysicalDps(
       { label: 'Hit chance', value: toPercent(fullTable.hit) },
       { label: 'Crit chance', value: toPercent(fullTable.crit) },
       { label: 'Miss chance', value: toPercent(fullTable.miss) },
-      { label: 'Dodge + parry chance', value: toPercent(fullTable.dodge + fullTable.parry) },
+      // Parry and block are zero for a melee DPS, who is behind the target, so this is the dodge row
+      // alone. Kept as a sum rather than renamed to `fullTable.dodge` so that a future tank or
+      // front-facing caller shows the right total without this line needing to change again.
+      { label: 'Dodge chance', value: toPercent(fullTable.dodge + fullTable.parry) },
       { label: 'Glancing blow chance', value: toPercent(fullTable.glance) },
       { label: 'Armor mitigation', value: toPercent(armorMitigation) },
     ]
@@ -362,7 +366,7 @@ function calculatePhysicalDps(
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
-    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/parry/glance/crit outcomes, then reduced by armor mitigation.${specialSummary}`,
+    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}`,
     breakdown,
   }
 }

@@ -49,6 +49,8 @@ import { getBuffById, modelledBuffs, sampleBuffs, unmodelledBuffs } from '../src
 import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
+  buildSpecialAttackTable,
+  buildWhiteAttackTable,
   computeAttackerBaseCritChance,
 } from '../src/domain/simulation/attackTable'
 import {
@@ -1597,6 +1599,42 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
   // disappears, the panel starts implying tier pieces are being valued when they are not.
   await expect(sets).toContainText(/None of these bonuses are included in the stat totals/i)
   await expect(sets).toContainText(/undervalues tier pieces/i)
+})
+
+test('a melee attacker behind the target cannot be parried or blocked', async () => {
+  // Parry and block both require the defender to be facing the attacker. A melee DPS is behind the
+  // boss for the whole fight, so both rows are zero — not reduced, impossible. The simulator applied
+  // them anyway, which against a level 73 target removed 14% parry plus 5% block from every swing:
+  // nearly a fifth of a melee spec's damage deleted for a positional reason that never happens.
+  const shared = { skillDiff: 15, expertiseSkillPoints: 0, missReduction: 0, rawCritChance: 0.25 }
+
+  const behind = buildWhiteAttackTable({ ...shared, dualWield: true, attacksFromBehind: true })
+  const inFront = buildWhiteAttackTable({ ...shared, dualWield: true, attacksFromBehind: false })
+
+  expect(behind.parry).toBe(0)
+  expect(behind.block).toBe(0)
+  expect(inFront.parry, 'a level 73 target parries 14% of front attacks').toBeCloseTo(0.14, 10)
+  expect(inFront.block).toBeCloseTo(0.05, 10)
+
+  // The freed probability has to reappear in the landing rows, not vanish: an ordered table always
+  // sums to 1, so the only question is which outcomes it lands in.
+  const total = (t: { miss: number; dodge: number; parry: number; glance: number; block: number; crit: number; hit: number }) =>
+    t.miss + t.dodge + t.parry + t.glance + t.block + t.crit + t.hit
+  expect(total(behind)).toBeCloseTo(1, 10)
+  expect(total(inFront)).toBeCloseTo(1, 10)
+  expect(behind.hit + behind.crit).toBeCloseTo(inFront.hit + inFront.crit + 0.19, 10)
+
+  // Dodge survives from behind, which is what keeps Expertise worth anything to a melee DPS.
+  expect(behind.dodge).toBeGreaterThan(0)
+  expect(behind.dodge).toBeCloseTo(inFront.dodge, 10)
+
+  // The special table is a separate function and had the same bug.
+  const specialBehind = buildSpecialAttackTable({ ...shared, attacksFromBehind: true })
+  const specialFront = buildSpecialAttackTable({ ...shared, attacksFromBehind: false })
+  expect(specialBehind.parry).toBe(0)
+  expect(specialBehind.block).toBe(0)
+  expect(specialFront.parry).toBeGreaterThan(0)
+  expect(specialBehind.hit + specialBehind.crit).toBeGreaterThan(specialFront.hit + specialFront.crit)
 })
 
 test('a set with two bonuses at the same threshold renders both', async ({ page }) => {

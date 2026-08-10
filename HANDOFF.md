@@ -30,7 +30,7 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 66 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 67 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -137,10 +137,23 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
 
 ### 1. The simulation's own known gaps
 
-Now visible on the Simulation tab, so its limitations are visible too. A geared Fury warrior reads
-~158 DPS, which is low — rotation modelling is the acknowledged gap and the panel says so. Also:
-healer HPS has **no mana constraint**, meta gem activation requirements are **never checked**, weapon
-and armour procs are unpopulated (schema exists, data does not), and rotations cover 2 specs of 27.
+Now visible on the Simulation tab, so its limitations are visible too. Still open: healer HPS has
+**no mana constraint**, meta gem activation requirements are **never checked**, weapon and armour
+procs are unpopulated (schema exists, data does not), and rotations cover 2 specs of 27.
+
+**On the low melee DPS — the diagnosis has changed.** This was recorded as "rotation modelling is
+the acknowledged gap", but investigating it found the larger cause was an attack-table bug, now
+fixed: the player's white and special tables applied **parry and block** to a melee DPS. Both
+require the defender to be *facing* the attacker, and a melee DPS is behind the boss all fight, so
+against a level 73 target that deleted 14% parry plus 5% block from every swing. Fixing it moved a
+Fury Warrior from 125 to 148 DPS and took hit chance from 21.7% to 39.2%. `attacksFromBehind` is now
+a required input on both builders, so a future front-facing caller has to state its position.
+
+A multi-ability rotation resolver already exists (`resolveRotation`), with GCD and energy budgeting,
+and Fury already layers Bloodthirst and Whirlwind onto white damage. What it cannot do is **rage**:
+`computeUsageRate` returns `unmodelled` for any rage-costed ability without a cooldown, so Heroic
+Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
+for melee, not a priority-list engine, which is mostly already there.
 
 ### 2. Polish
 
