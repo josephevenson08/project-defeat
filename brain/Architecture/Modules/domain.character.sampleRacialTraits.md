@@ -36,7 +36,6 @@ From the top of the file:
 ## Imported by
 
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
-- [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
 
 ## Concepts & phases
 

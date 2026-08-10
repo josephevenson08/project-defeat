@@ -187,7 +187,7 @@ function App() {
     >
       {activeTab === 'planner' && (
         <>
-          <CharacterPanel character={character} gear={gear} onChange={updateCharacter} />
+          <CharacterPanel character={character} onChange={updateCharacter} />
           <GearPanel character={character} gear={gear} onChange={updateGear} />
           <BisPanel character={character} gear={gear} onEquip={updateGear} />
           <BuildPanel state={buildState} role={role} onImport={importBuild} />

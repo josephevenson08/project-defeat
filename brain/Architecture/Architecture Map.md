@@ -23,8 +23,8 @@ The modules everything else leans on — change these carefully.
 - [[features.character.characterTypes]] — 12 importers
 - [[components.layout.Panel]] — 11 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
-- [[features.gear.gearTypes]] — 10 importers
 - [[domain.raids.raidTypes]] — 9 importers
+- [[features.gear.gearTypes]] — 9 importers
 - [[features.gear.gearData]] — 8 importers
 - [[domain.character.roleTheme]] — 7 importers
 - [[domain.simulation.combatConstants]] — 7 importers
@@ -66,7 +66,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.character.characterTypes]] · 12 importers
 - [[features.gear.gearData]] · 8 importers
 - [[features.gear.GearPanel]] · 1 importers
-- [[features.gear.gearTypes]] · 10 importers
+- [[features.gear.gearTypes]] · 9 importers
 - [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
@@ -112,12 +112,12 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.buffs.sampleTargetDebuffs]] · 2 importers
 - [[domain.builds.buildSerialization]] · 3 importers
 - [[domain.builds.buildTypes]] · 4 importers
-- [[domain.character.applyRacialTraits]] · 2 importers
+- [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.characterTypes]] · 28 importers
 - [[domain.character.races]] · 2 importers
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 7 importers
-- [[domain.character.sampleRacialTraits]] · 2 importers
+- [[domain.character.sampleRacialTraits]] · 1 importers
 - [[domain.character.tbcClasses]] · 3 importers
 - [[domain.consumables.consumableCatalogueJson.d]] · 0 importers
 - [[domain.consumables.consumableTypes]] · 2 importers

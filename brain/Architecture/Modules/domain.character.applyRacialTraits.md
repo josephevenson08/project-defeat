@@ -32,7 +32,6 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.character.CharacterPanel]] — `src/features/character/CharacterPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

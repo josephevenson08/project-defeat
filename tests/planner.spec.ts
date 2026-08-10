@@ -231,7 +231,6 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
-  await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
   // Deliberately not pinned to a specific item. The default is whichever legal item the catalogue
   // offers first, which legitimately moves whenever the catalogue is re-ingested; what this test
   // actually cares about is that a legal weapon is equipped at all.
@@ -272,8 +271,12 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await expect(page.getByLabel('Specialization')).toHaveValue('Arcane')
   await page.getByLabel('Specialization').selectOption('Fire')
 
-  await expect(page.getByText(/Blood Elf Fire Mage/i)).toBeVisible()
-  await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
+  // The panel used to restate the character as "Blood Elf Fire Mage" under the selects. That summary
+  // has been removed, so the selects themselves are the record of what was chosen — and they are the
+  // thing the rest of this test depends on being right.
+  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Blood Elf')
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
 
   await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
   await selectSlotItem(page, 'Main Hand', 'apprentice-focus-staff')
@@ -297,7 +300,6 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Class').selectOption('Priest')
   await expect(page.getByLabel('Specialization')).toHaveValue('Discipline')
   await page.getByLabel('Specialization').selectOption('Holy')
-  await expect(page.getByText('Healer', { exact: true })).toBeVisible()
   await selectSlotItem(page, 'Hands', 'healers-grace-gloves')
   await selectSlotEnchant(page, 'Hands', 'Gloves - Major Healing')
 
@@ -309,7 +311,6 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Protection')
-  await expect(page.getByText('Tank', { exact: true })).toBeVisible()
   await selectSlotItem(page, 'Chest', 'bulwark-chestguard')
     // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
   // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
@@ -643,7 +644,6 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
   await page.getByLabel('Faction').selectOption('Horde')
   await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue(/Orc|Tauren|Troll/)
   await expect(page.getByLabel('Class')).toHaveValue('Shaman')
-  await expect(page.getByText('Caster DPS', { exact: true })).toBeVisible()
 })
 
 test('crafted items show recipe source, required skill, and material farm locations', async ({ page }) => {
@@ -688,13 +688,13 @@ test('character role sets a distinct accent color across Character, Stats, and S
   const physicalDps = 'rgb(156, 115, 70)'
   const healer = 'rgb(77, 138, 128)'
 
-  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', physicalDps)
+  await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', physicalDps)
 
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByLabel('Specialization').selectOption('Holy')
 
   // Holy Priest is a Healer, and the accent carries to the rail and the simulator too.
-  await expect(page.getByRole('region', { name: 'Character' }).locator('.summary-card strong')).toHaveCSS('color', healer)
+  await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', healer)
   // The rail is deliberately not accented — it is chrome, not a panel, and an accent bar down the
   // side of the whole app would be the loudest thing on screen.
 
@@ -864,7 +864,6 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Feral Druid Phase 2 Ranked List')).toBeVisible()
-  await expect(page.getByText('Physical DPS', { exact: true })).toBeVisible()
 
   await page.getByLabel('Specialization').selectOption('Restoration')
 
@@ -1930,27 +1929,19 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
   // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, so equip
   // one explicitly — this used to lean on the default main hand happening to be a sword, which
   // stopped being true when the catalogue was re-ingested.
+  // The traits list has been removed from the Character panel, so this now reads the racial where it
+  // actually matters — the stat totals on the rail. That is the stronger assertion of the two
+  // anyway: the old version could pass on a correct label while the stats went unchanged.
   await selectSlotItem(page, 'Main Hand', 'iblis-blade-of-the-fallen-seraph')
-  const swordSpec = page.getByTestId('racial-human-sword-specialization')
-  await expect(swordSpec).toContainText(/Included in your stats/i)
 
   const expertiseWithSword = readStatValue(await page.getByTestId('stat-expertise').innerText())
-  expect(expertiseWithSword).toBeGreaterThan(0)
+  expect(expertiseWithSword, 'Sword Specialization is +5 Expertise while a sword is equipped').toBeGreaterThan(0)
 
   // Swap to a non-sword main hand: the racial must switch off and the expertise must actually drop.
   // It has to be an axe, not the mace this once used — Humans get Mace Specialization too, so a mace
   // keeps expertise up and hides the very regression this assertion exists to catch.
   await selectSlotItem(page, 'Main Hand', 'crulshorukh-edge-of-chaos')
-  await expect(swordSpec).toContainText(/Only while wielding/i)
   expect(readStatValue(await page.getByTestId('stat-expertise').innerText())).toBeLessThan(expertiseWithSword)
-
-  // Unconditional racials are always on. The Human Spirit is a percentage bonus, so it has to be
-  // applied before the derivations that read Spirit rather than bolted on afterwards.
-  await expect(page.getByTestId('racial-human-the-human-spirit')).toContainText(/Included in your stats/i)
-
-  // On-use and utility racials are listed but explicitly not modelled — a race showing nothing would
-  // be indistinguishable from a race that genuinely has nothing.
-  await expect(page.getByTestId('racial-human-perception')).toContainText(/Utility/i)
 })
 
 test('changing race changes the racial list and the resulting stats', async ({ page }) => {
@@ -1960,14 +1951,12 @@ test('changing race changes the racial list and the resulting stats', async ({ p
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
   await page.getByLabel('Class').selectOption('Mage')
   const gnomeIntellect = readStatValue(await page.getByTestId('stat-intellect').innerText())
-  await expect(page.getByTestId('racial-gnome-expansive-mind')).toContainText(/Included in your stats/i)
 
   // Undead has no passive stat racial at all, so the same Mage should end up with less Intellect.
+  // Asserted through the rail rather than a traits list, which no longer exists on this panel.
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Undead')
   await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByTestId('racial-gnome-expansive-mind')).toHaveCount(0)
-  await expect(page.getByTestId('racial-undead-will-of-the-forsaken')).toContainText(/not modelled/i)
 
   expect(readStatValue(await page.getByTestId('stat-intellect').innerText())).toBeLessThan(gnomeIntellect)
 })
@@ -2008,16 +1997,15 @@ test('Draenei get the hit racial matching their class, not both', async ({ page 
   await openApp(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
 
-  // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version.
+  // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version, so a
+  // Draenei Warrior's spell hit stays where a non-Draenei's would be. Read off the rail: the traits
+  // list this used to check is gone from the Character panel, and the stat totals were always the
+  // real subject — granting both racials would show up here and nowhere else.
   await page.getByLabel('Class').selectOption('Warrior')
-  await expect(page.getByTestId('racial-draenei-heroic-presence')).toContainText(/Included in your stats/i)
-  await expect(page.getByTestId('racial-draenei-inspiring-presence')).toContainText(/Only for/i)
   const warriorSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
 
   // Shamans get Inspiring Presence (spell hit) instead — the two are separate racials in TBC, and
   // granting both would hand every Draenei twice the hit they actually have.
   await page.getByLabel('Class').selectOption('Shaman')
-  await expect(page.getByTestId('racial-draenei-inspiring-presence')).toContainText(/Included in your stats/i)
-  await expect(page.getByTestId('racial-draenei-heroic-presence')).toContainText(/Only for/i)
   expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText())).toBeGreaterThan(warriorSpellHit)
 })
