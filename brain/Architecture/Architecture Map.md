@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-117 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+118 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -40,7 +40,7 @@ Entry points and the root composition. Owns which tab is showing and holds the p
 - [[main]] · 0 importers
 - [[styles.global]] · 1 importers
 
-### components (7)
+### components (8)
 
 Presentational shell and primitives. No domain knowledge — these would work unchanged in a different app.
 
@@ -48,6 +48,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.layout.ErrorBoundary]] · 1 importers
 - [[components.layout.LoadingIntro]] · 1 importers
 - [[components.layout.Panel]] · 11 importers
+- [[components.layout.SectionPicker]] · 1 importers
 - [[components.layout.TabNav]] · 2 importers
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
@@ -57,7 +58,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
 - [[features.bis.BisPanel]] · 1 importers
-- [[features.buffs.BuffsPanel]] · 1 importers
+- [[features.buffs.BuffsPanel]] · 0 importers
 - [[features.builds.BuildPanel]] · 1 importers
 - [[features.builds.buildStorage]] · 2 importers
 - [[features.character.characterData]] · 4 importers

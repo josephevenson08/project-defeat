@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 207
+lines: 211
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 207 lines
+`src/App.tsx` · **app** layer · 211 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,7 @@ _Nothing exported (side-effect or style module)._
 
 - [[components.layout.AppShell]] — `src/components/layout/AppShell.tsx`
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
@@ -28,7 +29,6 @@ _Nothing exported (side-effect or style module)._
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
-- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`

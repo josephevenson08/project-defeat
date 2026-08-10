@@ -33,7 +33,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
-- [[App]] — `src/App.tsx`
+_None._
 
 ## Concepts & phases
 

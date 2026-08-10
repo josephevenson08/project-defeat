@@ -74,6 +74,19 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
  * Simulation lives on its own tab, so anything asserting on the simulator, the encounter settings,
  * stat weights or the upgrade finder has to go there first.
  */
+/**
+ * The app now opens on a section picker rather than landing inside a tab, so every test has to make
+ * the same choice a user does before it can assert anything.
+ *
+ * Tests enter through Character Planner because that is where most of them work. The ones that want
+ * Raids or Professions click the tab afterwards, which is also what a user would do — the picker is
+ * a way in, not the only way to move between sections.
+ */
+async function openApp(page: Page, section: 'planner' | 'raids' | 'professions' = 'planner') {
+  await page.goto('/')
+  await page.getByTestId(`section-${section}`).click()
+}
+
 async function openSimulationTab(page: Page) {
   // The tab is hidden from the app by default while the estimates are known to be wrong (see
   // src/featureFlags.ts). The math behind it is still worth testing, so these tests opt back in with
@@ -83,6 +96,8 @@ async function openSimulationTab(page: Page) {
     const url = new URL(page.url())
     url.searchParams.set('simulation', '1')
     await page.goto(url.toString())
+    // The reload drops back to the section picker, so re-enter before looking for the tab.
+    await page.getByTestId('section-planner').click()
   }
 
   await page.getByRole('button', { name: 'Simulation', exact: true }).click()
@@ -98,21 +113,12 @@ async function openPlannerTab(page: Page) {
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
 }
 
-/**
- * Runs the simulation and returns the score, then goes back to the planner so a caller toggling
- * buffs keeps its place.
- *
- * The run is not optional: `simulationResult` starts undefined and App clears it on every character,
- * gear or buff change, so there is no score to read until the button is pressed. That is deliberate —
- * a stale number next to changed gear would be worse than none.
+/*
+ * `readSimulationScore` lived here — run the simulation, read the score, return to the planner. Its
+ * only caller was the buff-toggle test, which now works against `calculateStats` directly because
+ * the Buffs & Consumables panel it used to click is no longer rendered. Reading a DPS number through
+ * two tab switches was always the indirect way to assert that buffs reach the stat totals.
  */
-async function readSimulationScore(page: Page) {
-  await openSimulationTab(page)
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const score = Number(await page.getByTestId('simulation-score').innerText())
-  await openPlannerTab(page)
-  return score
-}
 
 /** Switches to the simulation tab and produces a fresh result there. */
 async function runSimulation(page: Page) {
@@ -156,7 +162,7 @@ async function selectSlotGem(page: Page, slot: string, colour: string, value: st
 /**
  * Runs the simulation for a spec straight through the domain, with no browser involved.
  *
- * The simulator is hidden from the UI (`SHOW_SIMULATOR` in src/App.tsx), but the findings asserted
+ * The simulator is hidden from the UI (`isSimulationEnabled` in src/featureFlags.ts), but the findings asserted
  * with this are about the engine rather than the panels — cat form swinging its own weapon, specials
  * layering onto white damage — so they are worth keeping and belong against the functions directly.
  */
@@ -212,7 +218,7 @@ function readStatValue(text: string) {
 }
 
 test('user can run a basic local physical DPS simulation', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
@@ -257,7 +263,7 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 })
 
 test('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Orc')
@@ -286,7 +292,7 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
 })
 
 test('healer and tank roles produce role-specific results', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Priest')
   await expect(page.getByLabel('Specialization')).toHaveValue('Discipline')
@@ -362,7 +368,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
 })
 
 test('expanded gear foundation has multiple options for every slot', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Default character is Warrior/Fury, which has no Relic slot in TBC (only Shaman/Paladin/Druid do),
   // so ask the domain which slots are actually rendered rather than hardcoding the exception.
@@ -402,7 +408,7 @@ test('Enhancement Shaman Phase 2 starter ranking resolves to catalog items', asy
 })
 
 test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
@@ -433,7 +439,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 })
 
 test('Enhancement Shaman filters gear, relics, enchants, and source details by spec', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
@@ -477,7 +483,7 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
 })
 
 test('BiS panel shows Enhancement Shaman rankings and equips a listed item', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
 
@@ -505,7 +511,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
 })
 
 test('BiS panel can equip paired trinket targets without duplicating unique items', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
@@ -530,7 +536,7 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
 })
 
 test('paired ring and trinket slots share compatible options and block duplicate unique items', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await withSlotOpen(page, 'Trinket 1', async () => {
     await expect(page.getByLabel('Trinket 1', { exact: true }).locator('option', { hasText: 'Dragonspine Trophy' })).toHaveCount(1)
@@ -621,7 +627,7 @@ test('Arms, Fury, and Protection Warrior Phase 2 starter rankings resolve to cat
 })
 
 test('race/class selection enforces real TBC legality in the UI', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Default is Alliance/Human; Human cannot be a Shaman, so Shaman should not be a selectable class yet.
   await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(0)
@@ -641,7 +647,7 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
 })
 
 test('crafted items show recipe source, required skill, and material farm locations', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Mage')
   await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
@@ -657,7 +663,7 @@ test('crafted items show recipe source, required skill, and material farm locati
 })
 
 test('item quality renders with the standard WoW rarity color', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
@@ -674,7 +680,7 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
 })
 
 test('character role sets a distinct accent color across Character, Stats, and Simulator panels', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // The accents are the muted set now. They were amber-500/violet-500/teal-400/blue-400, which
   // competed with epic purple and rare blue for attention; role is real information, but item quality
@@ -697,7 +703,7 @@ test('character role sets a distinct accent color across Character, Stats, and S
 })
 
 test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatment and their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
@@ -725,7 +731,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
 })
 
 test('Warrior specs hide the Relic slot and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByLabel('Specialization').selectOption('Arms')
@@ -762,7 +768,7 @@ test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve
 })
 
 test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByLabel('Specialization').selectOption('Holy')
@@ -804,7 +810,7 @@ test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to ca
 })
 
 test('Priest specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByLabel('Specialization').selectOption('Holy')
@@ -842,7 +848,7 @@ test('Balance, Feral, and Restoration Druid Phase 2 starter rankings resolve to 
 })
 
 test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Druid is only legal for Night Elf (Alliance) and Tauren (Horde); pick Night Elf before Class so it's offered.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
@@ -882,7 +888,7 @@ test('Beast Mastery, Marksmanship, and Survival Hunter Phase 2 starter rankings 
 })
 
 test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Hunter is not legal for the default Human race; pick Dwarf first so Hunter is offered.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
@@ -922,7 +928,7 @@ test('Arcane, Fire, and Frost Mage Phase 2 starter rankings resolve to catalog i
 })
 
 test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Mage')
   await page.getByLabel('Specialization').selectOption('Arcane')
@@ -1006,7 +1012,7 @@ test('Assassination, Combat, and Subtlety Rogue Phase 2 starter rankings resolve
 })
 
 test('Rogue specs hide the Relic slot, support full dual-wield, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Rogue')
   await page.getByLabel('Specialization').selectOption('Assassination')
@@ -1056,7 +1062,7 @@ test('Affliction, Demonology, and Destruction Warlock Phase 2 starter rankings r
 })
 
 test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Warlock')
   await page.getByLabel('Specialization').selectOption('Affliction')
@@ -1088,7 +1094,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
 })
 
 test('Professions tab shows skill tiers and material farming, and switches between professions', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Professions', exact: true }).click()
@@ -1110,7 +1116,7 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
 })
 
 test('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Default character is a Fury Warrior (melee physical DPS).
   await openSimulationTab(page)
@@ -1136,7 +1142,7 @@ test('stat weights rank stats correctly and separate unmodeled stats from capped
 })
 
 test('stat weights follow the character role and class', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Hunters run the ranged attack table, so ranged attack power replaces melee AP as the reference.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
@@ -1175,7 +1181,7 @@ test('stat weights follow the character role and class', async ({ page }) => {
 })
 
 test('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await openSimulationTab(page)
   const mitigation = page.getByTestId('encounter-armor-mitigation')
 
@@ -1206,7 +1212,7 @@ test('encounter settings change armor mitigation and feed back into the simulati
 })
 
 test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await openSimulationTab(page)
   const list = page.getByTestId('upgrade-list')
   await expect(list).toBeVisible()
@@ -1255,7 +1261,7 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
 })
 
 test('a build autosaves and is restored after a reload', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
 
   await page.getByLabel('Class').selectOption('Mage')
@@ -1278,14 +1284,17 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
   })
   expect(savedTarget, 'the saved build must carry the encounter target, not just the character').toBeTruthy()
 
+  // A reload starts over at the section picker — the chosen section is deliberately session state,
+  // not something persisted. The *build* is what has to survive, which is what this asserts next.
   await page.reload()
+  await page.getByTestId('section-planner').click()
 
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
 })
 
 test('a build can be exported and imported back', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Capture the default Warrior build, then change the character away from it.
   const exported = await page.getByTestId('build-export-output').inputValue()
@@ -1304,7 +1313,7 @@ test('a build can be exported and imported back', async ({ page }) => {
 })
 
 test('an invalid build is rejected without changing the current character', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   await page.getByLabel('Class').selectOption('Mage')
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
@@ -1324,7 +1333,7 @@ test('an invalid build is rejected without changing the current character', asyn
 })
 
 test('a build referencing a missing item still loads, reporting the dropped slot', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   const exported = JSON.parse(await page.getByTestId('build-export-output').inputValue())
   exported.gear.Head = { itemId: 'an-item-that-was-removed-from-the-catalog', gemIds: [] }
@@ -1374,7 +1383,7 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
 test('the Raids tab renders a raid, its bosses and an attunement chain', async ({ page }) => {
   // The raids panel is one of three things this repo has historically shipped that nothing rendered,
   // and it was the only part of the app with that history and no test confirming it still renders.
-  await page.goto('/')
+  await openApp(page)
   await page.getByRole('button', { name: 'Raids', exact: true }).click()
 
   const detail = page.getByTestId('raid-detail')
@@ -1394,26 +1403,54 @@ test('the Raids tab renders a raid, its bosses and an attunement chain', async (
   await expect(attunement.locator('li').first()).toBeVisible()
 })
 
-test('toggling a buff and a consumable actually moves the simulated result', async ({ page }) => {
-  // The buffs panel is fully wired into calculateStats, calculateSimulation, stat weights and the
-  // upgrade finder, and had no test at all — a regression that silently stopped applying buffs would
-  // have passed the whole suite.
+test('the app opens on a section picker, and the rail follows the character', async ({ page }) => {
+  // The app used to land inside a tab. It now asks which of the three things you came to do, because
+  // gearing a character, reading a loot table and levelling a profession have nothing to do with
+  // each other.
   await page.goto('/')
-  const before = await readSimulationScore(page)
+  await expect(page.getByTestId('section-planner')).toBeVisible()
+  await expect(page.getByTestId('section-raids')).toBeVisible()
+  await expect(page.getByTestId('section-professions')).toBeVisible()
+  // The tab bar is a way *between* sections, not the way in, so it is not on this screen.
+  await expect(page.locator('.tab-nav')).toHaveCount(0)
 
-  await page.getByTestId('buff-toggle-battle-shout').click()
-  const withBuff = await readSimulationScore(page)
-  expect(withBuff, 'Battle Shout is attack power, so a Fury Warrior must gain from it').toBeGreaterThan(before)
+  // Entering through Raids must land on Raids, not on whichever tab happens to be first.
+  await page.getByTestId('section-raids').click()
+  await expect(page.locator('.tab-nav')).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Character summary' }), 'no character is in play on Raids, so no stat rail').toHaveCount(0)
 
-  await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  const withFlask = await readSimulationScore(page)
-  expect(withFlask, 'a flask stacks on top of the buff rather than replacing it').toBeGreaterThan(withBuff)
+  // The rail is stats, and stats belong to a character — so it appears on the planner and only there.
+  await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
+  await expect(page.locator('.rail')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
 
-  // Toggling back off must return the original number exactly — a buff that applies but never clears
-  // would otherwise look correct on the way up and be wrong for the rest of the session.
-  await page.getByTestId('buff-toggle-battle-shout').click()
-  await page.getByTestId('consumable-toggle-flask-of-relentless-assault').click()
-  expect(await readSimulationScore(page)).toBe(before)
+  await page.getByRole('button', { name: 'Professions', exact: true }).click()
+  await expect(page.locator('.rail')).toHaveCount(0)
+})
+
+test('buffs and consumables still reach the stat totals with the panel hidden', async () => {
+  // This used to click the Buffs & Consumables panel. The panel is no longer rendered, but the three
+  // id lists behind it are still carried in the saved build and still read by calculateStats,
+  // calculateSimulation, the stat weights and the upgrade finder. With the panel gone that wiring is
+  // exactly what could quietly become a no-op, so the test moves down to it rather than being dropped
+  // along with the UI it happened to be driving.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+
+  const base = calculateStats(character, gear, [], [])
+  const withShout = calculateStats(character, gear, ['battle-shout'], [])
+  expect(withShout.attackPower - base.attackPower, 'Battle Shout is a flat +306 attack power').toBe(306)
+
+  const withFlask = calculateStats(character, gear, ['battle-shout'], ['flask-of-relentless-assault'])
+  expect(withFlask.attackPower, 'a flask stacks on top of the buff rather than replacing it').toBeGreaterThan(withShout.attackPower)
+
+  // Clearing the ids must return the original totals exactly — a buff that applies but never clears
+  // would look right on the way up and be wrong for the rest of the session.
+  expect(calculateStats(character, gear, [], [])).toEqual(base)
+
+  // An unmodelled buff carries no stats at all, so it must change nothing rather than contributing
+  // some incidental value. Bloodlust is a raid cooldown this engine cannot express.
+  expect(calculateStats(character, gear, ['bloodlust'], [])).toEqual(base)
 })
 
 test('every raid buff is sourced to a spell rank and is either applied or explicitly not modelled', async () => {
@@ -1497,23 +1534,22 @@ test('the buff corrections that had real wrong values stay corrected', async () 
   expect(getBuffById('battle-shout')?.stats?.rangedAttackPower ?? 0).toBe(0)
 })
 
-test('buffs that cannot be modelled are listed in the panel without a checkbox', async ({ page }) => {
-  // The alternative was leaving 15 real raid buffs out of the app entirely, which reads as an
-  // oversight rather than a stated limit. They must actually reach the screen — and must not offer a
-  // control that does nothing when clicked.
-  await page.goto('/')
+test('every unmodelled buff carries text a panel could render', async () => {
+  // This asserted that unmodelled buffs reach the screen without a checkbox. The Buffs & Consumables
+  // panel is no longer rendered, so that premise is gone — but the data contract it was really
+  // protecting is not: an unmodelled buff has to explain itself in words, or restoring the panel
+  // would put 15 rows on screen with a name and nothing else.
+  expect(unmodelledBuffs.length, '15 of the 33 cannot be expressed as stats').toBe(15)
 
-  const bloodlust = page.getByTestId('buff-unmodelled-bloodlust')
-  await expect(bloodlust).toBeVisible()
-  await expect(bloodlust).toContainText('30%')
-  expect(await bloodlust.locator('input').count(), 'an unmodelled buff must not offer a checkbox').toBe(0)
+  for (const buff of unmodelledBuffs) {
+    expect(buff.stats, `${buff.id} must contribute no stats`).toBeUndefined()
+    expect(buff.statMultipliers, `${buff.id} must contribute no multipliers`).toBeUndefined()
+    expect(buff.notModelled!.length, `${buff.id} needs a real explanation, not a placeholder`).toBeGreaterThan(40)
+  }
 
-  // And the modelled ones keep theirs.
-  await expect(page.getByTestId('buff-toggle-battle-shout')).toBeVisible()
-
-  // Role filtering still applies to both groups: Innervate is a caster/healer buff and this is a
-  // Fury Warrior, so it should not be on screen at all.
-  await expect(page.getByTestId('buff-unmodelled-innervate')).toHaveCount(0)
+  // Bloodlust is the example worth pinning: it is the buff a reader would most expect to find, and
+  // its explanation has to carry the actual effect rather than just saying it is unsupported.
+  expect(getBuffById('bloodlust')?.notModelled).toContain('30%')
 })
 
 test('every spec can fill every gear slot the UI shows it', async () => {
@@ -1577,7 +1613,7 @@ test('armor comes from the catalogue, and the derivation only fills genuine gaps
 })
 
 test('equipped tier pieces surface their set bonuses, and say they are not scored', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByLabel('Specialization').selectOption('Fury')
 
@@ -1658,7 +1694,7 @@ test('a set with two bonuses at the same threshold renders both', async ({ page 
     if (message.type() === 'error') consoleErrors.push(message.text())
   })
 
-  await page.goto('/')
+  await openApp(page)
   await page.getByLabel('Class').selectOption('Warlock')
   await selectSlotItem(page, 'Head', 'voidheart-crown')
   await selectSlotItem(page, 'Chest', 'voidheart-robe')
@@ -1889,7 +1925,7 @@ test('the item catalog and the raid data agree on where every drop comes from', 
 })
 
 test('racial traits apply to stats, and weapon-conditional ones follow the equipped weapon', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Default is a Human Fury Warrior. Human Sword Specialization is conditional on a sword, so equip
   // one explicitly — this used to lean on the default main hand happening to be a sword, which
@@ -1918,7 +1954,7 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
 })
 
 test('changing race changes the racial list and the resulting stats', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
 
   // Gnome's Expansive Mind is a flat +5% Intellect, so it should move Intellect for any class.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
@@ -1937,7 +1973,7 @@ test('changing race changes the racial list and the resulting stats', async ({ p
 })
 
 test('named build slots survive a character switch that would overwrite the autosave', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await expect(page.getByTestId('build-slots-empty')).toBeVisible()
 
   // Set up a Fury Warrior and save it under a name.
@@ -1958,8 +1994,10 @@ test('named build slots survive a character switch that would overwrite the auto
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
 
-  // Slots persist across a reload, since they live in storage rather than component state.
+  // Slots persist across a reload, since they live in storage rather than component state. The
+  // section choice does not, so re-enter the planner before looking for them.
   await page.reload()
+  await page.getByTestId('section-planner').click()
   await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
 
   await page.getByTestId('build-slot-delete-Fury main').click()
@@ -1967,7 +2005,7 @@ test('named build slots survive a character switch that would overwrite the auto
 })
 
 test('Draenei get the hit racial matching their class, not both', async ({ page }) => {
-  await page.goto('/')
+  await openApp(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
 
   // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version.

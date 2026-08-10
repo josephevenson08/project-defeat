@@ -1,25 +1,27 @@
 ---
 type: module
 layer: components
-source: src/components/layout/AppShell.tsx
-lines: 45
+source: src/components/layout/SectionPicker.tsx
+lines: 79
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
-# components.layout.AppShell
+# components.layout.SectionPicker
 
-`src/components/layout/AppShell.tsx` · **components** layer · 45 lines
+`src/components/layout/SectionPicker.tsx` · **components** layer · 79 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `AppShell`
+**function** — `SectionPicker`
+
+**type** — `SectionId`
 
 ## Imports
 
-- [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+_None._
 
 ## Imported by
 

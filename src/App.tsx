@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
+import { SectionPicker } from './components/layout/SectionPicker'
 import { BisPanel } from './features/bis/BisPanel'
 import { BuildPanel } from './features/builds/BuildPanel'
 import { loadBuildFromStorage, saveBuildToStorage } from './features/builds/buildStorage'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
 import type { SavedBuild } from './domain/builds/buildTypes'
-import { BuffsPanel } from './features/buffs/BuffsPanel'
 import { CharacterPanel } from './features/character/CharacterPanel'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
@@ -65,10 +65,6 @@ function visibleTabs(simulationEnabled: boolean) {
   return APP_TABS.filter((tab) => tab.id !== 'simulation' || simulationEnabled)
 }
 
-function toggleId(ids: readonly string[], id: string) {
-  return ids.includes(id) ? ids.filter((existing) => existing !== id) : [...ids, id]
-}
-
 /** Rebuilds a full gear set from a saved build, normalized against the character it was saved for. */
 function gearFromBuild(build: SavedBuild): EquippedGear {
   const baseline = normalizeGearForCharacter(defaultGear, build.character.className, build.character.spec)
@@ -82,6 +78,7 @@ function App() {
   const [restoredBuild] = useState(loadBuildFromStorage)
 
   const [introComplete, setIntroComplete] = useState(false)
+  const [sectionChosen, setSectionChosen] = useState(false)
   // Read once at mount: the flag comes from the URL and nothing in-session changes it.
   const [simulationEnabled] = useState(isSimulationEnabled)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
@@ -135,20 +132,14 @@ function App() {
     setSimulationResult(undefined)
   }
 
-  function toggleBuff(id: string) {
-    setActiveBuffIds((current) => toggleId(current, id))
-    setSimulationResult(undefined)
-  }
-
-  function toggleConsumable(id: string) {
-    setActiveConsumableIds((current) => toggleId(current, id))
-    setSimulationResult(undefined)
-  }
-
-  function toggleTargetDebuff(id: string) {
-    setActiveTargetDebuffIds((current) => toggleId(current, id))
-    setSimulationResult(undefined)
-  }
+  /*
+   * The buff, consumable and target-debuff *toggles* are gone with the Buffs & Consumables panel,
+   * but the three id lists deliberately are not: `calculateStats`, `findUpgrades` and the saved-build
+   * format all still read them, and a build saved while the panel existed must keep resolving.
+   *
+   * `BuffsPanel.tsx` and its data are untouched on disk. Restoring the panel means rendering it
+   * again and giving it back three callbacks that flip an id in and out of these lists.
+   */
 
   const upgradeReport = useMemo(
     () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
@@ -170,22 +161,35 @@ function App() {
 
   if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
 
+  // The way in. Choosing a section is a real decision — gearing a character, reading a loot table and
+  // levelling a profession have nothing to do with each other — so it is made once, deliberately,
+  // rather than by landing in whichever tab happened to be first. The tab bar still moves you
+  // between them afterwards.
+  if (!sectionChosen) {
+    return (
+      <SectionPicker
+        onSelect={(section) => {
+          setActiveTab(section)
+          setSectionChosen(true)
+        }}
+      />
+    )
+  }
+
   return (
-    <AppShell rail={<StatsRail stats={stats} />} tabs={visibleTabs(simulationEnabled)} activeTab={activeTab} onTabChange={setActiveTab}>
+    <AppShell
+      // Stats belong to a character, and only the planner has one in play. A rail of numbers next to
+      // a raid's loot table would be describing something that is not on screen.
+      rail={activeTab === 'planner' ? <StatsRail stats={stats} /> : undefined}
+      tabs={visibleTabs(simulationEnabled)}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    >
       {activeTab === 'planner' && (
         <>
           <CharacterPanel character={character} gear={gear} onChange={updateCharacter} />
           <GearPanel character={character} gear={gear} onChange={updateGear} />
           <BisPanel character={character} gear={gear} onEquip={updateGear} />
-          <BuffsPanel
-            character={character}
-            activeBuffIds={activeBuffIds}
-            activeConsumableIds={activeConsumableIds}
-            activeTargetDebuffIds={activeTargetDebuffIds}
-            onToggleBuff={toggleBuff}
-            onToggleConsumable={toggleConsumable}
-            onToggleTargetDebuff={toggleTargetDebuff}
-          />
           <BuildPanel state={buildState} role={role} onImport={importBuild} />
         </>
       )}

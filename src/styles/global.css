@@ -138,6 +138,103 @@ select {
   min-height: 100vh;
 }
 
+/* Raids and Professions have no character in play, so no rail. The main pane takes the full width
+   rather than leaving a 288px gap where the stats used to be. */
+.app-shell-no-rail {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/*
+ * The way in: three sections, chosen once. Centred and unhurried on purpose — it is the only screen
+ * in the app that is not dense, and the contrast with what follows is the point.
+ */
+.section-picker {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 48px;
+  min-height: 100vh;
+  padding: 48px 24px;
+}
+
+.section-picker-head {
+  text-align: center;
+}
+
+.section-picker-head h1 {
+  font-size: 32px;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+  margin: 0;
+}
+
+.section-picker-sub {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  margin: 8px 0 0;
+  text-transform: uppercase;
+}
+
+.section-picker-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  max-width: 900px;
+  width: 100%;
+}
+
+/*
+ * Each card carries its section's hue on the top rule and nowhere else. The near-monochrome policy
+ * exists so item quality colour reads first; no item quality is on this screen, so there is nothing
+ * here for a hue to compete with.
+ */
+.section-card {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--section-accent);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: 8px;
+  padding: 20px;
+  text-align: left;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.section-card:hover,
+.section-card:focus-visible {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+  border-top-color: var(--section-accent);
+}
+
+.section-card-tagline {
+  color: var(--section-accent);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.section-card-label {
+  color: var(--text-strong);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+}
+
+.section-card-blurb {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* Discord's persistent rail: it never navigates away, so the stat readout stays on screen while gear
    is being changed. Sticky rather than fixed, so it scrolls independently of the main pane. */
 .rail {

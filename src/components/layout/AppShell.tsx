@@ -3,8 +3,12 @@ import { TabNav, type TabDefinition } from './TabNav'
 
 type AppShellProps<T extends string> = {
   children: ReactNode
-  /** Persistent left-rail content. This is where the stat readout lives. */
-  rail: ReactNode
+  /**
+   * Persistent left-rail content — the stat readout. Omitted on sections where there is no character
+   * in play: a raid loot table and a profession guide have no stats to keep glancing at, and a rail
+   * of numbers belonging to nothing is worse than no rail.
+   */
+  rail?: ReactNode
   tabs: readonly TabDefinition<T>[]
   activeTab: T
   onTabChange: (tab: T) => void
@@ -19,14 +23,16 @@ type AppShellProps<T extends string> = {
  */
 export function AppShell<T extends string>({ children, rail, tabs, activeTab, onTabChange }: AppShellProps<T>) {
   return (
-    <div className="app-shell">
-      <aside className="rail" aria-label="Character summary">
-        <div className="rail-brand">
-          <h1>Project Defeat</h1>
-          <p className="rail-brand-sub">TBC Classic · Phase 2</p>
-        </div>
-        {rail}
-      </aside>
+    <div className={`app-shell${rail ? '' : ' app-shell-no-rail'}`}>
+      {rail && (
+        <aside className="rail" aria-label="Character summary">
+          <div className="rail-brand">
+            <h1>Project Defeat</h1>
+            <p className="rail-brand-sub">TBC Classic · Phase 2</p>
+          </div>
+          {rail}
+        </aside>
+      )}
       <main className="app-main">
         <header className="topbar">
           <TabNav tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
