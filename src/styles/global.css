@@ -25,7 +25,14 @@
 
   --text: #ededed;
   --text-dim: #a3a3a3;
-  --text-faint: #6e6e6e;
+  /*
+   * Was #6e6e6e, which measured 3.88:1 on --surface-0 and failed WCAG AA. It carries the uppercase
+   * eyebrows and the rail's group headers — all 11-12px, so none of them qualify as large text and
+   * all of them needed 4.5:1. #858585 measures 5.37:1 on --surface-0 and 5.08:1 on the --surface-1
+   * rail, and stays visibly a step fainter than --text-dim, which is the distinction this token
+   * exists to make.
+   */
+  --text-faint: #858585;
 
   /* Reserved for genuine warnings — unverified data, unmodelled effects. Not decoration. */
   --warn: #d4a017;
@@ -48,6 +55,15 @@
 
 * {
   box-sizing: border-box;
+}
+
+/*
+ * `small` was left at the browser default of 0.8333em, which resolved to 13.3333px — a size nobody
+ * chose, sitting a third of a pixel away from the 13px step used elsewhere. Pinned so the app has
+ * one small-text size rather than two that differ by rounding.
+ */
+small {
+  font-size: 13px;
 }
 
 body {
@@ -602,6 +618,13 @@ select {
   color: var(--text-dim);
   line-height: 1.5;
   margin: 0 0 18px;
+  /*
+   * Explanatory prose, and the only text in the app that runs long enough to need a measure. At the
+   * planner's full width it was setting ~117 characters per line against a comfortable 45-75, which
+   * makes the return sweep to the next line hard to track. Panels stay full width; only the prose
+   * inside them is capped.
+   */
+  max-width: 72ch;
 }
 
 .form-grid,
