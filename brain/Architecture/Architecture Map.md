@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-116 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+117 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -31,11 +31,12 @@ The modules everything else leans on — change these carefully.
 
 ## By layer
 
-### app (3)
+### app (4)
 
 Entry points and the root composition. Owns which tab is showing and holds the planner state every panel reads.
 
 - [[App]] · 1 importers
+- [[featureFlags]] · 1 importers
 - [[main]] · 0 importers
 - [[styles.global]] · 1 importers
 

@@ -14,6 +14,7 @@ import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
+import { isSimulationEnabled } from './featureFlags'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { EncounterPanel } from './features/simulator/EncounterPanel'
 import { findUpgrades } from './features/simulator/findUpgrades'
@@ -56,6 +57,14 @@ const APP_TABS: readonly TabDefinition<AppTab>[] = [
   { id: 'professions', label: 'Professions' },
 ]
 
+/**
+ * Simulation is currently hidden — see `isSimulationEnabled` for why. Filtered here rather than
+ * removed from `APP_TABS` so the tab's definition, and this comment, stay next to the others.
+ */
+function visibleTabs(simulationEnabled: boolean) {
+  return APP_TABS.filter((tab) => tab.id !== 'simulation' || simulationEnabled)
+}
+
 function toggleId(ids: readonly string[], id: string) {
   return ids.includes(id) ? ids.filter((existing) => existing !== id) : [...ids, id]
 }
@@ -73,6 +82,8 @@ function App() {
   const [restoredBuild] = useState(loadBuildFromStorage)
 
   const [introComplete, setIntroComplete] = useState(false)
+  // Read once at mount: the flag comes from the URL and nothing in-session changes it.
+  const [simulationEnabled] = useState(isSimulationEnabled)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
   const [character, setCharacter] = useState<CharacterProfile>(() => restoredBuild?.character ?? initialCharacter)
   const [gear, setGear] = useState<EquippedGear>(() =>
@@ -160,7 +171,7 @@ function App() {
   if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
 
   return (
-    <AppShell rail={<StatsRail stats={stats} />} tabs={APP_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
+    <AppShell rail={<StatsRail stats={stats} />} tabs={visibleTabs(simulationEnabled)} activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'planner' && (
         <>
           <CharacterPanel character={character} gear={gear} onChange={updateCharacter} />
@@ -178,7 +189,7 @@ function App() {
           <BuildPanel state={buildState} role={role} onImport={importBuild} />
         </>
       )}
-      {activeTab === 'simulation' && (
+      {activeTab === 'simulation' && simulationEnabled && (
         <>
           <EncounterPanel target={target} role={role} onChange={updateTarget} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />

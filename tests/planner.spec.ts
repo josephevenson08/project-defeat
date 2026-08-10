@@ -75,6 +75,16 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
  * stat weights or the upgrade finder has to go there first.
  */
 async function openSimulationTab(page: Page) {
+  // The tab is hidden from the app by default while the estimates are known to be wrong (see
+  // src/featureFlags.ts). The math behind it is still worth testing, so these tests opt back in with
+  // the URL override. The reload is safe because the build autosaves — gear and buffs set before
+  // this point come back with it, which is what lets `readSimulationScore` be called mid-test.
+  if ((await page.getByRole('button', { name: 'Simulation', exact: true }).count()) === 0) {
+    const url = new URL(page.url())
+    url.searchParams.set('simulation', '1')
+    await page.goto(url.toString())
+  }
+
   await page.getByRole('button', { name: 'Simulation', exact: true }).click()
   await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
 }
@@ -208,9 +218,10 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
-  // Simulation is a tab now rather than a panel on this one, so what belongs here is that the way in
-  // exists. The panel itself is asserted at the end, after the character is set up.
-  await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toBeVisible()
+  // Simulation is deliberately NOT offered: the tab is hidden while its estimates are known to be
+  // wrong (src/featureFlags.ts). Asserted as absent rather than simply dropped, so that un-hiding it
+  // is a decision someone makes on purpose rather than something that drifts back in.
+  await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toHaveCount(0)
 
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
