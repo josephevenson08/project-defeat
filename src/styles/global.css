@@ -26,6 +26,14 @@
   --text: #ededed;
   --text-dim: #a3a3a3;
   /*
+   * Pure white, one step above --text, for the headings and values that should read as the primary
+   * thing in their panel. This existed already as 14 hardcoded `#ffffff` declarations — an
+   * undocumented fourth text level that no token described and nothing could change centrally.
+   * Naming it is the fix; flattening it to --text would have thrown away emphasis that was doing
+   * real work.
+   */
+  --text-strong: #ffffff;
+  /*
    * Was #6e6e6e, which measured 3.88:1 on --surface-0 and failed WCAG AA. It carries the uppercase
    * eyebrows and the rail's group headers — all 11-12px, so none of them qualify as large text and
    * all of them needed 4.5:1. #858585 measures 5.37:1 on --surface-0 and 5.08:1 on the --surface-1
@@ -90,7 +98,7 @@ select {
 }
 
 .loading-intro h1 {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: clamp(40px, 8vw, 78px);
   line-height: 1;
   margin: 4px 0 12px;
@@ -784,7 +792,7 @@ select:focus,
 }
 
 .stat-tile strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 24px;
 }
 
@@ -1073,7 +1081,7 @@ select:focus,
 }
 
 .buffs-group h3 {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 15px;
   margin: 0 0 10px;
 }
@@ -1123,7 +1131,7 @@ select:focus,
 }
 
 .buffs-checkbox-row strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
@@ -1214,7 +1222,7 @@ select:focus,
 }
 
 .profession-detail-header h3 {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 20px;
   margin: 0;
 }
@@ -1257,7 +1265,7 @@ select:focus,
 
 .profession-tier-row strong,
 .profession-material-row strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
@@ -1328,7 +1336,7 @@ input[type='number']:focus {
 
 .encounter-preset-active {
   border-color: var(--panel-accent, var(--text-dim));
-  color: #ffffff;
+  color: var(--text-strong);
 }
 
 .encounter-summary small {
@@ -1453,7 +1461,7 @@ input[type='number']:focus {
 }
 
 .stat-weight-relative {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 14px;
   font-weight: 850;
   min-width: 46px;
@@ -1583,7 +1591,7 @@ input[type='number']:focus {
 }
 
 .raid-detail-header h3 {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 20px;
   margin: 0;
 }
@@ -1659,7 +1667,7 @@ input[type='number']:focus {
 }
 
 .raid-boss-header strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 15px;
 }
 
@@ -1730,7 +1738,7 @@ input[type='number']:focus {
 }
 
 .raid-loot-row strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 13px;
 }
 
@@ -1781,7 +1789,7 @@ input[type='number']:focus {
 }
 
 .raid-attunement-step strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 14px;
 }
 
@@ -1883,9 +1891,11 @@ textarea:focus {
   padding-top: 14px;
 }
 
+/* A section heading inside a panel. Same job as `.buffs-group h3`, so the same size — it was 14px
+   against that rule's 15px, which made the two read as different levels when they are not. */
 .racials h3 {
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   margin: 0 0 10px;
 }
 
@@ -1908,7 +1918,7 @@ textarea:focus {
 }
 
 .racials li strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 13px;
 }
 
@@ -1943,9 +1953,10 @@ textarea:focus {
   padding-top: 14px;
 }
 
+/* Also a panel section heading — see `.racials h3`. */
 .build-slots h3 {
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   margin: 0 0 6px;
 }
 
@@ -2007,7 +2018,7 @@ input[type='text']:focus {
 }
 
 .build-slot-main strong {
-  color: #ffffff;
+  color: var(--text-strong);
   font-size: 14px;
   overflow-wrap: anywhere;
 }

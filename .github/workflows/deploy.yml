@@ -1,0 +1,58 @@
+# Builds the planner and publishes it to GitHub Pages on every push to main.
+#
+# The app is local-first with no backend and no runtime network calls, so a static build is the
+# whole deployment — there is nothing to configure at the far end and no secrets to hold.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Lets a deploy be re-run from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+# GITHUB_TOKEN needs to write Pages and mint an OIDC token for the deploy step.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. In-progress runs finish rather than being cancelled, so a deploy that
+# is already uploading is not left half-applied.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Gate the deploy on the same checks the repo gates commits on, so a red build cannot ship.
+      # Playwright is deliberately not run here: it needs browser downloads and a dev server, and it
+      # already runs locally before every push.
+      - run: npx tsc -b
+      - run: npm run lint
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
