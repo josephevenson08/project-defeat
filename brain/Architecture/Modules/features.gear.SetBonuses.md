@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/SetBonuses.tsx
-lines: 50
+lines: 54
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.SetBonuses
 
-`src/features/gear/SetBonuses.tsx` · **features** layer · 50 lines
+`src/features/gear/SetBonuses.tsx` · **features** layer · 54 lines
 
 _No doc comment at the top of this file._
 

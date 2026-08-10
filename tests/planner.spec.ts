@@ -1599,6 +1599,31 @@ test('equipped tier pieces surface their set bonuses, and say they are not score
   await expect(sets).toContainText(/undervalues tier pieces/i)
 })
 
+test('a set with two bonuses at the same threshold renders both', async ({ page }) => {
+  // Voidheart Raiment splits its 2-piece across shadow and fire. That made `bonus.pieces` stop being
+  // a unique React key, and duplicate keys let React drop a child — so the second bonus could vanish
+  // silently while every other assertion still passed. React only warns in the console, which no
+  // test reads, hence checking the rendered count directly.
+  const consoleErrors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text())
+  })
+
+  await page.goto('/')
+  await page.getByLabel('Class').selectOption('Warlock')
+  await selectSlotItem(page, 'Head', 'voidheart-crown')
+  await selectSlotItem(page, 'Chest', 'voidheart-robe')
+
+  const sets = page.getByTestId('set-bonuses')
+  await expect(sets.locator('.set-bonus-name')).toContainText('Voidheart Raiment (2/5)')
+  await expect(sets.locator('.set-bonus-active'), 'both 2-piece bonuses are met, so both must show').toHaveCount(2)
+  await expect(sets.locator('.set-bonus-active').filter({ hasText: 'shadow damage' })).toHaveCount(1)
+  await expect(sets.locator('.set-bonus-active').filter({ hasText: 'fire damage' })).toHaveCount(1)
+  await expect(sets.locator('.set-bonus-inactive')).toHaveCount(1)
+
+  expect(consoleErrors.filter((text) => text.includes('same key')), 'duplicate React keys').toEqual([])
+})
+
 test('every tier set bonus is sourced, reachable, and honest about not being scored', async () => {
   // The set list went from 9 sets to all 17 of Tier 5, each bonus read verbatim off the Wowhead item
   // page in `sourcedFrom`. Three things have to stay true together, and each has failed somewhere in
@@ -1616,8 +1641,13 @@ test('every tier set bonus is sourced, reachable, and honest about not being sco
       problems.push(`${set.id}: no catalogued item carries this setId, so the set is unreachable`)
     }
 
+    // Most sets are one 2-piece and one 4-piece, but not all, so this checks the thresholds rather
+    // than the shape: Voidheart Raiment splits its 2-piece across shadow and fire, and Malorne
+    // Harness splits both tiers across Bear and Cat form. An earlier version of this test asserted
+    // an exact [2, 4] and would have quietly forced those extra bonuses to be dropped.
     const pieceCounts = set.bonuses.map((bonus) => bonus.pieces)
-    expect(pieceCounts, `${set.id} should define a 2- and 4-piece bonus`).toEqual([2, 4])
+    expect(new Set(pieceCounts), `${set.id} defines bonuses at thresholds other than 2 and 4`).toEqual(new Set([2, 4]))
+    expect(pieceCounts, `${set.id} bonuses must be listed in ascending piece order`).toEqual([...pieceCounts].sort((a, b) => a - b))
 
     for (const bonus of set.bonuses) {
       if (bonus.modelled) problems.push(`${set.id} ${bonus.pieces}pc: claims to be modelled, but nothing applies set bonuses`)
@@ -1627,7 +1657,12 @@ test('every tier set bonus is sourced, reachable, and honest about not being sco
   }
 
   expect(problems, problems.join(' | ')).toEqual([])
-  expect(sampleItemSets.length, 'TBC Tier 5 is 17 sets, one per class per role').toBe(17)
+
+  // 17 sets per tier, one per class per role. Tier 4 sits at almost exactly the same item level as
+  // the 17 Gladiator PvP sets, so a batch selected by item level alone picks up both — this pins the
+  // count that says only the tier sets were taken.
+  expect(sampleItemSets.filter((set) => set.tier === 4).length, 'TBC Tier 4 is 17 sets').toBe(17)
+  expect(sampleItemSets.filter((set) => set.tier === 5).length, 'TBC Tier 5 is 17 sets').toBe(17)
 
   // A full set must be assemblable, or the 4-piece bonus can never fire. Five distinct slots.
   for (const set of sampleItemSets) {

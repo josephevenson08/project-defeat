@@ -3,16 +3,21 @@ import type { GearItem } from './itemTypes'
 /**
  * A single set bonus, and — importantly — whether this simulator can act on it.
  *
- * Across all thirty-four Tier 5 bonuses — every one of them, now that the set list is complete —
- * **not one is a flat stat addition.** They are ability-specific ("your Overpower grants 100 attack
- * power", "Starfire damage increased by 10%"), resource-specific ("Bloodthirst and Mortal Strike
- * cost 5 less rage"), pet or talent scaling, or they benefit the party rather than the wearer.
- * Recording them as stats would therefore be inventing numbers, not approximating them — the same
- * category error that had four healer relics carrying flat healing power.
+ * Across all seventy-one bonuses of Tier 4 and Tier 5 — every one of them, now that both set lists
+ * are complete — **not one is an unconditional flat stat addition.** They are ability-specific
+ * ("your Overpower grants 100 attack power", "Starfire damage increased by 10%"), resource-specific
+ * ("Bloodthirst and Mortal Strike cost 5 less rage"), pet, talent or form scaling, cooldown
+ * reductions, or they benefit the party rather than the wearer. Recording them as stats would
+ * therefore be inventing numbers, not approximating them — the same category error that had four
+ * healer relics carrying flat healing power.
  *
- * The nearest miss is Cataclysm Harness 4-piece, "You gain 5% additional haste from your Flurry
- * ability": haste is a stat this engine reads, but it arrives through a talent proc, so a flat 5%
- * would be an invented uptime rather than an approximated one.
+ * Three come close, and each fails for a different reason worth keeping in view:
+ * - Cataclysm Harness 4-piece grants haste, which the engine reads, but through Flurry — a talent
+ *   proc, so a flat 5% would be an invented uptime rather than an approximated one.
+ * - Malorne Harness 4-piece grants 1400 armor, but only in Bear Form.
+ * - Malorne Harness 4-piece also grants 30 Strength, but only in Cat Form. This is the single
+ *   nearest miss in either tier: the app already treats Feral as a cat-form physical DPS, so this
+ *   one would be applicable if form were a first-class concept rather than an implicit assumption.
  *
  * So `modelled` is false everywhere for now, and `whyNotModelled` says what would need to exist
  * first. That is deliberately visible rather than silent: a BiS ranking built from itemised stats
@@ -32,6 +37,8 @@ export type SetBonus = {
 export type ItemSet = {
   id: string
   name: string
+  /** Which raid tier the set belongs to. 4 is Karazhan/Gruul/Magtheridon, 5 is SSC/Tempest Keep. */
+  tier: 4 | 5
   /** Total pieces in the set. TBC tier sets are five. */
   totalPieces: number
   bonuses: readonly SetBonus[]
@@ -51,24 +58,35 @@ const PARTY = 'Benefits the party rather than the wearer, and this simulator mod
 const TRIGGER = 'A proc whose trigger rate the engine does not model — being hit, or landing a spell crit — so its uptime cannot be derived the way an item proc with a stated internal cooldown can.'
 const PET = 'Pets are not modelled at all.'
 const TALENT = 'Scales a talent. There are no talent trees in this app, so the ability it modifies does not exist to be modified.'
+const COOLDOWN = 'Shortens the cooldown of an ability the engine neither models nor schedules, so there is no cooldown for it to shorten.'
+const TOTEM_BUFF = 'Raises the value of a raid buff listed separately on the Buffs panel. Set bonuses are not applied, and the buff entry already records the improved figure in its own notes — applying it here as well would double-count it.'
+const FORM = 'Conditional on a shapeshift form. Forms are an implicit assumption in this app rather than a modelled state, so there is no form to test before applying it.'
 
 /**
- * All seventeen Tier 5 sets, one per class per role. Every bonus below is the verbatim tooltip text,
- * read off the Wowhead item page named in `sourcedFrom` — an item tooltip embeds its whole set
- * listing, so one piece sources both bonuses.
+ * All thirty-four tier sets of Tier 4 and Tier 5 — seventeen each, one per class per role. Every
+ * bonus below is the verbatim tooltip text, read off the Wowhead item page named in `sourcedFrom`
+ * with `tools/ingest/wowhead-lookup.mjs`; an item tooltip embeds its whole set listing, so one piece
+ * sources every bonus the set has.
  *
- * This used to be nine sets, and the four-piece bonuses were unreachable because only Head and Chest
- * were catalogued. All five slots of all seventeen sets now carry a `setId`, so both tiers of bonus
- * are reachable in the app.
+ * Tier 5 began as nine sets whose four-piece bonuses were unreachable, because only Head and Chest
+ * were catalogued. All five slots of all thirty-four sets now carry a `setId`, so every bonus is
+ * reachable in the app.
  *
- * Only Tier 5 is here, which is the phase this app targets. The catalogue knows 222 set names in
- * total — Tier 4, Tier 6, dungeon and PvP sets — and those deliberately show nothing rather than
- * inventing bonuses.
+ * Tier 4 is here as well as Tier 5 because a Phase 2 raider is still wearing pieces of it — the
+ * two-piece bonuses in particular survive well into SSC and Tempest Keep. Most sets carry exactly
+ * one 2-piece and one 4-piece, but not all: Voidheart Raiment splits its 2-piece across shadow and
+ * fire, and Malorne Harness splits both tiers across Bear and Cat form, so `bonuses` is a list and
+ * not a pair.
+ *
+ * The catalogue knows 222 set names in total. The remaining 188 — Tier 6, dungeon and PvP sets,
+ * including 17 Gladiator sets that sit at almost exactly Tier 4's item level — are deliberately
+ * undefined and show nothing rather than inventing bonuses.
  */
 export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'destroyer-battlegear',
     name: 'Destroyer Battlegear',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30118,
     bonuses: [
@@ -79,6 +97,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'destroyer-armor',
     name: 'Destroyer Armor',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30113,
     bonuses: [
@@ -89,6 +108,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'crystalforge-raiment',
     name: 'Crystalforge Raiment',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30134,
     bonuses: [
@@ -99,6 +119,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'crystalforge-armor',
     name: 'Crystalforge Armor',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30123,
     bonuses: [
@@ -109,6 +130,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'crystalforge-battlegear',
     name: 'Crystalforge Battlegear',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30129,
     bonuses: [
@@ -120,6 +142,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'nordrassil-regalia',
     name: 'Nordrassil Regalia',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30231,
     bonuses: [
@@ -131,6 +154,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'nordrassil-raiment',
     name: 'Nordrassil Raiment',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30216,
     bonuses: [
@@ -142,6 +166,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'nordrassil-harness',
     name: 'Nordrassil Harness',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30222,
     bonuses: [
@@ -152,6 +177,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'rift-stalker-armor',
     name: 'Rift Stalker Armor',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30139,
     bonuses: [
@@ -162,6 +188,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'tirisfal-regalia',
     name: 'Tirisfal Regalia',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30196,
     bonuses: [
@@ -173,6 +200,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'avatar-regalia',
     name: 'Avatar Regalia',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30159,
     bonuses: [
@@ -184,6 +212,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'avatar-raiment',
     name: 'Avatar Raiment',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30150,
     bonuses: [
@@ -194,6 +223,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'deathmantle',
     name: 'Deathmantle',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30144,
     bonuses: [
@@ -205,6 +235,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'cataclysm-regalia',
     name: 'Cataclysm Regalia',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30169,
     bonuses: [
@@ -215,6 +246,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'cataclysm-raiment',
     name: 'Cataclysm Raiment',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30164,
     bonuses: [
@@ -225,6 +257,7 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'cataclysm-harness',
     name: 'Cataclysm Harness',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30185,
     bonuses: [
@@ -236,12 +269,211 @@ export const sampleItemSets: readonly ItemSet[] = [
   {
     id: 'corruptor-raiment',
     name: 'Corruptor Raiment',
+    tier: 5,
     totalPieces: 5,
     sourcedFrom: 30211,
     bonuses: [
       { pieces: 2, description: 'Causes your pet to be healed for 15% of the damage you deal.', modelled: false, whyNotModelled: PET },
       { pieces: 4, description: 'Your Shadowbolt spell hits increase the damage of Corruption by 10% and your Incinerate spell hits increase the damage of Immolate by 10%.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
     ],
+  },
+
+  // ---- Tier 4 (Karazhan, Gruul's Lair, Magtheridon's Lair) ----
+  {
+    id: 'warbringer-battlegear',
+    name: 'Warbringer Battlegear',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29019,
+    bonuses: [
+      { pieces: 2, description: 'Your Whirlwind ability costs 5 less rage.', modelled: false, whyNotModelled: RESOURCE },
+      { pieces: 4, description: 'You gain an additional 2 rage each time one of your attacks is parried or dodged.', modelled: false, whyNotModelled: RESOURCE },
+    ],
+  },
+  {
+    id: 'warbringer-armor',
+    name: 'Warbringer Armor',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29011,
+    bonuses: [
+      { pieces: 2, description: 'You have a chance each time you parry to gain Blade Turning, absorbing 200 damage for 15 sec. (Proc chance: 25%)', modelled: false, whyNotModelled: TRIGGER },
+      { pieces: 4, description: 'Your Revenge ability causes your next damaging ability to do 10% more damage.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+  },
+  {
+    id: 'justicar-armor',
+    name: 'Justicar Armor',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29066,
+    bonuses: [
+      { pieces: 2, description: 'Increases the damage dealt by your Seal of Righteousness, Seal of Vengeance, or Seal of [Blood][the Martyr] by 10%.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Increases the damage dealt by your Holy Shield by 15.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+    notes: 'The bracketed "[Blood][the Martyr]" in the 2-piece is the tooltip\'s own faction switch, not a transcription artefact — Horde Paladins get Seal of Blood, Alliance get Seal of the Martyr. Left verbatim rather than resolved to one faction.',
+  },
+  {
+    id: 'justicar-battlegear',
+    name: 'Justicar Battlegear',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29071,
+    bonuses: [
+      { pieces: 2, description: 'Increases the damage bonus of your Judgement of the Crusader by 15%.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Increases the damage dealt by your Judgement of Command by 10%.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+  },
+  {
+    id: 'justicar-raiment',
+    name: 'Justicar Raiment',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29061,
+    bonuses: [
+      { pieces: 2, description: 'Increases the amount healed by your Judgement of Light by 20.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Reduces the cooldown on your Divine Favor ability by 15 sec.', modelled: false, whyNotModelled: COOLDOWN },
+    ],
+  },
+  {
+    id: 'aldor-regalia',
+    name: 'Aldor Regalia',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29076,
+    bonuses: [
+      { pieces: 2, description: 'Gives you a 100% chance to avoid interruption caused by damage while casting Fireball or Frostbolt.', modelled: false, whyNotModelled: 'Prevents spell pushback. The engine already assumes uninterrupted casting, so this bonus is silently baked into every result — modelling it would mean first modelling the incoming damage it protects against.' },
+      { pieces: 4, description: 'Reduces the cooldown on Presence of Mind by 24 sec, on Blast Wave by 4 sec, and on Ice Block by 40 sec.', modelled: false, whyNotModelled: COOLDOWN },
+    ],
+  },
+  {
+    id: 'demon-stalker-armor',
+    name: 'Demon Stalker Armor',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29081,
+    bonuses: [
+      { pieces: 2, description: 'Reduces the chance your Feign Death ability will be resisted by 5%.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Reduces the mana cost of your Multi-Shot ability by 10%.', modelled: false, whyNotModelled: RESOURCE },
+    ],
+  },
+  {
+    id: 'netherblade',
+    name: 'Netherblade',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29044,
+    bonuses: [
+      { pieces: 2, description: 'Increases the duration of your Slice and Dice ability by 3 sec.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Your finishing moves have a 15% chance to grant you a combo point. (Proc chance: 15%)', modelled: false, whyNotModelled: 'Grants combo points, which the engine does not track — it derives a special attack\'s rate from a cooldown or an energy cost, never from a combo-point budget.' },
+    ],
+  },
+  {
+    id: 'incarnate-raiment',
+    name: 'Incarnate Raiment',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29049,
+    bonuses: [
+      { pieces: 2, description: 'Your Prayer of Healing spell now also causes an additional 150 healing over 9 sec.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+      { pieces: 4, description: 'Each time you cast Flash Heal, your next Greater Heal cast within 15 sec has its casting time reduced by 0.1, stacking up to 5 times.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+  },
+  {
+    id: 'incarnate-regalia',
+    name: 'Incarnate Regalia',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29056,
+    bonuses: [
+      { pieces: 2, description: 'Your Shadowfiend now has 75 more stamina and lasts 3 sec. longer.', modelled: false, whyNotModelled: PET },
+      { pieces: 4, description: 'Your Mind Flay and Smite spells deal 5% more damage.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+  },
+  {
+    id: 'malorne-harness',
+    name: 'Malorne Harness',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29096,
+    bonuses: [
+      { pieces: 2, description: 'Your melee attacks in Bear Form and Dire Bear Form have a chance to generate 10 additional rage. (Proc chance: 4%)', modelled: false, whyNotModelled: RESOURCE },
+      { pieces: 2, description: 'Your melee attacks in Cat Form have a chance to generate 20 additional energy. (Proc chance: 4%)', modelled: false, whyNotModelled: RESOURCE },
+      { pieces: 4, description: 'Increases your armor by 1400 in Bear Form and Dire Bear Form.', modelled: false, whyNotModelled: FORM },
+      { pieces: 4, description: 'Increases your strength by 30 in Cat Form.', modelled: false, whyNotModelled: FORM },
+    ],
+    notes: 'Four bonuses, not two — each tier splits across Bear and Cat. The Cat Form 4-piece is the closest either tier comes to being applicable: 30 Strength is exactly the kind of flat stat the engine reads, and the app already treats Feral as cat-form physical DPS. It stays unapplied because form is an implicit assumption here rather than modelled state, so nothing distinguishes a cat from a bear to gate it on.',
+  },
+  {
+    id: 'malorne-raiment',
+    name: 'Malorne Raiment',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29086,
+    bonuses: [
+      { pieces: 2, description: 'Your helpful spells have a chance to restore up to 120 mana. (Proc chance: 5%)', modelled: false, whyNotModelled: RESOURCE },
+      { pieces: 4, description: 'Reduces the cooldown on your Nature\'s Swiftness ability by 24 sec.', modelled: false, whyNotModelled: COOLDOWN },
+    ],
+  },
+  {
+    id: 'malorne-regalia',
+    name: 'Malorne Regalia',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29091,
+    bonuses: [
+      { pieces: 2, description: 'Your harmful spells have a chance to restore up to 120 mana. (Proc chance: 5%)', modelled: false, whyNotModelled: RESOURCE },
+      { pieces: 4, description: 'Reduces the cooldown on your Innervate ability by 48 sec.', modelled: false, whyNotModelled: COOLDOWN },
+    ],
+  },
+  {
+    id: 'cyclone-harness',
+    name: 'Cyclone Harness',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29038,
+    bonuses: [
+      { pieces: 2, description: 'Your Strength of Earth Totem ability grants an additional 12 strength.', modelled: false, whyNotModelled: TOTEM_BUFF },
+      { pieces: 4, description: 'Your Stormstrike ability does an additional 30 damage per weapon.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+    notes: 'The 2-piece is spell 37223, "Improved Strength of Earth" — a set bonus despite the name, and the source of the 98 Strength that Strength of Earth Totem reaches. It is easy to mistake for the Enhancing Totems talent, which reaches the same 98 by a different route (+15% of 86).',
+  },
+  {
+    id: 'cyclone-raiment',
+    name: 'Cyclone Raiment',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29028,
+    bonuses: [
+      { pieces: 2, description: 'Your Mana Spring Totem ability grants an additional 3 mana every 2 sec.', modelled: false, whyNotModelled: TOTEM_BUFF },
+      { pieces: 4, description: 'Reduces the cooldown on your Nature\'s Swiftness ability by 24 sec.', modelled: false, whyNotModelled: COOLDOWN },
+    ],
+    notes: 'The 2-piece is spell 37210, "Improved Mana Spring Totem" — again a set bonus, not the Restorative Totems talent that raises the same totem by 25%.',
+  },
+  {
+    id: 'cyclone-regalia',
+    name: 'Cyclone Regalia',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 29033,
+    bonuses: [
+      { pieces: 2, description: 'Your Wrath of Air Totem ability grants an additional 20 spell damage.', modelled: false, whyNotModelled: TOTEM_BUFF },
+      { pieces: 4, description: 'Your offensive spell critical strikes have a chance to reduce the base mana cost of your next spell by 270. (Proc chance: 11%)', modelled: false, whyNotModelled: RESOURCE },
+    ],
+    notes: 'The 2-piece is spell 37212, "Improved Wrath of Air Totem". This is the 121 spell power wowsims models as that totem\'s "improved" value — a set bonus, not a talent. TBC has no Improved Wrath of Air Totem talent at all.',
+  },
+  {
+    id: 'voidheart-raiment',
+    name: 'Voidheart Raiment',
+    tier: 4,
+    totalPieces: 5,
+    sourcedFrom: 28963,
+    bonuses: [
+      { pieces: 2, description: 'Your shadow damage spells have a chance to grant you 135 bonus shadow damage for 15 sec. (Proc chance: 5%)', modelled: false, whyNotModelled: TRIGGER },
+      { pieces: 2, description: 'Your fire damage spells have a chance to grant you 135 bonus fire damage for 15 sec. (Proc chance: 5%)', modelled: false, whyNotModelled: TRIGGER },
+      { pieces: 4, description: 'Increases the duration of your Corruption and Immolate abilities by 3 sec.', modelled: false, whyNotModelled: ABILITY_SPECIFIC },
+    ],
+    notes: 'Two separate 2-piece bonuses, one per school, and both are school-specific spell power — a quantity StatBlock has no field for even before the proc rate is considered.',
   },
 ]
 

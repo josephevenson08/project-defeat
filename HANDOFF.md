@@ -30,7 +30,7 @@ Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitH
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 65 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 66 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -110,8 +110,19 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
   further down only references the variable, so reading that call gets you an identifier, not data.
   The rows are JS object literals, not JSON (`quality:-1` is unquoted), and spell names contain
   colons, so bare keys have to be quoted with a scanner rather than a regex.
-- **Individual spell pages carry the tooltip in `g_spells[<id>].tooltip_enus`**, which is far more
-  reliable than the prose the old parser was fighting.
+- **Individual spell pages carry the tooltip in `g_spells[<id>].tooltip_enus`**, and item pages in
+  `g_items[<id>].tooltip_enus` — an item tooltip embeds its whole set listing and every "(2) Set:"
+  line, so one piece sources a set's bonuses. Both are far more reliable than the prose the old
+  parser was fighting. `tools/ingest/wowhead-lookup.mjs` does the fetching, decoding and
+  rank-disambiguation; it prints and writes nothing, because the reading is the part that has to
+  stay human.
+- **"Improved <totem>" spell names in the 37xxx range are Tier 4 set bonuses, not talents.** 37223
+  "Improved Strength of Earth", 37210 "Improved Mana Spring Totem" and 37212 "Improved Wrath of Air
+  Totem" are the Cyclone 2-piece bonuses. This is easy to get backwards because the real talents
+  reach similar numbers by a different route — Enhancing Totems (2 ranks, +15%) takes Strength of
+  Earth to the same 98 the set bonus reaches by adding a flat 12. The talent that raises Mana Spring
+  is called **Restorative Totems**, not "Improved Mana Spring Totem"; there is no Improved Wrath of
+  Air Totem talent at all.
 - **wowsims is not infallible where it disagrees with a tooltip.** It models Blessing of Wisdom at
   42 mp5; spells 27142 and 27143 both say 41. That was the only outright conflict across all 33 —
   everything else agreed to the digit — but it is the reason the tooltip is the tie-breaker.
@@ -133,10 +144,10 @@ and armour procs are unpopulated (schema exists, data does not), and rotations c
 
 ### 2. Polish
 
-- Tier set bonuses now cover **all 17 Tier 5 sets**, each read verbatim off the Wowhead item page in
-  `sourcedFrom`. The other 205 ingested set names (Tier 4, Tier 6, dungeon, PvP) are deliberately
-  undefined and show nothing rather than inventing bonuses — Tier 4 is the obvious next batch, since
-  a Phase 2 raider is still wearing pieces of it.
+- Tier set bonuses now cover **all 34 sets of Tier 4 and Tier 5** — 17 each, 71 bonuses — read
+  verbatim off the Wowhead item page in `sourcedFrom`. The other 188 ingested set names (Tier 6,
+  dungeon, PvP) are deliberately undefined and show nothing rather than inventing bonuses. Tier 6 is
+  the next batch if wanted, though it is past this app's stated Phase 2 target.
 - The BiS and Buffs panels are on the design tokens but still use the older layout shapes; they'd
   benefit from the treatment the gear panel got.
 

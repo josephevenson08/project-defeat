@@ -33,10 +33,14 @@ export function SetBonuses({ activeSets }: SetBonusesProps) {
           <span className="set-bonus-name">
             {set.name} ({equippedPieces}/{set.totalPieces})
           </span>
-          {set.bonuses.map((bonus) => {
+          {set.bonuses.map((bonus, index) => {
             const live = activeBonuses.includes(bonus)
             return (
-              <small className={live ? 'set-bonus-active' : 'set-bonus-inactive'} key={bonus.pieces}>
+              // Keyed by index, not by `bonus.pieces`: a set can carry more than one bonus at the
+              // same threshold. Voidheart Raiment splits its 2-piece across shadow and fire, and
+              // Malorne Harness splits both tiers across Bear and Cat form, so the piece count
+              // stopped being unique the moment Tier 4 was added.
+              <small className={live ? 'set-bonus-active' : 'set-bonus-inactive'} key={index}>
                 ({bonus.pieces}) {bonus.description}
                 {live ? ' — active, not counted' : ''}
               </small>

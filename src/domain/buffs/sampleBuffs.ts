@@ -259,7 +259,7 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Physical DPS', 'Tank'],
     stats: { strength: 86 },
     notes:
-      'Rank 6: "increases the strength of party members within 20 yards by 86". Enhancing Totems 5/5 raises it to 98, and the Cyclone 4-piece bonus does the same; both together give 112.',
+      'Rank 6: "increases the strength of party members within 20 yards by 86". Two things raise it, and they are commonly confused: Enhancing Totems 2/2 (a talent, +15%) gives 98, and the Cyclone Harness 2-piece — not 4-piece — adds a flat 12 for the same 98 (spell 37223, "Improved Strength of Earth", which is a set bonus despite the name). Both together give 112.',
   },
   {
     id: 'grace-of-air-totem',
@@ -269,7 +269,7 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Physical DPS'],
     stats: { agility: 77 },
     notes:
-      'Rank 3, the highest in TBC: "increases the agility of party members within 20 yards by 77". Enhancing Totems 5/5 raises it to 88.',
+      'Rank 3, the highest in TBC: "increases the agility of party members within 20 yards by 77". Enhancing Totems 2/2 (+15%) raises it to 88.',
   },
   {
     id: 'mana-spring-totem',
@@ -279,7 +279,7 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Caster DPS', 'Healer'],
     stats: { mp5: 50 },
     notes:
-      'Rank 5: "restores 20 mana every 2 seconds", which is 50 per 5 seconds. Improved Mana Spring Totem 5/5 raises it to 62.5.',
+      'Rank 5: "restores 20 mana every 2 seconds", which is 50 per 5 seconds. Restorative Totems 5/5 (a talent, +25%) raises it to 62.5. Separately, the Cyclone Raiment 2-piece adds 3 mana every 2 sec — spell 37210, "Improved Mana Spring Totem", which is a set bonus and not the talent its name suggests.',
   },
   {
     id: 'totem-of-wrath',
@@ -302,7 +302,7 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Caster DPS', 'Healer'],
     stats: { spellPower: 101 },
     notes:
-      '"Party members within 20 yards of the totem have their spell damage and healing increased by up to 101". Spell power, not haste — the haste version of this totem is a Wrath of the Lich King change, and this entry previously carried 101 spell haste rating. Improved Wrath of Air Totem 2/2 raises it to 121.',
+      '"Party members within 20 yards of the totem have their spell damage and healing increased by up to 101". Spell power, not haste — the haste version of this totem is a Wrath of the Lich King change, and this entry previously carried 101 spell haste rating. The 121 that wowsims models as the "improved" value is the Cyclone Regalia 2-piece set bonus, not a talent: spell 37212 is named "Improved Wrath of Air Totem" but is a set bonus granting an additional 20 spell damage.',
   },
   {
     id: 'windfury-totem',
