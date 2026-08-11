@@ -218,6 +218,8 @@ async function withSlotOpen(page: Page, slot: string, assertions: () => Promise<
 }
 import { getGemById, sampleGems, socketBonusIsActive } from '../src/domain/gems/sampleGems'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
+import { getTalentData } from '../src/domain/talents/sampleTalents'
+import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 
@@ -240,7 +242,7 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toHaveCount(0)
 
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
   // Deliberately not pinned to a specific item. The default is whichever legal item the catalogue
   // offers first, which legitimately moves whenever the catalogue is re-ingested; what this test
   // actually cares about is that a legal weapon is equipped at all.
@@ -278,15 +280,15 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Orc')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Blood Elf')
   await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Arcane')
-  await page.getByLabel('Specialization').selectOption('Fire')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Arcane')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
 
   // The panel used to restate the character as "Blood Elf Fire Mage" under the selects. That summary
   // has been removed, so the selects themselves are the record of what was chosen — and they are the
   // thing the rest of this test depends on being right.
   await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Blood Elf')
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
 
   await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
   await selectSlotItem(page, 'Main Hand', 'apprentice-focus-staff')
@@ -308,8 +310,8 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Priest')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Discipline')
-  await page.getByLabel('Specialization').selectOption('Holy')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Discipline')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
   await selectSlotItem(page, 'Hands', 'healers-grace-gloves')
   await selectSlotEnchant(page, 'Hands', 'Gloves - Major Healing')
 
@@ -320,7 +322,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
 
   await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Paladin')
-  await page.getByLabel('Specialization').selectOption('Protection')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
   await selectSlotItem(page, 'Chest', 'bulwark-chestguard')
     // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
   // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
@@ -424,7 +426,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
 
@@ -455,7 +457,7 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
 
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
@@ -506,7 +508,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
 
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expect(page.getByText('Enhancement Shaman Phase 2 Ranked List')).toBeVisible()
@@ -533,7 +535,7 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
 
   // One row per trinket: the ranking is not duplicated across Trinket 1 and Trinket 2, because each
   // row already carries an equip button for both sockets.
@@ -653,7 +655,7 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
   await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(1)
 
   await page.getByLabel('Class').selectOption('Shaman')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Elemental')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Elemental')
 
   // Switching faction should keep the class legal by picking a valid race for it (Draenei -> Horde has no Draenei,
   // so it should land on a Horde race that can still be a Shaman: Orc, Tauren, or Troll).
@@ -684,7 +686,7 @@ test('item quality renders with the standard WoW rarity color', async ({ page })
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Enhancement')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
   await selectSlotItem(page, 'Head', 'cataclysm-helm')
 
   // Quality is carried by colour on the item name itself now, rather than spelled out in a caption.
@@ -707,7 +709,7 @@ test('character role sets a distinct accent color across Character, Stats, and S
   await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', physicalDps)
 
   await page.getByLabel('Class').selectOption('Priest')
-  await page.getByLabel('Specialization').selectOption('Holy')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
 
   // Holy Priest is a Healer, and the accent carries to the rail and the simulator too.
   await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', healer)
@@ -724,7 +726,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await page.getByLabel('Faction').selectOption('Horde')
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
   await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByLabel('Specialization').selectOption('Elemental')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Elemental')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
@@ -733,7 +735,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Restoration')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
@@ -750,7 +752,7 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByLabel('Specialization').selectOption('Arms')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Arms Warrior Phase 2 Ranked List')).toBeVisible()
@@ -758,7 +760,7 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Protection')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Protection Warrior Phase 2 Ranked List')).toBeVisible()
@@ -787,7 +789,7 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Paladin')
-  await page.getByLabel('Specialization').selectOption('Holy')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   // Asserted on the gear slot rather than a BiS heading: the Holy Paladin guide publishes no Libram
@@ -798,13 +800,13 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Protection')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
   await expect(page.getByText('Protection Paladin Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Retribution')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Retribution')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
@@ -829,7 +831,7 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Priest')
-  await page.getByLabel('Specialization').selectOption('Holy')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Holy Priest Phase 2 Ranked List')).toBeVisible()
@@ -837,10 +839,10 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Discipline')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Discipline')
   await expect(page.getByText('Discipline Priest Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Shadow')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Shadow')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Shadow Priest Phase 2 Ranked List')).toBeVisible()
@@ -869,19 +871,19 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   // Druid is only legal for Night Elf (Alliance) and Tauren (Horde); pick Night Elf before Class so it's offered.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
   await page.getByLabel('Class').selectOption('Druid')
-  await page.getByLabel('Specialization').selectOption('Balance')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Balance')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Balance Druid Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Feral')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Feral')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
   await expect(page.getByText('Feral Druid Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Restoration')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
 
   await expect(slotCell(page, 'Ranged')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
@@ -908,7 +910,7 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
   // Hunter is not legal for the default Human race; pick Dwarf first so Hunter is offered.
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
   await page.getByLabel('Class').selectOption('Hunter')
-  await page.getByLabel('Specialization').selectOption('Beast Mastery')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Beast Mastery')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Beast Mastery Hunter Phase 2 Ranked List')).toBeVisible()
@@ -916,10 +918,10 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Marksmanship')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Marksmanship')
   await expect(page.getByText('Marksmanship Hunter Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Survival')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Survival')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Survival Hunter Phase 2 Ranked List')).toBeVisible()
@@ -946,7 +948,7 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Mage')
-  await page.getByLabel('Specialization').selectOption('Arcane')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arcane')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Arcane Mage Phase 2 Ranked List')).toBeVisible()
@@ -954,10 +956,10 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Fire')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
   await expect(page.getByText('Fire Mage Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Frost')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Frost')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Frost Mage Phase 2 Ranked List')).toBeVisible()
@@ -1030,7 +1032,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Rogue')
-  await page.getByLabel('Specialization').selectOption('Assassination')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Assassination')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Assassination Rogue Phase 2 Ranked List')).toBeVisible()
@@ -1044,7 +1046,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Combat')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
   await expect(page.getByText('Combat Rogue Phase 2 Ranked List')).toBeVisible()
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Warp Slicer' })).toHaveCount(1)
@@ -1053,7 +1055,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Subtlety')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Subtlety')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Subtlety Rogue Phase 2 Ranked List')).toBeVisible()
@@ -1080,7 +1082,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Warlock')
-  await page.getByLabel('Specialization').selectOption('Affliction')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Affliction')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Affliction Warlock Phase 2 Ranked List')).toBeVisible()
@@ -1094,10 +1096,10 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
   })
 
-  await page.getByLabel('Specialization').selectOption('Demonology')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Demonology')
   await expect(page.getByText('Demonology Warlock Phase 2 Ranked List')).toBeVisible()
 
-  await page.getByLabel('Specialization').selectOption('Destruction')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Destruction')
 
   await expect(slotCell(page, 'Relic')).toHaveCount(0)
   await expect(page.getByText('Destruction Warlock Phase 2 Ranked List')).toBeVisible()
@@ -1181,7 +1183,7 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await openPlannerTab(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Human')
   await page.getByLabel('Class').selectOption('Priest')
-  await page.getByLabel('Specialization').selectOption('Holy')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-healingPower')).toContainText('1.00')
   await expect(page.locator('.stat-weights-unmodeled')).toContainText('MP5')
@@ -1189,7 +1191,7 @@ test('stat weights follow the character role and class', async ({ page }) => {
   // Tanks normalize against stamina and get the avoidance stat set.
   await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByLabel('Specialization').selectOption('Protection')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-stamina')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
@@ -1280,7 +1282,7 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
 
   await page.getByLabel('Class').selectOption('Mage')
-  await page.getByLabel('Specialization').selectOption('Fire')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
 
   // The autosave runs in an effect, so wait for it to actually reach storage before reloading.
   await expect
@@ -1305,7 +1307,7 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
   await page.getByTestId('section-planner').click()
 
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Fire')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
 })
 
 test('a build can be exported and imported back', async ({ page }) => {
@@ -1416,6 +1418,86 @@ test('the Raids tab renders a raid, its bosses and an attunement chain', async (
   const attunement = page.getByTestId('raid-attunement')
   await expect(attunement).toBeVisible()
   await expect(attunement.locator('li').first()).toBeVisible()
+})
+
+test('the Warrior talent trees are complete and their spending rules hold', async () => {
+  // Ingested from Wowhead's TBC talent calculator, joining the grid payload (row, column, ranks,
+  // prerequisites) to the spell payload that carries each rank's name and description.
+  const data = getTalentData('Warrior')
+  expect(data, 'Warrior talents must be ingested').toBeTruthy()
+  expect(data!.trees.map((tree) => tree.spec)).toEqual(['Arms', 'Fury', 'Protection'])
+
+  for (const tree of data!.trees) {
+    // Nine rows, 0-indexed. The deepest is the 41-point tier, and it is the talent a build is
+    // usually named after — the panel rendered eight rows at first and dropped it from all three.
+    const deepest = tree.talents.filter((talent) => talent.row === 8)
+    expect(deepest.length, `${tree.spec} must have a 41-point talent`).toBe(1)
+
+    for (const talent of tree.talents) {
+      expect(talent.name, `${tree.spec} talent ${talent.id} needs a name`).toBeTruthy()
+      expect(talent.rankDescriptions.length, `${talent.name} needs one description per rank`).toBe(talent.maxRank)
+      expect(talent.spellIds.length).toBe(talent.maxRank)
+      expect(talent.column).toBeGreaterThanOrEqual(0)
+      expect(talent.column).toBeLessThanOrEqual(3)
+    }
+  }
+
+  const arms = data!.trees[0]
+  const fury = data!.trees[1]
+  expect(fury.talents.find((talent) => talent.row === 8)!.name).toBe('Rampage')
+
+  // A row is gated on points already in that tree, and the gate is stated rather than just disabling.
+  const deepArms = arms.talents.find((talent) => talent.row === 8)!
+  expect(whyBlocked(data!.trees, arms, deepArms, {})).toMatch(/Needs 40 points in Arms/)
+
+  // Filling row 0 opens row 1 but nothing deeper.
+  const firstRow = arms.talents.find((talent) => talent.row === 0)!
+  const secondRow = arms.talents.find((talent) => talent.row === 1)!
+  const fiveInRowOne = { [firstRow.id]: firstRow.maxRank, [arms.talents.filter((t) => t.row === 0)[1]?.id ?? -1]: 5 - firstRow.maxRank }
+  expect(whyBlocked(data!.trees, arms, secondRow, fiveInRowOne)).toBeUndefined()
+
+  // The 41-point budget is global, not per tree. Spending it all in Arms must close Fury.
+  const allSpent: Record<number, number> = {}
+  let left = TALENT_POINTS_AT_70
+  for (const talent of [...arms.talents].sort((a, b) => a.row - b.row)) {
+    if (left <= 0) break
+    const take = Math.min(talent.maxRank, left)
+    allSpent[talent.id] = take
+    left -= take
+  }
+  expect(pointsSpent(data!.trees, allSpent)).toBe(TALENT_POINTS_AT_70)
+  expect(whyBlocked(data!.trees, fury, fury.talents[0], allSpent)).toBe('No points left.')
+
+  // Removal is refused where the game would refuse it. `allSpent` is a legitimately reachable state
+  // — it was filled from row 0 downward — which matters, because a hand-built state that already
+  // violates the row rules makes every removal illegal and proves nothing.
+  const deepestFilled = [...arms.talents].filter((talent) => (allSpent[talent.id] ?? 0) > 0).sort((a, b) => b.row - a.row)[0]
+  expect(canRemovePoint(arms, deepestFilled, allSpent), 'the deepest spent talent is always removable').toBe(true)
+
+  // Removing a single point can never strand a deeper talent below its row requirement, because the
+  // requirement counts points in the whole tree — including the deep point itself. Placing one
+  // therefore always leaves the total at least one above the gate, so taking one back leaves exactly
+  // enough. Asserted rather than assumed: `canRemovePoint` guards against it anyway, and this pins
+  // the reasoning so the guard is not mistaken for something that fires.
+  const rowZero = arms.talents.filter((talent) => talent.row === 0)
+  const tight: Record<number, number> = {}
+  let toPlace = POINTS_PER_ROW
+  for (const talent of rowZero) {
+    const take = Math.min(talent.maxRank, toPlace)
+    if (take > 0) tight[talent.id] = take
+    toPlace -= take
+  }
+  tight[secondRow.id] = 1
+  expect(pointsInTree(arms, tight)).toBe(POINTS_PER_ROW + 1)
+  expect(canRemovePoint(arms, rowZero[0], tight), 'five points remain, which is what row 1 needs').toBe(true)
+
+  // And a prerequisite cannot be emptied while the talent it gates is still spent into.
+  const gated = arms.talents.find((talent) => talent.requires.length > 0)
+  if (gated) {
+    const prerequisite = arms.talents.find((talent) => talent.id === gated.requires[0].id)!
+    const holding = { ...allSpent, [prerequisite.id]: prerequisite.maxRank, [gated.id]: 1 }
+    expect(canRemovePoint(arms, prerequisite, holding), `${prerequisite.name} still holds up ${gated.name}`).toBe(false)
+  }
 })
 
 test('a hybrid gem earns the socket bonus it satisfies', async () => {
@@ -1665,7 +1747,7 @@ test('armor comes from the catalogue, and the derivation only fills genuine gaps
 test('equipped tier pieces surface their set bonuses, and say they are not scored', async ({ page }) => {
   await openApp(page)
   await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByLabel('Specialization').selectOption('Fury')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fury')
 
   await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
   await selectSlotItem(page, 'Chest', 'destroyer-breastplate')
@@ -2032,7 +2114,7 @@ test('named build slots survive a character switch that would overwrite the auto
   await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
   await page.getByTestId('build-slot-load-Fury main').click()
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
-  await expect(page.getByLabel('Specialization')).toHaveValue('Fury')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
 
   // Slots persist across a reload, since they live in storage rather than component state. The
   // section choice does not, so re-enter the planner before looking for them.

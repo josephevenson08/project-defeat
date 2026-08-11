@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/builds/buildTypes.ts
-lines: 41
+lines: 46
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.builds.buildTypes
 
-`src/domain/builds/buildTypes.ts` · **domain** layer · 41 lines
+`src/domain/builds/buildTypes.ts` · **domain** layer · 46 lines
 
 From the top of the file:
 

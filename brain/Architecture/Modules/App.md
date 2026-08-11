@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 241
+lines: 249
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 241 lines
+`src/App.tsx` · **app** layer · 249 lines
 
 _No doc comment at the top of this file._
 
@@ -27,6 +27,7 @@ _Nothing exported (side-effect or style module)._
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
+- [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
@@ -50,6 +51,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Imported by
 

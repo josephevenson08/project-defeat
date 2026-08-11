@@ -9,6 +9,8 @@ import { applySavedGear, type BuildState } from './domain/builds/buildSerializat
 import type { SavedBuild } from './domain/builds/buildTypes'
 import { CharacterCreator } from './features/character/CharacterCreator'
 import { CharacterRail } from './features/character/CharacterRail'
+import { TalentsPanel } from './features/talents/TalentsPanel'
+import type { TalentPoints } from './domain/talents/talentTypes'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
 import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
@@ -96,14 +98,15 @@ function App() {
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>(() => restoredBuild?.activeBuffIds ?? [])
   const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>(() => restoredBuild?.activeConsumableIds ?? [])
   const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>(() => restoredBuild?.activeTargetDebuffIds ?? [])
+  const [talentPoints, setTalentPoints] = useState<TalentPoints>(() => restoredBuild?.talentPoints ?? {})
   const [target, setTarget] = useState<SimulationTarget>(() => restoredBuild?.target ?? defaultSimulationTarget)
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
-  const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target }
+  const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target }
 
   useEffect(() => {
-    saveBuildToStorage({ character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target })
-  }, [character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target])
+    saveBuildToStorage({ character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target })
+  }, [character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target])
 
   function importBuild(build: SavedBuild) {
     setCharacter(build.character)
@@ -111,6 +114,7 @@ function App() {
     setActiveBuffIds(build.activeBuffIds)
     setActiveConsumableIds(build.activeConsumableIds)
     setActiveTargetDebuffIds(build.activeTargetDebuffIds)
+    setTalentPoints(build.talentPoints ?? {})
     setTarget(build.target)
     setSimulationResult(undefined)
   }
@@ -134,6 +138,9 @@ function App() {
   }
 
   function updateCharacter(nextCharacter: CharacterProfile) {
+    // Talents belong to a class. Keeping them across a class change would leave points sitting on
+    // talent ids that the new class's trees do not contain.
+    if (nextCharacter.className !== character.className) setTalentPoints({})
     setCharacter(nextCharacter)
     setGear((current) => normalizeGearForCharacter(current, nextCharacter.className, nextCharacter.spec))
     setSimulationResult(undefined)
@@ -219,6 +226,7 @@ function App() {
           {/* The character selects live in the rail now — see CharacterRail. This tab is what you
               are doing, not who you are. */}
           <GearPanel character={character} gear={gear} onChange={updateGear} />
+          <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />
           <BisPanel character={character} gear={gear} onEquip={updateGear} />
           <BuildPanel state={buildState} role={role} onImport={importBuild} />
         </>

@@ -15,6 +15,7 @@ export type BuildState = {
   activeBuffIds: readonly string[]
   activeConsumableIds: readonly string[]
   activeTargetDebuffIds: readonly string[]
+  talentPoints: Readonly<Record<number, number>>
   target: SavedBuild['target']
 }
 
@@ -39,8 +40,19 @@ export function serializeBuild(state: BuildState): SavedBuild {
     activeBuffIds: [...state.activeBuffIds],
     activeConsumableIds: [...state.activeConsumableIds],
     activeTargetDebuffIds: [...state.activeTargetDebuffIds],
+    talentPoints: { ...state.talentPoints },
     target: { ...state.target },
   }
+}
+
+/** Talent points arrive as an id-keyed map; anything else in that field is discarded rather than trusted. */
+function isPointMap(value: unknown): value is Record<number, number> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.entries(value).every(([key, entry]) => Number.isFinite(Number(key)) && typeof entry === 'number' && entry >= 0)
+  )
 }
 
 function isStringArray(value: unknown): value is string[] {
@@ -157,6 +169,7 @@ export function validateBuild(parsed: unknown): BuildImportResult {
       activeBuffIds: isStringArray(candidate.activeBuffIds) ? candidate.activeBuffIds : [],
       activeConsumableIds: isStringArray(candidate.activeConsumableIds) ? candidate.activeConsumableIds : [],
       activeTargetDebuffIds: isStringArray(candidate.activeTargetDebuffIds) ? candidate.activeTargetDebuffIds : [],
+      talentPoints: isPointMap(candidate.talentPoints) ? candidate.talentPoints : {},
       target,
     },
   }

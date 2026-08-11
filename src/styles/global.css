@@ -290,6 +290,137 @@ select {
 }
 
 /*
+ * Talents: three 4-wide grids side by side, as the game lays them out.
+ *
+ * The geometry is the information here — how deep a build goes is a vertical distance, and comparing
+ * two builds means comparing two shapes. A list of talent names would lose that entirely.
+ */
+.talents-summary {
+  align-items: baseline;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.talents-reset {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.talents-reset:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.talent-trees {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.talent-tree {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--tree-accent);
+  padding: 14px;
+}
+
+.talent-tree-head {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.talent-tree-head h3 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.talent-tree-count {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.talent-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Holds the column open where a tree has no talent, so rows stay aligned across all three trees. */
+.talent-empty {
+  aspect-ratio: 1;
+}
+
+.talent {
+  align-items: center;
+  aspect-ratio: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: 2px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 4px;
+  text-align: center;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.talent:hover {
+  border-color: var(--line-strong);
+}
+
+.talent-name {
+  font-size: 9px;
+  line-height: 1.15;
+  overflow: hidden;
+}
+
+.talent-rank {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* Spent, and spent out — the two states worth seeing at a glance from across the grid. */
+.talent-filled {
+  border-color: var(--tree-accent);
+  color: var(--text);
+}
+
+.talent-filled .talent-rank {
+  color: var(--tree-accent);
+}
+
+.talent-maxed {
+  background: var(--surface-3);
+}
+
+.talent-maxed .talent-rank {
+  color: #6f8f6a;
+}
+
+/* A row you have not reached yet. Dimmed rather than hidden: seeing what is further down the tree is
+   most of the reason to look at a tree at all. */
+.talent-locked {
+  opacity: 0.45;
+}
+
+/*
  * A socketed gem: a colour-matched frame standing in for the gem icon, its name in quality colour,
  * and what it actually gives you. The dropdown above names the gem; this says why you picked it.
  *

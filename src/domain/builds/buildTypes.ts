@@ -27,6 +27,11 @@ export type SavedBuild = {
   activeBuffIds: string[]
   activeConsumableIds: string[]
   activeTargetDebuffIds: string[]
+  /**
+   * Points per talent id. Optional because every build saved before talents existed omits it, and
+   * those builds must keep loading — an older save is a valid save, not a corrupt one.
+   */
+  talentPoints?: Record<number, number>
   target: SimulationTarget
 }
 
