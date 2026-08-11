@@ -11,6 +11,7 @@ import { animateEquipFeedback } from '../../lib/animations'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemById, getVisibleGearSlotsForSpec } from '../gear/gearData'
 import type { EquippedGear, EquippedSlot, GearItem } from '../gear/gearTypes'
+import { slotGlyph } from '../gear/slotGlyphs'
 
 type BisPanelProps = {
   character: CharacterProfile
@@ -116,73 +117,71 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
 
                     return (
                       <article className="bis-entry" key={`${entry.slot}-${entry.rank}-${entry.itemId}`}>
-                        <div className="bis-entry-main">
-                          <span className="bis-rank">#{entry.rank}</span>
-                          <div>
-                            <h4 style={item ? { color: getQualityColor(item.quality) } : undefined}>{item?.name ?? entry.itemId}</h4>
-                            <p>
-                              {wowItemId ? `Item ID ${wowItemId}` : 'Item ID pending audit'} · {displayName}
-                            </p>
-                          </div>
-                        </div>
+                        <span className="bis-rank">#{entry.rank}</span>
 
-                        <dl className="bis-entry-details">
-                          <div>
-                            <dt>Source</dt>
-                            <dd>{source.sourceType ?? (item ? itemLocation(item) || item.source : entry.sourceName)}</dd>
-                          </div>
-                          {(source.instance || source.bossOrVendor || source.phase) && (
-                            <div>
-                              <dt>Farm</dt>
-                              <dd>
-                                {[source.instance, source.bossOrVendor, source.phase ? `Phase ${source.phase}` : undefined].filter(Boolean).join(' · ')}
-                              </dd>
-                            </div>
-                          )}
-                          {source.needsVerification && (
-                            <div className="bis-verification-warning">
-                              <dt>Verification</dt>
-                              <dd>{source.notes ?? 'Needs source/rank verification before treating as final.'}</dd>
-                            </div>
-                          )}
-                          {entry.notes && (
-                            <div>
-                              <dt>Notes</dt>
-                              <dd>{entry.notes}</dd>
-                            </div>
-                          )}
-                          {item?.crafting && (
-                            <div className="bis-crafting-details">
-                              <dt>Crafting</dt>
-                              <dd>
-                                <p className="crafting-headline">
-                                  {item.craftedBy}
-                                  {item.crafting.requiredSkill ? ` (${item.crafting.requiredSkill} skill)` : ''}
-                                  {item.crafting.specialization ? ` · ${item.crafting.specialization}` : ''}
-                                </p>
-                                <p className="crafting-recipe-source">Recipe: {item.crafting.recipeSource}</p>
-                                <ul className="crafting-materials">
-                                  {item.crafting.materials.map((material) => (
-                                    <li key={material.name}>
-                                      <strong>
-                                        {material.quantity}x {material.name}
-                                      </strong>
-                                      <span> — {material.farmSource}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </dd>
-                            </div>
-                          )}
+                        {/* Frame first, so a row is anchored the same way the paperdoll is. Sized to
+                            the icon it will become once art lands. */}
+                        <span className="bis-item-frame" aria-hidden="true">
+                          <span className="bis-item-frame-text">{slotGlyph(entry.slot)}</span>
+                          {item?.itemLevel ? <span className="bis-item-ilvl">{item.itemLevel}</span> : null}
+                        </span>
+
+                        <div className="bis-entry-body">
+                          <h4 style={item ? { color: getQualityColor(item.quality) } : undefined}>{item?.name ?? entry.itemId}</h4>
+
+                          {/*
+                            Identity on one line rather than three stacked definition rows: id, slot,
+                            and where it comes from. "Farm" was a second source line saying the same
+                            thing in more words, so instance and boss fold in here instead.
+                          */}
+                          <p className="bis-entry-meta">
+                            {wowItemId ? `#${wowItemId}` : 'ID pending'} · {displayName} ·{' '}
+                            {[
+                              source.sourceType ?? (item ? itemLocation(item) || item.source : entry.sourceName),
+                              source.instance,
+                              source.bossOrVendor,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </p>
+
                           {(enchantName || gemNames.length > 0) && (
-                            <div>
-                              <dt>Recommended</dt>
-                              <dd>
-                                {[enchantName, gemNames.length > 0 ? gemNames.join(', ') : undefined].filter(Boolean).join(' · ')}
-                              </dd>
+                            <p className="bis-entry-recommended">
+                              <span className="bis-entry-tag">Recommended</span>
+                              {[enchantName, gemNames.length > 0 ? gemNames.join(', ') : undefined].filter(Boolean).join(' · ')}
+                            </p>
+                          )}
+
+                          {/* Crafting stays: knowing an item is crafted is useless without knowing
+                              what it costs, which is the one thing you cannot look up in-game while
+                              standing at a vendor. */}
+                          {item?.crafting && (
+                            <div className="bis-crafting">
+                              <p className="crafting-headline">
+                                {item.craftedBy}
+                                {item.crafting.requiredSkill ? ` (${item.crafting.requiredSkill} skill)` : ''}
+                                {item.crafting.specialization ? ` · ${item.crafting.specialization}` : ''}
+                                {item.crafting.recipeSource ? ` — recipe: ${item.crafting.recipeSource}` : ''}
+                              </p>
+                              <ul className="crafting-materials">
+                                {item.crafting.materials.map((material) => (
+                                  <li key={material.name}>
+                                    <strong>
+                                      {material.quantity}x {material.name}
+                                    </strong>
+                                    <span> — {material.farmSource}</span>
+                                  </li>
+                                ))}
+                              </ul>
                             </div>
                           )}
-                        </dl>
+
+                          {source.needsVerification && (
+                            <p className="bis-verification-warning">
+                              {source.notes ?? 'Needs source/rank verification before treating as final.'}
+                            </p>
+                          )}
+                        </div>
 
                         {item ? (
                           <div className="bis-equip-actions">

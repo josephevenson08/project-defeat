@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearPanel.tsx
-lines: 147
+lines: 126
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearPanel
 
-`src/features/gear/GearPanel.tsx` · **features** layer · 147 lines
+`src/features/gear/GearPanel.tsx` · **features** layer · 126 lines
 
 _No doc comment at the top of this file._
 
@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.gear.SetBonuses]] — `src/features/gear/SetBonuses.tsx`
+- [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 
 ## Imported by
 

@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

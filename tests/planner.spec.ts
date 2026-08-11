@@ -489,7 +489,12 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Ranged', exact: true })).toHaveCount(0)
 
-  await expect(page.getByText('Serpentshrine Cavern · Leotheras the Blind · Phase 2')).toBeVisible()
+  // Instance and boss used to be a separate "Farm" row restating the source in more words. They now
+  // sit on the single identity line with the item id and slot, so this asserts the content rather
+  // than the old row's exact punctuation.
+  const leotherasRow = page.locator('.bis-entry', { hasText: 'Leotheras the Blind' }).first()
+  await expect(leotherasRow).toContainText('Serpentshrine Cavern')
+  await expect(leotherasRow).toContainText('Leotheras the Blind')
   await expect(page.getByText(/Needs source\/rank verification/i).first()).toBeVisible()
 })
 
@@ -507,7 +512,8 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await expect(page.getByText('Enhancement Shaman Phase 2 Ranked List')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
   await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Helm' })).toBeVisible()
-  await expect(page.getByText(/Item ID 30190/i)).toBeVisible()
+  // The id is now prefixed with # on the compact identity line rather than spelled "Item ID".
+  await expect(page.getByTestId('bis-panel').getByText(/#30190/)).toBeVisible()
 
   const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
   await page.getByRole('button', { name: /Equip Cataclysm Helm/i }).click()

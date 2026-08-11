@@ -7,6 +7,7 @@ import { SetBonuses } from './SetBonuses'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 import { ItemPopup } from './ItemPopup'
+import { slotGlyph } from './slotGlyphs'
 
 type GearPanelProps = {
   character: CharacterProfile
@@ -29,28 +30,6 @@ const PAPERDOLL: Record<'left' | 'right' | 'weapons', readonly GearSlot[]> = {
   left: ['Head', 'Neck', 'Shoulders', 'Back', 'Chest', 'Wrists'],
   right: ['Hands', 'Waist', 'Legs', 'Feet', 'Finger 1', 'Finger 2', 'Trinket 1', 'Trinket 2'],
   weapons: ['Main Hand', 'Off Hand', 'Ranged', 'Relic'],
-}
-
-/** Short glyph standing in for an item icon. No art assets, and no network calls at runtime. */
-const SLOT_GLYPH: Record<string, string> = {
-  Head: 'HD',
-  Neck: 'NK',
-  Shoulders: 'SH',
-  Back: 'BK',
-  Chest: 'CH',
-  Wrists: 'WR',
-  Hands: 'HN',
-  Waist: 'WT',
-  Legs: 'LG',
-  Feet: 'FT',
-  'Finger 1': 'R1',
-  'Finger 2': 'R2',
-  'Trinket 1': 'T1',
-  'Trinket 2': 'T2',
-  'Main Hand': 'MH',
-  'Off Hand': 'OH',
-  Ranged: 'RG',
-  Relic: 'RL',
 }
 
 /**
@@ -85,7 +64,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
     return (
       <button type="button" className="gear-cell" key={slot} aria-label={`${displayName} slot`} onClick={() => setOpenSlot(slot)}>
         <span className="gear-glyph" aria-hidden="true">
-          <span className="gear-glyph-text">{SLOT_GLYPH[slot] ?? '--'}</span>
+          <span className="gear-glyph-text">{slotGlyph(slot)}</span>
           {equipped.item.itemLevel ? <span className="gear-ilvl">{equipped.item.itemLevel}</span> : null}
           {equipped.item.sockets?.length ? (
             <span className="gear-gems">
