@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 
 ## Concepts & phases
 

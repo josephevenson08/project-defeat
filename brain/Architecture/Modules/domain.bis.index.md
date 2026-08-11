@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 
 ## Concepts & phases
 

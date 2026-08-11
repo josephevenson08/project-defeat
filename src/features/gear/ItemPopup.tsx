@@ -3,6 +3,8 @@ import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { describeStats } from '../../domain/stats/describeStats'
+import { getBisListForSpec } from '../../domain/bis'
+import { getPairedGearSlots } from '../../domain/gear/slotCompatibility'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
@@ -37,6 +39,12 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
   const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
   // The same function calculateStats uses, so the panel can never claim a bonus the totals withheld.
   const socketBonusMet = socketBonusIsActive(equipped.item.sockets, equipped.gemIds)
+
+  /** Where the current item sits in this spec's ranked list for this slot, if it is on it at all. */
+  const rankedHere = useMemo(() => {
+    const list = getBisListForSpec(character.className, character.spec)
+    return list?.entries.find((entry) => entry.itemId === equipped.item.id && getPairedGearSlots(entry.slot).includes(slot))
+  }, [character.className, character.spec, equipped.item.id, slot])
   const enchants = getEnchantsForSlot(slot, character, equipped.item)
 
   /**
@@ -88,7 +96,13 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
           </button>
         </header>
 
-        <div className="popup-body">
+        {/*
+          Two panes: the list you are choosing from on the left, everything about the current choice
+          on the right. Stacked, the detail sat below the list and you scrolled past the thing you
+          were picking to read about it — so comparing two items meant scrolling between them.
+        */}
+        <div className="popup-body popup-body-split">
+          <div className="popup-pane popup-pane-list">
           <label className="popup-field">
             <span className="popup-field-label">
               Item
@@ -135,6 +149,30 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
               )}
             </select>
           </label>
+          </div>
+
+          <div className="popup-pane popup-pane-detail">
+          {/* What the current choice actually gives you, ahead of where it drops from. */}
+          <div className="popup-item-stats">
+            <p className="popup-pane-title">{equipped.item.name}</p>
+            <p className="popup-item-statline">{describeStats(equipped.item.stats) || 'No stats recorded for this item.'}</p>
+
+            {/*
+              The ranked list, summarised for this one item instead of laid out in full below the
+              picker. Whether the thing you are looking at is actually recommended for your spec is
+              the question the guide list exists to answer, and it is answerable in a line.
+            */}
+            {rankedHere ? (
+              <p className="popup-rank popup-rank-listed" data-testid="popup-rank">
+                <strong>#{rankedHere.rank}</strong> for {character.spec} {character.className} in this slot
+                {rankedHere.notes ? ` — ${rankedHere.notes}` : ''}
+              </p>
+            ) : (
+              <p className="popup-rank" data-testid="popup-rank">
+                Not in the {character.spec} {character.className} ranked list for this slot.
+              </p>
+            )}
+          </div>
 
           {enchants.length > 0 && (
             <label className="popup-field">
@@ -224,6 +262,7 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
           ) : null}
 
           <ItemFacts item={equipped.item} slotLabel={displayName} />
+          </div>
         </div>
       </div>
     </div>
