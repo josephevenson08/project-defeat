@@ -4,7 +4,7 @@
 disagrees with this file, trust git.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`0cfefb6`**, everything pushed.
+`josephevenson08/project-defeat`, currently at **`c165cf1`**, everything pushed.
 
 ---
 
@@ -41,7 +41,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 67 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 70 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -53,10 +53,19 @@ npm run brain                         # "0 written" — idempotent
 A local-first React + TypeScript + Vite planner for WoW TBC Classic, targeting Phase 2 (SSC/TK,
 Tier 5). No backend, no runtime network calls — typed data and generated JSON in the repo.
 
-**Layout:** Discord skeleton — a persistent left rail holding the stat readout, one main pane, four
-tabs (Character Planner, Simulation, Raids, Professions), popups layered over rather than modes you
-travel between. Tesla's restraint in the palette, Nothing's detailing: flat surfaces, hairline rules,
-tracked uppercase mono labels, tabular figures, no gradients.
+**Layout:** intro → a **section picker** (Character Planner / Raids / Professions) → the chosen
+section, with a tab bar for moving between them afterwards. Discord skeleton underneath: a left rail,
+one main pane, popups layered over rather than modes you travel between. Tesla's restraint in the
+palette, Nothing's detailing: flat surfaces, hairline rules, tracked uppercase mono labels, tabular
+figures, no gradients.
+
+**The rail is section-specific.** Planner: the character selects plus the stat readout. Raids: the
+raid switcher. Professions: none. A rail of numbers beside a loot table would describe something not
+on screen.
+
+**Entering the planner runs character creation** — four steps, faction → race → class → spec, each
+committing immediately so an earlier change re-narrows everything after it. A restored build skips
+it; the rail's "Start over" reopens it.
 
 **Colour policy:** item quality colour is information, not decoration, so it stays and everything
 else is near-monochrome *specifically so quality reads first*. Socket colours likewise. Role accents
@@ -76,6 +85,8 @@ node tools/ingest/ingest-bis.mjs                # BiS rankings, 27 specs
 node tools/ingest/ingest-bis-recommendations.mjs # gem + enchant picks per spec
 node tools/ingest/validate-sample.mjs --sample 32 --max-phase 2 --quality Epic
 node tools/ingest/reconcile-curated.mjs --check-wowhead
+node tools/ingest/ingest-talents.mjs --class Warrior  # 66 Warrior talents
+node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 ```
 
 | | Was | Now |
@@ -87,6 +98,8 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
 | Consumables | 14 | **31** |
 | Gem/enchant recommendations | none | **107 + 274** |
 | Raid buffs | 14, all unverified | **33**, each cited to a spell rank |
+| Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
+| Talents | none | **66**, Warrior only |
 
 ---
 
@@ -166,7 +179,33 @@ and Fury already layers Bloodthirst and Whirlwind onto white damage. What it can
 Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
 for melee, not a priority-list engine, which is mostly already there.
 
-### 2. UI — audited, three fixes applied, two findings retracted
+### 2. UI — the requested rework is done except professions, tier lists and icons
+
+Everything below shipped this session, each as its own commit. What is left is listed at the end.
+
+- **Section picker** in front of the tab bar; **stat rail scoped to the planner**.
+- **Character creation journey**; the Character panel is gone from the tab and its four selects live
+  in the rail. The role card and racial traits list were removed by request — the role still drives
+  every accent and `applyRacialTraits` still feeds the totals, they are just not restated.
+- **Gear paperdoll** — armour left, everything else right, weapons across the bottom, right column
+  mirrored so glyphs sit on the outer edge. Spec filtering is unchanged.
+- **Gem sockets** show the gem, its stats, and whether the socket bonus is *earned right now*.
+- **Ranked-gear rows** rebuilt: frame, one identity line, filled Equip. Farm and Notes removed,
+  crafting kept.
+- **Gear popup split in two** — picker left, the choice's stats, rank, enchant, sockets and source
+  right. It previously never showed item stats at all.
+- **Warrior talents**, ingested. See below.
+- **Raids rebuilt** — a picker first, loot only, other raids in the rail. Boss mechanics and role
+  notes deliberately removed; attunement chains kept, since access is not a fight guide.
+- **Colour**: section, raid and talent-tree accents; real gem colours; item quality as a hairline on
+  each paperdoll slot; enchants in the game's green.
+
+**Buffs & Consumables and the Simulation tab are both hidden, not deleted.** Panels and data are
+untouched on disk; `src/featureFlags.ts` explains the simulation one, and `?simulation=1` brings it
+back for the tests. The buff/consumable/debuff id lists stay in `App` because `calculateStats`,
+`findUpgrades` and the saved-build format all still read them.
+
+### 2a. Earlier UI audit — three fixes applied, two findings retracted
 
 A measured audit of the running app (not a stylesheet read) found and fixed:
 
@@ -201,7 +240,34 @@ Still open, and deliberately left for a design decision rather than guessed at:
   pure black maximises halation and spends the darkest value available. Left alone — it is a
   deliberate part of the stated aesthetic and the contrast measurements all pass.
 
-### 3. Polish
+### 3. What is left of the requested rework
+
+- **Professions levelling guides**, in the style of wow-professions.com. Not started.
+- **Spec tier-list view** — the three Wowhead DPS/healer/tank ranking pages, as their own view. Note
+  these rank *specs*, not items, so they cannot drive the per-slot BiS lists; that was confirmed.
+- **Item and gem icons.** Deliberately deferred to last. Everything is built to take them: the
+  paperdoll glyph, the ranked-row frame and the raid loot frame all share `slotGlyphs` and are sized
+  to the icon that replaces them, and gem frames are colour-matched placeholders. The open decision
+  is vendoring into the repo (offline-safe, ~15-25 MB in a OneDrive folder) versus hotlinking
+  Wowhead's CDN (breaks the no-runtime-network-calls invariant).
+
+### 4. Talents — Warrior only, by design
+
+66 talents across Arms, Fury and Protection, ingested by `tools/ingest/ingest-talents.mjs`. Adding a
+class is one line in `TREES_BY_CLASS` plus a re-run; classes without data say so rather than
+rendering an empty tree.
+
+The calculator page is an empty shell. The trees come from
+`nether.wowhead.com/tbc/data/talents-classic` as **two payloads that must be joined**: a
+`WH.setPageData` grid with rows, columns, ranks and prerequisites, and a `WH.Gatherer.addData(6, …)`
+call further down the same file with the spell rows. The grid never names a talent — a talent is
+named after its rank-1 spell.
+
+`canRemovePoint` keeps a row-requirement guard that **provably cannot fire**: a row needs `row * 5`
+points counting the deep point itself, so placing one always leaves the total a point clear of the
+gate. Documented in place, and a test pins the reasoning so it is not mistaken for reachable code.
+
+### 5. Polish
 
 - Tier set bonuses now cover **all 34 sets of Tier 4 and Tier 5** — 17 each, 71 bonuses — read
   verbatim off the Wowhead item page in `sourcedFrom`. The other 188 ingested set names (Tier 6,
