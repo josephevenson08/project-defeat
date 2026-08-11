@@ -242,7 +242,30 @@ Still open, and deliberately left for a design decision rather than guessed at:
 
 ### 3. What is left of the requested rework
 
-- **Professions levelling guides**, in the style of wow-professions.com. Not started.
+- **Professions levelling guides**, in the style of wow-professions.com. Not started, but the URLs
+  are resolved — the obvious `/guides/tbc-<prof>-leveling-guide` pattern 404s. The real index is
+  `https://www.wow-professions.com/tbc-classic`, and the guides are:
+
+  ```
+  /tbc/alchemy-leveling-guide-burning-crusade-classic
+  /tbc/blacksmithing-leveling-guide-burning-crusade-classic
+  /tbc/enchanting-leveling-guide-burning-crusade-classic
+  /tbc/engineering-leveling-guide-burning-crusade-classic
+  /tbc/jewelcrafting-leveling-guide-burning-crusade-classic
+  /tbc/leatherworking-leveling-guide-burning-crusade-classic
+  /tbc/tailoring-leveling-guide-burning-crusade-classic
+  /tbc/cooking-leveling-guide-tbc-classic
+  /tbc/first-aid-leveling-guide-burning-crusade-classic
+  /tbc/fishing-leveling-guide-burning-crusade-classic
+  /tbc/herbalism-leveling-guide-tbc-classic   /tbc/mining-leveling-guide-tbc-classic
+  /tbc/skinning-leveling-guide-tbc-classic    /tbc/lockpicking-leveling-guide-tbc-classic
+  ```
+
+  `ProfessionProfile.levelingPath` already exists and `RecipeLeveling` already has the right shape
+  (skill range, recipe, recipe source, key materials). The 300-375 TBC tail is partly filled with
+  several steps flagged `needsVerification`; those are the ones to replace. **Take the facts, not the
+  prose** — skill ranges, item names and material counts are facts, their wording is not. The 1-300
+  vanilla range is out of scope for a Phase 2 planner and is honestly marked as not itemised.
 - **Spec tier-list view** — the three Wowhead DPS/healer/tank ranking pages, as their own view. Note
   these rank *specs*, not items, so they cannot drive the per-slot BiS lists; that was confirmed.
 - **Item and gem icons.** Deliberately deferred to last. Everything is built to take them: the
