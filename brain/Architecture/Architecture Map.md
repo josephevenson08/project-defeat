@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-124 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+126 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -53,7 +53,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (31)
+### features (33)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -70,10 +70,12 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.gear.gearTypes]] · 10 importers
 - [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
-- [[features.gear.slotGlyphs]] · 2 importers
+- [[features.gear.slotGlyphs]] · 3 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.raids.RaidAttunementChain]] · 1 importers
 - [[features.raids.RaidLootList]] · 1 importers
+- [[features.raids.RaidPicker]] · 1 importers
+- [[features.raids.RaidRail]] · 1 importers
 - [[features.raids.RaidsPanel]] · 1 importers
 - [[features.simulator.calculateSimulation]] · 3 importers
 - [[features.simulator.calculateStatWeights]] · 2 importers
@@ -152,7 +154,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.sampleProfessions]] · 1 importers
 - [[domain.professions.sampleProfessionTiers]] · 2 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
-- [[domain.raids.index]] · 3 importers
+- [[domain.raids.index]] · 5 importers
 - [[domain.raids.karazhanBosses]] · 1 importers
 - [[domain.raids.magtheridonsLairBosses]] · 1 importers
 - [[domain.raids.raidTypes]] · 9 importers
@@ -168,7 +170,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers
-- [[domain.stats.describeStats]] · 2 importers
+- [[domain.stats.describeStats]] · 3 importers
 - [[domain.stats.statTypes]] · 14 importers
 - [[domain.stats.statUtils]] · 2 importers
 - [[domain.talents.sampleTalents]] · 1 importers

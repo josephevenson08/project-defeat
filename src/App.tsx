@@ -31,6 +31,8 @@ import { calculateStats } from './features/stats/calculateStats'
 import { StatsRail } from './features/stats/StatsRail'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
 import { RaidsPanel } from './features/raids/RaidsPanel'
+import { RaidPicker } from './features/raids/RaidPicker'
+import { RaidRail } from './features/raids/RaidRail'
 import type { TabDefinition } from './components/layout/TabNav'
 
 const initialCharacter: CharacterProfile = {
@@ -99,6 +101,11 @@ function App() {
   const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>(() => restoredBuild?.activeConsumableIds ?? [])
   const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>(() => restoredBuild?.activeTargetDebuffIds ?? [])
   const [talentPoints, setTalentPoints] = useState<TalentPoints>(() => restoredBuild?.talentPoints ?? {})
+  /*
+   * Which raid's loot is being read. Undefined means the picker: five loot tables stacked on one page
+   * is several hundred rows, and nobody arrives wanting all five — they arrive wanting one.
+   */
+  const [selectedRaidId, setSelectedRaidId] = useState<string>()
   const [target, setTarget] = useState<SimulationTarget>(() => restoredBuild?.target ?? defaultSimulationTarget)
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
@@ -215,6 +222,10 @@ function App() {
             <CharacterRail character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
             <StatsRail stats={stats} />
           </>
+        ) : activeTab === 'raids' && selectedRaidId ? (
+          // Same argument as the planner's stat rail: the rail holds the thing you keep returning to
+          // while reading the main pane. Here that is the list of other raids.
+          <RaidRail selectedRaidId={selectedRaidId} onSelect={setSelectedRaidId} onBackToPicker={() => setSelectedRaidId(undefined)} />
         ) : undefined
       }
       tabs={visibleTabs(simulationEnabled)}
@@ -239,7 +250,8 @@ function App() {
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
         </>
       )}
-      {activeTab === 'raids' && <RaidsPanel />}
+      {activeTab === 'raids' &&
+        (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
       {activeTab === 'professions' && <ProfessionsPanel />}
     </AppShell>
   )

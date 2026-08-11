@@ -1397,27 +1397,50 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   expect(hunter.result.summary).toMatch(/Steady Shot is not included/i)
 })
 
-test('the Raids tab renders a raid, its bosses and an attunement chain', async ({ page }) => {
+test('Raids opens on a picker, then shows one raid’s loot with the rest in the rail', async ({ page }) => {
   // The raids panel is one of three things this repo has historically shipped that nothing rendered,
-  // and it was the only part of the app with that history and no test confirming it still renders.
+  // so this covers that it still renders — and now that it renders the right thing. The tab used to
+  // stack five raids' loot behind a boss-by-boss accordion; it now asks which raid first.
   await openApp(page)
   await page.getByRole('button', { name: 'Raids', exact: true }).click()
 
+  // Picker first, and no rail yet — there is nothing to switch between until something is chosen.
+  await expect(page.getByTestId('raid-pick-serpentshrine-cavern')).toBeVisible()
+  await expect(page.locator('.rail')).toHaveCount(0)
+
+  await page.getByTestId('raid-pick-serpentshrine-cavern').click()
+
   const detail = page.getByTestId('raid-detail')
   await expect(detail).toBeVisible()
+  await expect(detail).toContainText('Lady Vashj')
 
-  // A raid with no bosses would still render a panel, so assert the content and not just the shell.
-  await expect(detail.getByRole('heading').first()).toBeVisible()
-  await expect(detail).toContainText(/Serpentshrine Cavern|Tempest Keep|Karazhan|Gruul|Magtheridon/)
+  // Loot is expanded on arrival. The accordion this replaced hid the one thing the page is for
+  // behind a click per boss.
+  const firstDrop = detail.locator('.raid-loot-row').first()
+  await expect(firstDrop).toBeVisible()
+  await expect(firstDrop.locator('.raid-loot-frame')).toBeVisible()
+  // A loot table of names alone says what drops but not whether you want it.
+  await expect(detail.locator('.raid-loot-stats').first()).toBeVisible()
 
-  // Attunement chains only exist for Serpentshrine Cavern and Tempest Keep, and only render under the
-  // Attunement view — so the toggle has to be reachable and the chain has to survive the switch.
-  // This is the part most likely to disappear silently, since nothing else links to it.
-  await page.getByRole('button', { name: 'Serpentshrine Cavern', exact: true }).click()
+  // Explicitly not a fight guide any more.
+  await expect(detail.locator('.raid-boss-mechanics')).toHaveCount(0)
+  await expect(detail.locator('.raid-boss-role-notes')).toHaveCount(0)
+
+  // The other raids move to the rail, so switching never leaves the page.
+  await expect(page.getByTestId('rail-raid-tempest-keep')).toBeVisible()
+  await page.getByTestId('rail-raid-tempest-keep').click()
+  await expect(page.getByTestId('raid-detail')).toContainText(/Al'ar|Void Reaver|Kael/)
+
+  // Attunement chains exist only for Serpentshrine Cavern and Tempest Keep, and are access
+  // information rather than a fight guide, so they survive the loot-only rework.
   await page.getByRole('button', { name: 'Attunement', exact: true }).click()
   const attunement = page.getByTestId('raid-attunement')
   await expect(attunement).toBeVisible()
   await expect(attunement.locator('li').first()).toBeVisible()
+
+  // And the picker is reachable again.
+  await page.getByTestId('raids-back-to-picker').click()
+  await expect(page.getByTestId('raid-pick-karazhan')).toBeVisible()
 })
 
 test('the Warrior talent trees are complete and their spending rules hold', async () => {

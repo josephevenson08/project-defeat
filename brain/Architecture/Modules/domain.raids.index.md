@@ -28,6 +28,8 @@ _No doc comment at the top of this file._
 
 - [[features.raids.RaidAttunementChain]] — `src/features/raids/RaidAttunementChain.tsx`
 - [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
+- [[features.raids.RaidPicker]] — `src/features/raids/RaidPicker.tsx`
+- [[features.raids.RaidRail]] — `src/features/raids/RaidRail.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 
 ## Concepts & phases

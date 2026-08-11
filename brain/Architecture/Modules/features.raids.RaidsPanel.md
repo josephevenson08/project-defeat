@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidsPanel.tsx
-lines: 175
+lines: 99
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidsPanel
 
-`src/features/raids/RaidsPanel.tsx` · **features** layer · 175 lines
+`src/features/raids/RaidsPanel.tsx` · **features** layer · 99 lines
 
 _No doc comment at the top of this file._
 
