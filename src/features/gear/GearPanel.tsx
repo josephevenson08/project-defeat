@@ -62,7 +62,19 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
     const enchant = equipped.enchantId ? getEnchantById(equipped.enchantId) : undefined
 
     return (
-      <button type="button" className="gear-cell" key={slot} aria-label={`${displayName} slot`} onClick={() => setOpenSlot(slot)}>
+      <button
+        type="button"
+        className="gear-cell"
+        key={slot}
+        aria-label={`${displayName} slot`}
+        onClick={() => setOpenSlot(slot)}
+        /*
+         * The equipped item's quality, as a hairline down the edge of its slot. Quality is already the
+         * one colour this interface lets carry meaning, and repeating it on the frame means the
+         * paperdoll reads at a glance — which slots hold epics is answerable without reading a name.
+         */
+        style={{ '--slot-quality': getQualityColor(equipped.item.quality) } as React.CSSProperties}
+      >
         <span className="gear-glyph" aria-hidden="true">
           <span className="gear-glyph-text">{slotGlyph(slot)}</span>
           {equipped.item.itemLevel ? <span className="gear-ilvl">{equipped.item.itemLevel}</span> : null}

@@ -1084,6 +1084,24 @@ select {
   outline: none;
 }
 
+/* The equipped item's quality as a hairline on the slot's outer edge — see GearPanel for why. */
+.gear-column-left .gear-cell,
+.gear-weapons .gear-cell {
+  border-left: 2px solid var(--slot-quality, var(--line));
+}
+
+/* Mirrored, so the right column's rule sits on its outer edge too. */
+.gear-column-right .gear-cell {
+  border-right: 2px solid var(--slot-quality, var(--line));
+}
+
+@media (max-width: 760px) {
+  .gear-column-right .gear-cell {
+    border-left: 2px solid var(--slot-quality, var(--line));
+    border-right: 1px solid var(--line);
+  }
+}
+
 .gear-glyph {
   align-items: center;
   background: var(--surface-0);
@@ -1149,8 +1167,17 @@ select {
   white-space: nowrap;
 }
 
+/*
+ * Enchants take the green the game prints them in on an item tooltip. Like item quality and socket
+ * colour, this is a hue a WoW player already reads as a category rather than as decoration — it says
+ * "this line is an enchant" before the words are read.
+ *
+ * Muted well below the greens used for confirm and success, so it stays a label and does not read as
+ * a state. Measures 6.6:1 on the gear cell's surface. An empty slot keeps `--text-faint` instead —
+ * "No enchant" is an absence, not an enchant.
+ */
 .gear-enchant {
-  color: var(--text-dim);
+  color: #7fa87f;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
