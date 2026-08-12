@@ -27,7 +27,9 @@ tags: [brain/domain, domain/profession]
 - skill 100–285: **Fish-based recipes: Bristle Whisker Catfish, Rockscale Cod, Spotted Yellowtail** — Trainer-taught and cooking supplier vendors; requires the corresponding fish to be caught via Fishing.
 - skill 225–300: **"Clamlette Surprise" and related quest chain** — Quest chain in your faction capital, needed to unlock Artisan Cooking.
 - skill 275–375: **Master Cookbook purchase** — Gaston (Alliance, Honor Hold) / Baxter (Horde, Thrallmar) / Naka (neutral, Cenarion Refuge); learn from bag once purchased.
-- skill 285–375: **Outland recipes: Ravager Dog, Golden Fish Sticks, Spicy Crawdad Surprise** — Cooking dailies vendors in Outland (e.g. Zangarmarsh) and Master Cookbook trainer-equivalent recipes.
+- skill 300–325: **30x Ravager Dog, or 30x Buzzard Bites** — Recipe: Ravager Dog sold by Cookie One-Eye (Horde) and the Alliance equivalent in Hellfire Peninsula. · 30 Ravager Flesh, or 30 Buzzard Meat
+- skill 325–355: **40x of any one of Talbuk Steak, Roasted Clefthoof or Warp Burger** — Outland vendor recipes. · 40 Talbuk Venison, Clefthoof Meat or Warped Flesh — whichever you can farm
+- skill 355–375: **60x Crunchy Serpent, or 60x Mok'Nathal Shortribs** — Horde: both from Xerintha Ravenoak. Alliance has an equivalent vendor. · 60 Serpent Flesh, or 60 Raptor Ribs
 
 ## Where this lives in the code
 

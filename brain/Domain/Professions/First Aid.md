@@ -27,8 +27,10 @@ tags: [brain/domain, domain/profession]
 - skill 40–150: **Heavy Linen Bandage, Wool Bandage, Heavy Wool Bandage** — Trainer-taught. · Linen Cloth, Wool Cloth
 - skill 150–225: **Silk Bandage, Heavy Silk Bandage, Mageweave Bandage** — Expert manual purchased from Deneb Walker (Alliance, Arathi Highlands) or Balai Lok'Wein (Horde, Dustwallow Marsh); learn from bag. · Silk Cloth, Mageweave Cloth
 - skill 225–260: **Heavy Mageweave Bandage** — Unlocked via the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde; requires level 35, skill 225).
-- skill 260–330: **Runecloth Bandage, Heavy Runecloth Bandage** — Trainer-taught (Artisan tier). · Runecloth
-- skill 330–375: **Netherweave Bandage, Heavy Netherweave Bandage** — Manuals purchased from Burko (Alliance, Temple of Telhamat) or Aresella (Horde, Falcon Watch), Hellfire Peninsula, alongside the "Doctor in the House" Master First Aid manual; learn from bag. · Netherweave Cloth
+- skill 260–300: **Runecloth Bandage** — Trainer-taught. · Runecloth
+- skill 300–330: **70x Heavy Runecloth Bandage** — Trainer-taught. · 140 Runecloth
+- skill 330–360: **45x Netherweave Bandage** — Manual: Netherweave Bandage, from an Outland vendor. · 45 Netherweave Cloth
+- skill 360–375: **20x Heavy Netherweave Bandage** — Manual: Heavy Netherweave Bandage, from an Outland vendor. · 40 Netherweave Cloth
 
 ## Where this lives in the code
 

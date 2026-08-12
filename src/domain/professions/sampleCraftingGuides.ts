@@ -482,11 +482,23 @@ const cookingLeveling: readonly RecipeLeveling[] = [
     recipeSource: 'Gaston (Alliance, Honor Hold) / Baxter (Horde, Thrallmar) / Naka (neutral, Cenarion Refuge); learn from bag once purchased.',
   },
   {
-    skillRange: [285, 375],
-    recipeOrItem: 'Outland recipes: Ravager Dog, Golden Fish Sticks, Spicy Crawdad Surprise',
-    recipeSource: 'Cooking dailies vendors in Outland (e.g. Zangarmarsh) and Master Cookbook trainer-equivalent recipes.',
-    needsVerification: true,
-    notes: 'Some late recipes are notably gold-expensive due to rare fish/meat requirements (e.g. Spicy Crawdad Surprise).',
+    skillRange: [300, 325],
+    recipeOrItem: '30x Ravager Dog, or 30x Buzzard Bites',
+    recipeSource: 'Recipe: Ravager Dog sold by Cookie One-Eye (Horde) and the Alliance equivalent in Hellfire Peninsula.',
+    keyMaterials: ['30 Ravager Flesh, or 30 Buzzard Meat'],
+  },
+  {
+    skillRange: [325, 355],
+    recipeOrItem: '40x of any one of Talbuk Steak, Roasted Clefthoof or Warp Burger',
+    recipeSource: 'Outland vendor recipes.',
+    keyMaterials: ['40 Talbuk Venison, Clefthoof Meat or Warped Flesh — whichever you can farm'],
+    notes: 'Pick by what your zone drops rather than by the food: all three cover the same range.',
+  },
+  {
+    skillRange: [355, 375],
+    recipeOrItem: "60x Crunchy Serpent, or 60x Mok'Nathal Shortribs",
+    recipeSource: 'Horde: both from Xerintha Ravenoak. Alliance has an equivalent vendor.',
+    keyMaterials: ['60 Serpent Flesh, or 60 Raptor Ribs'],
   },
 ]
 
@@ -515,16 +527,28 @@ const firstAidLeveling: readonly RecipeLeveling[] = [
     recipeSource: 'Unlocked via the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde; requires level 35, skill 225).',
   },
   {
-    skillRange: [260, 330],
-    recipeOrItem: 'Runecloth Bandage, Heavy Runecloth Bandage',
-    recipeSource: 'Trainer-taught (Artisan tier).',
+    skillRange: [260, 300],
+    recipeOrItem: 'Runecloth Bandage',
+    recipeSource: 'Trainer-taught.',
     keyMaterials: ['Runecloth'],
   },
   {
-    skillRange: [330, 375],
-    recipeOrItem: 'Netherweave Bandage, Heavy Netherweave Bandage',
-    recipeSource: 'Manuals purchased from Burko (Alliance, Temple of Telhamat) or Aresella (Horde, Falcon Watch), Hellfire Peninsula, alongside the "Doctor in the House" Master First Aid manual; learn from bag.',
-    keyMaterials: ['Netherweave Cloth'],
+    skillRange: [300, 330],
+    recipeOrItem: '70x Heavy Runecloth Bandage',
+    recipeSource: 'Trainer-taught.',
+    keyMaterials: ['140 Runecloth'],
+  },
+  {
+    skillRange: [330, 360],
+    recipeOrItem: '45x Netherweave Bandage',
+    recipeSource: 'Manual: Netherweave Bandage, from an Outland vendor.',
+    keyMaterials: ['45 Netherweave Cloth'],
+  },
+  {
+    skillRange: [360, 375],
+    recipeOrItem: '20x Heavy Netherweave Bandage',
+    recipeSource: 'Manual: Heavy Netherweave Bandage, from an Outland vendor.',
+    keyMaterials: ['40 Netherweave Cloth'],
   },
 ]
 
