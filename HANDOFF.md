@@ -298,7 +298,10 @@ Still open, and deliberately left for a design decision rather than guessed at:
   pure black maximises halation and spends the darkest value available. Left alone — it is a
   deliberate part of the stated aesthetic and the contrast measurements all pass.
 
-### 3. What is left of the requested rework
+### 3. The requested rework — all three remaining items are now done
+
+Nothing is outstanding here. Kept as a record of what each one turned out to involve, since two of
+the three were mis-scoped going in.
 
 - ~~Professions levelling guides~~ — **done, all 9.** Every crafting profession has a sourced
   300-375 path with real craft counts and material quantities. Remaining `needsVerification` flags in
