@@ -226,7 +226,7 @@ async function withSlotOpen(page: Page, slot: string, assertions: () => Promise<
 }
 import { getGemById, sampleGems, socketBonusIsActive } from '../src/domain/gems/sampleGems'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
-import { getTalentData } from '../src/domain/talents/sampleTalents'
+import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
@@ -2585,4 +2585,88 @@ test('every raid loot entry that names a catalogued item is linked to it', () =>
   for (const entry of stillUnresolved) {
     expect(entry.notes, `"${entry.name}" is unresolved and should say why`).toBeTruthy()
   }
+})
+
+test('all nine classes have three ingested talent trees, and every icon is vendored', () => {
+  // Warrior was built end to end first to prove the parser; the other eight then came from the same
+  // payload with no parser change, only tree ids. This asserts the set is complete and well-formed
+  // rather than trusting that a nine-way re-run did what it looked like it did.
+  expect([...classesWithTalents].sort()).toEqual([...tbcClasses.map((entry) => entry.className)].sort())
+
+  let total = 0
+  for (const definition of tbcClasses) {
+    const data = getTalentData(definition.className)
+    expect(data, `${definition.className} should have talent data`).toBeTruthy()
+    if (!data) continue
+
+    // Three trees, and their specs must be the app's spec names — not the payload's internal ones.
+    // Six of the 27 trees are labelled differently at source (Paladin "Combat" is Retribution,
+    // Warlock "Curses" is Affliction, "Summoning" is Demonology, Shaman "ElementalCombat",
+    // Druid "FeralCombat", Hunter "BeastMastery"), so this is the check that the mapping held.
+    expect(data.trees).toHaveLength(3)
+    expect([...data.trees.map((tree) => tree.spec)].sort()).toEqual([...definition.specs].sort())
+
+    for (const tree of data.trees) {
+      expect(tree.talents.length, `${definition.className} ${tree.spec} should have talents`).toBeGreaterThan(15)
+      for (const talent of tree.talents) {
+        expect(talent.name, `a ${definition.className} talent has no name`).toBeTruthy()
+        expect(talent.rankDescriptions.length, `${talent.name} should describe each rank`).toBe(talent.maxRank)
+        // The whole point of the icon pass: a slug with no file behind it renders an empty box.
+        expect(
+          existsSync(resolve(process.cwd(), 'public/icons', `${talent.icon}.jpg`)),
+          `${definition.className} "${talent.name}" wants icon ${talent.icon}, which is not vendored`,
+        ).toBe(true)
+        total += 1
+      }
+    }
+  }
+
+  expect(total, 'talents across all nine classes').toBe(579)
+
+  // Talents share a lot of art with items, which is why adding 426 talent icons only cost 171 files.
+  expect(talentIconNames.length).toBeLessThan(total)
+})
+
+test('the talent tree renders real icons for a class other than the one built first', async ({ page }) => {
+  await openApp(page)
+
+  // Night Elf Druid: a class that did not exist in this panel until the nine-way ingest, and whose
+  // trees are the ones the payload labels "FeralCombat".
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
+  await page.getByLabel('Class').selectOption('Druid')
+
+  await expect(page.getByRole('region', { name: 'Balance talents' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Feral talents' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Restoration talents' })).toBeVisible()
+  await expect(page.getByTestId('talents-unavailable')).toHaveCount(0)
+
+  const icons = page.locator('.talent-icon')
+  expect(await icons.count(), 'every talent cell should carry an icon').toBeGreaterThan(50)
+
+  // Lazy by design — three trees of ~62 talents run well past the fold. That means "not loaded yet"
+  // is the correct state for most of them, so asking whether they are all loaded races the viewport
+  // rather than testing anything. Pin the laziness, then force the whole set to load and require
+  // every URL to resolve; that is the invariant worth having, and it covers icons no scroll reaches.
+  expect(await icons.first().getAttribute('loading')).toBe('lazy')
+
+  const broken = await icons.evaluateAll(async (nodes) => {
+    await Promise.all(
+      nodes.map((node) => {
+        const image = node as HTMLImageElement
+        image.loading = 'eager'
+        const source = image.src
+        image.src = ''
+        image.src = source
+        return image.decode().catch(() => undefined)
+      }),
+    )
+    return nodes
+      .filter((n) => !(n as HTMLImageElement).complete || (n as HTMLImageElement).naturalWidth === 0)
+      .map((n) => (n as HTMLImageElement).getAttribute('src'))
+  })
+  expect(broken, 'no talent icon should fail to load').toEqual([])
+
+  // Decorative: the button already names the talent and its rank, so an alt here would make a screen
+  // reader say the name twice.
+  expect(await icons.first().getAttribute('alt')).toBe('')
 })

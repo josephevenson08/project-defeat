@@ -534,9 +534,9 @@ const PHASES = [
       'Consumables with Alchemy/Cooking provenance',
       'All 13 professions: skill tiers, trainer requirements, material farm locations, leveling paths',
       'Wowhead Phase 2 spec tier lists (DPS, healer, tank) as their own section — 28 placements covering all 27 specs',
+      'Talent trees for all nine classes: 579 talents across 27 trees, with icons, per-rank descriptions and prerequisite gating',
     ],
     remaining: [
-      'Talent trees',
       'Profession *bonuses to stats* (e.g. extra sockets from Blacksmithing) — distinct from the profession reference data that is done',
       'Race/class-specific assumptions beyond legality checks',
       'Feral bear/cat mode split',

@@ -17,7 +17,8 @@
 
 import { mkdirSync, existsSync, readFileSync, writeFileSync, statSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { registerHooks } from 'node:module'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
@@ -26,8 +27,30 @@ const CDN = 'https://wow.zamimg.com/images/wow/icons/large'
 
 const force = process.argv.includes('--force')
 
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    try {
+      return nextResolve(specifier, context)
+    } catch (err) {
+      if (!specifier.startsWith('.')) throw err
+      try {
+        return nextResolve(`${specifier}.ts`, context)
+      } catch {
+        return nextResolve(`${specifier}/index.ts`, context)
+      }
+    }
+  },
+})
+
+// Two sources, one icon directory. Items and gems come from the generated mapping; talents carry
+// their own icon slug in the calculator payload, so they need no mapping step at all. They share the
+// CDN path and the same 56x56 "large" size, so they share the fetch and the folder.
 const { icons } = JSON.parse(readFileSync(resolve(REPO, 'src/domain/icons/icons.json'), 'utf8'))
-const names = [...new Set(Object.values(icons))].sort()
+const { talentIconNames } = await import(pathToFileURL(resolve(REPO, 'src/domain/talents/sampleTalents.ts')).href)
+
+const itemNames = new Set(Object.values(icons))
+const names = [...new Set([...itemNames, ...talentIconNames])].sort()
+console.log(`${itemNames.size} item/gem icons + ${talentIconNames.length} talent icons -> ${names.length} distinct`)
 
 mkdirSync(OUT_DIR, { recursive: true })
 

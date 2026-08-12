@@ -3226,3 +3226,47 @@ input[type='text']:focus {
 .raid-loot-frame .item-icon {
   border-radius: 1px;
 }
+
+/*
+ * Talent icons.
+ *
+ * A talent cell is square and already carries a name and a rank, so the icon takes the space it can
+ * and the text sits under it. Sizing is relative rather than fixed: the grid is four columns of
+ * whatever the panel is wide, so a hardcoded pixel size would either overflow on a narrow viewport
+ * or float in the middle on a wide one.
+ *
+ * A locked talent dims through .talent-locked's opacity, which covers the icon too — deliberately,
+ * because a bright icon in a dimmed cell would undo the one signal that row is not reachable yet.
+ */
+.talent-icon {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  display: block;
+  flex: 0 1 auto;
+  min-height: 0;
+  object-fit: cover;
+  width: 60%;
+  max-width: 32px;
+  aspect-ratio: 1;
+}
+
+/* Spent talents get the tree's accent on the icon frame as well as the cell, so a filled column
+   reads as one run rather than as cells that happen to be adjacent. */
+.talent-filled .talent-icon {
+  border-color: var(--tree-accent);
+}
+
+/*
+ * Below roughly 900px the grid columns get narrow enough that the icon, the name and the rank stop
+ * fitting together. The name is the one that can go: the icon identifies the talent, and the full
+ * name is still in the tooltip and the aria-label.
+ */
+@media (max-width: 900px) {
+  .talent-name {
+    display: none;
+  }
+
+  .talent-icon {
+    width: 72%;
+  }
+}

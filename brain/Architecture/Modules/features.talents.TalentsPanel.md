@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/talents/TalentsPanel.tsx
-lines: 139
+lines: 148
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.talents.TalentsPanel
 
-`src/features/talents/TalentsPanel.tsx` · **features** layer · 139 lines
+`src/features/talents/TalentsPanel.tsx` · **features** layer · 148 lines
 
 _No doc comment at the top of this file._
 

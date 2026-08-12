@@ -26,6 +26,54 @@ const SOURCE = 'https://nether.wowhead.com/tbc/data/talents-classic?dv=17&db=178
  * unspaced "WarriorArms". Listed in the order the game shows them left to right.
  */
 const TREES_BY_CLASS = {
+  Druid: [
+    // "FeralCombat" in the payload.
+    { id: 283, spec: 'Balance' },
+    { id: 281, spec: 'Feral' },
+    { id: 282, spec: 'Restoration' },
+  ],
+  Hunter: [
+    // "BeastMastery", unspaced.
+    { id: 361, spec: 'Beast Mastery' },
+    { id: 363, spec: 'Marksmanship' },
+    { id: 362, spec: 'Survival' },
+  ],
+  Mage: [
+    { id: 81, spec: 'Arcane' },
+    { id: 41, spec: 'Fire' },
+    { id: 61, spec: 'Frost' },
+  ],
+  Paladin: [
+    { id: 382, spec: 'Holy' },
+    { id: 383, spec: 'Protection' },
+    // The payload calls this tree "Combat". Confirmed as Retribution by its contents — it is the
+    // tree holding Seal of Command and Crusader Strike, not by assuming the label.
+    { id: 381, spec: 'Retribution' },
+  ],
+  Priest: [
+    { id: 201, spec: 'Discipline' },
+    { id: 202, spec: 'Holy' },
+    { id: 203, spec: 'Shadow' },
+  ],
+  Rogue: [
+    { id: 182, spec: 'Assassination' },
+    { id: 181, spec: 'Combat' },
+    { id: 183, spec: 'Subtlety' },
+  ],
+  Shaman: [
+    // "ElementalCombat" in the payload.
+    { id: 261, spec: 'Elemental' },
+    { id: 263, spec: 'Enhancement' },
+    { id: 262, spec: 'Restoration' },
+  ],
+  Warlock: [
+    // Two legacy names here, both confirmed by contents rather than by the label: "Curses" is the
+    // tree with Unstable Affliction and Siphon Life, and "Summoning" is the one with Soul Link and
+    // Fel Domination.
+    { id: 302, spec: 'Affliction' },
+    { id: 303, spec: 'Demonology' },
+    { id: 301, spec: 'Destruction' },
+  ],
   Warrior: [
     { id: 161, spec: 'Arms' },
     { id: 164, spec: 'Fury' },

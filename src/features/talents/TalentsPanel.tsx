@@ -120,6 +120,15 @@ export function TalentsPanel({ character, points, onChange }: TalentsPanelProps)
                         // The reason a talent cannot be taken is the thing calculators usually hide.
                         title={`${talent.name} ${rank}/${talent.maxRank}\n\n${description}${blocked ? `\n\n${blocked}` : ''}`}
                       >
+                        {/* The icon is decorative here: the button's aria-label already names the
+                            talent and its rank, and the name is rendered as text right below it. */}
+                        <img
+                          className="talent-icon"
+                          src={`${import.meta.env.BASE_URL}icons/${talent.icon}.jpg`}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
                         <span className="talent-name">{talent.name}</span>
                         <span className="talent-rank">
                           {rank}/{talent.maxRank}

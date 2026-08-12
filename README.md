@@ -34,6 +34,8 @@ Early MVP / foundation phase.
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
+- Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
+  descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
   `public/icons/` (1,238 files, 2.1 MB) so the app keeps working offline and makes no runtime network

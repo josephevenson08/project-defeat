@@ -47,7 +47,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 80 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 85 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -91,7 +91,8 @@ node tools/ingest/ingest-bis.mjs                # BiS rankings, 27 specs
 node tools/ingest/ingest-bis-recommendations.mjs # gem + enchant picks per spec
 node tools/ingest/validate-sample.mjs --sample 32 --max-phase 2 --quality Epic
 node tools/ingest/reconcile-curated.mjs --check-wowhead
-node tools/ingest/ingest-talents.mjs --class Warrior  # 66 Warrior talents
+node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 579 talents
+node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
 node tools/ingest/ingest-icons.mjs              # icon *names* for 4,741 items and gems
@@ -109,9 +110,9 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | Raid buffs | 14, all unverified | **33**, each cited to a spell rank |
 | Target debuffs | 6, all unverified | **6**, each cited to a spell rank |
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
-| Talents | none | **66**, Warrior only |
+| Talents | none | **579** across all 9 classes, 27 trees |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
-| Item/gem icons | none, two-letter glyphs | **4,741 mapped**, 1,238 files vendored, 2.1 MB |
+| Icons | none, two-letter glyphs | **1,609 files** vendored, 2.8 MB — items, gems and talents |
 
 ---
 
@@ -339,11 +340,28 @@ the three were mis-scoped going in.
   little and keeps the no-runtime-network-calls invariant intact, so the hotlinking option was never
   actually worth its downside.
 
-### 4. Talents — Warrior only, by design
+### 4. Talents — all nine classes, with icons
 
-66 talents across Arms, Fury and Protection, ingested by `tools/ingest/ingest-talents.mjs`. Adding a
-class is one line in `TREES_BY_CLASS` plus a re-run; classes without data say so rather than
-rendering an empty tree.
+**579 talents across 27 trees**, ingested by `tools/ingest/ingest-talents.mjs`. Warrior was built end
+to end first to prove the parser; the other eight then came from the same payload with **no parser
+change at all**, only tree ids. Every talent renders its real icon. The "class has no talents yet"
+path in `TalentsPanel` is now unreachable and kept only as a guard.
+
+**Six of the 27 trees are named something else in the payload**, in Vanilla-era internal terms, and
+every one was confirmed by *reading the tree's contents* rather than trusting the label:
+
+| Payload | Actually | Confirmed by |
+|---|---|---|
+| Paladin `Combat` | Retribution | holds Benediction, Improved Seal of the Crusader |
+| Warlock `Curses` | Affliction | holds Suppression, Improved Corruption |
+| Warlock `Summoning` | Demonology | holds Demonic Embrace, Improved Imp |
+| Shaman `ElementalCombat` | Elemental | holds Convection, Concussion |
+| Druid `FeralCombat` | Feral | holds Ferocity, Feral Aggression |
+| Hunter `BeastMastery` | Beast Mastery | unspaced only |
+
+The tree ids themselves are **not** hand-written either — they are read off the payload's own `trees`
+map, where each entry's `description` is an unspaced "WarriorArms". A test asserts each class's three
+tree specs match the app's spec names, so a mis-mapping fails loudly rather than mislabelling a tree.
 
 The calculator page is an empty shell. The trees come from
 `nether.wowhead.com/tbc/data/talents-classic` as **two payloads that must be joined**: a
