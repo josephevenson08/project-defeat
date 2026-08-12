@@ -47,6 +47,14 @@ import { getSignatureAbility } from '../src/domain/abilities'
 import { RATING_PER_PERCENT, effectUptime } from '../src/domain/simulation/combatConstants'
 import { getBuffById, modelledBuffs, sampleBuffs, unmodelledBuffs } from '../src/domain/buffs/sampleBuffs'
 import {
+  getTargetDebuffById,
+  modelledTargetDebuffs,
+  sampleTargetDebuffs,
+  unmodelledTargetDebuffs,
+} from '../src/domain/buffs/sampleTargetDebuffs'
+import { computeArmorMitigation } from '../src/domain/simulation/damageFormulas'
+import { defaultSimulationTarget } from '../src/domain/simulation/sampleEncounters'
+import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
   buildSpecialAttackTable,
@@ -1707,6 +1715,107 @@ test('every unmodelled buff carries text a panel could render', async () => {
   // Bloodlust is the example worth pinning: it is the buff a reader would most expect to find, and
   // its explanation has to carry the actual effect rather than just saying it is unsupported.
   expect(getBuffById('bloodlust')?.notModelled).toContain('30%')
+})
+
+test('the target-debuff corrections that had real wrong values stay corrected', async () => {
+  // Same shape as the buff assertions above, same reason: all six debuffs were flagged
+  // "approximate pending final Wowhead audit" and five were wrong rather than approximate. Each is
+  // pinned individually against the spell rank its number came from.
+
+  // The three armor debuffs were stored as fractions of the target's armor. TBC has no percentage
+  // armor debuff — all three are flat, and a fraction silently scaled them with the target.
+  const sunder = getTargetDebuffById('sunder-armor')
+  const faerieFire = getTargetDebuffById('faerie-fire')
+  const recklessness = getTargetDebuffById('curse-of-recklessness')
+
+  // Spell 25225: "reducing it by 520 per Sunder Armor ... up to 5 times" — 2600 at a full stack.
+  expect(sunder?.armorReduction).toBe(2600)
+  // Spell 26993: "Decrease the armor of the target by 610".
+  expect(faerieFire?.armorReduction).toBe(610)
+  // Spell 27226: "reducing armor by 800".
+  expect(recklessness?.armorReduction).toBe(800)
+
+  // A value below 1 here means someone has put a fraction back into a flat-armor field, which is
+  // exactly how the original numbers (0.2, 0.05, 0.08) read.
+  for (const debuff of sampleTargetDebuffs) {
+    if (debuff.armorReduction === undefined) continue
+    expect(debuff.armorReduction, `${debuff.name} must be flat armor points, not a fraction`).toBeGreaterThan(1)
+  }
+
+  // Spell 20337: "the critical strike chance of all attacks made against that target". "All
+  // attacks" is literal — this was modelled as physical-only, so casters got nothing from it.
+  const crusader = getTargetDebuffById('improved-seal-of-the-crusader')
+  expect(crusader?.physicalCritTakenBonus).toBe(0.03)
+  expect(crusader?.spellCritTakenBonus, 'Improved SotC is not physical-only').toBe(0.03)
+
+  // Spell 28595 is Frost-only, and was being applied to every spell school. It is now listed rather
+  // than applied, so it must contribute no crit at all.
+  const wintersChill = getTargetDebuffById('winters-chill')
+  expect(wintersChill?.spellCritTakenBonus ?? 0, "Winter's Chill is Frost-only and must not apply to every spell").toBe(0)
+  expect(wintersChill?.notModelled).toBeTruthy()
+
+  // Spell 27228: the one value that survived the audit unchanged.
+  expect(getTargetDebuffById('curse-of-elements')?.spellDamageTakenMultiplier).toBe(0.1)
+
+  // Every entry now cites the rank it was read from, and nothing is left unverified.
+  for (const debuff of sampleTargetDebuffs) {
+    expect(debuff.spellId, `${debuff.name} must cite the spell rank its numbers came from`).toBeGreaterThan(0)
+    expect(debuff.needsVerification ?? false, `${debuff.name} is sourced and should not be flagged`).toBe(false)
+  }
+})
+
+test('the armor debuffs subtract flat armor and stack with each other', async () => {
+  // The shape change has to reach the math, not just the data file. Under the old percentage model
+  // these three removed 33% of whatever the target had; they remove a fixed 4010 regardless.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const armorDebuffs = ['sunder-armor', 'curse-of-recklessness', 'faerie-fire']
+
+  const withDebuffs = calculateSimulation(character, gear, stats, 'Physical DPS', armorDebuffs)
+  const target = defaultSimulationTarget
+
+  const expectedArmor = target.armor - (2600 + 800 + 610)
+  const expectedMitigation = Math.round(computeArmorMitigation(expectedArmor, 70) * 100 * 10) / 10
+  expect(breakdownValue(withDebuffs, /Armor mitigation/)).toBe(expectedMitigation)
+
+  // And pin it against what the old model produced, so a revert to a fraction fails here rather
+  // than quietly changing every physical DPS number.
+  const percentageModelMitigation = Math.round(computeArmorMitigation(target.armor * (1 - 0.33), 70) * 100 * 10) / 10
+  expect(expectedMitigation).not.toBe(percentageModelMitigation)
+
+  // Three separate debuffs, three separate subtractions: no exclusivity between them. Only Sunder
+  // and Expose Armor are exclusive in TBC, and Expose Armor is not in this dataset.
+  const sunderOnly = calculateSimulation(character, gear, stats, 'Physical DPS', ['sunder-armor'])
+  const sunderMitigation = Math.round(computeArmorMitigation(target.armor - 2600, 70) * 100 * 10) / 10
+  expect(breakdownValue(sunderOnly, /Armor mitigation/)).toBe(sunderMitigation)
+  expect(breakdownValue(withDebuffs, /Armor mitigation/)!).toBeLessThan(breakdownValue(sunderOnly, /Armor mitigation/)!)
+})
+
+test('a debuff that cannot be modelled is separated from the ones that can be', () => {
+  // Same treatment the fifteen unmodelled raid buffs get, for the same reason: Winter's Chill is a
+  // real raid debuff, and dropping it would read as an oversight rather than a stated limit.
+  //
+  // This arrived as a UI test that drove the Buffs & Consumables panel. That panel is no longer
+  // rendered — it is hidden, not deleted, alongside the simulation tab — so the assertion moves down
+  // to the split it was really about, exactly as the buff/consumable test above did when the same
+  // thing happened to it. BuffsPanel still reads these two lists and still renders the unmodelled
+  // ones without a checkbox; what no longer exists is a page to click.
+  expect(unmodelledTargetDebuffs.map((debuff) => debuff.id)).toEqual(['winters-chill'])
+
+  // The reason it cannot be modelled is narrow and worth keeping visible: no spell school is recorded
+  // anywhere in the simulation, so a Frost-only debuff can be applied to every spell or to none.
+  const wintersChill = unmodelledTargetDebuffs[0]
+  expect(wintersChill.notes, "the Frost-only scope is why it is not modelled").toMatch(/Frost/)
+  expect(wintersChill.spellCritTakenBonus, 'an unmodelled debuff must not also apply its effect').toBeUndefined()
+
+  // The modelled ones carry flat armor, not a fraction. TBC has no percentage armor debuff, and
+  // reading these as percentages is the bug this dataset was rebuilt to fix.
+  const sunder = modelledTargetDebuffs.find((debuff) => debuff.id === 'sunder-armor')
+  expect(sunder?.armorReduction, 'Sunder Armor is 520 per stack at 5 stacks').toBe(2600)
+  for (const debuff of modelledTargetDebuffs) {
+    expect(debuff, `${debuff.id} must not carry a percentage armor reduction`).not.toHaveProperty('armorReductionPercent')
+  }
 })
 
 test('every spec can fill every gear slot the UI shows it', async () => {

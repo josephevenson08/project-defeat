@@ -24,6 +24,12 @@ setting `base` globally sends every test to a path nothing serves.
 - **Push to `origin/main` after each completed feature.** No branches or PRs unless asked.
 - **Gate commits on the real test exit code**, never a piped `tail` — the pipe reports the tail's
   status, and a red commit was pushed that way once.
+- **If a test run dies partway with `ERR_CONNECTION_REFUSED`, it is the dev server, not the tests.**
+  Seen twice in a row from a worktree: tests 1-40 pass, then every remaining test fails to reach
+  127.0.0.1:5173 because the Playwright-managed Vite server has exited. Cause unknown. The fix is to
+  start the server yourself on 5173 first — `reuseExistingServer: true` means Playwright adopts it
+  instead of managing its own — after which the full suite passes. Read the exit code, but read the
+  *failure mode* too: a dead server and a broken assertion both come back as exit 1.
 - **Line endings differ by file.** `src/styles/global.css` is CRLF; `tests/planner.spec.ts` and most
   of `tools/ingest/*.mjs` are LF. Check with `file` before any scripted edit — a `\r\n` split against
   an LF file silently matches nothing and "succeeds".
@@ -41,7 +47,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 74 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 77 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -99,6 +105,7 @@ node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placemen
 | Consumables | 14 | **31** |
 | Gem/enchant recommendations | none | **107 + 274** |
 | Raid buffs | 14, all unverified | **33**, each cited to a spell rank |
+| Target debuffs | 6, all unverified | **6**, each cited to a spell rank |
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
 | Talents | none | **66**, Warrior only |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
@@ -168,6 +175,21 @@ node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placemen
 - **wowsims is not infallible where it disagrees with a tooltip.** It models Blessing of Wisdom at
   42 mp5; spells 27142 and 27143 both say 41. That was the only outright conflict across all 33 —
   everything else agreed to the digit — but it is the reason the tooltip is the tie-breaker.
+- **The six target debuffs went the same way, and five of the six were wrong.** The three armor
+  debuffs were stored as *fractions* of the target's armor (20%, 8%, 5%) and TBC has no percentage
+  armor debuff: Sunder Armor is 520 flat per stack (2600 at 5), Faerie Fire 610, Curse of
+  Recklessness 800, and they all stack. `armorReductionPercent` was therefore the wrong *shape*, not
+  just the wrong number, and is now `armorReduction` in flat points. Winter's Chill was giving +10%
+  crit to every caster when it is Frost-only, and Improved Seal of the Crusader was physical-only
+  when its tooltip says "all attacks". Curse of the Elements' 10% was the one value that survived.
+- **The tooltip-vs-wowsims tie-breaker went unused on the debuffs** — all six agreed to the digit,
+  including every number that overturned what had shipped. Two sources agreeing is what makes a
+  correction safe to make against data that already looked plausible.
+- **Spell school is the thing the simulation cannot express.** Nothing in `SignatureAbility` or the
+  simulator records whether a cast is Frost or Shadow, which is the whole reason Winter's Chill is
+  `notModelled` rather than applied. Curse of the Elements is school-scoped too but stays modelled
+  because it covers every modelled caster except Elemental Shaman. Adding schools would let both be
+  exact.
 - **Fifteen of the 33 buffs cannot be expressed as stats at all** (threat, maximum health,
   resistances, damage multipliers, weapon procs, timed cooldowns). They carry `notModelled` and
   render without a checkbox rather than being omitted. Adding any of them to the model properly
