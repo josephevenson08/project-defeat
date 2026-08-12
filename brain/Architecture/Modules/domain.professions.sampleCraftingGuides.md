@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/sampleCraftingGuides.ts
-lines: 417
+lines: 448
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.sampleCraftingGuides
 
-`src/domain/professions/sampleCraftingGuides.ts` · **domain** layer · 417 lines
+`src/domain/professions/sampleCraftingGuides.ts` · **domain** layer · 448 lines
 
 From the top of the file:
 
@@ -18,8 +18,9 @@ From the top of the file:
 > **Alchemy's 300-375 tail is sourced** against wow-professions.com's TBC guide
 > (`/tbc/alchemy-leveling-guide-burning-crusade-classic`): skill ranges, craft counts and material
 > quantities are transcribed as facts, the wording here is this repo's own. The other eight
-> professions still carry the older estimated steps and their `needsVerification` flags — Alchemy
-> was done end to end first to establish the shape, the same way Warrior was for talents. These are not
+> professions still carry the older estimated steps and their `needsVerification` flags. Alchemy was
+> done end to end first to establish the shape, the same way Warrior was for talents; **Jewelcrafting
+> followed**, sourced the same way from `/tbc/jewelcrafting-leveling-guide-burning-crusade-classic`. These are not
 > exhaustive per-recipe lists - just enough waypoints (with recipe source callouts for
 > BoE/vendor/quest recipes that are commonly used to skip skill-up gaps) that a player
 > reading this knows generally how to level without getting stuck. All ranges below 300

@@ -6,8 +6,9 @@ import type { Profession, RecipeLeveling } from './professionTypes'
  * **Alchemy's 300-375 tail is sourced** against wow-professions.com's TBC guide
  * (`/tbc/alchemy-leveling-guide-burning-crusade-classic`): skill ranges, craft counts and material
  * quantities are transcribed as facts, the wording here is this repo's own. The other eight
- * professions still carry the older estimated steps and their `needsVerification` flags — Alchemy
- * was done end to end first to establish the shape, the same way Warrior was for talents. These are not
+ * professions still carry the older estimated steps and their `needsVerification` flags. Alchemy was
+ * done end to end first to establish the shape, the same way Warrior was for talents; **Jewelcrafting
+ * followed**, sourced the same way from `/tbc/jewelcrafting-leveling-guide-burning-crusade-classic`. These are not
  * exhaustive per-recipe lists - just enough waypoints (with recipe source callouts for
  * BoE/vendor/quest recipes that are commonly used to skip skill-up gaps) that a player
  * reading this knows generally how to level without getting stuck. All ranges below 300
@@ -227,26 +228,56 @@ const jewelcraftingLeveling: readonly RecipeLeveling[] = [
     needsVerification: true,
   },
   {
-    skillRange: [300, 310],
-    recipeOrItem: 'Beginner gem-cutting designs (uncommon-quality cut gems)',
+    skillRange: [300, 320],
+    recipeOrItem: '~30 uncommon gem cuts, mixed across Brilliant Golden Draenite, Glowing Shadow Draenite, Inscribed Flame Spessarite, Radiant Deep Peridot, Solid Azure Moonstone and Teardrop Blood Garnet',
+    recipeSource: 'Designs sold by Kalaen / Tatiana in Hellfire Peninsula.',
+    keyMaterials: ['One raw gem per cut — prospect Fel Iron Ore for the lot'],
+  },
+  {
+    skillRange: [320, 325],
+    recipeOrItem: '5-7x of any one of Glinting Flame Spessarite, Bright Blood Garnet, Jagged Deep Peridot or Sparkling Azure Moonstone',
+    recipeSource: 'Designs sold by Kalaen / Tatiana in Hellfire Peninsula.',
+  },
+  {
+    skillRange: [325, 335],
+    recipeOrItem: '12x Mercurial Adamantite',
     recipeSource: 'Master Jewelcrafting trainer (Outland).',
+    keyMaterials: ['48 Adamantite Powder — roughly 240 Adamantite Ore prospected', '12 Primal Earth'],
+    notes:
+      'Needs a Mercurial Stone as a tool, which Jewelcrafters cannot make: buy one or ask an Alchemist. Keep all twelve bars — they are the material for the 340 step.',
   },
   {
-    skillRange: [310, 350],
-    recipeOrItem: 'Rare-quality colored gem cuts (using draenite/garnet-tier gems)',
-    recipeSource: 'Master Jewelcrafting trainer (Outland), plus some designs from Outland faction vendors.',
-    keyMaterials: ['Various draenite and garnet gems'],
+    skillRange: [335, 340],
+    recipeOrItem: '5-10x of any one of Potent Flame Spessarite, Sovereign Shadow Draenite or Smooth Golden Draenite',
+    recipeSource: 'Sovereign and Smooth from Kalaen / Tatiana; Potent Flame Spessarite from Nakodu, which needs Friendly with Lower City.',
   },
   {
-    skillRange: [350, 365],
-    recipeOrItem: 'Rare gem patterns (Dawnstone, Nightseye, Talasite, Living Ruby, Noble Topaz, Star of Elune)',
-    recipeSource: 'Master Jewelcrafting trainer (Outland) and reputation vendors.',
+    skillRange: [340, 350],
+    recipeOrItem: '12x Heavy Adamantite Ring',
+    recipeSource: 'Master Jewelcrafting trainer (Outland).',
+    keyMaterials: ['12 Adamantite Bar', '12 Mercurial Adamantite — the ones saved at 325'],
+  },
+  {
+    skillRange: [350, 360],
+    recipeOrItem: '15x Purified Shadow Pearl',
+    recipeSource: 'Master Jewelcrafting trainer (Outland).',
+    keyMaterials: ['15 Shadow Pearl', '15 Purified Draenic Water — any Outland innkeeper'],
+    notes:
+      'Shadow Pearl only comes from Jaggal Clams at a poor rate, so buy rather than farm. Twelve Mystic Dawnstone or Steady Talasite cover the same range if the market is dry.',
+  },
+  {
+    skillRange: [360, 365],
+    recipeOrItem:
+      "5x of a Jewelcrafting-only epic gem — Crimson Sun, Don Julio's Heart, Falling Star, Blood of Amber, Stone of Blades, Facet of Eternity or Kailee's Rose",
+    recipeSource:
+      "All reputation-gated: Consortium Revered (Crimson Sun, Don Julio's Heart), Lower City Revered (Falling Star), Sha'tar Honored/Revered (Kailee's Rose, Blood of Amber), Keepers of Time Honored/Revered (Facet of Eternity, Stone of Blades).",
+    notes: 'The cheapest useful thing to make at this level. Without the reputation, another 7-8 of the previous cuts covers it.',
   },
   {
     skillRange: [365, 375],
-    recipeOrItem: 'Meta gem cuts and the Braided Eternium Chain',
-    recipeSource: 'Master Jewelcrafting trainer (Outland); meta gem patterns are often reputation-gated.',
-    needsVerification: true,
+    recipeOrItem: '10x meta gem cuts',
+    recipeSource: "Designs are reputation-gated — Insightful Earthstorm Diamond from Almaador at Sha'tar reputation, among others.",
+    keyMaterials: ['10 Earthstorm Diamond or 10 Skyfire Diamond'],
   },
 ]
 
