@@ -24,10 +24,12 @@ tags: [brain/domain, domain/profession]
 ## Leveling path
 
 - skill 1–300: **Standard vanilla potion/elixir progression (Minor Healing Potion through Major Troll's Blood Potion/Elixir of the Mongoose, etc.)** — Trainer-taught for the most part, with a handful of BoE recipes from vendors/AH used to smooth over gaps.
-- skill 300–315: **Pick one starter craft: Volatile Healing Potion, Adept's Elixir, or Onslaught Elixir (craft ~15x)** — Master Alchemy trainer (Outland). · Felweed, Crystal Vial
-- skill 315–340: **Continue with trainer potions/elixirs (e.g. Major Dreamless Sleep precursors, Elixir of Major Defense)** — Master Alchemy trainer (Outland).
-- skill 340–355: **Super Mana Potion** — BoE recipe purchasable from Daga Ramba or Haalrun (Nagrand). · Felweed, Mana Thistle, Crystal Vial
-- skill 355–375: **Major Dreamless Sleep Potion** — BoE recipe purchasable from Daga Ramba or Leeli Longhaggle.
+- skill 300–315: **15x of any one of Volatile Healing Potion, Adept's Elixir or Onslaught Elixir** — Master Alchemy trainer (Outland). · 15 Felweed, 15 Golden Sansam, Dreamfoil or Mountain Silversage — whichever matches the craft you picked
+- skill 315–330: **25x Elixir of Healing Power** — Master Alchemy trainer (Outland). · 25 Golden Sansam, 25 Dreaming Glory
+- skill 330–335: **5x Elixir of Draenic Wisdom** — Master Alchemy trainer (Outland). · 5 Terocone, 5 Felweed
+- skill 335–340: **5x Super Healing Potion** — Master Alchemy trainer (Outland). · 10 Netherbloom, 5 Felweed
+- skill 340–355: **15x Super Mana Potion** — Recipe sold by Daga Ramba (Nagrand) or Haalrun (Zangarmarsh). · 30 Dreaming Glory, 15 Felweed
+- skill 355–375: **40x Major Dreamless Sleep Potion** — Recipe sold by Daga Ramba (Nagrand) or Leeli Longhaggle. · 40 Dreaming Glory, 40 Nightmare Vine
 - skill 325–375: **Specialization questline (Potion / Elixir / Transmutation Mastery)** — Quest, available once Alchemy skill 325 and character level 68 are reached; unlocks specialization-only recipes with a chance at bonus items.
 
 ## Where this lives in the code
