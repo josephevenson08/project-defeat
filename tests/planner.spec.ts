@@ -82,7 +82,7 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
  * Raids or Professions click the tab afterwards, which is also what a user would do — the picker is
  * a way in, not the only way to move between sections.
  */
-async function openApp(page: Page, section: 'planner' | 'raids' | 'professions' = 'planner') {
+async function openApp(page: Page, section: 'planner' | 'tierlists' | 'raids' | 'professions' = 'planner') {
   await page.goto('/')
   await page.getByTestId(`section-${section}`).click()
 
@@ -222,6 +222,7 @@ import { getTalentData } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
+import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
 
 
 function readStatValue(text: string) {
@@ -1553,11 +1554,12 @@ test('a hybrid gem earns the socket bonus it satisfies', async () => {
 })
 
 test('the app opens on a section picker, and the rail follows the character', async ({ page }) => {
-  // The app used to land inside a tab. It now asks which of the three things you came to do, because
-  // gearing a character, reading a loot table and levelling a profession have nothing to do with
-  // each other.
+  // The app used to land inside a tab. It now asks which of the four things you came to do, because
+  // gearing a character, reading a tier list, reading a loot table and levelling a profession have
+  // nothing to do with each other.
   await page.goto('/')
   await expect(page.getByTestId('section-planner')).toBeVisible()
+  await expect(page.getByTestId('section-tierlists')).toBeVisible()
   await expect(page.getByTestId('section-raids')).toBeVisible()
   await expect(page.getByTestId('section-professions')).toBeVisible()
   // The tab bar is a way *between* sections, not the way in, so it is not on this screen.
@@ -2164,4 +2166,120 @@ test('Draenei get the hit racial matching their class, not both', async ({ page 
   // granting both would hand every Draenei twice the hit they actually have.
   await page.getByLabel('Class').selectOption('Shaman')
   expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText())).toBeGreaterThan(warriorSpellHit)
+})
+
+test('every spec appears on a tier list, and a spec can hold two placements at once', () => {
+  // The union across the three lists must be every spec the app knows. A spec missing from all three
+  // would render as a silent gap in the view with no explanation, and the ingest asserts the same
+  // thing at generation time — this pins it against the committed data.
+  const known = tbcClasses.flatMap((entry) => entry.specs.map((spec) => `${entry.className}|${spec}`))
+  const placed = new Set(
+    specTierLists.flatMap((list) => list.tiers.flatMap((tier) => tier.placements.map((p) => `${p.className}|${p.spec}`))),
+  )
+  expect([...known].filter((key) => !placed.has(key)), 'every spec should be ranked somewhere').toEqual([])
+
+  // Every placement has to name a spec the app actually has. A Wowhead rename would otherwise write
+  // a spec nothing can select into the domain.
+  for (const list of specTierLists) {
+    for (const tier of list.tiers) {
+      for (const placement of tier.placements) {
+        const definition = tbcClasses.find((entry) => entry.className === placement.className)
+        expect(definition, `${placement.slug} names an unknown class`).toBeTruthy()
+        expect(definition?.specs, `${placement.slug} names a spec ${placement.className} does not have`).toContain(placement.spec)
+      }
+    }
+  }
+
+  // The reason placements are keyed by (role, spec) rather than by spec. Feral Druid is a mediocre
+  // damage spec and the best tank in the phase; collapsing the two axes would force one of those two
+  // true statements to be discarded.
+  const feral = getPlacementsForSpec('Druid', 'Feral')
+  expect(feral.map((p) => `${p.role} ${p.label}`).sort()).toEqual(['DPS C', 'Tank S'])
+
+  // Discipline Priest is the parser's trap: its badge sits inside a link whose hash reads
+  // "holy-priest", because Wowhead publishes one shared Priest healing guide. Reading the hash rather
+  // than the badge would file it under Holy and lose the spec entirely.
+  expect(getPlacementsForSpec('Priest', 'Discipline').map((p) => `${p.role} ${p.label}`)).toEqual(['Healer B'])
+  expect(getPlacementsForSpec('Priest', 'Holy').map((p) => `${p.role} ${p.label}`)).toEqual(['Healer S'])
+
+  // All three lists are Phase 2, which is what the rest of the app targets. The ingest refuses to
+  // write a page whose title says otherwise, so this catches data swapped in by other means.
+  for (const list of specTierLists) {
+    expect(list.phase, `${list.role} list should be Phase 2`).toBe(2)
+    expect(list.sourceUrl, `${list.role} list should cite its source page`).toMatch(/^https:\/\/www\.wowhead\.com\/tbc\/guide\//)
+  }
+})
+
+test('the tier list view shows all three lists and marks the current spec on every list it appears on', async ({ page }) => {
+  await openApp(page)
+
+  // Feral Druid is the spec worth driving this with: it is the only one on two lists. Race first —
+  // the class list is filtered by race and the default Human cannot be a Druid, which is the app
+  // enforcing real TBC legality rather than anything going wrong.
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
+  await page.getByLabel('Class').selectOption('Druid')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Feral')
+  await page.getByRole('button', { name: 'Spec Tier Lists', exact: true }).click()
+
+  await expect(page.getByRole('region', { name: 'DPS tier list' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Healer tier list' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Tank tier list' })).toBeVisible()
+
+  // Marked twice, at two different tiers, which is the whole point of the (role, spec) keying.
+  const marked = page.locator('.tier-spec[data-current]')
+  await expect(marked).toHaveCount(2)
+  await expect(page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-row[data-depth="3"] .tier-spec[data-current]')).toHaveCount(1)
+  await expect(page.getByRole('region', { name: 'Tank tier list' }).locator('.tier-row[data-depth="0"] .tier-spec[data-current]')).toHaveCount(1)
+
+  // Named in words, not signalled by the accent alone — the role hues are muted enough that an 11px
+  // label set in one would miss AA, and a colour-only mark would fail SC 1.4.1 regardless.
+  await expect(marked.first().locator('.tier-spec-you')).toHaveText('Your spec')
+
+})
+
+test('no spec is marked on the tier lists until a character has been chosen', async ({ page }) => {
+  // Highlighting the default Fury Warrior for someone who never picked it would answer "where do I
+  // stand" with a spec they never named — the same class of invention this project keeps undoing.
+  //
+  // This is its own test rather than a reload at the end of the previous one, because a reload does
+  // not reproduce the condition: the planner autosaves, and App treats a *restored* build as a
+  // deliberate choice on purpose, so coming back to a saved character marks it and should. The state
+  // being asserted here is genuinely "storage is empty", which is only true at the start of a test.
+  await page.goto('/')
+  await page.getByTestId('section-tierlists').click()
+
+  await expect(page.getByRole('region', { name: 'DPS tier list' })).toBeVisible()
+  await expect(page.locator('.tier-spec[data-current]')).toHaveCount(0)
+  await expect(page.locator('.tier-spec-you')).toHaveCount(0)
+})
+
+test('tier letters stay out of the item quality palette', async ({ page }) => {
+  await openApp(page, 'tierlists')
+
+  // Wowhead draws S in q5 orange, A in q4 purple and B in q3 blue. This app spends quality colour on
+  // exactly one thing — "this item is epic" — and borrowing it to mean "this spec is strong" would
+  // make the loudest colour on the page ambiguous. Rank reads through ink weight instead, so every
+  // tier letter must be a neutral grey: r, g and b equal.
+  const letters = page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-letter')
+  await expect(letters).toHaveCount(5)
+
+  for (const color of await letters.evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n).color))) {
+    const [r, g, b] = color.match(/\d+/g)!.slice(0, 3).map(Number)
+    expect(r === g && g === b, `tier letter drawn in ${color}, which carries a hue`).toBe(true)
+  }
+
+  // And the ramp has to actually distinguish all five tiers. Five tiers against four text tokens is
+  // why the rule beside each row steps down half a beat after the ink does; without that, B and C
+  // rendered identically, which a measurement of the running page is what caught.
+  const steps = await page
+    .getByRole('region', { name: 'DPS tier list' })
+    .locator('.tier-row')
+    .evaluateAll((rows) =>
+      rows.map((row) => {
+        const ink = getComputedStyle(row.querySelector('.tier-letter')!).color
+        const rule = getComputedStyle(row.querySelector('.tier-row-label')!).borderLeftColor
+        return `${ink}|${rule}`
+      }),
+    )
+  expect(new Set(steps).size, 'each tier should be visually distinct from the others').toBe(5)
 })

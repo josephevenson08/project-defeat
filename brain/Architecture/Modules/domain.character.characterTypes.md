@@ -42,6 +42,8 @@ _No doc comment at the top of this file._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
+- [[domain.tierlists.tierListTypes]] — `src/domain/tierlists/tierListTypes.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`

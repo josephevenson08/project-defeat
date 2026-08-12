@@ -73,7 +73,7 @@ keep a muted hue. Audited: the only saturated colours anywhere are item quality 
 
 ## The data
 
-Five datasets, all real, all from pinned sources. Regenerate any of them:
+Six datasets, all real, all from pinned sources. Regenerate any of them:
 
 ```bash
 node tools/ingest/ingest-items.mjs              # 4,505 items from wowsims/tbc @3301fca5
@@ -87,6 +87,7 @@ node tools/ingest/validate-sample.mjs --sample 32 --max-phase 2 --quality Epic
 node tools/ingest/reconcile-curated.mjs --check-wowhead
 node tools/ingest/ingest-talents.mjs --class Warrior  # 66 Warrior talents
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
+node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
 ```
 
 | | Was | Now |
@@ -100,6 +101,7 @@ node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lo
 | Raid buffs | 14, all unverified | **33**, each cited to a spell rank |
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
 | Talents | none | **66**, Warrior only |
+| Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
 
 ---
 
@@ -147,6 +149,22 @@ node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lo
   Earth to the same 98 the set bonus reaches by adding a flat 12. The talent that raises Mana Spring
   is called **Restorative Totems**, not "Improved Mana Spring Totem"; there is no Improved Wrath of
   Air Totem talent at all.
+- **Wowhead's tier lists are markup, not prose, which makes them the easiest ingest in the repo.**
+  `[tier-list=rows]` wraps `[tier]` blocks carrying `[tier-label bg=qN]S[/tier-label]` and a
+  `[tier-content]` of `[spec-badge=arcane-mage]` slugs. Read the spec from the **badge**, never from
+  the `[url guide= hash=]` wrapped around it: on the healer page the Discipline Priest badge sits
+  inside a link whose hash says `holy-priest`, because Wowhead publishes one shared Priest healing
+  guide. Trusting the hash files Discipline under Holy and silently loses a spec.
+- **The same spec can hold two different tier placements, and that is not a conflict.** Feral Druid is
+  C-tier on the DPS list and S-tier on the tank list. Tier data is keyed by (role, spec) for this
+  reason; the app's own `CharacterRole` is a *different* axis that classifies Feral once, as
+  `Physical DPS`, so the two cannot be merged.
+- **Wowhead draws tier letters in item-quality colours and this app deliberately does not.** S is
+  `q5`, A is `q4`, B is `q3` on their pages. Reusing quality colour to mean "this spec is strong"
+  would make the one chromatic signal in this interface ambiguous, so rank reads through the text
+  ramp instead. Five tiers against four text tokens is why the rule beside each row steps down half a
+  beat after the ink does — without that, B and C rendered identically, which only a measurement of
+  the running page caught.
 - **wowsims is not infallible where it disagrees with a tooltip.** It models Blessing of Wisdom at
   42 mp5; spells 27142 and 27143 both say 41. That was the only outright conflict across all 33 —
   everything else agreed to the digit — but it is the reason the tooltip is the tie-breaker.
@@ -179,7 +197,7 @@ and Fury already layers Bloodthirst and Whirlwind onto white damage. What it can
 Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
 for melee, not a priority-list engine, which is mostly already there.
 
-### 2. UI — the requested rework is done except professions, tier lists and icons
+### 2. UI — the requested rework is done except icons
 
 Everything below shipped this session, each as its own commit. What is left is listed at the end.
 
@@ -246,8 +264,10 @@ Still open, and deliberately left for a design decision rather than guessed at:
   300-375 path with real craft counts and material quantities. Remaining `needsVerification` flags in
   `sampleCraftingGuides.ts` are all on pre-300 vanilla ranges, which are deliberately out of scope.
 
-- **Spec tier-list view** — the three Wowhead DPS/healer/tank ranking pages, as their own view. Note
-  these rank *specs*, not items, so they cannot drive the per-slot BiS lists; that was confirmed.
+- ~~Spec tier-list view~~ — **done.** Its own section and tab, 28 placements across the three Wowhead
+  Phase 2 lists, covering all 27 specs. `tools/ingest/ingest-tier-lists.mjs` regenerates it. As
+  suspected, these rank *specs*, not items, and nothing wires them into the per-slot BiS lists.
+
 - **Item and gem icons.** Deliberately deferred to last. Everything is built to take them: the
   paperdoll glyph, the ranked-row frame and the raid loot frame all share `slotGlyphs` and are sized
   to the icon that replaces them, and gem frames are colour-matched placeholders. The open decision

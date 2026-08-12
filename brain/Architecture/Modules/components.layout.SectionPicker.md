@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/SectionPicker.tsx
-lines: 79
+lines: 86
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.SectionPicker
 
-`src/components/layout/SectionPicker.tsx` · **components** layer · 79 lines
+`src/components/layout/SectionPicker.tsx` · **components** layer · 86 lines
 
 _No doc comment at the top of this file._
 

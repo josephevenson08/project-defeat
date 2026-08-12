@@ -524,6 +524,7 @@ const PHASES = [
       'Target debuffs: armor reduction, crit taken, spell damage taken',
       'Consumables with Alchemy/Cooking provenance',
       'All 13 professions: skill tiers, trainer requirements, material farm locations, leveling paths',
+      'Wowhead Phase 2 spec tier lists (DPS, healer, tank) as their own section — 28 placements covering all 27 specs',
     ],
     remaining: [
       'Talent trees',
@@ -531,7 +532,14 @@ const PHASES = [
       'Race/class-specific assumptions beyond legality checks',
       'Feral bear/cat mode split',
     ],
-    modules: ['domain/buffs/sampleBuffs.ts', 'domain/consumables/sampleConsumables.ts', 'domain/professions/sampleProfessions.ts', 'features/buffs/BuffsPanel.tsx'],
+    modules: [
+      'domain/buffs/sampleBuffs.ts',
+      'domain/consumables/sampleConsumables.ts',
+      'domain/professions/sampleProfessions.ts',
+      'features/buffs/BuffsPanel.tsx',
+      'domain/tierlists/tierLists.ts',
+      'features/tierlists/TierListsPanel.tsx',
+    ],
   },
   {
     number: 4,

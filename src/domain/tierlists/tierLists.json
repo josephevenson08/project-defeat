@@ -1,0 +1,234 @@
+{
+  "$schema": "wowhead tbc spec tier-list ingestion",
+  "upstream": {
+    "site": "wowhead.com",
+    "expansion": "TBC Classic",
+    "phase": 2,
+    "note": "Tier letters and spec placements only. Wowhead's per-spec analysis and tier definitions are their authored prose and are deliberately not copied; each list carries sourceUrl instead."
+  },
+  "generatedBy": "tools/ingest/ingest-tier-lists.mjs",
+  "listCount": 3,
+  "placementCount": 28,
+  "specsCovered": 27,
+  "lists": [
+    {
+      "role": "DPS",
+      "title": "DPS Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/dps-rankings-tier-list-pve-burning-crusade-classic-wow",
+      "phase": 2,
+      "tiers": [
+        {
+          "label": "S",
+          "placements": [
+            {
+              "slug": "arcane-mage",
+              "className": "Mage",
+              "spec": "Arcane"
+            },
+            {
+              "slug": "destruction-warlock",
+              "className": "Warlock",
+              "spec": "Destruction"
+            },
+            {
+              "slug": "beast-mastery-hunter",
+              "className": "Hunter",
+              "spec": "Beast Mastery"
+            },
+            {
+              "slug": "fury-warrior",
+              "className": "Warrior",
+              "spec": "Fury"
+            }
+          ]
+        },
+        {
+          "label": "A",
+          "placements": [
+            {
+              "slug": "arms-warrior",
+              "className": "Warrior",
+              "spec": "Arms"
+            },
+            {
+              "slug": "enhancement-shaman",
+              "className": "Shaman",
+              "spec": "Enhancement"
+            },
+            {
+              "slug": "affliction-warlock",
+              "className": "Warlock",
+              "spec": "Affliction"
+            },
+            {
+              "slug": "survival-hunter",
+              "className": "Hunter",
+              "spec": "Survival"
+            }
+          ]
+        },
+        {
+          "label": "B",
+          "placements": [
+            {
+              "slug": "retribution-paladin",
+              "className": "Paladin",
+              "spec": "Retribution"
+            },
+            {
+              "slug": "combat-rogue",
+              "className": "Rogue",
+              "spec": "Combat"
+            },
+            {
+              "slug": "shadow-priest",
+              "className": "Priest",
+              "spec": "Shadow"
+            },
+            {
+              "slug": "elemental-shaman",
+              "className": "Shaman",
+              "spec": "Elemental"
+            },
+            {
+              "slug": "balance-druid",
+              "className": "Druid",
+              "spec": "Balance"
+            },
+            {
+              "slug": "fire-mage",
+              "className": "Mage",
+              "spec": "Fire"
+            }
+          ]
+        },
+        {
+          "label": "C",
+          "placements": [
+            {
+              "slug": "feral-druid",
+              "className": "Druid",
+              "spec": "Feral"
+            },
+            {
+              "slug": "frost-mage",
+              "className": "Mage",
+              "spec": "Frost"
+            },
+            {
+              "slug": "demonology-warlock",
+              "className": "Warlock",
+              "spec": "Demonology"
+            }
+          ]
+        },
+        {
+          "label": "D",
+          "placements": [
+            {
+              "slug": "marksmanship-hunter",
+              "className": "Hunter",
+              "spec": "Marksmanship"
+            },
+            {
+              "slug": "assassination-rogue",
+              "className": "Rogue",
+              "spec": "Assassination"
+            },
+            {
+              "slug": "subtlety-rogue",
+              "className": "Rogue",
+              "spec": "Subtlety"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "Healer",
+      "title": "Healer Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/healer-rankings-tier-list-pve-burning-crusade-classic-wow",
+      "phase": 2,
+      "tiers": [
+        {
+          "label": "S",
+          "placements": [
+            {
+              "slug": "holy-priest",
+              "className": "Priest",
+              "spec": "Holy"
+            },
+            {
+              "slug": "restoration-shaman",
+              "className": "Shaman",
+              "spec": "Restoration"
+            }
+          ]
+        },
+        {
+          "label": "A",
+          "placements": [
+            {
+              "slug": "restoration-druid",
+              "className": "Druid",
+              "spec": "Restoration"
+            },
+            {
+              "slug": "holy-paladin",
+              "className": "Paladin",
+              "spec": "Holy"
+            }
+          ]
+        },
+        {
+          "label": "B",
+          "placements": [
+            {
+              "slug": "discipline-priest",
+              "className": "Priest",
+              "spec": "Discipline"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "Tank",
+      "title": "Tank Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead",
+      "sourceUrl": "https://www.wowhead.com/tbc/guide/tank-rankings-tier-list-pve-burning-crusade-classic-wow",
+      "phase": 2,
+      "tiers": [
+        {
+          "label": "S",
+          "placements": [
+            {
+              "slug": "feral-druid",
+              "className": "Druid",
+              "spec": "Feral"
+            }
+          ]
+        },
+        {
+          "label": "A",
+          "placements": [
+            {
+              "slug": "protection-paladin",
+              "className": "Paladin",
+              "spec": "Protection"
+            }
+          ]
+        },
+        {
+          "label": "B",
+          "placements": [
+            {
+              "slug": "protection-warrior",
+              "className": "Warrior",
+              "spec": "Protection"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

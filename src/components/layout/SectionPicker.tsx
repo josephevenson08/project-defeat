@@ -1,4 +1,4 @@
-export type SectionId = 'planner' | 'raids' | 'professions'
+export type SectionId = 'planner' | 'tierlists' | 'raids' | 'professions'
 
 type SectionDefinition = {
   id: SectionId
@@ -11,7 +11,7 @@ type SectionDefinition = {
 }
 
 /**
- * The three things this app does, offered as a deliberate choice rather than a tab bar you land in
+ * The four things this app does, offered as a deliberate choice rather than a tab bar you land in
  * the middle of.
  *
  * The tab bar still exists once you are inside — this is a way *in*, not a replacement for moving
@@ -28,6 +28,13 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Gear, gems and talents',
     blurb: 'Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to.',
     accent: '#9c7346',
+  },
+  {
+    id: 'tierlists',
+    label: 'Spec Tier Lists',
+    tagline: 'Where specs stand',
+    blurb: 'Wowhead’s Phase 2 rankings for damage, healing and tanking — all three lists on one page.',
+    accent: '#856a9c',
   },
   {
     id: 'raids',

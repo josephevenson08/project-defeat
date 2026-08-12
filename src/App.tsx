@@ -30,6 +30,7 @@ import type { SimulationTarget } from './domain/simulation/encounterTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsRail } from './features/stats/StatsRail'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
+import { TierListsPanel } from './features/tierlists/TierListsPanel'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import { RaidPicker } from './features/raids/RaidPicker'
 import { RaidRail } from './features/raids/RaidRail'
@@ -42,7 +43,7 @@ const initialCharacter: CharacterProfile = {
   spec: 'Fury',
 }
 
-type AppTab = 'planner' | 'simulation' | 'raids' | 'professions'
+type AppTab = 'planner' | 'simulation' | 'tierlists' | 'raids' | 'professions'
 
 /**
  * Simulation is its own tab rather than more panels under the planner.
@@ -58,6 +59,7 @@ type AppTab = 'planner' | 'simulation' | 'raids' | 'professions'
 const APP_TABS: readonly TabDefinition<AppTab>[] = [
   { id: 'planner', label: 'Character Planner' },
   { id: 'simulation', label: 'Simulation' },
+  { id: 'tierlists', label: 'Spec Tier Lists' },
   { id: 'raids', label: 'Raids' },
   { id: 'professions', label: 'Professions' },
 ]
@@ -250,6 +252,10 @@ function App() {
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
         </>
       )}
+      {/* The character is passed only once it has been chosen deliberately. Marking the default Fury
+          Warrior on the lists for someone who never picked it would answer "where do I stand" with a
+          spec they never named. */}
+      {activeTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
       {activeTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
       {activeTab === 'professions' && <ProfessionsPanel />}

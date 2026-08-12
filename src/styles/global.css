@@ -3053,3 +3053,146 @@ input[type='text']:focus {
   display: block;
   margin-top: 3px;
 }
+
+/*
+ * Spec tier lists.
+ *
+ * Wowhead draws its tier letters in item-quality colours — S in q5 orange, A in q4 purple, B in q3
+ * blue. This does not, and that is deliberate: quality colour is the one chromatic signal this
+ * interface spends, it means "this item is epic" everywhere else, and reusing it to mean "this spec
+ * is strong" would make the loudest colour on the page ambiguous.
+ *
+ * Rank reads through ink weight instead. --tier-ink steps down from --text-strong at the top tier to
+ * --text-faint at the bottom, and the rule beside each row weakens with it. Every step is a token
+ * that already passes AA on these surfaces.
+ */
+
+.tier-intro {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.tier-intro h2 {
+  font-size: 20px;
+  margin: 4px 0 10px;
+}
+
+.tier-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.tier-rows {
+  border-top: 1px solid var(--line);
+  display: grid;
+}
+
+.tier-row {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 56px 1fr;
+  padding: 14px 0;
+}
+
+/*
+ * The ranking ramp. Depth 0 is the top tier.
+ *
+ * The DPS list has five tiers and there are only four text tokens, so the ramp runs on two
+ * dimensions rather than one: ink steps down, and the rule beside the row steps down half a beat
+ * later. That gives five distinct (ink, rule) pairs out of four colours without inventing a fifth
+ * text token. B and C would otherwise render identically, which is what a measurement of the
+ * running page turned up.
+ *
+ * The letter itself is the actual information; this ramp reinforces it rather than carrying it.
+ */
+.tier-row[data-depth='0'] { --tier-ink: var(--text-strong); --tier-rule: var(--line-strong); }
+.tier-row[data-depth='1'] { --tier-ink: var(--text); --tier-rule: var(--line-strong); }
+.tier-row[data-depth='2'] { --tier-ink: var(--text-dim); --tier-rule: var(--line-strong); }
+.tier-row[data-depth='3'] { --tier-ink: var(--text-dim); --tier-rule: var(--line); }
+.tier-row[data-depth='4'] { --tier-ink: var(--text-faint); --tier-rule: var(--line); }
+
+.tier-row-label {
+  border-left: 2px solid var(--tier-rule);
+  padding-left: 12px;
+}
+
+.tier-letter {
+  color: var(--tier-ink);
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.tier-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tier-spec {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--tier-rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 3px;
+  min-width: 148px;
+  padding: 9px 12px;
+}
+
+.tier-spec-spec {
+  color: var(--tier-ink);
+  font-size: 14px;
+}
+
+.tier-spec-class {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+/*
+ * The current character's spec. The accent is on the border only — the role hues are muted enough
+ * that #9c7346 measures 4.19:1 on --surface-2, which is fine for a rule (AA wants 3:1 for non-text)
+ * and short of the 4.5:1 this 11px label would need. So the label is set in --text-strong and the
+ * colour does the pointing, which is also why the chip says "Your spec" in words rather than relying
+ * on the hue alone.
+ */
+.tier-spec[data-current] {
+  background: var(--surface-2);
+  border-left-color: var(--tier-accent);
+}
+
+.tier-spec[data-current] .tier-spec-spec {
+  color: var(--text-strong);
+}
+
+.tier-spec-you {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.tier-source {
+  margin: 16px 0 0;
+}
+
+.tier-source a {
+  color: var(--text-dim);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tier-source a:hover {
+  color: var(--text);
+}

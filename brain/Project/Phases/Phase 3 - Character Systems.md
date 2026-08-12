@@ -18,6 +18,7 @@ Buffs, debuffs, and consumables are wired into the stat pipeline. Talents are no
 - Target debuffs: armor reduction, crit taken, spell damage taken
 - Consumables with Alchemy/Cooking provenance
 - All 13 professions: skill tiers, trainer requirements, material farm locations, leveling paths
+- Wowhead Phase 2 spec tier lists (DPS, healer, tank) as their own section — 28 placements covering all 27 specs
 
 ## Remaining
 
@@ -32,6 +33,8 @@ Buffs, debuffs, and consumables are wired into the stat pipeline. Talents are no
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
+- [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Neighbours
 

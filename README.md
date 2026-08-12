@@ -30,6 +30,10 @@ Early MVP / foundation phase.
 - Raids tab: all five Phase 1/2 raids boss by boss, with per-role callouts, notable drops colour-coded
   by item quality where the drop exists in the catalog, and step-by-step attunement chains for
   Serpentshrine Cavern and Tempest Keep
+- Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
+  27 specs, with the current character's spec marked on every list it appears on. Tier letters and
+  membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
+  These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - Configurable encounter settings (target level, armor)
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations

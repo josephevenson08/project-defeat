@@ -1,15 +1,15 @@
 ---
 type: module
-layer: app
-source: src/styles/global.css
-lines: 3199
+layer: domain
+source: src/domain/tierlists/tierListsJson.d.ts
+lines: 17
 generated: true
-tags: [brain/architecture, layer/app]
+tags: [brain/architecture, layer/domain]
 ---
 
-# styles.global
+# domain.tierlists.tierListsJson.d
 
-`src/styles/global.css` · **app** layer · 3199 lines
+`src/domain/tierlists/tierListsJson.d.ts` · **domain** layer · 17 lines
 
 _No doc comment at the top of this file._
 
@@ -23,7 +23,7 @@ _None._
 
 ## Imported by
 
-- [[main]] — `src/main.tsx`
+_None._
 
 ## Concepts & phases
 

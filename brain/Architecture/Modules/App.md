@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 261
+lines: 267
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 261 lines
+`src/App.tsx` · **app** layer · 267 lines
 
 _No doc comment at the top of this file._
 
@@ -54,6 +54,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
+- [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Imported by
 
