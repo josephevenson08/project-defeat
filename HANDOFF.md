@@ -242,8 +242,9 @@ Still open, and deliberately left for a design decision rather than guessed at:
 
 ### 3. What is left of the requested rework
 
-- **Professions levelling guides**, in the style of wow-professions.com. Not started, but the URLs
-  are resolved — the obvious `/guides/tbc-<prof>-leveling-guide` pattern 404s. The real index is
+- **Professions levelling guides**, in the style of wow-professions.com. **2 of 9 done** — Alchemy
+  and Jewelcrafting have real 300-375 paths; the other seven still carry estimates and their
+  `needsVerification` flags. The URLs are resolved — the obvious `/guides/tbc-<prof>-leveling-guide` pattern 404s. The real index is
   `https://www.wow-professions.com/tbc-classic`, and the guides are:
 
   ```
@@ -261,9 +262,14 @@ Still open, and deliberately left for a design decision rather than guessed at:
   /tbc/skinning-leveling-guide-tbc-classic    /tbc/lockpicking-leveling-guide-tbc-classic
   ```
 
-  `ProfessionProfile.levelingPath` already exists and `RecipeLeveling` already has the right shape
-  (skill range, recipe, recipe source, key materials). The 300-375 TBC tail is partly filled with
-  several steps flagged `needsVerification`; those are the ones to replace. **Take the facts, not the
+  Method, proven twice: fetch the guide, strip tags, find the `300 - 3` anchor, and read the
+  `range → Nx Item - materials` lines off it. Both passes found the old estimates were not just
+  vague but **wrong on materials** — Super Mana Potion listed Mana Thistle and Crystal Vial when it
+  is Dreaming Glory and Felweed. Expect that in the remaining seven.
+
+  `sampleCraftingGuides.ts` is **CRLF**: a scripted edit matching `
+` silently matches nothing and
+  reports success. Normalise, edit, write back as CRLF. **Take the facts, not the
   prose** — skill ranges, item names and material counts are facts, their wording is not. The 1-300
   vanilla range is out of scope for a Phase 2 planner and is honestly marked as not itemised.
 - **Spec tier-list view** — the three Wowhead DPS/healer/tank ranking pages, as their own view. Note
