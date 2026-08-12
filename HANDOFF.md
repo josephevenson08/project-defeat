@@ -242,36 +242,10 @@ Still open, and deliberately left for a design decision rather than guessed at:
 
 ### 3. What is left of the requested rework
 
-- **Professions levelling guides**, in the style of wow-professions.com. **2 of 9 done** — Alchemy
-  and Jewelcrafting have real 300-375 paths; the other seven still carry estimates and their
-  `needsVerification` flags. The URLs are resolved — the obvious `/guides/tbc-<prof>-leveling-guide` pattern 404s. The real index is
-  `https://www.wow-professions.com/tbc-classic`, and the guides are:
+- ~~Professions levelling guides~~ — **done, all 9.** Every crafting profession has a sourced
+  300-375 path with real craft counts and material quantities. Remaining `needsVerification` flags in
+  `sampleCraftingGuides.ts` are all on pre-300 vanilla ranges, which are deliberately out of scope.
 
-  ```
-  /tbc/alchemy-leveling-guide-burning-crusade-classic
-  /tbc/blacksmithing-leveling-guide-burning-crusade-classic
-  /tbc/enchanting-leveling-guide-burning-crusade-classic
-  /tbc/engineering-leveling-guide-burning-crusade-classic
-  /tbc/jewelcrafting-leveling-guide-burning-crusade-classic
-  /tbc/leatherworking-leveling-guide-burning-crusade-classic
-  /tbc/tailoring-leveling-guide-burning-crusade-classic
-  /tbc/cooking-leveling-guide-tbc-classic
-  /tbc/first-aid-leveling-guide-burning-crusade-classic
-  /tbc/fishing-leveling-guide-burning-crusade-classic
-  /tbc/herbalism-leveling-guide-tbc-classic   /tbc/mining-leveling-guide-tbc-classic
-  /tbc/skinning-leveling-guide-tbc-classic    /tbc/lockpicking-leveling-guide-tbc-classic
-  ```
-
-  Method, proven twice: fetch the guide, strip tags, find the `300 - 3` anchor, and read the
-  `range → Nx Item - materials` lines off it. Both passes found the old estimates were not just
-  vague but **wrong on materials** — Super Mana Potion listed Mana Thistle and Crystal Vial when it
-  is Dreaming Glory and Felweed. Expect that in the remaining seven.
-
-  `sampleCraftingGuides.ts` is **CRLF**: a scripted edit matching `
-` silently matches nothing and
-  reports success. Normalise, edit, write back as CRLF. **Take the facts, not the
-  prose** — skill ranges, item names and material counts are facts, their wording is not. The 1-300
-  vanilla range is out of scope for a Phase 2 planner and is honestly marked as not itemised.
 - **Spec tier-list view** — the three Wowhead DPS/healer/tank ranking pages, as their own view. Note
   these rank *specs*, not items, so they cannot drive the per-slot BiS lists; that was confirmed.
 - **Item and gem icons.** Deliberately deferred to last. Everything is built to take them: the
