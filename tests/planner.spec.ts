@@ -2539,3 +2539,50 @@ test('the upgrade finder still discloses when a gain rests on estimated stats', 
   // and the test should track the mechanism being alive rather than the size of the backlog.
   expect(specsWithNotes.length).toBeGreaterThan(10)
 })
+
+test('every raid loot entry that names a catalogued item is linked to it', () => {
+  // The raid data was written when the catalogue held 230 hand-written items. It now holds 4,560
+  // ingested ones, so 85 entries named an item that was present while still carrying no itemId and a
+  // note reading "not yet in the item catalog" — false, and visible as a "??" frame where an icon
+  // should be. tools/ingest/link-raid-loot.mjs closed that gap; this stops it reopening as the
+  // catalogue keeps growing.
+  const catalogueIdsByName = new Map<string, string[]>()
+  for (const item of allItems) {
+    const key = item.name.toLowerCase()
+    catalogueIdsByName.set(key, [...(catalogueIdsByName.get(key) ?? []), item.id])
+  }
+
+  const unlinked: string[] = []
+  const staleNotes: string[] = []
+
+  for (const raid of sampleRaids) {
+    const bosses = sampleRaidBosses.filter((boss) => boss.raidId === raid.id)
+    for (const entry of [...bosses.flatMap((boss) => boss.loot), ...(raid.notableTrashLoot ?? [])]) {
+      const matches = catalogueIdsByName.get(entry.name.toLowerCase())
+
+      // An entry whose name resolves to exactly one catalogue item must say so. More than one is
+      // left alone on purpose — choosing between them would be a guess.
+      if (!entry.itemId && matches?.length === 1) unlinked.push(`${raid.name}: "${entry.name}" -> ${matches[0]}`)
+
+      // And nothing that IS linked may still claim to be missing from the catalogue.
+      if (entry.itemId && /not (?:yet )?in the item catalog/i.test(entry.notes ?? '')) {
+        staleNotes.push(`${raid.name}: "${entry.name}"`)
+      }
+    }
+  }
+
+  expect(unlinked, 'these loot entries name a catalogued item but carry no itemId').toEqual([])
+  expect(staleNotes, 'these are linked but still say they are not in the catalogue').toEqual([])
+
+  // The entries that remain unresolved should be the ones that genuinely are not gear — mounts,
+  // enchanting formulas and tier tokens. A floor rather than an exact count, because supplementing
+  // the catalogue should lower it.
+  const stillUnresolved = sampleRaids.flatMap((raid) => {
+    const bosses = sampleRaidBosses.filter((boss) => boss.raidId === raid.id)
+    return [...bosses.flatMap((boss) => boss.loot), ...(raid.notableTrashLoot ?? [])].filter((entry) => !entry.itemId)
+  })
+  expect(stillUnresolved.length).toBeLessThan(60)
+  for (const entry of stillUnresolved) {
+    expect(entry.notes, `"${entry.name}" is unresolved and should say why`).toBeTruthy()
+  }
+})

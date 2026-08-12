@@ -35,24 +35,15 @@ The fight opens against five Hellfire Channelers keeping Magtheridon banished; t
   Druid T4 chest, redeemed from Chestguard of the Fallen Defender.
 - **Justicar Chestguard** (Tier Token) — [[Tank]]
   Paladin T4 chest, redeemed from Chestguard of the Fallen Champion.
-- **Eye of Magtheridon** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Well-known caster trinket; real Magtheridon drop, not yet in the item catalog.
-- **Karaborian Talisman** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Thundering Greathelm** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Cloak of the Pit Stalker** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Liar's Tongue Gloves** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Terror Pit Girdle** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Girdle of the Endless Pit** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Crystalheart Pulse-Staff** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
-- **Glaive of the Pit** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Magtheridon drop, not yet in the item catalog.
+- **Eye of Magtheridon** (Boss) — [[Caster DPS]]
+- **Karaborian Talisman** (Boss) — [[Physical DPS]]
+- **Thundering Greathelm** (Boss) — [[Tank]]
+- **Cloak of the Pit Stalker** (Boss) — [[Physical DPS]]
+- **Liar's Tongue Gloves** (Boss) — [[Physical DPS]]
+- **Terror Pit Girdle** (Boss) — [[Physical DPS]]
+- **Girdle of the Endless Pit** (Boss) — [[Tank]]
+- **Crystalheart Pulse-Staff** (Boss) — [[Healer]]
+- **Glaive of the Pit** (Boss) — [[Physical DPS]]
 - **Magtheridon's Head** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
   Raid-wide quest item turned in for a reputation reward and a necklace choice.
 

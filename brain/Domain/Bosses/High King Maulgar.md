@@ -38,14 +38,10 @@ A five-target pull: Maulgar plus four ogre lieutenants, each of which needs its 
   Druid T4 shoulders, redeemed from Pauldrons of the Fallen Defender.
 - **Voidheart Mantle** (Tier Token) — [[Caster DPS]]
   Warlock T4 shoulders, redeemed from Pauldrons of the Fallen Champion.
-- **Belt of Divine Inspiration** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Maulgar drop, not yet in the item catalog.
-- **Malefic Mask of the Shadows** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Maulgar drop, not yet in the item catalog.
-- **Maulgar's Warhelm** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Maulgar drop, not yet in the item catalog.
-- **Hammer of the Naaru** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Maulgar drop, not yet in the item catalog.
+- **Belt of Divine Inspiration** (Boss) — [[Healer]]
+- **Malefic Mask of the Shadows** (Boss) — [[Physical DPS]]
+- **Maulgar's Warhelm** (Boss) — [[Physical DPS]]
+- **Hammer of the Naaru** (Boss) — [[Healer]]
 
 
 

@@ -33,26 +33,16 @@ Growth stacks every 30 seconds and permanently raises his damage and size, which
   T4 leg token — Warrior, Priest, Druid.
 - **Leggings of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 leg token — Hunter, Mage, Rogue, Shaman.
-- **Teeth of Gruul** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Eye of Gruul** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Axe of the Gronn Lords** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Bloodmaw Magus-Blade** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Collar of Cho'gall** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Cowl of Nature's Breath** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Gauntlets of Martial Perfection** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Gauntlets of the Dragonslayer** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Windshear Boots** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
-- **Gronn-Stitched Girdle** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Gruul drop, not yet in the item catalog.
+- **Teeth of Gruul** (Boss) — [[Physical DPS]]
+- **Eye of Gruul** (Boss) — [[Healer]]
+- **Axe of the Gronn Lords** (Boss) — [[Physical DPS]]
+- **Bloodmaw Magus-Blade** (Boss) — [[Caster DPS]]
+- **Collar of Cho'gall** (Boss) — [[Caster DPS]]
+- **Cowl of Nature's Breath** (Boss) — [[Caster DPS]]
+- **Gauntlets of Martial Perfection** (Boss) — [[Physical DPS]]
+- **Gauntlets of the Dragonslayer** (Boss) — [[Tank]]
+- **Windshear Boots** (Boss) — [[Physical DPS]]
+- **Gronn-Stitched Girdle** (Boss) — [[Physical DPS]]
 
 
 

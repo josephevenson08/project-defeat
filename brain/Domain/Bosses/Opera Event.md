@@ -22,10 +22,10 @@ One of three randomised encounters per lockout. The Wizard of Oz is a five-targe
 
 - **Earthsoul Leggings** (Boss) — [[Healer]]
 - **Ribbon of Sacrifice** (Boss) — [[Healer]]
-- **Wicked Witch's Hat** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Wizard of Oz variant only. Not in the item catalog.
-- **Masquerade Gown** (Boss) — [[Caster DPS]], [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Romulo and Julianne variant only. Not in the item catalog.
+- **Wicked Witch's Hat** (Boss) — [[Caster DPS]]
+  Wizard of Oz variant only.
+- **Masquerade Gown** (Boss) — [[Caster DPS]], [[Healer]]
+  Romulo and Julianne variant only.
 
 > The variant is rerolled each lockout, so a specific drop cannot be farmed on demand.
 

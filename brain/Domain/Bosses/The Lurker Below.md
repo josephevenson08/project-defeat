@@ -29,16 +29,11 @@ Summoned by fishing the strange pool in the middle of the platform ring, which n
 - **Grove-Bands of Remulos** (Boss) — [[Healer]]
 - **Velvet Boots of the Guardian** (Boss) — [[Caster DPS]]
 - **Mallet of the Tides** (Boss) — [[Healer]]
-- **Libram of Absolute Truth** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Lurker drop, not yet in the item catalog.
-- **Glowing Breastplate of Truth** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Lurker drop, not yet in the item catalog.
-- **Tempest-Strider Boots** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Lurker drop, not yet in the item catalog.
-- **Boots of Effortless Striking** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Lurker drop, not yet in the item catalog.
-- **Cord of Screaming Terrors** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Lurker drop, not yet in the item catalog.
+- **Libram of Absolute Truth** (Boss) — [[Healer]]
+- **Glowing Breastplate of Truth** (Boss) — [[Healer]]
+- **Tempest-Strider Boots** (Boss) — [[Caster DPS]]
+- **Boots of Effortless Striking** (Boss) — [[Physical DPS]]
+- **Cord of Screaming Terrors** (Boss) — [[Caster DPS]]
 
 
 

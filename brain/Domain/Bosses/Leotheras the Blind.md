@@ -47,10 +47,8 @@ Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes th
 - **Fang of the Leviathan** (Boss) — [[Physical DPS]]
 - **True-Aim Stalker Bands** (Boss) — [[Physical DPS]]
 - **Orca-Hide Boots** (Boss) — [[Physical DPS]]
-- **Girdle of the Invulnerable** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Leotheras drop, not yet in the item catalog.
-- **Coral-Barbed Shoulderpads** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Leotheras drop, not yet in the item catalog.
+- **Girdle of the Invulnerable** (Boss) — [[Tank]]
+- **Coral-Barbed Shoulderpads** (Boss) — [[Physical DPS]]
 
 
 

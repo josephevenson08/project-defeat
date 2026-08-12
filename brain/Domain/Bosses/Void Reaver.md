@@ -51,14 +51,10 @@ Mechanically the simplest boss in Tier 5 and famous for gearing raids fast. Knoc
 - **Warp-Spring Coil** (Boss) — [[Physical DPS]]
 - **Cowl of the Grand Engineer** (Boss) — [[Caster DPS]]
 - **Wristguards of Determination** (Boss) — [[Tank]]
-- **Fel Reaver's Piston** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Void Reaver drop, not yet in the item catalog.
-- **Girdle of Zaetar** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Void Reaver drop, not yet in the item catalog.
-- **Void Reaver Greaves** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Void Reaver drop, not yet in the item catalog.
-- **Fel-Steel Warhelm** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Void Reaver drop, not yet in the item catalog.
+- **Fel Reaver's Piston** (Boss) — [[Physical DPS]]
+- **Girdle of Zaetar** (Boss) — [[Healer]]
+- **Void Reaver Greaves** (Boss) — [[Physical DPS]]
+- **Fel-Steel Warhelm** (Boss) — [[Tank]]
 
 
 

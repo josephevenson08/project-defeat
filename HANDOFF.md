@@ -185,11 +185,17 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   catalogue, the Wowhead-only supplement and the curated provenance layer. Any script deriving a
   per-item dataset must read `allItems`, not the JSON — reading the JSON silently missed "Blessed
   Book of Nagrand", which reached the paperdoll with no icon.
-- **124 of the 272 raid loot entries name an item the catalogue does not carry**, so they render the
-  `??` fallback rather than art. This predates icons entirely and is not caused by them — those rows
-  always showed `??`. What changed is that it is now *visible*: uniform placeholders made a resolved
-  and an unresolved row look alike. Worst is Karazhan at 19 of 45. `supplement-items.mjs` is the
-  mechanism for closing it.
+- **Raid loot notes reading "not yet in the item catalog" went stale without anything editing them.**
+  That data was written when the catalogue held 230 hand-written items; it now holds 4,560, and 85 of
+  the 124 unlinked entries named an item that was already present. They carried no `itemId`, so they
+  drew the `??` frame and the note was simply false. `tools/ingest/link-raid-loot.mjs` links by exact
+  unique name — never guessing where a name matches two items — and trims only that one stale
+  sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
+  went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
+  mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **The ten files in `src/domain/raids/` were marked read-only on disk**, alone in the whole repo —
+  an artifact of the worktree agent that created them on 2026-07-30. Any scripted edit there fails
+  with `EPERM` until the attribute is cleared. Nothing else under `src/` has it.
 - **Wowhead's tier lists are markup, not prose, which makes them the easiest ingest in the repo.**
   `[tier-list=rows]` wraps `[tier]` blocks carrying `[tier-label bg=qN]S[/tier-label]` and a
   `[tier-content]` of `[spec-badge=arcane-mage]` slugs. Read the spec from the **badge**, never from

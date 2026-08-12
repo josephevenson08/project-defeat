@@ -71,10 +71,8 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
   Alternative choice from 'Kael'thas and the Verdant Sphere'.
 - **The Sun King's Talisman** (Quest Reward) — [[Caster DPS]]
   Alternative choice from 'Kael'thas and the Verdant Sphere'.
-- **The Darkener's Grasp** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
-  Fourth choice from 'Kael'thas and the Verdant Sphere'; not yet in the item catalog.
-- **Crown of the Sun** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Kael'thas drop, not yet in the item catalog.
+- **The Darkener's Grasp** (Quest Reward)
+- **Crown of the Sun** (Boss) — [[Caster DPS]]
 - **Ashes of Al'ar** (Boss) _(not in item catalog — [[Needs Verification]])_
   Flying mount with a drop rate around 1-2%. Not in the item catalog.
 

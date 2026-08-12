@@ -28,20 +28,13 @@ Three phases on a fixed timer. In Phase 1 she has no threat table and fires Arca
 - **Boots of the Resilient** (Boss) — [[Healer]]
 - **Vambraces of Ending** (Boss) — [[Physical DPS]]
   Sources place this on High Astromancer Solarian as item 29966, but the item catalog records it as a Phase 1 Karazhan drop with wowItemId 28514. The catalog entry needs correcting.
-- **Void Star Talisman** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Solarian's Sapphire** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Ethereum Life-Staff** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Star-Soul Breeches** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Star-Strider Boots** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Greaves of the Bloodwarder** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
-- **Girdle of the Righteous Path** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Solarian drop, not yet in the item catalog.
+- **Void Star Talisman** (Boss) — [[Caster DPS]]
+- **Solarian's Sapphire** (Boss) — [[Healer]]
+- **Ethereum Life-Staff** (Boss) — [[Healer]]
+- **Star-Soul Breeches** (Boss) — [[Healer]]
+- **Star-Strider Boots** (Boss) — [[Physical DPS]]
+- **Greaves of the Bloodwarder** (Boss) — [[Tank]]
+- **Girdle of the Righteous Path** (Boss) — [[Healer]]
 
 
 

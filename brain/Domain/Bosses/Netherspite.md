@@ -22,8 +22,7 @@ Three coloured beams shine from portals and each must be intercepted by a specif
 ## Notable drops (2)
 
 - **Cowl of Defiance** (Boss) — [[Physical DPS]]
-- **Jewel of Infinite Possibilities** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Netherspite drop, not yet in the item catalog.
+- **Jewel of Infinite Possibilities** (Boss) — [[Physical DPS]]
 
 
 

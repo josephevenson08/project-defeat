@@ -22,12 +22,9 @@ Summoned on Medivh's Terrace with the Blackened Urn, which requires its own ques
 
 - **Blazing Signet** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
   Quest item for 'The Cudgel of Kar'desh'. This is the reason Phase 2 groups still summon Nightbane.
-- **Talisman of Nightbane** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Nightbane drop, not yet in the item catalog.
-- **Dragonheart Flameshield** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Nightbane drop, not yet in the item catalog.
-- **Shield of Impenetrable Darkness** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Nightbane drop, not yet in the item catalog.
+- **Talisman of Nightbane** (Boss) — [[Tank]]
+- **Dragonheart Flameshield** (Boss) — [[Healer]]
+- **Shield of Impenetrable Darkness** (Boss) — [[Tank]]
 
 
 

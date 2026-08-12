@@ -30,8 +30,8 @@ The Curator summons Astral Flares that must be killed on sight — they explode 
   T4 gloves token — Hunter, Mage, Rogue, Shaman.
 - **Voidheart Gloves** (Tier Token) — [[Caster DPS]]
   Warlock T4 gloves, redeemed from Gloves of the Fallen Champion.
-- **Staff of Infinite Mysteries** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Feral druid tanking staff. Not in the item catalog.
+- **Staff of Infinite Mysteries** (Boss) — [[Tank]]
+  Feral druid tanking staff.
 
 
 

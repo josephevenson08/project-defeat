@@ -33,10 +33,8 @@ Three phases. Phase 1 is a tank-and-spank with Enfeeble, which drops five random
   T4 helm token — Warrior, Priest, Druid.
 - **Helm of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 helm token — Hunter, Mage, Rogue, Shaman.
-- **Gorehowl** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Malchezaar drop, not yet in the item catalog.
-- **The Decapitator** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Malchezaar drop, not yet in the item catalog.
+- **Gorehowl** (Boss) — [[Physical DPS]]
+- **The Decapitator** (Boss) — [[Physical DPS]]
 
 
 

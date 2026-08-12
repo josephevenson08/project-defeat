@@ -49,12 +49,9 @@ Four separate targets, each on its own tank. Karathress absorbs the abilities of
 - **Sextant of Unstable Currents** (Boss) — [[Caster DPS]]
 - **Bloodsea Brigand's Vest** (Boss) — [[Physical DPS]]
 - **Soul-Strider Boots** (Boss) — [[Healer]]
-- **World Breaker** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Karathress drop, not yet in the item catalog.
-- **Fathom-Brooch of the Tidewalker** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Karathress drop, not yet in the item catalog.
-- **Frayed Tether of the Drowned** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Karathress drop, not yet in the item catalog.
+- **World Breaker** (Boss) — [[Physical DPS]]
+- **Fathom-Brooch of the Tidewalker** (Boss) — [[Healer]]
+- **Frayed Tether of the Drowned** (Boss) — [[Healer]]
 
 
 

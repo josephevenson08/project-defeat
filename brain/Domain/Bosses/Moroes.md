@@ -24,8 +24,7 @@ Moroes brings four of six possible dinner-guest adds, randomised per lockout, an
 - **Edgewalker Longboots** (Boss) — [[Physical DPS]]
 - **Formula: Enchant Weapon - Mongoose** (Boss) _(not in item catalog — [[Needs Verification]])_
   Enchanting formula, still one of the top Phase 2 weapon enchants. Not in the item catalog.
-- **Moroes' Lucky Pocket Watch** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Moroes drop, not yet in the item catalog.
+- **Moroes' Lucky Pocket Watch** (Boss) — [[Tank]]
 
 
 

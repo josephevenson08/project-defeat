@@ -24,7 +24,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
         dropType: 'Boss',
         roles: ['Physical DPS'],
       },
-      { name: 'Steelhawk Crossbow', dropType: 'Boss', roles: ['Physical DPS'], needsVerification: true, notes: 'Real Attumen drop, not yet in the item catalog.' },
+      { itemId: 'steelhawk-crossbow', name: 'Steelhawk Crossbow', dropType: 'Boss', roles: ['Physical DPS'] },
       { name: "Fiery Warhorse's Reins", dropType: 'Boss', needsVerification: true, notes: 'Mount, very low drop rate. Not in the item catalog.' },
     ],
   },
@@ -42,7 +42,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     loot: [
       { itemId: 'edgewalker-longboots', name: 'Edgewalker Longboots', wowItemId: 28545, dropType: 'Boss', roles: ['Physical DPS'] },
       { name: 'Formula: Enchant Weapon - Mongoose', dropType: 'Boss', needsVerification: true, notes: 'Enchanting formula, still one of the top Phase 2 weapon enchants. Not in the item catalog.' },
-      { name: "Moroes' Lucky Pocket Watch", dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Real Moroes drop, not yet in the item catalog.' },
+      { itemId: 'moroes-lucky-pocket-watch', name: "Moroes' Lucky Pocket Watch", dropType: 'Boss', roles: ['Tank'] },
     ],
   },
   {
@@ -58,7 +58,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     loot: [
       { itemId: 'mitts-of-the-treemender', name: 'Mitts of the Treemender', dropType: 'Boss', roles: ['Healer'] },
       { itemId: 'totem-of-healing-rains', name: 'Totem of Healing Rains', dropType: 'Boss', roles: ['Healer'] },
-      { name: 'Shard of the Virtuous', dropType: 'Boss', roles: ['Healer'], needsVerification: true, notes: 'Real Maiden drop, not yet in the item catalog.' },
+      { itemId: 'shard-of-the-virtuous', name: 'Shard of the Virtuous', dropType: 'Boss', roles: ['Healer'] },
     ],
   },
   {
@@ -74,8 +74,8 @@ export const karazhanBosses: readonly RaidBoss[] = [
     loot: [
       { itemId: 'earthsoul-leggings', name: 'Earthsoul Leggings', dropType: 'Boss', roles: ['Healer'] },
       { itemId: 'ribbon-of-sacrifice', name: 'Ribbon of Sacrifice', dropType: 'Boss', roles: ['Healer'] },
-      { name: 'Wicked Witch\'s Hat', dropType: 'Boss', roles: ['Caster DPS'], needsVerification: true, notes: 'Wizard of Oz variant only. Not in the item catalog.' },
-      { name: 'Masquerade Gown', dropType: 'Boss', roles: ['Caster DPS', 'Healer'], needsVerification: true, notes: 'Romulo and Julianne variant only. Not in the item catalog.' },
+      { itemId: 'wicked-witchs-hat', name: 'Wicked Witch\'s Hat', dropType: 'Boss', roles: ['Caster DPS'], needsVerification: true, notes: 'Wizard of Oz variant only.' },
+      { itemId: 'masquerade-gown', name: 'Masquerade Gown', dropType: 'Boss', roles: ['Caster DPS', 'Healer'], needsVerification: true, notes: 'Romulo and Julianne variant only.' },
     ],
     notes: 'The variant is rerolled each lockout, so a specific drop cannot be farmed on demand.',
   },
@@ -96,7 +96,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
       { name: 'Gloves of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 gloves token — Warrior, Priest, Druid.' },
       { name: 'Gloves of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 gloves token — Hunter, Mage, Rogue, Shaman.' },
       { itemId: 'voidheart-gloves', name: 'Voidheart Gloves', dropType: 'Tier Token', roles: ['Caster DPS'], notes: 'Warlock T4 gloves, redeemed from Gloves of the Fallen Champion.' },
-      { name: 'Staff of Infinite Mysteries', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Feral druid tanking staff. Not in the item catalog.' },
+      { itemId: 'staff-of-infinite-mysteries', name: 'Staff of Infinite Mysteries', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Feral druid tanking staff.' },
     ],
   },
   {
@@ -128,8 +128,8 @@ export const karazhanBosses: readonly RaidBoss[] = [
     ],
     loot: [
       { itemId: 'drape-of-the-dark-reavers', name: 'Drape of the Dark Reavers', wowItemId: 28672, dropType: 'Boss', roles: ['Caster DPS'], notes: 'Holds Phase 2 best-in-slot status for several caster specs.' },
-      { name: 'Pendant of the Violet Eye', dropType: 'Boss', roles: ['Healer'], needsVerification: true, notes: 'Real Aran drop, not yet in the item catalog.' },
-      { name: 'Mantle of the Mind Flayer', dropType: 'Boss', roles: ['Caster DPS'], needsVerification: true, notes: 'Real Aran drop, not yet in the item catalog.' },
+      { itemId: 'pendant-of-the-violet-eye', name: 'Pendant of the Violet Eye', dropType: 'Boss', roles: ['Healer'] },
+      { itemId: 'mantle-of-the-mind-flayer', name: 'Mantle of the Mind Flayer', dropType: 'Boss', roles: ['Caster DPS'] },
     ],
   },
   {
@@ -145,7 +145,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     ],
     loot: [
       { itemId: 'cowl-of-defiance', name: 'Cowl of Defiance', wowItemId: 28732, dropType: 'Boss', roles: ['Physical DPS'] },
-      { name: 'Jewel of Infinite Possibilities', dropType: 'Boss', roles: ['Physical DPS'], needsVerification: true, notes: 'Real Netherspite drop, not yet in the item catalog.' },
+      { itemId: 'jewel-of-infinite-possibilities', name: 'Jewel of Infinite Possibilities', dropType: 'Boss', roles: ['Physical DPS'] },
     ],
   },
   {
@@ -157,8 +157,8 @@ export const karazhanBosses: readonly RaidBoss[] = [
       'A scripted game of chess where each raider controls a piece by standing on it. There is no gear check and no wipe risk worth planning around — the loot is guaranteed. Kill the enemy king; healers should take the healer pieces and keep the friendly king topped up. It sits on the critical path to Prince Malchezaar, so it is never skipped.',
     loot: [
       { itemId: 'ring-of-recurrence', name: 'Ring of Recurrence', dropType: 'Boss', roles: ['Caster DPS'] },
-      { name: "King's Defender", dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Real Chess Event drop, not yet in the item catalog.' },
-      { name: 'Triptych Shield of the Ancients', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Real Chess Event drop, not yet in the item catalog.' },
+      { itemId: 'kings-defender', name: "King's Defender", dropType: 'Boss', roles: ['Tank'] },
+      { itemId: 'triptych-shield-of-the-ancients', name: 'Triptych Shield of the Ancients', dropType: 'Boss', roles: ['Tank'] },
     ],
   },
   {
@@ -187,8 +187,8 @@ export const karazhanBosses: readonly RaidBoss[] = [
       { name: 'Helm of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 helm token — Paladin, Priest, Warlock.' },
       { name: 'Helm of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 helm token — Warrior, Priest, Druid.' },
       { name: 'Helm of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 helm token — Hunter, Mage, Rogue, Shaman.' },
-      { name: 'Gorehowl', dropType: 'Boss', roles: ['Physical DPS'], needsVerification: true, notes: 'Real Malchezaar drop, not yet in the item catalog.' },
-      { name: 'The Decapitator', dropType: 'Boss', roles: ['Physical DPS'], needsVerification: true, notes: 'Real Malchezaar drop, not yet in the item catalog.' },
+      { itemId: 'gorehowl', name: 'Gorehowl', dropType: 'Boss', roles: ['Physical DPS'] },
+      { itemId: 'the-decapitator', name: 'The Decapitator', dropType: 'Boss', roles: ['Physical DPS'] },
     ],
   },
   {
@@ -203,9 +203,9 @@ export const karazhanBosses: readonly RaidBoss[] = [
     ],
     loot: [
       { name: 'Blazing Signet', dropType: 'Quest Reward', notes: "Quest item for 'The Cudgel of Kar'desh'. This is the reason Phase 2 groups still summon Nightbane." },
-      { name: 'Talisman of Nightbane', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Real Nightbane drop, not yet in the item catalog.' },
-      { name: 'Dragonheart Flameshield', dropType: 'Boss', roles: ['Healer'], needsVerification: true, notes: 'Real Nightbane drop, not yet in the item catalog.' },
-      { name: 'Shield of Impenetrable Darkness', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Real Nightbane drop, not yet in the item catalog.' },
+      { itemId: 'talisman-of-nightbane', name: 'Talisman of Nightbane', dropType: 'Boss', roles: ['Tank'] },
+      { itemId: 'dragonheart-flameshield', name: 'Dragonheart Flameshield', dropType: 'Boss', roles: ['Healer'] },
+      { itemId: 'shield-of-impenetrable-darkness', name: 'Shield of Impenetrable Darkness', dropType: 'Boss', roles: ['Tank'] },
     ],
   },
 ]

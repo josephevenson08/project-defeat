@@ -23,10 +23,8 @@ No threat table — Aran attacks whoever he likes, so there is no tank. Flame Wr
 
 - **Drape of the Dark Reavers** (Boss) — [[Caster DPS]]
   Holds Phase 2 best-in-slot status for several caster specs.
-- **Pendant of the Violet Eye** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Aran drop, not yet in the item catalog.
-- **Mantle of the Mind Flayer** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Aran drop, not yet in the item catalog.
+- **Pendant of the Violet Eye** (Boss) — [[Healer]]
+- **Mantle of the Mind Flayer** (Boss) — [[Caster DPS]]
 
 
 

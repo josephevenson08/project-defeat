@@ -32,12 +32,9 @@ Phase 1 has Al'ar cycling clockwise between four platforms every 30 seconds, dro
   Sources place this on Al'ar, but the item catalog records it as a Kael'thas Sunstrider drop with wowItemId 32944. Both the boss and the item id on the catalog entry need re-checking.
 - **Arcanite Steam-Pistol** (Boss) — [[Physical DPS]]
   Sources place this on Al'ar in The Eye, but the item catalog records it as a Serpentshrine Cavern drop. The catalog entry needs correcting.
-- **Talon of Al'ar** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Al'ar drop, not yet in the item catalog.
-- **Fire Crest Breastplate** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Al'ar drop, not yet in the item catalog.
-- **Netherbane** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Al'ar drop, not yet in the item catalog.
+- **Talon of Al'ar** (Boss) — [[Caster DPS]]
+- **Fire Crest Breastplate** (Boss) — [[Physical DPS]]
+- **Netherbane** (Boss) — [[Tank]]
 
 
 

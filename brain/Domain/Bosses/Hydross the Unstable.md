@@ -27,24 +27,15 @@ A two-tank resistance fight. Hydross flips between a frost form and a nature for
 - **Blackfathom Warbands** (Boss) — [[Physical DPS]]
 - **Shoulderpads of the Stranger** (Boss) — [[Physical DPS]]
 - **Wraps of Purification** (Boss) — [[Healer]]
-- **Living Root of the Wildheart** (Boss) — Hybrid _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Idol of the Crescent Goddess** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Scarab of Displacement** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Band of Vile Aggression** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Brighthelm of Justice** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Pauldrons of the Wardancer** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Ranger-General's Chestguard** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Boots of the Shifting Nightmare** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
-- **Robe of Hateful Echoes** (Boss) — [[Caster DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Hydross drop, not yet in the item catalog.
+- **Living Root of the Wildheart** (Boss) — Hybrid
+- **Idol of the Crescent Goddess** (Boss) — [[Healer]]
+- **Scarab of Displacement** (Boss) — [[Tank]]
+- **Band of Vile Aggression** (Boss) — [[Tank]]
+- **Brighthelm of Justice** (Boss) — [[Healer]]
+- **Pauldrons of the Wardancer** (Boss) — [[Physical DPS]]
+- **Ranger-General's Chestguard** (Boss) — [[Physical DPS]]
+- **Boots of the Shifting Nightmare** (Boss) — [[Caster DPS]]
+- **Robe of Hateful Echoes** (Boss) — [[Caster DPS]]
 
 
 

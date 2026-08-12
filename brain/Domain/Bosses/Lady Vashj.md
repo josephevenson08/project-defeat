@@ -56,14 +56,10 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
 - **Ring of Endless Coils** (Boss) — [[Tank]]
 - **Coral Band of the Revived** (Boss) — [[Healer]]
 - **Vestments of the Sea-Witch** (Boss) — [[Caster DPS]]
-- **Serpent Spine Longbow** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Vashj drop and a Phase 2 chase item for hunters; not yet in the item catalog.
-- **Prism of Inner Calm** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Vashj drop, not yet in the item catalog.
-- **Krakken-Heart Breastplate** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Vashj drop, not yet in the item catalog.
-- **Runetotem's Mantle** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Vashj drop, not yet in the item catalog.
+- **Serpent Spine Longbow** (Boss) — [[Physical DPS]]
+- **Prism of Inner Calm** (Boss) — [[Healer]]
+- **Krakken-Heart Breastplate** (Boss) — [[Tank]]
+- **Runetotem's Mantle** (Boss) — [[Healer]]
 - **Vashj's Vial Remnant** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
   Quest item for the Mount Hyjal attunement chain, which becomes relevant in Phase 3 rather than Phase 2.
 

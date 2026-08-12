@@ -22,8 +22,7 @@ A spread-out fight. Holy Wrath chains between players standing near each other, 
 
 - **Mitts of the Treemender** (Boss) — [[Healer]]
 - **Totem of Healing Rains** (Boss) — [[Healer]]
-- **Shard of the Virtuous** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Maiden drop, not yet in the item catalog.
+- **Shard of the Virtuous** (Boss) — [[Healer]]
 
 
 

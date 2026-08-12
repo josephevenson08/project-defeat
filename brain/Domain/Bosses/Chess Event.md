@@ -19,10 +19,8 @@ A scripted game of chess where each raider controls a piece by standing on it. T
 ## Notable drops (3)
 
 - **Ring of Recurrence** (Boss) — [[Caster DPS]]
-- **King's Defender** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Chess Event drop, not yet in the item catalog.
-- **Triptych Shield of the Ancients** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Chess Event drop, not yet in the item catalog.
+- **King's Defender** (Boss) — [[Tank]]
+- **Triptych Shield of the Ancients** (Boss) — [[Tank]]
 
 
 

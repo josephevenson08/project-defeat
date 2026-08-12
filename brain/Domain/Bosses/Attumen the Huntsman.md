@@ -22,8 +22,7 @@ Starts as the horse Midnight; Attumen joins at 95% and the two merge into one mo
 ## Notable drops (3)
 
 - **Gloves of Dexterous Manipulation** (Boss) — [[Physical DPS]]
-- **Steelhawk Crossbow** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Attumen drop, not yet in the item catalog.
+- **Steelhawk Crossbow** (Boss) — [[Physical DPS]]
 - **Fiery Warhorse's Reins** (Boss) _(not in item catalog — [[Needs Verification]])_
   Mount, very low drop rate. Not in the item catalog.
 

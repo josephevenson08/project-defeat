@@ -27,20 +27,13 @@ Earthquake damages everyone within 50 yards and spawns two packs of six murlocs 
 - **Ring of Sundered Souls** (Boss) — [[Physical DPS]]
 - **Razor-Scale Battlecloak** (Boss) — [[Tank]]
 - **Warboots of Obliteration** (Boss) — [[Physical DPS]]
-- **Pendant of the Lost Ages** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Band of the Vigilant** (Boss) — [[Tank]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Pauldrons of the Argent Sentinel** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Mantle of the Tireless Tracker** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Girdle of the Tidal Call** (Boss) — [[Healer]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Gnarled Chestpiece of the Ancients** (Boss) — Hybrid _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
-- **Illidari Shoulderpads** (Boss) — [[Physical DPS]] _(not in item catalog — [[Needs Verification]])_
-  Real Morogrim drop, not yet in the item catalog.
+- **Pendant of the Lost Ages** (Boss) — [[Healer]]
+- **Band of the Vigilant** (Boss) — [[Tank]]
+- **Pauldrons of the Argent Sentinel** (Boss) — [[Healer]]
+- **Mantle of the Tireless Tracker** (Boss) — [[Physical DPS]]
+- **Girdle of the Tidal Call** (Boss) — [[Healer]]
+- **Gnarled Chestpiece of the Ancients** (Boss) — Hybrid
+- **Illidari Shoulderpads** (Boss) — [[Physical DPS]]
 
 
 
