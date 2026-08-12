@@ -6,6 +6,7 @@ import type { CharacterProfile } from '../character/characterTypes'
 import { SetBonuses } from './SetBonuses'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
+import { ItemIcon } from './ItemIcon'
 import { ItemPopup } from './ItemPopup'
 import { slotGlyph } from './slotGlyphs'
 
@@ -76,7 +77,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
         style={{ '--slot-quality': getQualityColor(equipped.item.quality) } as React.CSSProperties}
       >
         <span className="gear-glyph" aria-hidden="true">
-          <span className="gear-glyph-text">{slotGlyph(slot)}</span>
+          <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
           {equipped.item.itemLevel ? <span className="gear-ilvl">{equipped.item.itemLevel}</span> : null}
           {equipped.item.sockets?.length ? (
             <span className="gear-gems">

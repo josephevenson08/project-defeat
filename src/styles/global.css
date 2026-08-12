@@ -421,7 +421,7 @@ select {
   width: 40px;
 }
 
-.raid-loot-frame-text {
+.raid-loot-frame .item-icon-fallback {
   color: var(--text-faint);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1115,7 +1115,7 @@ select {
   width: 44px;
 }
 
-.gear-glyph-text {
+.gear-glyph .item-icon-fallback {
   color: var(--text-faint);
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1830,7 +1830,7 @@ select:focus,
   width: 40px;
 }
 
-.bis-item-frame-text {
+.bis-item-frame .item-icon-fallback {
   color: var(--text-faint);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -3195,4 +3195,34 @@ input[type='text']:focus {
 
 .tier-source a:hover {
   color: var(--text);
+}
+
+/*
+ * Item icons.
+ *
+ * The frames these sit in were always sized to the icon that would replace the two-letter glyph, so
+ * this is a swap rather than a layout change: 40px in the ranked and loot rows, 44px on the
+ * paperdoll. The art is Wowhead's 56x56 "large", downscaled, which leaves a little headroom on a
+ * high-DPI display rather than upscaling a 36x36.
+ *
+ * The icon fills its frame edge to edge and the frame's own border does the framing, which is what
+ * keeps a wall of loot rows reading as one grid instead of 100 slightly different rectangles.
+ */
+
+.item-icon {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/*
+ * Quality already colours the hairline on each paperdoll slot, and the icon underneath it is full
+ * of its own colour. A hard edge between the two read as a seam, so the icon is inset by the
+ * border rather than sitting flush against it.
+ */
+.gear-glyph .item-icon,
+.bis-item-frame .item-icon,
+.raid-loot-frame .item-icon {
+  border-radius: 1px;
 }

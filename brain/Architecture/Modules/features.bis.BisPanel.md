@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/bis/BisPanel.tsx
-lines: 229
+lines: 230
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.bis.BisPanel
 
-`src/features/bis/BisPanel.tsx` · **features** layer · 229 lines
+`src/features/bis/BisPanel.tsx` · **features** layer · 230 lines
 
 _No doc comment at the top of this file._
 
@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
+- [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 - [[lib.animations]] — `src/lib/animations.ts`
 

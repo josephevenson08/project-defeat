@@ -34,6 +34,10 @@ Early MVP / foundation phase.
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
+- Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
+  ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
+  `public/icons/` (1,238 files, 2.1 MB) so the app keeps working offline and makes no runtime network
+  calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - Configurable encounter settings (target level, armor)
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations

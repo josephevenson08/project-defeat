@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-131 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+134 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -53,7 +53,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (34)
+### features (35)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -68,6 +68,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.gear.gearData]] · 8 importers
 - [[features.gear.GearPanel]] · 1 importers
 - [[features.gear.gearTypes]] · 10 importers
+- [[features.gear.ItemIcon]] · 3 importers
 - [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
 - [[features.gear.slotGlyphs]] · 3 importers
@@ -92,7 +93,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (84)
+### domain (86)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -148,6 +149,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
 - [[domain.gems.gemTypes]] · 1 importers
 - [[domain.gems.sampleGems]] · 5 importers
+- [[domain.icons.icons]] · 1 importers
+- [[domain.icons.iconsJson.d]] · 0 importers
 - [[domain.professions.index]] · 1 importers
 - [[domain.professions.professionTypes]] · 5 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers

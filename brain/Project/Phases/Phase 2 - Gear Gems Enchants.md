@@ -20,6 +20,7 @@ Structured item data with sources, sockets, legality rules, and per-spec ranking
 - Class/weapon/relic legality checks
 - Phase 2 starter BiS for all 27 specs, including role meta gems and role-appropriate enchants
 - Spec-aware slot labels and hidden-slot rules for every class
+- Real item and gem icons: 4,741 entries mapped to 1,238 vendored files, offline and with no runtime network calls
 
 ## Remaining
 
@@ -32,6 +33,8 @@ Structured item data with sources, sockets, legality rules, and per-spec ranking
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.icons.icons]] — `src/domain/icons/icons.ts`
+- [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 
 ## Neighbours
 

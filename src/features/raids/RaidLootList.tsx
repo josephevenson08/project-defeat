@@ -1,6 +1,7 @@
 import type { RaidLootEntry } from '../../domain/raids'
 import { describeStats } from '../../domain/stats/describeStats'
 import { getItemById } from '../gear/gearData'
+import { ItemIcon } from '../gear/ItemIcon'
 import { slotGlyph } from '../gear/slotGlyphs'
 
 type RaidLootListProps = {
@@ -29,7 +30,7 @@ export function RaidLootList({ entries, nameColor }: RaidLootListProps) {
         return (
           <div className="raid-loot-row" key={`${entry.dropType}-${entry.itemId ?? entry.name}`} data-testid={`loot-${entry.itemId ?? entry.name}`}>
             <span className="raid-loot-frame" aria-hidden="true">
-              <span className="raid-loot-frame-text">{item?.slot ? slotGlyph(item.slot) : '??'}</span>
+              <ItemIcon wowItemId={item?.wowItemId} fallback={item?.slot ? slotGlyph(item.slot) : '??'} />
               {item?.itemLevel ? <span className="raid-loot-ilvl">{item.itemLevel}</span> : null}
             </span>
 

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidLootList.tsx
-lines: 63
+lines: 64
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidLootList
 
-`src/features/raids/RaidLootList.tsx` · **features** layer · 63 lines
+`src/features/raids/RaidLootList.tsx` · **features** layer · 64 lines
 
 _No doc comment at the top of this file._
 
@@ -22,6 +22,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
 - [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 
 ## Imported by

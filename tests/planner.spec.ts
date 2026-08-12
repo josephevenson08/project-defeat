@@ -231,6 +231,9 @@ import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, poin
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
 
 
 function readStatValue(text: string) {
@@ -2391,4 +2394,82 @@ test('tier letters stay out of the item quality palette', async ({ page }) => {
       }),
     )
   expect(new Set(steps).size, 'each tier should be visually distinct from the others').toBe(5)
+})
+
+test('every catalogued item with a real item id resolves to a vendored icon file', () => {
+  // Two halves, and both matter. The mapping is generated from MIT-licensed upstream data, but the
+  // artwork is vendored by a separate script — so a name that maps to no file on disk is the exact
+  // failure mode of vendoring, and it would render as an empty frame rather than an error.
+  const missingName: string[] = []
+  const missingFile: string[] = []
+  const seen = new Set<string>()
+
+  for (const item of allItems) {
+    if (!item.wowItemId) continue
+    const icon = getIconName(item.wowItemId)
+    if (!icon) {
+      missingName.push(`${item.id} (${item.wowItemId})`)
+      continue
+    }
+    if (seen.has(icon)) continue
+    seen.add(icon)
+    if (!existsSync(resolve(process.cwd(), 'public/icons', `${icon}.jpg`))) missingFile.push(icon)
+  }
+
+  expect(missingName, 'every catalogued item with a wowItemId should have an icon name').toEqual([])
+  expect(missingFile, 'every icon name in use should have a vendored file behind it').toEqual([])
+
+  // Items share artwork heavily, which is the whole reason vendoring is ~2 MB rather than tens of
+  // megabytes. If this ever inverts, the vendoring decision deserves revisiting.
+  expect(seen.size).toBeLessThan(allItems.length / 2)
+  expect(distinctIconCount).toBe(1238)
+  expect(mappedIconCount).toBe(4741)
+})
+
+test('the paperdoll renders real item icons rather than the placeholder glyphs', async ({ page }) => {
+  await openApp(page)
+
+  // The frames were always sized to the icon that would replace the two-letter glyph, so this is the
+  // assertion that the swap actually happened rather than the glyph still being there.
+  const icons = page.locator('.gear-glyph img.item-icon')
+  expect(await icons.count(), 'every visible slot should carry an icon').toBeGreaterThan(10)
+  await expect(page.locator('.gear-glyph .item-icon-fallback')).toHaveCount(0)
+
+  // Present in the DOM is not the same as loaded. A wrong path 404s and still renders an <img>.
+  const broken = await icons.evaluateAll((nodes) =>
+    nodes.filter((n) => !(n as HTMLImageElement).complete || (n as HTMLImageElement).naturalWidth === 0).length,
+  )
+  expect(broken, 'no icon should fail to load').toBe(0)
+
+  // Wowhead's "large" is 56x56, and the frames are 40-44px. Downscaling is deliberate; if this ever
+  // reports 36 the fetch script has quietly switched to "medium" and the paperdoll is upscaling.
+  const naturalWidths = await icons.evaluateAll((nodes) => [...new Set(nodes.map((n) => (n as HTMLImageElement).naturalWidth))])
+  expect(naturalWidths).toEqual([56])
+
+  // The slot an icon lands in has to match the item in it — a mapping keyed on the wrong id would
+  // still load 19 perfectly valid images.
+  const headSrc = await page
+    .getByRole('button', { name: 'Head slot', exact: true })
+    .locator('img.item-icon')
+    .getAttribute('src')
+  const headItem = getItemById(defaultGear.Head.item.id)
+  expect(headSrc).toContain(getIconName(headItem?.wowItemId))
+})
+
+test('a raid loot row with no catalogued item still renders a frame', async ({ page }) => {
+  await openApp(page, 'raids')
+  await page.getByTestId('raid-pick-karazhan').click()
+
+  // 124 of the 272 raid loot entries across all five raids name an item the catalogue does not carry,
+  // which predates icons entirely — those rows have always shown "??". Real icons make the gap
+  // visible rather than causing it, and the fallback is what keeps an unresolved row from collapsing
+  // to an empty box. Not pinned to an exact count: supplementing the catalogue should lower it, and
+  // this test should track the fallback working, not the size of the backlog.
+  const rows = page.locator('.raid-loot-row')
+  expect(await rows.count()).toBeGreaterThan(0)
+
+  const icons = await page.locator('.raid-loot-frame img.item-icon').count()
+  const fallbacks = await page.locator('.raid-loot-frame .item-icon-fallback').count()
+  expect(icons + fallbacks, 'every loot row gets exactly one of the two').toBe(await rows.count())
+  expect(icons, 'the catalogued ones should show real art').toBeGreaterThan(0)
 })

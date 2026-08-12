@@ -11,6 +11,7 @@ import { animateEquipFeedback } from '../../lib/animations'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemById, getVisibleGearSlotsForSpec } from '../gear/gearData'
 import type { EquippedGear, EquippedSlot, GearItem } from '../gear/gearTypes'
+import { ItemIcon } from '../gear/ItemIcon'
 import { slotGlyph } from '../gear/slotGlyphs'
 
 type BisPanelProps = {
@@ -122,7 +123,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                         {/* Frame first, so a row is anchored the same way the paperdoll is. Sized to
                             the icon it will become once art lands. */}
                         <span className="bis-item-frame" aria-hidden="true">
-                          <span className="bis-item-frame-text">{slotGlyph(entry.slot)}</span>
+                          <ItemIcon wowItemId={item?.wowItemId} fallback={slotGlyph(entry.slot)} />
                           {item?.itemLevel ? <span className="bis-item-ilvl">{item.itemLevel}</span> : null}
                         </span>
 

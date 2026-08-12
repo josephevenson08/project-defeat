@@ -47,7 +47,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 77 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 80 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -94,6 +94,8 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
 node tools/ingest/ingest-talents.mjs --class Warrior  # 66 Warrior talents
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
+node tools/ingest/ingest-icons.mjs              # icon *names* for 4,741 items and gems
+node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/icons/ (1,238 files)
 ```
 
 | | Was | Now |
@@ -109,6 +111,7 @@ node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placemen
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
 | Talents | none | **66**, Warrior only |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
+| Item/gem icons | none, two-letter glyphs | **4,741 mapped**, 1,238 files vendored, 2.1 MB |
 
 ---
 
@@ -156,6 +159,21 @@ node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placemen
   Earth to the same 98 the set bonus reaches by adding a flat 12. The talent that raises Mana Spring
   is called **Restorative Totems**, not "Improved Mana Spring Totem"; there is no Improved Wrath of
   Air Totem talent at all.
+- **Icon names come from the upstream the catalogue already uses, not from scraping Wowhead.**
+  `assets/item_data/all_item_tooltips.csv` in wowsims/tbc, at the same pinned commit, carries an
+  `"icon"` field for ~30,000 items — one request for the whole mapping. Two dead ends first: wowsims'
+  `all_items.go` has no icon field at all, and Wowhead's item *listviews* carry `displayid` rather
+  than an icon name, cap out around 1,720 rows, and apply their URL category filters client-side —
+  `/tbc/items/head/quality:4` and `/tbc/items/quality:4` return byte-identical HTML.
+- **`allItems` is 4,560 while `itemCatalogue.json` is 4,505.** `itemCatalogue.ts` merges the ingested
+  catalogue, the Wowhead-only supplement and the curated provenance layer. Any script deriving a
+  per-item dataset must read `allItems`, not the JSON — reading the JSON silently missed "Blessed
+  Book of Nagrand", which reached the paperdoll with no icon.
+- **124 of the 272 raid loot entries name an item the catalogue does not carry**, so they render the
+  `??` fallback rather than art. This predates icons entirely and is not caused by them — those rows
+  always showed `??`. What changed is that it is now *visible*: uniform placeholders made a resolved
+  and an unresolved row look alike. Worst is Karazhan at 19 of 45. `supplement-items.mjs` is the
+  mechanism for closing it.
 - **Wowhead's tier lists are markup, not prose, which makes them the easiest ingest in the repo.**
   `[tier-list=rows]` wraps `[tier]` blocks carrying `[tier-label bg=qN]S[/tier-label]` and a
   `[tier-content]` of `[spec-badge=arcane-mage]` slugs. Read the spec from the **badge**, never from
@@ -219,7 +237,7 @@ and Fury already layers Bloodthirst and Whirlwind onto white damage. What it can
 Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
 for melee, not a priority-list engine, which is mostly already there.
 
-### 2. UI — the requested rework is done except icons
+### 2. UI — the requested rework is done
 
 Everything below shipped this session, each as its own commit. What is left is listed at the end.
 
@@ -290,11 +308,11 @@ Still open, and deliberately left for a design decision rather than guessed at:
   Phase 2 lists, covering all 27 specs. `tools/ingest/ingest-tier-lists.mjs` regenerates it. As
   suspected, these rank *specs*, not items, and nothing wires them into the per-slot BiS lists.
 
-- **Item and gem icons.** Deliberately deferred to last. Everything is built to take them: the
-  paperdoll glyph, the ranked-row frame and the raid loot frame all share `slotGlyphs` and are sized
-  to the icon that replaces them, and gem frames are colour-matched placeholders. The open decision
-  is vendoring into the repo (offline-safe, ~15-25 MB in a OneDrive folder) versus hotlinking
-  Wowhead's CDN (breaks the no-runtime-network-calls invariant).
+- ~~Item and gem icons~~ — **done, vendored.** The size estimate that made this look like a hard
+  call was wrong by an order of magnitude: 4,741 catalogued entries share only **1,238 distinct
+  icons**, and at Wowhead's 56×56 "large" that is **2.1 MB**, not 15-25. Vendoring therefore costs
+  little and keeps the no-runtime-network-calls invariant intact, so the hotlinking option was never
+  actually worth its downside.
 
 ### 4. Talents — Warrior only, by design
 
