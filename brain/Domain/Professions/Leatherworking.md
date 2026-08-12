@@ -24,12 +24,12 @@ tags: [brain/domain, domain/profession]
 ## Leveling path
 
 - skill 1–300: **Standard vanilla leather/mail armor progression** — Trainer-taught, with a specialization choice (Dragonscale / Elemental / Tribal) unlocked via questline partway through.
-- skill 300–310: **Knothide Leather (from Knothide Leather Scraps)** — Master Leatherworking trainer (Outland). · Knothide Leather Scraps
-- skill 310–325: **Armor kits crafted from Knothide Leather** — Master Leatherworking trainer (Outland).
-- skill 325–335: **Heavy Knothide Leather** — Pattern purchased from Cro Threadstrong in Shattrath.
-- skill 335–350: **Knothide Leather vests (with thread)** — Master Leatherworking trainer (Outland).
-- skill 350–365: **Heavy armor kits from thicker leather variants** — Master Leatherworking trainer (Outland). · Thick Clefthoof Leather
-- skill 365–375: **Drums of Battle** — Pattern from Almaador in Shattrath; requires Honored reputation with The Sha'tar.
+- skill 300–325: **30x Knothide Armor Kit** — Master Leatherworking trainer (Outland). · 120 Knothide Leather
+- skill 325–335: **222x Heavy Knothide Leather** — Pattern sold by Cro Threadstrong in Shattrath City. · 1,110 Knothide Leather
+- skill 335–350: **20x Thick Draenic Vest** — Master Leatherworking trainer (Outland). · 280 Knothide Leather, 60 Rune Thread
+- skill 350–365: **50x Heavy Knothide Armor Kit** — Master Leatherworking trainer (Outland). · 150 Heavy Knothide Leather
+- skill 365–370: **6x Drums of Battle** — Recipe sold by Almaador in Shattrath City; needs Honored with The Sha'tar. · 36 Heavy Knothide Leather, 24 Thick Clefthoof Leather
+- skill 370–375: **6x Drums of Panic** — Recipe sold by Alurmi, inside the Caverns of Time; needs Honored with Keepers of Time. · 36 Heavy Knothide Leather, 24 Fel Hide
 
 ## Where this lives in the code
 
