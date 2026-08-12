@@ -24,12 +24,13 @@ tags: [brain/domain, domain/profession]
 ## Leveling path
 
 - skill 1–300: **Standard vanilla Engineering progression (guns, explosives, gadgets)** — Trainer-taught, with several quest/BoE schematics along the way.
-- skill 300–310: **Fel Iron Casing, Handful of Fel Iron Bolts, Elemental Blasting Powder (component crafting)** — Master Engineering trainer (Outland). · Fel Iron Bar
-- skill 310–320: **Fel Iron Bomb** — Master Engineering trainer (Outland).
-- skill 320–335: **Fel Iron Musket (or equivalent Fel Iron ranged weapon)** — Master Engineering trainer (Outland).
-- skill 335–350: **White Smoke Flare** — Schematic purchased from a vendor such as Wind Trader Lathrai in Shattrath, or from a reputation quartermaster.
-- skill 350–360: **Khorium Power Core** — Master Engineering trainer (Outland). · Khorium Bar, Primal Fire
-- skill 360–375: **Field Repair Bot 110G** — Schematic drops from the Gan'arg Analyzer in Blade's Edge Mountains.
+- skill 300–320: **114x Handful of Fel Iron Bolts and 20x Elemental Blasting Powder** — Master Engineering trainer (Outland). · 114 Fel Iron Bar, 20 Mote of Fire, 40 Mote of Earth
+- skill 320–325: **7x Fel Iron Bomb** — Master Engineering trainer (Outland). · 7 Fel Iron Casing, 14 Handful of Fel Iron Bolts, 7 Elemental Blasting Powder
+- skill 325–335: **30x Adamantite Frame** — Master Engineering trainer (Outland). · 120 Adamantite Bar, 30 Primal Earth
+- skill 335–355: **70x White Smoke Flare** — Schematic sold by a vendor; green for most of the range. · 70 Elemental Blasting Powder, 70 Netherweave Cloth
+- skill 355–360: **5x Khorium Power Core** — Master Engineering trainer (Outland). · 15 Khorium Bar, 5 Primal Fire
+- skill 360–370: **15x Adamantite Rifle** — Master Engineering trainer (Outland). · 45 Fel Iron Casing, 30 Adamantite Frame, 60 Handful of Fel Iron Bolts
+- skill 370–375: **5x Field Repair Bot 110G** — Master Engineering trainer (Outland). · 40 Adamantite Bar, 40 Handful of Fel Iron Bolts, 5 Khorium Power Core
 
 ## Where this lives in the code
 
