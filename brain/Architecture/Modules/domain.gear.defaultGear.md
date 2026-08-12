@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/defaultGear.ts
-lines: 28
+lines: 32
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.defaultGear
 
-`src/domain/gear/defaultGear.ts` · **domain** layer · 28 lines
+`src/domain/gear/defaultGear.ts` · **domain** layer · 32 lines
 
 From the top of the file:
 
@@ -28,6 +28,7 @@ From the top of the file:
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.gear.obtainability]] — `src/domain/gear/obtainability.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 
 ## Imported by

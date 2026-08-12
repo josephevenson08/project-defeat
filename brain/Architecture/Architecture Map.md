@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-134 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+135 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -17,7 +17,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 The modules everything else leans on — change these carefully.
 
 - [[domain.character.characterTypes]] — 30 importers
-- [[domain.gear.itemTypes]] — 25 importers
+- [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[features.character.characterTypes]] — 15 importers
 - [[domain.stats.statTypes]] — 14 importers
@@ -93,7 +93,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (86)
+### domain (87)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -141,7 +141,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.gearSlots]] · 17 importers
 - [[domain.gear.itemCatalogue]] · 5 importers
 - [[domain.gear.itemSets]] · 2 importers
-- [[domain.gear.itemTypes]] · 25 importers
+- [[domain.gear.itemTypes]] · 26 importers
+- [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
 - [[domain.gear.slotCompatibility]] · 6 importers

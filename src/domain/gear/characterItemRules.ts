@@ -3,6 +3,7 @@ import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
 import { getItemsForSlot } from './itemCatalogue'
+import { isObtainable } from './obtainability'
 import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
 
 const enhancementExcludedWeaponTypes: readonly WeaponType[] = ['Bow', 'Gun', 'Crossbow', 'Wand', 'Libram', 'Idol', 'Shield', 'Staff', 'Sword']
@@ -38,6 +39,12 @@ const rogueIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Polearm', 'Staff
 const warlockIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Shield', 'Totem', 'Libram', 'Idol']
 
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
+  // First, and for every class alike: an item nobody can acquire is not gear. This gate is here
+  // rather than in the catalogue so the items stay readable as data — raid loot and provenance can
+  // still name them — while nothing can equip, default to, or be upgraded into one. See
+  // `obtainability.ts` for why each entry is on that list.
+  if (!isObtainable(item)) return false
+
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
 

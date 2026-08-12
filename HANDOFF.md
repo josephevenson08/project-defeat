@@ -159,6 +159,22 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   Earth to the same 98 the set bonus reaches by adding a flat 12. The talent that raises Mana Spring
   is called **Restorative Totems**, not "Improved Mana Spring Totem"; there is no Improved Wrath of
   Air Totem talent at all.
+- **The upstream item database is the game's item table, not a list of wearable gear — and that put
+  encounter props in every default loadout.** `getDefaultItemForSlot` picks by highest item level, so
+  before `domain/gear/obtainability.ts` existed **all 27 specs opened holding one of Kael'thas's
+  Tempest Keep encounter weapons**. Every stat total, simulation and stat weight in the app started
+  from a weapon that cannot be held, and the upgrade finder never proposed a weapon because nothing
+  beats ilvl 175. The evidence is in the data, not recall: those seven are the **only** items at ilvl
+  175 in a 4,505-item catalogue, eleven levels above ilvl 164, which is Sunwell and the highest
+  obtainable gear in all of TBC. Trashbringer is likewise alone at 155 with no Wowhead source tab.
+  Excluded at `isItemAllowedForCharacter` **and** in `defaultGear.ts`, because the starting set is
+  built before any character exists and never passes through that gate.
+- **Two tests were codifying that bug** and are worth not "fixing" back: one asserted Warp Slicer was
+  a Combat Rogue main-hand option, and one required the upgrade finder to flag at least one row as
+  resting on estimated stats. The second stopped holding for the *right* reason — Fury Warrior's
+  defaults became real sourced epics, so its upgrades compare sourced against sourced. Fury is the
+  only one of 27 specs in that position, and a domain test now pins that the disclosure still fires
+  for the other 26.
 - **Icon names come from the upstream the catalogue already uses, not from scraping Wowhead.**
   `assets/item_data/all_item_tooltips.csv` in wowsims/tbc, at the same pinned commit, carries an
   `"icon"` field for ~30,000 items — one request for the whole mapping. Two dead ends first: wowsims'

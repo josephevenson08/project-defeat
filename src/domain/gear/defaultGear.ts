@@ -1,6 +1,7 @@
 import { gearSlots } from './gearSlots'
 import type { EquippedGear, GearItem } from './itemTypes'
 import { getItemsForSlot } from './itemCatalogue'
+import { isObtainable } from './obtainability'
 import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
 
 /**
@@ -18,7 +19,10 @@ export const defaultGear = gearSlots.reduce((gear, slot) => {
       .map((item) => item.id),
   )
 
-  const candidates = getItemsForSlot(slot).filter((item: GearItem) => !usedUniqueIds.has(item.id))
+  // Obtainability is filtered here as well as in `isItemAllowedForCharacter`, because this set is
+  // built before any character exists and so never passes through that gate. It is the reason the
+  // app used to open holding Kael'thas's encounter weapons.
+  const candidates = getItemsForSlot(slot).filter((item: GearItem) => !usedUniqueIds.has(item.id) && isObtainable(item))
   const item = getDefaultItemForSlot(slot, candidates)
   if (!item) throw new Error(`Missing sample item for ${slot}`)
 

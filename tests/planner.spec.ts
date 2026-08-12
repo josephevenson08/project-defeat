@@ -234,6 +234,8 @@ import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
+import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/domain/gear/obtainability'
+import { findUpgrades } from '../src/features/simulator/findUpgrades'
 
 
 function readStatValue(text: string) {
@@ -1061,7 +1063,10 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
   await expect(page.getByText('Combat Rogue Phase 2 Ranked List')).toBeVisible()
   await withSlotOpen(page, 'Main Hand', async () => {
-    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Warp Slicer' })).toHaveCount(1)
+    // Was 'Warp Slicer', which is one of Kael'thas's encounter weapons and is no longer offered to
+    // anyone — see domain/gear/obtainability.ts. Rod of the Sun King is a real ilvl 141 Tempest Keep
+    // drop and an actual Combat Rogue main-hand, so it tests the same thing without asserting a bug.
+    await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
   })
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
@@ -1265,12 +1270,14 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
     await expect(gemNotes.first()).toContainText(/Assumes .+/)
   }
 
-  // Most of this catalog is still stat-budget estimates, and the few sourced items are markedly
-  // stronger than the estimates around them — so a ranking built on those comparisons has to say
-  // which rows rest on estimated data rather than presenting every delta as equally solid.
-  const dataNotes = list.locator('.upgrade-data-note')
-  expect(await dataNotes.count(), 'a catalog this unverified should flag at least one row').toBeGreaterThan(0)
-  for (const text of await dataNotes.allInnerTexts()) {
+  // A ranking built on estimated stats has to say so rather than presenting every delta as equally
+  // solid. This used to require at least one flagged row here, which stopped being true for the
+  // right reason: excluding the unobtainable items moved Fury Warrior's starting weapons from
+  // Kael'thas's ilvl 175 props to real sourced Phase 2 epics, so its upgrades now compare sourced
+  // against sourced and correctly have nothing to warn about. Fury is the only one of the 27 specs
+  // in that position — `dataQuality` reachability is pinned separately below, so the disclosure
+  // cannot quietly die while this test still passes.
+  for (const text of await list.locator('.upgrade-data-note').allInnerTexts()) {
     expect(text).toMatch(/likely overstated|approximate/)
   }
 
@@ -2472,4 +2479,63 @@ test('a raid loot row with no catalogued item still renders a frame', async ({ p
   const fallbacks = await page.locator('.raid-loot-frame .item-icon-fallback').count()
   expect(icons + fallbacks, 'every loot row gets exactly one of the two').toBe(await rows.count())
   expect(icons, 'the catalogued ones should show real art').toBeGreaterThan(0)
+})
+
+test('no spec can equip, default to, or be upgraded into an unobtainable item', () => {
+  // The bug this pins: getDefaultItemForSlot picks by highest item level, and Kael'thas's encounter
+  // weapons sit at ilvl 175 — the only items at that level in a 4,505-item catalogue, eleven above
+  // Sunwell, which is the highest obtainable gear in all of TBC. Before they were excluded, all 27
+  // specs opened holding one, so every stat total and every simulation in the app started from a
+  // weapon that cannot be held.
+  for (const entry of unobtainableItems) {
+    const item = allItems.find((candidate) => candidate.wowItemId === entry.wowItemId)
+    // Still present as data on purpose — raid loot and provenance may name these. Only equipping is
+    // barred, which is why this asserts the item exists AND that no character is offered it.
+    expect(item, `${entry.name} should still be in the catalogue as data`).toBeTruthy()
+    if (item) expect(isObtainable(item), `${entry.name}: ${entry.why}`).toBe(false)
+  }
+
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      for (const slot of gearSlots) {
+        for (const option of getItemsForSlotAndCharacter(slot, definition.className, spec)) {
+          expect(
+            option.wowItemId === undefined || !unobtainableWowItemIds.has(option.wowItemId),
+            `${definition.className} ${spec} is offered "${option.name}" in ${slot}, which nobody can acquire`,
+          ).toBe(true)
+        }
+      }
+    }
+  }
+
+  // And the starting set, which is built before any character exists and so never passes through
+  // isItemAllowedForCharacter — the exact hole that put encounter weapons in every default loadout.
+  for (const [slot, equipped] of Object.entries(defaultGear)) {
+    expect(isObtainable(equipped.item), `default ${slot} is "${equipped.item.name}"`).toBe(true)
+  }
+})
+
+test('the upgrade finder still discloses when a gain rests on estimated stats', () => {
+  // Guards the assertion loosened in the upgrade-finder UI test above. That test stopped being able
+  // to require a flagged row once Fury Warrior's defaults became fully sourced; this checks the
+  // classification is still reachable rather than quietly dead, across every spec at once.
+  let skewed = 0
+  const specsWithNotes: string[] = []
+
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: definition.className, spec }
+      const gear = normalizeGearForCharacter(defaultGear, definition.className, spec)
+      const report = findUpgrades(character, gear, getRoleForSpec(definition.className, spec), [], [], [], defaultSimulationTarget)
+
+      const flagged = report.candidates.filter((candidate) => candidate.dataQuality !== 'sourced')
+      skewed += flagged.length
+      if (flagged.length > 0) specsWithNotes.push(`${definition.className} ${spec}`)
+    }
+  }
+
+  expect(skewed, 'the estimated-data disclosure should still fire somewhere').toBeGreaterThan(0)
+  // Deliberately a floor rather than an exact count: verifying more of the catalogue lowers this,
+  // and the test should track the mechanism being alive rather than the size of the backlog.
+  expect(specsWithNotes.length).toBeGreaterThan(10)
 })

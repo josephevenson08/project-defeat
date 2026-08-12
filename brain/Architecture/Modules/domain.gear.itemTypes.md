@@ -40,6 +40,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
+- [[domain.gear.obtainability]] — `src/domain/gear/obtainability.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.gear.sampleItems]] — `src/domain/gear/sampleItems.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`

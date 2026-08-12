@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/characterItemRules.ts
-lines: 127
+lines: 134
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.characterItemRules
 
-`src/domain/gear/characterItemRules.ts` · **domain** layer · 127 lines
+`src/domain/gear/characterItemRules.ts` · **domain** layer · 134 lines
 
 _No doc comment at the top of this file._
 
@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.gear.obtainability]] — `src/domain/gear/obtainability.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 
 ## Imported by
