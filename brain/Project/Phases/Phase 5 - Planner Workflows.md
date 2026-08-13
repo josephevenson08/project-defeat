@@ -19,6 +19,8 @@ Upgrade planning, build save/load and import/export all work. Comparison and cos
 - Autosave to localStorage and restore on load, seeded through lazy state initializers
 - Export to a portable JSON snapshot and import it back, with per-slot issues reported
 - Named build slots stored separately from the autosave, so switching character cannot destroy a saved build
+- Planner split into four sub-tabs instead of one ~15-screen column, with the stat rail persisting across all four
+- Stat rail scoped to the spec — 12 rows rather than 26 on a Fury Warrior — with a toggle that restores every stat
 
 ## Remaining
 
@@ -26,6 +28,7 @@ Upgrade planning, build save/load and import/export all work. Comparison and cos
 - Side-by-side gear comparison
 - Source and cost planning
 - Better responsive/mobile layout
+- The ranked-gear panel is still 9.4 screens on its own — sub-tabs fixed navigation, not that panel's length
 
 ## Key modules
 

@@ -26,13 +26,35 @@ setting `base` globally sends every test to a path nothing serves.
   status, and a red commit was pushed that way once.
 - **If a test run dies partway with `ERR_CONNECTION_REFUSED`, it is the dev server, not the tests.**
   Seen twice in a row from a worktree: tests 1-40 pass, then every remaining test fails to reach
-  127.0.0.1:5173 because the Playwright-managed Vite server has exited. Cause unknown. The fix is to
-  start the server yourself on 5173 first — `reuseExistingServer: true` means Playwright adopts it
-  instead of managing its own — after which the full suite passes. Read the exit code, but read the
-  *failure mode* too: a dead server and a broken assertion both come back as exit 1.
-- **Line endings differ by file.** `src/styles/global.css` is CRLF; `tests/planner.spec.ts` and most
-  of `tools/ingest/*.mjs` are LF. Check with `file` before any scripted edit — a `\r\n` split against
-  an LF file silently matches nothing and "succeeds".
+  127.0.0.1:5173 because the Playwright-managed Vite server has exited. The fix is to start the
+  server yourself on 5173 first — `reuseExistingServer: true` means Playwright adopts it instead of
+  managing its own — after which the full suite passes. Read the exit code, but read the *failure
+  mode* too: a dead server and a broken assertion both come back as exit 1.
+
+  **One cause is now known: never run two suites at once.** `reuseExistingServer: true` means the
+  second run adopts the first run's server, and when the first finishes it takes that server down
+  mid-flight, so the second collapses into `ERR_CONNECTION_REFUSED` from wherever it had got to.
+  Start one server by hand and run one suite against it.
+- **Line endings: check, never assume — and `git ls-files --eol` is the only answer worth trusting.**
+  `core.autocrlf` is **true** here, so *every* file is stored LF in the index and the working-tree
+  copy is whatever last wrote it. That means the working-tree endings drift: this file and
+  `tests/planner.spec.ts` are currently `w/crlf`, `README.md` and `src/App.tsx` are `w/lf`, and a
+  fresh clone would hand you CRLF for all of them. An earlier version of this rule asserted
+  "planner.spec.ts is LF" as a fact about the repo; it was only ever a fact about one working tree at
+  one moment, and it stopped being true without anything going wrong.
+
+  What still bites is the same thing in either direction: a pattern containing `\n` matched against a
+  CRLF file finds nothing and "succeeds". So run `git ls-files --eol <path>` before any scripted
+  edit, and prefer patterns that cannot care — single-line matches, `\r?\n`, or appending with the
+  endings the file already has. **Committed bytes are unaffected either way**, so a working-tree flip
+  is not itself a defect to chase.
+
+- **A scripted edit must count what changed, not what it meant to change.** This cost a full test
+  run: a script that inserted a line after `await openApp(page)\n` incremented its counter on the
+  *marker test* and then called `.replace()`, which matched nothing against the CRLF working tree. It
+  cheerfully reported "4 tests patched" having written the file unmodified, and the failure only
+  surfaced two ten-minute suites later. Compare the string before and after, report from that, and
+  verify the result with an independent `grep` rather than trusting the script's own tally.
 - **`npm run brain` must stay idempotent** (a second run reports `0 written`). The repo lives in
   OneDrive, so churn matters.
 - **Wowhead rate-limits (HTTP 403)** once a run checks several candidate pages per lookup. Every
@@ -305,21 +327,61 @@ A measured audit of the running app (not a stylesheet read) found and fixed:
 - Apparent 158-character line lengths were short labels in wide containers. Only one element
   (`.panel-copy`) genuinely ran long, at ~117 chars/line; it is now capped at `72ch`.
 
-Still open, and deliberately left for a design decision rather than guessed at:
+Both design decisions that were parked here have since been taken, and are recorded in §2b below.
+Still open:
 
-- **The planner tab is a single ~25,000px scroll column** — about 35 screen-heights — stacking
-  Character, Gear, BiS, Buffs and Build. Reaching Buffs means scrolling past 19 gear slots. The rail
-  solved "don't lose your numbers when you move between tabs"; nothing solves moving *within* the
-  planner. Sub-tabs, a jump nav, or collapsible panels are all plausible; it is not a styling fix.
-- **The rail shows stats the spec cannot use.** On a Fury Warrior: Feral AP, Ranged AP, the entire
-  six-row Spell group, and six rows reading 0 — roughly 12 of 27 rows carrying no information, on
-  the one surface that is always visible.
 - **`h3` is styled at five sizes** (11, 13, 15, 20px and a mono label variant). The 11px mono
   uppercase one is a deliberate label pattern, not a smaller heading, so this is not purely a bug —
   but the tag is doing two different jobs and that is worth resolving deliberately.
 - Base surface is `#0a0a0a`, near-pure black. Material and Smashing both recommend ~`#121212`;
   pure black maximises halation and spends the darkest value available. Left alone — it is a
   deliberate part of the stated aesthetic and the contrast measurements all pass.
+
+### 2b. The two parked design decisions, now taken
+
+**The planner is four sub-tabs, not one column.** Measure first: it was **11,206px / 15.6 screens** at
+1280×720, not the ~25,000px recorded above — the hidden Buffs panel and the gear rebuild had already
+shrunk it. But the useful finding was the shape rather than the total: **Ranked Gear was 59% of the
+scroll and Talents 26%**, so two panels were 85% of it. `PLANNER_VIEWS` in `App.tsx` now splits Gear
+/ Talents / Ranked Gear / Build, each rendering *only* its own panel. The rail is what makes this
+affordable — the stat totals stay on screen across all four, so nothing the single column provided is
+lost.
+
+Sub-tabs rather than collapsible panels because these are four different activities, not four views
+of one thing. Collapsing would have kept the scroll and added a second thing to manage.
+
+**Still true afterwards, and worth knowing:** Ranked Gear on its own is *still* 9.4 screens. Sub-tabs
+fixed navigation, not that panel's length. Capping each slot's ranking at a few entries with a "show
+all" is the remaining move if it matters.
+
+**The rail is spec-aware, with an escape hatch.** A Fury Warrior went from 26 rows to **12**; a
+Protection Warrior gets 18, a Mage 11, a Holy Priest 12, a Feral Druid 13. `domain/stats/statRelevance.ts`
+holds the rules, and two of them are worth restating: **attributes and armor are never hidden**,
+because the in-game character sheet shows them to every class and hiding them would surprise more
+than the noise it saves; and **nothing is deleted, only defaulted away** — a "Show N more" toggle
+restores all 26. That toggle is the answer to every arguable case, such as Enhancement Shaman getting
+real value from spell power.
+
+The worst row was never the zeroes. It was **Healing Power 411 on a Fury Warrior**, which reads as a
+bug rather than as an irrelevant row.
+
+**This interacts with one test in a way worth not rediscovering:** the Draenei racial test reads
+*spell* hit off the rail for a **Warrior** — a number a Warrior has no normal reason to look at, and
+now hidden. It opens the toggle first. Hiding a stat can break a legitimate read, which is exactly
+why the toggle exists.
+
+**Three things about testing sub-tabs, each of which cost a full suite run:**
+
+- **`expect(locator).toHaveCount(0)` is vacuously true wherever the panel is not rendered.** With one
+  column that could not happen; with sub-tabs a test that drifted onto the wrong view would keep
+  passing while asserting nothing. `expectSlotHidden` and `expectNoRankingHeading` exist to force the
+  right view first, and any new absence assertion should go through something similar.
+- **Playwright's `name` option matches substrings.** `getByRole('region', { name: 'Gear' })` also
+  matches "BiS / Ranked Gear"; `{ name: 'Talents' }` matches all three "<Spec> talents" trees;
+  `{ name: 'Build' }` matches "Saved builds". Use `exact: true` on every region lookup here.
+- **`build-export-output` is inside a collapsed `<details>`**, so it is legitimately hidden and is
+  the wrong thing to assert visibility on. The other build tests only ever read it with
+  `.inputValue()`, which does not check visibility, which is why this never surfaced before.
 
 ### 3. The requested rework — all three remaining items are now done
 

@@ -127,7 +127,58 @@ async function openSimulationTab(page: Page) {
  */
 async function openPlannerTab(page: Page) {
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
+  // Which sub-tab you were last on is session state that survives a trip to Simulation, so coming
+  // back does not necessarily land on Gear. Ask for it rather than assuming it.
+  await openPlannerView(page, 'Gear')
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
+}
+
+/**
+ * The planner's four panels are sub-tabs now rather than one 15-screen column, so a test that wants
+ * Talents, Ranked Gear or Build has to ask for it the way a user does. Gear is the default view, so
+ * the many gear-only tests need no call at all.
+ *
+ * Idempotent by design — the helpers below call it freely, and clicking the tab you are already on
+ * is a no-op rather than something a test has to track.
+ */
+async function openPlannerView(page: Page, view: 'Gear' | 'Talents' | 'Ranked Gear' | 'Build') {
+  await page.getByRole('navigation', { name: 'Planner sections' }).getByRole('button', { name: view, exact: true }).click()
+}
+
+/**
+ * Asserts a spec is not offered a slot at all.
+ *
+ * This exists rather than a bare `expect(slotCell(...)).toHaveCount(0)` because that assertion is
+ * **vacuously true on any view where the gear grid is not rendered**. With the panels behind
+ * sub-tabs, a test that drifted onto Ranked Gear would keep passing while asserting nothing, which
+ * is the worst possible failure for a test whose whole subject is slot visibility.
+ */
+async function expectSlotHidden(page: Page, slot: string) {
+  await openPlannerView(page, 'Gear')
+  await expect(slotCell(page, slot)).toHaveCount(0)
+}
+
+/** Asserts the ranked-gear panel is showing a given spec's list, switching to that view first. */
+async function expectRankedList(page: Page, title: string) {
+  await openPlannerView(page, 'Ranked Gear')
+  await expect(page.getByText(title)).toBeVisible()
+}
+
+/**
+ * Asserts the ranking has a section for a slot, under the label that spec uses for it.
+ *
+ * The slot display name is a *heading* only in the ranking — the gear grid renders it as a span — so
+ * these assertions belong to that view and nowhere else.
+ */
+async function expectRankingHeading(page: Page, label: string) {
+  await openPlannerView(page, 'Ranked Gear')
+  await expect(page.getByRole('heading', { name: label, exact: true })).toBeVisible()
+}
+
+/** The absence form, which needs the view switch even more: elsewhere it passes vacuously. */
+async function expectNoRankingHeading(page: Page, label: string) {
+  await openPlannerView(page, 'Ranked Gear')
+  await expect(page.getByRole('heading', { name: label, exact: true })).toHaveCount(0)
 }
 
 /*
@@ -149,6 +200,9 @@ function slotCell(page: Page, slot: string) {
 }
 
 async function openSlot(page: Page, slot: string) {
+  // Every gear interaction routes through here, so putting the view switch in one place is what
+  // keeps the tests that interleave gear and rankings from having to track which tab they are on.
+  await openPlannerView(page, 'Gear')
   await slotCell(page, slot).click()
   await expect(page.getByRole('dialog')).toBeVisible()
 }
@@ -236,6 +290,8 @@ import { resolve } from 'node:path'
 import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
 import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/domain/gear/obtainability'
 import { findUpgrades } from '../src/features/simulator/findUpgrades'
+import { relevantStats } from '../src/domain/stats/statRelevance'
+import { statLabels } from '../src/domain/stats/statTypes'
 
 
 function readStatValue(text: string) {
@@ -266,7 +322,7 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 
   // Regression check: Warriors have no Relic slot, and the default gear should not silently
   // inherit phantom spell/healing power from an illegally-equipped Totem/Libram/Idol.
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
+  await expectSlotHidden(page, 'Relic')
   // This used to assert zero spell power on the page. That stopped isolating the bug it was written
   // for once the catalogue grew to ~4,500 items: the first legal item for a slot can now be a caster
   // piece a warrior may legitimately wear, so a non-zero reading is no longer evidence of anything.
@@ -490,7 +546,7 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
     await expect(page.getByLabel('Off Hand enchant')).not.toContainText('Shield - Major Stamina')
   })
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
+  await expectSlotHidden(page, 'Ranged')
   await expect(page.getByText('No Ranged Weapon Recommended')).toHaveCount(0)
 
   await withSlotOpen(page, 'Totem', async () => {
@@ -502,8 +558,8 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await withSlotOpen(page, 'Totem', async () => {
     await expect(page.getByLabel('Totem', { exact: true }).locator('option', { hasText: 'Libram of Testing' })).toHaveCount(0)
   })
-  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Ranged', exact: true })).toHaveCount(0)
+  await expectRankingHeading(page, 'Totem')
+  await expectNoRankingHeading(page, 'Ranged')
 
   // Instance and boss used to be a separate "Farm" row restating the source in more words. They now
   // sit on the single identity line with the item id and slot, so this asserts the content rather
@@ -516,6 +572,7 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
 
 test('BiS panel shows Enhancement Shaman rankings and equips a listed item', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Ranked Gear')
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
 
@@ -525,8 +582,8 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
 
   await expect(page.getByTestId('bis-panel')).toBeVisible()
-  await expect(page.getByText('Enhancement Shaman Phase 2 Ranked List')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
+  await expectRankedList(page, 'Enhancement Shaman Phase 2 Ranked List')
+  await expectRankingHeading(page, 'Head')
   await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Helm' })).toBeVisible()
   // The id is now prefixed with # on the compact identity line rather than spelled "Item ID".
   await expect(page.getByTestId('bis-panel').getByText(/#30190/)).toBeVisible()
@@ -537,6 +594,8 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await withSlotOpen(page, 'Head', async () => {
     await expect(page.getByLabel('Head', { exact: true })).toHaveValue('cataclysm-helm')
   })
+  // Checking the gear grid moved us back to the Gear view; the Equipped button lives on the ranking.
+  await openPlannerView(page, 'Ranked Gear')
   await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
 
   const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
@@ -556,10 +615,15 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
   const dragonspineRow = page.locator('.bis-entry', { hasText: 'Dragonspine Trophy' })
   const bloodlustRow = page.locator('.bis-entry', { hasText: 'Bloodlust Brooch' })
 
+  // This test alternates between the ranking and the gear grid, which are separate sub-tabs now.
+  // `withSlotOpen` moves to Gear on its own, so each return to a row has to ask for Ranked Gear.
+  await openPlannerView(page, 'Ranked Gear')
   await dragonspineRow.getByRole('button', { name: 'Equip Trinket 1' }).click()
   await withSlotOpen(page, 'Trinket 1', async () => {
     await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
   })
+
+  await openPlannerView(page, 'Ranked Gear')
   await expect(dragonspineRow.getByRole('button', { name: 'Unique equipped' })).toBeDisabled()
 
   await bloodlustRow.getByRole('button', { name: 'Equip Trinket 2' }).click()
@@ -742,18 +806,18 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
   await page.getByLabel('Class').selectOption('Shaman')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Elemental')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
-  await expect(page.getByText('Elemental Shaman Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Totem')
+  await expectRankedList(page, 'Elemental Shaman Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Totem', exact: true })).toBeVisible()
-  await expect(page.getByText('Restoration Shaman Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Totem')
+  await expectRankedList(page, 'Restoration Shaman Phase 2 Ranked List')
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
   })
@@ -768,16 +832,16 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
   await page.getByLabel('Class').selectOption('Warrior')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Arms Warrior Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Arms Warrior Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Protection Warrior Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Protection Warrior Phase 2 Ranked List')
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(1)
   })
@@ -805,26 +869,26 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
+  await expectSlotHidden(page, 'Ranged')
   // Asserted on the gear slot rather than a BiS heading: the Holy Paladin guide publishes no Libram
   // section, so there is no ranking to head — but the slot itself must still be labelled Libram.
   await expect(slotCell(page, 'Libram')).toHaveCount(1)
-  await expect(page.getByText('Holy Paladin Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Holy Paladin Phase 2 Ranked List')
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
-  await expect(page.getByText('Protection Paladin Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Libram')
+  await expectRankedList(page, 'Protection Paladin Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Retribution')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Libram', exact: true })).toBeVisible()
-  await expect(page.getByText('Retribution Paladin Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Libram')
+  await expectRankedList(page, 'Retribution Paladin Phase 2 Ranked List')
 })
 
 test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to catalog items', async () => {
@@ -847,19 +911,19 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
   await page.getByLabel('Class').selectOption('Priest')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Holy Priest Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Holy Priest Phase 2 Ranked List')
   await withSlotOpen(page, 'Ranged', async () => {
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Discipline')
-  await expect(page.getByText('Discipline Priest Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Discipline Priest Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Shadow')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Shadow Priest Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Shadow Priest Phase 2 Ranked List')
   await withSlotOpen(page, 'Ranged', async () => {
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
   })
@@ -887,21 +951,21 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   await page.getByLabel('Class').selectOption('Druid')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Balance')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
-  await expect(page.getByText('Balance Druid Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Idol')
+  await expectRankedList(page, 'Balance Druid Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Feral')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
-  await expect(page.getByText('Feral Druid Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Idol')
+  await expectRankedList(page, 'Feral Druid Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
 
-  await expect(slotCell(page, 'Ranged')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Idol', exact: true })).toBeVisible()
-  await expect(page.getByText('Restoration Druid Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Ranged')
+  await expectRankingHeading(page, 'Idol')
+  await expectRankedList(page, 'Restoration Druid Phase 2 Ranked List')
 })
 
 test('Beast Mastery, Marksmanship, and Survival Hunter Phase 2 starter rankings resolve to catalog items', async () => {
@@ -926,19 +990,19 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
   await page.getByLabel('Class').selectOption('Hunter')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Beast Mastery')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Beast Mastery Hunter Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Beast Mastery Hunter Phase 2 Ranked List')
   await withSlotOpen(page, 'Ranged', async () => {
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Marksmanship')
-  await expect(page.getByText('Marksmanship Hunter Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Marksmanship Hunter Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Survival')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Survival Hunter Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Survival Hunter Phase 2 Ranked List')
   await withSlotOpen(page, 'Hands', async () => {
     await expect(page.getByLabel('Hands', { exact: true }).locator('option', { hasText: 'Gloves of Dexterous Manipulation' })).toHaveCount(1)
   })
@@ -964,19 +1028,19 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
   await page.getByLabel('Class').selectOption('Mage')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arcane')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Arcane Mage Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Arcane Mage Phase 2 Ranked List')
   await withSlotOpen(page, 'Ranged', async () => {
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
-  await expect(page.getByText('Fire Mage Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Fire Mage Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Frost')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Frost Mage Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Frost Mage Phase 2 Ranked List')
   await withSlotOpen(page, 'Ranged', async () => {
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
   })
@@ -1048,8 +1112,8 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   await page.getByLabel('Class').selectOption('Rogue')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Assassination')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Assassination Rogue Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Assassination Rogue Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of Vashj' })).toHaveCount(1)
   })
@@ -1061,7 +1125,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
-  await expect(page.getByText('Combat Rogue Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     // Was 'Warp Slicer', which is one of Kael'thas's encounter weapons and is no longer offered to
     // anyone — see domain/gear/obtainability.ts. Rod of the Sun King is a real ilvl 141 Tempest Keep
@@ -1074,8 +1138,8 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Subtlety')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Subtlety Rogue Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Subtlety Rogue Phase 2 Ranked List')
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
   })
@@ -1101,8 +1165,8 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await page.getByLabel('Class').selectOption('Warlock')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Affliction')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Affliction Warlock Phase 2 Ranked List')).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Affliction Warlock Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of the Leviathan' })).toHaveCount(1)
   })
@@ -1114,13 +1178,13 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   })
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Demonology')
-  await expect(page.getByText('Demonology Warlock Phase 2 Ranked List')).toBeVisible()
+  await expectRankedList(page, 'Demonology Warlock Phase 2 Ranked List')
 
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Destruction')
 
-  await expect(slotCell(page, 'Relic')).toHaveCount(0)
-  await expect(page.getByText('Destruction Warlock Phase 2 Ranked List')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Head', exact: true })).toBeVisible()
+  await expectSlotHidden(page, 'Relic')
+  await expectRankedList(page, 'Destruction Warlock Phase 2 Ranked List')
+  await expectRankingHeading(page, 'Head')
   // "Voidheart Cover", which this used to assert, does not exist — it was one of the invented names
   // in the old hand-written lists. The real set piece is Voidheart Crown, and the guide's top head
   // pick for Destruction is the engineering helm.
@@ -1331,6 +1395,7 @@ test('a build autosaves and is restored after a reload', async ({ page }) => {
 
 test('a build can be exported and imported back', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Build')
 
   // Capture the default Warrior build, then change the character away from it.
   const exported = await page.getByTestId('build-export-output').inputValue()
@@ -1350,6 +1415,7 @@ test('a build can be exported and imported back', async ({ page }) => {
 
 test('an invalid build is rejected without changing the current character', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Build')
 
   await page.getByLabel('Class').selectOption('Mage')
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
@@ -1370,6 +1436,7 @@ test('an invalid build is rejected without changing the current character', asyn
 
 test('a build referencing a missing item still loads, reporting the dropped slot', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Build')
 
   const exported = JSON.parse(await page.getByTestId('build-export-output').inputValue())
   exported.gear.Head = { itemId: 'an-item-that-was-removed-from-the-catalog', gemIds: [] }
@@ -2240,6 +2307,7 @@ test('changing race changes the racial list and the resulting stats', async ({ p
 
 test('named build slots survive a character switch that would overwrite the autosave', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Build')
   await expect(page.getByTestId('build-slots-empty')).toBeVisible()
 
   // Set up a Fury Warrior and save it under a name.
@@ -2260,10 +2328,12 @@ test('named build slots survive a character switch that would overwrite the auto
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
 
-  // Slots persist across a reload, since they live in storage rather than component state. The
-  // section choice does not, so re-enter the planner before looking for them.
+  // Slots persist across a reload, since they live in storage rather than component state. Neither
+  // the section choice nor the planner sub-tab does — both are session state — so re-enter both
+  // before looking for them.
   await page.reload()
   await page.getByTestId('section-planner').click()
+  await openPlannerView(page, 'Build')
   await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
 
   await page.getByTestId('build-slot-delete-Fury main').click()
@@ -2273,6 +2343,11 @@ test('named build slots survive a character switch that would overwrite the auto
 test('Draenei get the hit racial matching their class, not both', async ({ page }) => {
   await openApp(page)
   await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+
+  // Spell Hit is one of the rows the rail now hides for a physical spec, which is correct and is
+  // exactly why this test has to open the full readout: the subject here is a Warrior's *spell* hit,
+  // a number a Warrior has no normal reason to look at. The toggle is how you see it.
+  await page.getByTestId('rail-show-all-stats').click()
 
   // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version, so a
   // Draenei Warrior's spell hit stays where a non-Draenei's would be. Read off the rail: the traits
@@ -2629,6 +2704,7 @@ test('all nine classes have three ingested talent trees, and every icon is vendo
 
 test('the talent tree renders real icons for a class other than the one built first', async ({ page }) => {
   await openApp(page)
+  await openPlannerView(page, 'Talents')
 
   // Night Elf Druid: a class that did not exist in this panel until the nine-way ingest, and whose
   // trees are the ones the payload labels "FeralCombat".
@@ -2669,4 +2745,122 @@ test('the talent tree renders real icons for a class other than the one built fi
   // Decorative: the button already names the talent and its rank, so an alt here would make a screen
   // reader say the name twice.
   expect(await icons.first().getAttribute('alt')).toBe('')
+})
+
+test('the planner shows one panel at a time instead of a single long column', async ({ page }) => {
+  await openApp(page)
+
+  // Stacked, these four came to about 15 screen-heights, and two of them were 85% of it: the ranked
+  // list at 59% and the talent trees at 26%. Reaching Build meant scrolling past 19 gear slots and
+  // three talent trees.
+  const nav = page.getByRole('navigation', { name: 'Planner sections' })
+  await expect(nav).toBeVisible()
+  await expect(nav.getByRole('button')).toHaveText(['Gear', 'Talents', 'Ranked Gear', 'Build'])
+
+  // Gear is where you land, so the many gear-only tests need no navigation at all.
+  await expect(page.getByRole('region', { name: 'Gear', exact: true })).toBeVisible()
+  await expect(page.getByTestId('bis-panel')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Talents', exact: true })).toHaveCount(0)
+
+  // Each view renders its own panel and *only* its own — the point is the other three are not in the
+  // document, not merely scrolled past.
+  const views = [
+    { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
+    { view: 'Ranked Gear' as const, present: page.getByTestId('bis-panel'), absent: page.getByRole('region', { name: 'Talents', exact: true }) },
+    // The Build panel's region, not its export textarea — that lives inside a collapsed <details>,
+    // so it is legitimately hidden until you open it. `exact` because "Saved builds" is a region
+    // too, and Playwright's name option matches substrings by default.
+    { view: 'Build' as const, present: page.getByRole('region', { name: 'Build', exact: true }), absent: page.getByTestId('bis-panel') },
+    { view: 'Gear' as const, present: page.getByRole('region', { name: 'Gear', exact: true }), absent: page.getByRole('region', { name: 'Build', exact: true }) },
+  ]
+  for (const { view, present, absent } of views) {
+    await openPlannerView(page, view)
+    await expect(present, `${view} should render its own panel`).toBeVisible()
+    await expect(absent, `${view} should not render the previous panel`).toHaveCount(0)
+  }
+
+  // The rail is what makes splitting these affordable: the stat totals stay on screen throughout, so
+  // moving between the four does not cost you the numbers you were reading.
+  for (const view of ['Gear', 'Talents', 'Ranked Gear', 'Build'] as const) {
+    await openPlannerView(page, view)
+    await expect(page.getByRole('region', { name: 'Stats' }), `the stat rail should survive ${view}`).toBeVisible()
+  }
+})
+
+test('the stat rail hides rows the spec cannot use, and the toggle brings them back', async ({ page }) => {
+  await openApp(page)
+
+  // A Fury Warrior was shown all 26 rows, of which roughly half carried nothing: the entire Spell
+  // group, Feral attack power, and six defensive rows reading 0. Healing Power 411 on a Warrior is
+  // the worst of them — it reads as a bug rather than as an irrelevant row.
+  const rows = page.locator('.rail-stat')
+  const before = await rows.count()
+  expect(before).toBeLessThan(15)
+
+  await expect(page.getByTestId('stat-healing-power')).toHaveCount(0)
+  await expect(page.getByTestId('stat-feral-ap')).toHaveCount(0)
+  await expect(page.getByTestId('stat-ranged-ap')).toHaveCount(0)
+  await expect(page.getByTestId('stat-spell-power')).toHaveCount(0)
+  // Attributes and Armor are never hidden — the in-game character sheet shows them to every class.
+  await expect(page.getByTestId('stat-strength')).toBeVisible()
+  await expect(page.getByTestId('stat-armor')).toBeVisible()
+  // And what a Fury Warrior does read stays.
+  await expect(page.getByTestId('stat-attack-power')).toBeVisible()
+  await expect(page.getByTestId('stat-expertise')).toBeVisible()
+
+  // Nothing is deleted, only defaulted away. This is the escape hatch for any spec where the
+  // relevance call is arguable — Enhancement Shaman does get something from spell power.
+  const toggle = page.getByTestId('rail-show-all-stats')
+  await expect(toggle).toContainText(`Show ${26 - before} more`)
+  await toggle.click()
+  await expect(rows).toHaveCount(26)
+  await expect(page.getByTestId('stat-healing-power')).toBeVisible()
+
+  await toggle.click()
+  await expect(rows).toHaveCount(before)
+})
+
+test('stat relevance follows the role, with the carve-outs it claims', () => {
+  // Pinned against the domain rather than the DOM so all 27 specs are covered rather than the few a
+  // browser test can afford to click through.
+  const rowsFor = (className: TbcClass, spec: TbcSpec) =>
+    relevantStats(
+      statLabels.map(([key]) => key),
+      getRoleForSpec(className, spec),
+      className,
+      spec,
+    )
+
+  // Every spec keeps the five attributes and armor, and every spec loses something.
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      const rows = rowsFor(definition.className, spec)
+      for (const always of ['strength', 'agility', 'stamina', 'intellect', 'spirit', 'armor'] as const) {
+        expect(rows, `${definition.className} ${spec} should always show ${always}`).toContain(always)
+      }
+      expect(rows.length, `${definition.className} ${spec} should hide something`).toBeLessThan(statLabels.length)
+    }
+  }
+
+  // Physical DPS drops the spell group; casters and healers drop the physical one.
+  expect(rowsFor('Warrior', 'Fury')).not.toContain('spellPower')
+  expect(rowsFor('Mage', 'Arcane')).not.toContain('attackPower')
+  expect(rowsFor('Priest', 'Holy')).not.toContain('attackPower')
+
+  // Healing power is a healer's row. On a Shadow Priest it is the same noise it is on a Warrior.
+  expect(rowsFor('Priest', 'Holy')).toContain('healingPower')
+  expect(rowsFor('Priest', 'Shadow')).not.toContain('healingPower')
+  expect(rowsFor('Warrior', 'Fury')).not.toContain('healingPower')
+
+  // Feral AP only exists in Druid forms; ranged AP only drives damage for a Hunter.
+  expect(rowsFor('Druid', 'Feral')).toContain('feralAttackPower')
+  expect(rowsFor('Druid', 'Balance')).not.toContain('feralAttackPower')
+  expect(rowsFor('Hunter', 'Survival')).toContain('rangedAttackPower')
+  expect(rowsFor('Rogue', 'Combat')).not.toContain('rangedAttackPower')
+
+  // A tank is the one role that both swings and is hit, so it is the only one keeping two groups.
+  expect(rowsFor('Warrior', 'Protection')).toContain('defenseRating')
+  expect(rowsFor('Warrior', 'Protection')).toContain('attackPower')
+  expect(rowsFor('Warrior', 'Fury')).not.toContain('defenseRating')
+  expect(rowsFor('Paladin', 'Protection')).toContain('blockValue')
 })

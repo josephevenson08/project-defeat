@@ -36,6 +36,7 @@ _None._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
+- [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`

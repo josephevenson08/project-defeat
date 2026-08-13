@@ -42,6 +42,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 - [[domain.tierlists.tierListTypes]] — `src/domain/tierlists/tierListTypes.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
@@ -53,6 +54,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
+- [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases
 

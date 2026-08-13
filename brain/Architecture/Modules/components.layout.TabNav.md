@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/TabNav.tsx
-lines: 29
+lines: 36
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.TabNav
 
-`src/components/layout/TabNav.tsx` · **components** layer · 29 lines
+`src/components/layout/TabNav.tsx` · **components** layer · 36 lines
 
 _No doc comment at the top of this file._
 

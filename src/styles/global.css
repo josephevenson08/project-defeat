@@ -3270,3 +3270,51 @@ input[type='text']:focus {
     width: 72%;
   }
 }
+
+/*
+ * The planner's second level of tabs.
+ *
+ * Subordinate to the bar above it, and it has to read that way at a glance or the two look like
+ * competing navigations. So: smaller type, tighter gaps, no top margin of its own, and a dotted
+ * baseline rather than a solid one — the same hairline vocabulary, one step quieter.
+ */
+
+.tab-nav-sub {
+  border-bottom-style: dashed;
+  gap: 18px;
+  grid-column: 1 / -1;
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+.tab-nav-sub .tab-nav-button {
+  font-size: 11px;
+  padding: 8px 2px;
+}
+
+/*
+ * The rail's "show N more".
+ *
+ * Reads as a control rather than a stat: full width, its own rule above it, and set in the same
+ * faint mono as the group headings so it does not compete with the numbers it sits under.
+ */
+.rail-stat-toggle {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  color: var(--text-faint);
+  cursor: pointer;
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  margin-top: 4px;
+  padding: 10px 0 2px;
+  text-align: left;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.rail-stat-toggle:hover {
+  color: var(--text-dim);
+}

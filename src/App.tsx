@@ -34,7 +34,7 @@ import { TierListsPanel } from './features/tierlists/TierListsPanel'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import { RaidPicker } from './features/raids/RaidPicker'
 import { RaidRail } from './features/raids/RaidRail'
-import type { TabDefinition } from './components/layout/TabNav'
+import { TabNav, type TabDefinition } from './components/layout/TabNav'
 
 const initialCharacter: CharacterProfile = {
   faction: 'Alliance',
@@ -72,6 +72,28 @@ function visibleTabs(simulationEnabled: boolean) {
   return APP_TABS.filter((tab) => tab.id !== 'simulation' || simulationEnabled)
 }
 
+type PlannerView = 'gear' | 'talents' | 'bis' | 'build'
+
+/**
+ * The planner's four panels, as a second level of tabs rather than one column.
+ *
+ * Stacked, they came to about 15 screen-heights, and two of them were 85% of it: the ranked-gear
+ * list at 59% and the talent trees at 26%. Reaching Build meant scrolling past 19 gear slots and 27
+ * talent trees. The rail already solved "don't lose your numbers when you move between tabs", which
+ * is what makes splitting these affordable — the stat totals stay on screen throughout, so this
+ * costs nothing that the single column was providing.
+ *
+ * Sub-tabs rather than collapsible panels because these are four different activities, not four
+ * views of one thing: you gear, then you spend talent points, then you check a ranking. Collapsing
+ * would have kept the scroll and added a second thing to manage.
+ */
+const PLANNER_VIEWS: readonly TabDefinition<PlannerView>[] = [
+  { id: 'gear', label: 'Gear' },
+  { id: 'talents', label: 'Talents' },
+  { id: 'bis', label: 'Ranked Gear' },
+  { id: 'build', label: 'Build' },
+]
+
 /** Rebuilds a full gear set from a saved build, normalized against the character it was saved for. */
 function gearFromBuild(build: SavedBuild): EquippedGear {
   const baseline = normalizeGearForCharacter(defaultGear, build.character.className, build.character.spec)
@@ -95,6 +117,8 @@ function App() {
   // Read once at mount: the flag comes from the URL and nothing in-session changes it.
   const [simulationEnabled] = useState(isSimulationEnabled)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
+  // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
+  const [plannerView, setPlannerView] = useState<PlannerView>('gear')
   const [character, setCharacter] = useState<CharacterProfile>(() => restoredBuild?.character ?? initialCharacter)
   const [gear, setGear] = useState<EquippedGear>(() =>
     restoredBuild ? gearFromBuild(restoredBuild) : normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec),
@@ -222,7 +246,7 @@ function App() {
         activeTab === 'planner' ? (
           <>
             <CharacterRail character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
-            <StatsRail stats={stats} />
+            <StatsRail stats={stats} role={role} className={character.className} spec={character.spec} />
           </>
         ) : activeTab === 'raids' && selectedRaidId ? (
           // Same argument as the planner's stat rail: the rail holds the thing you keep returning to
@@ -238,10 +262,17 @@ function App() {
         <>
           {/* The character selects live in the rail now — see CharacterRail. This tab is what you
               are doing, not who you are. */}
-          <GearPanel character={character} gear={gear} onChange={updateGear} />
-          <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />
-          <BisPanel character={character} gear={gear} onEquip={updateGear} />
-          <BuildPanel state={buildState} role={role} onImport={importBuild} />
+          <TabNav
+            tabs={PLANNER_VIEWS}
+            activeTab={plannerView}
+            onChange={setPlannerView}
+            ariaLabel="Planner sections"
+            className="tab-nav tab-nav-sub"
+          />
+          {plannerView === 'gear' && <GearPanel character={character} gear={gear} onChange={updateGear} />}
+          {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}
+          {plannerView === 'bis' && <BisPanel character={character} gear={gear} onEquip={updateGear} />}
+          {plannerView === 'build' && <BuildPanel state={buildState} role={role} onImport={importBuild} />}
         </>
       )}
       {activeTab === 'simulation' && simulationEnabled && (
