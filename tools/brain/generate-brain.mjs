@@ -1178,6 +1178,18 @@ async function writeDomainNotes(data, modules) {
       (total, list) => total + list.entries.filter((entry) => entry.rank > 1).length,
       0,
     ),
+    /*
+     * Depth measured per *slot*, which is the thing a player actually reads. The entry-level count
+     * above cannot answer "does this slot offer a choice" — a list can be 1,040 entries deep at rank
+     * 2+ while individual slots still show one option. Counting slots is what caught the roadmap
+     * claiming BiS was "one item deep" long after the ingest had fixed it.
+     */
+    bisSlotCount: bisLists.reduce((total, list) => total + new Set(list.entries.map((entry) => entry.slot)).size, 0),
+    bisSlotsWithOneOption: bisLists.reduce((total, list) => {
+      const perSlot = new Map()
+      for (const entry of list.entries) perSlot.set(entry.slot, (perSlot.get(entry.slot) ?? 0) + 1)
+      return total + [...perSlot.values()].filter((count) => count === 1).length
+    }, 0),
     gems: sampleGems.length,
     enchants: sampleEnchants.length,
     buffs: sampleBuffs.length,
@@ -1301,7 +1313,7 @@ async function writeProjectNotes(modules, counts) {
       `1. **Multi-ability rotations** — started, and **only Fury and Arms Warrior have more than one ability**. Both now press Whirlwind on its 10s cooldown alongside their signature button, resolved against a shared global-cooldown budget. Every other spec still models exactly one ability, and all specs still lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated by differing amounts. The engine handles arbitrary ability lists; what gates the rest is sourced ability data. Still the biggest accuracy gap in ${link('Phase 4 - Simulation')}.`,
       `2. **Tank score severity weighting** — the tank path now resolves one ordered incoming table including crushing blows (see ${link('Tank Avoidance')}), but the headline Survivability Score still weights avoidance, armor and stamina without pricing how much worse a crit or a crush is than a plain hit. The breakdown carries a damage-per-swing figure that does account for it; folding that into the score is a metric redesign and deliberately hasn't been done unilaterally.`,
       `3. **Item catalog verification** — ${counts.itemsFlagged} of ${counts.items} items in ${link('domain.gear.sampleItems')} still carry \`needsVerification\`, so ${counts.items - counts.itemsFlagged} are now sourced against real tooltips. Every audited batch so far has found real errors — invented stats, fabricated sockets, placeholder item levels — so an unflagged item is meaningfully different from a flagged one, and a sourced-versus-estimated comparison is skewed in the sourced item's favour until the rest catch up.`,
-      `4. **BiS lists are one item deep** — ${counts.bisEntries} ranked entries exist across all 27 specs, but only ${counts.bisEntriesRankedDeeperThanOne} of them sit at rank 2 or lower. Every other slot offers a single option while the UI labels it "1 ranked", which presents one guess as a considered ranking. This is a larger gap than the verification backlog and it is the core promise of the planner.`,
+      `4. **BiS depth is no longer the gap it was recorded as** — ${counts.bisEntries} ranked entries cover ${counts.bisSlotCount} slots across all 27 specs, and only **${counts.bisSlotsWithOneOption}** of those slots still offer a single option. This item used to read "BiS lists are one item deep", which was true of the 27 hand-written lists but stopped being true when the Wowhead ingest replaced them, and nothing updated the prose. Measured per slot rather than per entry, because a list can be thousands of entries deep while individual slots still show one option. What is left here is a thin tail, not the core promise of the planner.`,
       '',
       '## Related',
       '',
