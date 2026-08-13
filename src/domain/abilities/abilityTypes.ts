@@ -147,6 +147,21 @@ export type SignatureAbility = {
   channeled?: boolean
   /** GCD the ability triggers: 1.5s for most, 1.0s for energy-based rogue and cat-form druid attacks. */
   gcdSeconds: number
+  /**
+   * True for abilities that trigger no global cooldown at all, so they can be used alongside the
+   * rotation rather than competing with it for GCDs. Heroic Strike and Cleave are the TBC examples.
+   *
+   * Recorded as its own flag rather than `gcdSeconds: 0`, because consumers read that field as
+   * `gcdSeconds || 1.5` and a zero would silently become a full global cooldown.
+   */
+  offGlobalCooldown?: boolean
+  /**
+   * True for "on next swing" abilities, which do not land alongside the main-hand auto attack but
+   * **replace** it. Two consequences a consumer must handle or it will overstate the ability badly:
+   * its real contribution is only the *difference* from the swing it displaced, and the displaced
+   * swing generates no rage, because the rage aura excludes main-hand specials.
+   */
+  replacesMainHandSwing?: boolean
   cooldownSeconds?: number
   resource?: AbilityResourceCost
   /** Base damage/healing at max rank before scaling. Omitted when the ability has no flat base. */

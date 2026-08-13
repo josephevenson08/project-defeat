@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-136 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+137 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -26,8 +26,8 @@ The modules everything else leans on — change these carefully.
 - [[domain.character.roleTheme]] — 10 importers
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.raids.raidTypes]] — 9 importers
+- [[domain.simulation.combatConstants]] — 8 importers
 - [[features.gear.gearData]] — 8 importers
-- [[domain.simulation.combatConstants]] — 7 importers
 
 ## By layer
 
@@ -93,7 +93,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (88)
+### domain (89)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -169,9 +169,10 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.serpentshrineCavernBosses]] · 1 importers
 - [[domain.raids.tempestKeepBosses]] · 1 importers
 - [[domain.simulation.attackTable]] · 1 importers
-- [[domain.simulation.combatConstants]] · 7 importers
+- [[domain.simulation.combatConstants]] · 8 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
 - [[domain.simulation.encounterTypes]] · 7 importers
+- [[domain.simulation.rageModel]] · 1 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers

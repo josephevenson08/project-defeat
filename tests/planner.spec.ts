@@ -292,6 +292,16 @@ import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/
 import { findUpgrades } from '../src/features/simulator/findUpgrades'
 import { relevantStats } from '../src/domain/stats/statRelevance'
 import { statLabels } from '../src/domain/stats/statTypes'
+import {
+  MAIN_HAND_HIT_FACTOR,
+  OFF_HAND_HIT_FACTOR,
+  RAGE_CONVERSION_FACTOR,
+  RAGE_PER_POINT_OF_DAMAGE,
+  rageDumpUsesPerSecond,
+  rageFromOneSwing,
+  ragePerSecondFromWeapon,
+} from '../src/domain/simulation/rageModel'
+import { getRotationAbilities } from '../src/domain/abilities'
 
 
 function readStatValue(text: string) {
@@ -2863,4 +2873,118 @@ test('stat relevance follows the role, with the carve-outs it claims', () => {
   expect(rowsFor('Warrior', 'Protection')).toContain('attackPower')
   expect(rowsFor('Warrior', 'Fury')).not.toContain('defenseRating')
   expect(rowsFor('Paladin', 'Protection')).toContain('blockValue')
+})
+
+test('rage income follows the sourced formula, including the parts that are easy to get wrong', () => {
+  // Constants read off wowsims/tbc sim/core/rage.go at the pinned commit, not from memory.
+  expect(RAGE_CONVERSION_FACTOR).toBe(274.7)
+  expect(RAGE_PER_POINT_OF_DAMAGE).toBeCloseTo(3.75 / 274.7, 10)
+  expect(MAIN_HAND_HIT_FACTOR).toBe(3.5 / 2)
+  expect(OFF_HAND_HIT_FACTOR).toBe(1.75 / 2)
+
+  const base = {
+    damagePerLandedSwing: 400,
+    swingsPerSecond: 1 / 2.6,
+    baseSwingSpeed: 2.6,
+    isOffHand: false,
+    glanceMultiplier: 0.75,
+  }
+  const allHits = { miss: 0, dodge: 0, parry: 0, glance: 0, block: 0, crit: 0, hit: 1 }
+
+  // A clean hit: damage*3.75/274.7 + 1.75*2.6.
+  expect(rageFromOneSwing({ ...base, outcomes: allHits })).toBeCloseTo(400 * (3.75 / 274.7) + 1.75 * 2.6, 6)
+
+  // A miss generates nothing whatsoever — not even the swing-speed term.
+  expect(rageFromOneSwing({ ...base, outcomes: { ...allHits, hit: 0, miss: 1 } })).toBe(0)
+
+  // A dodge still pays out, on the damage the swing WOULD have done. This is the detail a
+  // from-memory implementation drops, and it is worth real rage over a fight.
+  const dodged = rageFromOneSwing({ ...base, outcomes: { ...allHits, hit: 0, dodge: 1 } })
+  expect(dodged).toBeCloseTo(rageFromOneSwing({ ...base, outcomes: allHits }), 6)
+
+  // A crit doubles the hit-factor term but is otherwise the 2x damage it already is.
+  const crit = rageFromOneSwing({ ...base, outcomes: { ...allHits, hit: 0, crit: 1 } })
+  expect(crit).toBeCloseTo(400 * 2 * (3.75 / 274.7) + 1.75 * 2.6 * 2, 6)
+
+  // The off-hand factor is half the main hand's, and nothing else differs.
+  const offHand = rageFromOneSwing({ ...base, isOffHand: true, outcomes: allHits })
+  expect(offHand).toBeCloseTo(400 * (3.75 / 274.7) + 0.875 * 2.6, 6)
+
+  // Haste is not part of the swing-speed term: it raises income by swinging more often, and the
+  // per-swing value uses the weapon's BASE speed.
+  const perSwing = rageFromOneSwing({ ...base, outcomes: allHits })
+  expect(ragePerSecondFromWeapon({ ...base, outcomes: allHits })).toBeCloseTo(perSwing / 2.6, 6)
+})
+
+test('a swing-replacing rage dump pays for the rage it suppresses, not just its own cost', () => {
+  // Heroic Strike replaces the main-hand swing, and a main-hand special generates no rage. So each
+  // use costs its rage AND the rage that swing would have made. Ignoring the second term is the
+  // easiest way to overstate a rage dump, so this pins the solved form.
+  const surplus = 10
+  const cost = 15
+  const suppressed = 5
+
+  const uses = rageDumpUsesPerSecond({
+    surplusRagePerSecond: surplus,
+    cost,
+    ragePerSuppressedSwing: suppressed,
+    mainHandSwingsPerSecond: 10,
+  })
+  expect(uses).toBeCloseTo(surplus / (cost + suppressed), 10)
+  // Strictly fewer uses than the naive cost-only answer, which is the whole point.
+  expect(uses).toBeLessThan(surplus / cost)
+
+  // It is an on-next-swing ability, so it can never be used more often than the weapon swings.
+  const swingCapped = rageDumpUsesPerSecond({
+    surplusRagePerSecond: 1000,
+    cost,
+    ragePerSuppressedSwing: suppressed,
+    mainHandSwingsPerSecond: 0.4,
+  })
+  expect(swingCapped).toBe(0.4)
+
+  // No surplus, no dump — and no negative uses.
+  expect(rageDumpUsesPerSecond({ surplusRagePerSecond: 0, cost, ragePerSuppressedSwing: suppressed, mainHandSwingsPerSecond: 1 })).toBe(0)
+  expect(rageDumpUsesPerSecond({ surplusRagePerSecond: -5, cost, ragePerSuppressedSwing: suppressed, mainHandSwingsPerSecond: 1 })).toBe(0)
+})
+
+test('Heroic Strike is in the rotation, and says in numbers why it still contributes nothing', () => {
+  // The ability data exists now, sourced from wowsims heroic_strike_cleave.go: 15 rage, main-hand
+  // weapon damage +176 flat, unnormalized, off the global cooldown, replacing the swing.
+  const heroicStrike = getRotationAbilities('Warrior', 'Fury').find((ability) => ability.name === 'Heroic Strike')
+  expect(heroicStrike, 'Heroic Strike should be in the Fury rotation').toBeTruthy()
+  expect(heroicStrike?.resource).toEqual({
+    type: 'Rage',
+    cost: 15,
+    note: 'reduced by 1 per point of Improved Heroic Strike and of Focused Rage',
+  })
+  expect(heroicStrike?.offGlobalCooldown).toBe(true)
+  expect(heroicStrike?.replacesMainHandSwing).toBe(true)
+  expect(heroicStrike?.scaling.flatWeaponDamageBonus).toBe(176)
+  // Unnormalized, unlike Whirlwind — a slow weapon keeps its advantage on Heroic Strike.
+  expect(heroicStrike?.scaling.normalizedWeaponDamage).toBe(false)
+
+  // It must stay LAST in the priority: it is a dump for surplus, so anything ahead of it claims
+  // rage first. If it ever sorts ahead of Bloodthirst the whole budget argument inverts.
+  const names = getRotationAbilities('Warrior', 'Fury').map((ability) => ability.name)
+  expect(names[0]).toBe('Bloodthirst')
+  expect(names[names.length - 1]).toBe('Heroic Strike')
+
+  // And the honest part: with only auto-attack rage modelled there is no surplus, so it contributes
+  // nothing — but the simulator now says so with the actual numbers instead of "unmodelled".
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const result = calculateSimulation(character, gear, stats, 'Physical DPS')
+
+  expect(result.breakdown.some((row) => row.label === 'Rage per second' && row.value > 0), 'rage income should be shown').toBe(true)
+  expect(result.summary).toContain('Heroic Strike')
+  expect(result.summary).toMatch(/rage\/sec/)
+  expect(result.summary, 'the missing rage sources should be named, not just implied').toMatch(/Bloodrage/)
+
+  // The cooldown priority must NOT be throttled by this partial income — doing so would report a
+  // DPS loss as an accuracy gain. Bloodthirst and Whirlwind both still land.
+  const specialLabels = result.breakdown.map((row) => row.label)
+  expect(specialLabels).toContain('Bloodthirst DPS')
+  expect(specialLabels).toContain('Whirlwind DPS')
 })

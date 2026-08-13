@@ -114,4 +114,66 @@ export const warriorSignatureAbilities: readonly SignatureAbility[] = [
     notes:
       'Pressed on its 10s cooldown alongside Mortal Strike. Same unsourced `rank`/`requiredLevel` caveat as the Fury entry.',
   },
+
+  /*
+   * Heroic Strike, last in both DPS priorities because it is a rage *dump*: it is what surplus rage
+   * is spent on once the cooldowns are covered, not something pressed for its own sake.
+   *
+   * Everything below is read off wowsims/tbc `sim/warrior/heroic_strike_cleave.go` at 3301fca5:
+   * `cost := 15.0 - ImprovedHeroicStrike - FocusedRage`, and
+   * `BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true)` — main hand, **not**
+   * normalized, +176 flat, 1x multiplier. Its ProcMask carries `ProcMaskMeleeMHSpecial`, which is
+   * what the rage aura checks to decide a swing generates nothing.
+   *
+   * The two flags matter more than the numbers. Heroic Strike triggers no GCD, so it does not
+   * compete with Bloodthirst and Whirlwind for buttons; and it replaces the main-hand swing rather
+   * than landing beside it, so counting its full damage as additional damage roughly doubles what it
+   * is actually worth.
+   */
+  {
+    className: 'Warrior',
+    spec: 'Fury',
+    name: 'Heroic Strike',
+    spellId: 29707,
+    effectType: 'Melee Special',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    offGlobalCooldown: true,
+    replacesMainHandSwing: true,
+    resource: { type: 'Rage', cost: 15, note: 'reduced by 1 per point of Improved Heroic Strike and of Focused Rage' },
+    scaling: {
+      basis: 'weapon damage',
+      weaponDamageMultiplier: 1,
+      normalizedWeaponDamage: false,
+      flatWeaponDamageBonus: 176,
+      coefficientNotes:
+        'Full main-hand swing damage plus a flat 176, and deliberately NOT normalized — wowsims passes `false` for the normalize argument, so unlike Whirlwind a slow weapon does keep its advantage here. Single-hand only: the off-hand does not strike, so `hitsBothWeapons` is absent rather than false-y by accident.',
+    },
+    needsVerification: true,
+    notes:
+      'The rage dump both DPS specs press between cooldowns, and the reason a rage model was worth building — before one existed this ability contributed nothing at all. Because it replaces the main-hand auto attack, its real value is the gap between a Heroic Strike and the swing it displaced, which also means it trades away that swing\'s rage. `rank` and `requiredLevel` are omitted rather than guessed, the same caveat the Whirlwind entries carry: wowsims tracks only level-70 spell IDs and does not record ranks.',
+  },
+  {
+    className: 'Warrior',
+    spec: 'Arms',
+    name: 'Heroic Strike',
+    spellId: 29707,
+    effectType: 'Melee Special',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    offGlobalCooldown: true,
+    replacesMainHandSwing: true,
+    resource: { type: 'Rage', cost: 15, note: 'reduced by 1 per point of Improved Heroic Strike and of Focused Rage' },
+    scaling: {
+      basis: 'weapon damage',
+      weaponDamageMultiplier: 1,
+      normalizedWeaponDamage: false,
+      flatWeaponDamageBonus: 176,
+      coefficientNotes:
+        'Identical to the Fury entry — the ability does not differ by spec. It is worth more to Arms in practice, because a two-hander\'s slower, larger swing is what the unnormalized weapon-damage portion multiplies.',
+    },
+    needsVerification: true,
+    notes:
+      'Same ability and same caveats as the Fury entry. Protection also presses Heroic Strike as a threat dump, but the tank path scores survivability rather than damage and never reads the rotation, so an entry there would be data nothing consumes.',
+  },
 ]

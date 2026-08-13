@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/abilities/abilityTypes.ts
-lines: 160
+lines: 175
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.abilityTypes
 
-`src/domain/abilities/abilityTypes.ts` · **domain** layer · 160 lines
+`src/domain/abilities/abilityTypes.ts` · **domain** layer · 175 lines
 
 From the top of the file:
 

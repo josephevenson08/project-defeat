@@ -13,7 +13,7 @@ The long-term goal: a local-first TBC Classic Anniversary simulator/planner cove
 | [[Phase 1 - Local Foundation]] | ✅ complete | 0 |
 | [[Phase 2 - Gear Gems Enchants]] | 🟢 mostly complete | 1 |
 | [[Phase 3 - Character Systems]] | 🟡 partial | 3 |
-| [[Phase 4 - Simulation]] | 🟡 partial | 4 |
+| [[Phase 4 - Simulation]] | 🟡 partial | 6 |
 | [[Phase 5 - Planner Workflows]] | 🟡 partial | 5 |
 | [[Phase 6 - In-Game Import]] | ⬜ not started | 4 |
 

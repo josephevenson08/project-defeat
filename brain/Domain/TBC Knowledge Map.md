@@ -26,7 +26,7 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **33** buffs
 - **6** debuffs
 - **31** consumables
-- **29** abilities
+- **31** abilities
 - **18** slots
 
 ## Roles

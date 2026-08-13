@@ -14,10 +14,12 @@ import {
 import {
   CAT_FORM_WEAPON,
   ENERGY_PER_SECOND,
+  averageSwingDamage,
   computeUsageRate,
   estimateSpecialAttack,
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
+import { rageDumpUsesPerSecond, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
   CRUSHING_BLOW_CHANCE,
@@ -173,8 +175,27 @@ type ResolvedRotation = {
   specials: ResolvedSpecial[]
   /** Abilities in the spec's rotation whose sustained rate can't be defended, named so their absence is visible. */
   excluded: { name: string; explanation: string }[]
-  /** True when a shared budget — the GCD or energy — rather than an ability's own cooldown limited the modelled rate. */
+  /** True when a shared budget — the GCD, energy or rage — rather than an ability's own cooldown limited the modelled rate. */
   contended: boolean
+  /** Rage income, for the breakdown. Undefined for specs that do not use rage. */
+  ragePerSecond?: number
+}
+
+/**
+ * What the white-swing model already worked out, handed to the rotation so rage can be budgeted.
+ *
+ * Rage income is a property of the auto attacks, so it has to be computed where the attack table and
+ * the swing damage already exist rather than recomputed from the stat block. Passing it in also keeps
+ * `resolveRotation` honest about the feedback loop: an on-next-swing ability displaces one of these
+ * swings, and both its damage and its rage have to be netted off.
+ */
+type MeleeSwingContext = {
+  ragePerSecond: number
+  mainHandSwingsPerSecond: number
+  /** What one main-hand swing generates, so a swing-replacing ability can give it back. */
+  ragePerMainHandSwing: number
+  /** Expected damage of the main-hand swing a replacement displaces, after the white attack table. */
+  displacedSwingDamage: number
 }
 
 /**
@@ -207,6 +228,7 @@ function resolveRotation(
   skillDiff: number,
   missReduction: number,
   rawCritChance: number,
+  melee?: MeleeSwingContext,
 ): ResolvedRotation {
   const abilities = getRotationAbilities(character.className, character.spec).filter(
     (ability) => ability.effectType === 'Melee Special',
@@ -223,6 +245,9 @@ function resolveRotation(
   const excluded: ResolvedRotation['excluded'] = []
   let gcdBudget = 1 / (abilities[0]?.gcdSeconds || 1.5)
   let energyBudget = ENERGY_PER_SECOND
+  // A third shared budget, and the one that was missing. Cooldown abilities spend from it in
+  // priority order and whatever survives funds the dump at the bottom of the list.
+  let rageBudget = melee?.ragePerSecond ?? 0
   let contended = false
 
   // Cat form swings its own internal weapon, so a Feral druid's specials must not read the equipped
@@ -233,6 +258,64 @@ function resolveRotation(
 
   for (const ability of abilities) {
     const estimate = estimateSpecialAttack(ability, mainHandProfile, offHandProfile, stats.attackPower)
+    const rageCost = ability.resource?.type === 'Rage' ? ability.resource.cost : 0
+
+    /*
+     * A rage dump — rage-costed, no cooldown of its own. Its rate is not "as often as possible" but
+     * "as often as the surplus funds", and because it replaces a main-hand swing each use also hands
+     * back the rage that swing would have made. `rageDumpUsesPerSecond` solves both at once.
+     *
+     * This is the branch that made Heroic Strike computable. Without it `computeUsageRate` returns
+     * `unmodelled` and the ability contributes nothing at all.
+     */
+    const isRageDump = rageCost > 0 && !ability.cooldownSeconds && melee !== undefined
+
+    if (isRageDump && melee) {
+      const displacedRage = ability.replacesMainHandSwing ? melee.ragePerMainHandSwing : 0
+      const uses = rageDumpUsesPerSecond({
+        surplusRagePerSecond: rageBudget,
+        cost: rageCost,
+        ragePerSuppressedSwing: displacedRage,
+        mainHandSwingsPerSecond: melee.mainHandSwingsPerSecond,
+      })
+
+      if (uses <= 0 || estimate.damagePerUse <= 0) {
+        // Quantified rather than hand-waved: this is the number that has to move before a rage dump
+        // is worth anything, and naming the missing sources says what would move it.
+        excluded.push({
+          name: ability.name,
+          explanation:
+            `auto attacks generate ${melee.ragePerSecond.toFixed(1)} rage/sec and the cooldowns ahead of it already commit ` +
+            `${(melee.ragePerSecond - rageBudget).toFixed(1)}, leaving no surplus to dump — Bloodrage, Unbridled Wrath, ` +
+            `damage taken and Flurry-driven haste are all unmodelled rage income`,
+        })
+        continue
+      }
+
+      /*
+       * An on-next-swing ability is worth the *difference* it makes, not its whole damage: the swing
+       * it replaces would have landed anyway. Counting the full amount roughly doubles it.
+       *
+       * The two sides are scored against different tables on purpose — a special cannot glance, so
+       * part of what the ability buys is trading a glancing white swing for one that cannot glance.
+       */
+      const perUse = ability.replacesMainHandSwing
+        ? estimate.damagePerUse * effectiveMultiplier - melee.displacedSwingDamage
+        : estimate.damagePerUse * effectiveMultiplier
+
+      rageBudget = Math.max(0, rageBudget - uses * (rageCost + displacedRage))
+      if (!ability.offGlobalCooldown) gcdBudget -= uses
+      contended = true
+
+      specials.push({
+        name: ability.name,
+        dps: Math.max(0, perUse) * uses,
+        explanation: ability.replacesMainHandSwing
+          ? `funded by surplus rage at roughly one per ${(1 / uses).toFixed(1)}s, counted as the gain over the main-hand swing it replaces`
+          : `funded by surplus rage at roughly one per ${(1 / uses).toFixed(1)}s`,
+      })
+      continue
+    }
 
     if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) {
       excluded.push({ name: ability.name, explanation: estimate.explanation })
@@ -242,11 +325,27 @@ function resolveRotation(
     const energyCost = ability.resource?.type === 'Energy' ? ability.resource.cost : 0
     const energyCeiling = energyCost > 0 ? energyBudget / energyCost : Number.POSITIVE_INFINITY
 
+    /*
+     * Rage-costed *cooldowns* are deliberately NOT capped by modelled rage income, and that is a
+     * judgement worth stating.
+     *
+     * This model captures one rage source: auto attacks. It has no Bloodrage, no Unbridled Wrath, no
+     * damage taken, and — most of all — no haste, so no Flurry, which is a large part of why a Fury
+     * warrior's real swing rate and rage income are far above what is computed here. Measured on the
+     * default set, white swings fund about 4-5 rage/sec while Bloodthirst and Whirlwind on cooldown
+     * need 7.5.
+     *
+     * Treating an admittedly partial income as a hard budget would throttle abilities a real warrior
+     * presses on cooldown, and would report a DPS *loss* as if it were an accuracy gain. So the
+     * priority is assumed affordable, income is still spent against it, and only a genuine surplus
+     * funds the dump below — which is the one place the number has to be defensible.
+     */
     const usesPerSecond = Math.max(0, Math.min(estimate.usesPerSecond, gcdBudget, energyCeiling))
     if (usesPerSecond < estimate.usesPerSecond) contended = true
 
     gcdBudget -= usesPerSecond
     energyBudget -= usesPerSecond * energyCost
+    rageBudget = Math.max(0, rageBudget - usesPerSecond * rageCost)
 
     if (usesPerSecond > 0) {
       specials.push({
@@ -264,7 +363,7 @@ function resolveRotation(
     }
   }
 
-  return { specials, excluded, contended }
+  return { specials, excluded, contended, ragePerSecond: melee?.ragePerSecond }
 }
 
 /** Says which specials were skipped and why, so a missing yellow-damage layer is visible rather than silent. */
@@ -295,6 +394,9 @@ function calculatePhysicalDps(
 
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
+  // Only the melee path builds this. A Hunter's ranged auto attacks generate no rage at all, so
+  // leaving it undefined is what keeps the rage budget from being offered to a spec that has none.
+  let meleeContext: MeleeSwingContext | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -332,6 +434,70 @@ function calculatePhysicalDps(
     const offHandDps = dualWield ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier : 0
     rawDps = mainHandDps + offHandDps
 
+    /*
+     * Rage income, from the same swings the white damage above is built on.
+     *
+     * Haste is not modelled for auto attacks anywhere in this file, so swings per second is simply
+     * 1/speed and the weapon's base speed is also its real one — which happens to be exactly what
+     * the hit-factor term wants, since that term does not scale with haste either.
+     *
+     * The damage fed in is **post-armor**, because wowsims generates rage from damage actually
+     * dealt. Using the pre-mitigation figure would inflate rage income by the whole armor
+     * reduction, about a third against a raid boss.
+     */
+    const outcomes = {
+      miss: fullTable.miss,
+      dodge: fullTable.dodge,
+      parry: fullTable.parry,
+      glance: fullTable.glance,
+      block: fullTable.block,
+      crit: fullTable.crit,
+      hit: fullTable.hit,
+    }
+    const mainHandSpeed = mainHandItem?.weaponSpeed ?? 0
+    const mainHandSwingsPerSecond = mainHandSpeed > 0 ? 1 / mainHandSpeed : 0
+    /*
+     * Two figures for the same swing, in two different units, and mixing them is the easy mistake:
+     * rage is generated from damage *dealt*, so it needs the post-armor number, while every special's
+     * DPS stays pre-armor here because `mitigatedDps` applies mitigation once at the end. Feeding the
+     * post-armor figure to `displacedSwingDamage` would mitigate the displaced swing twice and make
+     * the replacement look better than it is.
+     */
+    const mainHandSwingDamage = averageSwingDamage(mainHandItem, stats.attackPower, false)
+
+    const mainHandRageInput = {
+      damagePerLandedSwing: mainHandSwingDamage * (1 - armorMitigation),
+      swingsPerSecond: mainHandSwingsPerSecond,
+      baseSwingSpeed: mainHandSpeed,
+      isOffHand: false,
+      outcomes,
+      glanceMultiplier: avgGlanceMultiplier,
+    }
+
+    let ragePerSecond = mainHandSwingsPerSecond > 0 ? ragePerSecondFromWeapon(mainHandRageInput) : 0
+
+    if (dualWield && offHandItem?.weaponSpeed) {
+      ragePerSecond += ragePerSecondFromWeapon({
+        // An off-hand swing lands for half, and that halved figure is what generates rage.
+        damagePerLandedSwing: averageSwingDamage(offHandItem, stats.attackPower, false) * 0.5 * (1 - armorMitigation),
+        swingsPerSecond: 1 / offHandItem.weaponSpeed,
+        baseSwingSpeed: offHandItem.weaponSpeed,
+        isOffHand: true,
+        outcomes,
+        glanceMultiplier: avgGlanceMultiplier,
+      })
+    }
+
+    if (mainHandSwingsPerSecond > 0) {
+      meleeContext = {
+        ragePerSecond,
+        mainHandSwingsPerSecond,
+        ragePerMainHandSwing: rageFromOneSwing(mainHandRageInput),
+        // Pre-armor, matching every other special's DPS, since mitigation is applied once at the end.
+        displacedSwingDamage: mainHandSwingDamage * effectiveMultiplier,
+      }
+    }
+
     breakdown = [
       { label: 'Attack power', value: round(apDps) },
       { label: 'Weapon damage', value: round(mainHandWeaponDps + offHandWeaponDps) },
@@ -350,13 +516,19 @@ function calculatePhysicalDps(
   // Yellow (special) damage, layered on top of the white swing model above. Only the melee path gets
   // this: the ranged special (Steady Shot) is mana-costed with no cooldown, so its sustained rate
   // depends on auto-shot weaving that isn't modelled.
-  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance)
+  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance, meleeContext)
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
 
   for (const entry of rotation.specials) {
     breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
+  }
+
+  // Shown rather than kept internal: rage income is what decides whether the dump at the bottom of
+  // the priority is worth anything, so a reader can see why it contributes what it does.
+  if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
+    breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
   }
 
   const modelled = rotation.specials.map((entry) => `${entry.name} (${entry.explanation})`).join(', ')

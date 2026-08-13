@@ -198,6 +198,16 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   defaults became real sourced epics, so its upgrades compare sourced against sourced. Fury is the
   only one of 27 specs in that position, and a domain test now pins that the disclosure still fires
   for the other 26.
+- **The default gear set can equip a two-hander and an off-hand at the same time.** `defaultGear`
+  fills each slot independently by highest item level, so a Fury Warrior opens with **Twinblade of
+  the Phoenix (2H sword, 3.6s) in the main hand and Rod of the Sun King (1H mace) in the off hand** —
+  impossible in TBC, and `isDualWield` then happily adds phantom off-hand white damage on top. Found
+  while measuring rage income, which is why the numbers there looked odd. Not fixed: the guard
+  belongs in slot normalisation and would move every melee DPS figure, so it wants its own change.
+- **Melee haste rating does nothing at all.** `weaponDiceToWhiteDps` is `avg/speed` and
+  `attackPowerToWhiteDps` is `AP/14`; neither reads `stats.hasteRating`, so swing speed never changes.
+  It happens not to matter for the default sets, which carry 0 haste — but it is the main reason
+  modelled rage income falls short of what a real Fury warrior generates.
 - **Icon names come from the upstream the catalogue already uses, not from scraping Wowhead.**
   `assets/item_data/all_item_tooltips.csv` in wowsims/tbc, at the same pinned commit, carries an
   `"icon"` field for ~30,000 items — one request for the whole mapping. Two dead ends first: wowsims'
@@ -276,11 +286,33 @@ against a level 73 target that deleted 14% parry plus 5% block from every swing.
 Fury Warrior from 125 to 148 DPS and took hit chance from 21.7% to 39.2%. `attacksFromBehind` is now
 a required input on both builders, so a future front-facing caller has to state its position.
 
-A multi-ability rotation resolver already exists (`resolveRotation`), with GCD and energy budgeting,
-and Fury already layers Bloodthirst and Whirlwind onto white damage. What it cannot do is **rage**:
-`computeUsageRate` returns `unmodelled` for any rage-costed ability without a cooldown, so Heroic
-Strike — a large slice of real Fury damage — contributes nothing. A rage model is the next real step
-for melee, not a priority-list engine, which is mostly already there.
+**Rage is now modelled, and the result was not the one expected.** `domain/simulation/rageModel.ts`
+implements wowsims/tbc `sim/core/rage.go` at the pinned commit — `damage*(3.75/274.7) +
+HitFactor*BaseSwingSpeed`, main-hand factor `3.5/2` and off-hand `1.75/2`, doubled on a crit, nothing
+at all on a miss but full value on a dodge or parry. Heroic Strike is in the ability data too, from
+`heroic_strike_cleave.go`: 15 rage, main-hand damage +176 flat, **unnormalized**, off the GCD, and
+`replacesMainHandSwing`.
+
+**It still contributes nothing, and now the simulator says why in numbers.** Auto attacks fund about
+**3.7 rage/sec** on the default set, while Bloodthirst and Whirlwind on cooldown need **7.5**. There
+is no surplus for a dump. What is missing is not the dump — it is rage *income*: **Bloodrage,
+Unbridled Wrath, damage taken, and above all haste**, since `weaponDiceToWhiteDps` ignores haste
+entirely, so no Flurry and no swing-speed scaling of any kind. Melee haste rating currently does
+**nothing** in this simulator, which is its own finding.
+
+Two design decisions in there worth not re-litigating:
+
+- **Rage-costed *cooldowns* are deliberately not throttled by this income.** Modelled income covers
+  one source of several, and treating a partial constraint as a complete one would throttle abilities
+  a real warrior presses on cooldown and report a DPS *loss* as an accuracy gain. Verified: DPS is
+  byte-identical before and after the model — 196.5 Fury, 233.7 Arms, 205.6 Combat Rogue, 100.1
+  Feral. The model adds honesty and a foundation, not a number change.
+- **A swing-replacing ability is worth only the difference it makes**, and it also gives back the rage
+  of the swing it displaced, since main-hand specials generate none. `rageDumpUsesPerSecond` solves
+  `uses = surplus / (cost + suppressedRage)` in closed form rather than iterating. Counting Heroic
+  Strike's full damage as additional damage roughly doubles it.
+
+The remaining gap for melee is therefore **haste**, not a priority-list engine.
 
 ### 2. UI — the requested rework is done
 
