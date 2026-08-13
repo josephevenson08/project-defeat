@@ -2,20 +2,22 @@
 type: module
 layer: domain
 source: src/domain/gear/slotCompatibility.ts
-lines: 60
+lines: 98
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.slotCompatibility
 
-`src/domain/gear/slotCompatibility.ts` · **domain** layer · 60 lines
+`src/domain/gear/slotCompatibility.ts` · **domain** layer · 98 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `getDefaultItemForSlot`, `getPairedGearSlots`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `isUniqueRestricted`
+**function** — `getDefaultItemForSlot`, `getPairedGearSlots`, `isEmptySlotItem`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `isUniqueRestricted`, `twoHanderOccupiesOffHand`
+
+**const** — `EMPTY_OFF_HAND`
 
 ## Imports
 
@@ -30,6 +32,7 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 
 ## Concepts & phases
 

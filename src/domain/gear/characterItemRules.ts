@@ -2,9 +2,16 @@ import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
+
 import { getItemsForSlot } from './itemCatalogue'
 import { isObtainable } from './obtainability'
-import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
+import {
+  EMPTY_OFF_HAND,
+  getDefaultItemForSlot,
+  isEmptySlotItem,
+  isUniqueRestricted,
+  twoHanderOccupiesOffHand,
+} from './slotCompatibility'
 
 const enhancementExcludedWeaponTypes: readonly WeaponType[] = ['Bow', 'Gun', 'Crossbow', 'Wand', 'Libram', 'Idol', 'Shield', 'Staff', 'Sword']
 const enhancementMainHandTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Dagger']
@@ -38,12 +45,43 @@ const rogueIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Polearm', 'Staff
 // Warlocks can use Daggers, Swords, Staves, and Wands; everything else is illegal for any Warlock spec.
 const warlockIllegalWeaponTypes: readonly WeaponType[] = ['Axe', 'Mace', 'Fist Weapon', 'Polearm', 'Bow', 'Gun', 'Crossbow', 'Thrown', 'Shield', 'Totem', 'Libram', 'Idol']
 
+/**
+ * Which two-handed weapon types each class may actually wield.
+ *
+ * The `weaponType` lists below cannot express this on their own: TBC gives one- and two-handed
+ * swords, axes and maces the **same** `weaponType`, so "Rogues may use swords" silently admitted
+ * two-handed ones. A Rogue was being handed Twinblade of the Phoenix, a two-hander no Rogue can
+ * equip in any expansion — and once the off-hand rule landed, that also cost them their off hand.
+ * The same hole let a Mage or Warlock be offered a two-handed sword, since neither class's illegal
+ * list mentions swords at all.
+ *
+ * Read as: everything **not** listed here is off-limits in two-handed form. Rogue is deliberately an
+ * empty set rather than a missing key, because "no two-handers at all" is the actual rule.
+ */
+const TWO_HANDED_PROFICIENCIES: Record<TbcClass, readonly WeaponType[]> = {
+  Warrior: ['Axe', 'Mace', 'Sword', 'Polearm', 'Staff'],
+  Paladin: ['Axe', 'Mace', 'Sword', 'Polearm'],
+  Hunter: ['Axe', 'Sword', 'Polearm', 'Staff'],
+  Shaman: ['Axe', 'Mace', 'Staff'],
+  Druid: ['Mace', 'Staff', 'Polearm'],
+  Priest: ['Staff'],
+  Mage: ['Staff'],
+  Warlock: ['Staff'],
+  Rogue: [],
+}
+
 export function isItemAllowedForCharacter(item: GearItem, className: TbcClass, spec: TbcSpec) {
   // First, and for every class alike: an item nobody can acquire is not gear. This gate is here
   // rather than in the catalogue so the items stay readable as data — raid loot and provenance can
   // still name them — while nothing can equip, default to, or be upgraded into one. See
   // `obtainability.ts` for why each entry is on that list.
   if (!isObtainable(item)) return false
+
+  // Handedness before weapon type, because the type alone cannot tell a one-handed sword from a
+  // two-handed one and every class list below is written in terms of type.
+  if (item.handType === 'Two Hand' && item.weaponType && !TWO_HANDED_PROFICIENCIES[className].includes(item.weaponType)) {
+    return false
+  }
 
   if (item.allowedClasses && !item.allowedClasses.includes(className)) return false
   if (item.allowedSpecs && !item.allowedSpecs.includes(spec)) return false
@@ -100,6 +138,19 @@ export function getFallbackItemForCharacter(slot: GearSlot, className: TbcClass,
   return getDefaultItemForSlot(slot, getItemsForSlotAndCharacter(slot, className, spec))
 }
 
+/**
+ * Enforces the one weapon rule that spans two slots: a two-hander leaves the off hand empty.
+ *
+ * Applied wherever gear changes rather than only at normalisation, because equipping a two-hander by
+ * hand has to clear the off hand just as switching spec into one does. Idempotent, so calling it
+ * twice is free.
+ */
+export function applyWeaponSlotRules(gear: EquippedGear): EquippedGear {
+  if (!twoHanderOccupiesOffHand(gear['Main Hand']?.item)) return gear
+  if (gear['Off Hand']?.item.id === EMPTY_OFF_HAND.id) return gear
+  return { ...gear, 'Off Hand': { item: EMPTY_OFF_HAND, gemIds: [] } }
+}
+
 export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClass, spec: TbcSpec): EquippedGear {
   // Unique items already surviving the switch are withheld from the fallbacks. Two illegal paired
   // slots would otherwise both fall back to the same highest-item-level option and produce a doubled
@@ -110,7 +161,7 @@ export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClas
       .map((equipped) => equipped.item.id),
   )
 
-  return Object.fromEntries(
+  const normalized = Object.fromEntries(
     Object.entries(gear).map(([slot, equippedSlot]) => {
       const gearSlot = slot as GearSlot
       if (isItemAllowedForCharacter(equippedSlot.item, className, spec)) return [gearSlot, equippedSlot]
@@ -130,4 +181,24 @@ export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClas
       ]
     }),
   ) as EquippedGear
+
+  // Last, because the fallbacks above choose each hand independently and can themselves produce the
+  // illegal pairing — a spec switching into a two-hander is exactly when this fires.
+  if (twoHanderOccupiesOffHand(normalized['Main Hand']?.item)) return applyWeaponSlotRules(normalized)
+
+  /*
+   * And the reverse. An empty off hand is legal only next to a two-hander, so switching *out* of one
+   * has to fill it again — otherwise the placeholder survives `isItemAllowedForCharacter`, which has
+   * no restrictions to fail, and the slot stays empty forever. That cost a Protection Warrior its
+   * shield, and with it every block calculation in Effective Health.
+   */
+  if (isEmptySlotItem(normalized['Off Hand']?.item)) {
+    const options = getItemsForSlotAndCharacter('Off Hand', className, spec).filter((item) => !usedUniqueIds.has(item.id))
+    const fallback = getDefaultItemForSlot('Off Hand', options)
+    if (fallback) {
+      return { ...normalized, 'Off Hand': { item: fallback, gemIds: fallback.sockets?.map(() => '') ?? [] } }
+    }
+  }
+
+  return normalized
 }

@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/gear/characterItemRules.ts
-lines: 134
+lines: 205
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.characterItemRules
 
-`src/domain/gear/characterItemRules.ts` · **domain** layer · 134 lines
+`src/domain/gear/characterItemRules.ts` · **domain** layer · 205 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `getFallbackItemForCharacter`, `getItemsForSlotAndCharacter`, `isItemAllowedForCharacter`, `normalizeGearForCharacter`
+**function** — `applyWeaponSlotRules`, `getFallbackItemForCharacter`, `getItemsForSlotAndCharacter`, `isItemAllowedForCharacter`, `normalizeGearForCharacter`
 
 ## Imports
 

@@ -2,7 +2,7 @@ import { gearSlots } from './gearSlots'
 import type { EquippedGear, GearItem } from './itemTypes'
 import { getItemsForSlot } from './itemCatalogue'
 import { isObtainable } from './obtainability'
-import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
+import { EMPTY_OFF_HAND, getDefaultItemForSlot, isUniqueRestricted, twoHanderOccupiesOffHand } from './slotCompatibility'
 
 /**
  * The starting gear set.
@@ -10,8 +10,11 @@ import { getDefaultItemForSlot, isUniqueRestricted } from './slotCompatibility'
  * Slots are filled in order, and any unique item already placed is withheld from later slots. Without
  * that, the paired slots both take the single highest-item-level option and the app opens in a state
  * it will not let you create by hand — two copies of a unique ring, trinket or weapon.
+ *
+ * The two-hander rule is applied *after* the reduce rather than inside it, so it cannot depend on
+ * whether `gearSlots` happens to list Main Hand before Off Hand.
  */
-export const defaultGear = gearSlots.reduce((gear, slot) => {
+const filledGear = gearSlots.reduce((gear, slot) => {
   const usedUniqueIds = new Set(
     Object.values(gear)
       .map((equipped) => equipped.item)
@@ -29,3 +32,12 @@ export const defaultGear = gearSlots.reduce((gear, slot) => {
   gear[slot] = { item, gemIds: item.sockets?.map(() => '') ?? [] }
   return gear
 }, {} as EquippedGear)
+
+/*
+ * Highest-item-level-per-slot picks each hand independently, so it happily paired a two-handed
+ * weapon with a one-hander. That is not a legal TBC set, and it was not cosmetic: the off-hand's
+ * stats were counted and the simulator added a phantom off-hand's white damage on top of it.
+ */
+export const defaultGear: EquippedGear = twoHanderOccupiesOffHand(filledGear['Main Hand']?.item)
+  ? { ...filledGear, 'Off Hand': { item: EMPTY_OFF_HAND, gemIds: [] } }
+  : filledGear

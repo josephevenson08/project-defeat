@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 298
+lines: 300
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 298 lines
+`src/App.tsx` · **app** layer · 300 lines
 
 _No doc comment at the top of this file._
 

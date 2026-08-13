@@ -13,7 +13,7 @@ import { TalentsPanel } from './features/talents/TalentsPanel'
 import type { TalentPoints } from './domain/talents/talentTypes'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
-import { defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
+import { applyWeaponSlotRules, defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
@@ -166,7 +166,9 @@ function App() {
   )
 
   function updateGear(slot: GearSlot, equippedSlot: EquippedSlot) {
-    setGear((current) => ({ ...current, [slot]: equippedSlot }))
+    // Equipping a two-hander has to empty the off hand, the same way switching spec into one does.
+    // Without this the rule would hold only until the first manual weapon change.
+    setGear((current) => applyWeaponSlotRules({ ...current, [slot]: equippedSlot }))
     setSimulationResult(undefined)
   }
 

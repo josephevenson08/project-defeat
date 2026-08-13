@@ -4,6 +4,7 @@ import type { SocketColor } from '../../domain/gear/itemTypes'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
 import { getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from '../gear/gearData'
+import { twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import type { EquippedGear, GearItem, GearSlot } from '../gear/gearTypes'
 import { calculateStats } from '../stats/calculateStats'
 import { calculateSimulation } from './calculateSimulation'
@@ -146,6 +147,14 @@ export function findUpgrades(
   for (const slot of getVisibleGearSlotsForSpec(character.className, character.spec)) {
     const equipped = gear[slot]
     if (!equipped) continue
+
+    /*
+     * An off hand held shut by a two-hander has no legal candidates, and skipping it matters more
+     * than it sounds: the slot holds `EMPTY_OFF_HAND`, so every one-hander in the catalogue scores as
+     * an enormous gain against nothing. It topped the list at +31 DPS — an upgrade the player cannot
+     * take, and one `applyWeaponSlotRules` would undo the moment they tried.
+     */
+    if (slot === 'Off Hand' && twoHanderOccupiesOffHand(gear['Main Hand']?.item)) continue
 
     const currentEnchantId = equipped.enchantId
 

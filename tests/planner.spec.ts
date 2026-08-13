@@ -302,6 +302,8 @@ import {
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
+import { EMPTY_OFF_HAND, isEmptySlotItem } from '../src/domain/gear/slotCompatibility'
+import { applyWeaponSlotRules } from '../src/domain/gear/characterItemRules'
 
 
 function readStatValue(text: string) {
@@ -1180,6 +1182,10 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await withSlotOpen(page, 'Main Hand', async () => {
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Fang of the Leviathan' })).toHaveCount(1)
   })
+  // A Warlock's default main hand is a staff, which occupies both hands — so the off hand offers
+  // nothing until a one-hander is equipped. Equip one first, then check the off-hand options; that
+  // is the capability the assertion is actually about.
+  await selectSlotItem(page, 'Main Hand', 'fang-of-the-leviathan')
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Fathomstone' })).toHaveCount(1)
   })
@@ -2525,7 +2531,16 @@ test('the paperdoll renders real item icons rather than the placeholder glyphs',
   // assertion that the swap actually happened rather than the glyph still being there.
   const icons = page.locator('.gear-glyph img.item-icon')
   expect(await icons.count(), 'every visible slot should carry an icon').toBeGreaterThan(10)
-  await expect(page.locator('.gear-glyph .item-icon-fallback')).toHaveCount(0)
+
+  // One fallback is expected and correct: the default Fury Warrior wields a two-hander, so the off
+  // hand holds EMPTY_OFF_HAND, which has no item id and therefore no icon. Asserting zero would be
+  // asserting that an empty slot draws artwork.
+  const fallbacks = page.locator('.gear-glyph .item-icon-fallback')
+  const emptySlots = await page
+    .locator('.gear-cell')
+    .filter({ hasText: 'Empty' })
+    .count()
+  expect(await fallbacks.count(), 'only genuinely empty slots may fall back to a glyph').toBe(emptySlots)
 
   // Present in the DOM is not the same as loaded. A wrong path 404s and still renders an <img>.
   const broken = await icons.evaluateAll((nodes) =>
@@ -2987,4 +3002,75 @@ test('Heroic Strike is in the rotation, and says in numbers why it still contrib
   const specialLabels = result.breakdown.map((row) => row.label)
   expect(specialLabels).toContain('Bloodthirst DPS')
   expect(specialLabels).toContain('Whirlwind DPS')
+})
+
+test('a two-handed weapon leaves the off hand empty, for every spec', () => {
+  // defaultGear fills each slot independently by item level, which paired a two-hander with a
+  // one-hander in 18 of the 27 specs: a Fury Warrior holding a two-handed sword AND a one-handed
+  // mace, every caster holding a staff AND a sword. Not cosmetic — the off-hand's stats were counted
+  // and isDualWield added a whole phantom off-hand's white damage on top.
+  const illegal: string[] = []
+
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      const gear = normalizeGearForCharacter(defaultGear, definition.className, spec)
+      const mainHand = gear['Main Hand'].item
+      const offHand = gear['Off Hand'].item
+
+      if (mainHand.handType === 'Two Hand' && !isEmptySlotItem(offHand)) {
+        illegal.push(`${definition.className} ${spec}: ${mainHand.name} (2H) with ${offHand.name}`)
+      }
+
+      // And the reverse, which is what the first version of this fix broke: an empty off hand is
+      // legal ONLY beside a two-hander. The placeholder passes isItemAllowedForCharacter -- it has
+      // no restrictions to fail -- so without a refill a Protection Warrior lost its shield slot
+      // permanently, and with it every block term in Effective Health.
+      if (mainHand.handType !== 'Two Hand' && isEmptySlotItem(offHand)) {
+        illegal.push(`${definition.className} ${spec}: one-handed ${mainHand.name} but the off hand was left empty`)
+      }
+    }
+  }
+
+  expect(illegal).toEqual([])
+
+  // The placeholder has to be inert wherever it is read, or it trades one wrong number for another.
+  expect(EMPTY_OFF_HAND.stats).toEqual({})
+  expect(EMPTY_OFF_HAND.weaponType).toBeUndefined()
+  expect(EMPTY_OFF_HAND.armorType).toBeUndefined()
+  expect(EMPTY_OFF_HAND.itemLevel).toBeUndefined()
+
+  // Equipping a two-hander by hand must clear the off hand too, not only a spec switch.
+  const dualWielded = normalizeGearForCharacter(defaultGear, 'Shaman', 'Enhancement')
+  expect(isEmptySlotItem(dualWielded['Off Hand'].item), 'Enhancement dual-wields, so this starts filled').toBe(false)
+
+  const twoHander = allItems.find((item) => item.handType === 'Two Hand' && item.slot === 'Main Hand')
+  expect(twoHander).toBeTruthy()
+  const afterSwap = applyWeaponSlotRules({ ...dualWielded, 'Main Hand': { item: twoHander!, gemIds: [] } })
+  expect(isEmptySlotItem(afterSwap['Off Hand'].item), 'equipping a two-hander should empty the off hand').toBe(true)
+
+  // Idempotent, since it runs on every gear change.
+  expect(applyWeaponSlotRules(afterSwap)).toEqual(afterSwap)
+})
+
+test('the empty off hand contributes no stats and no phantom off-hand damage', () => {
+  // The bug cost real numbers: +52 attack power to melee and a whole extra weapon's white damage.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  expect(gear['Main Hand'].item.handType).toBe('Two Hand')
+  expect(isEmptySlotItem(gear['Off Hand'].item)).toBe(true)
+
+  // Swapping the placeholder for a real one-hander is exactly the state the app used to open in;
+  // the stat totals must differ, which is what proves the placeholder is contributing nothing.
+  const oneHander = allItems.find((item) => item.handType === 'One Hand' && (item.stats.attackPower ?? 0) > 0)
+  expect(oneHander).toBeTruthy()
+  const withPhantom = { ...gear, 'Off Hand': { item: oneHander!, gemIds: [] } }
+
+  const clean = calculateStats(character, gear)
+  const inflated = calculateStats(character, withPhantom)
+  expect(inflated.attackPower).toBeGreaterThan(clean.attackPower)
+
+  // And the simulator must not treat the placeholder as a dual-wielded weapon.
+  const result = calculateSimulation(character, gear, clean, 'Physical DPS')
+  const inflatedResult = calculateSimulation(character, withPhantom, inflated, 'Physical DPS')
+  expect(inflatedResult.scoreExact).toBeGreaterThan(result.scoreExact)
 })

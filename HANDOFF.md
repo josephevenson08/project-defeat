@@ -198,12 +198,38 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   defaults became real sourced epics, so its upgrades compare sourced against sourced. Fury is the
   only one of 27 specs in that position, and a domain test now pins that the disclosure still fires
   for the other 26.
-- **The default gear set can equip a two-hander and an off-hand at the same time.** `defaultGear`
-  fills each slot independently by highest item level, so a Fury Warrior opens with **Twinblade of
-  the Phoenix (2H sword, 3.6s) in the main hand and Rod of the Sun King (1H mace) in the off hand** —
-  impossible in TBC, and `isDualWield` then happily adds phantom off-hand white damage on top. Found
-  while measuring rage income, which is why the numbers there looked odd. Not fixed: the guard
-  belongs in slot normalisation and would move every melee DPS figure, so it wants its own change.
+- **The default gear set used to equip a two-hander and an off-hand at once — in 18 of the 27
+  specs.** `defaultGear` fills each slot independently by highest item level, so a Fury Warrior
+  opened holding a two-handed sword *and* a one-handed mace, and every caster a staff *and* a sword.
+  Not cosmetic: the off-hand's stats were counted (+52 attack power for melee, +28 stamina for
+  casters) and `isDualWield` added a whole phantom off-hand's white damage on top. Fixed —
+  `twoHanderOccupiesOffHand` plus an `EMPTY_OFF_HAND` placeholder, applied in `defaultGear`, in
+  `normalizeGearForCharacter` and in `applyWeaponSlotRules` on every manual gear change. Melee DPS
+  fell to its honest value: **Fury 196.5 → 165.6, Arms 233.7 → 203.2, Combat Rogue 205.6 → 185.6**.
+  Feral is unchanged, correctly, because cat form swings its own weapon.
+
+  **The reverse rule is what the first attempt got wrong, and it is the subtle half.** An empty off
+  hand is legal *only* beside a two-hander, but the placeholder passes `isItemAllowedForCharacter` —
+  it has no restrictions to fail — so nothing ever replaced it. Switching to a one-handed spec left
+  the slot empty forever, which cost a **Protection Warrior its shield** and with it every block term
+  in Effective Health. `normalizeGearForCharacter` now refills an empty off hand whenever the main
+  hand is not two-handed, and a test asserts both directions.
+
+  `EquippedGear` is a `Record<GearSlot, EquippedSlot>`, so "empty" is not otherwise representable —
+  hence a placeholder rather than an optional slot, which would have rippled through every consumer.
+
+  **The fix surfaced two more real bugs**, both of which had been hiding behind the illegal pairing:
+
+  - **Rogues were being handed two-handed weapons.** TBC gives one- and two-handed swords, axes and
+    maces the *same* `weaponType`, so "Rogues may use swords" silently admitted two-handers, and the
+    default Rogue opened holding Twinblade of the Phoenix. The same hole would offer a Mage or
+    Warlock a two-handed sword, since neither class's illegal list mentions swords at all.
+    `TWO_HANDED_PROFICIENCIES` now states, per class, which types are legal in two-handed form —
+    Rogue is an empty set, deliberately, because "none at all" is the rule.
+  - **The upgrade finder recommended upgrades that cannot be equipped.** With the off hand held shut
+    by a two-hander it holds `EMPTY_OFF_HAND`, so every one-hander in the catalogue scored as an
+    enormous gain against nothing and topped the list at **+31 DPS** — an upgrade the player cannot
+    take, and one `applyWeaponSlotRules` undoes the moment they try.
 - **Melee haste rating does nothing at all.** `weaponDiceToWhiteDps` is `avg/speed` and
   `attackPowerToWhiteDps` is `AP/14`; neither reads `stats.hasteRating`, so swing speed never changes.
   It happens not to matter for the default sets, which carry 0 haste — but it is the main reason
@@ -294,7 +320,8 @@ at all on a miss but full value on a dodge or parry. Heroic Strike is in the abi
 `replacesMainHandSwing`.
 
 **It still contributes nothing, and now the simulator says why in numbers.** Auto attacks fund about
-**3.7 rage/sec** on the default set, while Bloodthirst and Whirlwind on cooldown need **7.5**. There
+**3.1 rage/sec** on the default set — it was 3.7 before the two-hander fix below removed a phantom
+off-hand that was generating rage it had no right to — while Bloodthirst and Whirlwind need **7.5**. There
 is no surplus for a dump. What is missing is not the dump — it is rage *income*: **Bloodrage,
 Unbridled Wrath, damage taken, and above all haste**, since `weaponDiceToWhiteDps` ignores haste
 entirely, so no Flurry and no swing-speed scaling of any kind. Melee haste rating currently does
@@ -304,9 +331,9 @@ Two design decisions in there worth not re-litigating:
 
 - **Rage-costed *cooldowns* are deliberately not throttled by this income.** Modelled income covers
   one source of several, and treating a partial constraint as a complete one would throttle abilities
-  a real warrior presses on cooldown and report a DPS *loss* as an accuracy gain. Verified: DPS is
-  byte-identical before and after the model — 196.5 Fury, 233.7 Arms, 205.6 Combat Rogue, 100.1
-  Feral. The model adds honesty and a foundation, not a number change.
+  a real warrior presses on cooldown and report a DPS *loss* as an accuracy gain. Verified by
+  stashing the change and re-measuring: the rage model moved **no DPS number at all**. The figures
+  did move afterwards — Fury 196.5 → 165.6 — but from the two-hander fix below, not from this.
 - **A swing-replacing ability is worth only the difference it makes**, and it also gives back the rage
   of the swing it displaced, since main-hand specials generate none. `rageDumpUsesPerSecond` solves
   `uses = surplus / (cost + suppressedRage)` in closed form rather than iterating. Counting Heroic

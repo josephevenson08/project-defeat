@@ -4,7 +4,7 @@ import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { describeStats } from '../../domain/stats/describeStats'
 import { getBisListForSpec } from '../../domain/bis'
-import { getPairedGearSlots } from '../../domain/gear/slotCompatibility'
+import { getPairedGearSlots, twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
@@ -55,12 +55,22 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
    * sockets, set bonuses and stat weights all matter more — but it is a far better opening guess than
    * whatever Blizzard happened to number first.
    */
+  /**
+   * A two-hander occupies both hands, so the off hand has nothing to offer while one is equipped.
+   *
+   * Offering the list anyway would be worse than useless: `applyWeaponSlotRules` empties the off hand
+   * again the moment a two-hander is in the main hand, so every pick would silently revert.
+   */
+  const offHandBlockedByTwoHander = slot === 'Off Hand' && twoHanderOccupiesOffHand(gear['Main Hand']?.item)
+
   const allOptions = useMemo(
     () =>
-      [...getItemsForSlotAndCharacter(slot, character.className, character.spec)].sort(
-        (a, b) => (b.itemLevel ?? 0) - (a.itemLevel ?? 0) || a.name.localeCompare(b.name),
-      ),
-    [slot, character.className, character.spec],
+      offHandBlockedByTwoHander
+        ? []
+        : [...getItemsForSlotAndCharacter(slot, character.className, character.spec)].sort(
+            (a, b) => (b.itemLevel ?? 0) - (a.itemLevel ?? 0) || a.name.localeCompare(b.name),
+          ),
+    [slot, character.className, character.spec, offHandBlockedByTwoHander],
   )
 
   // The equipped item always stays in the list, so filtering can never leave the select showing a
@@ -145,7 +155,11 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
                   </option>
                 ))
               ) : (
-                <option>No relevant item options</option>
+                <option>
+                  {offHandBlockedByTwoHander
+                    ? `${gear['Main Hand'].item.name} is two-handed and occupies this slot`
+                    : 'No relevant item options'}
+                </option>
               )}
             </select>
           </label>

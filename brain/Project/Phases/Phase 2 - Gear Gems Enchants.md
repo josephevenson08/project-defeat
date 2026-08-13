@@ -17,7 +17,7 @@ Structured item data with sources, sockets, legality rules, and per-spec ranking
 - Structured item data with quality, source, phase, sockets, and socket bonuses
 - Source/farming metadata: instance, boss, vendor, reputation, crafting profession
 - Full crafting detail on crafted items: skill, specialization, recipe source, per-material farm spots
-- Class/weapon/relic legality checks
+- Class/weapon/relic legality checks, including the cross-slot rule that a two-hander leaves the off hand empty
 - Phase 2 starter BiS for all 27 specs, including role meta gems and role-appropriate enchants
 - Spec-aware slot labels and hidden-slot rules for every class
 - Real item and gem icons: 4,741 entries mapped to 1,238 vendored files, offline and with no runtime network calls

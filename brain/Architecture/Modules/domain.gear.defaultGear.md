@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/defaultGear.ts
-lines: 32
+lines: 44
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.defaultGear
 
-`src/domain/gear/defaultGear.ts` · **domain** layer · 32 lines
+`src/domain/gear/defaultGear.ts` · **domain** layer · 44 lines
 
 From the top of the file:
 
@@ -18,6 +18,9 @@ From the top of the file:
 > Slots are filled in order, and any unique item already placed is withheld from later slots. Without
 > that, the paired slots both take the single highest-item-level option and the app opens in a state
 > it will not let you create by hand — two copies of a unique ring, trinket or weapon.
+> 
+> The two-hander rule is applied *after* the reduce rather than inside it, so it cannot depend on
+> whether `gearSlots` happens to list Main Hand before Off Hand.
 
 ## Exports
 

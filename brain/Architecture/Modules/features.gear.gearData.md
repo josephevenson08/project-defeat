@@ -15,7 +15,7 @@ _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `defaultGear`, `gearSlots`, `getGearSlotDisplayName`, `getItemById`, `getItemsForSlot`, `getItemsForSlotAndCharacter`, `getPairedGearSlots`, `getVisibleGearSlotsForSpec`, `isItemAllowedForCharacter`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `normalizeGearForCharacter`, `placeholderGear`
+**re-export** — `applyWeaponSlotRules`, `defaultGear`, `gearSlots`, `getGearSlotDisplayName`, `getItemById`, `getItemsForSlot`, `getItemsForSlotAndCharacter`, `getPairedGearSlots`, `getVisibleGearSlotsForSpec`, `isItemAllowedForCharacter`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `normalizeGearForCharacter`, `placeholderGear`
 
 ## Imports
 

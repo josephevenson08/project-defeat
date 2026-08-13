@@ -145,7 +145,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
-- [[domain.gear.slotCompatibility]] · 6 importers
+- [[domain.gear.slotCompatibility]] · 7 importers
 - [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
 - [[domain.gems.gemTypes]] · 1 importers

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/findUpgrades.ts
-lines: 212
+lines: 221
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.findUpgrades
 
-`src/features/simulator/findUpgrades.ts` · **features** layer · 212 lines
+`src/features/simulator/findUpgrades.ts` · **features** layer · 221 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
