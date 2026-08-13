@@ -4,7 +4,7 @@
 disagrees with this file, trust git.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`d1f05ea`**, everything pushed.
+`josephevenson08/project-defeat`, currently at **`5b1a5e0`**, everything pushed.
 
 ---
 
@@ -69,7 +69,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 88 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 91 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
