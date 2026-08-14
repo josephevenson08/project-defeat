@@ -3074,3 +3074,48 @@ test('the empty off hand contributes no stats and no phantom off-hand damage', (
   const inflatedResult = calculateSimulation(character, withPhantom, inflated, 'Physical DPS')
   expect(inflatedResult.scoreExact).toBeGreaterThan(result.scoreExact)
 })
+
+test('melee haste raises white damage and rage income, in proportion', () => {
+  // Haste rating used to reach no output whatsoever: white damage is weaponDice/speed plus AP/14 and
+  // neither formula read it, so the rail displayed a stat that did nothing and the stat-weight engine
+  // priced it at exactly zero. No catalogued Phase 2 item carries melee haste -- only 78 of 4,560
+  // items do, none of them raid gear -- so this has to be tested by injecting it rather than by
+  // equipping something.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+
+  const base = calculateStats(character, gear)
+  expect(base.hasteRating, 'Phase 2 gear carries no melee haste, which is faithful to TBC').toBe(0)
+
+  // 15.8 rating per 1%, so 158 rating is exactly +10% attack speed.
+  const hasted = { ...base, hasteRating: 158 }
+  const expected = 1 + 158 / RATING_PER_PERCENT.meleeHaste / 100
+  expect(expected).toBeCloseTo(1.1, 6)
+
+  const without = calculateSimulation(character, gear, base, 'Physical DPS')
+  const withHaste = calculateSimulation(character, gear, hasted, 'Physical DPS')
+  expect(withHaste.scoreExact).toBeGreaterThan(without.scoreExact)
+
+  // Haste does not make a swing hit harder, it makes swings more frequent — so white damage scales
+  // by exactly (1 + haste). The specials do not: they sit on cooldowns and the GCD, and melee haste
+  // reduces neither. That is why the totals move by less than 10% even though white damage moves by
+  // exactly 10%.
+  const whiteOnly = (result: typeof without) => {
+    const ap = result.breakdown.find((row) => row.label === 'Attack power')?.value ?? 0
+    const weapon = result.breakdown.find((row) => row.label === 'Weapon damage')?.value ?? 0
+    return ap + weapon
+  }
+  // The breakdown rows are the unscaled inputs, so they should NOT move; the score should.
+  expect(whiteOnly(withHaste)).toBeCloseTo(whiteOnly(without), 6)
+  expect(withHaste.scoreExact / without.scoreExact).toBeGreaterThan(1)
+  expect(withHaste.scoreExact / without.scoreExact).toBeLessThan(expected)
+
+  // Rage income scales with swing frequency too, which is the whole reason rageModel keeps
+  // swingsPerSecond and baseSwingSpeed as separate inputs.
+  const rageOf = (result: typeof without) => result.breakdown.find((row) => row.label === 'Rage per second')?.value ?? 0
+  expect(rageOf(withHaste)).toBeGreaterThan(rageOf(without))
+
+  // And it is surfaced rather than silently folded in.
+  expect(withHaste.breakdown.some((row) => row.label === 'Attack speed increase' && row.value === 10)).toBe(true)
+  expect(without.breakdown.some((row) => row.label === 'Attack speed increase'), 'no permanent 0 row').toBe(false)
+})

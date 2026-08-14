@@ -230,10 +230,13 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
     by a two-hander it holds `EMPTY_OFF_HAND`, so every one-hander in the catalogue scored as an
     enormous gain against nothing and topped the list at **+31 DPS** — an upgrade the player cannot
     take, and one `applyWeaponSlotRules` undoes the moment they try.
-- **Melee haste rating does nothing at all.** `weaponDiceToWhiteDps` is `avg/speed` and
-  `attackPowerToWhiteDps` is `AP/14`; neither reads `stats.hasteRating`, so swing speed never changes.
-  It happens not to matter for the default sets, which carry 0 haste — but it is the main reason
-  modelled rage income falls short of what a real Fury warrior generates.
+- **Melee haste used to reach no output at all** — `weaponDiceToWhiteDps` is `avg/speed` and
+  `attackPowerToWhiteDps` is `AP/14`, and neither read `hasteRating`, so the rail displayed a stat
+  that did nothing and the stat-weight engine priced it at exactly zero. Fixed: white damage scales
+  by `(1 + haste)` and rage income with it. **It changes no current number**, because only 78 of
+  4,560 items carry melee haste and none is Phase 2 raid gear — so the test injects 158 rating
+  (exactly +10%) rather than equipping something. Worth knowing before "fixing" it again: the
+  absence is real TBC, not missing data.
 - **Icon names come from the upstream the catalogue already uses, not from scraping Wowhead.**
   `assets/item_data/all_item_tooltips.csv` in wowsims/tbc, at the same pinned commit, carries an
   `"icon"` field for ~30,000 items — one request for the whole mapping. Two dead ends first: wowsims'
@@ -323,9 +326,15 @@ at all on a miss but full value on a dodge or parry. Heroic Strike is in the abi
 **3.1 rage/sec** on the default set — it was 3.7 before the two-hander fix below removed a phantom
 off-hand that was generating rage it had no right to — while Bloodthirst and Whirlwind need **7.5**. There
 is no surplus for a dump. What is missing is not the dump — it is rage *income*: **Bloodrage,
-Unbridled Wrath, damage taken, and above all haste**, since `weaponDiceToWhiteDps` ignores haste
-entirely, so no Flurry and no swing-speed scaling of any kind. Melee haste rating currently does
-**nothing** in this simulator, which is its own finding.
+Unbridled Wrath, damage taken, and Flurry**.
+
+**Haste is now modelled and it is not the unlock it looked like.** White damage scales by
+`(1 + haste)` and rage income with it, so the mechanism is in place — but only **78 of 4,560**
+catalogued items carry melee haste and **none at Phase 2 raid item level**, which is faithful to TBC
+rather than a data gap: the expansion put almost no haste rating on early gear. So modelling it moved
+no current number. The rage shortfall is therefore gated on **talent scaling**, not gear: Flurry's
+30% attack speed after a crit is where a Fury warrior's real swing rate comes from, and talents reach
+the simulation nowhere at all.
 
 Two design decisions in there worth not re-litigating:
 

@@ -21,10 +21,11 @@ Real TBC attack-table and spell-table mechanics, plus per-spec signature abiliti
 - Per-spec signature abilities feeding the caster and healer estimates
 - Configurable encounter settings and computed stat weights
 - Rage income from auto attacks, implementing the wowsims formula, with swing-replacing abilities netting off both the damage and the rage of the swing they displace
+- Melee and ranged haste: white damage and rage income both scale with attack speed (no Phase 2 item carries any, so it changes nothing today)
 
 ## Remaining
 
-- Melee haste: swing speed never changes, so haste rating does nothing and Flurry cannot be modelled — now the main blocker on rage income
+- Talent scaling — the real blocker on rage income, since Flurry's 30% attack speed after a crit is where a Fury warrior's swing rate actually comes from
 - Rage income beyond auto attacks: Bloodrage, Unbridled Wrath and damage taken are all unmodelled, so no rage dump can be afforded
 - Multi-ability rotation priority and cooldown usage
 - Proc modelling and talent scaling

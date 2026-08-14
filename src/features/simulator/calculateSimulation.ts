@@ -392,6 +392,24 @@ function calculatePhysicalDps(
   const rawCritChance = ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus
   const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
 
+  /*
+   * Attack speed. Until this existed, `hasteRating` reached no output at all: the white-damage
+   * formulas are `weaponDice/speed` and `AP/14`, and neither read it — so the rail displayed a stat
+   * that did nothing, and the stat-weight engine priced it at exactly zero.
+   *
+   * Haste does not make a swing hit harder, it makes swings more frequent. Damage per swing stays
+   * `weaponRoll + (AP/14) * baseSpeed` — the attack-power term uses the weapon's **base** speed, not
+   * its hasted one — while swings per second becomes `(1 + haste) / baseSpeed`. Multiply those and
+   * the whole white-damage total simply scales by `(1 + haste)`, which is why this lands as one
+   * factor rather than as changes to both formulas.
+   *
+   * It moves nothing on Phase 2 gear, and that is correct rather than a failure: only 78 of 4,560
+   * catalogued items carry melee haste and none of them is Phase 2 raid gear. TBC put almost no
+   * haste rating on early-expansion items.
+   */
+  const hasteFraction = ratingToFraction(stats.hasteRating, RATING_PER_PERCENT.meleeHaste)
+  const attackSpeedMultiplier = 1 + hasteFraction
+
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
   // Only the melee path builds this. A Hunter's ranged auto attacks generate no rage at all, so
@@ -403,7 +421,8 @@ function calculatePhysicalDps(
     const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance })
     const effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
     const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
-    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier
+    // Ranged haste uses the same rating and behaves the same way: more shots, not bigger ones.
+    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier * attackSpeedMultiplier
     breakdown = [
       { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
       { label: 'Weapon damage', value: round(weaponDps) },
@@ -430,8 +449,8 @@ function calculatePhysicalDps(
     const mainHandWeaponDps = weaponDiceToWhiteDps(mainHandItem?.weaponDamageMin, mainHandItem?.weaponDamageMax, mainHandItem?.weaponSpeed)
     const offHandWeaponDps = weaponDiceToWhiteDps(offHandItem?.weaponDamageMin, offHandItem?.weaponDamageMax, offHandItem?.weaponSpeed)
     const apDps = attackPowerToWhiteDps(stats.attackPower)
-    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier
-    const offHandDps = dualWield ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier : 0
+    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier * attackSpeedMultiplier
+    const offHandDps = dualWield ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier : 0
     rawDps = mainHandDps + offHandDps
 
     /*
@@ -455,7 +474,9 @@ function calculatePhysicalDps(
       hit: fullTable.hit,
     }
     const mainHandSpeed = mainHandItem?.weaponSpeed ?? 0
-    const mainHandSwingsPerSecond = mainHandSpeed > 0 ? 1 / mainHandSpeed : 0
+    // Hasted, because rage income scales with how often you swing. The hit-factor term below still
+    // takes the *base* speed, which is the distinction `rageModel` was written to keep.
+    const mainHandSwingsPerSecond = mainHandSpeed > 0 ? attackSpeedMultiplier / mainHandSpeed : 0
     /*
      * Two figures for the same swing, in two different units, and mixing them is the easy mistake:
      * rage is generated from damage *dealt*, so it needs the post-armor number, while every special's
@@ -480,7 +501,7 @@ function calculatePhysicalDps(
       ragePerSecond += ragePerSecondFromWeapon({
         // An off-hand swing lands for half, and that halved figure is what generates rage.
         damagePerLandedSwing: averageSwingDamage(offHandItem, stats.attackPower, false) * 0.5 * (1 - armorMitigation),
-        swingsPerSecond: 1 / offHandItem.weaponSpeed,
+        swingsPerSecond: attackSpeedMultiplier / offHandItem.weaponSpeed,
         baseSwingSpeed: offHandItem.weaponSpeed,
         isOffHand: true,
         outcomes,
@@ -529,6 +550,12 @@ function calculatePhysicalDps(
   // the priority is worth anything, so a reader can see why it contributes what it does.
   if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
+  }
+
+  // Only shown when there is any, so it does not add a permanent 0 row to every melee readout —
+  // Phase 2 gear carries no melee haste at all.
+  if (hasteFraction > 0) {
+    breakdown.push({ label: 'Attack speed increase', value: toPercent(hasteFraction) })
   }
 
   const modelled = rotation.specials.map((entry) => `${entry.name} (${entry.explanation})`).join(', ')
