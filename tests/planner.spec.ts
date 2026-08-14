@@ -66,7 +66,7 @@ import {
   averageSwingDamage,
   computeSpecialDamagePerUse,
 } from '../src/domain/simulation/specialAttacks'
-import { allItems, getItemById, getItemsForSlot } from '../src/domain/gear/itemCatalogue'
+import { allItems, getItemById, getItemByWowItemId, getItemsForSlot } from '../src/domain/gear/itemCatalogue'
 import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
@@ -3118,4 +3118,63 @@ test('melee haste raises white damage and rage income, in proportion', () => {
   // And it is surfaced rather than silently folded in.
   expect(withHaste.breakdown.some((row) => row.label === 'Attack speed increase' && row.value === 10)).toBe(true)
   expect(without.breakdown.some((row) => row.label === 'Attack speed increase'), 'no permanent 0 row').toBe(false)
+})
+
+test('trinket procs and on-use effects are ingested, and reach the stat totals', () => {
+  // The ingested catalogue carried an effect on NONE of its 4,505 items; only 14 hand-curated
+  // entries had one. Since not one TBC trinket is a pure stat stick, that priced the whole item
+  // class near zero everywhere calculateStats folds an effect in at its uptime -- including the
+  // always-visible stat rail, not just the hidden simulator.
+  const withEffect = allItems.filter((item) => item.effect)
+  expect(withEffect.length).toBeGreaterThan(40)
+
+  const trinkets = allItems.filter((item) => String(item.slot).startsWith('Trinket'))
+  expect(trinkets.filter((item) => item.effect).length, 'most catalogued trinkets should carry one').toBeGreaterThan(30)
+
+  // Every ingested effect must be usable by effectUptime: a real duration and a real rate.
+  for (const item of withEffect) {
+    const effect = item.effect!
+    if (effect.notModelled) continue
+    expect(['proc', 'onUse']).toContain(effect.kind)
+    expect(effect.durationSeconds, `${item.name} has no duration`).toBeGreaterThan(0)
+    expect(effect.cooldownSeconds, `${item.name} has no cooldown`).toBeGreaterThan(0)
+    expect(Object.keys(effect.statBonus).length, `${item.name} grants nothing`).toBeGreaterThan(0)
+  }
+
+  // Read off wowsims melee_trinkets.go rather than recalled: +278 AP for 20s on a 2 minute cooldown.
+  const brooch = getItemByWowItemId(29383)
+  expect(brooch?.name).toBe('Bloodlust Brooch')
+  expect(brooch?.effect).toEqual({
+    kind: 'onUse',
+    statBonus: { attackPower: 278, rangedAttackPower: 278 },
+    durationSeconds: 20,
+    cooldownSeconds: 120,
+  })
+
+  // And it actually lands in the totals, averaged by uptime rather than at face value.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const before = calculateStats(character, gear)
+  const after = calculateStats(character, { ...gear, 'Trinket 1': { item: brooch!, gemIds: [] } })
+
+  // 72 flat, plus 278 at a 20/120 uptime.
+  const expectedGain = 72 + 278 * (20 / 120)
+  expect(after.attackPower - before.attackPower).toBeCloseTo(expectedGain, 4)
+})
+
+test('effects that cannot be expressed as a stat bonus are left absent, not approximated', () => {
+  // 48 of the wowsims effects are damage procs, mana returns, mob-type conditionals or health-only
+  // buffs. StatBlock has no field for any of them, and the ingest reports and skips rather than
+  // inventing a stat bonus -- which is the failure mode this project keeps undoing.
+
+  // Hand of Justice is an extra-attack proc, not a stat buff.
+  expect(getItemByWowItemId(11815)?.effect, 'Hand of Justice grants an extra attack, not stats').toBeUndefined()
+  // Shadowmoon Insignia grants only Health, which StatBlock derives from Stamina and cannot hold.
+  expect(getItemByWowItemId(32501)?.effect).toBeUndefined()
+
+  // A curated effect still wins over an ingested one: those were read off real tooltips and several
+  // carry a notModelled explanation the ingest cannot produce.
+  const capacitor = allItems.find((item) => item.id === 'the-lightning-capacitor')
+  expect(capacitor?.effect?.notModelled, 'the curated explanation must survive the merge').toBeTruthy()
+  expect(capacitor?.effect?.statBonus).toEqual({})
 })

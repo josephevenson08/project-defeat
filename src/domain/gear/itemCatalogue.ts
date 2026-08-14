@@ -3,6 +3,7 @@
 // does not declare its type.
 import rawCatalogue from './itemCatalogue.json' with { type: 'json' }
 import rawSupplement from './itemSupplement.json' with { type: 'json' }
+import rawItemEffects from './itemEffects.json' with { type: 'json' }
 import type { CatalogueConflict, RawCatalogueItem } from './catalogueTypes'
 import type { TbcClass } from '../character/characterTypes'
 import type { GearSlot } from './gearSlots'
@@ -27,6 +28,31 @@ import { isItemCompatibleWithGearSlot } from './slotCompatibility'
  *
  * Reproduce the comparison with `node tools/ingest/reconcile-curated.mjs --check-wowhead`.
  */
+
+/**
+ * Trinket, weapon and meta-gem effects, ingested by `tools/ingest/ingest-item-effects.mjs`.
+ *
+ * Before these existed the ingested catalogue carried **no effect on any of its 4,505 items** — only
+ * the 14 hand-curated entries had one. Since not one trinket in TBC is a pure stat stick, that
+ * priced the entire item class at close to zero everywhere `calculateStats` folds an effect in at its
+ * uptime, including the always-visible stat rail.
+ *
+ * Applied as a *base* layer: a curated `effect` still wins, because those were read off real tooltips
+ * and several carry a `notModelled` explanation this ingest cannot produce.
+ */
+const ingestedEffectByWowItemId = new Map(
+  rawItemEffects.effects.map((entry) => [
+    entry.wowItemId,
+    {
+      // Cast at the boundary, as the other generated-JSON modules do: TypeScript widens the literal
+      // to `string` reading it from the file. The ingest only ever writes these two.
+      kind: entry.kind as 'proc' | 'onUse',
+      statBonus: entry.statBonus as GearItem['stats'],
+      durationSeconds: entry.durationSeconds,
+      cooldownSeconds: entry.cooldownSeconds,
+    } satisfies NonNullable<GearItem['effect']>,
+  ]),
+)
 
 /** Curated fields wowsims carries no data for. Everything mechanical comes from the ingested source. */
 const PROVENANCE_FIELDS = [
@@ -106,6 +132,11 @@ const consumedCurated = new Set<GearItem>()
 
 for (const raw of rawCatalogue.items) {
   const item = toGearItem(raw)
+  // Base layer, before the curated overlay below — `effect` is in PROVENANCE_FIELDS, so a curated
+  // one replaces this rather than merging with it.
+  const ingestedEffect = ingestedEffectByWowItemId.get(raw.wowItemId)
+  if (ingestedEffect) item.effect = ingestedEffect
+
   const curated = findCurated(raw)
 
   if (curated) {
@@ -142,6 +173,8 @@ const ingestedWowIds = new Set(merged.map((item) => item.wowItemId))
 for (const raw of rawSupplement.items) {
   if (ingestedWowIds.has(raw.wowItemId)) continue
   const item = toGearItem(raw as RawCatalogueItem)
+  const supplementEffect = ingestedEffectByWowItemId.get(raw.wowItemId)
+  if (supplementEffect) item.effect = supplementEffect
   if (raw.needsVerification) item.needsVerification = true
   if (usedIds.has(item.id)) item.id = `${item.id}-${item.wowItemId}`
   usedIds.add(item.id)

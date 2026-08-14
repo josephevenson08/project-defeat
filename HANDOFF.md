@@ -117,6 +117,7 @@ node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 5
 node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
+node tools/ingest/ingest-item-effects.mjs       # 49 trinket/weapon procs and on-use effects
 node tools/ingest/ingest-icons.mjs              # icon *names* for 4,741 items and gems
 node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/icons/ (1,238 files)
 ```
@@ -135,6 +136,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | Talents | none | **579** across all 9 classes, 27 trees |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
 | Icons | none, two-letter glyphs | **1,609 files** vendored, 2.8 MB — items, gems and talents |
+| Item effects | 14 curated, 0 ingested | **55 items**, 46 of 175 trinkets |
 
 ---
 
@@ -304,8 +306,29 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 ### 1. The simulation's own known gaps
 
 Now visible on the Simulation tab, so its limitations are visible too. Still open: healer HPS has
-**no mana constraint**, meta gem activation requirements are **never checked**, weapon and armour
-procs are unpopulated (schema exists, data does not), and rotations cover 2 specs of 27.
+**no mana constraint**, meta gem activation requirements are **never checked**, and rotations cover
+2 specs of 27.
+
+**Item effects are no longer one of them.** `tools/ingest/ingest-item-effects.mjs` reads
+`sim/common/*.go` from the pinned wowsims commit: **49 effects, 31 on-use and 18 procs**, taking the
+catalogue from **0 of 4,505 items** carrying one to 55 overall and **46 of 175 trinkets**. It matters
+outside the hidden simulator — `calculateStats` folds an effect in at `duration / cooldown`, so this
+moves the always-visible stat rail. Bloodlust Brooch went from 72 attack power to 118: 72 flat plus
+278 at a 20/120 uptime.
+
+Two things about that ingest worth keeping:
+
+- **It refuses what it cannot express.** 48 further effects are damage procs, mana returns, mob-type
+  conditionals, or grant only Health — which `StatBlock` derives from Stamina and has no field for.
+  Those are reported and skipped rather than given an invented stat bonus. Hand of Justice grants an
+  extra attack, not stats, and correctly has no effect at all.
+- **Procs without an internal cooldown use a procs-per-minute rate.** wowsims expresses some as
+  `NewPPMManager(1.0, …)`, meaning one proc a minute on average, so the mean gap is `60 / ppm`
+  seconds — which drops straight into `effectUptime`. That recovered Madness of the Betrayer and one
+  other that would otherwise have been dropped for having no ICD.
+- Curated effects still win over ingested ones. Those were read off real tooltips and several carry a
+  `notModelled` explanation this ingest cannot produce — The Lightning Capacitor's charge mechanic is
+  the clearest.
 
 **On the low melee DPS — the diagnosis has changed.** This was recorded as "rotation modelling is
 the acknowledged gap", but investigating it found the larger cause was an attack-table bug, now

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/itemCatalogue.ts
-lines: 212
+lines: 245
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemCatalogue
 
-`src/domain/gear/itemCatalogue.ts` · **domain** layer · 212 lines
+`src/domain/gear/itemCatalogue.ts` · **domain** layer · 245 lines
 
 From the top of the file:
 

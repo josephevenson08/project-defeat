@@ -1,0 +1,611 @@
+{
+  "$schema": "wowsims-tbc item effect ingestion",
+  "upstream": {
+    "repo": "wowsims/tbc",
+    "sha": "3301fca59306a747e521274c36e073e69acc7b77",
+    "paths": [
+      "sim/common/melee_trinkets.go",
+      "sim/common/caster_trinkets.go",
+      "sim/common/melee_items.go",
+      "sim/common/caster_items.go",
+      "sim/common/metagems.go"
+    ],
+    "license": "MIT",
+    "note": "Only effects expressible as \"these stats, for this long, on this cooldown\". Damage procs, mana returns and mob-type conditionals are skipped rather than approximated; see skippedCount."
+  },
+  "generatedBy": "tools/ingest/ingest-item-effects.mjs",
+  "effectCount": 49,
+  "skippedCount": 48,
+  "effects": [
+    {
+      "wowItemId": 22954,
+      "name": "Kiss of the Spider",
+      "kind": "onUse",
+      "statBonus": {
+        "hasteRating": 200
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 23041,
+      "name": "Slayer's Crest",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 260,
+        "rangedAttackPower": 260
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 23046,
+      "name": "Restrained Essence of Sapphiron",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 130
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 24126,
+      "name": "Living Ruby Serpent",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 150
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 300,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 24128,
+      "name": "Figurine Nightseye Panther",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 320,
+        "rangedAttackPower": 320
+      },
+      "durationSeconds": 12,
+      "cooldownSeconds": 180,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 25893,
+      "name": "Mystic Focus Proc",
+      "kind": "proc",
+      "statBonus": {
+        "spellHasteRating": 320
+      },
+      "durationSeconds": 4,
+      "cooldownSeconds": 35,
+      "trigger": "Mystic Focus Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/metagems.go"
+    },
+    {
+      "wowItemId": 27683,
+      "name": "Fungal Frenzy",
+      "kind": "proc",
+      "statBonus": {
+        "spellHasteRating": 320
+      },
+      "durationSeconds": 6,
+      "cooldownSeconds": 45,
+      "trigger": "Fungal Frenzy",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 27891,
+      "name": "Adamantine Figurine",
+      "kind": "onUse",
+      "statBonus": {
+        "armor": 1280
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28034,
+      "name": "Rage of the Unraveller",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 300,
+        "rangedAttackPower": 300
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 50,
+      "trigger": "Rage of the Unraveller",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28041,
+      "name": "Bladefists Breadth",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 200,
+        "rangedAttackPower": 200
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28121,
+      "name": "Icon of Unyielding Courage",
+      "kind": "onUse",
+      "statBonus": {
+        "armorPenetration": 600
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28288,
+      "name": "Abacus of Violent Odds",
+      "kind": "onUse",
+      "statBonus": {
+        "hasteRating": 260
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28418,
+      "name": "Call of the Nexus",
+      "kind": "proc",
+      "statBonus": {
+        "spellPower": 225
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 45,
+      "trigger": "Call of the Nexus",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 28484,
+      "name": "Bulwark of Kings",
+      "kind": "onUse",
+      "statBonus": {
+        "strength": 150
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 1800,
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 28485,
+      "name": "Bulwark of Ancient Kings",
+      "kind": "onUse",
+      "statBonus": {
+        "strength": 150
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 1800,
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 28528,
+      "name": "Moroes Lucky Pocket Watch",
+      "kind": "onUse",
+      "statBonus": {
+        "dodgeRating": 300
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 28602,
+      "name": "Power of Arcanagos",
+      "kind": "proc",
+      "statBonus": {
+        "spellPower": 130
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 50,
+      "trigger": "Power of Arcanagos",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_items.go"
+    },
+    {
+      "wowItemId": 28830,
+      "name": "Dragonspine Trophy Proc",
+      "kind": "proc",
+      "statBonus": {
+        "hasteRating": 325
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 20,
+      "trigger": "Dragonspine Trophy Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 29132,
+      "name": "Scryer's Bloodgem",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 150
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 90,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 29179,
+      "name": "Xiri's Gift",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 150
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 90,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 29297,
+      "name": "Band of the Eternal Defender Proc",
+      "kind": "proc",
+      "statBonus": {
+        "armor": 800
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 60,
+      "trigger": "Band of the Eternal Defender Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 29301,
+      "name": "Band of the Eternal Champion Proc",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 160,
+        "rangedAttackPower": 160
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 60,
+      "trigger": "Band of the Eternal Champion Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 29305,
+      "name": "Band of the Eternal Sage Proc",
+      "kind": "proc",
+      "statBonus": {
+        "spellPower": 95
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 60,
+      "trigger": "Band of the Eternal Sage Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_items.go"
+    },
+    {
+      "wowItemId": 29370,
+      "name": "Icon of the Silver Crescent",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 155
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 29376,
+      "name": "Essence of the Marytr",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 99
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 29383,
+      "name": "Bloodlust Brooch",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 278,
+        "rangedAttackPower": 278
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 29387,
+      "name": "Gnomeregan Auto-Blocker 600",
+      "kind": "onUse",
+      "statBonus": {
+        "blockValue": 200
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 29776,
+      "name": "Core of Arkelos",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 200,
+        "rangedAttackPower": 200
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 29962,
+      "name": "Heartrazor Proc",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 270,
+        "rangedAttackPower": 270
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 60,
+      "trigger": "Heartrazor Proc",
+      "rateBasis": "1 procs per minute",
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 30300,
+      "name": "Dabiris Enigma",
+      "kind": "onUse",
+      "statBonus": {
+        "blockRating": 125
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 90,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 30626,
+      "name": "Unstable Currents",
+      "kind": "proc",
+      "statBonus": {
+        "spellPower": 190
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 45,
+      "trigger": "Unstable Currents",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 30627,
+      "name": "Tsunami Talisman Proc",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 340,
+        "rangedAttackPower": 340
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 45,
+      "trigger": "Tsunami Talisman Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 30629,
+      "name": "Scarab of Displacement",
+      "kind": "onUse",
+      "statBonus": {
+        "defenseRating": 165,
+        "attackPower": -330,
+        "rangedAttackPower": -330
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 180,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 32410,
+      "name": "Thundering Skyfire Diamond Proc",
+      "kind": "proc",
+      "statBonus": {
+        "hasteRating": 240
+      },
+      "durationSeconds": 6,
+      "cooldownSeconds": 40,
+      "trigger": "Thundering Skyfire Diamond Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/metagems.go"
+    },
+    {
+      "wowItemId": 32483,
+      "name": "Skull of Gul'dan",
+      "kind": "onUse",
+      "statBonus": {
+        "spellHasteRating": 175
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 32505,
+      "name": "Madness of the Betrayer Proc",
+      "kind": "proc",
+      "statBonus": {
+        "armorPenetration": 300
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 60,
+      "trigger": "Madness of the Betrayer Proc",
+      "rateBasis": "1 procs per minute",
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 32658,
+      "name": "Badge of Tenacity",
+      "kind": "onUse",
+      "statBonus": {
+        "agility": 150
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 33829,
+      "name": "Hex Shrunken Head",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 211
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 33830,
+      "name": "Ancient Aqir Artifact",
+      "kind": "onUse",
+      "statBonus": {
+        "armor": 2500
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 33831,
+      "name": "Berserkers Call",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 360,
+        "rangedAttackPower": 360
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 34429,
+      "name": "Shifting Naaru Sliver",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 320
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 90,
+      "source": "sim/common/caster_trinkets.go"
+    },
+    {
+      "wowItemId": 34472,
+      "name": "Shard of Contempt Proc",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 230,
+        "rangedAttackPower": 230
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 45,
+      "trigger": "Shard of Contempt Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 34473,
+      "name": "Commendation of Kael'Thas Proc",
+      "kind": "proc",
+      "statBonus": {
+        "dodgeRating": 152
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 30,
+      "trigger": "Commendation of Kael'Thas Proc",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 34678,
+      "name": "Light's Wrath",
+      "kind": "proc",
+      "statBonus": {
+        "spellPower": 120
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 45,
+      "trigger": "Light's Wrath",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/caster_items.go"
+    },
+    {
+      "wowItemId": 34679,
+      "name": "Light's Strength",
+      "kind": "proc",
+      "statBonus": {
+        "attackPower": 200
+      },
+      "durationSeconds": 10,
+      "cooldownSeconds": 45,
+      "trigger": "Light's Strength",
+      "rateBasis": "internal cooldown",
+      "source": "sim/common/melee_items.go"
+    },
+    {
+      "wowItemId": 35702,
+      "name": "Figurine Shadowsong Panther",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 320,
+        "rangedAttackPower": 320
+      },
+      "durationSeconds": 15,
+      "cooldownSeconds": 90,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 38287,
+      "name": "Empty Direbrew Mug",
+      "kind": "onUse",
+      "statBonus": {
+        "attackPower": 278,
+        "rangedAttackPower": 278
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 38289,
+      "name": "Coren's Lucky Coin",
+      "kind": "onUse",
+      "statBonus": {
+        "blockValue": 200
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/melee_trinkets.go"
+    },
+    {
+      "wowItemId": 38290,
+      "name": "Dark Iron Smoking Pipe",
+      "kind": "onUse",
+      "statBonus": {
+        "spellPower": 155
+      },
+      "durationSeconds": 20,
+      "cooldownSeconds": 120,
+      "source": "sim/common/caster_trinkets.go"
+    }
+  ]
+}
