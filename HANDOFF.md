@@ -10,8 +10,8 @@ it exposed; melee haste; trinket and weapon effects; the healer mana constraint;
 activation. §1 and §2b carry the findings that cost the most to learn.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`773a8eb`** plus the talent-scaling scope commit,
-everything pushed.
+`josephevenson08/project-defeat`, currently at **`773a8eb`** plus the talent-scaling scope and
+branch-cleanup commits that follow it; everything pushed.
 
 ---
 
@@ -653,11 +653,23 @@ with a falsification test stated up front. One product decision is open and gate
 talents reach `calculateStats` and therefore the always-visible stat rail, or only the hidden
 simulator.
 
-**Two chores.** 19 stale git branches want deleting — `git branch --merged main` covers 18 of them,
-and `worktree-agent-afb0a902111f3a642` needs `-D` (its contents are superseded; checked). And CI
-warns that `actions/checkout@v4`, `configure-pages@v5`, `setup-node@v4` and `upload-artifact@v4`
-target the deprecated Node 20.
+**One chore done, one still open.** The 19 stale local branches are **deleted** (2026-08-15): 18 via
+`git branch -d --merged main`, and `worktree-agent-afb0a902111f3a642` via `-D` after checking that
+every file it added is already present in `main` — the raids rebuild superseded it. **Ten of those
+branches still exist on `origin`, and were deliberately left**, because this repo is public and
+deleting a published branch is a decision rather than a cleanup. `git worktree list` also still shows
+a stale worktree at `.claude/worktrees/lucid-cartwright-9d8b8c`, detached at `68aae34` — reachable
+from `main`, so its work is merged and the checkout is only costing OneDrive space.
 
-**Known-wrong data still standing:** 124 of 230 curated items in `sampleItems.ts` carry
+**Still open: CI targets the deprecated Node 20.** `deploy.yml` uses `actions/checkout@v4`,
+`actions/setup-node@v4`, `actions/configure-pages@v5`, `actions/upload-pages-artifact@v3` and
+`actions/deploy-pages@v4`. An earlier version of this note named `upload-artifact@v4`, which this
+workflow does not use, and omitted `deploy-pages@v4` entirely — so check the file, not the note.
+
+**Known-wrong data still standing:** **123** of 230 curated items in `sampleItems.ts` carry
 `needsVerification`, and 39 raid loot entries name items the catalogue does not hold — those last are
 mounts, enchant formulas and tier tokens, which are correctly absent rather than missing.
+
+**Count that one at the right indent.** A bare grep for `needsVerification: true` in `sampleItems.ts`
+returns **163**, not 123 — the other 40 sit on nested sub-objects, not on the item itself. Anchor the
+pattern to the item's own indentation (`^    needsVerification`) or the figure comes out a third high.
