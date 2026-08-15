@@ -10,7 +10,8 @@ it exposed; melee haste; trinket and weapon effects; the healer mana constraint;
 activation. §1 and §2b carry the findings that cost the most to learn.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`a8aae30`**, everything pushed.
+`josephevenson08/project-defeat`, currently at **`773a8eb`** plus the talent-scaling scope commit,
+everything pushed.
 
 ---
 
@@ -402,7 +403,7 @@ Unbridled Wrath, damage taken, and Flurry**.
 catalogued items carry melee haste and **none at Phase 2 raid item level**, which is faithful to TBC
 rather than a data gap: the expansion put almost no haste rating on early gear. So modelling it moved
 no current number. The rage shortfall is therefore gated on **talent scaling**, not gear: Flurry's
-30% attack speed after a crit is where a Fury warrior's real swing rate comes from, and talents reach
+25% attack speed after a crit is where a Fury warrior's real swing rate comes from, and talents reach
 the simulation nowhere at all.
 
 Two design decisions in there worth not re-litigating:
@@ -640,11 +641,17 @@ extracts effects for **Mystical Skyfire Diamond (25893)** and **Thundering Skyfi
 (damage procs, mana returns, health-only buffs) and the ingest reports each one — worth reading
 before assuming an item has no effect.
 
-**The biggest remaining accuracy item is talent scaling.** It gates rage income (Flurry's 30% attack
+**The biggest remaining accuracy item is talent scaling.** It gates rage income (Flurry's 25% attack
 speed after a crit is where a Fury warrior's swing rate really comes from), and it is what keeps
 melee DPS low. The talent *data* is already ingested for all nine classes — but as **prose**
 (`rankDescriptions`), not machine-readable effects, so this needs an extraction or authoring step
-first. Scope it before writing code.
+first. **Now scoped — `TALENT-SCALING-SCOPE.md`**, which corrects the framing in this paragraph:
+talent *effects* are machine-readable in wowsims at the already-pinned `3301fca5` (all nine classes;
+four warrior files are already in the ingest cache), so this is an ingest like item effects, not a
+prose-extraction job. The recommendation is one spec — Fury Warrior, character-global talents only —
+with a falsification test stated up front. One product decision is open and gates the size: whether
+talents reach `calculateStats` and therefore the always-visible stat rail, or only the hidden
+simulator.
 
 **Two chores.** 19 stale git branches want deleting — `git branch --merged main` covers 18 of them,
 and `worktree-agent-afb0a902111f3a642` needs `-D` (its contents are superseded; checked). And CI
