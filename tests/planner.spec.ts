@@ -302,6 +302,7 @@ import {
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
+import { computeManaBudget, manaFromIntellect, mp5RegenPerSecond, spiritRegenPerSecond } from '../src/domain/simulation/manaModel'
 import { EMPTY_OFF_HAND, isEmptySlotItem } from '../src/domain/gear/slotCompatibility'
 import { applyWeaponSlotRules } from '../src/domain/gear/characterItemRules'
 
@@ -3177,4 +3178,53 @@ test('effects that cannot be expressed as a stat bonus are left absent, not appr
   const capacitor = allItems.find((item) => item.id === 'the-lightning-capacitor')
   expect(capacitor?.effect?.notModelled, 'the curated explanation must survive the merge').toBeTruthy()
   expect(capacitor?.effect?.statBonus).toEqual({})
+})
+
+test('mana regen follows the sourced formulas, and Spirit is worth nothing mid-cast', () => {
+  // Read off wowsims sim/core/mana.go at the pinned commit rather than recalled.
+  expect(mp5RegenPerSecond(100)).toBeCloseTo(20, 10)
+  expect(spiritRegenPerSecond(300, 400)).toBeCloseTo(0.001 + 300 * Math.sqrt(400) * 0.009327, 10)
+  // Above the first 20 points each Intellect is 15 mana: intellect*15 + (20 - 15*20).
+  expect(manaFromIntellect(400)).toBe(400 * 15 - 280)
+
+  // The load-bearing detail: wowsims adds Spirit regen while casting only when
+  // SpiritRegenRateCasting is non-zero, and that comes from talents this project does not model. So
+  // an untalented healer mid-cast regenerates from MP5 alone, and Spirit prices near zero.
+  const budget = computeManaBudget({ manaCostPerCast: 840, castsPerSecond: 0.4, healPerCast: 3600, mp5: 100 })
+  expect(budget.regenPerSecond, 'MP5 only — no Spirit term while casting').toBeCloseTo(20, 10)
+  expect(budget.spentPerSecond).toBeCloseTo(336, 10)
+  expect(budget.deficitPerSecond).toBeCloseTo(316, 10)
+  expect(budget.sustainableFraction).toBeCloseTo(20 / 336, 10)
+  expect(budget.healingPerMana).toBeCloseTo(3600 / 840, 10)
+
+  // A rate regen can cover reports no deficit and never exceeds 100% sustainable.
+  const cheap = computeManaBudget({ manaCostPerCast: 10, castsPerSecond: 0.4, healPerCast: 100, mp5: 100 })
+  expect(cheap.deficitPerSecond).toBe(0)
+  expect(cheap.sustainableFraction).toBe(1)
+})
+
+test('the healing estimate states its mana cost instead of assuming mana is free', () => {
+  // "Healer HPS has no mana constraint" is one of the three reasons the Simulation tab is hidden.
+  // The deficit is reported rather than used to throttle the headline: a healer who casts flat out
+  // until empty and one who paces to the sustainable rate are both real, so replacing one wrong
+  // number with a differently wrong one would not be progress.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Paladin', spec: 'Holy' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Paladin', 'Holy')
+  const stats = calculateStats(character, gear)
+  const result = calculateSimulation(character, gear, stats, 'Healer')
+
+  const row = (label: string) => result.breakdown.find((entry) => entry.label === label)?.value
+  // Holy Light is 840 mana on a 2.5s cast, so 0.4 casts/sec spends 336.
+  expect(row('Mana per second spent')).toBeCloseTo(840 * (1 / 2.5), 1)
+  expect(row('Mana per second regained')).toBeCloseTo(stats.mp5 / 5, 1)
+  expect(row('Healing per point of mana')).toBeGreaterThan(0)
+  expect(row('Share of this rate regen can fund')).toBeGreaterThan(0)
+
+  expect(result.summary).toContain('not sustainable')
+  // The two caveats that stop the number being read as more than it is.
+  expect(result.summary, 'Spirit being talent-gated is why it prices at zero').toMatch(/Spirit/)
+  expect(result.summary, 'no time-to-empty, because class base mana is not in the pinned source').toMatch(/mana pool/)
+
+  // The headline is untouched — still the unconstrained rate, now stated as such.
+  expect(result.scoreExact).toBeGreaterThan(0)
 })

@@ -20,6 +20,7 @@ import {
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
 import { rageDumpUsesPerSecond, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
+import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
   CRUSHING_BLOW_CHANCE,
@@ -636,8 +637,35 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
     { label: 'MP5', value: stats.mp5 },
   ]
 
+  /*
+   * The mana term. This estimate used to have none at all — a healer casting forever — which is the
+   * single largest reason the Simulation tab is hidden.
+   *
+   * The deficit is reported rather than used to throttle the headline. Both a healer who casts flat
+   * out until empty and one who paces to the sustainable rate are real, and picking one silently
+   * would replace an overstated number with a differently wrong one. What was actually missing was
+   * any statement that the rate costs more than it earns, and by how much.
+   */
+  const manaCost = cast.ability?.resource?.type === 'Mana' ? cast.ability.resource.cost : 0
+  const mana = manaCost > 0 ? computeManaBudget({ manaCostPerCast: manaCost, castsPerSecond, healPerCast: expectedHealPerCast, mp5: stats.mp5 }) : undefined
+
+  if (mana) {
+    breakdown.push(
+      { label: 'Mana per second spent', value: round(mana.spentPerSecond) },
+      { label: 'Mana per second regained', value: round(mana.regenPerSecond) },
+      { label: 'Healing per point of mana', value: round(mana.healingPerMana) },
+      { label: 'Share of this rate regen can fund', value: toPercent(mana.sustainableFraction) },
+    )
+  }
+
+  const manaNote = mana
+    ? mana.deficitPerSecond > 0
+      ? ` **This rate is not sustainable.** ${cast.label} costs ${manaCost} mana and at ${round(castsPerSecond)} casts/sec that is ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained — a shortfall of ${round(mana.deficitPerSecond)}/sec, so regen alone funds ${toPercent(mana.sustainableFraction)}% of it. Note that while casting, an untalented healer regenerates from MP5 only: Spirit's contribution is gated behind Meditation and its equivalents, which are not modelled, so Spirit prices near zero here. How long you last before running dry is deliberately not given — that needs a mana pool, and class base mana is not in the pinned source.`
+      : ` At ${round(castsPerSecond)} casts/sec this costs ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained, so it is sustainable indefinitely.`
+    : ' Mana is not modelled for this spec — its signature ability records no mana cost.'
+
   const summary = cast.ability
-    ? `Heal crit/haste estimate modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base healing, and ${cast.coefficient} healing coefficient. Single-ability approximation — no downranking, HoT overlap, or triage decisions.`
+    ? `Heal crit/haste estimate modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base healing, and ${cast.coefficient} healing coefficient. Single-ability approximation — no downranking, HoT overlap, or triage decisions.${manaNote}`
     : `Heal crit/haste estimate assuming a ${cast.label}. Scales from healing power only — this spec has no modeled signature cast.`
 
   return {
