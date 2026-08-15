@@ -10,7 +10,7 @@ it exposed; melee haste; trinket and weapon effects; the healer mana constraint;
 activation. §1 and §2b carry the findings that cost the most to learn.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`a071bae`**, everything pushed.
+`josephevenson08/project-defeat`, currently at **`a8aae30`**, everything pushed.
 
 ---
 
