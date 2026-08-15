@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gems/sampleGems.ts
-lines: 52
+lines: 72
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gems.sampleGems
 
-`src/domain/gems/sampleGems.ts` · **domain** layer · 52 lines
+`src/domain/gems/sampleGems.ts` · **domain** layer · 72 lines
 
 From the top of the file:
 

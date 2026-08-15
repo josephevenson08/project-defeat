@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gems/gemTypes.ts
-lines: 54
+lines: 99
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gems.gemTypes
 
-`src/domain/gems/gemTypes.ts` · **domain** layer · 54 lines
+`src/domain/gems/gemTypes.ts` · **domain** layer · 99 lines
 
 From the top of the file:
 
@@ -22,9 +22,9 @@ From the top of the file:
 
 ## Exports
 
-**function** — `gemFitsSocket`, `socketColorsForGem`
+**function** — `countGemColors`, `gemFitsSocket`, `metaGemIsActive`, `socketColorsForGem`
 
-**type** — `Gem`, `GemColor`
+**type** — `Gem`, `GemColor`, `MetaGemRequirement`
 
 ## Imports
 
@@ -34,6 +34,8 @@ From the top of the file:
 ## Imported by
 
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
+- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 

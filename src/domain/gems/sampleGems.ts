@@ -1,4 +1,5 @@
 import rawGems from './gemCatalogue.json' with { type: 'json' }
+import rawMetaRequirements from './metaGemRequirements.json' with { type: 'json' }
 import type { SocketColor } from '../gear/itemTypes'
 import type { Gem } from './gemTypes'
 import { gemFitsSocket } from './gemTypes'
@@ -9,7 +10,26 @@ import { gemFitsSocket } from './gemTypes'
  * This was 11 hand-written gems against 4,528 items, which made every socket dropdown in the app
  * offer the same dozen options regardless of colour. It is now the full 212.
  */
-export const sampleGems: readonly Gem[] = rawGems.gems as Gem[]
+/**
+ * Meta activation conditions, layered on by wowItemId.
+ *
+ * Kept as a separate ingest rather than folded into the gem catalogue because they come from a
+ * different source: wowsims models what a meta gem *does* and leaves the condition to the player, so
+ * these are read off each gem's own Wowhead tooltip instead.
+ */
+const metaRequirementByWowItemId = new Map(
+  rawMetaRequirements.requirements.map((entry) => [
+    entry.wowItemId,
+    (entry.kind === 'moreThan'
+      ? { kind: 'moreThan', moreColor: entry.moreColor, thanColor: entry.thanColor, text: entry.text }
+      : { kind: 'minimums', minimums: entry.minimums, text: entry.text }) as NonNullable<Gem['metaRequirement']>,
+  ]),
+)
+
+export const sampleGems: readonly Gem[] = (rawGems.gems as Gem[]).map((gem) => {
+  const metaRequirement = gem.wowItemId === undefined ? undefined : metaRequirementByWowItemId.get(gem.wowItemId)
+  return metaRequirement ? { ...gem, metaRequirement } : gem
+})
 
 const byId = new Map(sampleGems.map((gem) => [gem.id, gem]))
 

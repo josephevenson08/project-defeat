@@ -7,6 +7,7 @@ import { getConsumableById } from '../../domain/consumables/sampleConsumables'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { deriveItemArmor } from '../../domain/gear/armorValues'
 import { getGemById, socketBonusIsActive } from '../../domain/gems/sampleGems'
+import { metaGemIsActive } from '../../domain/gems/gemTypes'
 import { effectUptime } from '../../domain/simulation/combatConstants'
 import { addStats, applyStatMultipliers, scaleStats } from '../../domain/stats/statUtils'
 import { type StatBlock } from './statsTypes'
@@ -25,6 +26,16 @@ export function calculateStats(
 ): StatBlock {
   const classDefinition = getClassDefinition(character.className)
   let total: StatBlock = { ...classDefinition.baseStats }
+
+  /*
+   * Every gem equipped, gathered before anything is summed, because a meta gem's condition is about
+   * the *whole set* rather than its own item — "requires at least 2 Red gems" counts red gems in
+   * every socket you have. Nothing checked this before, so a meta's stats applied the moment it was
+   * socketed whether or not the player had actually met the condition.
+   */
+  const socketedGems = Object.values(gear).flatMap((slot) =>
+    slot.gemIds.map((gemId) => getGemById(gemId)).filter((gem): gem is NonNullable<typeof gem> => gem !== undefined),
+  )
 
   Object.values(gear).forEach((slot) => {
     total = addStats(total, slot.item.stats)
@@ -47,7 +58,10 @@ export function calculateStats(
 
     slot.gemIds.forEach((gemId) => {
       const gem = getGemById(gemId)
-      if (gem) total = addStats(total, gem.stats)
+      if (!gem) return
+      // A meta gem whose colour condition is unmet grants nothing at all — not a reduced amount.
+      if (gem.color === 'Meta' && !metaGemIsActive(gem, socketedGems)) return
+      total = addStats(total, gem.stats)
     })
 
     if (socketBonusIsActive(slot.item.sockets, slot.gemIds)) {

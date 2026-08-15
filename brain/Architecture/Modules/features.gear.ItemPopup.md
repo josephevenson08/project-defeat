@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/ItemPopup.tsx
-lines: 341
+lines: 363
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.ItemPopup
 
-`src/features/gear/ItemPopup.tsx` · **features** layer · 341 lines
+`src/features/gear/ItemPopup.tsx` · **features** layer · 363 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
+- [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`

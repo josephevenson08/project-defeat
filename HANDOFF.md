@@ -118,6 +118,7 @@ node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalog
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
 node tools/ingest/ingest-item-effects.mjs       # 49 trinket/weapon procs and on-use effects
+node tools/ingest/ingest-meta-gems.mjs          # colour conditions for all 18 meta gems
 node tools/ingest/ingest-icons.mjs              # icon *names* for 4,741 items and gems
 node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/icons/ (1,238 files)
 ```
@@ -305,9 +306,39 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 
 ### 1. The simulation's own known gaps
 
-Now visible on the Simulation tab, so its limitations are visible too. Still open: healer HPS has
-**no mana constraint**, meta gem activation requirements are **never checked**, and rotations cover
-2 specs of 27.
+Now visible on the Simulation tab, so its limitations are visible too. Still open: rotations cover
+2 specs of 27, and there is no multi-iteration variance or result charting.
+
+**All three of the reasons `featureFlags.ts` gives for hiding the tab have now been addressed** —
+rage, item procs and the healer mana constraint. The flag's own wording is stale as a result; it
+still says "rage is not modelled at all". Whether the numbers are now defensible enough to show is a
+judgement, not a blocker, and it has not been taken.
+
+**The healer mana term** is `domain/simulation/manaModel.ts`, from wowsims `sim/core/mana.go`:
+`MP5/5` per second, Spirit regen as `0.001 + Spirit*sqrt(Intellect)*0.009327`, and `Intellect*15-280`
+of maximum mana. The load-bearing detail is that wowsims adds Spirit regen **while casting** only
+when `SpiritRegenRateCasting` is non-zero, and that comes from talents — so untalented, **MP5 is the
+entire regen mid-cast and Spirit prices at zero**. Real TBC, not a shortcut.
+
+The deficit is *reported*, not used to throttle the headline: a healer who casts flat out until empty
+and one who paces to the sustainable rate are both real, so picking one silently would swap an
+overstated number for a differently wrong one. A Holy Paladin reads 336 mana/sec spent against 6.8
+regained. **No time-to-empty is offered** — that needs a mana pool, and class base mana is not in the
+wowsims tree at this commit (only `racials.go` is), so `manaFromIntellect` exists and is tested but
+nothing divides by it.
+
+**Meta gem activation** is checked now. All 18 TBC meta gems carry a colour condition, read from each
+gem's own Wowhead tooltip by `tools/ingest/ingest-meta-gems.mjs`; wowsims models what a meta *does*
+and leaves the condition to the player, so it is no use here. Two shapes: minimum counts per colour,
+and "more X than Y". Hybrids count toward **both** their colours, meta gems count toward none, and an
+unmet meta grants **nothing** rather than a reduced amount. The panel says so in `--warn` amber —
+this project has already been bitten once by a gem check failing silently, and a meta failing because
+of gems in *other items* is worse again.
+
+**One trap in that ingest:** these Wowhead pages carry user comments, and item 25890's comments
+restate the requirements. A loose search of the page text finds player-written text and treats it as
+authoritative — only the `g_items[<id>].tooltip_enus` assignment is the item itself. Note it is an
+*assignment*, not a JSON key, which is what defeats the obvious `"tooltip_enus":` regex.
 
 **Item effects are no longer one of them.** `tools/ingest/ingest-item-effects.mjs` reads
 `sim/common/*.go` from the pinned wowsims commit: **49 effects, 31 on-use and 18 procs**, taking the

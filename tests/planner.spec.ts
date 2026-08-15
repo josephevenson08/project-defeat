@@ -279,6 +279,7 @@ async function withSlotOpen(page: Page, slot: string, assertions: () => Promise<
   await closeSlot(page)
 }
 import { getGemById, sampleGems, socketBonusIsActive } from '../src/domain/gems/sampleGems'
+import { countGemColors, metaGemIsActive } from '../src/domain/gems/gemTypes'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
@@ -3227,4 +3228,71 @@ test('the healing estimate states its mana cost instead of assuming mana is free
 
   // The headline is untouched — still the unconstrained rate, now stated as such.
   expect(result.scoreExact).toBeGreaterThan(0)
+})
+
+test('a meta gem grants nothing until its colour condition is met', () => {
+  // Nothing checked this before: a meta's stats applied the moment it was socketed, whether or not
+  // the player had the gems it demands. It is the one gem rule a player can actually get wrong.
+  const metas = sampleGems.filter((gem) => gem.color === 'Meta')
+  expect(metas).toHaveLength(18)
+  expect(metas.every((gem) => gem.metaRequirement), 'every TBC meta gem has a colour condition').toBe(true)
+
+  const red = sampleGems.find((gem) => gem.color === 'Red')!
+  const yellow = sampleGems.find((gem) => gem.color === 'Yellow')!
+  const blue = sampleGems.find((gem) => gem.color === 'Blue')!
+  const orange = sampleGems.find((gem) => gem.color === 'Orange')!
+
+  // A hybrid counts toward BOTH its colours at once, which is the whole reason to socket one.
+  expect(countGemColors([orange, orange])).toEqual({ Red: 2, Yellow: 2, Blue: 0, Meta: 0 })
+  // Meta gems never count toward a colour requirement, including their own.
+  expect(countGemColors(metas)).toEqual({ Red: 0, Yellow: 0, Blue: 0, Meta: 0 })
+
+  // Read off the gem's own Wowhead tooltip: 2 of each colour.
+  const relentless = metas.find((gem) => gem.name === 'Relentless Earthstorm Diamond')!
+  expect(relentless.metaRequirement?.kind).toBe('minimums')
+  expect(metaGemIsActive(relentless, [])).toBe(false)
+  expect(metaGemIsActive(relentless, [red, red, yellow, yellow, blue])).toBe(false)
+  expect(metaGemIsActive(relentless, [red, red, yellow, yellow, blue, blue])).toBe(true)
+  // Three Orange gems satisfy the red and yellow halves but not the blue one.
+  expect(metaGemIsActive(relentless, [orange, orange, orange])).toBe(false)
+
+  // The comparison shape, which is the other thing tooltips say.
+  const comparison = metas.find((gem) => gem.metaRequirement?.kind === 'moreThan')!
+  expect(comparison.metaRequirement?.text).toMatch(/more .* than/i)
+})
+
+test('an unmet meta gem reaches no stat total, and the panel says why', async ({ page }) => {
+  // Domain first: the stats must actually be withheld.
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+
+  const meta = sampleGems.find((gem) => gem.color === 'Meta' && (gem.stats.critRating ?? 0) > 0)!
+
+  // The default set has no Meta socket, so one has to be equipped first — Destroyer Battle-Helm is
+  // a real Fury Warrior head with Meta + Blue.
+  const helm = getItemById('destroyer-battle-helm')!
+  expect(helm.sockets).toContain('Meta')
+  const withHelm = { ...gear, Head: { item: helm, gemIds: helm.sockets!.map(() => '') } }
+
+  // Socket the meta on its own — nothing else gemmed, so no condition can be satisfied.
+  const withLoneMeta = {
+    ...withHelm,
+    Head: { item: helm, gemIds: helm.sockets!.map((socket) => (socket === 'Meta' ? meta.id : '')) },
+  }
+
+  const bare = calculateStats(character, withHelm)
+  const withMeta = calculateStats(character, withLoneMeta)
+  expect(withMeta.critRating, 'an unmet meta must contribute nothing at all').toBe(bare.critRating)
+  expect(metaGemIsActive(meta, [])).toBe(false)
+
+  // And the panel has to say so. A meta failing because of gems in OTHER items is close to
+  // impossible to work out from a stat total that simply reads lower than expected -- this project
+  // has already been bitten once by a gem check that failed silently.
+  await openApp(page)
+  await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
+  await selectSlotGem(page, 'Head', 'Meta', meta.id)
+  await withSlotOpen(page, 'Head', async () => {
+    await expect(page.getByText(/Inactive —/)).toBeVisible()
+    await expect(page.getByText(/grants nothing until it is/)).toBeVisible()
+  })
 })

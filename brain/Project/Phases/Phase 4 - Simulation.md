@@ -23,6 +23,8 @@ Real TBC attack-table and spell-table mechanics, plus per-spec signature abiliti
 - Rage income from auto attacks, implementing the wowsims formula, with swing-replacing abilities netting off both the damage and the rage of the swing they displace
 - Melee and ranged haste: white damage and rage income both scale with attack speed (no Phase 2 item carries any, so it changes nothing today)
 - Trinket and weapon effects: 49 procs and on-use buttons ingested from wowsims, folded into the stat totals at their uptime
+- Healer mana: spend against MP5 regen, with the deficit reported rather than used to throttle the headline
+- Meta gem activation: all 18 colour conditions ingested, an unmet meta grants nothing, and the panel says why
 
 ## Remaining
 
@@ -30,6 +32,7 @@ Real TBC attack-table and spell-table mechanics, plus per-spec signature abiliti
 - Rage income beyond auto attacks: Bloodrage, Unbridled Wrath and damage taken are all unmodelled, so no rage dump can be afforded
 - Multi-ability rotation priority and cooldown usage
 - Effects StatBlock cannot express: damage procs, mana returns and health-only buffs are skipped rather than approximated (48 of them)
+- Time to out of mana — needs a mana pool, and class base mana is not in the pinned wowsims source
 - Multi-iteration variance
 - Result charts
 

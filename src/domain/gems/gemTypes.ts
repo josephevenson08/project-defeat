@@ -11,6 +11,17 @@ import type { StatBlock } from '../stats/statTypes'
  */
 export type GemColor = SocketColor | 'Orange' | 'Purple' | 'Green' | 'Prismatic'
 
+/**
+ * The colour condition a meta gem needs before it does anything at all.
+ *
+ * Every TBC meta gem has one, and it is the single gem rule a player can actually get wrong — socket
+ * a Relentless Earthstorm Diamond without enough red gems elsewhere and it contributes nothing.
+ * Ingested from each gem's own Wowhead tooltip by `tools/ingest/ingest-meta-gems.mjs`.
+ */
+export type MetaGemRequirement =
+  | { kind: 'minimums'; minimums: readonly { color: SocketColor; count: number }[]; text: string }
+  | { kind: 'moreThan'; moreColor: SocketColor; thanColor: SocketColor; text: string }
+
 export type Gem = {
   id: string
   wowItemId?: number
@@ -20,6 +31,8 @@ export type Gem = {
   stats: Partial<StatBlock>
   phase?: number
   uniqueEquipped?: boolean
+  /** Present on meta gems only. Absent means no condition was found, not that there is none. */
+  metaRequirement?: MetaGemRequirement
   /** Resistances and spell penetration, which `StatBlock` has no fields for. Carried, not surfaced. */
   extraStats?: Record<string, number>
 }
@@ -50,4 +63,36 @@ export function gemFitsSocket(gem: Gem, socket: SocketColor) {
 /** The socket colours a gem colour counts as. Exposed for display, not just filtering. */
 export function socketColorsForGem(color: GemColor): readonly SocketColor[] {
   return SOCKETS_BY_GEM_COLOR[color]
+}
+
+/**
+ * How many gems of each colour a set of socketed gems counts as, for a meta gem's condition.
+ *
+ * A hybrid counts toward **both** of its colours — an Orange gem satisfies a red requirement and a
+ * yellow one simultaneously, which is exactly why hybrids are worth socketing. Meta gems themselves
+ * never count toward a colour requirement.
+ */
+export function countGemColors(gems: readonly Gem[]): Record<SocketColor, number> {
+  const counts: Record<SocketColor, number> = { Red: 0, Yellow: 0, Blue: 0, Meta: 0 }
+  for (const gem of gems) {
+    if (gem.color === 'Meta') continue
+    for (const color of socketColorsForGem(gem.color)) counts[color] += 1
+  }
+  return counts
+}
+
+/**
+ * Whether a meta gem's condition is met by the rest of the gems equipped.
+ *
+ * A meta with no recorded requirement is treated as active. That is the honest default: absence here
+ * means the ingest found no condition on the tooltip, not that the gem has none, and denying stats
+ * on missing data would invent a penalty.
+ */
+export function metaGemIsActive(gem: Gem, socketedGems: readonly Gem[]): boolean {
+  const requirement = gem.metaRequirement
+  if (!requirement) return true
+
+  const counts = countGemColors(socketedGems)
+  if (requirement.kind === 'moreThan') return counts[requirement.moreColor] > counts[requirement.thanColor]
+  return requirement.minimums.every((minimum) => counts[minimum.color] >= minimum.count)
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
+import { metaGemIsActive } from '../../domain/gems/gemTypes'
 import { describeStats } from '../../domain/stats/describeStats'
 import { getBisListForSpec } from '../../domain/bis'
 import { getPairedGearSlots, twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
@@ -62,6 +63,15 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
    * again the moment a two-hander is in the main hand, so every pick would silently revert.
    */
   const offHandBlockedByTwoHander = slot === 'Off Hand' && twoHanderOccupiesOffHand(gear['Main Hand']?.item)
+
+  /** Every gem across the whole set — a meta's condition counts gems in other items, not this one. */
+  const allSocketedGems = useMemo(
+    () =>
+      Object.values(gear)
+        .flatMap((equipped) => equipped.gemIds.map((gemId) => getGemById(gemId)))
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined),
+    [gear],
+  )
 
   const allOptions = useMemo(
     () =>
@@ -253,6 +263,18 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
                                     .join(', ')} — not counted in your totals`
                                 : 'No stats this app models')}
                           </span>
+                          {/*
+                            An unmet meta condition, said out loud. This project has already been
+                            bitten once by a gem check that failed silently — a hybrid in a matching
+                            socket losing its socket bonus with no explanation — and a meta gem
+                            contributing nothing because of gems in *other* items is even harder to
+                            work out from a stat total that simply reads lower than expected.
+                          */}
+                          {gem.color === 'Meta' && !metaGemIsActive(gem, allSocketedGems) ? (
+                            <span className="gem-chip-inactive" data-testid={`gem-meta-inactive-${slot}-${index}`}>
+                              Inactive — {gem.metaRequirement?.text ?? 'its colour condition is not met'}. It grants nothing until it is.
+                            </span>
+                          ) : null}
                         </span>
                       </div>
                     ) : (

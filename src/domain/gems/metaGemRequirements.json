@@ -1,0 +1,287 @@
+{
+  "$schema": "wowhead tbc meta gem activation requirements",
+  "upstream": {
+    "site": "wowhead.com",
+    "note": "Read from g_items[<id>].tooltip_enus on each item page. Deliberately not from the page text at large — these pages carry user comments restating the requirements, which are not authoritative."
+  },
+  "generatedBy": "tools/ingest/ingest-meta-gems.mjs",
+  "metaGemCount": 18,
+  "requirementCount": 18,
+  "unconditionalCount": 0,
+  "requirements": [
+    {
+      "wowItemId": 25890,
+      "gemId": "destructive-skyfire-diamond",
+      "name": "Destructive Skyfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 2
+        },
+        {
+          "color": "Blue",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Red gems; Requires at least 2 Blue gems; Requires at least 2 Yellow gems"
+    },
+    {
+      "wowItemId": 25893,
+      "gemId": "mystical-skyfire-diamond",
+      "name": "Mystical Skyfire Diamond",
+      "kind": "moreThan",
+      "moreColor": "Blue",
+      "thanColor": "Yellow",
+      "text": "Requires more Blue gems than Yellow gems"
+    },
+    {
+      "wowItemId": 25894,
+      "gemId": "swift-skyfire-diamond",
+      "name": "Swift Skyfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Red",
+          "count": 1
+        }
+      ],
+      "text": "Requires at least 2 Yellow gems; Requires at least 1 Red gems"
+    },
+    {
+      "wowItemId": 25895,
+      "gemId": "enigmatic-skyfire-diamond",
+      "name": "Enigmatic Skyfire Diamond",
+      "kind": "moreThan",
+      "moreColor": "Red",
+      "thanColor": "Yellow",
+      "text": "Requires more Red gems than Yellow gems"
+    },
+    {
+      "wowItemId": 25896,
+      "gemId": "powerful-earthstorm-diamond",
+      "name": "Powerful Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Blue",
+          "count": 3
+        }
+      ],
+      "text": "Requires at least 3 Blue gems"
+    },
+    {
+      "wowItemId": 25897,
+      "gemId": "bracing-earthstorm-diamond",
+      "name": "Bracing Earthstorm Diamond",
+      "kind": "moreThan",
+      "moreColor": "Red",
+      "thanColor": "Blue",
+      "text": "Requires more Red gems than Blue gems"
+    },
+    {
+      "wowItemId": 25898,
+      "gemId": "tenacious-earthstorm-diamond",
+      "name": "Tenacious Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Blue",
+          "count": 5
+        }
+      ],
+      "text": "Requires at least 5 Blue gems"
+    },
+    {
+      "wowItemId": 25899,
+      "gemId": "brutal-earthstorm-diamond",
+      "name": "Brutal Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Blue",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Red gems; Requires at least 2 Yellow gems; Requires at least 2 Blue gems"
+    },
+    {
+      "wowItemId": 25901,
+      "gemId": "insightful-earthstorm-diamond",
+      "name": "Insightful Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Blue",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Red gems; Requires at least 2 Yellow gems; Requires at least 2 Blue gems"
+    },
+    {
+      "wowItemId": 28556,
+      "gemId": "swift-windfire-diamond",
+      "name": "Swift Windfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Red",
+          "count": 1
+        }
+      ],
+      "text": "Requires at least 2 Yellow gems; Requires at least 1 Red gems"
+    },
+    {
+      "wowItemId": 28557,
+      "gemId": "swift-starfire-diamond",
+      "name": "Swift Starfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Red",
+          "count": 1
+        }
+      ],
+      "text": "Requires at least 2 Yellow gems; Requires at least 1 Red gems"
+    },
+    {
+      "wowItemId": 32409,
+      "gemId": "relentless-earthstorm-diamond",
+      "name": "Relentless Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 2
+        },
+        {
+          "color": "Blue",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Red gems; Requires at least 2 Yellow gems; Requires at least 2 Blue gems"
+    },
+    {
+      "wowItemId": 32410,
+      "gemId": "thundering-skyfire-diamond",
+      "name": "Thundering Skyfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 2
+        },
+        {
+          "color": "Blue",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Red gems; Requires at least 2 Blue gems; Requires at least 2 Yellow gems"
+    },
+    {
+      "wowItemId": 32640,
+      "gemId": "potent-unstable-diamond",
+      "name": "Potent Unstable Diamond",
+      "kind": "moreThan",
+      "moreColor": "Blue",
+      "thanColor": "Yellow",
+      "text": "Requires more Blue gems than Yellow gems"
+    },
+    {
+      "wowItemId": 32641,
+      "gemId": "imbued-unstable-diamond",
+      "name": "Imbued Unstable Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Yellow",
+          "count": 3
+        }
+      ],
+      "text": "Requires at least 3 Yellow gems"
+    },
+    {
+      "wowItemId": 34220,
+      "gemId": "chaotic-skyfire-diamond",
+      "name": "Chaotic Skyfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Blue",
+          "count": 2
+        }
+      ],
+      "text": "Requires at least 2 Blue gems"
+    },
+    {
+      "wowItemId": 35501,
+      "gemId": "eternal-earthstorm-diamond",
+      "name": "Eternal Earthstorm Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Blue",
+          "count": 2
+        },
+        {
+          "color": "Yellow",
+          "count": 1
+        }
+      ],
+      "text": "Requires at least 2 Blue gems; Requires at least 1 Yellow gems"
+    },
+    {
+      "wowItemId": 35503,
+      "gemId": "ember-skyfire-diamond",
+      "name": "Ember Skyfire Diamond",
+      "kind": "minimums",
+      "minimums": [
+        {
+          "color": "Red",
+          "count": 3
+        }
+      ],
+      "text": "Requires at least 3 Red gems"
+    }
+  ]
+}

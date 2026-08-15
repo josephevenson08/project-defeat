@@ -149,7 +149,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.slotCompatibility]] · 7 importers
 - [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
-- [[domain.gems.gemTypes]] · 1 importers
+- [[domain.gems.gemTypes]] · 3 importers
 - [[domain.gems.sampleGems]] · 5 importers
 - [[domain.icons.icons]] · 1 importers
 - [[domain.icons.iconsJson.d]] · 0 importers

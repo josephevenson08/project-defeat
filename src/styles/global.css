@@ -3318,3 +3318,19 @@ input[type='text']:focus {
 .rail-stat-toggle:hover {
   color: var(--text-dim);
 }
+
+/*
+ * A meta gem whose colour condition is not met.
+ *
+ * --warn rather than a grey, because this is the documented use for that token: a real warning about
+ * data or an effect that is not doing what it looks like it is doing. A meta contributing nothing
+ * because of gems in *other* items is close to impossible to work out from a stat total that simply
+ * reads lower than expected, which is why it gets the loudest treatment in this panel.
+ */
+.gem-chip-inactive {
+  color: var(--warn);
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 3px;
+}
