@@ -1,7 +1,13 @@
 # Project Defeat — handoff
 
-**Written 2026-08-09.** Self-contained brief for picking this up in a fresh chat. If `git log`
-disagrees with this file, trust git.
+**Started 2026-08-09, substantially rewritten 2026-08-15.** Self-contained brief for picking this up
+in a fresh chat. If `git log` disagrees with this file, trust git.
+
+**The 2026-08-15 session** shipped, in order: the spec tier-list view; a merge of the target-debuff
+rebuild; item and gem icons; planner sub-tabs and a spec-scoped stat rail; talents for all nine
+classes; a rage model; the two-hander/off-hand fix and the weapon-proficiency and upgrade-finder bugs
+it exposed; melee haste; trinket and weapon effects; the healer mana constraint; and meta gem
+activation. §1 and §2b carry the findings that cost the most to learn.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
 `josephevenson08/project-defeat`, currently at **`a071bae`**, everything pushed.
@@ -81,15 +87,19 @@ npm run brain                         # "0 written" — idempotent
 A local-first React + TypeScript + Vite planner for WoW TBC Classic, targeting Phase 2 (SSC/TK,
 Tier 5). No backend, no runtime network calls — typed data and generated JSON in the repo.
 
-**Layout:** intro → a **section picker** (Character Planner / Raids / Professions) → the chosen
-section, with a tab bar for moving between them afterwards. Discord skeleton underneath: a left rail,
-one main pane, popups layered over rather than modes you travel between. Tesla's restraint in the
-palette, Nothing's detailing: flat surfaces, hairline rules, tracked uppercase mono labels, tabular
-figures, no gradients.
+**Layout:** intro → a **section picker** (Character Planner / Spec Tier Lists / Raids / Professions)
+→ the chosen section, with a tab bar for moving between them afterwards. Discord skeleton underneath:
+a left rail, one main pane, popups layered over rather than modes you travel between. Tesla's
+restraint in the palette, Nothing's detailing: flat surfaces, hairline rules, tracked uppercase mono
+labels, tabular figures, no gradients.
+
+**The planner is a second level of tabs** — Gear / Talents / Ranked Gear / Build — each rendering
+only its own panel. See §2b for why, and for the measurements behind it.
 
 **The rail is section-specific.** Planner: the character selects plus the stat readout. Raids: the
-raid switcher. Professions: none. A rail of numbers beside a loot table would describe something not
-on screen.
+raid switcher. Tier lists and Professions: none. A rail of numbers beside a loot table would describe
+something not on screen. The stat rail is also **scoped to the spec** — 12 rows on a Fury Warrior
+rather than 26 — with a "show all" toggle; again §2b.
 
 **Entering the planner runs character creation** — four steps, faction → race → class → spec, each
 committing immediately so an earlier change re-narrows everything after it. A restored build skips
@@ -101,7 +111,7 @@ keep a muted hue. Audited: the only saturated colours anywhere are item quality 
 
 ## The data
 
-Six datasets, all real, all from pinned sources. Regenerate any of them:
+Every dataset is real and from a pinned source. Regenerate any of them:
 
 ```bash
 node tools/ingest/ingest-items.mjs              # 4,505 items from wowsims/tbc @3301fca5
@@ -138,6 +148,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
 | Icons | none, two-letter glyphs | **1,609 files** vendored, 2.8 MB — items, gems and talents |
 | Item effects | 14 curated, 0 ingested | **55 items**, 46 of 175 trinkets |
+| Meta gem conditions | never checked | **18 of 18**, enforced and explained in the panel |
 
 ---
 
@@ -208,8 +219,10 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   casters) and `isDualWield` added a whole phantom off-hand's white damage on top. Fixed —
   `twoHanderOccupiesOffHand` plus an `EMPTY_OFF_HAND` placeholder, applied in `defaultGear`, in
   `normalizeGearForCharacter` and in `applyWeaponSlotRules` on every manual gear change. Melee DPS
-  fell to its honest value: **Fury 196.5 → 165.6, Arms 233.7 → 203.2, Combat Rogue 205.6 → 185.6**.
-  Feral is unchanged, correctly, because cat form swings its own weapon.
+  fell to its honest value: **Fury 196.5 → 165.6, Arms 233.7 → 203.2, Combat Rogue 205.6 → 185.6**,
+  and Combat Rogue then fell again to **157.4** when the proficiency fix below took its two-hander
+  away and gave it two one-handers. Feral is unchanged, correctly, because cat form swings its own
+  weapon. **Those are the current figures** — anything earlier in this file is history.
 
   **The reverse rule is what the first attempt got wrong, and it is the subtle half.** An empty off
   hand is legal *only* beside a two-hander, but the placeholder passes `isItemAllowedForCharacter` —
@@ -366,7 +379,9 @@ the acknowledged gap", but investigating it found the larger cause was an attack
 fixed: the player's white and special tables applied **parry and block** to a melee DPS. Both
 require the defender to be *facing* the attacker, and a melee DPS is behind the boss all fight, so
 against a level 73 target that deleted 14% parry plus 5% block from every swing. Fixing it moved a
-Fury Warrior from 125 to 148 DPS and took hit chance from 21.7% to 39.2%. `attacksFromBehind` is now
+Fury Warrior from 125 to 148 DPS at the time and took hit chance from 21.7% to 39.2%. (That 148 is
+history: the same character now reads **165.6**, after the unobtainable-item and two-hander fixes
+changed which weapons it holds.) `attacksFromBehind` is now
 a required input on both builders, so a future front-facing caller has to state its position.
 
 **Rage is now modelled, and the result was not the one expected.** `domain/simulation/rageModel.ts`
@@ -582,8 +597,60 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
   the rest are hand-written.
 - Node ESM cannot resolve this repo's extensionless imports. Scripts that import app code use
   `registerHooks` to retry with `.ts`, and `pathToFileURL` because Windows drive letters parse as a
-  URL scheme. Copy that pattern.
+  URL scheme. Copy that pattern — **and include the `/index.ts` fallback**, or any script reaching a
+  barrel import like `../../domain/abilities` dies with `ERR_MODULE_NOT_FOUND` on a path that looks
+  perfectly correct:
+
+  ```js
+  registerHooks({
+    resolve(spec, ctx, next) {
+      try { return next(spec, ctx) } catch (err) {
+        if (!spec.startsWith('.')) throw err
+        try { return next(`${spec}.ts`, ctx) } catch { return next(`${spec}/index.ts`, ctx) }
+      }
+    },
+  })
+  ```
 - `.claude/agents/` is not registered as agent types in every environment. Dispatch a
   `general-purpose` agent and paste the agent file's contents into the prompt instead.
 - **Verify in the browser, not just in the diff.** A grep using a non-capturing group silently
   under-reported and left a legacy surface behind; the browser audit is what caught it.
+- **The Browser pane does not composite when it is hidden.** `requestAnimationFrame` never fires
+  there, so anime.js entrance animations sit at `opacity: 0` forever and `loading="lazy"` images
+  never load. Both look exactly like real bugs. Screenshots also fail outright. Read the DOM instead,
+  and force `loading="eager"` before asserting an image loaded.
+
+---
+
+## If you are picking this up now
+
+Everything below is open. Nothing is half-finished — each item is a decision or a fresh piece of work.
+
+**A decision only the repo owner can take.** All three reasons `src/featureFlags.ts` gives for hiding
+the Simulation tab have been addressed — rage, item procs, healer mana — so **its wording is now
+stale: it still says "rage is not modelled at all"**. Whether the numbers are defensible enough to
+show is a judgement and was deliberately not taken. There is a real argument against: rotations cover
+2 specs of 27, and melee DPS reads low because talents reach the simulation nowhere. Either way that
+file needs its reasoning rewritten, because it currently describes a state that no longer exists.
+
+**Two loose ends from the effects work.** `ingest-item-effects.mjs` reads `metagems.go`, so it
+extracts effects for **Mystical Skyfire Diamond (25893)** and **Thundering Skyfire Diamond (32410)**
+— but those are gems, `Gem` has no `effect` field, and nothing consumes them. The data is already in
+`itemEffects.json`; wiring it is small. Separately, 48 upstream effects are skipped as inexpressible
+(damage procs, mana returns, health-only buffs) and the ingest reports each one — worth reading
+before assuming an item has no effect.
+
+**The biggest remaining accuracy item is talent scaling.** It gates rage income (Flurry's 30% attack
+speed after a crit is where a Fury warrior's swing rate really comes from), and it is what keeps
+melee DPS low. The talent *data* is already ingested for all nine classes — but as **prose**
+(`rankDescriptions`), not machine-readable effects, so this needs an extraction or authoring step
+first. Scope it before writing code.
+
+**Two chores.** 19 stale git branches want deleting — `git branch --merged main` covers 18 of them,
+and `worktree-agent-afb0a902111f3a642` needs `-D` (its contents are superseded; checked). And CI
+warns that `actions/checkout@v4`, `configure-pages@v5`, `setup-node@v4` and `upload-artifact@v4`
+target the deprecated Node 20.
+
+**Known-wrong data still standing:** 124 of 230 curated items in `sampleItems.ts` carry
+`needsVerification`, and 39 raid loot entries name items the catalogue does not hold — those last are
+mounts, enchant formulas and tier tokens, which are correctly absent rather than missing.
