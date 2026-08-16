@@ -10,6 +10,24 @@ import type { GearItem } from './itemTypes'
  * roles, crafting materials, trinket effects.
  *
  * Do not add mechanical data here. Re-run `node tools/ingest/ingest-items.mjs` instead.
+ *
+ * ## What `needsVerification` means on an entry here
+ *
+ * **It is about the provenance, not the stats** — for all but one entry. 119 of the 120 flagged
+ * entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
+ * only `PROVENANCE_FIELDS`; their stat blocks are dead weight that never reaches the app. Most of
+ * their notes still say "stats are approximate pending final Wowhead audit", which described a real
+ * risk when this file *was* the catalogue and describes unused data now. Read such a note as "the
+ * drop location, vendor and roles are unverified", because that is all the flag can still govern.
+ *
+ * The exception is an entry with **no matching ingested row**, which ships whole, stats included. One
+ * flagged entry is in that state today (Blessed Book of Nagrand) and it is deliberate: its value is
+ * confirmed and the flag marks a schema gap, not a doubt. `catalogueMeta.unmatchedCuratedCount` is
+ * the number to watch — every entry in it is one whose invented numbers would reach the paperdoll.
+ *
+ * Four entries were deleted outright for being fictional (Training Sword, Practice Longbow, Shield of
+ * Rehearsal, Voidheart Cover). All four were selectable in a gear dropdown. If you find another,
+ * check `getItemsForSlot` before assuming it is harmless.
  */
 export const sampleItems: readonly GearItem[] = [
   {
@@ -660,23 +678,6 @@ export const sampleItems: readonly GearItem[] = [
     notes: 'Accessible dungeon physical DPS trinket fallback.',
   },
   {
-    id: 'training-sword',
-    name: 'Training Sword',
-    slot: 'Main Hand',
-    quality: 'Rare',
-    source: 'Vendor',
-    phase: 1,
-    weaponType: 'Sword',
-    roles: ['Physical DPS'],
-    stats: { attackPower: 40, critRating: 10 },
-    weaponSpeed: 2.6,
-    weaponDamageMin: 45,
-    weaponDamageMax: 84,
-    needsVerification: true,
-    notes:
-      'Fictional placeholder item (the real "Training Sword" is an unrelated low-level green weapon); weapon speed/damage are a representative estimate for a Phase 1 one-handed sword at this stat budget, not a real tooltip value.',
-  },
-  {
     id: 'apprentice-focus-staff',
     name: 'Apprentice Focus Staff',
     slot: 'Main Hand',
@@ -740,20 +741,6 @@ export const sampleItems: readonly GearItem[] = [
     notes: 'Dragonmaw upgrade path weapon; should remain visible even when Blacksmithing is not selected.',
   },
   {
-    id: 'shield-of-rehearsal',
-    name: 'Shield of Rehearsal',
-    slot: 'Off Hand',
-    quality: 'Rare',
-    source: 'Dungeon',
-    phase: 1,
-    armorType: 'Shield',
-    weaponType: 'Shield',
-    roles: ['Tank'],
-    needsVerification: true,
-    notes: "COULD NOT BE LOCATED. Two independent searches of Wowhead's TBC database found no item by this name. That is absence of evidence rather than proof, so it is flagged rather than deleted — but it should be treated as probably fictional and not used as a reference point. Worth contrasting with the six items in this catalog that carried a 'fictional placeholder' note and all turned out to be real: this is the reverse case, and the only one so far where the item genuinely cannot be found. Its stats, including the 900 armor, cannot be checked against anything.",
-    stats: { stamina: 18, defenseRating: 12, blockRating: 10, blockValue: 24, armor: 900 },
-  },
-  {
     id: 'orb-of-prototype-power',
     name: 'Orb of Prototype Power',
     slot: 'Off Hand',
@@ -803,22 +790,6 @@ export const sampleItems: readonly GearItem[] = [
     notes: 'Alternative off-hand melee weapon sample. Weapon speed/damage from Wowhead TBC Classic tooltip; other stats still pending final audit.',
   },
   {
-    id: 'practice-longbow',
-    name: 'Practice Longbow',
-    slot: 'Ranged',
-    quality: 'Rare',
-    source: 'Vendor',
-    phase: 1,
-    weaponType: 'Bow',
-    roles: ['Physical DPS'],
-    stats: { rangedAttackPower: 36, hitRating: 8 },
-    weaponSpeed: 2.8,
-    weaponDamageMin: 40,
-    weaponDamageMax: 75,
-    needsVerification: true,
-    notes: 'Fictional placeholder item; weapon speed/damage are a representative estimate for a Phase 1 vendor bow at this stat budget, not a real tooltip value.',
-  },
-  {
     id: 'sunfury-bow-of-the-phoenix',
     wowItemId: 28772,
     name: 'Sunfury Bow of the Phoenix',
@@ -839,8 +810,8 @@ export const sampleItems: readonly GearItem[] = [
   },
   {
     id: 'arcanite-steam-pistol',
-needsVerification: true,
-boss: "Al'ar",
+    needsVerification: true,
+    boss: "Al'ar",
     wowItemId: 29949,
     name: 'Arcanite Steam-Pistol',
     slot: 'Ranged',
@@ -958,6 +929,7 @@ boss: "Al'ar",
   // Elemental Shaman Phase 1/2 starter items (see src/domain/bis/elementalShamanPhase2.ts).
   {
     id: 'sun-kings-talisman',
+    wowItemId: 30015,
     name: "The Sun King's Talisman",
     slot: 'Neck',
     quality: 'Epic',
@@ -969,7 +941,8 @@ boss: "Al'ar",
     stats: { intellect: 20, spellPower: 54, spellCritRating: 15 },
     zone: 'Tempest Keep',
     needsVerification: true,
-    notes: "Quest reward from the Kael'thas Sunstrider encounter chain; stats are approximate pending final Wowhead audit.",
+    notes:
+      "Quest reward from the Kael'thas Sunstrider encounter chain. Linked to item 30015, so the stat block above is superseded by the ingested tooltip and no longer reaches the app — it had overstated spell power at 54 against a real 41, missed 22 stamina and 41 healing power entirely, and recorded item level 128 against a real 138. `allowedClasses` is not a provenance field either, so the ingested value wins over the ['Shaman'] here. The quest source and role remain curated and unverified.",
   },
   {
     id: 'cyclone-shoulderguards',
@@ -3676,6 +3649,7 @@ boss: "Al'ar",
   // All three specs share most of the same gear (agility/AP/crit/hit/expertise is universally valuable), matching real TBC.
   {
     id: 'choker-of-vile-intent',
+    wowItemId: 29381,
     name: 'Choker of Vile Intent',
     slot: 'Neck',
     quality: 'Epic',
@@ -3686,7 +3660,8 @@ boss: "Al'ar",
     stats: { agility: 22, stamina: 20, critRating: 18, hitRating: 12 },
     vendor: "G'eras",
     needsVerification: true,
-    notes: 'Badge of Justice vendor neck (25 badges); stats are approximate pending final Wowhead audit.',
+    notes:
+      'Badge of Justice vendor neck (25 badges). Linked to item 29381, so the stat block above is superseded by the ingested tooltip and no longer reaches the app — it had invented 18 crit rating the item does not have, missed 42 attack power and 42 ranged attack power, and recorded item level 115 against a real 110. The vendor and role remain curated and unverified.',
   },
   {
     id: 'deathmantle-helm',
@@ -3872,25 +3847,6 @@ boss: "Al'ar",
     weaponDamageMax: 115,
     notes:
       'Combat/Subtlety main-hand sword; a fast (1.50 speed) weapon prized for combo point generation. Note the real TBC "Warp Slicer" (item 30311) is actually a slower 2.90-speed, high-damage sword from Kael\'thas, not a fast dagger-speed weapon; this catalog entry deliberately reflects a different, fast-speed design intent, so weapon speed/damage here are a representative estimate for that intent and stat budget, not the real item\'s tooltip value. On-hit extra-attack proc is not modeled yet, stats are approximate pending final Wowhead audit.',
-  },
-  {
-    id: 'voidheart-cover',
-    name: 'Voidheart Cover',
-    slot: 'Head',
-    quality: 'Epic',
-    source: 'Raid',
-    phase: 2,
-    itemLevel: 133,
-    allowedClasses: ['Warlock'],
-    armorType: 'Cloth',
-    roles: ['Caster DPS'],
-    stats: { intellect: 34, stamina: 30, spellPower: 64, spellCritRating: 20, spellHitRating: 16 },
-    sockets: ['Meta', 'Blue'],
-    socketBonus: { spellPower: 5 },
-    instance: 'Serpentshrine Cavern',
-    boss: 'Lady Vashj',
-    needsVerification: true,
-    notes: 'Tier 5 Warlock set piece (Voidheart Raiment); stats are approximate pending final Wowhead audit.',
   },
   {
     id: 'voidheart-mantle',

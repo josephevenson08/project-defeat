@@ -46,8 +46,8 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
   Mage T5 helm, redeemed from Helm of the Vanquished Hero.
 - **Deathmantle Helm** (Tier Token) — [[Physical DPS]]
   Rogue T5 helm, redeemed from Helm of the Vanquished Hero.
-- **Voidheart Cover** (Tier Token) — [[Caster DPS]]
-  Warlock Tier 5 helm redeemed from Helm of the Vanquished Champion. The catalog records this under the Tier 4 "Voidheart" name; Warlock Tier 5 is the Corruptor Raiment set, so the catalog name needs auditing.
+- **Hood of the Corruptor** (Tier Token) — [[Caster DPS]]
+  Warlock Tier 5 helm, redeemed from Helm of the Vanquished Champion.
 - **Fang of Vashj** (Boss) — [[Physical DPS]]
 - **Lightfathom Scepter** (Boss) — [[Healer]]
 - **Belt of One-Hundred Deaths** (Boss) — [[Physical DPS]]

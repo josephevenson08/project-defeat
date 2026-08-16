@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raids/serpentshrineCavernBosses.ts
-lines: 216
+lines: 215
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.serpentshrineCavernBosses
 
-`src/domain/raids/serpentshrineCavernBosses.ts` · **domain** layer · 216 lines
+`src/domain/raids/serpentshrineCavernBosses.ts` · **domain** layer · 215 lines
 
 From the top of the file:
 

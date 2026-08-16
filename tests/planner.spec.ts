@@ -408,8 +408,9 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
   await selectSlotItem(page, 'Chest', 'bulwark-chestguard')
-    // Aldori Legacy Defender rather than Shield of Rehearsal: the latter cannot be located in
-  // Wowhead's TBC database at all, so a test asserting real block mechanics should not rest on it.
+  // Aldori Legacy Defender rather than the old Shield of Rehearsal fixture, which could not be found
+  // in Wowhead's TBC database at all and has since been deleted from the catalogue as fictional.
+  // A test asserting real block mechanics must rest on an item that exists.
   await selectSlotItem(page, 'Off Hand', 'aldori-legacy-defender')
 
   await runSimulation(page)
@@ -547,7 +548,12 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
   })
   await withSlotOpen(page, 'Off Hand', async () => {
-    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Shield of Rehearsal' })).toHaveCount(0)
+    // Aldori Legacy Defender rather than the old Shield of Rehearsal fixture. That item has since
+    // been deleted as fictional, which would have made this assertion pass for the worst possible
+    // reason — an absence test against something that does not exist proves nothing about filtering.
+    // This one is a real Tank shield a Protection Warrior *is* offered (247 off-hand options against
+    // an Enhancement Shaman's 126), so its absence here is the filter actually working.
+    await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aldori Legacy Defender' })).toHaveCount(0)
   })
 
   await withSlotOpen(page, 'Main Hand', async () => {

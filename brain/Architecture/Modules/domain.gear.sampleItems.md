@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/sampleItems.ts
-lines: 3986
+lines: 3942
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.sampleItems
 
-`src/domain/gear/sampleItems.ts` · **domain** layer · 3986 lines
+`src/domain/gear/sampleItems.ts` · **domain** layer · 3942 lines
 
 From the top of the file:
 
@@ -22,6 +22,24 @@ From the top of the file:
 > roles, crafting materials, trinket effects.
 > 
 > Do not add mechanical data here. Re-run `node tools/ingest/ingest-items.mjs` instead.
+> 
+> ## What `needsVerification` means on an entry here
+> 
+> **It is about the provenance, not the stats** — for all but one entry. 119 of the 120 flagged
+> entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
+> only `PROVENANCE_FIELDS`; their stat blocks are dead weight that never reaches the app. Most of
+> their notes still say "stats are approximate pending final Wowhead audit", which described a real
+> risk when this file *was* the catalogue and describes unused data now. Read such a note as "the
+> drop location, vendor and roles are unverified", because that is all the flag can still govern.
+> 
+> The exception is an entry with **no matching ingested row**, which ships whole, stats included. One
+> flagged entry is in that state today (Blessed Book of Nagrand) and it is deliberate: its value is
+> confirmed and the flag marks a schema gap, not a doubt. `catalogueMeta.unmatchedCuratedCount` is
+> the number to watch — every entry in it is one whose invented numbers would reach the paperdoll.
+> 
+> Four entries were deleted outright for being fictional (Training Sword, Practice Longbow, Shield of
+> Rehearsal, Voidheart Cover). All four were selectable in a gear dropdown. If you find another,
+> check `getItemsForSlot` before assuming it is harmless.
 
 ## Exports
 

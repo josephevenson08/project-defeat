@@ -743,10 +743,66 @@ the Node the app is built with, and changing the latter is its own decision.
 An earlier version of this note named `upload-artifact@v4`, which this
 workflow does not use, and omitted `deploy-pages@v4` entirely — so check the file, not the note.
 
-**Known-wrong data still standing:** **123** of 230 curated items in `sampleItems.ts` carry
-`needsVerification`, and 39 raid loot entries name items the catalogue does not hold — those last are
-mounts, enchant formulas and tier tokens, which are correctly absent rather than missing.
+**The curated `needsVerification` flags were audited, and the count was never the point.** It looked
+like 124 Wowhead lookups. Measuring what the flag still *governs* said otherwise, and that is the
+finding worth keeping:
 
-**Count that one at the right indent.** A bare grep for `needsVerification: true` in `sampleItems.ts`
-returns **163**, not 123 — the other 40 sit on nested sub-objects, not on the item itself. Anchor the
-pattern to the item's own indentation (`^    needsVerification`) or the figure comes out a third high.
+- **119 of the 120 remaining flags cannot affect the app.** Those entries match an ingested row, so
+  `itemCatalogue.ts` builds the item from the ingest and overlays only `PROVENANCE_FIELDS` — their
+  stat blocks are dead weight. **118 of their notes still say "stats are approximate pending final
+  Wowhead audit"**, which was true when this file *was* the catalogue and now describes unused data.
+  Read those as "drop location, vendor and roles unverified". The semantics are documented in
+  `sampleItems.ts`'s own header rather than by rewriting 118 notes.
+- **The risk was always the *unmatched* entries**, which ship whole with their invented numbers.
+  `catalogueMeta.unmatchedCuratedCount` is the number to watch; it went **33 → 28**, and
+  load-bearing flags went **7 → 1**.
+
+**Four fictional items were selectable in gear dropdowns** and are now deleted: Training Sword,
+Practice Longbow, Shield of Rehearsal ("COULD NOT BE LOCATED"), and **Voidheart Cover — which this
+very file already recorded as invented**. None was referenced by any BiS ranking, so the stated
+reason for keeping unmatched entries ("so BiS and raid-loot references keep resolving") applied to
+none of them. Curated count 230 → **226**.
+
+**Voidheart Cover was a chain, not a single bad row.** It was also SSC raid loot labelled a Warlock
+T5 helm. Voidheart is the Warlock **T4** set (ilvl 120); T5 is **Corruptor Raiment**. The real piece
+is **Hood of the Corruptor** (30212, ilvl 133), which is what its four sibling T5 helms in that same
+loot table look like — every one of them a real item with a `wowItemId` at ilvl 133. The fictional
+entry was the only one without one, which is the tell worth reusing.
+
+**Two more were real items that had simply never been given a `wowItemId`**, which is exactly why
+they never matched and shipped invented stats:
+
+| | Curated claimed | Real |
+|---|---|---|
+| Choker of Vile Intent | ilvl 115, 18 crit rating | **29381**, ilvl 110, no crit — plus **42 attack power and 42 ranged attack power** the entry missed entirely |
+| The Sun King's Talisman | ilvl 128, 54 spell power | **30015**, ilvl 138, 41 spell power, plus 22 stamina and 41 healing power missed |
+
+**One flag is deliberately kept.** Blessed Book of Nagrand ships whole and is flagged for a *schema
+gap*, not a doubt: its value is confirmed (no stats; it adds 79 healing to Flash of Light
+specifically) and nothing in `StatBlock` can express a spell-specific effect.
+
+Still standing: 39 raid loot entries name items the catalogue does not hold — mounts, enchant
+formulas and tier tokens, correctly absent rather than missing.
+
+**Deleting an item can make a test pass for the worst reason.** Removing Shield of Rehearsal left an
+assertion that it was *absent* from an Enhancement Shaman's off-hand list — which would then have
+held however broken the filtering became. It now names Aldori Legacy Defender, a real Tank shield a
+Protection Warrior **is** offered (247 off-hand options against an Enhancement Shaman's 126), so the
+absence proves the filter rather than the deletion.
+
+**Do not count that one with grep — load the module.** An earlier pass through this file "corrected"
+124 to 123 on the strength of a grep, and the grep was what was wrong. Three ways to count it
+disagreed:
+
+- A bare `needsVerification: true` returns **163**, because `crafting` blocks and individual
+  `crafting.materials[]` entries carry their own flags.
+- Anchoring to the item indent (`^    needsVerification`) returned **123**, because
+  `arcanite-steam-pistol` had its flag and `boss` written at **zero** indentation. Functionally fine,
+  invisible to the eye, and silently one short. That formatting is now fixed, so the anchored grep and
+  the real figure agree at 124 — but only by luck of nobody writing the next one crookedly.
+- Importing `sampleItems` and filtering `needsVerification === true` returns **124**, and is the only
+  method that cannot be defeated by whitespace.
+
+The wider point is the one the repo already makes about scripted edits: a pattern that matches
+nothing, or matches nearly everything, reports success either way. Count structured data by parsing
+it.
