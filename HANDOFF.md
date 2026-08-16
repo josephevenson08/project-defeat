@@ -616,8 +616,18 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
   verbatim off the Wowhead item page in `sourcedFrom`. The other 188 ingested set names (Tier 6,
   dungeon, PvP) are deliberately undefined and show nothing rather than inventing bonuses. Tier 6 is
   the next batch if wanted, though it is past this app's stated Phase 2 target.
-- The BiS and Buffs panels are on the design tokens but still use the older layout shapes; they'd
-  benefit from the treatment the gear panel got.
+- ~~The BiS and Buffs panels still use the older layout shapes~~ — **this note predates the work it
+  asks for, and half of it is unbuildable.** The BiS panel already got the treatment: §2 lists
+  "Ranked-gear rows rebuilt — frame, one identity line, filled Equip" as shipped, and that is what
+  the code has (`.bis-item-frame` with icon and item-level badge, a single `.bis-entry-meta` identity
+  line, a filled Equip button), plus the per-slot collapse added later. There is no dated markup left
+  in it — zero `<dl>`, `<dt>`, `<dd>` or `<table>` across BisPanel, BuffsPanel and GearPanel alike.
+
+  The Buffs panel is a different problem: **nothing renders it.** `BuffsPanel.tsx` is never imported
+  or mounted in `App.tsx`; the only mention is a comment recording that it is parked. Restyling it
+  would be work on a module nothing renders, which this file's own conventions forbid. The question
+  is not how to lay it out — it is whether Buffs & Consumables comes back at all, and that is a
+  product decision, not a design one.
 
 ---
 
