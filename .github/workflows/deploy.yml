@@ -11,7 +11,13 @@ on:
   workflow_dispatch:
 
 # GITHUB_TOKEN needs to write Pages and mint an OIDC token for the deploy step.
+#
+# `actions: read` is there because `deploy-pages` has required it since v4: build and deploy are
+# separate jobs, so the deploy step fetches the artifact by id through the Actions API rather than
+# receiving it directly. Deploys have been succeeding without it, so treat this as closing a
+# documented gap rather than fixing a live break.
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -26,9 +32,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      # node-version stays at 22 deliberately. The action itself now runs on Node 24, but this input
+      # is the Node the app is *built* with, which is a separate decision from clearing the
+      # deprecation warning.
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -42,8 +51,10 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      # v4 stopped including dotfiles in the artifact. Checked against this build: `dist` holds
+      # index.html, favicon.svg, icons.svg, icons/ and assets/ — no dotfiles, so nothing is lost.
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
@@ -55,4 +66,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
