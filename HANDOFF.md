@@ -469,9 +469,28 @@ A measured audit of the running app (not a stylesheet read) found and fixed:
 Both design decisions that were parked here have since been taken, and are recorded in §2b below.
 Still open:
 
-- **`h3` is styled at five sizes** (11, 13, 15, 20px and a mono label variant). The 11px mono
-  uppercase one is a deliberate label pattern, not a smaller heading, so this is not purely a bug —
-  but the tag is doing two different jobs and that is worth resolving deliberately.
+- ~~**`h3` is styled at five sizes**~~ — **resolved by naming the roles, not by flattening them.**
+  The four heading sizes were each doing a real and different job: 20px detail-page title
+  (professions, raids), 15px panel section heading, 13px amber callout title
+  (`.stat-weights-unmodeled`), and the 11px tracked mono label (`.bis-slot-heading`). The problem was
+  never that there were four, it was that `h3` alone told you nothing about which you would get —
+  every rule was a *descendant* selector keyed on the container. So they are now
+  `--heading-detail` / `--heading-section` / `--heading-callout` tokens, with the label pattern
+  staying on `--label-size` and deliberately not counted as a heading size: marking a group label up
+  as a heading is correct semantics, and visual weight is a separate decision.
+
+  **The real defect was the missing bare rule, and it was latent rather than live.** There was no
+  `h3 { }` at all, so an `h3` in any new container would have inherited the browser's `1.17em`
+  (~18.7px) — a size nobody chose, sitting between the 15px and 20px steps, close enough to both to
+  read as sloppiness rather than as a bug. Exactly the `small` finding one level up. Measured before
+  and after across every view: **20 `h3` elements, all landing on a chosen size, identical both
+  times** — nothing rendered differently, which is the point.
+
+- **62 lines of dead CSS removed with it.** `.racials` / `.racial-*` was referenced by **zero**
+  components — left behind when the racial traits list was removed by request (§2). Worth noting it
+  contained `#4ade80`, a saturated green, so the colour audit's claim that "the only saturated
+  colours anywhere are item quality and the warn amber" was true of the *rendered* app but not of the
+  stylesheet.
 - Base surface is `#0a0a0a`, near-pure black. Material and Smashing both recommend ~`#121212`;
   pure black maximises halation and spends the darkest value available. Left alone — it is a
   deliberate part of the stated aesthetic and the contrast measurements all pass.

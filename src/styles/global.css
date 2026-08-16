@@ -51,6 +51,21 @@
   /* Small uppercase tracked labels are the main texture in this design. */
   --label-size: 11px;
   --label-tracking: 0.14em;
+  /*
+   * Heading sizes, named by the job rather than the tag.
+   *
+   * `h3` was styled at four different sizes through four different descendant selectors, so what a
+   * heading looked like depended entirely on which container it landed in, and the tag said nothing.
+   * These name the roles instead: a new heading picks one, rather than inventing a fifth size.
+   *
+   * `--label-size` above is the fifth treatment and is deliberately *not* a heading size — the
+   * tracked uppercase mono label is a label pattern that happens to be marked up as a heading where
+   * it genuinely labels a group (the ranked-gear slot names). Semantics and weight are separate
+   * decisions, and that one is correct as it stands.
+   */
+  --heading-detail: 20px;
+  --heading-section: 15px;
+  --heading-callout: 13px;
 
   --radius: 2px;
 
@@ -72,6 +87,24 @@
  */
 small {
   font-size: 13px;
+}
+
+/*
+ * The same trap as `small` above, one level up, and still latent rather than live.
+ *
+ * Every `h3` rule in this file is a *descendant* selector — `.talent-tree-head h3`, `.buffs-group
+ * h3`, and so on — and there was no bare `h3` rule at all. Every h3 currently on screen happens to
+ * sit inside one of those containers (measured: 20 of them across every view, all landing on a
+ * chosen size), so nothing is wrong today. But an h3 in a new container would inherit the browser's
+ * 1.17em — about 18.7px — which is a size nobody picked and which sits between the 15px section
+ * heading and the 20px detail title, close enough to both to look like a mistake rather than read as
+ * one.
+ *
+ * Defaulting to the section heading closes that: a new heading is a section heading until something
+ * says otherwise, which is the common case and the safe one.
+ */
+h3 {
+  font-size: var(--heading-section);
 }
 
 body {
@@ -534,7 +567,7 @@ select {
 }
 
 .talent-tree-head h3 {
-  font-size: 15px;
+  font-size: var(--heading-section);
   margin: 0;
 }
 
@@ -2072,7 +2105,7 @@ select:focus,
 
 .buffs-group h3 {
   color: var(--text-strong);
-  font-size: 15px;
+  font-size: var(--heading-section);
   margin: 0 0 10px;
 }
 
@@ -2213,7 +2246,7 @@ select:focus,
 
 .profession-detail-header h3 {
   color: var(--text-strong);
-  font-size: 20px;
+  font-size: var(--heading-detail);
   margin: 0;
 }
 
@@ -2479,7 +2512,7 @@ input[type='number']:focus {
 
 .stat-weights-unmodeled h3 {
   color: var(--warn);
-  font-size: 13px;
+  font-size: var(--heading-callout);
   margin: 0 0 6px;
 }
 
@@ -2582,7 +2615,7 @@ input[type='number']:focus {
 
 .raid-detail-header h3 {
   color: var(--text-strong);
-  font-size: 20px;
+  font-size: var(--heading-detail);
   margin: 0;
 }
 
@@ -2875,78 +2908,16 @@ textarea:focus {
   margin-top: 10px;
 }
 
-.racials {
-  border-top: 1px solid var(--line);
-  margin-top: 18px;
-  padding-top: 14px;
-}
-
-/* A section heading inside a panel. Same job as `.buffs-group h3`, so the same size — it was 14px
-   against that rule's 15px, which made the two read as different levels when they are not. */
-.racials h3 {
-  color: var(--text);
-  font-size: 15px;
-  margin: 0 0 10px;
-}
-
-.racials ul {
-  display: grid;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.racials li {
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--line-strong);
-  border-radius: var(--radius);
-  display: grid;
-  gap: 3px;
-  padding: 8px 10px;
-}
-
-.racials li strong {
-  color: var(--text-strong);
-  font-size: 13px;
-}
-
-.racials li span {
-  color: var(--text);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.racials li small {
-  color: var(--text-dim);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.racial-active {
-  border-left-color: var(--panel-accent, var(--text-dim));
-}
-
-.racial-active small {
-  color: #4ade80;
-}
-
-.racial-inactive {
-  opacity: 0.72;
-}
-
 .build-slots {
   border-top: 1px solid var(--line);
   margin-top: 18px;
   padding-top: 14px;
 }
 
-/* Also a panel section heading — see `.racials h3`. */
+/* A panel section heading, on the shared token rather than a repeated literal. */
 .build-slots h3 {
   color: var(--text);
-  font-size: 15px;
+  font-size: var(--heading-section);
   margin: 0 0 6px;
 }
 
