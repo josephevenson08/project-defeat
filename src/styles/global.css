@@ -678,6 +678,18 @@ select {
 }
 
 /*
+ * A gem's proc, with its uptime. Deliberately NOT the amber warning treatment used for an inactive
+ * meta — a proc is what the gem does, not a problem to fix, and spending the one warning colour on
+ * ordinary information is what makes a real warning stop reading as one.
+ */
+.gem-chip-effect {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/*
  * Whether the socket bonus is earned right now. Amber is the app's warning colour, reserved for
  * genuine gaps — and an unearned bonus is one: you are carrying sockets that pay nothing.
  */

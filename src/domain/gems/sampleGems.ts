@@ -1,5 +1,6 @@
 import rawGems from './gemCatalogue.json' with { type: 'json' }
 import rawMetaRequirements from './metaGemRequirements.json' with { type: 'json' }
+import rawItemEffects from '../gear/itemEffects.json' with { type: 'json' }
 import type { SocketColor } from '../gear/itemTypes'
 import type { Gem } from './gemTypes'
 import { gemFitsSocket } from './gemTypes'
@@ -26,9 +27,36 @@ const metaRequirementByWowItemId = new Map(
   ]),
 )
 
+/**
+ * Gem procs, from the same `ingest-item-effects.mjs` run that fills the item effects.
+ *
+ * That ingest reads wowsims' `sim/common/metagems.go`, so it has always extracted these two — they
+ * simply had nowhere to go until `Gem.effect` existed, and the ingest reported them while nothing
+ * consumed them. Only Mystical Skyfire Diamond (25893) and Thundering Skyfire Diamond (32410) match
+ * a gem; the rest of the file is trinkets and weapons, and the id lookup is what keeps them apart.
+ */
+const effectByWowItemId = new Map(
+  rawItemEffects.effects.map((entry) => [
+    entry.wowItemId,
+    {
+      // Cast at the boundary as `itemCatalogue.ts` does — reading the JSON widens the literal to
+      // `string`, and the ingest only ever writes these two kinds.
+      kind: entry.kind as 'proc' | 'onUse',
+      statBonus: entry.statBonus as Gem['stats'],
+      durationSeconds: entry.durationSeconds,
+      cooldownSeconds: entry.cooldownSeconds,
+    } satisfies NonNullable<Gem['effect']>,
+  ]),
+)
+
 export const sampleGems: readonly Gem[] = (rawGems.gems as Gem[]).map((gem) => {
-  const metaRequirement = gem.wowItemId === undefined ? undefined : metaRequirementByWowItemId.get(gem.wowItemId)
-  return metaRequirement ? { ...gem, metaRequirement } : gem
+  if (gem.wowItemId === undefined) return gem
+
+  const metaRequirement = metaRequirementByWowItemId.get(gem.wowItemId)
+  const effect = effectByWowItemId.get(gem.wowItemId)
+  if (!metaRequirement && !effect) return gem
+
+  return { ...gem, ...(metaRequirement ? { metaRequirement } : {}), ...(effect ? { effect } : {}) }
 })
 
 const byId = new Map(sampleGems.map((gem) => [gem.id, gem]))

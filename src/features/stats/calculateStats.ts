@@ -60,8 +60,17 @@ export function calculateStats(
       const gem = getGemById(gemId)
       if (!gem) return
       // A meta gem whose colour condition is unmet grants nothing at all — not a reduced amount.
+      // This early return is also what gates the proc below: an inactive meta's proc is part of the
+      // nothing it grants.
       if (gem.color === 'Meta' && !metaGemIsActive(gem, socketedGems)) return
       total = addStats(total, gem.stats)
+
+      // Two meta gems are pure procs — Mystical Skyfire and Thundering Skyfire both carry no flat
+      // stats at all, so without this they contribute exactly zero. Averaged over uptime the same
+      // way an item's effect is, since it is the same ingest and the same approximation.
+      if (gem.effect) {
+        total = addStats(total, scaleStats(gem.effect.statBonus, effectUptime(gem.effect.durationSeconds, gem.effect.cooldownSeconds)))
+      }
     })
 
     if (socketBonusIsActive(slot.item.sockets, slot.gemIds)) {

@@ -634,10 +634,21 @@ show is a judgement and was deliberately not taken. There is a real argument aga
 2 specs of 27, and melee DPS reads low because talents reach the simulation nowhere. Either way that
 file needs its reasoning rewritten, because it currently describes a state that no longer exists.
 
-**Two loose ends from the effects work.** `ingest-item-effects.mjs` reads `metagems.go`, so it
-extracts effects for **Mystical Skyfire Diamond (25893)** and **Thundering Skyfire Diamond (32410)**
-— but those are gems, `Gem` has no `effect` field, and nothing consumes them. The data is already in
-`itemEffects.json`; wiring it is small. Separately, 48 upstream effects are skipped as inexpressible
+**The gem procs are wired now, and they were not a tidy-up.** `ingest-item-effects.mjs` reads
+`metagems.go`, so it always extracted **Mystical Skyfire Diamond (25893)** and **Thundering Skyfire
+Diamond (32410)**
+— but those are gems, and `Gem` had no `effect` field, so nothing consumed them.
+
+**The severity was understated here as "wiring it is small".** Both gems carry `stats: {}` in the
+catalogue, because wowsims models them purely as procs — so socketing either contributed **exactly
+zero** and the panel told the player "No stats this app models". Mystical Skyfire Diamond was a
+caster staple in TBC. `Gem.effect` now reuses the item `ItemEffect` shape, `sampleGems` layers it on
+by `wowItemId` from the same `itemEffects.json`, `calculateStats` folds it in at `effectUptime`
+**behind the meta-condition early return** — an inactive meta's proc is part of the nothing it grants
+— and the panel states the proc with its uptime rather than at face value, which would overstate
+Mystical Skyfire roughly sevenfold (320 spell haste for 4s on a 35s internal cooldown is 11% uptime).
+
+Separately, 48 upstream effects are skipped as inexpressible
 (damage procs, mana returns, health-only buffs) and the ingest reports each one — worth reading
 before assuming an item has no effect.
 

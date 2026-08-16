@@ -1,4 +1,4 @@
-import type { ItemQuality, SocketColor } from '../gear/itemTypes'
+import type { ItemEffect, ItemQuality, SocketColor } from '../gear/itemTypes'
 import type { StatBlock } from '../stats/statTypes'
 
 /**
@@ -33,6 +33,16 @@ export type Gem = {
   uniqueEquipped?: boolean
   /** Present on meta gems only. Absent means no condition was found, not that there is none. */
   metaRequirement?: MetaGemRequirement
+  /**
+   * A proc, for the two meta gems whose entire value is one.
+   *
+   * Mystical Skyfire Diamond and Thundering Skyfire Diamond both carry `stats: {}` in the catalogue,
+   * because wowsims models them as procs rather than as stat gems — so before this field existed,
+   * socketing either contributed *nothing* and the panel said "No stats this app models". Averaged by
+   * uptime exactly as an item's effect is, and gated on the meta's colour condition: an inactive meta
+   * grants nothing, and its proc is part of that nothing.
+   */
+  effect?: ItemEffect
   /** Resistances and spell penetration, which `StatBlock` has no fields for. Carried, not surfaced. */
   extraStats?: Record<string, number>
 }

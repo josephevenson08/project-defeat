@@ -3296,3 +3296,66 @@ test('an unmet meta gem reaches no stat total, and the panel says why', async ({
     await expect(page.getByText(/grants nothing until it is/)).toBeVisible()
   })
 })
+
+test('the two pure-proc meta gems reach the stat total, at their uptime', async ({ page }) => {
+  /*
+   * `ingest-item-effects.mjs` reads wowsims' `metagems.go`, so it always extracted these two — but
+   * `Gem` had no `effect` field, so nothing consumed them. Both carry `stats: {}`, which means that
+   * until this wiring existed, socketing either contributed exactly nothing and the panel said so in
+   * as many words. Their whole value is the proc.
+   */
+  const mystical = getGemById('mystical-skyfire-diamond')!
+  const thundering = getGemById('thundering-skyfire-diamond')!
+
+  for (const gem of [mystical, thundering]) {
+    expect(Object.keys(gem.stats), `${gem.name} is a pure proc, with no flat stats`).toHaveLength(0)
+    expect(gem.effect, `${gem.name} must carry its proc`).toBeDefined()
+  }
+
+  // Read off the ingest rather than assumed: 320 spell haste for 4s on a 35s internal cooldown.
+  expect(mystical.effect).toMatchObject({ kind: 'proc', durationSeconds: 4, cooldownSeconds: 35 })
+  expect(mystical.effect?.statBonus.spellHasteRating).toBe(320)
+
+  /*
+   * A Warrior wears the test helm, which is the odd-looking part: Mystical Skyfire is a caster gem.
+   * It does not matter — spell haste rating is class-neutral arithmetic here, and reusing the proven
+   * Destroyer Battle-Helm setup keeps this test about the gem rather than about gear legality.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const helm = getItemById('destroyer-battle-helm')!
+  expect(helm.sockets).toEqual(['Meta', 'Blue'])
+
+  // Pure Blue, so it counts toward Blue only. Mystical Skyfire wants more Blue gems than Yellow.
+  const blue = sampleGems.find((gem) => gem.color === 'Blue')!
+  const head = (gemIds: string[]) => ({ ...gear, Head: { item: helm, gemIds } })
+
+  const bare = calculateStats(character, head(['', '']))
+  const blueOnly = calculateStats(character, head(['', blue.id]))
+  const metaAlone = calculateStats(character, head([mystical.id, '']))
+  const metaAndBlue = calculateStats(character, head([mystical.id, blue.id]))
+
+  // Condition met: 1 Blue against 0 Yellow. The blue gem is held constant across both sides, so the
+  // difference is the meta's proc and nothing else -- the helm's socket bonus is Strength, which
+  // cannot reach spell haste either way.
+  expect(metaGemIsActive(mystical, [blue])).toBe(true)
+  expect(metaAndBlue.spellHasteRating - blueOnly.spellHasteRating).toBeCloseTo(320 * effectUptime(4, 35), 6)
+
+  // Condition unmet: 0 Blue is not "more than" 0 Yellow. A proc is part of the nothing an inactive
+  // meta grants, so it must not leak through on its own.
+  expect(metaGemIsActive(mystical, [])).toBe(false)
+  expect(metaAlone.spellHasteRating).toBe(bare.spellHasteRating)
+
+  // And the panel has to show it, or the gem still reads as worthless to anyone choosing one.
+  await openApp(page)
+  await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
+  await selectSlotGem(page, 'Head', 'Meta', mystical.id)
+  await withSlotOpen(page, 'Head', async () => {
+    const effect = page.getByTestId('gem-effect-Head-0')
+    await expect(effect).toBeVisible()
+    await expect(effect).toContainText('11% uptime')
+    // Scoped to the chip rather than the page: an absence assertion against the whole document
+    // would pass just as happily if the chip had not rendered at all.
+    await expect(page.getByTestId('gem-chip-Head-0')).not.toContainText('No stats this app models')
+  })
+})

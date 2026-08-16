@@ -3,6 +3,7 @@ import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { metaGemIsActive } from '../../domain/gems/gemTypes'
+import { effectUptime } from '../../domain/simulation/combatConstants'
 import { describeStats } from '../../domain/stats/describeStats'
 import { getBisListForSpec } from '../../domain/bis'
 import { getPairedGearSlots, twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
@@ -257,12 +258,31 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
                           */}
                           <span className="gem-chip-stats">
                             {describeStats(gem.stats) ||
-                              (gem.extraStats
-                                ? `${Object.entries(gem.extraStats)
-                                    .map(([key, value]) => `+${value} ${key.replace(/([a-z])([A-Z])/g, '$1 $2')}`)
-                                    .join(', ')} — not counted in your totals`
-                                : 'No stats this app models')}
+                              // A pure-proc meta has no flat stats, and the effect line below is what
+                              // says so — falling through to "No stats this app models" here would
+                              // contradict it on the very next line.
+                              (gem.effect
+                                ? ''
+                                : gem.extraStats
+                                  ? `${Object.entries(gem.extraStats)
+                                      .map(([key, value]) => `+${value} ${key.replace(/([a-z])([A-Z])/g, '$1 $2')}`)
+                                      .join(', ')} — not counted in your totals`
+                                  : 'No stats this app models')}
                           </span>
+                          {/*
+                            The proc, stated with its uptime rather than at face value. Mystical
+                            Skyfire and Thundering Skyfire are *entirely* this — they carry no flat
+                            stats at all — so without it the panel described two real gems as giving
+                            nothing. The averaged figure is what actually reaches your totals, and
+                            showing the full value alone would overstate them by roughly 7x.
+                          */}
+                          {gem.effect ? (
+                            <span className="gem-chip-effect" data-testid={`gem-effect-${slot}-${index}`}>
+                              {describeStats(gem.effect.statBonus)} for {gem.effect.durationSeconds}s every{' '}
+                              {gem.effect.cooldownSeconds}s — counted at{' '}
+                              {Math.round(effectUptime(gem.effect.durationSeconds, gem.effect.cooldownSeconds) * 100)}% uptime
+                            </span>
+                          ) : null}
                           {/*
                             An unmet meta condition, said out loud. This project has already been
                             bitten once by a gem check that failed silently — a hybrid in a matching
