@@ -26,7 +26,7 @@ The modules everything else leans on — change these carefully.
 - [[domain.character.roleTheme]] — 10 importers
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.raids.raidTypes]] — 9 importers
-- [[domain.simulation.combatConstants]] — 8 importers
+- [[domain.simulation.combatConstants]] — 9 importers
 - [[features.gear.gearData]] — 8 importers
 
 ## By layer
@@ -170,7 +170,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.serpentshrineCavernBosses]] · 1 importers
 - [[domain.raids.tempestKeepBosses]] · 1 importers
 - [[domain.simulation.attackTable]] · 1 importers
-- [[domain.simulation.combatConstants]] · 8 importers
+- [[domain.simulation.combatConstants]] · 9 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
 - [[domain.simulation.encounterTypes]] · 7 importers
 - [[domain.simulation.manaModel]] · 1 importers

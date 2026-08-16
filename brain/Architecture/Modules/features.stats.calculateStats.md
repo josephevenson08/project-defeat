@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/stats/calculateStats.ts
-lines: 110
+lines: 119
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.stats.calculateStats
 
-`src/features/stats/calculateStats.ts` · **features** layer · 110 lines
+`src/features/stats/calculateStats.ts` · **features** layer · 119 lines
 
 _No doc comment at the top of this file._
 
