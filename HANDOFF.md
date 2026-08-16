@@ -704,11 +704,25 @@ simulator.
 
 **Both chores are done.** The 19 stale local branches are **deleted** (2026-08-15): 18 via
 `git branch -d --merged main`, and `worktree-agent-afb0a902111f3a642` via `-D` after checking that
-every file it added is already present in `main` — the raids rebuild superseded it. **Ten of those
-branches still exist on `origin`, and were deliberately left**, because this repo is public and
-deleting a published branch is a decision rather than a cleanup. `git worktree list` also still shows
-a stale worktree at `.claude/worktrees/lucid-cartwright-9d8b8c`, detached at `68aae34` — reachable
-from `main`, so its work is merged and the checkout is only costing OneDrive space.
+every file it added is already present in `main` — the raids rebuild superseded it.
+
+**The ten that also existed on `origin` are deleted too**, on the repo owner's say-so, since this is
+a public repo and removing a published branch is a decision rather than a cleanup. All ten were
+ancestors of `origin/main`, so nothing was lost; their tips are recorded here in case GitHub's
+restore window ever lapses:
+
+```
+agent/integration-tbc-foundation 96ec2ab   feature/shaman-elemental-restoration-bis af50465
+data/expand-tbc-items-bis-foundation b686e9d  feature/spec-aware-bis-sources-enhancement 657774c
+feature/animejs-loading-polish 00c68cf     feature/spec-aware-slot-visibility cc0d3dc
+feature/bis-panel-equip-from-list b36bce3  feature/warrior-arms-fury-protection-bis 1e099b5
+feature/race-class-legality-and-crafting-data 0527e72   local-mvp-simulator fcade15
+```
+
+**Both stale worktrees are gone as well.** `.claude/worktrees/lucid-cartwright-9d8b8c` was detached
+at `68aae34`, reachable from `main`, so its work was merged and the checkout was only costing
+OneDrive sync; `agent-afb0a902111f3a642` was already an empty husk git no longer tracked. `git
+branch -a` is now `main` and `origin/main`, and `git worktree list` is the one checkout.
 
 **CI is off the deprecated Node 20** (2026-08-15). `deploy.yml` went `checkout` v4→v7,
 `setup-node` v4→v7, `configure-pages` v5→v6, `upload-pages-artifact` v3→v5 and `deploy-pages` v4→v5,
