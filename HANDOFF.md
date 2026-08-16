@@ -442,10 +442,24 @@ Everything below shipped this session, each as its own commit. What is left is l
 - **Colour**: section, raid and talent-tree accents; real gem colours; item quality as a hairline on
   each paperdoll slot; enchants in the game's green.
 
-**Buffs & Consumables and the Simulation tab are both hidden, not deleted.** Panels and data are
-untouched on disk; `src/featureFlags.ts` explains the simulation one, and `?simulation=1` brings it
-back for the tests. The buff/consumable/debuff id lists stay in `App` because `calculateStats`,
-`findUpgrades` and the saved-build format all still read them.
+**Buffs & Consumables is back; only the Simulation tab is still hidden.** `src/featureFlags.ts`
+explains the simulation one, and `?simulation=1` brings it back for the tests.
+
+**Hiding the buffs panel was worse than it looked, and this is the reason to be wary of hiding a
+surface whose data something else consumes.** The two tabs were hidden together, but for different
+reasons: the simulation numbers were known to be wrong, whereas the buff data is real and sourced —
+33 raid buffs each cited to the spell rank its numbers were read from, 31 consumables, 6 target
+debuffs — and `calculateStats` was applying it the whole time. With nothing rendering the toggles,
+the three id lists defaulted to empty and could never be changed, so **that entire dataset reached no
+number in the app**. Not wrong, just unreachable, and nothing about the interface said so.
+
+It is now the fifth planner sub-tab, between Talents and Ranked Gear — both are "what you bring",
+ahead of the rankings you check against. `App` holds one shared `toggleId` helper rather than three
+near-identical callbacks, since only the target state differs.
+
+A test pins the exact arithmetic rather than the direction: Battle Shout is a flat **+306** melee
+attack power at rank 8, so the assertion is `after - before === 306` and that unticking restores the
+original total exactly. "Went up" would pass just as happily with the buff applied twice.
 
 ### 2a. Earlier UI audit — three fixes applied, two findings retracted
 
@@ -623,11 +637,10 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
   line, a filled Equip button), plus the per-slot collapse added later. There is no dated markup left
   in it — zero `<dl>`, `<dt>`, `<dd>` or `<table>` across BisPanel, BuffsPanel and GearPanel alike.
 
-  The Buffs panel is a different problem: **nothing renders it.** `BuffsPanel.tsx` is never imported
-  or mounted in `App.tsx`; the only mention is a comment recording that it is parked. Restyling it
-  would be work on a module nothing renders, which this file's own conventions forbid. The question
-  is not how to lay it out — it is whether Buffs & Consumables comes back at all, and that is a
-  product decision, not a design one.
+  The Buffs panel was a different problem: nothing rendered it, so restyling it would have been work
+  on a module nothing renders — which this file's own conventions forbid. That question has since
+  been answered by bringing the panel back as the fifth planner sub-tab (§2), which is the
+  prerequisite any layout work on it needed.
 
 ---
 

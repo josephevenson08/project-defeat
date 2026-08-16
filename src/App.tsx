@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
@@ -35,6 +35,7 @@ import { RaidsPanel } from './features/raids/RaidsPanel'
 import { RaidPicker } from './features/raids/RaidPicker'
 import { RaidRail } from './features/raids/RaidRail'
 import { TabNav, type TabDefinition } from './components/layout/TabNav'
+import { BuffsPanel } from './features/buffs/BuffsPanel'
 
 const initialCharacter: CharacterProfile = {
   faction: 'Alliance',
@@ -72,7 +73,7 @@ function visibleTabs(simulationEnabled: boolean) {
   return APP_TABS.filter((tab) => tab.id !== 'simulation' || simulationEnabled)
 }
 
-type PlannerView = 'gear' | 'talents' | 'bis' | 'build'
+type PlannerView = 'gear' | 'talents' | 'buffs' | 'bis' | 'build'
 
 /**
  * The planner's four panels, as a second level of tabs rather than one column.
@@ -83,13 +84,22 @@ type PlannerView = 'gear' | 'talents' | 'bis' | 'build'
  * is what makes splitting these affordable — the stat totals stay on screen throughout, so this
  * costs nothing that the single column was providing.
  *
- * Sub-tabs rather than collapsible panels because these are four different activities, not four
- * views of one thing: you gear, then you spend talent points, then you check a ranking. Collapsing
- * would have kept the scroll and added a second thing to manage.
+ * Sub-tabs rather than collapsible panels because these are different activities, not several views
+ * of one thing: you gear, then you spend talent points, then you check a ranking. Collapsing would
+ * have kept the scroll and added a second thing to manage.
+ *
+ * Buffs & Consumables is back as the fifth. It was hidden along with the Simulation tab, but for a
+ * different reason and with a worse consequence: its data is real and sourced — 33 raid buffs each
+ * cited to the spell rank its numbers were read from, 31 consumables, 6 target debuffs — and
+ * `calculateStats` has been applying it the whole time. With nothing rendering the toggles, every
+ * one of those defaulted off and could not be turned on, so a sourced dataset reached no number in
+ * the app. It sits next to Talents because both are "what you bring", ahead of the rankings you
+ * check against.
  */
 const PLANNER_VIEWS: readonly TabDefinition<PlannerView>[] = [
   { id: 'gear', label: 'Gear' },
   { id: 'talents', label: 'Talents' },
+  { id: 'buffs', label: 'Buffs' },
   { id: 'bis', label: 'Ranked Gear' },
   { id: 'build', label: 'Build' },
 ]
@@ -182,13 +192,23 @@ function App() {
   }
 
   /*
-   * The buff, consumable and target-debuff *toggles* are gone with the Buffs & Consumables panel,
-   * but the three id lists deliberately are not: `calculateStats`, `findUpgrades` and the saved-build
-   * format all still read them, and a build saved while the panel existed must keep resolving.
+   * The three id lists feed `calculateStats`, `findUpgrades` and the saved-build format, and these
+   * toggles are what let a player change them again. They were removed when the Buffs & Consumables
+   * panel was hidden, which left the lists permanently empty — the sourced buff data was still being
+   * applied, it just had nothing to apply.
    *
-   * `BuffsPanel.tsx` and its data are untouched on disk. Restoring the panel means rendering it
-   * again and giving it back three callbacks that flip an id in and out of these lists.
+   * One shared helper rather than three near-identical ones: the operation is the same set-toggle in
+   * every case, and the only thing that differs is which piece of state it writes.
    */
+  const toggleId = useCallback(
+    (setIds: Dispatch<SetStateAction<readonly string[]>>) => (id: string) =>
+      setIds((current) => (current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id])),
+    [],
+  )
+
+  const toggleBuff = useMemo(() => toggleId(setActiveBuffIds), [toggleId])
+  const toggleConsumable = useMemo(() => toggleId(setActiveConsumableIds), [toggleId])
+  const toggleTargetDebuff = useMemo(() => toggleId(setActiveTargetDebuffIds), [toggleId])
 
   const upgradeReport = useMemo(
     () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
@@ -273,6 +293,17 @@ function App() {
           />
           {plannerView === 'gear' && <GearPanel character={character} gear={gear} onChange={updateGear} />}
           {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}
+          {plannerView === 'buffs' && (
+            <BuffsPanel
+              character={character}
+              activeBuffIds={activeBuffIds}
+              activeConsumableIds={activeConsumableIds}
+              activeTargetDebuffIds={activeTargetDebuffIds}
+              onToggleBuff={toggleBuff}
+              onToggleConsumable={toggleConsumable}
+              onToggleTargetDebuff={toggleTargetDebuff}
+            />
+          )}
           {plannerView === 'bis' && <BisPanel character={character} gear={gear} onEquip={updateGear} />}
           {plannerView === 'build' && <BuildPanel state={buildState} role={role} onImport={importBuild} />}
         </>

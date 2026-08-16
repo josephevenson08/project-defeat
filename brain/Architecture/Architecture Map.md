@@ -58,7 +58,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
 - [[features.bis.BisPanel]] · 1 importers
-- [[features.buffs.BuffsPanel]] · 0 importers
+- [[features.buffs.BuffsPanel]] · 1 importers
 - [[features.builds.BuildPanel]] · 1 importers
 - [[features.builds.buildStorage]] · 2 importers
 - [[features.character.CharacterCreator]] · 1 importers

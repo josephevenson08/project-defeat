@@ -141,7 +141,7 @@ async function openPlannerTab(page: Page) {
  * Idempotent by design — the helpers below call it freely, and clicking the tab you are already on
  * is a no-op rather than something a test has to track.
  */
-async function openPlannerView(page: Page, view: 'Gear' | 'Talents' | 'Ranked Gear' | 'Build') {
+async function openPlannerView(page: Page, view: 'Gear' | 'Talents' | 'Buffs' | 'Ranked Gear' | 'Build') {
   await page.getByRole('navigation', { name: 'Planner sections' }).getByRole('button', { name: view, exact: true }).click()
 }
 
@@ -2788,7 +2788,7 @@ test('the planner shows one panel at a time instead of a single long column', as
   // three talent trees.
   const nav = page.getByRole('navigation', { name: 'Planner sections' })
   await expect(nav).toBeVisible()
-  await expect(nav.getByRole('button')).toHaveText(['Gear', 'Talents', 'Ranked Gear', 'Build'])
+  await expect(nav.getByRole('button')).toHaveText(['Gear', 'Talents', 'Buffs', 'Ranked Gear', 'Build'])
 
   // Gear is where you land, so the many gear-only tests need no navigation at all.
   await expect(page.getByRole('region', { name: 'Gear', exact: true })).toBeVisible()
@@ -2799,7 +2799,8 @@ test('the planner shows one panel at a time instead of a single long column', as
   // document, not merely scrolled past.
   const views = [
     { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
-    { view: 'Ranked Gear' as const, present: page.getByTestId('bis-panel'), absent: page.getByRole('region', { name: 'Talents', exact: true }) },
+    { view: 'Buffs' as const, present: page.getByTestId('buffs-panel'), absent: page.getByRole('region', { name: 'Talents', exact: true }) },
+    { view: 'Ranked Gear' as const, present: page.getByTestId('bis-panel'), absent: page.getByTestId('buffs-panel') },
     // The Build panel's region, not its export textarea — that lives inside a collapsed <details>,
     // so it is legitimately hidden until you open it. `exact` because "Saved builds" is a region
     // too, and Playwright's name option matches substrings by default.
@@ -2814,7 +2815,7 @@ test('the planner shows one panel at a time instead of a single long column', as
 
   // The rail is what makes splitting these affordable: the stat totals stay on screen throughout, so
   // moving between the four does not cost you the numbers you were reading.
-  for (const view of ['Gear', 'Talents', 'Ranked Gear', 'Build'] as const) {
+  for (const view of ['Gear', 'Talents', 'Buffs', 'Ranked Gear', 'Build'] as const) {
     await openPlannerView(page, view)
     await expect(page.getByRole('region', { name: 'Stats' }), `the stat rail should survive ${view}`).toBeVisible()
   }
@@ -3414,4 +3415,34 @@ test('the ranked list opens collapsed per slot, and only offers the control wher
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
   await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
   await expect(panel.locator('.bis-slot-toggle')).toHaveCount(0)
+})
+
+test('Buffs & Consumables is reachable again, and a toggle moves the totals', async ({ page }) => {
+  /*
+   * The panel was hidden alongside the Simulation tab, but for a different reason and with a worse
+   * consequence. Its data is real and sourced — 33 raid buffs each cited to the spell rank its
+   * numbers were read from — and `calculateStats` was applying it the whole time. With nothing
+   * rendering the toggles the three id lists defaulted to empty and could never be changed, so that
+   * whole dataset reached no number in the app.
+   */
+  await openApp(page)
+  await openPlannerView(page, 'Buffs')
+  await expect(page.getByTestId('buffs-panel')).toBeVisible()
+
+  // Battle Shout is +306 attack power at rank 8, melee only. Asserting the exact delta rather than
+  // "went up" is the point: it proves the sourced value reaches the total intact, and would catch a
+  // buff being applied twice or scaled by something it should not be.
+  const readAp = async () => readStatValue(await page.getByTestId('stat-attack-power').innerText())
+
+  const before = await readAp()
+  await page.getByTestId('buff-toggle-battle-shout').click()
+  const after = await readAp()
+  expect(after - before, 'Battle Shout is a flat +306 melee attack power').toBe(306)
+
+  // And it has to come back off — a toggle that only adds is a filter, not a toggle.
+  await page.getByTestId('buff-toggle-battle-shout').click()
+  expect(await readAp(), 'unticking must restore the unbuffed total exactly').toBe(before)
+
+  // The rail survives the new view, like the other four.
+  await expect(page.getByRole('region', { name: 'Stats' })).toBeVisible()
 })
