@@ -1772,6 +1772,32 @@ select:focus,
   padding-bottom: 6px;
 }
 
+/*
+ * Opens a slot's remaining ranks. Deliberately a quiet text control rather than a Button: the
+ * filled buttons in this panel all *equip* something, and a control that only changes what is on
+ * screen must not look like one that changes your character.
+ */
+.bis-slot-toggle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  padding: 6px 0 0;
+  text-transform: uppercase;
+}
+
+.bis-slot-toggle:hover {
+  color: var(--text);
+}
+
+.bis-slot-toggle:focus-visible {
+  outline: 1px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
 /* Slot names read as column headers, the way a Wowhead or Icy Veins BiS table labels its rows.
    Small, tracked and uppercase rather than large and bold — the item names are what should carry
    weight here, and they already do it with quality colour. */

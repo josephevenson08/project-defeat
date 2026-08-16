@@ -3359,3 +3359,53 @@ test('the two pure-proc meta gems reach the stat total, at their uptime', async 
     await expect(page.getByTestId('gem-chip-Head-0')).not.toContainText('No stats this app models')
   })
 })
+
+test('the ranked list opens collapsed per slot, and only offers the control where it earns it', async ({ page }) => {
+  /*
+   * Measured before the cap was chosen, not after: the panel was 6,458px — 9.0 screens at 1280x720 —
+   * from 64 entries across 15 slot groups, with a median entry height of only 61px. The length came
+   * from how many entries there were, not from how tall they are, which is why the fix is to show
+   * fewer by default rather than to shrink them.
+   *
+   * Capping at 3, the obvious "a few", would have hidden just 22.9% of entries across all 27 specs,
+   * because 288 of the 398 slot groups hold exactly 4. Two lands at ~6.1 screens and still reads as
+   * a ranking, since a #1 and a #2 are both on screen.
+   */
+  await openApp(page)
+  await openPlannerView(page, 'Ranked Gear')
+
+  const panel = page.getByTestId('bis-panel')
+
+  // Fury Warrior ranks 3 or 4 items in every one of its 15 slots, so nothing is fully shown and the
+  // collapsed total is exactly 15 x 2.
+  await expect(panel.locator('.bis-entry')).toHaveCount(30)
+  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(15)
+
+  // Head ranks 3, so opening it reveals exactly the one it was holding back.
+  const headToggle = page.getByTestId('bis-show-all-Head')
+  await expect(headToggle).toHaveText('Show all 3')
+  await expect(headToggle).toHaveAttribute('aria-expanded', 'false')
+
+  await headToggle.click()
+  await expect(panel.locator('.bis-entry')).toHaveCount(31)
+  await expect(headToggle).toHaveText('Show top 2')
+  await expect(headToggle).toHaveAttribute('aria-expanded', 'true')
+
+  // Opening one slot must not open the rest. The point is to compare within a slot, not to restore
+  // the nine-screen wall in one click.
+  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(15)
+
+  await headToggle.click()
+  await expect(panel.locator('.bis-entry')).toHaveCount(30)
+  await expect(headToggle).toHaveText('Show all 3')
+
+  /*
+   * A Combat Rogue ranks at most 2 in every slot, so nothing is ever hidden. No slot should offer a
+   * control that would reveal nothing — a dead "Show all 2" next to two visible rows is worse than
+   * no control, because it implies there is more.
+   */
+  await page.getByLabel('Class').selectOption('Rogue')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
+  await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
+  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(0)
+})

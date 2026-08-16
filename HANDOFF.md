@@ -489,9 +489,26 @@ lost.
 Sub-tabs rather than collapsible panels because these are four different activities, not four views
 of one thing. Collapsing would have kept the scroll and added a second thing to manage.
 
-**Still true afterwards, and worth knowing:** Ranked Gear on its own is *still* 9.4 screens. Sub-tabs
-fixed navigation, not that panel's length. Capping each slot's ranking at a few entries with a "show
-all" is the remaining move if it matters.
+**Ranked Gear's own length is now dealt with — and the fix proposed here was the wrong one.** This
+used to say "capping each slot's ranking at a few entries with a show-all is the remaining move".
+Measuring first said otherwise, twice over:
+
+- **The length is entry *count*, not entry height.** The panel measured **6,458px, 9.0 screens** at
+  1280x720, from **64 entries across 15 slot groups** — but the median entry is only **61px**, which
+  is already tight. There is nothing to shrink; there are just a lot of rows.
+- **"A few" would not have worked.** Entries per slot across all 27 specs run min 1, **median 4**,
+  max 8, and **288 of the 398 slot groups hold exactly 4**. So capping at 3 hides only **22.9%** of
+  entries and lands at ~7.4 screens. Measured: 3 → ~7.4 screens, 2 → ~6.1, 1 → ~4.8.
+
+`DEFAULT_VISIBLE_PER_SLOT` in `BisPanel.tsx` is **2**, giving a measured **4,367px / 6.1 screens**, a
+32% cut, with a per-slot "Show all N". Two rather than one because the panel is called *Ranked* Gear:
+a #1 with a #2 under it still reads as a ranking, where a single row reads as a pick. The constant is
+the only thing to change to move along that curve.
+
+Two things worth not rediscovering. Expanding one slot deliberately does **not** expand the others —
+the reason to open a slot is to compare inside it, not to restore the wall. And **all three Rogue
+specs rank ≤2 in every slot**, so they show no toggles at all and always did fit; any test asserting
+toggle counts has to pick its spec deliberately.
 
 **The rail is spec-aware, with an escape hatch.** A Fury Warrior went from 26 rows to **12**; a
 Protection Warrior gets 18, a Mage 11, a Holy Priest 12, a Feral Druid 13. `domain/stats/statRelevance.ts`

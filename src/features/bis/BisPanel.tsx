@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
@@ -19,6 +20,24 @@ type BisPanelProps = {
   gear: EquippedGear
   onEquip: (slot: GearSlot, equippedSlot: EquippedSlot) => void
 }
+
+/**
+ * How many ranked entries a slot shows before it needs opening.
+ *
+ * Chosen from a measurement of the running panel rather than picked: it was **6,458px, 9.0 screens**
+ * at 1280x720, from 64 entries across 15 slot groups. The entries are not the problem individually —
+ * the median one is 61px, which is already tight — there are simply a lot of them.
+ *
+ * Entries per slot across all 27 specs run min 1, median 4, max 8, and 288 of the 398 slot groups
+ * hold exactly 4. That is what makes the obvious cap ineffective: capping at 3 hides only 22.9% of
+ * all entries and lands at ~7.4 screens, which is not a fix. Measured alternatives were 3 → ~7.4
+ * screens, 2 → ~6.1, 1 → ~4.8.
+ *
+ * Two keeps the panel legibly *ranked* — you can see a #1 and a #2, so the list still reads as a
+ * ranking rather than a single pick — while cutting about a third. Change this one number to move
+ * along that curve; nothing else depends on the value.
+ */
+const DEFAULT_VISIBLE_PER_SLOT = 2
 
 function entriesBySlot(entries: readonly RankedGearEntry[]) {
   const groups = new Map<GearSlot, RankedGearEntry[]>()
@@ -71,6 +90,19 @@ function equippedSlotFor(entry: RankedGearEntry, item: GearItem): EquippedSlot {
 }
 
 export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
+  // Which slots the reader has opened. Keyed by slot rather than a single "expand everything" flag,
+  // because the reason to open one is to compare inside *that* slot, not to restore the 9-screen
+  // wall. Held here rather than lifted: nothing outside this panel has any use for it, and a saved
+  // build should not carry which accordions happened to be open when it was saved.
+  const [expandedSlots, setExpandedSlots] = useState<ReadonlySet<GearSlot>>(new Set())
+
+  const toggleSlot = (slot: GearSlot) =>
+    setExpandedSlots((current) => {
+      const next = new Set(current)
+      if (!next.delete(slot)) next.add(slot)
+      return next
+    })
+
   const bisList = getBisListForSpec(character.className, character.spec)
 
   if (!bisList) {
@@ -99,6 +131,9 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
             const entries = groupedEntries.get(slot)
             if (!entries) return null
             const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
+            const isExpanded = expandedSlots.has(slot)
+            const visibleEntries = isExpanded ? entries : entries.slice(0, DEFAULT_VISIBLE_PER_SLOT)
+            const hiddenCount = entries.length - visibleEntries.length
 
             return (
               <section className="bis-slot-group" key={slot} aria-label={`${displayName} ranked items`}>
@@ -108,7 +143,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                 </div>
 
                 <div className="bis-entry-list">
-                  {entries.map((entry) => {
+                  {visibleEntries.map((entry) => {
                     const item = getItemById(entry.itemId)
                     const { enchantName, gemNames } = recommendationsFor(entry)
                     const targetSlots = getPairedGearSlots(entry.slot)
@@ -219,6 +254,22 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                     )
                   })}
                 </div>
+                {/*
+                  Only rendered when this slot actually has more, so a slot ranking one item shows
+                  no control at all rather than a dead "Show all 1". The count is in the label
+                  because "Show all" alone does not say whether it is worth the click.
+                */}
+                {hiddenCount > 0 || isExpanded ? (
+                  <button
+                    aria-expanded={isExpanded}
+                    className="bis-slot-toggle"
+                    data-testid={`bis-show-all-${slot}`}
+                    onClick={() => toggleSlot(slot)}
+                    type="button"
+                  >
+                    {isExpanded ? `Show top ${DEFAULT_VISIBLE_PER_SLOT}` : `Show all ${entries.length}`}
+                  </button>
+                ) : null}
               </section>
             )
           })}
