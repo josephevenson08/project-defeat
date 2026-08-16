@@ -11,7 +11,7 @@ activation. §1 and §2b carry the findings that cost the most to learn.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
 `josephevenson08/project-defeat`, currently at **`773a8eb`** plus the talent-scaling scope and
-branch-cleanup commits that follow it; everything pushed.
+the cleanup commits that follow it; everything pushed.
 
 ---
 
@@ -653,7 +653,7 @@ with a falsification test stated up front. One product decision is open and gate
 talents reach `calculateStats` and therefore the always-visible stat rail, or only the hidden
 simulator.
 
-**One chore done, one still open.** The 19 stale local branches are **deleted** (2026-08-15): 18 via
+**Both chores are done.** The 19 stale local branches are **deleted** (2026-08-15): 18 via
 `git branch -d --merged main`, and `worktree-agent-afb0a902111f3a642` via `-D` after checking that
 every file it added is already present in `main` — the raids rebuild superseded it. **Ten of those
 branches still exist on `origin`, and were deliberately left**, because this repo is public and
@@ -661,9 +661,23 @@ deleting a published branch is a decision rather than a cleanup. `git worktree l
 a stale worktree at `.claude/worktrees/lucid-cartwright-9d8b8c`, detached at `68aae34` — reachable
 from `main`, so its work is merged and the checkout is only costing OneDrive space.
 
-**Still open: CI targets the deprecated Node 20.** `deploy.yml` uses `actions/checkout@v4`,
-`actions/setup-node@v4`, `actions/configure-pages@v5`, `actions/upload-pages-artifact@v3` and
-`actions/deploy-pages@v4`. An earlier version of this note named `upload-artifact@v4`, which this
+**CI is off the deprecated Node 20** (2026-08-15). `deploy.yml` went `checkout` v4→v7,
+`setup-node` v4→v7, `configure-pages` v5→v6, `upload-pages-artifact` v3→v5 and `deploy-pages` v4→v5,
+all now on Node 24. **Verified end to end**, not just green: the run succeeded and the live site
+serves the same asset hashes the local build produced.
+
+Two hazards were checked rather than assumed, because this workflow publishes the live site.
+`upload-pages-artifact` **v4 stopped including dotfiles** in the artifact — this `dist` has none, so
+nothing is dropped; and `deploy-pages` v4+ **only accepts artifacts from `upload-pages-artifact` v3
+or newer**, which v5 satisfies. `actions: read` was also added: `deploy-pages` has required it since
+v4, because build and deploy are separate jobs here and the deploy fetches the artifact by id
+through the Actions API. Deploys were succeeding without it, so that closed a documented gap rather
+than a live break.
+
+`node-version` stays at **22** deliberately — the Node an *action* runs on is a different thing from
+the Node the app is built with, and changing the latter is its own decision.
+
+An earlier version of this note named `upload-artifact@v4`, which this
 workflow does not use, and omitted `deploy-pages@v4` entirely — so check the file, not the note.
 
 **Known-wrong data still standing:** **123** of 230 curated items in `sampleItems.ts` carry
