@@ -324,9 +324,10 @@ Now visible on the Simulation tab, so its limitations are visible too. Still ope
 2 specs of 27, and there is no multi-iteration variance or result charting.
 
 **All three of the reasons `featureFlags.ts` gives for hiding the tab have now been addressed** —
-rage, item procs and the healer mana constraint. The flag's own wording is stale as a result; it
-still says "rage is not modelled at all". Whether the numbers are now defensible enough to show is a
-judgement, not a blocker, and it has not been taken.
+rage, item procs and the healer mana constraint. **The flag's reasoning has been rewritten to match**
+(2026-08-15) — it used to claim "rage is not modelled at all", which would have sent the next reader
+off to re-fix something already done. The flag's *value* is untouched: whether the numbers are now
+defensible enough to show is a judgement, not a blocker, and it has still not been taken.
 
 **The healer mana term** is `domain/simulation/manaModel.ts`, from wowsims `sim/core/mana.go`:
 `MP5/5` per second, Spirit regen as `0.001 + Spirit*sqrt(Intellect)*0.009327`, and `Intellect*15-280`
@@ -628,11 +629,12 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
 Everything below is open. Nothing is half-finished — each item is a decision or a fresh piece of work.
 
 **A decision only the repo owner can take.** All three reasons `src/featureFlags.ts` gives for hiding
-the Simulation tab have been addressed — rage, item procs, healer mana — so **its wording is now
-stale: it still says "rage is not modelled at all"**. Whether the numbers are defensible enough to
-show is a judgement and was deliberately not taken. There is a real argument against: rotations cover
-2 specs of 27, and melee DPS reads low because talents reach the simulation nowhere. Either way that
-file needs its reasoning rewritten, because it currently describes a state that no longer exists.
+the Simulation tab have been addressed — rage, item procs, healer mana. **The stale wording is now
+fixed**; the file states what is actually true and says outright that the hide decision has not been
+revisited. **What remains is only the decision itself**, and it is genuinely yours: rotations cover 2
+specs of 27, melee DPS still reads low because talents reach the simulation nowhere, and there is no
+variance or charting. Against that, the tab now discloses its own gaps. Nothing is blocking a flip in
+either direction — it just needs someone to choose.
 
 **The gem procs are wired now, and they were not a tidy-up.** `ingest-item-effects.mjs` reads
 `metagems.go`, so it always extracted **Mystical Skyfire Diamond (25893)** and **Thundering Skyfire
