@@ -816,7 +816,20 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
 - **Source.** `tools/ingest/ingest-talent-effects.mjs` reads `sim/warrior/talents.go` at the pinned
   `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
-- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.4 → 5.8/sec**.
+- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
+- **It covers Arms too, free.** `deriveTalentModifiers` is keyed by **talent id** and
+  `warriorTalents.json` carries all three trees, so any spec sharing the class shares the effects —
+  nothing about the mechanism is Fury-specific. Arms measured **203.2 → 229.1**. Adding a class means
+  adding its extractors, not its specs.
+- **Protection gets nothing, and that is the honest gap.** Talents are applied in
+  `calculatePhysicalDps`; a Protection Warrior is scored by `calculateTankSurvivability`, which never
+  receives them. So Toughness, Vitality, Anticipation, Defiance and the shield talents reach nothing.
+  The ingest already refuses them by name with that reason, so the *data* side is consistent — it is
+  the application side that stops at the DPS path. A test pins this so it reads as a decision rather
+  than an oversight. Their formulas are already surveyed in `sim/warrior/talents.go` if it is picked
+  up: Anticipation +4 Defense/rank, Toughness armour ×(1+0.02·rank) on items only, Vitality stamina
+  ×(1+0.01·rank) and strength ×(1+0.02·rank), Defiance +2 expertise/rank, Deflection +1% parry/rank,
+  Shield Specialization +1% block/rank, Shield Mastery block value ×(1+0.1·rank).
 - **The falsification test half failed, which is the point of having written it first.** The scope
   required DPS to move *and* the rage gap to close. It did not close: 5.2 against 7.5, and Heroic
   Strike is still excluded. **Talents are a major missing piece but they are not the rage fix.**

@@ -251,7 +251,35 @@ substantially toward a defensible figure *and* close the rage gap — auto attac
 ~3.1 rage/sec against the 7.5 Bloodthirst and Whirlwind need. If it does not, the diagnosis in
 HANDOFF.md is wrong, and stages 2 and 3 should not be built on top of it.
 
-### Then reassess: stage 2 — the other physical specs
+### Stage 2 — what it actually costs, now that stage 1 is done
+
+**A class, not a spec.** `deriveTalentModifiers` is keyed by talent id, so all of a class's specs
+share its effects the moment its extractors exist — Arms came free with Fury. Adding Rogue buys three
+specs; Warlock, Mage, Priest and Hunter buy three each.
+
+**Rogue is the natural next one**, surveyed and mapping cleanly onto the existing fields:
+
+| Rogue talent | wowsims | Lands on |
+|---|---|---|
+| Malice | `MeleeCritRating × 1 × rank` | `meleeCritChance` |
+| Precision | `MeleeHitRating × 1 × rank` | `meleeHitChance` |
+| Deadliness | `AP × (1 + 0.02·rank)` | `attackPowerMultiplier` |
+| Weapon Expertise | `Expertise × 5 × rank` | needs a new field |
+
+Three would have to be refused, and the reasons are worth knowing before starting:
+
+- **Vitality and Sinister Calling multiply Agility**, which cascades into attack power and crit inside
+  `calculateStats` — a boundary this stage deliberately does not cross. Applying them in the
+  simulation would mean re-deriving what `calculateStats` already derives.
+- **Murder is gated on mob type** (humanoid/beast/giant/dragonkin), and nothing here models one.
+- **Serrated Blades grants armor penetration**, which the engine genuinely does not read — it is the
+  one stat still legitimately on the "not modelled" list.
+
+**The ingest needs generalizing first.** It is Warrior-hardcoded: `warrior.Talents.X` patterns, one
+output file, `warriorTalents.json` for the name cross-check. Parameterising by class is the real work;
+the per-talent extractors are the easy part.
+
+### Then reassess: the other physical specs
 
 Same machinery, no new concepts, once stage 1 has proven the shape. Arms, Protection, both Rogue
 DPS trees, Enhancement, Feral.

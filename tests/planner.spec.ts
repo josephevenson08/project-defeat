@@ -3996,3 +3996,52 @@ test('the estimate names unmodelled talents you actually took, and stays quiet o
   expect(note, 'talents that ARE modelled must not be listed as gaps').not.toContain('Cruelty')
   expect(note, 'and it should say which way the estimate is wrong').toMatch(/low by/i)
 })
+
+test('talent scaling covers both Warrior DPS specs, and deliberately not the tank', () => {
+  /*
+   * The scope described stage 1 as "Fury Warrior". Arms gets it free, and that is worth pinning
+   * rather than leaving as a happy accident: `deriveTalentModifiers` is keyed by **talent id**, and
+   * `warriorTalents.json` carries all three trees, so any spec that shares the class shares the
+   * effects. Nothing about the mechanism is Fury-specific.
+   *
+   * Protection is the honest gap. Talents are applied in `calculatePhysicalDps`, and a Protection
+   * Warrior is scored by `calculateTankSurvivability`, which never receives them — so Toughness,
+   * Vitality, Anticipation, Defiance and the shield talents all reach nothing. The ingest already
+   * refuses them by name with that reason, so the data side is consistent; it is the application
+   * side that stops at the DPS path.
+   */
+  const talents = getTalentData('Warrior')!
+  const byName = new Map<string, number>()
+  for (const tree of talents.trees) for (const talent of tree.talents) byName.set(talent.name, talent.id)
+
+  const points: Record<number, number> = {}
+  for (const [name, rank] of [
+    ['Cruelty', 5],
+    ['Precision', 3],
+    ['Two-Handed Weapon Specialization', 5],
+    ['Improved Berserker Stance', 5],
+  ] as const) {
+    const id = byName.get(name)
+    if (id !== undefined) points[id] = rank
+  }
+
+  const scoreFor = (spec: TbcSpec, role: CharacterRole, talentPoints: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec }
+    const gear = normalizeGearForCharacter(defaultGear, 'Warrior', spec)
+    const stats = calculateStats(character, gear)
+    return calculateSimulation(character, gear, stats, role, [], undefined, talentPoints).scoreExact
+  }
+
+  for (const spec of ['Arms', 'Fury'] as const) {
+    const bare = scoreFor(spec, 'Physical DPS', {})
+    const talented = scoreFor(spec, 'Physical DPS', points)
+    expect(talented, `${spec} must benefit from talents`).toBeGreaterThan(bare)
+  }
+
+  // Protection is scored as a tank, and the tank path takes no talents. Asserted so the gap is a
+  // recorded decision rather than something a future reader assumes is already handled.
+  expect(
+    scoreFor('Protection', 'Tank', points),
+    'the tank path does not receive talents yet — see the ingest\'s skipped list',
+  ).toBe(scoreFor('Protection', 'Tank', {}))
+})
