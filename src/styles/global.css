@@ -2467,6 +2467,26 @@ input[type='number']:focus {
   margin-top: 16px;
 }
 
+/*
+ * The spec-specific caveat under a result. Amber, like the other genuine-gap treatments in this app,
+ * because it is telling you the number above is wrong for your spec in a knowable direction — that
+ * is a warning, not a footnote.
+ */
+.simulation-spec-note {
+  background: rgba(212, 160, 23, 0.06);
+  border-left: 2px solid var(--warn);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 12px 0 0;
+  max-width: 72ch;
+  padding: 10px 12px;
+}
+
+.simulation-spec-note strong {
+  color: var(--warn);
+}
+
 .stat-weights-unmodeled {
   background: rgba(252, 211, 77, 0.06);
   border: 1px solid rgba(252, 211, 77, 0.22);

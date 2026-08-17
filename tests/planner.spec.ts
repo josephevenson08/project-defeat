@@ -3902,3 +3902,62 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/vs\. a level 73 target/i)).toBeVisible()
 })
+
+test('every spec says what its own estimate misses, and none of them say the same thing', () => {
+  /*
+   * All 31 signature abilities carry researched prose about how far a single-ability approximation
+   * sits from that spec's real rotation — that a Beast Mastery hunter's damage largely bypasses
+   * Steady Shot, that Survival is brought for Expose Weakness rather than personal DPS. Every word of
+   * it was written and **none of it reached the interface**, which is the same failure as the buffs
+   * panel: real, sourced content wired to nothing.
+   *
+   * It matters most precisely where the estimate is weakest. 25 of 27 specs are single-ability
+   * approximations, so for almost every spec this note *is* the honest part of the readout.
+   */
+  const races: Record<string, TbcRace> = {
+    Warrior: 'Human',
+    Paladin: 'Human',
+    Hunter: 'Human',
+    Rogue: 'Human',
+    Priest: 'Human',
+    Shaman: 'Draenei',
+    Mage: 'Human',
+    Warlock: 'Human',
+    Druid: 'Night Elf',
+  }
+
+  const notes = new Set<string>()
+  let specs = 0
+
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      specs += 1
+      const character: CharacterProfile = { faction: 'Alliance', race: races[entry.className], className: entry.className, spec }
+      const gear = normalizeGearForCharacter(defaultGear, entry.className, spec)
+      const stats = calculateStats(character, gear)
+      const result = calculateSimulation(character, gear, stats, getRoleForSpec(entry.className, spec))
+
+      expect(result.specNote, `${entry.className} ${spec} must say what its estimate misses`).toBeTruthy()
+      expect(result.specNote!.length, `${entry.className} ${spec}'s note must be a real explanation`).toBeGreaterThan(60)
+      notes.add(result.specNote!)
+    }
+  }
+
+  expect(specs).toBe(27)
+  // Distinct per spec. A shared note would mean the caveat had become boilerplate, which is the
+  // failure mode this whole area keeps falling into — a caveat nobody reads is a caveat nobody acts
+  // on, and an identical one across 27 specs earns that.
+  expect(notes.size, 'each spec needs its own caveat, not a shared one').toBe(27)
+})
+
+test('the spec caveat is rendered with the result, not just computed', async ({ page }) => {
+  await openApp(page)
+  await openSimulationTab(page)
+  await page.getByRole('button', { name: /run simulation/i }).click()
+
+  const note = page.getByTestId('simulation-spec-note')
+  await expect(note).toBeVisible()
+  await expect(note).toContainText('What this estimate misses for your spec')
+  // The default character is a Fury Warrior, so the note has to be Fury's rather than a generic one.
+  await expect(note).toContainText(/Bloodthirst/i)
+})

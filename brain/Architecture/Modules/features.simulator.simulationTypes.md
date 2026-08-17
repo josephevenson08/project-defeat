@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/simulationTypes.ts
-lines: 22
+lines: 36
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.simulationTypes
 
-`src/features/simulator/simulationTypes.ts` · **features** layer · 22 lines
+`src/features/simulator/simulationTypes.ts` · **features** layer · 36 lines
 
 _No doc comment at the top of this file._
 

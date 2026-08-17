@@ -33,6 +33,25 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
           <span>{result.metricLabel}</span>
           <strong data-testid="simulation-score">{result.score}</strong>
           <p>{result.summary}</p>
+
+          {/*
+            What this estimate misses for THIS spec, in its own words.
+
+            All 31 signature abilities carry researched prose on how far a single-ability
+            approximation sits from that spec's real rotation — that a Beast Mastery hunter's damage
+            largely bypasses Steady Shot, that Survival is brought for Expose Weakness rather than
+            personal DPS — and none of it reached the interface until now.
+
+            Its own block rather than more sentences in the summary: the summary says how the number
+            was computed, this says why it is wrong for you, and the second is the one a reader
+            actually needs. Given the warn treatment because it is a caveat, not commentary.
+          */}
+          {result.specNote && (
+            <p className="simulation-spec-note" data-testid="simulation-spec-note">
+              <strong>What this estimate misses for your spec:</strong> {result.specNote}
+            </p>
+          )}
+
           <div className="breakdown-list" aria-label="Result breakdown">
             {result.breakdown.map((entry) => (
               <div key={entry.label}>

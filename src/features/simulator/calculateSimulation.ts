@@ -131,6 +131,19 @@ function resolveCastProfile(character: CharacterProfile, fallbackCastTime: numbe
   }
 }
 
+/**
+ * The spec-specific caveat for whichever ability this estimate is actually built on.
+ *
+ * Every signature ability carries researched prose about how far a single-ability approximation is
+ * from that spec's real rotation, and none of it used to be surfaced. Resolved from the rotation's
+ * first entry rather than from `getSignatureAbility`, because the melee path layers several and the
+ * first is the one the estimate leans on.
+ */
+function specNoteFor(character: CharacterProfile): string | undefined {
+  const [primary] = getRotationAbilities(character.className, character.spec)
+  return primary?.notes
+}
+
 function round(value: number) {
   return Math.round(value * 10) / 10
 }
@@ -648,6 +661,7 @@ function calculatePhysicalDps(
 
   return {
     role: 'Physical DPS',
+    specNote: specNoteFor(character),
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
@@ -687,6 +701,7 @@ function calculateCasterDps(
 
   return {
     role: 'Caster DPS',
+    specNote: specNoteFor(character),
     metricLabel: 'Estimated DPS',
     score: round(dps),
     scoreExact: dps,
@@ -746,6 +761,7 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
 
   return {
     role: 'Healer',
+    specNote: specNoteFor(character),
     metricLabel: 'Estimated Healing',
     score: round(hps),
     scoreExact: hps,
@@ -882,6 +898,7 @@ function calculateTankSurvivability(
 
   return {
     role: 'Tank',
+    specNote: specNoteFor(character),
     metricLabel: 'Effective Health',
     score: round(effectiveHealth),
     scoreExact: effectiveHealth,
