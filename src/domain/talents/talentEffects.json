@@ -5,12 +5,13 @@
     "sha": "3301fca59306a747e521274c36e073e69acc7b77",
     "files": [
       "sim/warrior/talents.go",
-      "sim/warrior/dps/dps_warrior.go"
+      "sim/warrior/dps/dps_warrior.go",
+      "sim/warrior/berserker_rage.go"
     ]
   },
   "className": "Warrior",
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 10,
+  "effectCount": 11,
   "effects": [
     {
       "talentId": 157,
@@ -115,6 +116,17 @@
       "unit": "multiplier (flat, not per rank)",
       "flatValue": 1.25,
       "source": "sim/warrior/dps/dps_warrior.go"
+    },
+    {
+      "talentId": 1541,
+      "talent": "Improved Berserker Rage",
+      "tree": "Fury",
+      "maxRank": 2,
+      "kind": "ragePerSecondFlat",
+      "unit": "rage per second per rank",
+      "perRank": 0.16666666666666666,
+      "caveat": "Assumes Berserker Rage is pressed on cooldown, which is what upstream does whenever rage is under 80. 5 rage per rank on a 30s cooldown.",
+      "source": "sim/warrior/berserker_rage.go"
     }
   ],
   "skipped": [

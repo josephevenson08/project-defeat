@@ -52,6 +52,36 @@ export const RAGE_MULTIPLIER_UNTALENTED = 1
 /** Rage costs are only meaningful against the cap; a rotation cannot bank more than this. */
 export const MAX_RAGE = 100
 
+/*
+ * Bloodrage, from wowsims `sim/warrior/bloodrage.go` at the pinned commit.
+ *
+ * An *ability* rather than a talent, which is why it lives here and not in the talent effects: every
+ * warrior has it from level 10, so it is baseline rage income the model was simply missing. Upstream
+ * grants 10 rage instantly, plus 3 per rank of Improved Bloodrage, then ten 1-rage ticks a second
+ * apart, on a 60-second cooldown.
+ *
+ * Reduced to a sustained rate on the assumption it is pressed on cooldown, which is what upstream
+ * does whenever rage is under 70. That is the same approximation `effectUptime` makes for an on-use
+ * trinket, and it is the honest one for an ability with no reason to hold.
+ */
+export const BLOODRAGE_INSTANT_RAGE = 10
+export const BLOODRAGE_RAGE_PER_IMPROVED_RANK = 3
+export const BLOODRAGE_TICKS = 10
+export const BLOODRAGE_RAGE_PER_TICK = 1
+export const BLOODRAGE_COOLDOWN_SECONDS = 60
+
+/**
+ * Sustained rage per second from Bloodrage on cooldown.
+ *
+ * Untalented that is `(10 + 10) / 60`, a third of a rage per second — worth stating plainly because
+ * it is far smaller than the ability's 20-rage burst makes it feel, and the gap this was reached for
+ * is measured in whole rage per second.
+ */
+export function bloodrageRagePerSecond(improvedBloodrageRank = 0): number {
+  const instant = BLOODRAGE_INSTANT_RAGE + BLOODRAGE_RAGE_PER_IMPROVED_RANK * improvedBloodrageRank
+  return (instant + BLOODRAGE_TICKS * BLOODRAGE_RAGE_PER_TICK) / BLOODRAGE_COOLDOWN_SECONDS
+}
+
 /**
  * Whether Heroic Strike replacing a main-hand swing also suppresses that swing's rage.
  *

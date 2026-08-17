@@ -407,8 +407,22 @@ no current number.
 
 **The rage shortfall was blamed on talent scaling. That has now been built and tested, and the blame
 was only half right.** Talents reach the simulation as of 2026-08-15. A talented Fury build takes
-rage income from **3.1 to 5.2 rage/sec** against the 7.5 Bloodthirst and Whirlwind want — real, and
-still short: 69% of the way, with Heroic Strike still excluded. Flurry's
+rage income from **3.4 to 5.8 rage/sec** against the 7.5 Bloodthirst and Whirlwind want — real, and
+still short: 77% of the way, with Heroic Strike still excluded.
+
+**Every expressible rage source is now in, and the gap still does not close.** Bloodrage
+(`bloodrage.go`: 10 rage plus ten 1-rage ticks on a 60s cooldown) and Improved Berserker Rage
+(`berserker_rage.go`: 5 rage per rank on a 30s cooldown) were the two that remained, worth a third of
+a rage per second each. Bloodrage is an **ability, not a talent**, so it raises the untalented
+baseline too — the figure this file used to quote as 3.1 rage/sec is really **3.4**.
+
+**What is left cannot be reached by adding sources.** The only remaining rage in TBC is from *damage
+taken*, which upstream computes per incoming hit as `damage * 2.5 / 274.7`. A closed-form model of a
+DPS has no incoming-damage stream, and the shortfall works out to roughly **187 damage/sec taken** —
+entirely fight-specific. Closing it needs an **encounter input**, not more modelling, and picking a
+default would be exactly the plausible invented number this project keeps having to undo.
+
+Flurry's
 nominal 25% attack speed turns out to be worth **+7.4%** at the crit a Phase 2 Fury warrior actually
 has, because it is gated on crit and Phase 2 crit is 13%. It was never going to be the unlock.
 
@@ -727,7 +741,7 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
 - **Source.** `tools/ingest/ingest-talent-effects.mjs` reads `sim/warrior/talents.go` at the pinned
   `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
-- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.1 → 5.2/sec**.
+- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.4 → 5.8/sec**.
 - **The falsification test half failed, which is the point of having written it first.** The scope
   required DPS to move *and* the rage gap to close. It did not close: 5.2 against 7.5, and Heroic
   Strike is still excluded. **Talents are a major missing piece but they are not the rage fix.**

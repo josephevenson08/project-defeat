@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/rageModel.ts
-lines: 150
+lines: 180
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.rageModel
 
-`src/domain/simulation/rageModel.ts` · **domain** layer · 150 lines
+`src/domain/simulation/rageModel.ts` · **domain** layer · 180 lines
 
 From the top of the file:
 
@@ -45,9 +45,9 @@ From the top of the file:
 
 ## Exports
 
-**function** — `rageDumpUsesPerSecond`, `rageFromOneSwing`, `ragePerSecondFromWeapon`
+**function** — `bloodrageRagePerSecond`, `rageDumpUsesPerSecond`, `rageFromOneSwing`, `ragePerSecondFromWeapon`
 
-**const** — `HEROIC_STRIKE_SUPPRESSES_SWING_RAGE`, `MAIN_HAND_HIT_FACTOR`, `MAX_RAGE`, `OFF_HAND_HIT_FACTOR`, `RAGE_CONVERSION_FACTOR`, `RAGE_MULTIPLIER_UNTALENTED`, `RAGE_PER_POINT_OF_DAMAGE`
+**const** — `BLOODRAGE_COOLDOWN_SECONDS`, `BLOODRAGE_INSTANT_RAGE`, `BLOODRAGE_RAGE_PER_IMPROVED_RANK`, `BLOODRAGE_RAGE_PER_TICK`, `BLOODRAGE_TICKS`, `HEROIC_STRIKE_SUPPRESSES_SWING_RAGE`, `MAIN_HAND_HIT_FACTOR`, `MAX_RAGE`, `OFF_HAND_HIT_FACTOR`, `RAGE_CONVERSION_FACTOR`, `RAGE_MULTIPLIER_UNTALENTED`, `RAGE_PER_POINT_OF_DAMAGE`
 
 **type** — `SwingOutcomeMix`, `WhiteSwingRageInput`
 

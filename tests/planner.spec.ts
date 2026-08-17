@@ -284,6 +284,7 @@ import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
 import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, unmodelledTalents } from '../src/domain/talents/talentModifiers'
+import { bloodrageRagePerSecond } from '../src/domain/simulation/rageModel'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -3555,11 +3556,16 @@ test('talents do NOT close the rage gap, which is what this pass set out to test
    * test: a talented Fury build should move DPS substantially AND close the rage shortfall. The
    * first held — 165.6 to 193.2, +16.7%. The second did not.
    *
-   * Auto attacks fund 3.1 rage/sec untalented. Every rage talent this project can express takes that
-   * to **5.2**: Endless Rage multiplies swing income by 1.25, Flurry raises the swing rate that
-   * income is built on, Anger Management adds a flat 1/3, and Unbridled Wrath's 15 procs a minute
-   * add 0.25. Against the 7.5 that Bloodthirst and Whirlwind on cooldown want, the dump stays
-   * unaffordable — 69% of the way there, which is a real move and still not enough.
+   * Swings plus Bloodrage fund 3.4 rage/sec untalented. **Every rage source this project can express
+   * takes that to 5.8** — Endless Rage multiplies swing income by 1.25, Flurry raises the swing rate
+   * that income is built on, Anger Management adds a flat 1/3, Unbridled Wrath's 15 procs a minute
+   * add 0.25, and Improved Berserker Rage another 1/3. Against the 7.5 Bloodthirst and Whirlwind on
+   * cooldown want, that is 77% and the dump is still unaffordable.
+   *
+   * **The remainder is not reachable by adding more sources.** What is left is rage from damage
+   * taken, which upstream computes per incoming hit — and a closed-form model of a DPS has no
+   * incoming-damage stream. Closing it needs an encounter input, not another talent, and inventing
+   * one would be exactly the kind of plausible number this project keeps having to undo.
    *
    * What is still missing is therefore NOT talent scaling. It is Bloodrage, damage taken, and rage
    * from sources this model does not carry. Flurry was expected to be the unlock and is not, because
@@ -3580,9 +3586,38 @@ test('talents do NOT close the rage gap, which is what this pass set out to test
   const result = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
   const rage = result.breakdown.find((entry) => entry.label === 'Rage per second')!.value
 
-  expect(rage, 'talent rage income is real').toBeGreaterThan(3.1)
+  expect(rage, 'talent rage income is real').toBeGreaterThan(3.4)
   expect(rage, 'but it does not reach the 7.5 the rotation wants').toBeLessThan(7.5)
   expect(result.summary, 'and the estimate must still say the dump is unfunded').toMatch(/no surplus to dump/i)
+})
+
+test('Bloodrage is baseline warrior income, and is not multiplied by Endless Rage', () => {
+  /*
+   * An ability rather than a talent — every warrior has it from level 10 — so it raises the
+   * *untalented* baseline too, which is why the figure this file used to quote as 3.1 is now 3.4.
+   *
+   * `sim/warrior/bloodrage.go`: 10 rage instantly plus ten 1-rage ticks, on a 60s cooldown. Reduced
+   * to a sustained rate on the assumption it is pressed on cooldown, which is what upstream does
+   * whenever rage is under 70.
+   */
+  expect(bloodrageRagePerSecond()).toBeCloseTo(20 / 60, 10)
+  // Improved Bloodrage is a Protection talent, so a Fury build never sees this branch — but the
+  // ability itself scales, and the constant is sourced rather than assumed.
+  expect(bloodrageRagePerSecond(2)).toBeCloseTo(26 / 60, 10)
+
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const untalented = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
+  const rage = untalented.breakdown.find((entry) => entry.label === 'Rage per second')!.value
+
+  // Endless Rage multiplies rage generated *from damage dealt*. Bloodrage is granted outright, so it
+  // must sit outside that multiplier — folding it in would inflate a sourced number by 25%.
+  const points = furyTalentPoints([['Endless Rage', 1]])
+  const withEndlessRage = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+  const talentedRage = withEndlessRage.breakdown.find((entry) => entry.label === 'Rage per second')!.value
+  const swingIncome = rage - bloodrageRagePerSecond()
+  expect(talentedRage).toBeCloseTo(swingIncome * 1.25 + bloodrageRagePerSecond(), 1)
 })
 
 test('the talents this model cannot express are reported rather than dropped', () => {

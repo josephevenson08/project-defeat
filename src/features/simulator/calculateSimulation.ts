@@ -19,7 +19,7 @@ import {
   estimateSpecialAttack,
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
-import { rageDumpUsesPerSecond, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
+import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
@@ -561,6 +561,14 @@ function calculatePhysicalDps(
      */
     ragePerSecond *= talents.rageGeneratedMultiplier
     ragePerSecond += talents.flatRagePerSecond + talents.rageProcsPerMinute / 60
+
+    /*
+     * Bloodrage is an ability rather than a talent — every warrior has it from level 10 — so it is
+     * baseline income this model was simply missing, and it sits outside Endless Rage for the same
+     * reason the flat trickle does: Endless Rage multiplies rage generated *from damage dealt*.
+     */
+    if (character.className === 'Warrior') ragePerSecond += bloodrageRagePerSecond()
+
 
     if (mainHandSwingsPerSecond > 0) {
       meleeContext = {

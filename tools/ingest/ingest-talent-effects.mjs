@@ -29,6 +29,8 @@ const SOURCES = [
   { path: 'sim/warrior/talents.go', cache: 'sim_warrior_talents.go' },
   // Endless Rage is applied at the rage bar rather than with the other talents.
   { path: 'sim/warrior/dps/dps_warrior.go', cache: 'sim_warrior_dps_dps_warrior.go' },
+  // Improved Berserker Rage lives with the ability it modifies, not in talents.go.
+  { path: 'sim/warrior/berserker_rage.go', cache: 'sim_warrior_berserker_rage.go' },
 ]
 
 const refetch = process.argv.includes('--refetch')
@@ -135,6 +137,19 @@ const EXTRACTORS = [
     value: (m) => Number(m[1]),
     flat: true,
   },
+  {
+    talent: 'Improved Berserker Rage',
+    kind: 'ragePerSecondFlat',
+    unit: 'rage per second per rank',
+    // Two anchors in one file: the per-rank rage and the cooldown it is gated behind. Both are
+    // captured so the sustained rate below is derived rather than assumed — a cooldown change
+    // upstream stops this matching instead of silently keeping the old rate.
+    re: /rageBonus := (\d+) \* float64\(warrior\.Talents\.ImprovedBerserkerRage\)/,
+    re2: /Duration: time\.Second \* (\d+),/,
+    value: (m, m2) => Number(m[1]) / Number(m2[1]),
+    caveat:
+      'Assumes Berserker Rage is pressed on cooldown, which is what upstream does whenever rage is under 80. 5 rage per rank on a 30s cooldown.',
+  },
 ]
 
 /*
@@ -166,10 +181,22 @@ const effects = []
 const failures = []
 
 for (const extractor of EXTRACTORS) {
-  const hit = combined.map(({ text, path }) => ({ m: text.match(extractor.re), path })).find((r) => r.m)
+  const hit = combined.map(({ text, path }) => ({ m: text.match(extractor.re), path, text })).find((r) => r.m)
   if (!hit) {
     failures.push(`${extractor.talent}: pattern did not match any source file`)
     continue
+  }
+
+  // A second anchor, for effects whose value needs two numbers from the same file — a rage amount
+  // and the cooldown it sits behind, say. Required when declared: a half-matched extractor would
+  // otherwise produce a value derived from one real number and one assumed one.
+  let second
+  if (extractor.re2) {
+    second = hit.text.match(extractor.re2)
+    if (!second) {
+      failures.push(`${extractor.talent}: second pattern did not match in ${hit.path}`)
+      continue
+    }
   }
 
   const talent = talentsByName.get(extractor.talent)
@@ -185,8 +212,8 @@ for (const extractor of EXTRACTORS) {
     maxRank: talent.maxRank,
     kind: extractor.kind,
     unit: extractor.unit,
-    perRank: extractor.flat ? undefined : extractor.value(hit.m),
-    flatValue: extractor.flat ? extractor.value(hit.m) : undefined,
+    perRank: extractor.flat ? undefined : extractor.value(hit.m, second),
+    flatValue: extractor.flat ? extractor.value(hit.m, second) : undefined,
     caveat: extractor.caveat,
     source: hit.path,
   })
