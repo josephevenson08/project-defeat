@@ -3866,3 +3866,39 @@ test('the upgrade finder no longer claims most of the catalogue is estimated', (
   // past 10% would mean the prose is wrong again.
   expect(flagged.length / allItems.length).toBeLessThan(0.1)
 })
+
+test('a saved build cannot bring back a different encounter target', async ({ page }) => {
+  /*
+   * The failure this pins was introduced by fixing the encounter and not following it through.
+   * `target` was restored from the saved build, which outlived the controls that set it: a build
+   * saved while the armor presets existed would come back carrying 3,500 armor, and the panel would
+   * announce "one fixed target — level 73 with 3,500 armor" while telling the reader there was
+   * nothing to configure. Two players would get different numbers for a reason neither could see.
+   *
+   * `buildSerialization` accepts any `{ level, armor }`, so this is reachable by importing a build
+   * as well as by having saved one earlier — it is not only a migration concern.
+   */
+  await openApp(page)
+
+  // Plant a build carrying a deliberately wrong target, exactly as an older save would look.
+  await page.evaluate(() => {
+    const raw = localStorage.getItem('project-defeat:build:v1')
+    if (!raw) throw new Error('expected an autosaved build')
+    const build = JSON.parse(raw)
+    build.target = { id: 'stale', name: 'Stale caster target', level: 70, armor: 3500 }
+    localStorage.setItem('project-defeat:build:v1', JSON.stringify(build))
+  })
+
+  await page.reload()
+  await page.getByTestId('section-planner').click()
+  await openSimulationTab(page)
+
+  // The fixed target wins. 10,643 / 21,200.5 = 50.2%; the planted 3,500 would read 24.9%.
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('50.2%')
+  await expect(page.getByText(/level 73/i).first()).toBeVisible()
+  await expect(page.getByText(/3,500/)).toHaveCount(0)
+
+  // And the estimate itself must run against the fixed boss, not the planted one.
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/vs\. a level 73 target/i)).toBeVisible()
+})

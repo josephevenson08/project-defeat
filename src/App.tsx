@@ -26,7 +26,6 @@ import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
 import { UpgradesPanel } from './features/simulator/UpgradesPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
-import type { SimulationTarget } from './domain/simulation/encounterTypes'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsRail } from './features/stats/StatsRail'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
@@ -142,7 +141,19 @@ function App() {
    * is several hundred rows, and nobody arrives wanting all five — they arrive wanting one.
    */
   const [selectedRaidId, setSelectedRaidId] = useState<string>()
-  const [target, setTarget] = useState<SimulationTarget>(() => restoredBuild?.target ?? defaultSimulationTarget)
+  /*
+   * The encounter is fixed, so this is a constant rather than state.
+   *
+   * It used to restore `restoredBuild?.target`, which quietly outlived the controls that set it: a
+   * build saved while the armor presets existed would come back carrying 3,500 armor, and the panel
+   * would announce "one fixed target — level 73 with 3,500 armor" while telling the reader there was
+   * nothing to configure. Every number would differ from another player's for a reason neither could
+   * see or change. A fixed target has to be fixed for restored builds too.
+   *
+   * `target` stays in the saved payload, so old builds still parse and new ones still round-trip. It
+   * is simply no longer read back.
+   */
+  const target = defaultSimulationTarget
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target }
@@ -158,7 +169,6 @@ function App() {
     setActiveConsumableIds(build.activeConsumableIds)
     setActiveTargetDebuffIds(build.activeTargetDebuffIds)
     setTalentPoints(build.talentPoints ?? {})
-    setTarget(build.target)
     setSimulationResult(undefined)
   }
 

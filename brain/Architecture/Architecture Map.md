@@ -172,7 +172,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.attackTable]] · 1 importers
 - [[domain.simulation.combatConstants]] · 9 importers
 - [[domain.simulation.damageFormulas]] · 2 importers
-- [[domain.simulation.encounterTypes]] · 7 importers
+- [[domain.simulation.encounterTypes]] · 6 importers
 - [[domain.simulation.manaModel]] · 1 importers
 - [[domain.simulation.rageModel]] · 1 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers
