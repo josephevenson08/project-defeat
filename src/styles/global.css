@@ -2327,6 +2327,15 @@ input[type='number']:focus {
   box-shadow: none;
 }
 
+/* Says what the zero default costs, next to the field it applies to. */
+.encounter-note {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+  max-width: 72ch;
+}
+
 .encounter-presets {
   display: flex;
   flex-wrap: wrap;

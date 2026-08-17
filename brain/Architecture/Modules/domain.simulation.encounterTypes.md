@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/encounterTypes.ts
-lines: 10
+lines: 24
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.encounterTypes
 
-`src/domain/simulation/encounterTypes.ts` · **domain** layer · 10 lines
+`src/domain/simulation/encounterTypes.ts` · **domain** layer · 24 lines
 
 _No doc comment at the top of this file._
 

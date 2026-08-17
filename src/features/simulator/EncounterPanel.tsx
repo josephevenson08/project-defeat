@@ -64,7 +64,35 @@ export function EncounterPanel({ target, role, onChange }: EncounterPanelProps) 
             onChange={(event) => onChange({ ...target, armor: Math.max(0, Number(event.target.value) || 0) })}
           />
         </label>
+
+        {/*
+          The one input the model cannot derive for you. TBC grants rage for damage taken as well as
+          dealt, and for a Warrior that is the difference between a rotation that funds its rage dump
+          and one that does not — but how much a melee DPS takes is entirely fight-specific, so the
+          default is 0 and the hint says what that costs rather than guessing on your behalf.
+        */}
+        <label className="field">
+          <span>Damage taken per second</span>
+          <input
+            type="number"
+            min={0}
+            max={5000}
+            step={25}
+            value={target.damageTakenPerSecond ?? 0}
+            aria-label="Damage taken per second"
+            onChange={(event) =>
+              onChange({ ...target, damageTakenPerSecond: Math.max(0, Number(event.target.value) || 0) })
+            }
+          />
+        </label>
       </div>
+
+      <p className="encounter-note">
+        Damage taken defaults to <strong>0</strong>, which understates rage income rather than
+        inventing a number for a fight this app knows nothing about. It only affects rage-using
+        specs: a Fury Warrior's rotation starts funding Heroic Strike somewhere around 250–300
+        damage per second taken.
+      </p>
 
       <div className="encounter-presets">
         {ARMOR_PRESETS.map((preset) => (

@@ -407,8 +407,16 @@ no current number.
 
 **The rage shortfall was blamed on talent scaling. That has now been built and tested, and the blame
 was only half right.** Talents reach the simulation as of 2026-08-15. A talented Fury build takes
-rage income from **3.4 to 5.8 rage/sec** against the 7.5 Bloodthirst and Whirlwind want — real, and
-still short: 77% of the way, with Heroic Strike still excluded.
+rage income from **3.4 to 5.4 rage/sec** against the 7.5 Bloodthirst and Whirlwind want — real, and
+still short, with Heroic Strike still excluded.
+
+**Endless Rage is easy to implement wrong, and this code did.** The tooltip reads "you generate 25%
+more rage from damage dealt", but `sim/core/rage.go` writes
+`damage*(3.75/RageFactor) + HitFactor*BaseSwingSpeed*rageMultiplier` — the multiplier belongs to the
+**swing-speed term only**, and the damage-proportional half is untouched. Applying it to the whole
+swing put talented rage at 5.8 when it is 5.4. `WhiteSwingRageInput.rageMultiplier` now carries it to
+the right term, and a test asserts the delta equals exactly 25% of the swing-speed term rather than
+merely "went up".
 
 **Every expressible rage source is now in, and the gap still does not close.** Bloodrage
 (`bloodrage.go`: 10 rage plus ten 1-rage ticks on a 60s cooldown) and Improved Berserker Rage
@@ -416,11 +424,24 @@ still short: 77% of the way, with Heroic Strike still excluded.
 a rage per second each. Bloodrage is an **ability, not a talent**, so it raises the untalented
 baseline too — the figure this file used to quote as 3.1 rage/sec is really **3.4**.
 
-**What is left cannot be reached by adding sources.** The only remaining rage in TBC is from *damage
-taken*, which upstream computes per incoming hit as `damage * 2.5 / 274.7`. A closed-form model of a
-DPS has no incoming-damage stream, and the shortfall works out to roughly **187 damage/sec taken** —
-entirely fight-specific. Closing it needs an **encounter input**, not more modelling, and picking a
-default would be exactly the plausible invented number this project keeps having to undo.
+**What is left is now an input rather than a gap.** The only remaining rage in TBC is from *damage
+taken* — `damage * 2.5 / 274.7`, and note upstream applies **no** rage multiplier to it, so Endless
+Rage does not touch it. A closed-form model of a DPS has no incoming-damage stream, so
+`SimulationTarget.damageTakenPerSecond` declares it instead, with a field on the Encounter panel.
+
+**It defaults to 0 on purpose.** How much a melee DPS takes is entirely fight-specific, so any other
+default would be an invented number wearing a measurement's clothes. Zero understates rage income and
+the panel says so rather than leaving the reader to infer it. Measured, on the default Fury set:
+
+| damage taken/sec | rage/sec | Heroic Strike |
+|---|---|---|
+| 0 (default) | 5.4 | excluded |
+| 200 | 7.3 | excluded |
+| **300** | 8.2 | **fires** |
+| 500 | 10.0 | 8.1 DPS |
+
+**The rotation becomes self-funding at roughly 250-300 damage/sec taken.** That number is the honest
+statement of how much of a real fight the zero default leaves out.
 
 Flurry's
 nominal 25% attack speed turns out to be worth **+7.4%** at the crit a Phase 2 Fury warrior actually

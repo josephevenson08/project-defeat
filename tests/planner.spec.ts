@@ -284,7 +284,6 @@ import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
 import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, unmodelledTalents } from '../src/domain/talents/talentModifiers'
-import { bloodrageRagePerSecond } from '../src/domain/simulation/rageModel'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -300,7 +299,9 @@ import {
   OFF_HAND_HIT_FACTOR,
   RAGE_CONVERSION_FACTOR,
   RAGE_PER_POINT_OF_DAMAGE,
+  bloodrageRagePerSecond,
   rageDumpUsesPerSecond,
+  rageFromDamageTaken,
   rageFromOneSwing,
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
@@ -3556,16 +3557,16 @@ test('talents do NOT close the rage gap, which is what this pass set out to test
    * test: a talented Fury build should move DPS substantially AND close the rage shortfall. The
    * first held — 165.6 to 193.2, +16.7%. The second did not.
    *
-   * Swings plus Bloodrage fund 3.4 rage/sec untalented. **Every rage source this project can express
-   * takes that to 5.8** — Endless Rage multiplies swing income by 1.25, Flurry raises the swing rate
-   * that income is built on, Anger Management adds a flat 1/3, Unbridled Wrath's 15 procs a minute
-   * add 0.25, and Improved Berserker Rage another 1/3. Against the 7.5 Bloodthirst and Whirlwind on
-   * cooldown want, that is 77% and the dump is still unaffordable.
+   * Swings plus Bloodrage fund 3.4 rage/sec untalented. **Every talent-side source takes that to
+   * 5.4** — Endless Rage scales the swing-speed term, Flurry raises the swing rate that income is
+   * built on, Anger Management adds a flat 1/3, Unbridled Wrath's 15 procs a minute add 0.25, and
+   * Improved Berserker Rage another 1/3. Against the 7.5 Bloodthirst and Whirlwind want, the dump
+   * stays unaffordable.
    *
-   * **The remainder is not reachable by adding more sources.** What is left is rage from damage
-   * taken, which upstream computes per incoming hit — and a closed-form model of a DPS has no
-   * incoming-damage stream. Closing it needs an encounter input, not another talent, and inventing
-   * one would be exactly the kind of plausible number this project keeps having to undo.
+   * **The remainder is not another talent.** What is left is rage from damage taken, which a
+   * closed-form model of a DPS cannot derive — it has no incoming-damage stream. That is now an
+   * encounter input defaulting to 0, so this assertion is about the default: with no incoming damage
+   * declared, the rotation does not fund its dump.
    *
    * What is still missing is therefore NOT talent scaling. It is Bloodrage, damage taken, and rage
    * from sources this model does not carry. Flurry was expected to be the unlock and is not, because
@@ -3611,13 +3612,22 @@ test('Bloodrage is baseline warrior income, and is not multiplied by Endless Rag
   const untalented = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
   const rage = untalented.breakdown.find((entry) => entry.label === 'Rage per second')!.value
 
-  // Endless Rage multiplies rage generated *from damage dealt*. Bloodrage is granted outright, so it
-  // must sit outside that multiplier — folding it in would inflate a sourced number by 25%.
+  /*
+   * Bloodrage is granted outright, so Endless Rage must not touch it — and Endless Rage does not
+   * scale a whole swing either, only the swing-speed half of one. Both mistakes show up the same
+   * way: the total rising by a full 25% of swing income. It must rise by strictly less than that,
+   * and by strictly more than nothing.
+   */
   const points = furyTalentPoints([['Endless Rage', 1]])
   const withEndlessRage = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
   const talentedRage = withEndlessRage.breakdown.find((entry) => entry.label === 'Rage per second')!.value
   const swingIncome = rage - bloodrageRagePerSecond()
-  expect(talentedRage).toBeCloseTo(swingIncome * 1.25 + bloodrageRagePerSecond(), 1)
+
+  expect(talentedRage, 'Endless Rage is worth something').toBeGreaterThan(rage)
+  expect(
+    talentedRage,
+    'but not a full 25% of swing income — that would mean it scaled Bloodrage, or the damage half of a swing',
+  ).toBeLessThan(swingIncome * 1.25 + bloodrageRagePerSecond())
 })
 
 test('the talents this model cannot express are reported rather than dropped', () => {
@@ -3630,4 +3640,94 @@ test('the talents this model cannot express are reported rather than dropped', (
   for (const entry of unmodelledTalents) {
     expect(entry.reason.length, `${entry.talent} needs a real reason, not a placeholder`).toBeGreaterThan(20)
   }
+})
+
+test('damage taken is an encounter input, and it is what funds the rage dump', async () => {
+  /*
+   * The last rage source in TBC, and the only one a closed-form model of a DPS cannot derive: rage
+   * is granted for damage **taken** as well as dealt. wowsims computes it per incoming hit, from a
+   * damage stream this simulator does not have.
+   *
+   * So it is declared rather than guessed. The default is 0, which understates rage income and says
+   * so, because how much a melee DPS takes is entirely fight-specific — any other default would be
+   * an invented number wearing a measurement's clothes.
+   */
+  expect(rageFromDamageTaken(0)).toBe(0)
+  // `damage * 2.5 / 274.7`, straight from sim/core/rage.go.
+  expect(rageFromDamageTaken(274.7)).toBeCloseTo(2.5, 10)
+  expect(rageFromDamageTaken(-100), 'negative incoming damage is not a thing').toBe(0)
+
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const points = furyTalentPoints([
+    ['Cruelty', 5],
+    ['Precision', 3],
+    ['Flurry', 5],
+    ['Improved Berserker Stance', 5],
+    ['Dual Wield Specialization', 5],
+    ['Unbridled Wrath', 5],
+    ['Weapon Mastery', 2],
+    ['Endless Rage', 1],
+    ['Anger Management', 1],
+    ['Improved Berserker Rage', 2],
+  ])
+
+  const at = (damageTakenPerSecond: number) =>
+    calculateSimulation(character, gear, stats, 'Physical DPS', [], { ...defaultSimulationTarget, damageTakenPerSecond }, points)
+  const rageOf = (result: ReturnType<typeof at>) => result.breakdown.find((entry) => entry.label === 'Rage per second')!.value
+  const heroicStrikeOf = (result: ReturnType<typeof at>) => result.breakdown.find((entry) => /Heroic Strike/i.test(entry.label))?.value
+
+  // Omitting the field must behave exactly as declaring zero, or the default is a hidden assumption.
+  const omitted = calculateSimulation(character, gear, stats, 'Physical DPS', [], defaultSimulationTarget, points)
+  expect(rageOf(omitted)).toBe(rageOf(at(0)))
+
+  // At the default the rotation still cannot fund its dump — the finding this whole pass produced.
+  expect(heroicStrikeOf(at(0)), 'no incoming damage means no surplus').toBeUndefined()
+  expect(rageOf(at(0))).toBeLessThan(7.5)
+
+  // Enough incoming damage and it does. The crossover sits around 250-300/sec, which is the number
+  // worth knowing: it says how much of a real fight the zero default is leaving out.
+  expect(heroicStrikeOf(at(500)), 'heavy incoming damage funds the dump').toBeGreaterThan(0)
+  expect(rageOf(at(500))).toBeGreaterThan(7.5)
+
+  /*
+   * Linear in the coefficient rather than merely "goes up". Compared across a wide span and at low
+   * precision on purpose: breakdown values are rounded to one decimal for display, so differencing
+   * two of them carries up to 0.1 of rounding error — tight enough tolerance on a narrow span would
+   * be testing the rounding rather than the model.
+   */
+  expect(rageOf(at(500)) - rageOf(at(100))).toBeCloseTo(rageFromDamageTaken(400), 0)
+})
+
+test('Endless Rage scales only the swing-speed term, not the whole swing', () => {
+  /*
+   * Easy to get wrong, and this code did get it wrong first: the tooltip reads "you generate 25% more
+   * rage from damage dealt", but upstream writes
+   *
+   *     damage*(3.75/RageFactor) + HitFactor*BaseSwingSpeed*rageMultiplier
+   *
+   * so the damage-proportional half is untouched. Applying the multiplier to the whole swing
+   * overstated the talent by enough to matter — it put talented rage income at 5.8 when it is 5.4.
+   */
+  const outcomes = { miss: 0.08, dodge: 0.065, parry: 0, glance: 0.24, block: 0, crit: 0.13, hit: 0.485 }
+  const base = {
+    damagePerLandedSwing: 400,
+    swingsPerSecond: 0.5,
+    baseSwingSpeed: 2.6,
+    isOffHand: false,
+    outcomes,
+    glanceMultiplier: 0.75,
+  }
+
+  const untalented = rageFromOneSwing(base)
+  const talented = rageFromOneSwing({ ...base, rageMultiplier: 1.25 })
+
+  expect(talented).toBeGreaterThan(untalented)
+  // If it multiplied the whole swing, this would be exactly 1.25.
+  expect(talented / untalented, 'the damage half must not scale').toBeLessThan(1.25)
+
+  // The difference must be exactly 25% of the swing-speed term alone.
+  const swingSpeedTerm = MAIN_HAND_HIT_FACTOR * base.baseSwingSpeed * (1 - outcomes.miss + outcomes.crit)
+  expect(talented - untalented).toBeCloseTo(0.25 * swingSpeedTerm, 10)
 })

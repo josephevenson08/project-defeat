@@ -43,11 +43,23 @@ export const MAIN_HAND_HIT_FACTOR = 3.5 / 2
 export const OFF_HAND_HIT_FACTOR = 1.75 / 2
 
 /**
- * wowsims passes `EndlessRage ? 1.25 : 1`. This project does not feed talents into the simulation,
- * so the untalented 1 is the honest value — and it is a *floor*, meaning a talented Fury warrior
- * generates more rage than this models, not less.
+ * wowsims passes `EndlessRage ? 1.25 : 1`. This is the default when no talents are supplied; talents
+ * now reach the simulation, so a Fury build passes 1.25 through `WhiteSwingRageInput.rageMultiplier`.
  */
 export const RAGE_MULTIPLIER_UNTALENTED = 1
+
+/**
+ * Rage from damage **taken**, from wowsims `sim/core/rage.go`: `damage * 2.5 / RageFactor`.
+ *
+ * Note what is absent — `OnSpellHitTaken` applies no `rageMultiplier`, so **Endless Rage does not
+ * touch this**. Its tooltip says "more rage from damage dealt", and upstream takes that literally.
+ */
+export const RAGE_PER_POINT_OF_DAMAGE_TAKEN = 2.5 / RAGE_CONVERSION_FACTOR
+
+/** Sustained rage per second from taking `damagePerSecond` of incoming damage. */
+export function rageFromDamageTaken(damagePerSecond: number): number {
+  return Math.max(0, damagePerSecond) * RAGE_PER_POINT_OF_DAMAGE_TAKEN
+}
 
 /** Rage costs are only meaningful against the cap; a rotation cannot bank more than this. */
 export const MAX_RAGE = 100
@@ -115,6 +127,12 @@ export type WhiteSwingRageInput = {
   outcomes: SwingOutcomeMix
   /** Average damage multiplier of a glancing blow, which is below 1. */
   glanceMultiplier: number
+  /**
+   * Endless Rage, as `1.25`. Defaults to 1.
+   *
+   * Applies to the swing-speed term **only**, not to the whole swing — see `rageFromOneSwing`.
+   */
+  rageMultiplier?: number
 }
 
 /** Rage a single swing of this weapon generates on average, including the zero from a miss. */
@@ -135,8 +153,17 @@ export function rageFromOneSwing(input: WhiteSwingRageInput): number {
     outcomes.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
 
   const fromDamage = input.damagePerLandedSwing * damageWeightedOutcomes * RAGE_PER_POINT_OF_DAMAGE
-  // Doubled on a crit, so a crit contributes the base factor twice: once as a non-miss, once again.
-  const fromSwingSpeed = hitFactor * input.baseSwingSpeed * RAGE_MULTIPLIER_UNTALENTED * (nonMiss + outcomes.crit)
+  /*
+   * Doubled on a crit, so a crit contributes the base factor twice: once as a non-miss, once again.
+   *
+   * `rageMultiplier` (Endless Rage) belongs to **this term only**, which is easy to get wrong. The
+   * tooltip reads "you generate 25% more rage from damage dealt", but upstream writes
+   * `damage*(3.75/RageFactor) + HitFactor*BaseSwingSpeed*rageMultiplier` — so the damage-proportional
+   * half is untouched and only the swing-speed half scales. Applying it to the whole swing
+   * overstates the talent, which an earlier version of this code did.
+   */
+  const fromSwingSpeed =
+    hitFactor * input.baseSwingSpeed * (input.rageMultiplier ?? RAGE_MULTIPLIER_UNTALENTED) * (nonMiss + outcomes.crit)
 
   return fromDamage + fromSwingSpeed
 }

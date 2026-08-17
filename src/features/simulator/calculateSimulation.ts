@@ -19,7 +19,7 @@ import {
   estimateSpecialAttack,
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
-import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
+import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
   AVOIDANCE_PER_DEFENSE_SKILL_POINT,
@@ -533,6 +533,7 @@ function calculatePhysicalDps(
       isOffHand: false,
       outcomes,
       glanceMultiplier: avgGlanceMultiplier,
+      rageMultiplier: talents.rageGeneratedMultiplier,
     }
 
     let ragePerSecond = mainHandSwingsPerSecond > 0 ? ragePerSecondFromWeapon(mainHandRageInput) : 0
@@ -547,6 +548,7 @@ function calculatePhysicalDps(
         isOffHand: true,
         outcomes,
         glanceMultiplier: avgGlanceMultiplier,
+        rageMultiplier: talents.rageGeneratedMultiplier,
       })
     }
 
@@ -559,7 +561,6 @@ function calculatePhysicalDps(
      * raises rage generated *from damage dealt*, so a flat trickle and a proc that grants a fixed
      * rage point are outside it. Applying it to the total would silently inflate both.
      */
-    ragePerSecond *= talents.rageGeneratedMultiplier
     ragePerSecond += talents.flatRagePerSecond + talents.rageProcsPerMinute / 60
 
     /*
@@ -568,6 +569,13 @@ function calculatePhysicalDps(
      * reason the flat trickle does: Endless Rage multiplies rage generated *from damage dealt*.
      */
     if (character.className === 'Warrior') ragePerSecond += bloodrageRagePerSecond()
+
+    /*
+     * Rage from damage taken. Zero unless the encounter says otherwise, because how much a melee
+     * DPS takes is fight-specific and a default would be invented rather than measured. Endless
+     * Rage does not apply: upstream's `OnSpellHitTaken` carries no rage multiplier.
+     */
+    ragePerSecond += rageFromDamageTaken(target.damageTakenPerSecond ?? 0)
 
 
     if (mainHandSwingsPerSecond > 0) {
