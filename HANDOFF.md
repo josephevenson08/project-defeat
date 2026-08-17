@@ -817,6 +817,12 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
 - **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
+- **Stage 2 shipped the same day: the ingest is class-parameterised and Rogue is in.** Talent
+  scaling covers **5 specs** now — Warrior Arms and Fury, Rogue Assassination, Combat and Subtlety.
+  The generalization was cheap because **talent ids are globally unique**, so one effects list serves
+  every class and `deriveTalentModifiers` was untouched. **Warrior and Rogue both have a talent called
+  Precision** (different tree, id and max rank); each extractor is cross-checked against its own
+  class's tree, which is what keeps a name lookup honest.
 - **It covers Arms too, free.** `deriveTalentModifiers` is keyed by **talent id** and
   `warriorTalents.json` carries all three trees, so any spec sharing the class shares the effects —
   nothing about the mechanism is Fury-specific. Arms measured **203.2 → 229.1**. Adding a class means

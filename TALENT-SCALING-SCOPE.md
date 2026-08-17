@@ -251,7 +251,30 @@ substantially toward a defensible figure *and* close the rage gap — auto attac
 ~3.1 rage/sec against the 7.5 Bloodthirst and Whirlwind need. If it does not, the diagnosis in
 HANDOFF.md is wrong, and stages 2 and 3 should not be built on top of it.
 
-### Stage 2 — what it actually costs, now that stage 1 is done
+### Stage 2 — **done for Rogue**, and cheaper than this section predicted
+
+The generalization it called "the real work" turned out to be small: **talent ids are globally unique
+Wowhead ids**, so effects from every class share one list and `deriveTalentModifiers` needed *no
+change at all*. Only the ingest was Warrior-hardcoded — the source list, the extractor patterns, and
+the tree it cross-checked names against.
+
+Talent scaling now covers **5 specs**: Warrior Arms and Fury, Rogue Assassination, Combat and
+Subtlety. Measured 163.7 → 190.7, 157.4 → 183.7, 166.8 → 194.2.
+
+`expertiseSkillPoints` is the one new field, in **skill points rather than rating** — the attack table
+divides rating by a constant to get points anyway, and upstream grants these in points, so converting
+would make the value depend on `EXPERTISE_RATING_PER_SKILL_POINT`. Verified it reaches the *table*
+rather than only the score: the dodge row goes 1.8% → 0, because 10 points at 0.25% each more than
+cover a level 73 target's dodge.
+
+**The name collision was real and is guarded.** Warrior and Rogue both have Precision — different
+tree, different id, different max rank. Each extractor is cross-checked against its own class's tree.
+
+**Remaining classes are now cheap**, in this order by specs bought per class file: Warlock, Mage,
+Priest, Hunter, Shaman, Paladin, Druid — three specs each. The limiting factor is that each class
+file needs reading to find which talents map onto existing fields and which must be refused.
+
+### The original stage 2 estimate, kept for contrast
 
 **A class, not a spec.** `deriveTalentModifiers` is keyed by talent id, so all of a class's specs
 share its effects the moment its extractors exist — Arms came free with Fury. Adding Rogue buys three
