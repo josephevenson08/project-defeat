@@ -69,6 +69,14 @@ setting `base` globally sends every test to a path nothing serves.
 - **Leave `Untitled.canvas` alone**, it's the user's own file.
 - **Never invent data.** Anything not read off a real source gets `needsVerification: true`. This
   project's whole history is recovering from plausible-looking invented values.
+- **A caveat needs something that fails when it stops being true.** Six user-facing statements were
+  found *wrong* in one session — `featureFlags.ts`, the rotation summary's list of unmodelled rage
+  sources, the stat-weights "haste is not modelled" flag, the upgrade finder's "most of this catalog
+  is estimated", a restored encounter target the player could not change, and a tank note that
+  implied talents were counted. **Every one was true when written.** Closing a gap never forces the
+  text describing it to change, so the text rots silently — and a confident wrong caveat is worse
+  than no caveat. Write the assertion with the sentence: a flagged-unmodelled stat must score zero,
+  the "two specs" figure must match the ability data, and so on.
 
 ## Verify you're where this describes
 
@@ -76,7 +84,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 100 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 122 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
