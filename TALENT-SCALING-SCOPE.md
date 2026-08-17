@@ -1,11 +1,50 @@
 # Talent scaling — scope
 
-**Written 2026-08-15, against `773a8eb`.** A decision document, not a plan of record. HANDOFF.md
-names talent scaling as "the biggest remaining accuracy item" and says to scope it before writing
-code. This is that scope. Nothing here has been built.
+**Written 2026-08-15 against `773a8eb`; stage 1 shipped the same day.** This began as a decision
+document. It is kept because the prediction it made was **half wrong**, and the record of that is
+worth more than a tidy plan.
 
 Every count below was measured off the repo, not recalled. Where a measurement is a heuristic, it
 says so and says which direction it errs.
+
+---
+
+## What actually happened
+
+**Stage 1 is built.** Warrior talents reach `calculateSimulation` and nothing else;
+`tools/ingest/ingest-talent-effects.mjs` reads `sim/warrior/talents.go`, `dps_warrior.go` and
+`berserker_rage.go` at the pinned commit. 11 effects extracted, 9 talent groups refused by name.
+
+**The falsification test this document committed to in advance half failed, which is the whole point
+of having written it first.** It required DPS to move *and* the rage gap to close:
+
+| | Untalented | Talented |
+|---|---|---|
+| Fury DPS | 165.6 | **193.2** (+16.7%) ✅ |
+| Rage/sec | 3.4 | **5.4**, against 7.5 needed ❌ |
+| Heroic Strike | excluded | **still excluded** ❌ |
+
+So **talents are a major missing piece but they are not the rage fix**, which is what HANDOFF.md had
+asserted. Flurry — the talent that whole diagnosis rested on — is gated on crit, and at the 13% a
+Phase 2 Fury warrior actually has, a "+25% attack speed" talent is worth **+7.4%**.
+
+Adding every remaining expressible rage source (Bloodrage, Improved Berserker Rage) reached 5.4 and
+stopped. The last one, rage from damage taken, needs an incoming-damage stream a closed-form model of
+a DPS does not have — it became `SimulationTarget.damageTakenPerSecond`, and then became unreachable
+when the encounter was fixed to one boss with no controls. **Fury's rotation still cannot fund its
+own dump, and now says so precisely.**
+
+Three corrections came out of building it, each caught by asserting a *value* rather than a
+direction:
+
+- `rageGeneratedMultiplier` was in neither dispatch map, so **Endless Rage contributed nothing**. A
+  test asserting "DPS went up" would have passed. `talentModifiers.ts` now throws at import if any
+  ingested effect kind has no destination.
+- **Endless Rage applies to the swing-speed term only**, not the whole swing — the tooltip says "more
+  rage from damage dealt" and upstream disagrees with its own tooltip. Getting this wrong put
+  talented rage at 5.8 instead of 5.4.
+- Flurry needed a closed-form derivation the ingest could not supply: a Markov chain over the 3-stack
+  aura, `π₀ = (1-c)³`, time-weighted. Deliberately a lower bound.
 
 ---
 
@@ -177,7 +216,7 @@ the risk item.
 
 ## Recommendation
 
-### Do this: stage 1 — Fury Warrior, character-global talents only
+### ~~Do this~~ **Done**: stage 1 — Fury Warrior, character-global talents only
 
 The smallest change that tests the handoff's own diagnosis. Fury Warrior is the right spec because
 it is the one whose number is already known to be wrong (165.6 DPS), the one whose cause is already
