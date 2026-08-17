@@ -6,107 +6,38 @@ import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 
 const PLAYER_LEVEL = 70
 
-/** Level 73 is the standard "raid boss" (skull) level; the lower entries cover trash and 5-man targets. */
-const TARGET_LEVELS = [70, 71, 72, 73] as const
-
-/**
- * Rough armor reference points so the number field isn't a blind guess. These are widely-cited
- * community approximations for TBC-era targets rather than tooltip-exact per-boss values, which is
- * why the panel says so out loud.
- */
-const ARMOR_PRESETS = [
-  { label: 'Cloth / caster target', armor: 3500 },
-  { label: 'Typical raid boss', armor: 7700 },
-  { label: 'Heavily armored boss', armor: 10643 },
-] as const
-
 type EncounterPanelProps = {
   target: SimulationTarget
   role: CharacterRole
-  onChange: (target: SimulationTarget) => void
 }
 
-export function EncounterPanel({ target, role, onChange }: EncounterPanelProps) {
+/**
+ * What the simulation runs against — stated, not configured.
+ *
+ * This used to offer a target-level select, an armor field, three armor presets and a damage-taken
+ * input. All of it went, by request: the point of the tab is to gear a character and press Run, and
+ * four controls in front of that is ceremony charging rent. It follows the reference TBC simulators,
+ * which fix a standard raid target rather than asking first.
+ *
+ * The target is still *named*, and that is not the same thing as configuring it. A DPS figure is
+ * meaningless without knowing what it was measured against — the level gap drives the whole attack
+ * table, and armor decides how much of the damage survives. Removing the controls should not remove
+ * the reader's ability to know what the number means.
+ *
+ * `SimulationTarget` keeps every field it had, including `damageTakenPerSecond`. The domain can still
+ * express all of it and the tests still exercise it; it simply is not asked of the player any more.
+ */
+export function EncounterPanel({ target, role }: EncounterPanelProps) {
   const mitigation = computeArmorMitigation(target.armor, PLAYER_LEVEL)
   const levelDiff = target.level - PLAYER_LEVEL
 
   return (
     <Panel title="Encounter" eyebrow="Simulation target" accentColor={getRoleAccentColor(role)}>
       <p className="panel-copy">
-        The target every estimate is run against. Level drives the attack-table miss/dodge/glancing
-        penalties and spell hit floor; armor only affects physical damage.
+        Every estimate runs against one fixed target — a <strong>level {target.level}</strong> raid boss with{' '}
+        <strong>{target.armor.toLocaleString()}</strong> armor. There is nothing to configure here: gear your
+        character, then run the simulation.
       </p>
-
-      <div className="form-grid">
-        <label className="field">
-          <span>Target level</span>
-          <select
-            value={String(target.level)}
-            onChange={(event) => onChange({ ...target, level: Number(event.target.value) })}
-          >
-            {TARGET_LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {level} {level === 73 ? '(raid boss)' : `(+${level - PLAYER_LEVEL})`}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="field">
-          <span>Target armor</span>
-          <input
-            type="number"
-            min={0}
-            max={30000}
-            step={100}
-            value={target.armor}
-            aria-label="Target armor"
-            onChange={(event) => onChange({ ...target, armor: Math.max(0, Number(event.target.value) || 0) })}
-          />
-        </label>
-
-        {/*
-          The one input the model cannot derive for you. TBC grants rage for damage taken as well as
-          dealt, and for a Warrior that is the difference between a rotation that funds its rage dump
-          and one that does not — but how much a melee DPS takes is entirely fight-specific, so the
-          default is 0 and the hint says what that costs rather than guessing on your behalf.
-        */}
-        <label className="field">
-          <span>Damage taken per second</span>
-          <input
-            type="number"
-            min={0}
-            max={5000}
-            step={25}
-            value={target.damageTakenPerSecond ?? 0}
-            aria-label="Damage taken per second"
-            onChange={(event) =>
-              onChange({ ...target, damageTakenPerSecond: Math.max(0, Number(event.target.value) || 0) })
-            }
-          />
-        </label>
-      </div>
-
-      <p className="encounter-note">
-        Damage taken defaults to <strong>0</strong>, which understates rage income rather than
-        inventing a number for a fight this app knows nothing about. It only affects rage-using
-        specs: a Fury Warrior's rotation starts funding Heroic Strike somewhere around 250–300
-        damage per second taken.
-      </p>
-
-      <div className="encounter-presets">
-        {ARMOR_PRESETS.map((preset) => (
-          <button
-            className={`encounter-preset ${target.armor === preset.armor ? 'encounter-preset-active' : ''}`.trim()}
-            key={preset.label}
-            onClick={() => onChange({ ...target, armor: preset.armor })}
-            type="button"
-          >
-            {preset.label}
-            <small>{preset.armor.toLocaleString()}</small>
-          </button>
-        ))}
-      </div>
 
       <div className="summary-card encounter-summary">
         <span>Physical damage reduced by armor</span>
@@ -117,7 +48,8 @@ export function EncounterPanel({ target, role, onChange }: EncounterPanelProps) 
             : 'An even-level target carries no level-based miss or glancing penalty.'}
         </p>
         <small>
-          Armor presets are community approximations for TBC-era targets, not tooltip-exact per-boss values.
+          Armor is a widely-cited community approximation for a TBC raid boss, not a tooltip-exact per-boss value.
+          Rage from damage taken is not counted, which understates rage-using specs — see the result summary.
         </small>
       </div>
     </Panel>

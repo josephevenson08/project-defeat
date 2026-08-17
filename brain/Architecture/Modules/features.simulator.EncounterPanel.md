@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/EncounterPanel.tsx
-lines: 126
+lines: 58
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.EncounterPanel
 
-`src/features/simulator/EncounterPanel.tsx` · **features** layer · 126 lines
+`src/features/simulator/EncounterPanel.tsx` · **features** layer · 58 lines
 
 _No doc comment at the top of this file._
 

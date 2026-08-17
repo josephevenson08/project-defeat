@@ -215,11 +215,6 @@ function App() {
     [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
   )
 
-  function updateTarget(nextTarget: SimulationTarget) {
-    setTarget(nextTarget)
-    setSimulationResult(undefined)
-  }
-
   function runSimulation() {
     // Talents reach the simulation and nothing else — `calculateStats` deliberately still does not
     // see them, so the always-visible stat rail, gear rankings and upgrade finder are untouched.
@@ -312,7 +307,7 @@ function App() {
       )}
       {activeTab === 'simulation' && simulationEnabled && (
         <>
-          <EncounterPanel target={target} role={role} onChange={updateTarget} />
+          <EncounterPanel target={target} role={role} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
           <StatWeightsPanel weights={statWeights} role={role} />
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />

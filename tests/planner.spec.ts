@@ -1317,35 +1317,54 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
 })
 
-test('encounter settings change armor mitigation and feed back into the simulation', async ({ page }) => {
+test('the encounter is stated, not configured, and the fixed target is the one the model uses', async ({ page }) => {
+  /*
+   * The panel used to offer a target-level select, an armor field and three armor presets. All of it
+   * was removed by request — the tab exists to gear a character and press Run, and the reference TBC
+   * simulators fix a standard raid target rather than asking first.
+   *
+   * The target is still *named*, which is a different thing from being configurable: a DPS figure
+   * means nothing without knowing what it was measured against.
+   */
   await openApp(page)
   await openSimulationTab(page)
-  const mitigation = page.getByTestId('encounter-armor-mitigation')
 
-  // Default target is the heavily-armored 10643-armor boss. DR = armor / (armor + K) where
-  // K = 467.5 * 70 - 22167.5 = 10557.5, so 10643 / 21200.5 = 50.2%.
-  await expect(mitigation).toHaveText('50.2%')
+  // DR = armor / (armor + K), K = 467.5 * 70 - 22167.5 = 10557.5, so 10643 / 21200.5 = 50.2%.
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('50.2%')
+  await expect(page.getByText(/level 73/i).first()).toBeVisible()
 
-  // Dropping to the cloth-target preset must visibly reduce mitigation.
-  await page.getByRole('button', { name: /Cloth \/ caster target/ }).click()
-  await expect(mitigation).toHaveText('24.9%')
+  // No controls survive. Asserted against the panel rather than the page, so this cannot pass by the
+  // panel having failed to render at all.
+  const encounter = page.getByRole('region', { name: 'Encounter', exact: true })
+  await expect(encounter).toBeVisible()
+  await expect(encounter.locator('select')).toHaveCount(0)
+  await expect(encounter.locator('input')).toHaveCount(0)
+  await expect(encounter.locator('.encounter-preset')).toHaveCount(0)
+})
 
-  // ...and that has to actually reach the simulation, not just the encounter panel.
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const lowArmorScore = Number(await page.getByTestId('simulation-score').innerText())
+test('armor and target level still reach the simulation, now that nothing sets them by hand', () => {
+  /*
+   * The coverage the removed encounter test used to provide, kept against the domain instead of the
+   * controls. Armor and level are load-bearing inputs — armor decides how much damage survives, the
+   * level gap drives the whole attack table — so a wiring break would be invisible from the UI now
+   * that nothing adjusts them.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const run = (target: typeof defaultSimulationTarget) =>
+    calculateSimulation(character, gear, stats, 'Physical DPS', [], target).scoreExact
 
-  await page.getByRole('button', { name: /Heavily armored boss/ }).click()
-  await expect(mitigation).toHaveText('50.2%')
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const highArmorScore = Number(await page.getByTestId('simulation-score').innerText())
+  const standard = run(defaultSimulationTarget)
+  const lightlyArmored = run({ ...defaultSimulationTarget, armor: 3500 })
+  const evenLevel = run({ ...defaultSimulationTarget, level: 70 })
 
-  expect(lowArmorScore).toBeGreaterThan(highArmorScore)
+  expect(lightlyArmored, 'less armor must let more damage through').toBeGreaterThan(standard)
+  expect(evenLevel, 'an even-level target cannot glance or dodge as much').toBeGreaterThan(standard)
 
-  // Target level drives the attack table, so it must move the result too.
-  await page.getByLabel('Target level').selectOption('70')
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const evenLevelScore = Number(await page.getByTestId('simulation-score').innerText())
-  expect(evenLevelScore).toBeGreaterThan(highArmorScore)
+  // And the fixed target really is the level 73 boss the panel names.
+  expect(defaultSimulationTarget.level).toBe(73)
+  expect(defaultSimulationTarget.armor).toBe(10643)
 })
 
 test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {

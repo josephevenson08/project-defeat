@@ -2327,50 +2327,6 @@ input[type='number']:focus {
   box-shadow: none;
 }
 
-/* Says what the zero default costs, next to the field it applies to. */
-.encounter-note {
-  color: var(--text-dim);
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 10px 0 0;
-  max-width: 72ch;
-}
-
-.encounter-presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.encounter-preset {
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  color: var(--text);
-  cursor: pointer;
-  display: grid;
-  font-size: 12px;
-  font-weight: 700;
-  gap: 2px;
-  padding: 8px 12px;
-  text-align: left;
-}
-
-.encounter-preset:hover {
-  border-color: var(--line-strong);
-}
-
-.encounter-preset small {
-  color: var(--text-dim);
-  font-weight: 500;
-}
-
-.encounter-preset-active {
-  border-color: var(--panel-accent, var(--text-dim));
-  color: var(--text-strong);
-}
-
 .encounter-summary small {
   color: var(--text-dim);
   display: block;
