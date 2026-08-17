@@ -38,8 +38,11 @@ import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient, 
 import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounters'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
+import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, type TalentModifiers } from '../../domain/talents/talentModifiers'
+import type { TalentPoints } from '../../domain/talents/talentTypes'
 import type { TbcClass } from '../../domain/character/characterTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
+import { twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import type { EquippedGear } from '../gear/gearTypes'
 import type { StatBlock } from '../stats/statsTypes'
 import type { SimulationBreakdownEntry, SimulationResult } from './simulationTypes'
@@ -386,12 +389,24 @@ function calculatePhysicalDps(
   stats: StatBlock,
   target: SimulationTarget,
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
+  talents: TalentModifiers = noTalentModifiers,
 ): SimulationResult {
   const skillDiff = computeSkillDiff(target.level)
   const targetArmor = Math.max(0, target.armor - debuffs.armorReduction)
   const armorMitigation = computeArmorMitigation(targetArmor, PLAYER_LEVEL)
-  const rawCritChance = ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus
-  const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit)
+  /*
+   * Talent crit and hit are added as **chances**, alongside the debuff bonus, rather than converted
+   * back into ratings. Cruelty grants 5% crit outright; expressing that as rating would run the
+   * conversion backwards and make the answer depend on the rating-per-percent constant, which is not
+   * what the talent says.
+   */
+  const rawCritChance =
+    ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus + talents.meleeCritChance
+  const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit) + talents.meleeHitChance
+
+  // Improved Berserker Stance multiplies attack power, so it has to land before any of the
+  // attack-power-derived damage below rather than being added to the total afterwards.
+  const attackPower = stats.attackPower * talents.attackPowerMultiplier
 
   /*
    * Attack speed. Until this existed, `hasteRating` reached no output at all: the white-damage
@@ -409,7 +424,9 @@ function calculatePhysicalDps(
    * haste rating on early-expansion items.
    */
   const hasteFraction = ratingToFraction(stats.hasteRating, RATING_PER_PERCENT.meleeHaste)
-  const attackSpeedMultiplier = 1 + hasteFraction
+  // Gear haste only. Flurry multiplies on top of this inside the melee branch below, where the
+  // attack table exists — it needs the crit chance that actually occurs, not the raw one.
+  const gearAttackSpeedMultiplier = 1 + hasteFraction
 
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
@@ -423,7 +440,7 @@ function calculatePhysicalDps(
     const effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
     const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
     // Ranged haste uses the same rating and behaves the same way: more shots, not bigger ones.
-    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier * attackSpeedMultiplier
+    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier * gearAttackSpeedMultiplier
     breakdown = [
       { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
       { label: 'Weapon damage', value: round(weaponDps) },
@@ -441,7 +458,22 @@ function calculatePhysicalDps(
     const offHandItem = catForm ? undefined : gear['Off Hand']?.item
     const dualWield = catForm ? false : isDualWield(gear)
     const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
-    const fullTable = buildWhiteAttackTable({ skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
+    const fullTable = buildWhiteAttackTable({
+      skillDiff,
+      dualWield,
+      expertiseSkillPoints,
+      missReduction,
+      rawCritChance,
+      attacksFromBehind: true,
+      dodgeReduction: talents.targetDodgeReduction,
+    })
+
+    /*
+     * Flurry, now that the table exists. It is fed `fullTable.crit` rather than `rawCritChance`
+     * because crit suppression against a higher-level target is real: a crit that never happens
+     * cannot refresh a stack, and using the raw figure would overstate the uptime.
+     */
+    const attackSpeedMultiplier = gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit)
     const glanceRange = computeGlanceDamageRange(skillDiff)
     const avgGlanceMultiplier = (glanceRange.low + glanceRange.high) / 2
     const effectiveMultiplier =
@@ -449,9 +481,16 @@ function calculatePhysicalDps(
 
     const mainHandWeaponDps = weaponDiceToWhiteDps(mainHandItem?.weaponDamageMin, mainHandItem?.weaponDamageMax, mainHandItem?.weaponSpeed)
     const offHandWeaponDps = weaponDiceToWhiteDps(offHandItem?.weaponDamageMin, offHandItem?.weaponDamageMax, offHandItem?.weaponSpeed)
-    const apDps = attackPowerToWhiteDps(stats.attackPower)
-    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier * attackSpeedMultiplier
-    const offHandDps = dualWield ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier : 0
+    const apDps = attackPowerToWhiteDps(attackPower)
+    // Two-Handed Weapon Specialization is gated on actually holding one, exactly as upstream gates
+    // it on HandType — a Fury warrior dual-wielding gets nothing from it.
+    // The equipped item, not `mainHandItem` -- that may be the cat-form profile, which is a damage
+    // profile rather than a real weapon. The talent gates on what is actually held.
+    const twoHandedMultiplier = twoHanderOccupiesOffHand(gear['Main Hand']?.item) ? talents.twoHandedDamageMultiplier : 1
+    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier * attackSpeedMultiplier * twoHandedMultiplier
+    const offHandDps = dualWield
+      ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier * talents.offHandDamageMultiplier
+      : 0
     rawDps = mainHandDps + offHandDps
 
     /*
@@ -485,7 +524,7 @@ function calculatePhysicalDps(
      * post-armor figure to `displacedSwingDamage` would mitigate the displaced swing twice and make
      * the replacement look better than it is.
      */
-    const mainHandSwingDamage = averageSwingDamage(mainHandItem, stats.attackPower, false)
+    const mainHandSwingDamage = averageSwingDamage(mainHandItem, attackPower, false)
 
     const mainHandRageInput = {
       damagePerLandedSwing: mainHandSwingDamage * (1 - armorMitigation),
@@ -501,7 +540,8 @@ function calculatePhysicalDps(
     if (dualWield && offHandItem?.weaponSpeed) {
       ragePerSecond += ragePerSecondFromWeapon({
         // An off-hand swing lands for half, and that halved figure is what generates rage.
-        damagePerLandedSwing: averageSwingDamage(offHandItem, stats.attackPower, false) * 0.5 * (1 - armorMitigation),
+        damagePerLandedSwing:
+          averageSwingDamage(offHandItem, attackPower, false) * 0.5 * talents.offHandDamageMultiplier * (1 - armorMitigation),
         swingsPerSecond: attackSpeedMultiplier / offHandItem.weaponSpeed,
         baseSwingSpeed: offHandItem.weaponSpeed,
         isOffHand: true,
@@ -509,6 +549,18 @@ function calculatePhysicalDps(
         glanceMultiplier: avgGlanceMultiplier,
       })
     }
+
+    /*
+     * The three rage talents, and the reason this pass exists at all. Auto attacks alone fund about
+     * 3.1 rage/sec against the 7.5 Bloodthirst and Whirlwind want, which is why the dump has never
+     * been affordable.
+     *
+     * Endless Rage multiplies only the swing-derived income, because that is what it modifies -- it
+     * raises rage generated *from damage dealt*, so a flat trickle and a proc that grants a fixed
+     * rage point are outside it. Applying it to the total would silently inflate both.
+     */
+    ragePerSecond *= talents.rageGeneratedMultiplier
+    ragePerSecond += talents.flatRagePerSecond + talents.rageProcsPerMinute / 60
 
     if (mainHandSwingsPerSecond > 0) {
       meleeContext = {
@@ -814,6 +866,15 @@ function calculateTankSurvivability(
   }
 }
 
+/**
+ * `talentPoints` reaches the simulation and **deliberately nothing else**.
+ *
+ * Talents change plenty that `calculateStats` would care about — Vitality's Stamina, Toughness's
+ * armour — but routing them there moves the always-visible stat rail, every gear ranking and the
+ * upgrade finder at once, on the strength of a model that has not been checked yet. Starting here
+ * keeps the blast radius inside a tab that is hidden anyway, and leaves widening it as a later
+ * decision rather than a side effect of this one.
+ */
 export function calculateSimulation(
   character: CharacterProfile,
   gear: EquippedGear,
@@ -821,11 +882,15 @@ export function calculateSimulation(
   role: CharacterRole,
   activeTargetDebuffIds: readonly string[] = [],
   target: SimulationTarget = defaultSimulationTarget,
+  talentPoints: TalentPoints = {},
 ): SimulationResult {
   const debuffs = aggregateTargetDebuffs(activeTargetDebuffIds)
+  // Warrior-only for now: `talentEffects.json` covers one class, and a spec with no ingested effects
+  // derives the identity modifiers, so this is a no-op everywhere else rather than a wrong answer.
+  const talents = deriveTalentModifiers(talentPoints)
 
   if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs)
   if (role === 'Healer') return calculateHealing(character, stats)
   if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target)
-  return calculatePhysicalDps(character, gear, stats, target, debuffs)
+  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents)
 }

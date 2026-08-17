@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-139 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+141 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -27,7 +27,7 @@ The modules everything else leans on — change these carefully.
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.raids.raidTypes]] — 9 importers
 - [[domain.simulation.combatConstants]] — 9 importers
-- [[features.gear.gearData]] — 8 importers
+- [[domain.gear.slotCompatibility]] — 8 importers
 
 ## By layer
 
@@ -93,7 +93,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (91)
+### domain (93)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -146,7 +146,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
-- [[domain.gear.slotCompatibility]] · 7 importers
+- [[domain.gear.slotCompatibility]] · 8 importers
 - [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
 - [[domain.gems.gemTypes]] · 3 importers
@@ -183,7 +183,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.stats.statTypes]] · 15 importers
 - [[domain.stats.statUtils]] · 2 importers
 - [[domain.talents.sampleTalents]] · 1 importers
-- [[domain.talents.talentTypes]] · 3 importers
+- [[domain.talents.talentEffectsJson.d]] · 0 importers
+- [[domain.talents.talentModifiers]] · 1 importers
+- [[domain.talents.talentTypes]] · 5 importers
 - [[domain.tierlists.index]] · 1 importers
 - [[domain.tierlists.tierLists]] · 1 importers
 - [[domain.tierlists.tierListsJson.d]] · 0 importers

@@ -283,6 +283,7 @@ import { countGemColors, metaGemIsActive } from '../src/domain/gems/gemTypes'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
+import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, unmodelledTalents } from '../src/domain/talents/talentModifiers'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -3445,4 +3446,153 @@ test('Buffs & Consumables is reachable again, and a toggle moves the totals', as
 
   // The rail survives the new view, like the other four.
   await expect(page.getByRole('region', { name: 'Stats' })).toBeVisible()
+})
+
+test('an empty talent tree reproduces the untalented numbers exactly', () => {
+  /*
+   * The hard invariant of this whole pass. `talentPoints` defaults to `{}` everywhere, so if the
+   * modifiers were not exactly identity at zero points, every existing expectation in this file
+   * would move at once and the cause would be almost impossible to isolate.
+   */
+  expect(deriveTalentModifiers({})).toEqual(noTalentModifiers)
+
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+
+  const omitted = calculateSimulation(character, gear, stats, 'Physical DPS')
+  const empty = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
+  expect(empty.scoreExact, 'passing an empty tree must equal passing nothing').toBe(omitted.scoreExact)
+
+  // And it must still be the figure the handoff records, so a drift here is visible immediately.
+  expect(empty.score).toBe(165.6)
+})
+
+test('Flurry is solved analytically, and its value is gated hard by crit chance', () => {
+  /*
+   * wowsims models Flurry as a 3-stack aura on an event timeline: any melee crit sets 3 stacks, only
+   * a white hit removes one. This simulator has no timeline, so the aura becomes the stationary
+   * distribution of a Markov chain over the stack count — see `flurrySpeedMultiplier`.
+   *
+   * The boundaries are what make the derivation checkable without re-deriving it.
+   */
+  expect(flurrySpeedMultiplier(1, 0.3), 'untalented must be exact identity').toBe(1)
+  // At 100% crit the stacks refresh every swing and can never run out, so the aura is permanent and
+  // the multiplier is the full bonus. Any formula that misses this boundary is wrong.
+  expect(flurrySpeedMultiplier(1.25, 1)).toBeCloseTo(1.25, 10)
+  expect(flurrySpeedMultiplier(1.25, 0), 'it never procs without crits').toBe(1)
+
+  // Monotonic in crit, which is the qualitative claim the talent is about.
+  const curve = [0.05, 0.1, 0.2, 0.3, 0.5].map((crit) => flurrySpeedMultiplier(1.25, crit))
+  for (let i = 1; i < curve.length; i++) expect(curve[i]).toBeGreaterThan(curve[i - 1])
+
+  /*
+   * The finding worth pinning: at the crit a Phase 2 Fury warrior actually has, a "+25% attack
+   * speed" talent is worth about +7%. The handoff treated Flurry as the unlock that would close the
+   * rage gap. It is not, and this is the number that says why.
+   */
+  expect(flurrySpeedMultiplier(1.25, 0.131)).toBeCloseTo(1.0738, 3)
+})
+
+/** The modelled Fury allocation, by talent name, resolved against the ingested tree. */
+function furyTalentPoints(entries: readonly (readonly [string, number])[]) {
+  const data = getTalentData('Warrior')!
+  const byName = new Map<string, number>()
+  for (const tree of data.trees) for (const talent of tree.talents) byName.set(talent.name, talent.id)
+
+  const points: Record<number, number> = {}
+  for (const [name, rank] of entries) {
+    const id = byName.get(name)
+    expect(id, `${name} must exist in the ingested Warrior tree`).toBeDefined()
+    points[id!] = rank
+  }
+  return points
+}
+
+test('talent modifiers come from the ingest, and reach the melee estimate', () => {
+  const points = furyTalentPoints([
+    ['Cruelty', 5],
+    ['Precision', 3],
+    ['Flurry', 5],
+    ['Improved Berserker Stance', 5],
+    ['Dual Wield Specialization', 5],
+    ['Unbridled Wrath', 5],
+    ['Weapon Mastery', 2],
+    ['Endless Rage', 1],
+    ['Anger Management', 1],
+  ])
+
+  // Every value below is `sim/warrior/talents.go` at the pinned commit, not a tooltip reading.
+  const modifiers = deriveTalentModifiers(points)
+  expect(modifiers.meleeCritChance).toBeCloseTo(0.05, 10)
+  expect(modifiers.meleeHitChance).toBeCloseTo(0.03, 10)
+  expect(modifiers.attackPowerMultiplier).toBeCloseTo(1.1, 10)
+  expect(modifiers.offHandDamageMultiplier).toBeCloseTo(1.25, 10)
+  expect(modifiers.targetDodgeReduction).toBeCloseTo(0.02, 10)
+  expect(modifiers.flurryBonus).toBeCloseTo(1.25, 10)
+  expect(modifiers.rageGeneratedMultiplier).toBeCloseTo(1.25, 10)
+  expect(modifiers.flatRagePerSecond, 'Anger Management is 1 rage every 3 seconds').toBeCloseTo(1 / 3, 10)
+  expect(modifiers.rageProcsPerMinute, 'Unbridled Wrath is 3 procs per minute per rank').toBeCloseTo(15, 10)
+
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+
+  const before = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
+  const after = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+
+  // Cruelty is a flat +5% crit chance, so the crit row moves by exactly five points.
+  const critOf = (result: typeof before) => result.breakdown.find((entry) => entry.label === 'Crit chance')!.value
+  expect(critOf(after) - critOf(before)).toBeCloseTo(5, 6)
+
+  expect(after.scoreExact, 'talents must raise melee DPS').toBeGreaterThan(before.scoreExact)
+  expect(after.score).toBe(193.2)
+})
+
+test('talents do NOT close the rage gap, which is what this pass set out to test', () => {
+  /*
+   * Recorded as a result rather than a defect. The scope committed in advance to a falsification
+   * test: a talented Fury build should move DPS substantially AND close the rage shortfall. The
+   * first held — 165.6 to 193.2, +16.7%. The second did not.
+   *
+   * Auto attacks fund 3.1 rage/sec untalented. Every rage talent this project can express takes that
+   * to **5.2**: Endless Rage multiplies swing income by 1.25, Flurry raises the swing rate that
+   * income is built on, Anger Management adds a flat 1/3, and Unbridled Wrath's 15 procs a minute
+   * add 0.25. Against the 7.5 that Bloodthirst and Whirlwind on cooldown want, the dump stays
+   * unaffordable — 69% of the way there, which is a real move and still not enough.
+   *
+   * What is still missing is therefore NOT talent scaling. It is Bloodrage, damage taken, and rage
+   * from sources this model does not carry. Flurry was expected to be the unlock and is not, because
+   * it is gated on crit and Phase 2 crit is 13%.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+
+  const points = furyTalentPoints([
+    ['Flurry', 5],
+    ['Endless Rage', 1],
+    ['Anger Management', 1],
+    ['Unbridled Wrath', 5],
+    ['Cruelty', 5],
+  ])
+
+  const result = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+  const rage = result.breakdown.find((entry) => entry.label === 'Rage per second')!.value
+
+  expect(rage, 'talent rage income is real').toBeGreaterThan(3.1)
+  expect(rage, 'but it does not reach the 7.5 the rotation wants').toBeLessThan(7.5)
+  expect(result.summary, 'and the estimate must still say the dump is unfunded').toMatch(/no surplus to dump/i)
+})
+
+test('the talents this model cannot express are reported rather than dropped', () => {
+  // The ingest refuses what the closed-form model has nowhere to put, and says so per talent. That
+  // list is the honest statement of what a Fury number is still missing.
+  expect(unmodelledTalents.length).toBeGreaterThan(0)
+  const named = unmodelledTalents.map((entry) => entry.talent).join(' ')
+  expect(named).toMatch(/Deep Wounds/)
+  expect(named).toMatch(/Death Wish/)
+  for (const entry of unmodelledTalents) {
+    expect(entry.reason.length, `${entry.talent} needs a real reason, not a placeholder`).toBeGreaterThan(20)
+  }
 })

@@ -403,9 +403,14 @@ Unbridled Wrath, damage taken, and Flurry**.
 `(1 + haste)` and rage income with it, so the mechanism is in place — but only **78 of 4,560**
 catalogued items carry melee haste and **none at Phase 2 raid item level**, which is faithful to TBC
 rather than a data gap: the expansion put almost no haste rating on early gear. So modelling it moved
-no current number. The rage shortfall is therefore gated on **talent scaling**, not gear: Flurry's
-25% attack speed after a crit is where a Fury warrior's real swing rate comes from, and talents reach
-the simulation nowhere at all.
+no current number.
+
+**The rage shortfall was blamed on talent scaling. That has now been built and tested, and the blame
+was only half right.** Talents reach the simulation as of 2026-08-15. A talented Fury build takes
+rage income from **3.1 to 5.2 rage/sec** against the 7.5 Bloodthirst and Whirlwind want — real, and
+still short: 69% of the way, with Heroic Strike still excluded. Flurry's
+nominal 25% attack speed turns out to be worth **+7.4%** at the crit a Phase 2 Fury warrior actually
+has, because it is gated on crit and Phase 2 crit is 13%. It was never going to be the unlock.
 
 Two design decisions in there worth not re-litigating:
 
@@ -419,7 +424,9 @@ Two design decisions in there worth not re-litigating:
   `uses = surplus / (cost + suppressedRage)` in closed form rather than iterating. Counting Heroic
   Strike's full damage as additional damage roughly doubles it.
 
-The remaining gap for melee is therefore **haste**, not a priority-list engine.
+The remaining gap for melee is therefore **not** talents and **not** a priority-list engine. It is
+the rage sources this model still has none of — **Bloodrage, damage taken**, and rage from abilities
+the rotation does not carry.
 
 ### 2. UI — the requested rework is done
 
@@ -713,7 +720,26 @@ Separately, 48 upstream effects are skipped as inexpressible
 (damage procs, mana returns, health-only buffs) and the ingest reports each one — worth reading
 before assuming an item has no effect.
 
-**The biggest remaining accuracy item is talent scaling.** It gates rage income (Flurry's 25% attack
+**Talent scaling is built, and it did not do what this file predicted.** Stage 1 shipped 2026-08-15:
+Warrior talents reach `calculateSimulation` and **deliberately nothing else**, so the always-visible
+stat rail, gear rankings and upgrade finder are untouched. Widening that is a separate decision.
+
+- **Source.** `tools/ingest/ingest-talent-effects.mjs` reads `sim/warrior/talents.go` at the pinned
+  `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
+  talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
+- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.1 → 5.2/sec**.
+- **The falsification test half failed, which is the point of having written it first.** The scope
+  required DPS to move *and* the rage gap to close. It did not close: 5.2 against 7.5, and Heroic
+  Strike is still excluded. **Talents are a major missing piece but they are not the rage fix.**
+- **Why:** Flurry is gated on crit. The stack chain solves to a closed form (Markov chain over the
+  3-stack aura; `π₀ = (1-c)³`), and at 13% crit a "+25% attack speed" talent is worth **+7.4%**.
+- **A bug worth the retelling.** `rageGeneratedMultiplier` was in neither dispatch map, so Endless
+  Rage contributed nothing and the first measured rage figure was 4.2 rather than 5.2. It surfaced
+  only because a test asserted the modifier's *value*; asserting "DPS went up" would have passed with
+  the talent doing nothing. `talentModifiers.ts` now throws at import if any ingested effect kind has
+  no destination.
+
+Superseded framing kept for contrast — it gates rage income (Flurry's 25% attack
 speed after a crit is where a Fury warrior's swing rate really comes from), and it is what keeps
 melee DPS low. The talent *data* is already ingested for all nine classes — but as **prose**
 (`rankDescriptions`), not machine-readable effects, so this needs an extraction or authoring step

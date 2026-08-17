@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 
 ## Concepts & phases

@@ -107,6 +107,15 @@ export type WhiteAttackTableInputs = {
    * front of the boss and really can be parried.
    */
   attacksFromBehind: boolean
+  /**
+   * A flat reduction to the target's **dodge only**, as a fraction. Warrior's Weapon Mastery is the
+   * TBC case ("reduces the chance for your attacks to be dodged by 2%").
+   *
+   * Kept separate from `expertiseSkillPoints` rather than converted into it, because expertise
+   * reduces dodge **and** parry together while this touches only dodge. Folding one into the other
+   * would quietly hand a front-facing attacker a parry reduction the talent does not grant.
+   */
+  dodgeReduction?: number
 }
 
 /**
@@ -114,13 +123,13 @@ export type WhiteAttackTableInputs = {
  * Glance, Block, Crit, Hit — truncating lower-precedence entries once the running total reaches 100%.
  */
 export function buildWhiteAttackTable(inputs: WhiteAttackTableInputs): WhiteAttackTable {
-  const { skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind } = inputs
+  const { skillDiff, dualWield, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind, dodgeReduction = 0 } = inputs
 
   let missChance = computeBaseMissChance(skillDiff)
   if (dualWield) missChance = applyDualWieldMissPenalty(missChance)
   missChance = Math.max(0, missChance - missReduction)
 
-  const dodgeChance = computeDodgeChance(skillDiff, expertiseSkillPoints)
+  const dodgeChance = Math.max(0, computeDodgeChance(skillDiff, expertiseSkillPoints) - dodgeReduction)
   // Dodge survives from behind; parry and block do not. Expertise therefore keeps working on the
   // dodge row for a melee DPS, which is why it stays valuable even once parry is off the table.
   const parryChance = attacksFromBehind ? 0 : computeParryChance(skillDiff, expertiseSkillPoints)
@@ -197,10 +206,10 @@ export type SpecialAttackTable = Pick<WhiteAttackTable, 'miss' | 'dodge' | 'parr
  * separate table rather than a flag on the white one.
  */
 export function buildSpecialAttackTable(inputs: Omit<WhiteAttackTableInputs, 'dualWield'>): SpecialAttackTable {
-  const { skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind } = inputs
+  const { skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind, dodgeReduction = 0 } = inputs
 
   const missChance = Math.max(0, computeBaseMissChance(skillDiff) - missReduction)
-  const dodgeChance = computeDodgeChance(skillDiff, expertiseSkillPoints)
+  const dodgeChance = Math.max(0, computeDodgeChance(skillDiff, expertiseSkillPoints) - dodgeReduction)
   const parryChance = attacksFromBehind ? 0 : computeParryChance(skillDiff, expertiseSkillPoints)
   const blockChance = attacksFromBehind ? 0 : computeTargetBlockChance(skillDiff)
   const critChance = applyMeleeCritSuppression(rawCritChance, skillDiff)

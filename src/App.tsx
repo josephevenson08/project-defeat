@@ -221,7 +221,9 @@ function App() {
   }
 
   function runSimulation() {
-    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target))
+    // Talents reach the simulation and nothing else — `calculateStats` deliberately still does not
+    // see them, so the always-visible stat rail, gear rankings and upgrade finder are untouched.
+    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints))
   }
 
   const completeIntro = useCallback(() => {

@@ -29,6 +29,8 @@ _None._
 
 - [[App]] — `src/App.tsx`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases

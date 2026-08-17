@@ -1,0 +1,158 @@
+{
+  "$schema": "wowsims talent-effect extraction",
+  "upstream": {
+    "repo": "wowsims/tbc",
+    "sha": "3301fca59306a747e521274c36e073e69acc7b77",
+    "files": [
+      "sim/warrior/talents.go",
+      "sim/warrior/dps/dps_warrior.go"
+    ]
+  },
+  "className": "Warrior",
+  "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
+  "effectCount": 10,
+  "effects": [
+    {
+      "talentId": 157,
+      "talent": "Cruelty",
+      "tree": "Fury",
+      "maxRank": 5,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 1657,
+      "talent": "Precision",
+      "tree": "Fury",
+      "maxRank": 3,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 1543,
+      "talent": "Weapon Mastery",
+      "tree": "Fury",
+      "maxRank": 2,
+      "kind": "targetDodgeReduction",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 1658,
+      "talent": "Improved Berserker Stance",
+      "tree": "Fury",
+      "maxRank": 5,
+      "kind": "attackPowerMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "caveat": "wowsims applies this unconditionally; upstream notes it should be Berserker Stance only.",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 1581,
+      "talent": "Dual Wield Specialization",
+      "tree": "Fury",
+      "maxRank": 5,
+      "kind": "offHandDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 136,
+      "talent": "Two-Handed Weapon Specialization",
+      "tree": "Arms",
+      "maxRank": 5,
+      "kind": "physicalDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Applies only while a two-handed weapon is in the main hand; upstream gates on HandType.",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 156,
+      "talent": "Flurry",
+      "tree": "Fury",
+      "maxRank": 5,
+      "kind": "flurryHaste",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "caveat": "Upstream is a 3-stack aura: any melee crit sets 3 stacks, only a white hit removes one. The stack chain is solved analytically in talentModifiers.ts rather than simulated.",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 159,
+      "talent": "Unbridled Wrath",
+      "tree": "Fury",
+      "maxRank": 5,
+      "kind": "rageProcsPerMinute",
+      "unit": "procs per minute per rank",
+      "perRank": 3,
+      "caveat": "Each proc grants 1 rage.",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 137,
+      "talent": "Anger Management",
+      "tree": "Arms",
+      "maxRank": 1,
+      "kind": "ragePerSecondFlat",
+      "unit": "rage per second (flat, not per rank)",
+      "flatValue": 0.3333333333333333,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "talentId": 1661,
+      "talent": "Endless Rage",
+      "tree": "Arms",
+      "maxRank": 1,
+      "kind": "rageGeneratedMultiplier",
+      "unit": "multiplier (flat, not per rank)",
+      "flatValue": 1.25,
+      "source": "sim/warrior/dps/dps_warrior.go"
+    }
+  ],
+  "skipped": [
+    {
+      "talent": "Deep Wounds",
+      "reason": "A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials."
+    },
+    {
+      "talent": "Death Wish",
+      "reason": "An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has."
+    },
+    {
+      "talent": "Rampage",
+      "reason": "Stacking on-hit attack power. Needs a timeline to build stacks."
+    },
+    {
+      "talent": "Enrage",
+      "reason": "Triggers on being crit by the target — the model has no incoming-damage stream for a DPS."
+    },
+    {
+      "talent": "Sweeping Strikes",
+      "reason": "Extra targets. Single-target model."
+    },
+    {
+      "talent": "Blood Frenzy",
+      "reason": "A debuff on the target rather than a change to the player."
+    },
+    {
+      "talent": "Mace/Sword/Poleaxe Specialization",
+      "reason": "Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet."
+    },
+    {
+      "talent": "Impale",
+      "reason": "Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers."
+    },
+    {
+      "talent": "Toughness / Vitality / Anticipation / Deflection / Defiance / Shield Mastery / Shield Specialization",
+      "reason": "Tank talents. Expressible, but out of scope for a pass whose falsification test is a Fury DPS number."
+    }
+  ]
+}
