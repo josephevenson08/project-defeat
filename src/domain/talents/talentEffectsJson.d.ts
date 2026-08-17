@@ -1,8 +1,12 @@
 declare module "*/talentEffects.json" {
   const talentEffects: {
-    className: string
+    classes: string[]
     effectCount: number
     effects: {
+      /** Which class's tree this talent belongs to. Talent ids are globally unique, but two classes
+       *  can share a talent *name* (Warrior and Rogue both have Precision), so the class is what
+       *  keeps a name-based lookup honest. */
+      className: string
       talentId: number
       talent: string
       tree: string
@@ -16,7 +20,7 @@ declare module "*/talentEffects.json" {
       caveat?: string
       source: string
     }[]
-    skipped: { talent: string; reason: string }[]
+    skipped: { className: string; talent: string; reason: string }[]
   }
   export default talentEffects
 }

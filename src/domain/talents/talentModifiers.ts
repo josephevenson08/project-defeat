@@ -36,6 +36,14 @@ export type TalentModifiers = {
   rageProcsPerMinute: number
   /** Melee speed multiplier while the Flurry aura holds a stack. 1 when untalented. */
   flurryBonus: number
+  /**
+   * Expertise **skill points**, added directly to the attack table's own figure.
+   *
+   * Skill points rather than rating: the table divides rating by a constant to get points anyway, and
+   * upstream grants these talents in points. Converting to rating and back would make the value
+   * depend on `EXPERTISE_RATING_PER_SKILL_POINT`, which is not what the talent says.
+   */
+  expertiseSkillPoints: number
 }
 
 export const noTalentModifiers: TalentModifiers = {
@@ -49,6 +57,7 @@ export const noTalentModifiers: TalentModifiers = {
   flatRagePerSecond: 0,
   rageProcsPerMinute: 0,
   flurryBonus: 1,
+  expertiseSkillPoints: 0,
 }
 
 /** Which `TalentModifiers` field each extracted effect kind feeds, and how it combines. */
@@ -58,6 +67,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   targetDodgeReduction: 'targetDodgeReduction',
   rageProcsPerMinute: 'rageProcsPerMinute',
   ragePerSecondFlat: 'flatRagePerSecond',
+  expertiseSkill: 'expertiseSkillPoints',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
@@ -177,6 +187,9 @@ export function unmodelledTalentsInBuild(className: string, points: TalentPoints
 
   const taken: string[] = []
   for (const entry of rawTalentEffects.skipped) {
+    // Only this class's skips. Warrior and Rogue share talent names, so an unfiltered match would
+    // warn a Warrior about a Rogue talent they cannot have taken.
+    if (entry.className !== className) continue
     for (const name of entry.talent.split('/').map((part) => part.trim())) {
       if (spent.has(name)) taken.push(name)
     }

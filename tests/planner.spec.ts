@@ -4045,3 +4045,58 @@ test('talent scaling covers both Warrior DPS specs, and deliberately not the tan
     'the tank path does not receive talents yet — see the ingest\'s skipped list',
   ).toBe(scoreFor('Protection', 'Tank', {}))
 })
+
+test('Rogue talents are ingested per class, and two classes can share a talent name safely', () => {
+  /*
+   * Stage 2. The ingest was Warrior-hardcoded; it is now class-parameterised, and Rogue is the first
+   * class through it. Every Rogue value lands on a field Warrior already established, which was the
+   * point — adding a class is adding extractors, not machinery.
+   *
+   * **Precision exists in both classes.** Different tree, different id, different max rank (Warrior 3,
+   * Rogue 5). The ingest cross-checks each extracted name against that class's own tree, which is
+   * what stops a name-based lookup resolving to the wrong talent — the classic trap this repo already
+   * has a section about.
+   */
+  const warriorPrecision = getTalentData('Warrior')!.trees.flatMap((tree) => tree.talents).find((t) => t.name === 'Precision')!
+  const roguePrecision = getTalentData('Rogue')!.trees.flatMap((tree) => tree.talents).find((t) => t.name === 'Precision')!
+  expect(warriorPrecision.id).not.toBe(roguePrecision.id)
+  expect(warriorPrecision.maxRank).toBe(3)
+  expect(roguePrecision.maxRank).toBe(5)
+
+  // Each resolves to its own effect, at its own max rank, rather than one shadowing the other.
+  expect(deriveTalentModifiers({ [warriorPrecision.id]: 3 }).meleeHitChance).toBeCloseTo(0.03, 10)
+  expect(deriveTalentModifiers({ [roguePrecision.id]: 5 }).meleeHitChance).toBeCloseTo(0.05, 10)
+
+  const byName = new Map<string, number>()
+  for (const tree of getTalentData('Rogue')!.trees) for (const talent of tree.talents) byName.set(talent.name, talent.id)
+  const points: Record<number, number> = {}
+  for (const [name, rank] of [['Malice', 5], ['Precision', 5], ['Deadliness', 5], ['Weapon Expertise', 2]] as const) {
+    const id = byName.get(name)
+    expect(id, `${name} must exist in the ingested Rogue tree`).toBeDefined()
+    points[id!] = rank
+  }
+
+  const modifiers = deriveTalentModifiers(points)
+  expect(modifiers.meleeCritChance, 'Malice is 1% crit per rank').toBeCloseTo(0.05, 10)
+  expect(modifiers.attackPowerMultiplier, 'Deadliness is 2% attack power per rank').toBeCloseTo(1.1, 10)
+  expect(modifiers.expertiseSkillPoints, 'Weapon Expertise is 5 expertise SKILL per rank').toBeCloseTo(10, 10)
+
+  // All three Rogue specs benefit, because effects are keyed by talent id and the whole class tree is
+  // ingested. That is the economics of stage 2: a class buys its specs.
+  for (const spec of ['Assassination', 'Combat', 'Subtlety'] as const) {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Rogue', spec }
+    const gear = normalizeGearForCharacter(defaultGear, 'Rogue', spec)
+    const stats = calculateStats(character, gear)
+    const bare = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
+    const talented = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+
+    expect(talented.scoreExact, `${spec} must benefit`).toBeGreaterThan(bare.scoreExact)
+
+    // Expertise reaches the attack table as skill points: 10 points at 0.25% each is 2.5%, which more
+    // than covers the 1.8% dodge a level 73 target has. Asserting the dodge row went to zero proves
+    // it landed on the table rather than being counted as damage somewhere.
+    const dodgeOf = (r: typeof bare) => r.breakdown.find((entry) => entry.label === 'Dodge chance')!.value
+    expect(dodgeOf(bare)).toBeGreaterThan(0)
+    expect(dodgeOf(talented), 'talent expertise must reach the attack table').toBe(0)
+  }
+})

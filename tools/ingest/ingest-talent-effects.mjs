@@ -25,7 +25,7 @@ const CACHE = resolve(HERE, '.cache/wowsims')
 // Same pin as every other wowsims-derived dataset here. Changing it means re-running all of them.
 const UPSTREAM_SHA = '3301fca59306a747e521274c36e073e69acc7b77'
 
-const SOURCES = [
+const WARRIOR_SOURCES = [
   { path: 'sim/warrior/talents.go', cache: 'sim_warrior_talents.go' },
   // Endless Rage is applied at the rage bar rather than with the other talents.
   { path: 'sim/warrior/dps/dps_warrior.go', cache: 'sim_warrior_dps_dps_warrior.go' },
@@ -56,7 +56,7 @@ async function readSource({ path, cache }) {
  * That is the same discipline the repo's own rule about scripted edits asks for: count what changed,
  * not what you meant to change.
  */
-const EXTRACTORS = [
+const WARRIOR_EXTRACTORS = [
   {
     talent: 'Cruelty',
     kind: 'meleeCritChance',
@@ -156,7 +156,7 @@ const EXTRACTORS = [
  * Deliberately not extracted, and why. Listed rather than omitted so a reader can tell the
  * difference between "wowsims has no such talent" and "this project has nowhere to put it".
  */
-const SKIPPED = [
+const WARRIOR_SKIPPED = [
   ['Deep Wounds', 'A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials.'],
   ['Death Wish', 'An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has.'],
   ['Rampage', 'Stacking on-hit attack power. Needs a timeline to build stacks.'],
@@ -168,55 +168,114 @@ const SKIPPED = [
   ['Toughness / Vitality / Anticipation / Deflection / Defiance / Shield Mastery / Shield Specialization', 'Tank talents. Expressible, but out of scope for a pass whose falsification test is a Fury DPS number.'],
 ]
 
-const sources = await Promise.all(SOURCES.map(readSource))
-const combined = sources.map((text, i) => ({ text, path: SOURCES[i].path }))
+const ROGUE_SOURCES = [{ path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' }]
 
-// Cross-check every extracted name against the already-ingested talent tree, so a typo or a drifted
-// pattern fails loudly instead of producing an effect keyed to a talent that does not exist.
-const tree = JSON.parse(readFileSync(resolve(REPO, 'src/domain/talents/warriorTalents.json'), 'utf8'))
-const talentsByName = new Map()
-for (const t of tree.trees) for (const talent of t.talents) talentsByName.set(talent.name, { ...talent, tree: t.spec })
+/*
+ * Rogue. Every value here lands on a field Warrior already established, which is the point: adding a
+ * class is adding extractors, not machinery. Talent ids are globally unique Wowhead ids, so effects
+ * from every class share one list and `deriveTalentModifiers` needed no change at all.
+ */
+const ROGUE_EXTRACTORS = [
+  {
+    talent: 'Malice',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*([\d.]+)\*float64\(rogue\.Talents\.Malice\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Precision',
+    kind: 'meleeHitChance',
+    unit: 'fraction per rank',
+    // Same talent name as the Warrior's, different tree and different id. Matched against the Rogue
+    // tree below, so the two cannot be confused.
+    re: /AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*([\d.]+)\*float64\(rogue\.Talents\.Precision\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Deadliness',
+    kind: 'attackPowerMultiplier',
+    unit: 'fraction per rank',
+    re: /apBonus := 1 \+ ([\d.]+)\*float64\(rogue\.Talents\.Deadliness\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Weapon Expertise',
+    kind: 'expertiseSkill',
+    unit: 'expertise skill points per rank',
+    re: /AddStat\(stats\.Expertise,\s*core\.ExpertisePerQuarterPercentReduction\*([\d.]+)\*float64\(rogue\.Talents\.WeaponExpertise\)\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Expertise skill points, not rating — the attack table takes skill points directly.',
+  },
+]
+
+const ROGUE_SKIPPED = [
+  ['Vitality / Sinister Calling', 'Both multiply Agility, which cascades into attack power and crit inside calculateStats. Talents deliberately reach only the simulation, so applying these would mean re-deriving what calculateStats already derives.'],
+  ['Murder', 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
+  ['Serrated Blades', 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
+  ['Combat Potency', 'Energy returned on off-hand hits. The energy budget is a flat 10/sec, with no income model to feed.'],
+  ['Seal Fate / Ruthlessness / Relentless Strikes', 'Combo-point economy. There is no combo-point resource here at all.'],
+  ['Adrenaline Rush / Blade Flurry / Cold Blood', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+]
+
+const CLASSES = [
+  { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: WARRIOR_EXTRACTORS, skipped: WARRIOR_SKIPPED },
+  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: ROGUE_EXTRACTORS, skipped: ROGUE_SKIPPED },
+]
 
 const effects = []
+const skippedAll = []
 const failures = []
 
-for (const extractor of EXTRACTORS) {
-  const hit = combined.map(({ text, path }) => ({ m: text.match(extractor.re), path, text })).find((r) => r.m)
-  if (!hit) {
-    failures.push(`${extractor.talent}: pattern did not match any source file`)
-    continue
-  }
+for (const entry of CLASSES) {
+  const texts = await Promise.all(entry.sources.map(readSource))
+  const combined = texts.map((text, i) => ({ text, path: entry.sources[i].path }))
 
-  // A second anchor, for effects whose value needs two numbers from the same file — a rage amount
-  // and the cooldown it sits behind, say. Required when declared: a half-matched extractor would
-  // otherwise produce a value derived from one real number and one assumed one.
-  let second
-  if (extractor.re2) {
-    second = hit.text.match(extractor.re2)
-    if (!second) {
-      failures.push(`${extractor.talent}: second pattern did not match in ${hit.path}`)
+  // Cross-check every extracted name against that class's own ingested tree, so a typo or a drifted
+  // pattern fails loudly instead of producing an effect keyed to a talent that does not exist -- and
+  // so a name shared between classes (Precision) cannot resolve to the wrong one.
+  const tree = JSON.parse(readFileSync(resolve(REPO, `src/domain/talents/${entry.talentJson}`), 'utf8'))
+  const talentsByName = new Map()
+  for (const t of tree.trees) for (const talent of t.talents) talentsByName.set(talent.name, { ...talent, tree: t.spec })
+
+  for (const extractor of entry.extractors) {
+    const hit = combined.map(({ text, path }) => ({ m: text.match(extractor.re), path, text })).find((r) => r.m)
+    if (!hit) {
+      failures.push(`${entry.className} ${extractor.talent}: pattern did not match any source file`)
       continue
     }
+
+    let second
+    if (extractor.re2) {
+      second = hit.text.match(extractor.re2)
+      if (!second) {
+        failures.push(`${entry.className} ${extractor.talent}: second pattern did not match in ${hit.path}`)
+        continue
+      }
+    }
+
+    const talent = talentsByName.get(extractor.talent)
+    if (!talent) {
+      failures.push(`${entry.className} ${extractor.talent}: no talent by that name in ${entry.talentJson}`)
+      continue
+    }
+
+    effects.push({
+      className: entry.className,
+      talentId: talent.id,
+      talent: extractor.talent,
+      tree: talent.tree,
+      maxRank: talent.maxRank,
+      kind: extractor.kind,
+      unit: extractor.unit,
+      perRank: extractor.flat ? undefined : extractor.value(hit.m, second),
+      flatValue: extractor.flat ? extractor.value(hit.m, second) : undefined,
+      caveat: extractor.caveat,
+      source: hit.path,
+    })
   }
 
-  const talent = talentsByName.get(extractor.talent)
-  if (!talent) {
-    failures.push(`${extractor.talent}: no talent by that name in warriorTalents.json`)
-    continue
-  }
-
-  effects.push({
-    talentId: talent.id,
-    talent: extractor.talent,
-    tree: talent.tree,
-    maxRank: talent.maxRank,
-    kind: extractor.kind,
-    unit: extractor.unit,
-    perRank: extractor.flat ? undefined : extractor.value(hit.m, second),
-    flatValue: extractor.flat ? extractor.value(hit.m, second) : undefined,
-    caveat: extractor.caveat,
-    source: hit.path,
-  })
+  for (const [talent, reason] of entry.skipped) skippedAll.push({ className: entry.className, talent, reason })
 }
 
 if (failures.length > 0) {
@@ -228,12 +287,12 @@ if (failures.length > 0) {
 
 const out = {
   $schema: 'wowsims talent-effect extraction',
-  upstream: { repo: 'wowsims/tbc', sha: UPSTREAM_SHA, files: SOURCES.map((s) => s.path) },
-  className: 'Warrior',
+  upstream: { repo: 'wowsims/tbc', sha: UPSTREAM_SHA, files: CLASSES.flatMap((c) => c.sources.map((s) => s.path)) },
+  classes: CLASSES.map((c) => c.className),
   generatedBy: 'tools/ingest/ingest-talent-effects.mjs',
   effectCount: effects.length,
   effects,
-  skipped: SKIPPED.map(([talent, reason]) => ({ talent, reason })),
+  skipped: skippedAll,
 }
 
 const target = resolve(REPO, 'src/domain/talents/talentEffects.json')
@@ -248,6 +307,6 @@ if (previous === next) {
 
 for (const e of effects) {
   const value = e.perRank !== undefined ? `${e.perRank} per rank (max ${e.maxRank})` : `${e.flatValue} flat`
-  console.log(`  ${e.talent.padEnd(34)} ${e.kind.padEnd(26)} ${value}`)
+  console.log(`  ${e.className.padEnd(8)} ${e.talent.padEnd(34)} ${e.kind.padEnd(26)} ${value}`)
 }
-console.log(`\nskipped ${SKIPPED.length} talent groups the closed-form model has nowhere to put; see "skipped" in the JSON.`)
+console.log(`\nskipped ${skippedAll.length} talent groups across ${CLASSES.length} classes; see "skipped" in the JSON for why each one.`)

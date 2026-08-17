@@ -6,14 +6,19 @@
     "files": [
       "sim/warrior/talents.go",
       "sim/warrior/dps/dps_warrior.go",
-      "sim/warrior/berserker_rage.go"
+      "sim/warrior/berserker_rage.go",
+      "sim/rogue/talents.go"
     ]
   },
-  "className": "Warrior",
+  "classes": [
+    "Warrior",
+    "Rogue"
+  ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 11,
+  "effectCount": 15,
   "effects": [
     {
+      "className": "Warrior",
       "talentId": 157,
       "talent": "Cruelty",
       "tree": "Fury",
@@ -24,6 +29,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1657,
       "talent": "Precision",
       "tree": "Fury",
@@ -34,6 +40,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1543,
       "talent": "Weapon Mastery",
       "tree": "Fury",
@@ -44,6 +51,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1658,
       "talent": "Improved Berserker Stance",
       "tree": "Fury",
@@ -55,6 +63,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1581,
       "talent": "Dual Wield Specialization",
       "tree": "Fury",
@@ -65,6 +74,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 136,
       "talent": "Two-Handed Weapon Specialization",
       "tree": "Arms",
@@ -76,6 +86,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 156,
       "talent": "Flurry",
       "tree": "Fury",
@@ -87,6 +98,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 159,
       "talent": "Unbridled Wrath",
       "tree": "Fury",
@@ -98,6 +110,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 137,
       "talent": "Anger Management",
       "tree": "Arms",
@@ -108,6 +121,7 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1661,
       "talent": "Endless Rage",
       "tree": "Arms",
@@ -118,6 +132,7 @@
       "source": "sim/warrior/dps/dps_warrior.go"
     },
     {
+      "className": "Warrior",
       "talentId": 1541,
       "talent": "Improved Berserker Rage",
       "tree": "Fury",
@@ -127,44 +142,128 @@
       "perRank": 0.16666666666666666,
       "caveat": "Assumes Berserker Rage is pressed on cooldown, which is what upstream does whenever rage is under 80. 5 rage per rank on a 30s cooldown.",
       "source": "sim/warrior/berserker_rage.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 270,
+      "talent": "Malice",
+      "tree": "Assassination",
+      "maxRank": 5,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 181,
+      "talent": "Precision",
+      "tree": "Combat",
+      "maxRank": 5,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1702,
+      "talent": "Deadliness",
+      "tree": "Subtlety",
+      "maxRank": 5,
+      "kind": "attackPowerMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1703,
+      "talent": "Weapon Expertise",
+      "tree": "Combat",
+      "maxRank": 2,
+      "kind": "expertiseSkill",
+      "unit": "expertise skill points per rank",
+      "perRank": 5,
+      "caveat": "Expertise skill points, not rating — the attack table takes skill points directly.",
+      "source": "sim/rogue/talents.go"
     }
   ],
   "skipped": [
     {
+      "className": "Warrior",
       "talent": "Deep Wounds",
       "reason": "A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials."
     },
     {
+      "className": "Warrior",
       "talent": "Death Wish",
       "reason": "An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has."
     },
     {
+      "className": "Warrior",
       "talent": "Rampage",
       "reason": "Stacking on-hit attack power. Needs a timeline to build stacks."
     },
     {
+      "className": "Warrior",
       "talent": "Enrage",
       "reason": "Triggers on being crit by the target — the model has no incoming-damage stream for a DPS."
     },
     {
+      "className": "Warrior",
       "talent": "Sweeping Strikes",
       "reason": "Extra targets. Single-target model."
     },
     {
+      "className": "Warrior",
       "talent": "Blood Frenzy",
       "reason": "A debuff on the target rather than a change to the player."
     },
     {
+      "className": "Warrior",
       "talent": "Mace/Sword/Poleaxe Specialization",
       "reason": "Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet."
     },
     {
+      "className": "Warrior",
       "talent": "Impale",
       "reason": "Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers."
     },
     {
+      "className": "Warrior",
       "talent": "Toughness / Vitality / Anticipation / Deflection / Defiance / Shield Mastery / Shield Specialization",
       "reason": "Tank talents. Expressible, but out of scope for a pass whose falsification test is a Fury DPS number."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Vitality / Sinister Calling",
+      "reason": "Both multiply Agility, which cascades into attack power and crit inside calculateStats. Talents deliberately reach only the simulation, so applying these would mean re-deriving what calculateStats already derives."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Murder",
+      "reason": "Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Serrated Blades",
+      "reason": "Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the \"not modelled\" list."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Combat Potency",
+      "reason": "Energy returned on off-hand hits. The energy budget is a flat 10/sec, with no income model to feed."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Seal Fate / Ruthlessness / Relentless Strikes",
+      "reason": "Combo-point economy. There is no combo-point resource here at all."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Adrenaline Rush / Blade Flurry / Cold Blood",
+      "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
     }
   ]
 }

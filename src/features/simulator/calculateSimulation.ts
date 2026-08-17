@@ -271,12 +271,13 @@ function resolveRotation(
   missReduction: number,
   rawCritChance: number,
   melee?: MeleeSwingContext,
+  talents: TalentModifiers = noTalentModifiers,
 ): ResolvedRotation {
   const abilities = getRotationAbilities(character.className, character.spec).filter(
     (ability) => ability.effectType === 'Melee Special',
   )
 
-  const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
+  const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT + talents.expertiseSkillPoints
   // A melee DPS spends the whole fight behind the boss, where parry and block cannot happen.
   const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
   // Blocked specials still land, just reduced; the block value itself isn't modelled, so a blocked
@@ -504,7 +505,9 @@ function calculatePhysicalDps(
     const mainHandItem = catForm ? CAT_FORM_WEAPON : gear['Main Hand']?.item
     const offHandItem = catForm ? undefined : gear['Off Hand']?.item
     const dualWield = catForm ? false : isDualWield(gear)
-    const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT
+    // Talent expertise arrives as skill points and is added to the converted rating, not folded
+    // into it — Weapon Expertise grants 5 points per rank outright, which is not a rating.
+    const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT + talents.expertiseSkillPoints
     const fullTable = buildWhiteAttackTable({
       skillDiff,
       dualWield,
@@ -653,7 +656,7 @@ function calculatePhysicalDps(
   // Yellow (special) damage, layered on top of the white swing model above. Only the melee path gets
   // this: the ranged special (Steady Shot) is mana-costed with no cooldown, so its sustained rate
   // depends on auto-shot weaving that isn't modelled.
-  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance, meleeContext)
+  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance, meleeContext, talents)
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
