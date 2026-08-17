@@ -3752,3 +3752,98 @@ test('Endless Rage scales only the swing-speed term, not the whole swing', () =>
   const swingSpeedTerm = MAIN_HAND_HIT_FACTOR * base.baseSwingSpeed * (1 - outcomes.miss + outcomes.crit)
   expect(talented - untalented).toBeCloseTo(0.25 * swingSpeedTerm, 10)
 })
+
+/*
+ * ---------------------------------------------------------------------------------------------
+ * Disclosure invariants.
+ *
+ * The Simulation tab's whole case for being worth showing is that it describes its own limits
+ * honestly. Four of those descriptions turned out to be false in one sitting — the feature flag's
+ * three reasons, the rotation summary's list of "unmodelled" rage sources, the stat-weights panel's
+ * claim that haste is unread, and the upgrade finder's claim that most of the catalogue is
+ * estimated. Every one had been true when written.
+ *
+ * That is the pattern worth fixing rather than the four instances: closing a gap never forces the
+ * text describing it to change, so the text rots silently and a *wrong* caveat is worse than none.
+ * These tests give each claim something that fails when it stops being true.
+ * ---------------------------------------------------------------------------------------------
+ */
+
+test('a stat called unmodelled must actually score zero', () => {
+  /*
+   * The invariant that would have caught the haste bug on the day it appeared. `notModeledYet` says
+   * "the engine does not read this", and a stat the engine does not read cannot move the result. So
+   * a flagged stat scoring anything at all is a self-contradiction — which is exactly what haste was
+   * doing, at 0.059 per point, while the panel told players it was unread.
+   *
+   * Only asserted in that direction. The reverse is not a defect: an unflagged stat can legitimately
+   * score zero by being capped, which is the distinction the panel exists to draw.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+
+  for (const [className, spec, race, faction] of [
+    ['Warrior', 'Fury', 'Human', 'Alliance'],
+    ['Hunter', 'Beast Mastery', 'Human', 'Alliance'],
+    ['Mage', 'Fire', 'Human', 'Alliance'],
+    ['Priest', 'Holy', 'Human', 'Alliance'],
+  ] as const) {
+    const profile: CharacterProfile = { faction, race, className, spec }
+    const specGear = normalizeGearForCharacter(defaultGear, className, spec)
+    const role = getRoleForSpec(className, spec)
+    const weights = calculateStatWeights(profile, specGear, role)
+
+    for (const entry of weights.entries) {
+      if (!entry.notModeledYet) continue
+      expect(
+        entry.perPoint,
+        `${className} ${spec}: ${entry.label} is flagged "not modelled" but moves the result by ${entry.perPoint}`,
+      ).toBe(0)
+    }
+  }
+
+  // And the default character must still surface at least one genuinely unread stat, or the panel's
+  // explanation is being rendered for an empty list.
+  const furyWeights = calculateStatWeights(character, gear, 'Physical DPS')
+  expect(furyWeights.entries.some((entry) => entry.notModeledYet)).toBe(true)
+})
+
+test('the rotation-coverage claim on the Simulation panel matches the ability data', () => {
+  /*
+   * The panel says two specs layer real special attacks and the rest run from a single signature
+   * ability. That is a number in prose, which is the shape of claim this project keeps letting rot —
+   * so it gets an assertion.
+   */
+  const multiAbility: string[] = []
+  let singleAbility = 0
+
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      const count = getRotationAbilities(entry.className, spec).length
+      expect(count, `${entry.className} ${spec} should have at least one rotational ability`).toBeGreaterThan(0)
+      if (count > 1) multiAbility.push(`${entry.className} ${spec}`)
+      else singleAbility += 1
+    }
+  }
+
+  expect(multiAbility, 'exactly two specs have a real multi-ability rotation').toEqual(['Warrior Arms', 'Warrior Fury'])
+  expect(singleAbility, 'and the other 25 are single-ability approximations').toBe(25)
+})
+
+test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
+  /*
+   * It used to, and that was written when the catalogue held 230 hand-written items. It now holds
+   * 4,554, overwhelmingly ingested — the claim had inverted without anyone touching it.
+   *
+   * `dataQuality` on every upgrade row is driven by `needsVerification`, so this is the same figure
+   * the panel's prose quotes.
+   */
+  const flagged = allItems.filter((item) => item.needsVerification === true)
+  const sourcedShare = (allItems.length - flagged.length) / allItems.length
+
+  expect(allItems.length).toBeGreaterThan(4000)
+  expect(sourcedShare, 'the catalogue is overwhelmingly sourced, and the panel says so').toBeGreaterThan(0.9)
+  // Kept as a band rather than an exact number: it should move as data is verified, but a jump back
+  // past 10% would mean the prose is wrong again.
+  expect(flagged.length / allItems.length).toBeLessThan(0.1)
+})

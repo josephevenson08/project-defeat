@@ -29,9 +29,9 @@ export function UpgradesPanel({ character, report, role, onEquip }: UpgradesPane
         Every legal item for every slot, simulated as a straight swap and ranked by how much it moves the result.
         Sockets are filled with the best colour-matched gem for this character, so a delta is what the item is worth{' '}
         <strong>once gemmed</strong>; the slot&apos;s current enchant carries over whenever it stays legal. Equipping
-        applies exactly the gems and enchant the score assumed. Most of this catalog is still stat-budget estimates
-        rather than real tooltip values, and a row says so when its comparison rests on them — a sourced item measured
-        against an estimated one is flagged, because those gains read high in a predictable direction.
+        applies exactly the gems and enchant the score assumed. Almost all of this catalog is sourced from real data
+        now — about 3% of items still carry estimated stats — and a row says so when its comparison rests on one,
+        because a sourced item measured against an estimated one reads high in a predictable direction.
       </p>
 
       {report.candidates.length === 0 ? (

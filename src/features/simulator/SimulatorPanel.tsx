@@ -20,9 +20,12 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
   return (
     <Panel title="Simulation" eyebrow="Role-aware prototype" accentColor={getRoleAccentColor(role)}>
       <p className="panel-copy">
-        Runs a TBC attack-table/spell-table simulation against a level 73 raid boss using the current character's stat
-        totals, active buffs/consumables, and any target debuffs toggled below. Auto-attack/base-spell-damage rotation
-        modeling is still a known gap — see the result summary for what each estimate does and doesn't cover yet.
+        Runs a TBC attack-table/spell-table simulation against the target configured above, using the current
+        character&apos;s stat totals, talents, active buffs and consumables, and any target debuffs toggled below.
+        <strong> Rotation coverage is the standing gap:</strong> two specs layer their real special attacks on top of
+        auto attacks, and the rest are modeled from a single signature ability, which understates any spec whose damage
+        is spread across several buttons. Every estimate&apos;s summary names what it left out and why — read it, because
+        the caveats differ by spec rather than being boilerplate.
       </p>
       <Button onClick={onRun}>Run Simulation</Button>
       {result ? (
