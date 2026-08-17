@@ -323,6 +323,60 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 Now visible on the Simulation tab, so its limitations are visible too. Still open: rotations cover
 2 specs of 27, and there is no multi-iteration variance or result charting.
 
+**The encounter is fixed and has no controls** (2026-08-15, by request). It was a target-level
+select, an armor field, three armor presets and a damage-taken input; the tab exists to gear a
+character and press Run, which is what the reference TBC simulators do. One target: **level 73,
+10,643 armor**. The panel still *names* it, which is not the same as configuring it — a DPS figure
+means nothing without knowing what it was measured against.
+
+Two consequences worth knowing before touching this:
+
+- **10,643 is now *the* boss rather than one preset of three**, and the old panel labelled it
+  "Heavily armored boss" against 7,700 for "Typical raid boss". So the fixed target sits at the heavy
+  end and understates DPS against a typical one. Left unchanged deliberately: picking a different
+  single value moves every number in the app on judgement rather than a source. **This is an open
+  question, not a settled one.**
+- **Damage-taken rage is unreachable from the UI.** `SimulationTarget.damageTakenPerSecond` survives
+  with its tests, but nothing sets it, so it is pinned at 0 and Fury's rotation still cannot fund
+  Heroic Strike. That is the honest cost of zero configuration.
+
+**Removing a control twice left the state behind it live.** Worth watching for, because both were
+invisible until something exercised the second path:
+
+- `App.tsx` went on restoring `target` from the saved build, so a build saved while the presets
+  existed came back with 3,500 armor and the panel confidently announced a target the player never
+  chose and could not change. `buildSerialization` accepts any `{ level, armor }`, so an *imported*
+  build reached it too. `target` is now a constant; it stays in the payload for compatibility and is
+  never read back.
+- The same shape as §1's stale disclosures below: a change closes one path and leaves a second open.
+
+### The disclosures rot, and that is the pattern rather than the instances
+
+**Four of the simulator's self-descriptions were false in one sitting, all true when written.** The
+cause is structural and will recur: *closing a gap never forces the text describing that gap to
+change*, so the text rots silently — and on a surface whose case for being shown rests on describing
+itself honestly, a **wrong** caveat is worse than no caveat.
+
+| Claim | Reality when found |
+|---|---|
+| `featureFlags.ts`: rage unmodelled, no healer mana, procs unpopulated | all three fixed long before |
+| Rotation summary: "Bloodrage, Unbridled Wrath, damage taken, Flurry-driven haste are unmodelled" | all four modelled |
+| Stat weights: "Haste Rating — not modeled yet" | modelled, and worth **0.059/pt**, above Agility |
+| Upgrade finder: "most of this catalog is still stat-budget estimates" | **96.9% sourced** |
+
+So each now has an assertion that fails when it stops being true:
+
+- **A stat flagged `notModeledYet` must score exactly zero.** A stat the engine does not read cannot
+  move the result, so a flagged stat scoring anything is a self-contradiction. Verified by
+  reintroducing the haste bug — it fails naming the stat and the value. Runs across four roles. Only
+  the forward direction is asserted: an unflagged stat may legitimately score zero by being capped,
+  which is the distinction the panel exists to draw.
+- **Exactly 2 specs have multi-ability rotations and 25 are single-ability**, the figure the panel
+  prose quotes.
+- **The catalogue's sourced share stays above 90%**, as a band so verification work does not break it.
+
+If you add a caveat to any of these surfaces, give it something that fails when it stops being true.
+
 **All three of the reasons `featureFlags.ts` gives for hiding the tab have now been addressed** —
 rage, item procs and the healer mana constraint. **The flag's reasoning has been rewritten to match**
 (2026-08-15) — it used to claim "rage is not modelled at all", which would have sent the next reader
