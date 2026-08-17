@@ -160,6 +160,21 @@ export function flurrySpeedMultiplier(flurryBonus: number, meleeCritChance: numb
   return 1 / (idleShare + (1 - idleShare) / flurryBonus)
 }
 
+/**
+ * The classes whose talent effects have been ingested.
+ *
+ * Everything else derives identity modifiers, which is correct but **silent**: a Mage spending all 41
+ * points sees the estimate move by exactly nothing. That is the failure this file keeps guarding
+ * against in other forms — a real limitation with no way for the reader to learn it — so the class
+ * list is exported for the interface to say so out loud.
+ */
+export const classesWithTalentEffects: readonly string[] = rawTalentEffects.classes
+
+/** Whether a spec's talents can reach the simulation at all yet. */
+export function classHasTalentEffects(className: string): boolean {
+  return classesWithTalentEffects.includes(className)
+}
+
 /** The talents this pass deliberately does not model, and why. Surfaced so the gap stays visible. */
 export const unmodelledTalents: readonly { talent: string; reason: string }[] = rawTalentEffects.skipped
 

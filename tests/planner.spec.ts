@@ -4100,3 +4100,51 @@ test('Rogue talents are ingested per class, and two classes can share a talent n
     expect(dodgeOf(talented), 'talent expertise must reach the attack table').toBe(0)
   }
 })
+
+test('every role says what talents do for it, and the tank message is not the DPS one', () => {
+  /*
+   * A Mage spending 45 points watched the estimate go 462.5 -> 462.5 with nothing to explain it.
+   * Talent effects are ingested for Warrior and Rogue only, and casters, healers and tanks never
+   * received talents at all.
+   *
+   * The tank case is the one worth pinning hardest, because the first version of this got it wrong in
+   * the confident direction: it gave Protection the DPS message, which names only the *skipped*
+   * talents and so implies Toughness, Vitality and the rest are counted. They are not — the tank path
+   * receives none. A caveat that is wrong is worse than no caveat, which is the lesson this file has
+   * now recorded six times.
+   */
+  const spendFirstTree = (className: string) => {
+    const data = getTalentData(className)!
+    const points: Record<number, number> = {}
+    let spent = 0
+    for (const talent of data.trees[0].talents) {
+      if (spent >= TALENT_POINTS_AT_70) break
+      points[talent.id] = talent.maxRank
+      spent += talent.maxRank
+    }
+    return points
+  }
+
+  const noteFor = (className: TbcClass, spec: TbcSpec, role: CharacterRole, points: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    return calculateSimulation(character, gear, stats, role, [], undefined, points).unmodelledTalentNote
+  }
+
+  // A class with no ingested effects must say so rather than silently doing nothing.
+  const mage = noteFor('Mage', 'Fire', 'Caster DPS', spendFirstTree('Mage'))
+  expect(mage, 'a Mage spending points must be told they reach nothing').toBeTruthy()
+  expect(mage).toMatch(/only ingested for/i)
+  expect(mage, 'and that the talents themselves are real, not missing data').toMatch(/tree is complete/i)
+
+  // The tank gets its own message, naming the real reason.
+  const tank = noteFor('Warrior', 'Protection', 'Tank', spendFirstTree('Warrior'))
+  expect(tank).toBeTruthy()
+  expect(tank, 'the tank path reads no talents at all').toMatch(/does not read talents at all/i)
+  expect(tank, 'and must NOT imply the unlisted ones are counted').not.toMatch(/spent but not modelled/i)
+
+  // Silence when there is nothing to say, which is what keeps the others readable.
+  expect(noteFor('Mage', 'Fire', 'Caster DPS', {}), 'no points, no note').toBeUndefined()
+  expect(noteFor('Warrior', 'Protection', 'Tank', {}), 'no points, no note').toBeUndefined()
+})

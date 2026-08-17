@@ -39,6 +39,8 @@ import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounter
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
 import {
+  classHasTalentEffects,
+  classesWithTalentEffects,
   deriveTalentModifiers,
   flurrySpeedMultiplier,
   noTalentModifiers,
@@ -158,7 +160,40 @@ function specNoteFor(character: CharacterProfile): string | undefined {
  * which refuses what it cannot express rather than inventing a value, so this is the player-facing
  * half of a decision the data already made honestly.
  */
-function unmodelledTalentNoteFor(character: CharacterProfile, talentPoints: TalentPoints): string | undefined {
+function unmodelledTalentNoteFor(
+  character: CharacterProfile,
+  talentPoints: TalentPoints,
+  role: CharacterRole,
+): string | undefined {
+  const pointsSpent = Object.values(talentPoints).reduce((total, rank) => total + rank, 0)
+  if (pointsSpent === 0) return undefined
+
+  /*
+   * The louder case, and the one that was silent: this class has no ingested talent effects at all,
+   * so every point spent changes the estimate by exactly nothing. A Mage could spend all 41 and watch
+   * the number not move, with no way to learn why.
+   */
+  if (!classHasTalentEffects(character.className)) {
+    return (
+      `Talent effects are only ingested for ${classesWithTalentEffects.join(' and ')} so far, so the ` +
+      `${pointsSpent} points spent here reach this estimate not at all. The talents themselves are real ` +
+      'and the tree is complete — it is the effect extraction that stops at those classes.'
+    )
+  }
+
+  /*
+   * Tanks receive no talents at all — they are applied in `calculatePhysicalDps`, and a tank is
+   * scored by `calculateTankSurvivability`. Listing only the *skipped* talents here would imply the
+   * rest are counted, which is the precise kind of wrong caveat this file keeps having to correct.
+   */
+  if (role === 'Tank') {
+    return (
+      `Effective Health does not read talents at all yet, so the ${pointsSpent} points spent here change ` +
+      'nothing. Toughness, Vitality, Anticipation, Defiance and the shield talents are all extractable — ' +
+      'the gap is that talents are applied on the damage path only.'
+    )
+  }
+
   const taken = unmodelledTalentsInBuild(character.className, talentPoints)
   if (taken.length === 0) return undefined
 
@@ -705,6 +740,7 @@ function calculateCasterDps(
   stats: StatBlock,
   target: SimulationTarget,
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
+  unmodelledTalentNote?: string,
 ): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_NUKE_CAST_TIME)
   const levelDiff = target.level - PLAYER_LEVEL
@@ -732,6 +768,7 @@ function calculateCasterDps(
   return {
     role: 'Caster DPS',
     specNote: specNoteFor(character),
+    unmodelledTalentNote,
     metricLabel: 'Estimated DPS',
     score: round(dps),
     scoreExact: dps,
@@ -740,7 +777,7 @@ function calculateCasterDps(
   }
 }
 
-function calculateHealing(character: CharacterProfile, stats: StatBlock): SimulationResult {
+function calculateHealing(character: CharacterProfile, stats: StatBlock, unmodelledTalentNote?: string): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_HEAL_CAST_TIME)
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
@@ -792,6 +829,7 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock): Simula
   return {
     role: 'Healer',
     specNote: specNoteFor(character),
+    unmodelledTalentNote,
     metricLabel: 'Estimated Healing',
     score: round(hps),
     scoreExact: hps,
@@ -824,6 +862,7 @@ function calculateTankSurvivability(
   gear: EquippedGear,
   stats: StatBlock,
   target: SimulationTarget,
+  unmodelledTalentNote?: string,
 ): SimulationResult {
   const baseline = buildDefenderAvoidanceBaseline(target.level)
   const defenseSkillPoints = stats.defenseRating / DEFENSE_RATING_PER_SKILL_POINT
@@ -929,6 +968,7 @@ function calculateTankSurvivability(
   return {
     role: 'Tank',
     specNote: specNoteFor(character),
+    unmodelledTalentNote,
     metricLabel: 'Effective Health',
     score: round(effectiveHealth),
     scoreExact: effectiveHealth,
@@ -960,8 +1000,10 @@ export function calculateSimulation(
   // derives the identity modifiers, so this is a no-op everywhere else rather than a wrong answer.
   const talents = deriveTalentModifiers(talentPoints)
 
-  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs)
-  if (role === 'Healer') return calculateHealing(character, stats)
-  if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target)
-  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, unmodelledTalentNoteFor(character, talentPoints))
+  const talentNote = unmodelledTalentNoteFor(character, talentPoints, role)
+
+  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talentNote)
+  if (role === 'Healer') return calculateHealing(character, stats, talentNote)
+  if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talentNote)
+  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote)
 }
