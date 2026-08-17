@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateStatWeights.ts
-lines: 170
+lines: 181
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateStatWeights
 
-`src/features/simulator/calculateStatWeights.ts` · **features** layer · 170 lines
+`src/features/simulator/calculateStatWeights.ts` · **features** layer · 181 lines
 
 From the top of the file:
 

@@ -1258,12 +1258,24 @@ test('stat weights rank stats correctly and separate unmodeled stats from capped
   // Melee never reads ranged attack power, so it should not be probed at all for a Warrior.
   await expect(page.getByTestId('stat-weight-rangedAttackPower')).toHaveCount(0)
 
-  // Haste and armor penetration aren't read by the engine yet; they must be called out as
-  // unmodeled rather than silently listed as worth zero.
+  /*
+   * Armor penetration genuinely is not read by the engine, so it must be called out as unmodeled
+   * rather than silently listed as worth zero.
+   *
+   * **Haste used to be on that list and no longer belongs there.** White damage has scaled by
+   * `(1 + haste)` since melee haste was modelled; `CONSUMED_STATS` was simply never updated, so the
+   * panel went on telling players the engine did not read a stat it did read. This assertion used to
+   * pin the stale claim — worth flagging, because it is the reverse of the two tests in this file
+   * that codify real bugs and must NOT be "fixed".
+   *
+   * It matters beyond the label: probed, haste comes out above Agility and near Expertise, so the
+   * panel was hiding a strong stat. Separately and still true, Phase 2 gear carries almost none to
+   * find — what a point is worth and how many points exist are different questions.
+   */
   const unmodeled = page.locator('.stat-weights-unmodeled')
-  await expect(unmodeled).toContainText('Haste Rating')
   await expect(unmodeled).toContainText('Armor Pen')
-  await expect(page.getByTestId('stat-weight-hasteRating')).toHaveCount(0)
+  await expect(unmodeled, 'haste is modelled and must not be listed as unmodelled').not.toContainText('Haste Rating')
+  await expect(page.getByTestId('stat-weight-hasteRating')).toHaveCount(1)
 })
 
 test('stat weights follow the character role and class', async ({ page }) => {
@@ -2997,8 +3009,15 @@ test('Heroic Strike is in the rotation, and says in numbers why it still contrib
   expect(names[0]).toBe('Bloodthirst')
   expect(names[names.length - 1]).toBe('Heroic Strike')
 
-  // And the honest part: with only auto-attack rage modelled there is no surplus, so it contributes
-  // nothing — but the simulator now says so with the actual numbers instead of "unmodelled".
+  /*
+   * And the honest part. This used to read "with only auto-attack rage modelled"; that is no longer
+   * why the dump is unfunded. Swings, Bloodrage, Anger Management, Unbridled Wrath, Endless Rage and
+   * Flurry-driven haste are all counted now. What is left out is rage from damage taken, and that is
+   * a *declared zero* — an encounter setting — rather than a missing model.
+   *
+   * The summary has to say which, because "unmodelled" and "you left the input at 0" call for
+   * completely different responses from a reader.
+   */
   const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
   const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
   const stats = calculateStats(character, gear)
@@ -3006,8 +3025,10 @@ test('Heroic Strike is in the rotation, and says in numbers why it still contrib
 
   expect(result.breakdown.some((row) => row.label === 'Rage per second' && row.value > 0), 'rage income should be shown').toBe(true)
   expect(result.summary).toContain('Heroic Strike')
-  expect(result.summary).toMatch(/rage\/sec/)
-  expect(result.summary, 'the missing rage sources should be named, not just implied').toMatch(/Bloodrage/)
+  expect(result.summary, 'the actual income figure belongs in the message').toMatch(/rage income is [\d.]+\/sec/)
+  expect(result.summary, 'the sources that ARE counted should be named').toMatch(/Bloodrage/)
+  expect(result.summary, 'and the one that is not, with why').toMatch(/damage taken/)
+  expect(result.summary, 'naming it as an encounter default rather than a gap').toMatch(/defaults to 0/)
 
   // The cooldown priority must NOT be throttled by this partial income — doing so would report a
   // DPS loss as an accuracy gain. Bloodthirst and Whirlwind both still land.

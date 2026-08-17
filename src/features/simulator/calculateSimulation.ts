@@ -286,12 +286,20 @@ function resolveRotation(
       if (uses <= 0 || estimate.damagePerUse <= 0) {
         // Quantified rather than hand-waved: this is the number that has to move before a rage dump
         // is worth anything, and naming the missing sources says what would move it.
+        /*
+         * This message named Bloodrage, Unbridled Wrath, damage taken and Flurry as "unmodelled
+         * rage income" long after all four were modelled — the same stale-disclosure failure the
+         * feature flag had. What actually keeps the dump unfunded now is a *declared* zero rather
+         * than a missing model, so that is what it says.
+         */
         excluded.push({
           name: ability.name,
           explanation:
-            `auto attacks generate ${melee.ragePerSecond.toFixed(1)} rage/sec and the cooldowns ahead of it already commit ` +
-            `${(melee.ragePerSecond - rageBudget).toFixed(1)}, leaving no surplus to dump — Bloodrage, Unbridled Wrath, ` +
-            `damage taken and Flurry-driven haste are all unmodelled rage income`,
+            `rage income is ${melee.ragePerSecond.toFixed(1)}/sec and the cooldowns ahead of it already commit ` +
+            `${(melee.ragePerSecond - rageBudget).toFixed(1)}, leaving no surplus to dump. Swings, Bloodrage, Anger ` +
+            `Management, Unbridled Wrath, Endless Rage and Flurry-driven haste are all counted; what is not is rage ` +
+            `from damage taken, which is an encounter setting and defaults to 0 — a Fury warrior's rotation starts ` +
+            `funding this somewhere around 250-300 damage/sec taken`,
         })
         continue
       }

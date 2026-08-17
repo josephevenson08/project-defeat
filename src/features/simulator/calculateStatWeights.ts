@@ -58,6 +58,17 @@ const CONSUMED_STATS: Record<CharacterRole, ReadonlySet<keyof StatBlock>> = {
     'critRating',
     'hitRating',
     'expertiseRating',
+    /*
+     * Melee haste has been read since white damage started scaling by `(1 + haste)`; this list was
+     * simply never updated, so the panel kept telling players a modelled stat was unmodelled.
+     *
+     * That mattered more than a stale label usually does. Probed, haste is worth **0.059 per point**
+     * on the default Fury set — above Agility and close to Expertise — so the panel was hiding a
+     * genuinely strong stat behind "the engine doesn't read this". Not to be confused with the
+     * separate, still-true fact that Phase 2 gear carries almost no haste to *find*: what a point is
+     * worth and how many points exist are different questions, and only the second one is bleak.
+     */
+    'hasteRating',
   ]),
   'Caster DPS': new Set<keyof StatBlock>(['intellect', 'spirit', 'spellPower', 'spellCritRating', 'spellHitRating', 'spellHasteRating']),
   Healer: new Set<keyof StatBlock>(['intellect', 'spirit', 'healingPower', 'spellCritRating', 'spellHasteRating']),
