@@ -182,7 +182,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.stats.statRelevance]] · 1 importers
 - [[domain.stats.statTypes]] · 15 importers
 - [[domain.stats.statUtils]] · 2 importers
-- [[domain.talents.sampleTalents]] · 1 importers
+- [[domain.talents.sampleTalents]] · 2 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers
 - [[domain.talents.talentModifiers]] · 1 importers
 - [[domain.talents.talentTypes]] · 5 importers

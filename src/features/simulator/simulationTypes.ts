@@ -31,5 +31,14 @@ export type SimulationResult = {
    * question and the one a reader is more likely to need.
    */
   specNote?: string
+  /**
+   * Talents this character has spent points in that the model cannot express, named.
+   *
+   * Only set when points are actually spent, because a warning about talents you do not have is
+   * noise — and noise is how a caveat stops being read. The list itself comes from the ingest, which
+   * refuses what it cannot express rather than inventing a value for it, so this is the player-facing
+   * half of a decision already made honestly in the data.
+   */
+  unmodelledTalentNote?: string
   breakdown: SimulationBreakdownEntry[]
 }

@@ -38,7 +38,13 @@ import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient, 
 import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounters'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
-import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, type TalentModifiers } from '../../domain/talents/talentModifiers'
+import {
+  deriveTalentModifiers,
+  flurrySpeedMultiplier,
+  noTalentModifiers,
+  unmodelledTalentsInBuild,
+  type TalentModifiers,
+} from '../../domain/talents/talentModifiers'
 import type { TalentPoints } from '../../domain/talents/talentTypes'
 import type { TbcClass } from '../../domain/character/characterTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
@@ -142,6 +148,25 @@ function resolveCastProfile(character: CharacterProfile, fallbackCastTime: numbe
 function specNoteFor(character: CharacterProfile): string | undefined {
   const [primary] = getRotationAbilities(character.className, character.spec)
   return primary?.notes
+}
+
+/**
+ * Names the talents this build took that the model cannot express.
+ *
+ * Only produced when points are actually spent on one, because warning someone about talents they do
+ * not have is noise — and noise is how a caveat stops being read. The list comes from the ingest,
+ * which refuses what it cannot express rather than inventing a value, so this is the player-facing
+ * half of a decision the data already made honestly.
+ */
+function unmodelledTalentNoteFor(character: CharacterProfile, talentPoints: TalentPoints): string | undefined {
+  const taken = unmodelledTalentsInBuild(character.className, talentPoints)
+  if (taken.length === 0) return undefined
+
+  return (
+    `${taken.join(', ')} ${taken.length === 1 ? 'is' : 'are'} spent but not modelled here, so this estimate is ` +
+    'low by whatever they are worth. They need a damage-over-time layer, a cooldown usage policy or an ' +
+    'incoming-damage stream, none of which a closed-form model has.'
+  )
 }
 
 function round(value: number) {
@@ -411,6 +436,7 @@ function calculatePhysicalDps(
   target: SimulationTarget,
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
   talents: TalentModifiers = noTalentModifiers,
+  unmodelledTalentNote?: string,
 ): SimulationResult {
   const skillDiff = computeSkillDiff(target.level)
   const targetArmor = Math.max(0, target.armor - debuffs.armorReduction)
@@ -662,6 +688,7 @@ function calculatePhysicalDps(
   return {
     role: 'Physical DPS',
     specNote: specNoteFor(character),
+    unmodelledTalentNote,
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
@@ -933,5 +960,5 @@ export function calculateSimulation(
   if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs)
   if (role === 'Healer') return calculateHealing(character, stats)
   if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target)
-  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents)
+  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, unmodelledTalentNoteFor(character, talentPoints))
 }

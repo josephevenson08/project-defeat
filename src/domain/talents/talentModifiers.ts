@@ -1,4 +1,5 @@
 import rawTalentEffects from './talentEffects.json' with { type: 'json' }
+import { getTalentData } from './sampleTalents'
 import type { TalentPoints } from './talentTypes'
 
 /**
@@ -151,3 +152,34 @@ export function flurrySpeedMultiplier(flurryBonus: number, meleeCritChance: numb
 
 /** The talents this pass deliberately does not model, and why. Surfaced so the gap stays visible. */
 export const unmodelledTalents: readonly { talent: string; reason: string }[] = rawTalentEffects.skipped
+
+/**
+ * The unmodelled talents this particular build has actually spent points in.
+ *
+ * Returns the **specific talent names**, not the grouped labels the ingest files them under: a player
+ * who took Impale wants to read "Impale", not "Mace/Sword/Poleaxe Specialization". Several skipped
+ * entries cover more than one talent, which is why the labels are split before matching.
+ *
+ * Empty when nothing applies, and that emptiness is the point — warning someone about talents they do
+ * not have is noise, and noise is how a caveat stops being read.
+ */
+export function unmodelledTalentsInBuild(className: string, points: TalentPoints): readonly string[] {
+  const data = getTalentData(className)
+  if (!data) return []
+
+  const spent = new Set<string>()
+  for (const tree of data.trees) {
+    for (const talent of tree.talents) {
+      if ((points[talent.id] ?? 0) > 0) spent.add(talent.name)
+    }
+  }
+  if (spent.size === 0) return []
+
+  const taken: string[] = []
+  for (const entry of rawTalentEffects.skipped) {
+    for (const name of entry.talent.split('/').map((part) => part.trim())) {
+      if (spent.has(name)) taken.push(name)
+    }
+  }
+  return taken
+}

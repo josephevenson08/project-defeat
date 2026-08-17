@@ -3961,3 +3961,38 @@ test('the spec caveat is rendered with the result, not just computed', async ({ 
   // The default character is a Fury Warrior, so the note has to be Fury's rather than a generic one.
   await expect(note).toContainText(/Bloodthirst/i)
 })
+
+test('the estimate names unmodelled talents you actually took, and stays quiet otherwise', () => {
+  /*
+   * `unmodelledTalents` existed for an hour with a test as its only consumer — the same failure this
+   * session kept finding elsewhere: real, written content reaching no user. The ingest refuses nine
+   * talent groups it cannot express and records a reason for each; this is the player-facing half of
+   * that decision.
+   *
+   * The silence matters as much as the message. Warning someone about talents they do not have is
+   * noise, and noise is how a caveat stops being read — which is exactly how the four stale
+   * disclosures earlier today managed to sit there being false.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const stats = calculateStats(character, gear)
+  const noteFor = (points: Record<number, number>) =>
+    calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points).unmodelledTalentNote
+
+  expect(noteFor({}), 'nothing spent, nothing to warn about').toBeUndefined()
+
+  // Talents the model DOES express must not produce a warning either.
+  expect(noteFor(furyTalentPoints([['Cruelty', 5], ['Flurry', 5]])), 'modelled talents are not a gap').toBeUndefined()
+
+  /*
+   * And when an unmodelled one is taken it is named specifically. "Impale" rather than the grouped
+   * label the ingest files it under ("Mace/Sword/Poleaxe Specialization"), because the player picked
+   * a talent, not a category.
+   */
+  const note = noteFor(furyTalentPoints([['Cruelty', 5], ['Deep Wounds', 3], ['Impale', 2]]))
+  expect(note).toBeTruthy()
+  expect(note).toContain('Deep Wounds')
+  expect(note).toContain('Impale')
+  expect(note, 'talents that ARE modelled must not be listed as gaps').not.toContain('Cruelty')
+  expect(note, 'and it should say which way the estimate is wrong').toMatch(/low by/i)
+})

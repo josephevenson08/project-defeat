@@ -52,6 +52,17 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
             </p>
           )}
 
+          {/*
+            Only appears once points are actually spent on something unmodelled, which is what keeps
+            it from becoming furniture. Separate from the spec note above because it is a different
+            claim: that one is about the rotation, this one is about the talents you chose.
+          */}
+          {result.unmodelledTalentNote && (
+            <p className="simulation-spec-note" data-testid="simulation-talent-note">
+              <strong>Talents you have spent that this cannot model:</strong> {result.unmodelledTalentNote}
+            </p>
+          )}
+
           <div className="breakdown-list" aria-label="Result breakdown">
             {result.breakdown.map((entry) => (
               <div key={entry.label}>
