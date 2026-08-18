@@ -7,15 +7,19 @@
       "sim/warrior/talents.go",
       "sim/warrior/dps/dps_warrior.go",
       "sim/warrior/berserker_rage.go",
-      "sim/rogue/talents.go"
+      "sim/rogue/talents.go",
+      "sim/hunter/talents.go",
+      "sim/shaman/talents.go"
     ]
   },
   "classes": [
     "Warrior",
-    "Rogue"
+    "Rogue",
+    "Hunter",
+    "Shaman"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 15,
+  "effectCount": 24,
   "effects": [
     {
       "className": "Warrior",
@@ -79,7 +83,7 @@
       "talent": "Two-Handed Weapon Specialization",
       "tree": "Arms",
       "maxRank": 5,
-      "kind": "physicalDamageMultiplier",
+      "kind": "twoHandedDamageMultiplier",
       "unit": "fraction per rank",
       "perRank": 0.01,
       "caveat": "Applies only while a two-handed weapon is in the main hand; upstream gates on HandType.",
@@ -187,6 +191,108 @@
       "perRank": 5,
       "caveat": "Expertise skill points, not rating — the attack table takes skill points directly.",
       "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1321,
+      "talent": "Killer Instinct",
+      "tree": "Survival",
+      "maxRank": 3,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Upstream files this under MeleeCrit; the ranged attack table reads the same crit figure.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1310,
+      "talent": "Surefooted",
+      "tree": "Survival",
+      "maxRank": 3,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1344,
+      "talent": "Lethal Shots",
+      "tree": "Marksmanship",
+      "maxRank": 5,
+      "kind": "rangedCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Ranged crit only, which is why it is a separate field from the melee crit above.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1362,
+      "talent": "Ranged Weapon Specialization",
+      "tree": "Marksmanship",
+      "maxRank": 5,
+      "kind": "rangedDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1802,
+      "talent": "Serpent's Swiftness",
+      "tree": "Beast Mastery",
+      "maxRank": 5,
+      "kind": "rangedAttackSpeedMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "caveat": "Also speeds the pet in upstream; there is no pet here, so only the hunter half applies.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Shaman",
+      "talentId": 613,
+      "talent": "Thundering Strikes",
+      "tree": "Enhancement",
+      "maxRank": 5,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/shaman/talents.go"
+    },
+    {
+      "className": "Shaman",
+      "talentId": 583,
+      "talent": "Nature's Guidance",
+      "tree": "Restoration",
+      "maxRank": 3,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/shaman/talents.go"
+    },
+    {
+      "className": "Shaman",
+      "talentId": 1643,
+      "talent": "Weapon Mastery",
+      "tree": "Enhancement",
+      "maxRank": 5,
+      "kind": "physicalDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/shaman/talents.go"
+    },
+    {
+      "className": "Shaman",
+      "talentId": 1692,
+      "talent": "Dual Wield Specialization",
+      "tree": "Enhancement",
+      "maxRank": 3,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/shaman/talents.go"
     }
   ],
   "skipped": [
@@ -264,6 +370,51 @@
       "className": "Rogue",
       "talent": "Adrenaline Rush / Blade Flurry / Cold Blood",
       "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Ferocity / Animal Handler / Unleashed Fury / Frenzy / Focused Fire / The Beast Within",
+      "reason": "Pet talents. There is no pet in this model, which is also why Beast Mastery is the spec its own note flags as most understated."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Combat Experience / Survivalist",
+      "reason": "Multiply Agility and Health, which cascade inside calculateStats. Talents deliberately reach only the simulation."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Mortal Shots",
+      "reason": "Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Expose Weakness",
+      "reason": "Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Master Tactician / Thrill of the Hunt / Readiness",
+      "reason": "Procs and cooldowns needing a timeline."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Toughness / Anticipation / Shield Specialization",
+      "reason": "Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Elemental Fury / Concussion / Call of Thunder",
+      "reason": "Spell-side talents, and calculateCasterDps takes no talents yet."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Flurry",
+      "reason": "Shaman has its own Flurry at a different rank scale; the analytic derivation is Warrior-shaped and would need re-checking against the Shaman ranks before being reused."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Shamanistic Rage / Stormstrike cooldowns",
+      "reason": "Activated abilities needing a usage policy."
     }
   ]
 }

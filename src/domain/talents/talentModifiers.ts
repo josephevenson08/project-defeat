@@ -37,6 +37,20 @@ export type TalentModifiers = {
   /** Melee speed multiplier while the Flurry aura holds a stack. 1 when untalented. */
   flurryBonus: number
   /**
+   * Multiplies all physical damage, ungated. Shaman's Weapon Mastery.
+   *
+   * Separate from `twoHandedDamageMultiplier` on purpose: Warrior's Two-Handed Weapon Specialization
+   * applies only while a two-hander is held, and upstream gates it on `HandType`. One shared field
+   * would either hand a dual-wielding Shaman a gate it does not have, or strip Warrior's.
+   */
+  physicalDamageMultiplier: number
+  /** Added to ranged crit chance only. Hunter's Lethal Shots. */
+  rangedCritChance: number
+  /** Multiplies ranged white damage. Hunter's Ranged Weapon Specialization. 1 when untalented. */
+  rangedDamageMultiplier: number
+  /** Multiplies ranged attack speed. Hunter's Serpent's Swiftness. 1 when untalented. */
+  rangedAttackSpeedMultiplier: number
+  /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
    * Skill points rather than rating: the table divides rating by a constant to get points anyway, and
@@ -58,6 +72,10 @@ export const noTalentModifiers: TalentModifiers = {
   rageProcsPerMinute: 0,
   flurryBonus: 1,
   expertiseSkillPoints: 0,
+  physicalDamageMultiplier: 1,
+  rangedCritChance: 0,
+  rangedDamageMultiplier: 1,
+  rangedAttackSpeedMultiplier: 1,
 }
 
 /** Which `TalentModifiers` field each extracted effect kind feeds, and how it combines. */
@@ -68,12 +86,16 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   rageProcsPerMinute: 'rageProcsPerMinute',
   ragePerSecondFlat: 'flatRagePerSecond',
   expertiseSkill: 'expertiseSkillPoints',
+  rangedCritChance: 'rangedCritChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   attackPowerMultiplier: 'attackPowerMultiplier',
   offHandDamageMultiplier: 'offHandDamageMultiplier',
-  physicalDamageMultiplier: 'twoHandedDamageMultiplier',
+  twoHandedDamageMultiplier: 'twoHandedDamageMultiplier',
+  physicalDamageMultiplier: 'physicalDamageMultiplier',
+  rangedDamageMultiplier: 'rangedDamageMultiplier',
+  rangedAttackSpeedMultiplier: 'rangedAttackSpeedMultiplier',
   flurryHaste: 'flurryBonus',
   rageGeneratedMultiplier: 'rageGeneratedMultiplier',
 }

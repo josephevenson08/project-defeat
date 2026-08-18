@@ -519,11 +519,17 @@ function calculatePhysicalDps(
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
-    const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance })
+    // Lethal Shots is ranged crit specifically, so it joins here rather than in the shared figure.
+    const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance: rawCritChance + talents.rangedCritChance })
     const effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
     const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
     // Ranged haste uses the same rating and behaves the same way: more shots, not bigger ones.
-    rawDps = (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) * effectiveMultiplier * gearAttackSpeedMultiplier
+    rawDps =
+      (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) *
+      effectiveMultiplier *
+      gearAttackSpeedMultiplier *
+      talents.rangedAttackSpeedMultiplier *
+      talents.rangedDamageMultiplier
     breakdown = [
       { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
       { label: 'Weapon damage', value: round(weaponDps) },
@@ -572,9 +578,10 @@ function calculatePhysicalDps(
     // The equipped item, not `mainHandItem` -- that may be the cat-form profile, which is a damage
     // profile rather than a real weapon. The talent gates on what is actually held.
     const twoHandedMultiplier = twoHanderOccupiesOffHand(gear['Main Hand']?.item) ? talents.twoHandedDamageMultiplier : 1
-    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier * attackSpeedMultiplier * twoHandedMultiplier
+    const physicalMultiplier = talents.physicalDamageMultiplier * twoHandedMultiplier
+    const mainHandDps = (mainHandWeaponDps + apDps) * effectiveMultiplier * attackSpeedMultiplier * physicalMultiplier
     const offHandDps = dualWield
-      ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier * talents.offHandDamageMultiplier
+      ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier * talents.offHandDamageMultiplier * physicalMultiplier
       : 0
     rawDps = mainHandDps + offHandDps
 

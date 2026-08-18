@@ -97,7 +97,7 @@ const WARRIOR_EXTRACTORS = [
   },
   {
     talent: 'Two-Handed Weapon Specialization',
-    kind: 'physicalDamageMultiplier',
+    kind: 'twoHandedDamageMultiplier',
     unit: 'fraction per rank',
     re: /PhysicalDamageDealtMultiplier \*= 1 \+ ([\d.]+)\*float64\(warrior\.Talents\.TwoHandedWeaponSpecialization\)/,
     value: (m) => Number(m[1]),
@@ -218,9 +218,117 @@ const ROGUE_SKIPPED = [
   ['Adrenaline Rush / Blade Flurry / Cold Blood', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
 ]
 
+const HUNTER_SOURCES = [{ path: 'sim/hunter/talents.go', cache: 'sim_hunter_talents.go' }]
+
+/*
+ * Hunter. The only class whose specs all run the RANGED branch, so its effects land on ranged fields
+ * rather than the melee ones — Serpent's Swiftness is the big one at +4% ranged attack speed a rank.
+ *
+ * Every pet talent is refused: there is no pet in this model at all, and Beast Mastery's real edge
+ * lives there, which the spec's own note already says.
+ */
+const HUNTER_EXTRACTORS = [
+  {
+    talent: 'Killer Instinct',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*([\d.]+)\*float64\(hunter\.Talents\.KillerInstinct\)\)/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Upstream files this under MeleeCrit; the ranged attack table reads the same crit figure.',
+  },
+  {
+    talent: 'Surefooted',
+    kind: 'meleeHitChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*([\d.]+)\*float64\(hunter\.Talents\.Surefooted\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Lethal Shots',
+    kind: 'rangedCritChance',
+    unit: 'fraction per rank',
+    re: /PseudoStats\.BonusRangedCritRating \+= ([\d.]+) \* float64\(hunter\.Talents\.LethalShots\) \* core\.MeleeCritRatingPerCritChance/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Ranged crit only, which is why it is a separate field from the melee crit above.',
+  },
+  {
+    talent: 'Ranged Weapon Specialization',
+    kind: 'rangedDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /PseudoStats\.RangedDamageDealtMultiplier \*= 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.RangedWeaponSpecialization\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: "Serpent's Swiftness",
+    kind: 'rangedAttackSpeedMultiplier',
+    unit: 'fraction per rank',
+    re: /PseudoStats\.RangedSpeedMultiplier \*= 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.SerpentsSwiftness\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Also speeds the pet in upstream; there is no pet here, so only the hunter half applies.',
+  },
+]
+
+const HUNTER_SKIPPED = [
+  ['Ferocity / Animal Handler / Unleashed Fury / Frenzy / Focused Fire / The Beast Within', 'Pet talents. There is no pet in this model, which is also why Beast Mastery is the spec its own note flags as most understated.'],
+  ['Combat Experience / Survivalist', 'Multiply Agility and Health, which cascade inside calculateStats. Talents deliberately reach only the simulation.'],
+  ['Mortal Shots', 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
+  ['Expose Weakness', 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
+  ['Master Tactician / Thrill of the Hunt / Readiness', 'Procs and cooldowns needing a timeline.'],
+]
+
+const SHAMAN_SOURCES = [{ path: 'sim/shaman/talents.go', cache: 'sim_shaman_talents.go' }]
+
+/*
+ * Shaman. Two of these share a NAME with a Warrior talent and do something completely different --
+ * Weapon Mastery is physical damage here and dodge reduction there, Dual Wield Specialization is hit
+ * here and off-hand damage there. Keying effects by class-checked talent id rather than by name is
+ * what stops one silently becoming the other.
+ */
+const SHAMAN_EXTRACTORS = [
+  {
+    talent: 'Thundering Strikes',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*([\d.]+)\*float64\(shaman\.Talents\.ThunderingStrikes\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: "Nature's Guidance",
+    kind: 'meleeHitChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeHit,\s*float64\(shaman\.Talents\.NaturesGuidance\)\*([\d.]+)\*core\.MeleeHitRatingPerHitChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Weapon Mastery',
+    kind: 'physicalDamageMultiplier',
+    unit: 'fraction per rank',
+    // NOT the Warrior talent of the same name, which reduces the target's dodge instead.
+    re: /PseudoStats\.PhysicalDamageDealtMultiplier \*= 1 \+ ([\d.]+)\*float64\(shaman\.Talents\.WeaponMastery\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Dual Wield Specialization',
+    kind: 'meleeHitChance',
+    unit: 'fraction per rank',
+    // NOT the Warrior talent of the same name, which raises off-hand damage instead.
+    re: /AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*([\d.]+)\*float64\(shaman\.Talents\.DualWieldSpecialization\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+]
+
+const SHAMAN_SKIPPED = [
+  ['Toughness / Anticipation / Shield Specialization', 'Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only.'],
+  ['Elemental Fury / Concussion / Call of Thunder', 'Spell-side talents, and calculateCasterDps takes no talents yet.'],
+  ['Flurry', 'Shaman has its own Flurry at a different rank scale; the analytic derivation is Warrior-shaped and would need re-checking against the Shaman ranks before being reused.'],
+  ['Shamanistic Rage / Stormstrike cooldowns', 'Activated abilities needing a usage policy.'],
+]
+
 const CLASSES = [
   { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: WARRIOR_EXTRACTORS, skipped: WARRIOR_SKIPPED },
   { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: ROGUE_EXTRACTORS, skipped: ROGUE_SKIPPED },
+  { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
+  { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
 ]
 
 const effects = []

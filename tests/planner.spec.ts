@@ -4148,3 +4148,70 @@ test('every role says what talents do for it, and the tank message is not the DP
   expect(noteFor('Mage', 'Fire', 'Caster DPS', {}), 'no points, no note').toBeUndefined()
   expect(noteFor('Warrior', 'Protection', 'Tank', {}), 'no points, no note').toBeUndefined()
 })
+
+test('Hunter and Shaman talents land, and a shared talent name does not cross classes', () => {
+  /*
+   * Two classes now share a talent NAME with Warrior while doing something completely different:
+   * Shaman's Weapon Mastery is physical damage where Warrior's reduces the target's dodge, and its
+   * Dual Wield Specialization is hit where Warrior's raises off-hand damage.
+   *
+   * Keying effects by class-checked talent id rather than by name is what stops one silently becoming
+   * the other. A stronger test of that than Rogue's Precision was — there the effect at least
+   * matched, so a mix-up would have been invisible.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const warriorWeaponMastery = idOf('Warrior', 'Weapon Mastery')
+  const shamanWeaponMastery = idOf('Shaman', 'Weapon Mastery')
+  expect(warriorWeaponMastery).not.toBe(shamanWeaponMastery)
+
+  // Warrior's reduces dodge and leaves damage alone; Shaman's does the exact opposite.
+  const warriorSide = deriveTalentModifiers({ [warriorWeaponMastery]: 2 })
+  expect(warriorSide.targetDodgeReduction).toBeCloseTo(0.02, 10)
+  expect(warriorSide.physicalDamageMultiplier, "Warrior's must not grant damage").toBe(1)
+
+  const shamanSide = deriveTalentModifiers({ [shamanWeaponMastery]: 5 })
+  expect(shamanSide.physicalDamageMultiplier).toBeCloseTo(1.1, 10)
+  expect(shamanSide.targetDodgeReduction, "Shaman's must not reduce dodge").toBe(0)
+
+  // Same again for Dual Wield Specialization, which differs just as sharply.
+  const warriorDw = deriveTalentModifiers({ [idOf('Warrior', 'Dual Wield Specialization')]: 5 })
+  const shamanDw = deriveTalentModifiers({ [idOf('Shaman', 'Dual Wield Specialization')]: 3 })
+  expect(warriorDw.offHandDamageMultiplier).toBeCloseTo(1.25, 10)
+  expect(warriorDw.meleeHitChance).toBe(0)
+  expect(shamanDw.meleeHitChance).toBeCloseTo(0.06, 10)
+  expect(shamanDw.offHandDamageMultiplier).toBe(1)
+
+  /*
+   * Hunter is the only class whose specs all run the ranged branch, so its effects land on ranged
+   * fields. Serpent's Swiftness is the largest single talent in the model at +4% ranged attack speed
+   * per rank.
+   */
+  const hunterPoints = {
+    [idOf('Hunter', 'Lethal Shots')]: 5,
+    [idOf('Hunter', "Serpent's Swiftness")]: 5,
+    [idOf('Hunter', 'Ranged Weapon Specialization')]: 5,
+  }
+  const hunter = deriveTalentModifiers(hunterPoints)
+  expect(hunter.rangedCritChance).toBeCloseTo(0.05, 10)
+  expect(hunter.rangedAttackSpeedMultiplier).toBeCloseTo(1.2, 10)
+  expect(hunter.rangedDamageMultiplier).toBeCloseTo(1.05, 10)
+  // Ranged crit must NOT leak into the melee figure, or a melee spec would inherit a hunter talent.
+  expect(hunter.meleeCritChance).toBe(0)
+
+  const shamanPoints = { [shamanWeaponMastery]: 5, [idOf('Shaman', 'Thundering Strikes')]: 5 }
+  const cases: readonly (readonly [TbcClass, TbcSpec, TbcRace, Record<number, number>])[] = [
+    ['Hunter', 'Beast Mastery', 'Human', hunterPoints],
+    ['Hunter', 'Marksmanship', 'Human', hunterPoints],
+    ['Shaman', 'Enhancement', 'Draenei', shamanPoints],
+  ]
+  for (const [className, spec, race, points] of cases) {
+    const character: CharacterProfile = { faction: 'Alliance', race, className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    const bare = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
+    const talented = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+    expect(talented.scoreExact, `${className} ${spec} must benefit from talents`).toBeGreaterThan(bare.scoreExact)
+  }
+})
