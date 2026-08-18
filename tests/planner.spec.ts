@@ -1329,8 +1329,8 @@ test('the encounter is stated, not configured, and the fixed target is the one t
   await openApp(page)
   await openSimulationTab(page)
 
-  // DR = armor / (armor + K), K = 467.5 * 70 - 22167.5 = 10557.5, so 10643 / 21200.5 = 50.2%.
-  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('50.2%')
+  // DR = armor / (armor + K), K = 467.5 * 70 - 22167.5 = 10557.5, so 7700 / 18257.5 = 42.2%.
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('42.2%')
   await expect(page.getByText(/level 73/i).first()).toBeVisible()
 
   // No controls survive. Asserted against the panel rather than the page, so this cannot pass by the
@@ -1364,7 +1364,7 @@ test('armor and target level still reach the simulation, now that nothing sets t
 
   // And the fixed target really is the level 73 boss the panel names.
   expect(defaultSimulationTarget.level).toBe(73)
-  expect(defaultSimulationTarget.armor).toBe(10643)
+  expect(defaultSimulationTarget.armor).toBe(7700)
 })
 
 test('upgrade finder ranks real swaps, spans slots, and equipping delivers the promised gain', async ({ page }) => {
@@ -3507,7 +3507,7 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
   expect(empty.scoreExact, 'passing an empty tree must equal passing nothing').toBe(omitted.scoreExact)
 
   // And it must still be the figure the handoff records, so a drift here is visible immediately.
-  expect(empty.score).toBe(165.6)
+  expect(empty.score).toBe(192.3)
 })
 
 test('Flurry is solved analytically, and its value is gated hard by crit chance', () => {
@@ -3588,14 +3588,14 @@ test('talent modifiers come from the ingest, and reach the melee estimate', () =
   expect(critOf(after) - critOf(before)).toBeCloseTo(5, 6)
 
   expect(after.scoreExact, 'talents must raise melee DPS').toBeGreaterThan(before.scoreExact)
-  expect(after.score).toBe(193.2)
+  expect(after.score).toBe(224.3)
 })
 
 test('talents do NOT close the rage gap, which is what this pass set out to test', () => {
   /*
    * Recorded as a result rather than a defect. The scope committed in advance to a falsification
    * test: a talented Fury build should move DPS substantially AND close the rage shortfall. The
-   * first held — 165.6 to 193.2, +16.7%. The second did not.
+   * first held — 192.3 to 224.3, +16.6%. The second did not.
    *
    * Swings plus Bloodrage fund 3.4 rage/sec untalented. **Every talent-side source takes that to
    * 5.4** — Endless Rage scales the swing-speed term, Flurry raises the swing rate that income is
@@ -3893,8 +3893,8 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
   await page.getByTestId('section-planner').click()
   await openSimulationTab(page)
 
-  // The fixed target wins. 10,643 / 21,200.5 = 50.2%; the planted 3,500 would read 24.9%.
-  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('50.2%')
+  // The fixed target wins. 7,700 / 18,257.5 = 42.2%; the planted 3,500 would read 24.9%.
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('42.2%')
   await expect(page.getByText(/level 73/i).first()).toBeVisible()
   await expect(page.getByText(/3,500/)).toHaveCount(0)
 

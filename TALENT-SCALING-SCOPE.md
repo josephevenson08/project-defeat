@@ -20,7 +20,7 @@ of having written it first.** It required DPS to move *and* the rage gap to clos
 
 | | Untalented | Talented |
 |---|---|---|
-| Fury DPS | 165.6 | **193.2** (+16.7%) ✅ |
+| Fury DPS | 192.3 | **224.3** (+16.6%) ✅ |
 | Rage/sec | 3.4 | **5.4**, against 7.5 needed ❌ |
 | Heroic Strike | excluded | **still excluded** ❌ |
 
@@ -259,7 +259,8 @@ change at all*. Only the ingest was Warrior-hardcoded — the source list, the e
 the tree it cross-checked names against.
 
 Talent scaling now covers **5 specs**: Warrior Arms and Fury, Rogue Assassination, Combat and
-Subtlety. Measured 163.7 → 190.7, 157.4 → 183.7, 166.8 → 194.2.
+Subtlety. Measured against the 10,643 target at the time: 163.7 → 190.7, 157.4 → 183.7, 166.8 → 194.2. All
+three moved up again when the fixed boss became 7,700 armor.
 
 `expertiseSkillPoints` is the one new field, in **skill points rather than rating** — the attack table
 divides rating by a constant to get points anyway, and upstream grants these in points, so converting

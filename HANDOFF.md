@@ -334,16 +334,17 @@ Now visible on the Simulation tab, so its limitations are visible too. Still ope
 **The encounter is fixed and has no controls** (2026-08-15, by request). It was a target-level
 select, an armor field, three armor presets and a damage-taken input; the tab exists to gear a
 character and press Run, which is what the reference TBC simulators do. One target: **level 73,
-10,643 armor**. The panel still *names* it, which is not the same as configuring it — a DPS figure
+7,700 armor**. The panel still *names* it, which is not the same as configuring it — a DPS figure
 means nothing without knowing what it was measured against.
 
 Two consequences worth knowing before touching this:
 
-- **10,643 is now *the* boss rather than one preset of three**, and the old panel labelled it
-  "Heavily armored boss" against 7,700 for "Typical raid boss". So the fixed target sits at the heavy
-  end and understates DPS against a typical one. Left unchanged deliberately: picking a different
-  single value moves every number in the app on judgement rather than a source. **This is an open
-  question, not a settled one.**
+- **The armor was 10,643 and is now 7,700**, settled by the repo owner. While three presets existed,
+  10,643 was the one labelled "Heavily armored boss" against 7,700 for "Typical raid boss" — so
+  keeping it as the *only* target meant every physical DPS number was quoted against the heavy end.
+  **Every DPS figure in the app moved up when this changed**: armor mitigation 50.2% → 42.2%, Fury
+  165.6 → 192.3, Arms 203.2 → 236. Both values are community approximations rather than
+  tooltip-exact, which is why the encounter still carries `needsVerification`.
 - **Damage-taken rage is unreachable from the UI.** `SimulationTarget.damageTakenPerSecond` survives
   with its tests, but nothing sets it, so it is pinned at 0 and Fury's rotation still cannot fund
   Heroic Strike. That is the honest cost of zero configuration.
@@ -824,7 +825,8 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
 - **Source.** `tools/ingest/ingest-talent-effects.mjs` reads `sim/warrior/talents.go` at the pinned
   `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
-- **Result.** Fury DPS **165.6 → 193.2 (+16.7%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
+- **Result.** Fury DPS **192.3 → 224.3 (+16.6%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
+  (Post-7,700-armor figures. Against the old 10,643 target they read 165.6 → 193.2.)
 - **Stage 2 shipped the same day: the ingest is class-parameterised and Rogue is in.** Talent
   scaling covers **5 specs** now — Warrior Arms and Fury, Rogue Assassination, Combat and Subtlety.
   The generalization was cheap because **talent ids are globally unique**, so one effects list serves
@@ -833,7 +835,7 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   class's tree, which is what keeps a name lookup honest.
 - **It covers Arms too, free.** `deriveTalentModifiers` is keyed by **talent id** and
   `warriorTalents.json` carries all three trees, so any spec sharing the class shares the effects —
-  nothing about the mechanism is Fury-specific. Arms measured **203.2 → 229.1**. Adding a class means
+  nothing about the mechanism is Fury-specific. Arms measured **236 → 271.6**. Adding a class means
   adding its extractors, not its specs.
 - **Protection gets nothing, and that is the honest gap.** Talents are applied in
   `calculatePhysicalDps`; a Protection Warrior is scored by `calculateTankSurvivability`, which never
