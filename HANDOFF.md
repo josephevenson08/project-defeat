@@ -253,7 +253,11 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   fell to its honest value: **Fury 196.5 → 165.6, Arms 233.7 → 203.2, Combat Rogue 205.6 → 185.6**,
   and Combat Rogue then fell again to **157.4** when the proficiency fix below took its two-hander
   away and gave it two one-handers. Feral is unchanged, correctly, because cat form swings its own
-  weapon. **Those are the current figures** — anything earlier in this file is history.
+  weapon.
+
+  **Those were the current figures against the 10,643-armor target.** They are now 192.3 / 236 /
+  185.6-ish against 7,700 — the fix they describe is still real, but read the numbers as a record of
+  what that fix did rather than as today's readouts.
 
   **The reverse rule is what the first attempt got wrong, and it is the subtle half.** An empty off
   hand is legal *only* beside a two-hander, but the placeholder passes `isItemAllowedForCharacter` —
@@ -467,8 +471,9 @@ fixed: the player's white and special tables applied **parry and block** to a me
 require the defender to be *facing* the attacker, and a melee DPS is behind the boss all fight, so
 against a level 73 target that deleted 14% parry plus 5% block from every swing. Fixing it moved a
 Fury Warrior from 125 to 148 DPS at the time and took hit chance from 21.7% to 39.2%. (That 148 is
-history: the same character now reads **165.6**, after the unobtainable-item and two-hander fixes
-changed which weapons it holds.) `attacksFromBehind` is now
+history, and so is the 165.6 it became after the unobtainable-item and two-hander fixes changed
+which weapons it holds. The same character now reads **192.3**, after the boss armor moved to
+7,700.) `attacksFromBehind` is now
 a required input on both builders, so a future front-facing caller has to state its position.
 
 **Rage is now modelled, and the result was not the one expected.** `domain/simulation/rageModel.ts`
