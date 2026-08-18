@@ -9,17 +9,21 @@
       "sim/warrior/berserker_rage.go",
       "sim/rogue/talents.go",
       "sim/hunter/talents.go",
-      "sim/shaman/talents.go"
+      "sim/shaman/talents.go",
+      "sim/druid/talents.go",
+      "sim/paladin/talents.go"
     ]
   },
   "classes": [
     "Warrior",
     "Rogue",
     "Hunter",
-    "Shaman"
+    "Shaman",
+    "Druid",
+    "Paladin"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 24,
+  "effectCount": 30,
   "effects": [
     {
       "className": "Warrior",
@@ -293,6 +297,76 @@
       "unit": "fraction per rank",
       "perRank": 0.02,
       "source": "sim/shaman/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 798,
+      "talent": "Sharpened Claws",
+      "tree": "Feral",
+      "maxRank": 3,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 824,
+      "talent": "Naturalist",
+      "tree": "Restoration",
+      "maxRank": 5,
+      "kind": "physicalDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 803,
+      "talent": "Predatory Strikes",
+      "tree": "Feral",
+      "maxRank": 3,
+      "kind": "flatAttackPower",
+      "unit": "attack power per rank",
+      "perRank": 35,
+      "caveat": "Upstream scales by character level; folded in at 70, which is the only level this app models.",
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1761,
+      "talent": "Sanctified Seals",
+      "tree": "Retribution",
+      "maxRank": 3,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank (implied coefficient of 1 upstream)",
+      "perRank": 0.01,
+      "caveat": "Upstream omits the coefficient, which means 1 -- one percent of crit chance per rank.",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1411,
+      "talent": "Conviction",
+      "tree": "Retribution",
+      "maxRank": 5,
+      "kind": "meleeCritChance",
+      "unit": "fraction per rank (implied coefficient of 1 upstream)",
+      "perRank": 0.01,
+      "caveat": "Upstream omits the coefficient, which means 1.",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1630,
+      "talent": "Precision",
+      "tree": "Protection",
+      "maxRank": 3,
+      "kind": "meleeHitChance",
+      "unit": "fraction per rank (implied coefficient of 1 upstream)",
+      "perRank": 0.01,
+      "caveat": "Upstream omits the coefficient, which means 1.",
+      "source": "sim/paladin/talents.go"
     }
   ],
   "skipped": [
@@ -415,6 +489,51 @@
       "className": "Shaman",
       "talent": "Shamanistic Rage / Stormstrike cooldowns",
       "reason": "Activated abilities needing a usage policy."
+    },
+    {
+      "className": "Druid",
+      "talent": "Subtlety",
+      "reason": "Reduces threat, which nothing here scores."
+    },
+    {
+      "className": "Druid",
+      "talent": "Survival of the Fittest / Thick Hide",
+      "reason": "Tank-facing crit-taken and armour. Talents reach the damage path only."
+    },
+    {
+      "className": "Druid",
+      "talent": "Heart of the Wild / Furor",
+      "reason": "Multiply Strength, Intellect or the form itself, cascading through calculateStats."
+    },
+    {
+      "className": "Druid",
+      "talent": "Moonkin Form / Tree of Life",
+      "reason": "Shapeshifts with party-wide effects; neither the form nor the party is modelled."
+    },
+    {
+      "className": "Druid",
+      "talent": "Omen of Clarity / Primal Fury",
+      "reason": "Proc-driven energy and combo points, needing a timeline."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Divine Strength",
+      "reason": "Multiplies Strength, which cascades into attack power inside calculateStats."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Spell Warding / Improved Righteous Fury",
+      "reason": "Damage-taken reduction; no incoming-damage stream on the damage path."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Vengeance / Sanctity Aura",
+      "reason": "Proc-driven and aura damage multipliers that need a timeline or a party."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Crusade",
+      "reason": "Gated on the target being a humanoid, demon, undead or elemental. No mob type here."
     }
   ]
 }

@@ -489,7 +489,9 @@ function calculatePhysicalDps(
 
   // Improved Berserker Stance multiplies attack power, so it has to land before any of the
   // attack-power-derived damage below rather than being added to the total afterwards.
-  const attackPower = stats.attackPower * talents.attackPowerMultiplier
+  // Flat talent attack power lands BEFORE the multiplier, matching upstream: Predatory Strikes
+  // adds a stat, and Improved Berserker Stance then scales the total.
+  const attackPower = (stats.attackPower + talents.flatAttackPower) * talents.attackPowerMultiplier
 
   /*
    * Attack speed. Until this existed, `hasteRating` reached no output at all: the white-damage

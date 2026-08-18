@@ -44,6 +44,8 @@ export type TalentModifiers = {
    * would either hand a dual-wielding Shaman a gate it does not have, or strip Warrior's.
    */
   physicalDamageMultiplier: number
+  /** Flat attack power added before any multiplier. Druid's Predatory Strikes. */
+  flatAttackPower: number
   /** Added to ranged crit chance only. Hunter's Lethal Shots. */
   rangedCritChance: number
   /** Multiplies ranged white damage. Hunter's Ranged Weapon Specialization. 1 when untalented. */
@@ -74,6 +76,7 @@ export const noTalentModifiers: TalentModifiers = {
   expertiseSkillPoints: 0,
   physicalDamageMultiplier: 1,
   rangedCritChance: 0,
+  flatAttackPower: 0,
   rangedDamageMultiplier: 1,
   rangedAttackSpeedMultiplier: 1,
 }
@@ -87,6 +90,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   ragePerSecondFlat: 'flatRagePerSecond',
   expertiseSkill: 'expertiseSkillPoints',
   rangedCritChance: 'rangedCritChance',
+  flatAttackPower: 'flatAttackPower',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {

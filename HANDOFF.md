@@ -827,23 +827,30 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
 - **Result.** Fury DPS **192.3 → 224.3 (+16.6%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
   (Post-7,700-armor figures. Against the old 10,643 target they read 165.6 → 193.2.)
-- **Stage 2: the ingest is class-parameterised, with Rogue, Hunter and Shaman in.** Talent scaling
-  covers **9 specs** — Warrior Arms and Fury, all three Rogue, all three Hunter, Shaman Enhancement.
+- **Stage 2 is complete for every spec that can receive talents.** All **11 Physical DPS specs** are
+  covered — Warrior Arms and Fury, all three Rogue, all three Hunter, Shaman Enhancement, Druid Feral,
+  Paladin Retribution. 24 effects across six classes, 33 talent groups refused by name with reasons.
   Cheap because **talent ids are globally unique**, so one effects list serves every class and
-  `deriveTalentModifiers` was untouched. Hunter gains most, at **106.1 → 148.1 (+39.6%)** for Beast
-  Mastery, because **Serpent's Swiftness is +4% ranged attack speed a rank** — the largest single
-  talent in the model. Shaman Enhancement 132.5 → 168.2.
+  `deriveTalentModifiers` never changed. Largest gain is Hunter Beast Mastery **106.1 → 148.1
+  (+39.6%)**, because **Serpent's Swiftness is +4% ranged attack speed a rank**.
 
-  **Shared talent names across classes are real, and not always the same effect.** Warrior and Rogue
-  both have Precision (same effect, different rank cap). Warrior and Shaman both have **Weapon
-  Mastery** — dodge reduction for one, physical damage for the other — and **Dual Wield
-  Specialization** — off-hand damage for one, hit for the other. Effects are keyed by talent id and
-  every extractor is cross-checked against its own class's tree; that is the only reason these do not
-  cross-contaminate, and a test asserts both directions.
+  **The 7 caster and 2 healer specs are a different gap, and conflating them would be a mistake.**
+  Those paths take no talent argument at all, so ingesting their effects would produce data reaching
+  nothing — the exact failure this session kept finding. The estimate tells those players so
+  directly instead.
 
-  One consequence: Warrior's Two-Handed Weapon Specialization is gated on actually holding a
-  two-hander while Shaman's Weapon Mastery is not, so `twoHandedDamageMultiplier` and
-  `physicalDamageMultiplier` are separate fields rather than one shared multiplier.
+  **Shared talent names across classes are real, and not always the same effect.** Three classes have
+  a **Precision** (Warrior max 3, Rogue max 5, Paladin max 3 — same effect, different caps). Warrior
+  and Shaman both have **Weapon Mastery** — dodge reduction for one, physical damage for the other —
+  and **Dual Wield Specialization** — off-hand damage for one, hit for the other. Effects are keyed by
+  talent id and every extractor is cross-checked against its own class's tree; that is the only
+  reason these do not cross-contaminate, and tests assert both directions.
+
+  Two upstream shapes worth knowing before adding a class. **Paladin writes no coefficient at all**
+  (`MeleeCritRatingPerCritChance*float64(Talents.X)`), which means 1 — the patterns anchor on the
+  talent *and* the rating constant with nothing between, so a coefficient appearing later breaks the
+  match rather than being ignored. **Druid scales by character level** (`rank * 0.5 * CharacterLevel`),
+  folded in at 70 since that is the only level modelled.
 - **It covers Arms too, free.** `deriveTalentModifiers` is keyed by **talent id** and
   `warriorTalents.json` carries all three trees, so any spec sharing the class shares the effects —
   nothing about the mechanism is Fury-specific. Arms measured **236 → 271.6**. Adding a class means

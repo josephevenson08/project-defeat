@@ -283,7 +283,13 @@ import { countGemColors, metaGemIsActive } from '../src/domain/gems/gemTypes'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
 import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
-import { deriveTalentModifiers, flurrySpeedMultiplier, noTalentModifiers, unmodelledTalents } from '../src/domain/talents/talentModifiers'
+import {
+  classHasTalentEffects,
+  deriveTalentModifiers,
+  flurrySpeedMultiplier,
+  noTalentModifiers,
+  unmodelledTalents,
+} from '../src/domain/talents/talentModifiers'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -4214,4 +4220,52 @@ test('Hunter and Shaman talents land, and a shared talent name does not cross cl
     const talented = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
     expect(talented.scoreExact, `${className} ${spec} must benefit from talents`).toBeGreaterThan(bare.scoreExact)
   }
+})
+
+test('every Physical DPS spec has talent effects, and three classes share a talent name', () => {
+  /*
+   * The milestone this pass was aiming at: talent scaling reaches every spec that *can* receive it.
+   * All 11 Physical DPS specs are covered — Warrior Arms and Fury, all three Rogue, all three Hunter,
+   * Shaman Enhancement, Druid Feral, Paladin Retribution.
+   *
+   * The 7 caster and 2 healer specs are uncovered, and that is a *different* gap: those paths take no
+   * talent argument at all, so ingesting their effects would produce data reaching nothing — the
+   * failure this session kept finding. The estimate tells those players so directly.
+   */
+  const physical: string[] = []
+  const uncoveredPhysical: string[] = []
+
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      if (getRoleForSpec(entry.className, spec) !== 'Physical DPS') continue
+      physical.push(`${entry.className} ${spec}`)
+      if (!classHasTalentEffects(entry.className)) uncoveredPhysical.push(`${entry.className} ${spec}`)
+    }
+  }
+
+  expect(physical).toHaveLength(11)
+  expect(uncoveredPhysical, 'every Physical DPS spec must have ingested talent effects').toEqual([])
+
+  /*
+   * Three classes now have a talent called Precision — Warrior, Rogue and Paladin. Same effect in all
+   * three, but different ids and different rank caps, so a name-keyed lookup would silently give a
+   * Paladin the Rogue's five ranks. Effects are keyed by id, and each extractor is cross-checked
+   * against its own class's tree.
+   */
+  const precisionIds = (['Warrior', 'Rogue', 'Paladin'] as const).map((className) => {
+    const talent = getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((t) => t.name === 'Precision')!
+    return { className, id: talent.id, maxRank: talent.maxRank }
+  })
+  expect(new Set(precisionIds.map((entry) => entry.id)).size, 'three distinct talents').toBe(3)
+  expect(precisionIds.find((e) => e.className === 'Rogue')!.maxRank).toBe(5)
+  expect(precisionIds.find((e) => e.className === 'Paladin')!.maxRank).toBe(3)
+
+  // Each resolves to hit at its own cap, rather than one shadowing the others.
+  for (const { id, maxRank } of precisionIds) {
+    expect(deriveTalentModifiers({ [id]: maxRank }).meleeHitChance).toBeCloseTo(0.01 * maxRank, 10)
+  }
+
+  // Druid's Predatory Strikes is flat attack power, folded to level 70 from upstream's level scaling.
+  const predatory = getTalentData('Druid')!.trees.flatMap((t) => t.talents).find((t) => t.name === 'Predatory Strikes')!
+  expect(deriveTalentModifiers({ [predatory.id]: 3 }).flatAttackPower).toBeCloseTo(105, 10)
 })

@@ -324,11 +324,94 @@ const SHAMAN_SKIPPED = [
   ['Shamanistic Rage / Stormstrike cooldowns', 'Activated abilities needing a usage policy.'],
 ]
 
+const DRUID_SOURCES = [{ path: 'sim/druid/talents.go', cache: 'sim_druid_talents.go' }]
+
+const DRUID_EXTRACTORS = [
+  {
+    talent: 'Sharpened Claws',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.MeleeCrit,\s*float64\(druid\.Talents\.SharpenedClaws\)\*([\d.]+)\*core\.MeleeCritRatingPerCritChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Naturalist',
+    kind: 'physicalDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /PseudoStats\.PhysicalDamageDealtMultiplier \*= 1 \+ ([\d.]+)\*float64\(druid\.Talents\.Naturalist\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Predatory Strikes',
+    kind: 'flatAttackPower',
+    unit: 'attack power per rank',
+    // Scaled by character level upstream: rank * 0.5 * CharacterLevel. This project is level-70 only
+    // (PLAYER_LEVEL in calculateSimulation), so the level is folded in here rather than carried as a
+    // second variable nothing else would use.
+    re: /AddStat\(stats\.AttackPower,\s*float64\(druid\.Talents\.PredatoryStrikes\)\*([\d.]+)\*float64\(core\.CharacterLevel\)\)/,
+    value: (m) => Number(m[1]) * 70,
+    caveat: 'Upstream scales by character level; folded in at 70, which is the only level this app models.',
+  },
+]
+
+const DRUID_SKIPPED = [
+  ['Subtlety', 'Reduces threat, which nothing here scores.'],
+  ['Survival of the Fittest / Thick Hide', 'Tank-facing crit-taken and armour. Talents reach the damage path only.'],
+  ['Heart of the Wild / Furor', 'Multiply Strength, Intellect or the form itself, cascading through calculateStats.'],
+  ['Moonkin Form / Tree of Life', 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
+  ['Omen of Clarity / Primal Fury', 'Proc-driven energy and combo points, needing a timeline.'],
+]
+
+const PALADIN_SOURCES = [{ path: 'sim/paladin/talents.go', cache: 'sim_paladin_talents.go' }]
+
+/*
+ * Paladin. Its lines carry no explicit coefficient -- upstream writes
+ * `MeleeCritRatingPerCritChance*float64(Talents.X)` with the multiplier omitted, which means 1, i.e.
+ * one percent per rank. The patterns therefore anchor on the talent AND the rating constant with
+ * nothing between them, so a coefficient appearing later stops the match rather than being ignored.
+ */
+const PALADIN_EXTRACTORS = [
+  {
+    talent: 'Sanctified Seals',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank (implied coefficient of 1 upstream)',
+    re: /AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*float64\(paladin\.Talents\.SanctifiedSeals\)\)/,
+    value: () => 0.01,
+    caveat: 'Upstream omits the coefficient, which means 1 -- one percent of crit chance per rank.',
+  },
+  {
+    talent: 'Conviction',
+    kind: 'meleeCritChance',
+    unit: 'fraction per rank (implied coefficient of 1 upstream)',
+    re: /AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*float64\(paladin\.Talents\.Conviction\)\)/,
+    value: () => 0.01,
+    caveat: 'Upstream omits the coefficient, which means 1.',
+  },
+  {
+    talent: 'Precision',
+    kind: 'meleeHitChance',
+    unit: 'fraction per rank (implied coefficient of 1 upstream)',
+    // The THIRD class with a talent called Precision. Same effect as the other two, different id.
+    re: /AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*float64\(paladin\.Talents\.Precision\)\)/,
+    value: () => 0.01,
+    caveat: 'Upstream omits the coefficient, which means 1.',
+  },
+]
+
+const PALADIN_SKIPPED = [
+  ['Divine Strength', 'Multiplies Strength, which cascades into attack power inside calculateStats.'],
+  ['Spell Warding / Improved Righteous Fury', 'Damage-taken reduction; no incoming-damage stream on the damage path.'],
+  ['Vengeance / Sanctity Aura', 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
+  ['Crusade', 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
+]
+
 const CLASSES = [
   { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: WARRIOR_EXTRACTORS, skipped: WARRIOR_SKIPPED },
   { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: ROGUE_EXTRACTORS, skipped: ROGUE_SKIPPED },
   { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
+  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: DRUID_EXTRACTORS, skipped: DRUID_SKIPPED },
+  { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: PALADIN_EXTRACTORS, skipped: PALADIN_SKIPPED },
 ]
 
 const effects = []
