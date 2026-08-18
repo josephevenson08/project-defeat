@@ -829,7 +829,8 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   (Post-7,700-armor figures. Against the old 10,643 target they read 165.6 → 193.2.)
 - **Stage 2 is complete for every spec that can receive talents.** All **11 Physical DPS specs** are
   covered — Warrior Arms and Fury, all three Rogue, all three Hunter, Shaman Enhancement, Druid Feral,
-  Paladin Retribution. 24 effects across six classes, 33 talent groups refused by name with reasons.
+  Paladin Retribution. **30 effects** across six classes (Warrior 11, Rogue 4, Hunter 5, Shaman 4,
+  Druid 3, Paladin 3), with 33 talent groups refused by name and a reason each.
   Cheap because **talent ids are globally unique**, so one effects list serves every class and
   `deriveTalentModifiers` never changed. Largest gain is Hunter Beast Mastery **106.1 → 148.1
   (+39.6%)**, because **Serpent's Swiftness is +4% ranged attack speed a rank**.
