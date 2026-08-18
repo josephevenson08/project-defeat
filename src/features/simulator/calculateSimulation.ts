@@ -1005,8 +1005,13 @@ export function calculateSimulation(
   talentPoints: TalentPoints = {},
 ): SimulationResult {
   const debuffs = aggregateTargetDebuffs(activeTargetDebuffIds)
-  // Warrior-only for now: `talentEffects.json` covers one class, and a spec with no ingested effects
-  // derives the identity modifiers, so this is a no-op everywhere else rather than a wrong answer.
+  // `talentEffects.json` covers six classes — Warrior, Rogue, Hunter, Shaman, Druid, Paladin — which
+  // is every class holding a Physical DPS spec. A spec with no ingested effects derives the identity
+  // modifiers, so this is a no-op elsewhere rather than a wrong answer.
+  //
+  // Only `calculatePhysicalDps` below is handed the result. The caster, healer and tank paths take no
+  // talent argument at all, so widening coverage means changing those signatures first, not ingesting
+  // more effects — data reaching nothing is the failure this repo keeps rediscovering.
   const talents = deriveTalentModifiers(talentPoints)
 
   const talentNote = unmodelledTalentNoteFor(character, talentPoints, role)

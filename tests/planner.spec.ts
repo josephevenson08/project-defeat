@@ -3516,6 +3516,56 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
   expect(empty.score).toBe(192.3)
 })
 
+test('the caster and healer paths are talent-blind, which is what featureFlags.ts claims', () => {
+  /*
+   * `featureFlags.ts` says talents reach 11 specs of 27 and that the other 16 cannot receive them
+   * because `calculateCasterDps`, `calculateHealing` and `calculateTankSurvivability` take no talent
+   * argument. That sentence has already rotted once — it read "reaches the simulation nowhere at all"
+   * for two days after `37e2cf2` wired talents in — so it gets an assertion rather than a promise.
+   *
+   * Shaman and Paladin are the sharp choices. Both have **ingested talent effects**, so an unchanged
+   * score proves the *path* ignores them rather than merely that the data is absent — which is what a
+   * Mage or Priest would have shown, and would have kept passing even after the plumbing landed.
+   *
+   * The tank third of that claim is pinned separately, in the Warrior talent-scaling test.
+   *
+   * When someone threads talents into either path, this test fails — and the failure is the reminder
+   * to rewrite the flag's text, which is the whole point of writing it this way.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const scoreFor = (className: TbcClass, spec: TbcSpec, role: CharacterRole, points: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    return calculateSimulation(character, gear, stats, role, [], undefined, points).scoreExact
+  }
+
+  const shamanPoints = { [idOf('Shaman', 'Weapon Mastery')]: 5 }
+  const paladinPoints = { [idOf('Paladin', 'Precision')]: 3 }
+
+  // The points have to be real, or an unchanged score would prove nothing at all.
+  expect(deriveTalentModifiers(shamanPoints)).not.toEqual(noTalentModifiers)
+  expect(deriveTalentModifiers(paladinPoints)).not.toEqual(noTalentModifiers)
+
+  expect(
+    scoreFor('Shaman', 'Elemental', 'Caster DPS', shamanPoints),
+    'the caster path does not receive talents yet',
+  ).toBe(scoreFor('Shaman', 'Elemental', 'Caster DPS', {}))
+
+  expect(
+    scoreFor('Paladin', 'Holy', 'Healer', paladinPoints),
+    'the healer path does not receive talents yet',
+  ).toBe(scoreFor('Paladin', 'Holy', 'Healer', {}))
+
+  // And the same class's Physical DPS spec must move, or the comparison above is vacuous.
+  expect(
+    scoreFor('Paladin', 'Retribution', 'Physical DPS', paladinPoints),
+    'Retribution shares the class and must benefit, proving the points reach the DPS path',
+  ).toBeGreaterThan(scoreFor('Paladin', 'Retribution', 'Physical DPS', {}))
+})
+
 test('Flurry is solved analytically, and its value is gated hard by crit chance', () => {
   /*
    * wowsims models Flurry as a 3-stack aura on an event timeline: any melee crit sets 3 stacks, only
@@ -4110,8 +4160,10 @@ test('Rogue talents are ingested per class, and two classes can share a talent n
 test('every role says what talents do for it, and the tank message is not the DPS one', () => {
   /*
    * A Mage spending 45 points watched the estimate go 462.5 -> 462.5 with nothing to explain it.
-   * Talent effects are ingested for Warrior and Rogue only, and casters, healers and tanks never
-   * received talents at all.
+   * Talent effects are ingested for six classes now — Warrior, Rogue, Hunter, Shaman, Druid, Paladin
+   * — but casters, healers and tanks still never receive them, because those three paths take no
+   * talent argument. Shaman and Paladin make that visible: both have ingested effects, and both still
+   * score identically talented on their caster and healer specs.
    *
    * The tank case is the one worth pinning hardest, because the first version of this got it wrong in
    * the confident direction: it gave Protection the DPS message, which names only the *skipped*
@@ -4228,16 +4280,23 @@ test('every Physical DPS spec has talent effects, and three classes share a tale
    * All 11 Physical DPS specs are covered — Warrior Arms and Fury, all three Rogue, all three Hunter,
    * Shaman Enhancement, Druid Feral, Paladin Retribution.
    *
-   * The 7 caster and 2 healer specs are uncovered, and that is a *different* gap: those paths take no
-   * talent argument at all, so ingesting their effects would produce data reaching nothing — the
-   * failure this session kept finding. The estimate tells those players so directly.
+   * The other 16 specs are uncovered, and that is a *different* gap: those paths take no talent
+   * argument at all, so ingesting their effects would produce data reaching nothing — the failure
+   * this session kept finding. The estimate tells those players so directly.
+   *
+   * That figure is asserted rather than written down because it was wrong in prose for a while: this
+   * comment, HANDOFF.md and featureFlags.ts all said "7 caster and 2 healer", which is 9 specs
+   * against the real 16. Counting from `getRoleForSpec` is the only method that cannot drift.
    */
   const physical: string[] = []
   const uncoveredPhysical: string[] = []
+  const byRole = new Map<string, number>()
 
   for (const entry of tbcClasses) {
     for (const spec of entry.specs) {
-      if (getRoleForSpec(entry.className, spec) !== 'Physical DPS') continue
+      const role = getRoleForSpec(entry.className, spec)
+      byRole.set(role, (byRole.get(role) ?? 0) + 1)
+      if (role !== 'Physical DPS') continue
       physical.push(`${entry.className} ${spec}`)
       if (!classHasTalentEffects(entry.className)) uncoveredPhysical.push(`${entry.className} ${spec}`)
     }
@@ -4245,6 +4304,14 @@ test('every Physical DPS spec has talent effects, and three classes share a tale
 
   expect(physical).toHaveLength(11)
   expect(uncoveredPhysical, 'every Physical DPS spec must have ingested talent effects').toEqual([])
+
+  // The split featureFlags.ts quotes: 11 covered, and 16 that cannot be until their paths take talents.
+  expect(Object.fromEntries([...byRole].sort()), 'the role split featureFlags.ts quotes').toEqual({
+    'Caster DPS': 9,
+    Healer: 5,
+    'Physical DPS': 11,
+    Tank: 2,
+  })
 
   /*
    * Three classes now have a talent called Precision — Warrior, Rogue and Paladin. Same effect in all
