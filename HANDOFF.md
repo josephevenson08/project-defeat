@@ -29,11 +29,30 @@ activation.
 11. **Six false disclosures found and fixed**, each now behind an assertion. This is the finding
     that outlasts the code — see the caveat rule in Rules, and §1.
 
-The Simulation tab is **still hidden**; that decision was deliberately left to the repo owner.
+**The 2026-08-18 session** was short and did two things, both of them corrections:
+
+1. **A seventh false disclosure, in the file the entry above claims was fixed.** `featureFlags.ts`
+   said talent scaling "reaches the simulation nowhere at all" — true on 2026-08-16, false from
+   2026-08-17, and still there. Every bullet in that file is now pinned by an assertion, the sharpest
+   being that the caster and healer paths must score *identically* with real talent points. Verified
+   by falsification. See the caveat rule in Rules, and §1.
+2. **The rotations gap scoped — `ROTATION-SCOPE.md` — and this file's hypothesis about it was wrong.**
+   Rotations are **not** an ingest. Talents were cheap because upstream had already reduced each one
+   to a number; a rotation upstream is an imperative state machine over a timeline this simulator does
+   not have. Recommendation is a per-spec closed-form extension on a short list, Hunter first — its
+   three specs are excluded by an effect-type filter rather than by missing data, though the
+   derivation of Steady Shot's rate against auto-shot weaving is still real work.
+
+Also corrected: **"7 caster and 2 healer specs" was wrong in four places** and was never right — the
+split is 9 Caster DPS, 5 Healer, 11 Physical DPS, 2 Tank. It is asserted now, not written.
+
+The Simulation tab is **still hidden**; that decision was deliberately left to the repo owner, and
+was re-confirmed on 2026-08-18.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, at **`054e035`**, everything pushed. Working tree is clean
-apart from `Untitled.canvas`, which is the owner’s own file — leave it alone.
+`josephevenson08/project-defeat`. Working tree is clean apart from `Untitled.canvas`, which is the
+owner’s own file — leave it alone. **Read `git log -1` for the current commit rather than trusting a
+SHA written here**; this line has named a stale one twice.
 
 ---
 
@@ -100,13 +119,23 @@ setting `base` globally sends every test to a path nothing serves.
   than no caveat. Write the assertion with the sentence: a flagged-unmodelled stat must score zero,
   the "two specs" figure must match the ability data, and so on.
 
+  **`featureFlags.ts` then rotted a second time, one day after being fixed** (found 2026-08-18,
+  §1) — so the rule's real lesson is that *fixing* an instance buys nothing on its own. Only the
+  assertion does. Prose corrected without one has a demonstrated half-life here of about a day.
+
+  **A count in prose is the same defect wearing different clothes.** "7 caster and 2 healer specs"
+  appeared in this file twice, in `featureFlags.ts` and in a test comment; the real split is 9 and 5,
+  with 2 tanks, and nothing had to change for it to become wrong — it was miscounted at writing and
+  then copied. Counts belong in assertions computed from the data, which is the same rule the repo
+  already states as "counts are computed, never written into prose".
+
 ## Verify you're where this describes
 
 ```bash
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 124 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 125 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -392,12 +421,19 @@ cause is structural and will recur: *closing a gap never forces the text describ
 change*, so the text rots silently — and on a surface whose case for being shown rests on describing
 itself honestly, a **wrong** caveat is worse than no caveat.
 
+**"Will recur" was not a figure of speech — three more were found on 2026-08-18**, the first of them
+in `featureFlags.ts` for the second time, one day after that file was corrected. The last three rows
+below are that session; the first four are the original sitting.
+
 | Claim | Reality when found |
 |---|---|
 | `featureFlags.ts`: rage unmodelled, no healer mana, procs unpopulated | all three fixed long before |
 | Rotation summary: "Bloodrage, Unbridled Wrath, damage taken, Flurry-driven haste are unmodelled" | all four modelled |
 | Stat weights: "Haste Rating — not modeled yet" | modelled, and worth **0.059/pt**, above Agility |
 | Upgrade finder: "most of this catalog is still stat-budget estimates" | **96.9% sourced** |
+| *(2026-08-18)* `featureFlags.ts` again: talent scaling "reaches the simulation nowhere at all" | wired in one day after the sentence was written; **11 specs** covered |
+| *(2026-08-18)* `calculateSimulation.ts`: "Warrior-only for now … covers one class" | **six classes**, 30 effects |
+| *(2026-08-18)* Test comment: "ingested for Warrior and Rogue only" | **six classes** |
 
 So each now has an assertion that fails when it stops being true:
 
@@ -417,6 +453,23 @@ rage, item procs and the healer mana constraint. **The flag's reasoning has been
 (2026-08-15) — it used to claim "rage is not modelled at all", which would have sent the next reader
 off to re-fix something already done. The flag's *value* is untouched: whether the numbers are now
 defensible enough to show is a judgement, not a blocker, and it has still not been taken.
+(Re-confirmed 2026-08-18: still hidden, by the repo owner's decision.)
+
+**Then it rotted again, in the same file, within a day — this is the seventh instance and the
+strongest evidence the pattern is structural rather than a run of carelessness.** The 2026-08-15
+rewrite closed with "talent scaling … reaches the simulation nowhere at all". True when written.
+`37e2cf2` wired talents into `calculateSimulation` on 2026-08-17 and `fba60c8` took them to all 11
+Physical DPS specs on 2026-08-18, and the sentence sat there through both. It was the load-bearing
+one, too: it is the file the owner reads to take decision #1, and it argued for staying hidden on
+the strength of a defect that had been fixed.
+
+**Fixed 2026-08-18, and this time every bullet in that file is pinned by an assertion.** The sharpest
+is `tests/planner.spec.ts` → "the caster and healer paths are talent-blind": it scores a Shaman
+Elemental and a Paladin Holy with real talent points and requires the result **not** to move.
+Shaman and Paladin are chosen because both *have* ingested effects, so an unchanged score proves the
+**path** ignores them rather than that the data is missing — a Mage would have passed the test
+forever, including after the plumbing landed. Verified by falsification: threading talents into
+`calculateCasterDps` makes it fail, naming the caster path.
 
 **The healer mana term** is `domain/simulation/manaModel.ts`, from wowsims `sim/core/mana.go`:
 `MP5/5` per second, Spirit regen as `0.001 + Spirit*sqrt(Intellect)*0.009327`, and `Intellect*15-280`
@@ -839,12 +892,23 @@ and each item here is a decision or a fresh piece of work.
 **Caster and healer talents are blocked on plumbing, not data.** `calculateCasterDps` and
 `calculateHealing` take no talent argument at all, so ingesting Mage, Priest or Warlock effects would
 produce data reaching nothing — the exact failure this session kept finding. **Do the plumbing
-first.** That covers the 7 caster and 2 healer specs.
+first.** That covers **16 specs, not 9** — see the count correction below.
+
+**The "7 caster and 2 healer" figure was wrong wherever it appeared** (2026-08-18), which was this
+file twice, `featureFlags.ts` and a test comment. Counted from `getRoleForSpec` — the same source
+`App.tsx:175` feeds the simulator — the 27 specs are **11 Physical DPS, 9 Caster DPS, 5 Healer, 2
+Tank**. So talents reach 11 and the uncovered remainder is 16. The split is now asserted in
+`tests/planner.spec.ts` rather than written in prose, because prose is exactly how it drifted.
 
 **Rotations are the biggest remaining gap and the reason the tab reads as indicative.** 25 of 27
-specs are modelled from a single signature ability. wowsims has full ability implementations for all
-nine classes at the pinned commit, so this may be an ingest rather than a research project — the
-same insight that made talents cheap. Much larger than talents were; scope it first.
+specs are modelled from a single signature ability. ~~wowsims has full ability implementations for
+all nine classes at the pinned commit, so this may be an ingest rather than a research project.~~
+**Scoped 2026-08-18, and that hypothesis is wrong — `ROTATION-SCOPE.md`.** Talents were cheap because
+a talent is a *number* upstream had already reduced; a rotation is an imperative state machine
+reading live simulation state — current energy, combo points, aura remaining duration, stack counts,
+time left in the fight — and **the mechanism is the entire content**. This simulator has no timeline
+at all. The recommendation is a per-spec closed-form extension on a short list, starting with Hunter
+(three specs, blocked only by an effect-type filter), not an ingest and not a general engine.
 
 **Protection Warrior’s tank path reads no talents.** Talents are applied in `calculatePhysicalDps`,
 and a tank is scored by `calculateTankSurvivability`. A test pins this so it reads as a decision. The
@@ -892,10 +956,11 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   `deriveTalentModifiers` never changed. Largest gain is Hunter Beast Mastery **106.1 → 148.1
   (+39.6%)**, because **Serpent's Swiftness is +4% ranged attack speed a rank**.
 
-  **The 7 caster and 2 healer specs are a different gap, and conflating them would be a mistake.**
-  Those paths take no talent argument at all, so ingesting their effects would produce data reaching
-  nothing — the exact failure this session kept finding. The estimate tells those players so
-  directly instead.
+  **The other 16 specs are a different gap, and conflating them would be a mistake.** Those paths —
+  caster, healer and tank — take no talent argument at all, so ingesting their effects would produce
+  data reaching nothing, the exact failure this session kept finding. The estimate tells those
+  players so directly instead. (This paragraph said "7 caster and 2 healer" until 2026-08-18; the
+  real split is 9 Caster DPS, 5 Healer, 2 Tank, and it is asserted now rather than written.)
 
   **Shared talent names across classes are real, and not always the same effect.** Three classes have
   a **Precision** (Warrior max 3, Rogue max 5, Paladin max 3 — same effect, different caps). Warrior
