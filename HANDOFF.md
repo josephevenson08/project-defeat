@@ -3,15 +3,37 @@
 **Started 2026-08-09, substantially rewritten 2026-08-15.** Self-contained brief for picking this up
 in a fresh chat. If `git log` disagrees with this file, trust git.
 
-**The 2026-08-15 session** shipped, in order: the spec tier-list view; a merge of the target-debuff
+**The first 2026-08-15 session** shipped: the spec tier-list view; a merge of the target-debuff
 rebuild; item and gem icons; planner sub-tabs and a spec-scoped stat rail; talents for all nine
-classes; a rage model; the two-hander/off-hand fix and the weapon-proficiency and upgrade-finder bugs
-it exposed; melee haste; trinket and weapon effects; the healer mana constraint; and meta gem
-activation. §1 and §2b carry the findings that cost the most to learn.
+classes; a rage model; the two-hander/off-hand fix and the weapon-proficiency and upgrade-finder
+bugs it exposed; melee haste; trinket and weapon effects; the healer mana constraint; and meta gem
+activation.
+
+**The second 2026-08-15 session** (`773a8eb..054e035`, 34 commits) did, in order:
+
+1. **Scoped talent scaling before building it** — `TALENT-SCALING-SCOPE.md`, kept precisely because
+   the prediction it made turned out half wrong.
+2. **Chores**: 19 stale branches deleted locally and on `origin`, both stale worktrees removed, CI
+   moved off the deprecated Node 20 actions.
+3. **Meta gem procs wired** — two gems that contributed literally zero.
+4. **Ranked Gear collapsed per slot**, 9.0 → 6.1 screens, after measuring that this file’s own
+   proposed fix would not have worked.
+5. **`h3` roles named as tokens**, 62 lines of dead CSS removed.
+6. **Curated item audit**: four *fictional* items deleted that were selectable in gear dropdowns,
+   two real ones linked to the ingest.
+7. **Buffs & Consumables restored** as the fifth planner sub-tab — its 33 sourced raid buffs had
+   been reaching no number at all.
+8. **Talent scaling built**: 1 spec → **all 11 Physical DPS specs**, six classes, 30 effects.
+9. **Rage sources completed** — Bloodrage, Improved Berserker Rage, damage taken as an input.
+10. **Encounter fixed to one boss**, zero controls, 7,700 armor.
+11. **Six false disclosures found and fixed**, each now behind an assertion. This is the finding
+    that outlasts the code — see the caveat rule in Rules, and §1.
+
+The Simulation tab is **still hidden**; that decision was deliberately left to the repo owner.
 
 Repo: `C:\Users\josep\OneDrive - Saint Louis University\Project Defeat`, on GitHub as
-`josephevenson08/project-defeat`, currently at **`773a8eb`** plus the talent-scaling scope and
-the cleanup commits that follow it; everything pushed.
+`josephevenson08/project-defeat`, at **`054e035`**, everything pushed. Working tree is clean
+apart from `Untitled.canvas`, which is the owner’s own file — leave it alone.
 
 ---
 
@@ -84,7 +106,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 122 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 124 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -790,15 +812,45 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
 
 ## If you are picking this up now
 
-Everything below is open. Nothing is half-finished — each item is a decision or a fresh piece of work.
+Everything below is open. Nothing is half-finished — every commit was green before it was pushed,
+and each item here is a decision or a fresh piece of work.
 
-**A decision only the repo owner can take.** All three reasons `src/featureFlags.ts` gives for hiding
-the Simulation tab have been addressed — rage, item procs, healer mana. **The stale wording is now
-fixed**; the file states what is actually true and says outright that the hide decision has not been
-revisited. **What remains is only the decision itself**, and it is genuinely yours: rotations cover 2
-specs of 27, melee DPS still reads low because talents reach the simulation nowhere, and there is no
-variance or charting. Against that, the tab now discloses its own gaps. Nothing is blocking a flip in
-either direction — it just needs someone to choose.
+### The three decisions only the repo owner can take
+
+1. **Unhide the Simulation tab?** `src/featureFlags.ts` states what is actually true now and says
+   outright that the decision has not been revisited. The argument has changed: the tab discloses
+   its own limits honestly *per spec*, and talents reach 11 specs. The remaining argument against is
+   that **25 of 27 specs are single-ability approximations**. Nothing blocks a flip either way.
+2. **Should talents reach `calculateStats`?** Today they reach `calculateSimulation` only, which
+   keeps the blast radius inside a hidden tab. Widening it moves the always-visible stat rail, gear
+   rankings and the upgrade finder — more correct, much more visible, and it makes "an empty tree
+   reproduces today’s numbers exactly" a hard invariant.
+3. **Is 7,700 the right boss armor?** Set this session, replacing 10,643. Both are community
+   approximations rather than tooltip-exact, which is why the encounter still carries
+   `needsVerification`.
+
+### The work, in the order it is worth doing
+
+**Caster and healer talents are blocked on plumbing, not data.** `calculateCasterDps` and
+`calculateHealing` take no talent argument at all, so ingesting Mage, Priest or Warlock effects would
+produce data reaching nothing — the exact failure this session kept finding. **Do the plumbing
+first.** That covers the 7 caster and 2 healer specs.
+
+**Rotations are the biggest remaining gap and the reason the tab reads as indicative.** 25 of 27
+specs are modelled from a single signature ability. wowsims has full ability implementations for all
+nine classes at the pinned commit, so this may be an ingest rather than a research project — the
+same insight that made talents cheap. Much larger than talents were; scope it first.
+
+**Protection Warrior’s tank path reads no talents.** Talents are applied in `calculatePhysicalDps`,
+and a tank is scored by `calculateTankSurvivability`. A test pins this so it reads as a decision. The
+seven formulas are already surveyed in §1.
+
+**The rage dump still never fires.** Income reaches 5.4/sec against the 7.5 Bloodthirst and
+Whirlwind want. Every expressible source is in; the remainder is rage from damage taken, which is an
+encounter input defaulting to 0 and no longer reachable from the UI since the encounter was fixed.
+
+**Known-wrong data still standing:** 123 of 226 curated items carry `needsVerification` — but read
+the §"curated flags" note first, because 119 of those cannot affect the app at all.
 
 **The gem procs are wired now, and they were not a tidy-up.** `ingest-item-effects.mjs` reads
 `metagems.go`, so it always extracted **Mystical Skyfire Diamond (25893)** and **Thundering Skyfire
