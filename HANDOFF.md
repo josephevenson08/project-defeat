@@ -72,6 +72,17 @@ setting `base` globally sends every test to a path nothing serves.
 - **Push to `origin/main` after each completed feature.** No branches or PRs unless asked.
 - **Gate commits on the real test exit code**, never a piped `tail` — the pipe reports the tail's
   status, and a red commit was pushed that way once.
+- **Do not edit `src/` while the suite is running, and do not read its progress with `tail`.** Two
+  separate traps, both hit on 2026-08-18. Editing during a run triggers Vite HMR on every open page
+  and took the suite from **8.9m to 19.6m** — comment-only edits, so the result stayed valid, but a
+  behavioural edit mid-run would have produced a result describing no version of the code. Do
+  doc-only work while it runs, or wait.
+
+  The second trap looks exactly like a hang: the line reporter overwrites one line with cursor-up
+  codes (`\x1b[1A\x1b[2K`), so `tail` on the redirected file shows whatever chunk it lands on and can
+  sit at the same test number for minutes while the run advances normally. `grep -o "\[[0-9]\+/[0-9]\+\]"
+  | sort -n | tail -1` reads the real position; `stat -c %y` on the file distinguishes a stall from a
+  slow test in one command.
 - **If a test run dies partway with `ERR_CONNECTION_REFUSED`, it is the dev server, not the tests.**
   Seen twice in a row from a worktree: tests 1-40 pass, then every remaining test fails to reach
   127.0.0.1:5173 because the Playwright-managed Vite server has exited. The fix is to start the
