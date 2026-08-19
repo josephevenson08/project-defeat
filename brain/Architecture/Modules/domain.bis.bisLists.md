@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisLists.ts
-lines: 191
+lines: 219
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisLists
 
-`src/domain/bis/bisLists.ts` · **domain** layer · 191 lines
+`src/domain/bis/bisLists.ts` · **domain** layer · 219 lines
 
 From the top of the file:
 
@@ -36,6 +36,7 @@ From the top of the file:
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
+- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 
 ## Imported by

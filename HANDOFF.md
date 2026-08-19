@@ -65,6 +65,13 @@ forward-looking, not a bad ingest. Dropped, and the count exported as `excludedB
 is asserted rather than silent. See §"Findings" for both, and for why an item-level rule would have
 been wrong.
 
+Then, on the owner's call, **main-hand and off-hand picks were separated into their own rankings.**
+A one-hander is catalogued `Main Hand` but is legal in either hand, so every one-hander the guide
+ranked under "Off Hand" was being filed as a main hand — a Fury warrior's Main Hand read
+`#1 #1 #2 #2 #3 #3 #4 #4`. The section now decides the slot unless the item cannot go there, six
+entries move, and ranks are made dense per slot. **Rank density is now asserted across every list**,
+which was not possible before.
+
 The Simulation tab is **still hidden**; that decision was deliberately left to the repo owner, and
 was re-confirmed on 2026-08-18.
 
@@ -165,7 +172,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 126 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 127 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -226,7 +233,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | | Was | Now |
 |---|---|---|
 | Items | 230, inferred | **4,554** merged, validated |
-| BiS entries | 463, only 2 deeper than rank 1 | **1,435** across 27 specs |
+| BiS entries | 463, only 2 deeper than rank 1 | **1,428** across 27 specs |
 | Gems | 11 | **212** |
 | Enchants | 22 | **91** |
 | Consumables | 14 | **31** |
@@ -404,13 +411,29 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   greyed out in the panel, because those rows carry an Equip button and the Gear panel will not list
   the items — so keeping them offers gear the rest of the app then refuses to acknowledge.
   `excludedByPhase` exports the count (**5**) so the filter is asserted rather than silent.
-- **BiS rank numbers are not dense, and that predates the phase work.** Eight slot groups have holes
-  or duplicates: Hunter Main Hand reads **[1, 3, 4]** because the guide's rank 2 resolves to an
-  off-hand item and changes slots, and **Warrior Arms and Fury carry duplicate Main Hand ranks**
-  because two guide sections — one per weapon style — both map there. Neither is obviously wrong:
-  "best two-hander" and "best one-hander" are separate rankings that happen to share a slot. A test
-  asserting density everywhere fails on all eight, so the phase test scopes its density check to the
-  five slots a drop actually touched. Deciding the general question is separate work.
+- **A one-hander is catalogued `Main Hand`, and taking that as the whole answer collided two
+  rankings into one slot** (fixed 2026-08-19). The guides publish a "Main Hand" and an "Off Hand"
+  section, and **the section says which hand the pick is for** — real information the build was
+  discarding, because it let the catalogue's slot win unconditionally.
+
+  The symptom: a Fury warrior's Main Hand read **`#1 #1 #2 #2 #3 #3 #4 #4`**, all four off-hand picks
+  stacked on all four main-hand picks, while the off hand showed a *synthesised* fallback list rather
+  than the four weapons the guide names for it. Arms read `[1, 2, 3, 3, 4, 4, 5, 6, 7]` the same way.
+
+  **An intermediate diagnosis in this file was wrong and is worth not repeating:** it said the
+  duplicates came from "two guide sections, one per weapon style". They do not — every section is
+  named after a *slot*. The two-hander/one-hander split inside Arms' Main Hand list (ranks 1-3 versus
+  4-7) is Wowhead's own ordering within a single section, and is left exactly as published.
+
+  The rule is now **honour the section unless the item cannot physically go there**, which keeps the
+  case the old rule existed for: "Claw of the Phoenix" is ranked in Hunter's *Main Hand* section and
+  is off-hand only, so it still moves. `isItemCompatibleWithGearSlot` already encodes the asymmetry.
+  **Exactly six entries move**, all one-handers returning to the off hand.
+- **Ranks are made dense per final slot, as the last step of the build.** Two things open gaps: a
+  phase drop removes a rank, and an item can change slots (Hunter's Main Hand read `#1 #3 #4` with
+  nothing to explain the missing #2). Relative order is untouched. Done *after* the off-hand fan-out,
+  because that can add entries too. A test now asserts density across every slot of every list —
+  which only became assertable once the collision above was fixed.
 - **Wowhead's tier lists are markup, not prose, which makes them the easiest ingest in the repo.**
   `[tier-list=rows]` wraps `[tier]` blocks carrying `[tier-label bg=qN]S[/tier-label]` and a
   `[tier-content]` of `[spec-badge=arcane-mage]` slugs. Read the spec from the **badge**, never from

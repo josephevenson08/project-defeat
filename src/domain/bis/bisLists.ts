@@ -3,6 +3,7 @@ import rawRecommendations from './bisRecommendations.json' with { type: 'json' }
 import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import type { GearSlot } from '../gear/gearSlots'
 import { getItemByWowItemId, isWithinDefaultPhase } from '../gear/itemCatalogue'
+import { isItemCompatibleWithGearSlot } from '../gear/slotCompatibility'
 import { getVisibleGearSlotsForSpec } from '../gear/slotVisibility'
 import type { BisList, RankedGearEntry } from './bisTypes'
 
@@ -100,7 +101,7 @@ function buildLists(): BisList[] {
 
   for (const spec of Object.values(rawRankings.specs) as RawSpec[]) {
     const entries: RankedGearEntry[] = []
-    for (const rows of Object.values(spec.slots)) {
+    for (const [section, rows] of Object.entries(spec.slots)) {
       /*
        * Wowhead's Phase 2 guides rank a few items Phase 2 cannot reach, labelled in their own notes
        * as "Optional", "Alternative" or "Seasonal". Both were verified against the item's real source
@@ -120,31 +121,38 @@ function buildLists(): BisList[] {
       })
       excludedByPhase += rows.length - inPhase.length
 
-      /*
-       * Renumbered densely so the panel does not render "#1 #2 #3 #5". The guide's ordering is
-       * preserved — this only closes the gaps a removal leaves. Note this can move rank 1, and with
-       * it the gem and enchant advice `toEntry` hangs off rank 1: that is correct, because the advice
-       * is published per spec rather than per item, so it belongs on whatever is actually best here.
-       */
-      const renumbered = inPhase
-        .slice()
-        .sort((a, b) => a.rank - b.rank)
-        .map((row, index) => ({ ...row, rank: index + 1 }))
-
-      for (const row of renumbered) {
+      for (const row of inPhase.slice().sort((a, b) => a.rank - b.rank)) {
         const item = getItemByWowItemId(row.wowItemId)
         if (!item) continue
 
-        // The item's own slot wins over the guide's section, because the sections are editorial and
-        // the catalogue's slot is not. Wowhead files "Claw of the Phoenix" under a Hunter melee
-        // weapons heading, but the item is off-hand only — trusting the heading would have offered it
-        // as a main hand it can never occupy.
-        //
-        // Paired slots are deliberately *not* duplicated. The guides publish one "Ring Jewelry" or
-        // "Trinkets" list because a player picks two from it, and the BiS panel already renders an
-        // equip button per paired slot on each row. Listing the entry under both Trinket 1 and
-        // Trinket 2 showed every trinket twice for no added information.
-        const entry = toEntry(row, item.slot, spec)
+        /*
+         * **The section decides the slot, unless the item physically cannot go there.**
+         *
+         * An earlier rule said the item's own slot always wins, and that was half right. It is right
+         * for "Claw of the Phoenix", which Wowhead files under a Hunter *Main Hand* heading while the
+         * item is off-hand only — trusting the heading would offer it as a main hand it can never
+         * occupy. It is wrong in the other direction, which is the common one: a **one-hander is
+         * catalogued `Main Hand`** but is perfectly legal in the off hand, so every one-hander the
+         * guide ranked in its "Off Hand" section was being filed under Main Hand instead.
+         *
+         * That threw away the guide's whole point — which hand the pick is *for* — and collided two
+         * rankings in one slot. A Fury warrior's Main Hand read `#1 #1 #2 #2 #3 #3 #4 #4`, because
+         * all four off-hand picks landed on top of all four main-hand picks.
+         *
+         * `isItemCompatibleWithGearSlot` already encodes the asymmetry, including the one-hander
+         * case, so the rule is simply: honour the section when the item fits it, fall back to the
+         * catalogue when it does not. Exactly six entries move, all of them one-handers returning to
+         * the off hand where the guide ranked them.
+         *
+         * Paired slots are deliberately *not* duplicated. The guides publish one "Ring Jewelry" or
+         * "Trinkets" list because a player picks two from it, and the BiS panel already renders an
+         * equip button per paired slot on each row. Listing the entry under both Trinket 1 and
+         * Trinket 2 showed every trinket twice for no added information.
+         */
+        const sectionSlot = section as GearSlot
+        const slot = isItemCompatibleWithGearSlot(item, sectionSlot) ? sectionSlot : item.slot
+
+        const entry = toEntry(row, slot, spec)
         if (entry) entries.push(entry)
       }
     }
@@ -159,6 +167,26 @@ function buildLists(): BisList[] {
         (entry) => entry.slot === 'Main Hand' && getItemByWowItemId(entry.wowItemId ?? 0)?.handType === 'One Hand',
       )
       entries.push(...oneHanders.map((entry, index) => ({ ...entry, slot: 'Off Hand' as GearSlot, rank: index + 1 })))
+    }
+
+    /*
+     * Ranks are made dense **per final slot**, which is the grouping the panel actually renders, and
+     * the last step because everything above can change which slot an entry lands in.
+     *
+     * Two things leave gaps otherwise. A phase drop removes a rank outright. And an item can move
+     * slots — "Claw of the Phoenix" is ranked #2 in Hunter's Main Hand section and is off-hand only,
+     * so Main Hand was left reading `#1 #3 #4` with nothing to explain the missing #2.
+     *
+     * Relative order is untouched; this only closes holes. It can move an entry to rank 1 and with it
+     * the gem and enchant advice `toEntry` hangs there — which is correct, because that advice is
+     * published per spec rather than per item, so it belongs on whatever is genuinely best in the
+     * slot rather than on a row that is no longer in it.
+     */
+    const nextRankBySlot = new Map<GearSlot, number>()
+    for (const entry of [...entries].sort((a, b) => a.rank - b.rank)) {
+      const next = (nextRankBySlot.get(entry.slot) ?? 0) + 1
+      nextRankBySlot.set(entry.slot, next)
+      entry.rank = next
     }
 
     lists.push({

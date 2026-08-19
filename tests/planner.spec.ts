@@ -3526,6 +3526,67 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
   expect(empty.score).toBe(192.3)
 })
 
+test('main-hand and off-hand picks are separate rankings, not one collided list', () => {
+  /*
+   * The guides publish a "Main Hand" and an "Off Hand" section, and the section says which hand the
+   * pick is *for*. That was being thrown away: a **one-hander is catalogued `Main Hand`** but is
+   * legal in either hand, so every one-hander ranked under "Off Hand" was filed as a main hand.
+   *
+   * The visible symptom was two rankings stacked in one slot. A Fury warrior's Main Hand read
+   * `#1 #1 #2 #2 #3 #3 #4 #4` — all four off-hand picks landed on top of all four main-hand picks —
+   * and the off hand showed a fallback list synthesised from main-hand one-handers instead of the
+   * four weapons the guide actually names for it.
+   *
+   * The rule is now: honour the section when the item fits it, fall back to the catalogue when it
+   * cannot. The fallback direction still matters and is asserted below — "Claw of the Phoenix" is
+   * ranked in Hunter's *Main Hand* section and is off-hand only, so it must move.
+   */
+  const listFor = (className: string, spec: string) =>
+    bisLists.find((entry) => entry.className === className && entry.spec === spec)!
+  const inSlot = (className: string, spec: string, slot: string) =>
+    listFor(className, spec)
+      .entries.filter((entry) => entry.slot === slot)
+      .sort((a, b) => a.rank - b.rank)
+      .map((entry) => getItemById(entry.itemId)!.name)
+
+  // Fury is the case that collided completely: four against four, no overlap between the lists.
+  const furyMain = inSlot('Warrior', 'Fury', 'Main Hand')
+  const furyOff = inSlot('Warrior', 'Fury', 'Off Hand')
+  expect(furyMain).toEqual(['Dragonstrike', 'Dragonmaw', 'Rod of the Sun King', 'Talon of the Phoenix'])
+  expect(furyOff[0], "the guide's top off-hand pick must be the one it names").toBe('Talon of Azshara')
+  expect(furyOff).toHaveLength(4)
+
+  // Arms keeps its two-handers ahead of its one-handers — that ordering is Wowhead's, not ours.
+  const armsMain = inSlot('Warrior', 'Arms', 'Main Hand')
+  expect(armsMain.slice(0, 3)).toEqual([
+    'Twinblade of the Phoenix',
+    'Lionheart Executioner',
+    "Merciless Gladiator's Greatsword",
+  ])
+  for (const name of armsMain.slice(0, 3)) {
+    expect(allItems.find((item) => item.name === name)!.handType, `${name} should be two-handed`).toBe('Two Hand')
+  }
+  expect(inSlot('Warrior', 'Arms', 'Off Hand')[0]).toBe("Merciless Gladiator's Quickblade")
+
+  /*
+   * The other direction: an off-hand-only item ranked in a Main Hand section must still move, or the
+   * panel offers a main hand it can never occupy. This is the case the original rule existed for, and
+   * keeping it is why the rule is "section unless impossible" rather than "section always".
+   */
+  expect(inSlot('Hunter', 'Beast Mastery', 'Off Hand')).toContain('Claw of the Phoenix')
+  expect(inSlot('Hunter', 'Beast Mastery', 'Main Hand')).not.toContain('Claw of the Phoenix')
+
+  // No slot may rank the same item twice, which is what a collided list produced.
+  for (const list of bisLists) {
+    const seen = new Set<string>()
+    for (const entry of list.entries) {
+      const key = `${entry.slot}|${entry.itemId}`
+      expect(seen.has(key), `${list.className} ${list.spec} ranks ${entry.itemId} twice in ${entry.slot}`).toBe(false)
+      seen.add(key)
+    }
+  }
+})
+
 test('nothing reachable offers gear from a later phase than this planner covers', () => {
   /*
    * The app targets Phase 2 and `getItemsForSlot` enforces that — so the picker, the default set and
@@ -3555,32 +3616,19 @@ test('nothing reachable offers gear from a later phase than this planner covers'
   expect(ranked, 'no ranked entry may name gear from a later phase').toEqual([])
   expect(excludedByPhase, 'and the ones dropped are counted rather than silently lost').toBe(5)
 
-  /*
-   * 2. The five slots a drop actually touched stay dense, or the panel renders "#1 #2 #3 #5".
-   *
-   * Scoped to those five deliberately. Rank density is **not** a property of this data generally, and
-   * asserting it everywhere fails on eight slot groups that predate this work: Hunter Main Hand is
-   * [1, 3, 4] because the guide's rank 2 resolves to an off-hand item and moves slots — the same
-   * section-versus-item-slot mismatch `bisLists.ts` already documents — and Warrior Arms and Fury
-   * carry *duplicate* Main Hand ranks because two guide sections, one per weapon style, both map
-   * there. Neither is caused by the phase filter and neither is obviously wrong: "best two-hander" and
-   * "best one-hander" are genuinely separate rankings. Widening this assertion means deciding that
-   * question first.
-   */
-  const touched: ReadonlyArray<readonly [string, string, string]> = [
-    ['Hunter', 'Beast Mastery', 'Finger 1'],
-    ['Hunter', 'Marksmanship', 'Finger 1'],
-    ['Hunter', 'Survival', 'Finger 1'],
-    ['Warrior', 'Protection', 'Finger 1'],
-    ['Warrior', 'Protection', 'Neck'],
-  ]
-  for (const [className, spec, slot] of touched) {
-    const list = bisLists.find((entry) => entry.className === className && entry.spec === spec)!
-    const ranks = list.entries.filter((entry) => entry.slot === slot).map((entry) => entry.rank).sort((a, b) => a - b)
-    expect(ranks.length, `${className} ${spec} ${slot} must still rank something`).toBeGreaterThan(0)
-    expect(ranks, `${className} ${spec} ${slot} ranks must be dense after the drop`).toEqual(
-      ranks.map((_, index) => index + 1),
-    )
+  // 2. Every slot group is a dense 1..N ranking. See the dedicated test below for why this holds.
+  for (const list of bisLists) {
+    const bySlot = new Map<string, number[]>()
+    for (const entry of list.entries) {
+      if (!bySlot.has(entry.slot)) bySlot.set(entry.slot, [])
+      bySlot.get(entry.slot)!.push(entry.rank)
+    }
+    for (const [slot, ranks] of bySlot) {
+      const sorted = [...ranks].sort((a, b) => a - b)
+      expect(sorted, `${list.className} ${list.spec} ${slot} ranks must be dense`).toEqual(
+        sorted.map((_, index) => index + 1),
+      )
+    }
   }
 
   // 3. Normalisation strips one that somehow got equipped — the saved-build and Equip-button path.

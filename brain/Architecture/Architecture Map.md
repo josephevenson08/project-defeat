@@ -25,9 +25,9 @@ The modules everything else leans on — change these carefully.
 - [[domain.abilities.abilityTypes]] — 11 importers
 - [[domain.character.roleTheme]] — 10 importers
 - [[features.gear.gearTypes]] — 10 importers
+- [[domain.gear.slotCompatibility]] — 9 importers
 - [[domain.raids.raidTypes]] — 9 importers
 - [[domain.simulation.combatConstants]] — 9 importers
-- [[domain.gear.slotCompatibility]] — 8 importers
 
 ## By layer
 
@@ -146,7 +146,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
-- [[domain.gear.slotCompatibility]] · 8 importers
+- [[domain.gear.slotCompatibility]] · 9 importers
 - [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
 - [[domain.gems.gemTypes]] · 3 importers
