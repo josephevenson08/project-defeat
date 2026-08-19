@@ -2,24 +2,35 @@
 
 Project Defeat is a local-first React + TypeScript + Vite simulator/planner for **TBC World of Warcraft Classic Anniversary**.
 
-The project is currently an early foundation, not an accuracy-complete simulator. The goal is to build toward a typed, local-first planner that can eventually support gear, gems, enchants, talents, buffs, debuffs, consumables, rotations, encounter settings, and build comparison.
+It is a working planner rather than an accuracy-complete simulator: gear, gems, enchants, talents,
+buffs, debuffs, consumables and raid composition are all real and sourced, while rotations remain the
+largest modelling gap. Every dataset is traceable to a pinned source, and anything the app cannot
+model says so on the surface that would otherwise imply it had.
+
+**Live: https://josephevenson08.github.io/project-defeat/**
 
 ## Current Status
 
-Early MVP / foundation phase.
+Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear
+catalogue, BiS rankings, talents, buffs, raids and professions are all real and sourced; the
+simulation behind them is built and tested but **hidden by default** while its estimates are known to
+be indicative — see `src/featureFlags.ts`, which states exactly what is and is not modelled.
 
 ## Current Features
 
 - TBC class/spec selection for all nine TBC classes
 - Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior)
 - Full TBC-style gear slot model
-- Expanded starter gear items for every slot with quality, source, phase, sockets, socket bonuses, stats, and WoW item IDs where currently confident
+- **4,554 catalogued items**, 99.5% carrying a real WoW item ID, ingested from a pinned wowsims/tbc
+  commit and merged with a curated provenance layer (drop location, roles, crafting)
+- **Phase 2 and only Phase 2.** 1,196 later-phase items are ingested but gated out of every path a
+  player can reach — the picker, the default set, the upgrade finder, saved builds and imports
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location
 - Phase 1/2 starter ranked/BiS data for all nine TBC classes and every spec (27 specs total: Shaman, Warrior, Paladin, Priest, Druid, Hunter, Mage, Rogue, Warlock)
 - Spec-aware starter filtering for gear, relics, and enchants across every class (legal weapon types per class, dual-wield vs. single-weapon rules, class-appropriate relic type)
 - Spec-aware gear slot visibility for every class, including the Totem/Libram/Idol relic display for Shaman/Paladin/Druid and the hidden Ranged-vs-Relic slot swap
-- Sample gems and enchants
+- 212 gems and 91 enchants, ingested and validated, with per-spec gem and enchant recommendations from Wowhead
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
 - Role-aware prototype simulation outputs:
   - Physical DPS
@@ -34,18 +45,21 @@ Early MVP / foundation phase.
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
-- Planner split into four sub-tabs (Gear / Talents / Ranked Gear / Build) rather than one ~15-screen
-  scroll column, with the stat rail persisting across all four
+- **Raid Composition section**: plan a 10 or 25-player roster and see which of the 33 sourced raid
+  buffs and 6 target debuffs it actually brings, with role balance and a ranked list of what one more
+  seat would buy you. Missing entries name who fixes them — "any Shaman", "an Elemental Shaman"
+- Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
+  than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
   that restores every stat — attributes and armor are never hidden
 - Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,238 files, 2.1 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,609 files, 2.8 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
-- Configurable encounter settings (target level, armor)
+- A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
 - Reduced-motion aware animation helpers
 - Playwright tests for physical, caster, healer, and tank flows
@@ -142,28 +156,20 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
-- Gear, gems, and enchants are still starter datasets, not a complete audited TBC database. A few
-  items now carry real Wowhead tooltip values (Fang of the Leviathan, Vambraces of Ending, Talon of
-  the Phoenix) while most carry stat-budget estimates, and the real ones are numerically much
-  stronger — Fang of the Leviathan alone has 221 spell power against ~46 on the placeholder caster
-  weapons. Any comparison involving a sourced item against an estimated one is skewed in the sourced
-  item's favour until the rest of the catalog is audited the same way. 106 of 230 items are now
-  sourced against real tooltips,
-  so this is the common case rather than a corner one — the Upgrade Finder now marks every row whose
-  delta rests on estimated data, and marks the sourced-versus-estimated rows specifically, since those
-  read high in a predictable direction.
-- Every class/spec has a guide-shaped Phase 2 starter ranking, but final Wowhead/Icy Veins/WoWSims
-  reconciliation is still pending, and nearly every item still flagged appears in a BiS list — so the
-  recommendations lean heavily on stat-budget estimates rather than confirmed tooltips. See the
-  generated `brain/Project/Roadmap Board.md` for the current counts; it computes them, and every
-  hand-written copy in prose has gone stale within a batch or two.
-- **The BiS lists are one item deep.** 463 ranked entries exist across all 27 specs and only 2 sit at
-  rank 2 or lower, so almost every slot offers a single option while the panel labels it "1 ranked".
-  That presents one guess as a considered ranking, and it is the largest gap in the planner right
-  now — larger than the verification backlog.
+- **Talents reach all 27 specs, but coverage is not completeness.** 579 talents are ingested across
+  all nine classes and 49 machine-readable effects reach the simulation; **49 talent groups are
+  refused by name**, each with a reason. Two kinds dominate: per-spell effects (Ignite, Shadow
+  Weaving, Ruin, every "Improved &lt;nuke&gt;") need a spell school this simulator does not record,
+  and stat-pipeline effects (Toughness, Vitality) would have to route through `calculateStats`, which
+  is a deliberate open decision. **Expect a talented estimate to read low**, especially for casters.
+- **Talents do not reach the always-visible stat rail.** They are applied inside the simulation only,
+  so spending points changes the estimate but not the paperdoll totals, the gear rankings, or the
+  upgrade finder. That is deliberate — widening it is the open product decision above — but it means
+  the two surfaces disagree by design.
+- **The app has a fixed minimum width of roughly 806px and is not mobile-responsive.** Measured at a
+  375px viewport every section overflows to the same figure, so this is the shell rather than any one
+  panel.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
-- Old guide-oriented data in `src/data` is not yet migrated into the active domain model.
-- No talent trees, so no talent scaling anywhere in the simulation.
 - Saved builds live in this browser's local storage only. Clearing site data loses them, and they do
   not follow you to another browser or machine — use export/import for that.
 - Recipe/material crafting detail exists on a handful of items as a proof of concept; most crafted items still need it filled in as each class's gear gets audited.

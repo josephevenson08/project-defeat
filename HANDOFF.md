@@ -82,6 +82,18 @@ coefficient, neither of which exists here, so **45 groups are refused by name**.
 **Meditation**, which changes what a *stat* is worth: it takes a Holy Priest's mid-cast regen from
 **11.6 to 24.6 mana/sec**, and Spirit stops pricing at zero.
 
+**The documentation was then audited end to end**, which found more rot than the code did. `ROADMAP.md`
+was 13 days stale and still described the *pre-ingest* era — "item stat blocks are best-effort
+approximations", "no talent scaling anywhere", a `training-sword` bug fixed by deleting the fictional
+item, and `src/data`, which no longer exists. `README.md` still said "No talent trees". The generated
+Known Limitations still called the catalogue "largely representative sample gear".
+
+**Six process patterns are now recorded in `ROADMAP.md` under "How decisions get made here"**, and
+eight new entries in the Decision Log. They are written as process rather than outcome because the
+outcomes keep changing and these have not: measure before designing, plumbing before data, verify
+before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
+invariant before trusting it.
+
 **A raid-composition planner was added** (2026-08-19, by request, modelled on Wowhead's TBC tool). A
 fifth section: pick 10 or 25, add specs, see which of the 33 raid buffs and 6 target debuffs the
 roster actually brings, plus role balance and what one more seat would buy you.
@@ -844,7 +856,9 @@ Still open:
 1280×720, not the ~25,000px recorded above — the hidden Buffs panel and the gear rebuild had already
 shrunk it. But the useful finding was the shape rather than the total: **Ranked Gear was 59% of the
 scroll and Talents 26%**, so two panels were 85% of it. `PLANNER_VIEWS` in `App.tsx` now splits Gear
-/ Talents / Ranked Gear / Build, each rendering *only* its own panel. The rail is what makes this
+/ Talents / Ranked Gear / Build, each rendering *only* its own panel. (**It is five now** — Buffs &
+Consumables was restored between Talents and Ranked Gear later the same session, as §2 records.) The
+rail is what makes this
 affordable — the stat totals stay on screen across all four, so nothing the single column provided is
 lost.
 

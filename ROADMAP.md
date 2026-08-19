@@ -59,14 +59,17 @@ Two items to treat with suspicion: a `"fictional placeholder item"` note appears
 and has been **wrong on all six checked so far** — every one was real. Conversely `shield-of-rehearsal`
 could not be found in Wowhead's TBC database at all by two independent searches.
 
-**The larger Phase 2 gap is not verification, it is BiS depth.** 463 ranked entries exist across all
-27 specs and only 2 sit at rank 2 or lower, so nearly every slot offers a single option while the
-panel labels it "1 ranked" — presenting one guess as a considered ranking. Every spec can at least
-fill every slot the UI offers it (there are no dead ends), but 17 slots have exactly one option, and
-those cluster in tank and healer specs.
+~~**The larger Phase 2 gap is not verification, it is BiS depth.**~~ **Closed.** This read "463 ranked
+entries exist across all 27 specs and only 2 sit at rank 2 or lower", which was the state before the
+rankings were ingested from Wowhead's guides. There are now **1,428 entries**, min 1 / **median 4** /
+max 8 per slot, so the panel shows a real ranking rather than one guess labelled "1 ranked" — and
+Ranked Gear collapses to the top 2 per slot by default precisely because depth stopped being the
+problem and length became one.
 
-Gems and enchants remain thin — 11 gems and 22 enchants — and are best treated as their own project
-rather than folded into item verification, since the sources and data shape differ.
+~~Gems and enchants remain thin — 11 gems and 22 enchants.~~ **Closed:** 212 gems and 91 enchants,
+ingested and validated, plus per-spec gem and enchant recommendations parsed from Wowhead's
+enchants-and-gems guides — which are published separately from the BiS guides, so they arrived as
+their own dataset.
 
 ## Phase 3: Character Systems
 
@@ -155,10 +158,34 @@ closed-form.
 catalogued trinkets is a pure stat stick, so a flat-stats model priced that whole class at nearly
 zero.
 
-What's still missing: rotation priority for the other 25 specs, procs on weapons and armour (the
-schema exists, the data does not), talent scaling, set bonuses being *scored* rather than surfaced,
-multi-iteration variance, and result charts. Healer HPS also has no mana constraint, so it is an
-unbounded ceiling rather than a sustainable rate.
+### Where Phase 4 actually stands now (2026-08-19)
+
+Several of the gaps listed above have since closed, and the paragraph that used to sit here — "still
+missing: … talent scaling … healer HPS has no mana constraint" — was true when written and is not
+now. Closing a gap never edits the sentence describing it, which is why the app's own caveats are
+each pinned by an assertion these days.
+
+**Closed:**
+
+- **Item procs and on-use effects** — 49 effects ingested from wowsims, folded in at
+  `duration / cooldown`. 46 of 175 trinkets carry one, plus two meta gems that previously contributed
+  literally zero.
+- **The healer mana constraint** — MP5, Spirit regen and the Intellect-to-mana conversion, from
+  wowsims' `mana.go`. Reported as a deficit rather than used to throttle the headline, because a
+  healer who casts flat out and one who paces are both real.
+- **Talent scaling, on all 27 specs** — 579 talents ingested across nine classes, 49 machine-readable
+  effects reaching every one of the four role paths.
+
+**Still open, and these are the honest ones:**
+
+- **Rotations cover 2 specs of 27.** The largest remaining gap by a distance, and the main reason the
+  Simulation tab stays hidden. Scoped in `ROTATION-SCOPE.md`, which corrects this file's earlier
+  assumption that it would be an ingest like talents: wowsims implements rotations as *imperative
+  state machines over an event timeline*, and this engine is closed-form.
+- **49 talent groups are refused by name.** Coverage is not completeness. Per-spell effects need a
+  spell school the simulator does not record; Toughness and Vitality need the stat pipeline.
+- **No multi-iteration variance and no result charts** — every number is a point estimate.
+- **Set bonuses are surfaced, not scored.**
 
 ## Phase 5: Planner Workflows
 
@@ -189,6 +216,16 @@ They are still browser-local — clearing site data loses them, and they do not 
 machine; export/import covers that. Gear comparison, source/cost planning, and a real mobile layout
 are unstarted.
 
+**Raid Composition landed here** (2026-08-19), as a fifth section rather than a planner panel: pick
+10 or 25, add specs, and see which of the 33 raid buffs and 6 target debuffs the roster brings, with
+role balance and a ranked list of what one more seat would buy. It is a workflow feature in the Phase
+5 sense — it plans something — but it belongs to nobody's character, which is why it has no rail.
+
+It cost little because the data already existed and was already correct. It is also the surface where
+`notModelled` stops mattering: 15 of the 33 buffs cannot be expressed as a stat change, so
+`calculateStats` applies only 18 — but a raid leader planning around Bloodlust does not care whether
+the simulator can price it.
+
 ## Phase 6: In-Game Import (CurseForge Addon)
 
 - Build a companion WoW addon (distributed via CurseForge) that reads the player's live character
@@ -202,13 +239,65 @@ are unstarted.
 - No backend is required for this if export/import stays client-side (paste a blob, parse in
   the browser); a small backend only becomes necessary if we want shareable links or account sync.
 
+## How decisions get made here
+
+Six patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as
+outcomes, because the outcomes above will keep changing and these have not.
+
+**Measure before designing, because the obvious fix is often wrong.** This file once proposed capping
+each BiS slot at "a few" entries. Measuring first showed the median slot holds exactly 4, so capping
+at 3 would have hidden 22.9% of entries and saved almost nothing. The same habit found that the
+planner column was 11,206px rather than the ~25,000px assumed, and that the real problem was its
+*shape* — two panels were 85% of it — not its total.
+
+**Plumbing before data, every time.** Talent effects for casters would have reached nothing until
+`calculateCasterDps` took a talent argument, and ingesting them first would have produced the
+project's signature failure: real, sourced data wired to nothing. That failure has happened three
+times here (buffs panel, gem procs, signature-ability prose), which is why the order is now a rule.
+
+**Verify before correcting, especially when the data looks wrong.** Five BiS entries named items
+Phase 2 cannot reach. The tempting read is "bad ingest". Tracing them to source showed Band of
+Eternity needs Scale of the Sands — Mount Hyjal, Phase 3 — and Hailstone Pendant drops from Ahune in
+the Midsummer event: the phase values were right and Wowhead was being forward-looking. Guessing the
+other way would have deleted legitimate rankings.
+
+**Coverage is not completeness, and the second number is the honest one.** Talents reach 27 of 27
+specs *and* 49 talent groups are refused by name. Quoting only the first would be true and
+misleading. Every surface that quotes a coverage figure now quotes the refusal count beside it.
+
+**A caveat needs something that fails when it stops being true.** Seven user-facing statements have
+been found *wrong* here, every one of them true when written — because closing a gap never edits the
+sentence describing that gap. Assertions, not promises: a flagged-unmodelled stat must score exactly
+zero, "2 specs of 27" must match the ability data, and a test that pinned the caster path as
+talent-blind was *designed* to fail on the day someone wired it, as the reminder to rewrite the text.
+
+**Falsify the assertion before trusting it.** Every invariant added recently was checked by breaking
+the thing it guards and confirming the failure names the real defect. A test that has never been seen
+to fail is a hypothesis, and this repo has shipped a green suite that asserted nothing at least once
+(`toHaveCount(0)` is vacuously true wherever the panel is not rendered).
+
 ## Current Data Provenance
 
-Wowhead and WoWSims are the primary research sources for item data, BiS rankings, and simulation
-formulas going forward (per project direction). Wowhead's guide pages are JS-rendered, so item
-stat blocks are currently best-effort approximations cross-checked against static summaries and
-prior knowledge; every approximated value is flagged `needsVerification: true` in the data files
-until it's been checked against an actual Wowhead item tooltip.
+**This section described the pre-ingest era and has been rewritten.** It used to say item stat blocks
+were "best-effort approximations cross-checked against static summaries and prior knowledge". That is
+no longer how any of it works, and the change was the single largest correctness event in the
+project's history.
+
+Every dataset is now ingested from a pinned source and regenerable:
+
+- **Items** — 4,554, of which 99.5% carry a real WoW item ID, from `wowsims/tbc` at commit
+  `3301fca5`, merged with a curated layer that contributes *provenance only* (drop location, roles,
+  crafting). Mechanical data is never authored by hand.
+- **BiS rankings, gem and enchant picks, tier lists** — parsed from Wowhead's own guide markup, not
+  from prose. The guides are client-rendered but their source is escaped BBCode inside the served
+  HTML, which is reproducible in a way that driving a browser is not.
+- **Buffs, debuffs, talents, item effects, meta gem conditions** — each cited to the spell rank or
+  upstream source file its numbers were read from.
+
+The reason this matters is recorded rather than asserted: when the hand-written catalogue was checked
+against the ingest, **87 of 98 overlapping entries disagreed**, and all 119 verifiable conflicts
+resolved **curated 0, ingested 119**. The old data was produced by inferring what an item *should*
+look like, which is exactly why it was uniformly plausible. Plausibility is not evidence.
 
 ## Raid Reference Data
 
@@ -229,11 +318,19 @@ written below each note's manual marker.
 
 ## Current Known Limitations
 
-- Simulation formulas use real TBC attack-table/spell-table mechanics, and every path now models one
-  real ability per spec — but only one. No rotation priority, procs, or talent scaling anywhere; some
-  physical specials are excluded outright where their rate isn't computable. See Phase 4 above.
-- Current item/gem/enchant data is sample data, not a real database. One known inconsistency:
-  `training-sword`'s `wowItemId` (28034) resolves to an unrelated real item, not the "Training Sword"
-  its name/stats describe — noticed while backfilling weapon damage data, not yet fixed.
-- Existing guide data under `src/data` remains disconnected from the active MVP foundation.
-- No backend is planned for the near term; the app should stay local-first.
+- **Rotations cover 2 specs of 27.** Every other spec is modelled from a single signature ability,
+  which understates any spec whose damage is spread across several buttons. See `ROTATION-SCOPE.md`.
+- **Talents reach all 27 specs but 49 talent groups are refused by name**, dominated by per-spell
+  effects and by the ones that would have to route through `calculateStats`. A talented estimate
+  reads low.
+- **Talents do not reach the always-visible stat rail** — only the simulation. Widening that is an
+  open product decision, and it is why spending points moves the estimate but not the paperdoll.
+- **No multi-iteration variance and no result charts.**
+- **The app has a fixed minimum width of roughly 806px and is not mobile-responsive.** This is the
+  shell rather than any one panel; every section overflows identically at 375px.
+- No backend is planned; the app stays local-first, and saved builds live in browser storage only.
+
+Two entries that used to sit here are gone rather than fixed, and the reason is worth keeping. The
+`training-sword` inconsistency was resolved by **deleting the item** — it was fictional, one of four
+selectable in gear dropdowns that did not exist in the game. And `src/data` no longer exists; the
+guide-era data it held was superseded by the ingest rather than migrated.

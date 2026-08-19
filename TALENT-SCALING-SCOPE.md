@@ -1,5 +1,14 @@
 # Talent scaling — scope
 
+> **Closed 2026-08-19. Talents now reach all 27 specs.** All nine classes are ingested, 49
+> machine-readable effects reach every one of the four role paths, and 49 talent groups are refused
+> by name with a reason each. The work went in three stages — Warrior only, then the 11 Physical DPS
+> specs, then the caster, healer and tank paths — and each stage threaded the plumbing *before*
+> ingesting the data, because effects with no argument to reach would have been data wired to
+> nothing. What remains is not coverage but **expressiveness**; see the refusal list.
+>
+> This document is kept for the record below, not as a plan.
+
 **Written 2026-08-15 against `773a8eb`; stage 1 shipped the same day.** This began as a decision
 document. It is kept because the prediction it made was **half wrong**, and the record of that is
 worth more than a tidy plan.
