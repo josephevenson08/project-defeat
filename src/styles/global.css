@@ -4111,3 +4111,86 @@ input[type='text']:focus {
     columns: 1;
   }
 }
+
+/* Seat contribution card --------------------------------------------------- */
+
+/* The seat is the positioning context, and it has to sit above its neighbours
+   while the card is open or the card is clipped by the next group column. */
+.raidcomp-seat {
+  position: relative;
+}
+
+.raidcomp-seat:hover,
+.raidcomp-seat:focus-within {
+  z-index: 20;
+}
+
+.raidcomp-seat-card {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 6px;
+  min-width: 190px;
+  max-width: 260px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.5);
+  /* Hidden rather than absent so it costs no layout and needs no JS state. */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 90ms ease;
+}
+
+/* `focus-within` as well as hover, so the card is reachable by keyboard —
+   every seat already contains focusable buttons. */
+.raidcomp-seat:hover .raidcomp-seat-card,
+.raidcomp-seat:focus-within .raidcomp-seat-card {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The last column would push its card off-screen; flip it to the left side. */
+.raidcomp-group:last-child .raidcomp-seat-card {
+  left: auto;
+  right: 100%;
+  margin-left: 0;
+  margin-right: 6px;
+}
+
+.raidcomp-seat-card-group + .raidcomp-seat-card-group {
+  margin-top: 8px;
+}
+
+.raidcomp-seat-card-label {
+  display: block;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 3px;
+}
+
+.raidcomp-seat-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raidcomp-seat-card li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.raidcomp-seat-card img {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}

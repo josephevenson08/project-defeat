@@ -291,7 +291,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 150 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 152 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -499,6 +499,13 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **The per-group buff row is party-scoped only, and that reads as a missing buff.** A Druid's Faerie
+  Fire lands on the boss, so it is correctly absent from "what group 1 receives" — and correctly
+  puzzling if you seated that Druid to get it. The coverage was always right (it shows under Debuffs);
+  the problem was purely where a raid leader was looking. Answered with a **per-seat hover card**
+  listing everything that player brings, split Party / Raid-wide / Debuffs so the distinction the
+  planner is built on survives being answered. Revealed by CSS on `:hover` and `:focus-within`, so it
+  needs no JS state and stays keyboard-reachable.
 - **A new `.app-shell` rule placed after `.app-shell-no-rail` silently wins the cascade.** Both are
   one class, so source order decides, and the later rule reinstated the 288px rail track on every
   section that has no rail — Raid Composition, tier lists, professions rendered as a ~208px strip

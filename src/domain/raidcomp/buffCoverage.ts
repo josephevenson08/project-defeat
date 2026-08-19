@@ -38,6 +38,31 @@ export type CoverageSection<T> = {
   missing: readonly MissingEntry<T>[]
 }
 
+/**
+ * Everything one seat brings, split by how far each part reaches.
+ *
+ * The group rows underneath each party deliberately show **party-scoped buffs only**, because that is
+ * what the seating decides. The cost is that a player's other contributions are invisible exactly
+ * where you are looking while seating them — a Druid's Faerie Fire lands on the boss, so it is
+ * correctly absent from "what group 1 receives", and correctly puzzling if you are checking whether
+ * your Druid brought it.
+ *
+ * This is the per-seat answer to that: what does *this player* bring, all of it, in one place.
+ */
+export type SeatContributions = {
+  party: readonly Buff[]
+  raidWide: readonly Buff[]
+  debuffs: readonly TargetDebuff[]
+}
+
+export function seatContributions(slot: RosterSlot): SeatContributions {
+  return {
+    party: PARTY_BUFFS.filter((buff) => slotProvides(slot, buff)),
+    raidWide: RAID_WIDE_BUFFS.filter((buff) => slotProvides(slot, buff)),
+    debuffs: sampleTargetDebuffs.filter((debuff) => slotProvides(slot, debuff)),
+  }
+}
+
 /** What one group's own members bring to that group. Party-scoped buffs only reach this far. */
 export type GroupCoverage = {
   groupIndex: number

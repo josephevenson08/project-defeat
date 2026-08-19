@@ -15,6 +15,7 @@ import {
   moveSeat,
   raidBuildsByClass,
   renameSeat,
+  seatContributions,
   resizeRoster,
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
@@ -52,6 +53,49 @@ function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
   return raidBuildsByClass
     .find((entry) => entry.className === slot.className)
     ?.builds.find((build) => build.spec === slot.spec)
+}
+
+/**
+ * What one seated player brings, revealed on hover or keyboard focus.
+ *
+ * The group row underneath each party shows **party-scoped buffs only**, which is correct and is the
+ * whole point of the layout — but it means a Druid's Faerie Fire is invisible there, because a debuff
+ * on the boss is not something group 1 "receives". That reads as a missing buff exactly when you are
+ * checking whether your Druid brought it.
+ *
+ * So the per-seat answer lives on the seat. Split by reach rather than merged, so the distinction the
+ * planner is built on survives being answered.
+ */
+function SeatContributionCard({ slot }: { slot: RosterSlot }) {
+  const contributions = seatContributions(slot)
+  const sections: readonly [string, readonly { id: string; name: string }[]][] = [
+    ['Party', contributions.party],
+    ['Raid-wide', contributions.raidWide],
+    ['Debuffs', contributions.debuffs],
+  ]
+
+  const total = contributions.party.length + contributions.raidWide.length + contributions.debuffs.length
+  if (total === 0) return null
+
+  return (
+    <div className="raidcomp-seat-card" role="tooltip">
+      {sections.map(([label, entries]) =>
+        entries.length === 0 ? null : (
+          <div key={label} className="raidcomp-seat-card-group">
+            <span className="raidcomp-seat-card-label">{label}</span>
+            <ul>
+              {entries.map((entry) => (
+                <li key={entry.id}>
+                  <img src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
+                  {entry.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ),
+      )}
+    </div>
+  )
 }
 
 /** Wowhead shows granted buffs as a row of icons; the names live in the title, as they do there. */
@@ -386,6 +430,9 @@ export function RaidCompositionPanel() {
                           >
                             ×
                           </button>
+
+                          {/* Revealed by CSS on hover and on keyboard focus within the seat. */}
+                          <SeatContributionCard slot={slot} />
                         </div>
                       ) : (
                         <span className="raidcomp-seat-empty">—</span>

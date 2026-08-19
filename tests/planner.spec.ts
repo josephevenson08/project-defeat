@@ -48,6 +48,7 @@ import {
   moveSeat,
   raidBuilds,
   raidBuildsByClass,
+  seatContributions,
   renameSeat,
   resizeRoster,
   seatAt,
@@ -5197,4 +5198,58 @@ test('the layout reflows to phone width without overflowing', async ({ page }) =
     scroll: document.documentElement.scrollWidth,
   }))
   expect(overflow.scroll, 'no horizontal scroll at 375px').toBeLessThanOrEqual(overflow.client)
+})
+
+test('a seat shows everything that player brings, including what the group row cannot', () => {
+  /*
+   * The group row under each party deliberately lists **party-scoped buffs only**, which is correct —
+   * a debuff on the boss is not something group 1 "receives". The cost is that a Druid's Faerie Fire
+   * is invisible exactly where you are seating that Druid, which reads as a missing buff rather than
+   * as a category boundary. This is the per-seat answer to that.
+   *
+   * Split by reach rather than merged into one list, so answering the question does not flatten the
+   * party-versus-raid distinction the whole planner is built on.
+   */
+  const dreamstate = seatContributions({ className: 'Druid', spec: 'Restoration', buildId: 'druid-dreamstate' })
+
+  expect(dreamstate.party.map((buff) => buff.name)).toContain('Gift of the Wild')
+  expect(dreamstate.raidWide.map((buff) => buff.name)).toEqual(expect.arrayContaining(['Thorns', 'Innervate']))
+  expect(
+    dreamstate.debuffs.map((debuff) => debuff.name),
+    'Faerie Fire is the one that went looking for a home',
+  ).toContain('Faerie Fire')
+
+  // Every druid brings Faerie Fire — it is class-wide, so the build must not narrow it.
+  for (const buildId of ['druid-balance', 'druid-feral-tank', 'druid-feral-cat', 'druid-restoration', 'druid-dreamstate']) {
+    const build = getRaidBuild(buildId)!
+    const contributions = seatContributions({ className: build.className, spec: build.spec, buildId })
+    expect(contributions.debuffs.map((d) => d.name), `${buildId} should bring Faerie Fire`).toContain('Faerie Fire')
+  }
+
+  /*
+   * And the split stays honest: Leader of the Pack is party-scoped and Feral-only, so it appears in
+   * exactly one bucket for exactly the builds that have it.
+   */
+  const bear = seatContributions({ className: 'Druid', spec: 'Feral', buildId: 'druid-feral-tank' })
+  expect(bear.party.map((buff) => buff.name)).toContain('Leader of the Pack')
+  expect(bear.raidWide.map((buff) => buff.name)).not.toContain('Leader of the Pack')
+  expect(dreamstate.party.map((buff) => buff.name)).not.toContain('Leader of the Pack')
+})
+
+test('the seat contribution card is present and hidden until hover', async ({ page }) => {
+  await openApp(page, 'raidcomp')
+  await page.getByTestId('raidcomp-add-druid-dreamstate').click()
+
+  /*
+   * Hidden by CSS rather than unmounted, so it costs no layout and needs no JS state — which also
+   * means the assertion is on visibility, not on presence.
+   */
+  const card = page.locator('.raidcomp-seat-card').first()
+  await expect(card).toHaveCount(1)
+  await expect(card).toBeHidden()
+
+  await page.locator('.raidcomp-seat-body').first().hover()
+  await expect(card).toBeVisible()
+  await expect(card).toContainText('Faerie Fire')
+  await expect(card).toContainText('Gift of the Wild')
 })

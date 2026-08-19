@@ -52,7 +52,9 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
   persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
   spec and buff, **drag-and-drop** to move players between groups (occupied seats swap rather than
-  overwrite), and an optional player name per seat
+  overwrite), an optional player name per seat, and a hover card on each seat listing everything that
+  player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
+  that group actually receives
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
