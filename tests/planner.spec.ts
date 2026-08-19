@@ -3661,21 +3661,20 @@ test('nothing reachable offers gear from a later phase than this planner covers'
   expect(phaseIssue!.message).not.toMatch(/isn't legal for/)
 })
 
-test('the caster and healer paths are talent-blind, which is what featureFlags.ts claims', () => {
+test('talents reach every caster and healer spec, and still not the tank', () => {
   /*
-   * `featureFlags.ts` says talents reach 11 specs of 27 and that the other 16 cannot receive them
-   * because `calculateCasterDps`, `calculateHealing` and `calculateTankSurvivability` take no talent
-   * argument. That sentence has already rotted once — it read "reaches the simulation nowhere at all"
-   * for two days after `37e2cf2` wired talents in — so it gets an assertion rather than a promise.
+   * This test used to assert the exact opposite, and that is the point of it.
    *
-   * Shaman and Paladin are the sharp choices. Both have **ingested talent effects**, so an unchanged
-   * score proves the *path* ignores them rather than merely that the data is absent — which is what a
-   * Mage or Priest would have shown, and would have kept passing even after the plumbing landed.
+   * It was written to pin `featureFlags.ts`'s claim that only 11 specs receive talents, with a note
+   * saying "when someone threads talents into either path, this test fails — and the failure is the
+   * reminder to rewrite the flag's text". That happened, deliberately, so the assertion is inverted
+   * and the flag rewritten with it.
    *
-   * The tank third of that claim is pinned separately, in the Warrior talent-scaling test.
-   *
-   * When someone threads talents into either path, this test fails — and the failure is the reminder
-   * to rewrite the flag's text, which is the whole point of writing it this way.
+   * Shaman and Paladin remain the sharp fixtures for a different reason now: both classes have
+   * *melee* effects that a caster or healer spec must **not** pick up. Weapon Mastery is physical
+   * damage — an Elemental Shaman taking it must move by exactly nothing, while Nature's Guidance
+   * moves the same spec's spell hit. That is what proves the fields are routed rather than merely
+   * summed.
    */
   const idOf = (className: string, name: string) =>
     getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
@@ -3687,28 +3686,118 @@ test('the caster and healer paths are talent-blind, which is what featureFlags.t
     return calculateSimulation(character, gear, stats, role, [], undefined, points).scoreExact
   }
 
-  const shamanPoints = { [idOf('Shaman', 'Weapon Mastery')]: 5 }
-  const paladinPoints = { [idOf('Paladin', 'Precision')]: 3 }
+  // Every caster and healer class must now move on its own spell talents.
+  const movers: ReadonlyArray<readonly [TbcClass, TbcSpec, CharacterRole, Record<number, number>]> = [
+    ['Mage', 'Fire', 'Caster DPS', { [idOf('Mage', 'Arcane Instability')]: 3, [idOf('Mage', 'Playing with Fire')]: 3 }],
+    ['Warlock', 'Destruction', 'Caster DPS', { [idOf('Warlock', 'Backlash')]: 3 }],
+    ['Priest', 'Shadow', 'Caster DPS', { [idOf('Priest', 'Force of Will')]: 5 }],
+    ['Priest', 'Holy', 'Healer', { [idOf('Priest', 'Force of Will')]: 5 }],
+    ['Druid', 'Balance', 'Caster DPS', { [idOf('Druid', 'Natural Perfection')]: 3 }],
+    ['Shaman', 'Elemental', 'Caster DPS', { [idOf('Shaman', "Nature's Guidance")]: 3 }],
+    ['Paladin', 'Holy', 'Healer', { [idOf('Paladin', 'Sanctified Seals')]: 3 }],
+  ]
+  for (const [className, spec, role, points] of movers) {
+    expect(
+      scoreFor(className, spec, role, points),
+      `${className} ${spec} must benefit from its own spell talents`,
+    ).toBeGreaterThan(scoreFor(className, spec, role, {}))
+  }
 
-  // The points have to be real, or an unchanged score would prove nothing at all.
-  expect(deriveTalentModifiers(shamanPoints)).not.toEqual(noTalentModifiers)
-  expect(deriveTalentModifiers(paladinPoints)).not.toEqual(noTalentModifiers)
-
+  /*
+   * Routing, not summing. A melee talent must reach a caster spec's score by exactly zero — the same
+   * class, the same call, a different field.
+   */
+  const weaponMastery = { [idOf('Shaman', 'Weapon Mastery')]: 5 }
+  expect(deriveTalentModifiers(weaponMastery)).not.toEqual(noTalentModifiers)
   expect(
-    scoreFor('Shaman', 'Elemental', 'Caster DPS', shamanPoints),
-    'the caster path does not receive talents yet',
+    scoreFor('Shaman', 'Elemental', 'Caster DPS', weaponMastery),
+    "a physical-damage talent must not touch a caster's score",
   ).toBe(scoreFor('Shaman', 'Elemental', 'Caster DPS', {}))
 
+  /*
+   * The tank path is the one that genuinely still receives nothing, and it is a decision rather than
+   * an oversight: talents are applied in `calculatePhysicalDps`, and a tank is scored by
+   * `calculateTankSurvivability`. Kept asserted so the remaining gap stays visible now that the
+   * caster and healer halves have closed.
+   */
+  const protPoints = { [idOf('Warrior', 'Cruelty')]: 5 }
+  expect(deriveTalentModifiers(protPoints)).not.toEqual(noTalentModifiers)
   expect(
-    scoreFor('Paladin', 'Holy', 'Healer', paladinPoints),
-    'the healer path does not receive talents yet',
-  ).toBe(scoreFor('Paladin', 'Holy', 'Healer', {}))
+    scoreFor('Warrior', 'Protection', 'Tank', protPoints),
+    'the tank path still does not receive talents — see the ingest\'s skipped list',
+  ).toBe(scoreFor('Warrior', 'Protection', 'Tank', {}))
 
-  // And the same class's Physical DPS spec must move, or the comparison above is vacuous.
-  expect(
-    scoreFor('Paladin', 'Retribution', 'Physical DPS', paladinPoints),
-    'Retribution shares the class and must benefit, proving the points reach the DPS path',
-  ).toBeGreaterThan(scoreFor('Paladin', 'Retribution', 'Physical DPS', {}))
+  /*
+   * The figure `featureFlags.ts` quotes, computed rather than trusted. Talents reach every spec whose
+   * role is not Tank, so the count is the split itself — and every class is ingested, so no spec is
+   * excluded for want of data any more.
+   */
+  const reached: string[] = []
+  const blind: string[] = []
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      const target = getRoleForSpec(entry.className, spec) === 'Tank' ? blind : reached
+      target.push(`${entry.className} ${spec}`)
+      expect(classHasTalentEffects(entry.className), `${entry.className} must have ingested effects`).toBe(true)
+    }
+  }
+  expect(reached, 'the "25 specs of 27" figure featureFlags.ts quotes').toHaveLength(25)
+  expect([...blind].sort(), 'and the two that cannot, both tanks').toEqual(['Paladin Protection', 'Warrior Protection'])
+})
+
+test('Meditation is what makes Spirit worth anything to a healer, and the estimate says which case it is in', () => {
+  /*
+   * The load-bearing detail of the whole mana model, and the one place a talent changes what a *stat*
+   * is worth rather than how big a number is. wowsims applies Spirit regen during casting only when
+   * `SpiritRegenRateCasting` is non-zero, and that comes solely from talents. Untalented, MP5 is the
+   * entire mid-cast regen and Spirit prices at exactly zero — real TBC, not a modelling shortcut.
+   *
+   * The estimate used to state that as a property of *the app* ("which are not modelled"). It is now
+   * a property of the *build*, computed, so it cannot rot: the sentence is chosen by the number.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Priest', spec: 'Holy' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Priest', 'Holy')
+  const stats = calculateStats(character, gear)
+  const resultFor = (points: Record<number, number>) =>
+    calculateSimulation(character, gear, stats, 'Healer', [], undefined, points)
+
+  const regenOf = (result: ReturnType<typeof resultFor>) =>
+    result.breakdown.find((entry) => entry.label === 'Mana per second regained')!.value
+
+  const bare = resultFor({})
+  const meditated = resultFor({ [idOf('Priest', 'Meditation')]: 3 })
+
+  /*
+   * The exact arithmetic is asserted on `computeManaBudget` rather than on the breakdown row, because
+   * the row is rounded for display and rounding would hide the difference between applying the share
+   * once, twice, or at the wrong rank. "Went up" would pass in all three cases.
+   */
+  const spirit = spiritRegenPerSecond(stats.spirit, stats.intellect)
+  const budget = (share: number) =>
+    computeManaBudget({
+      manaCostPerCast: 100,
+      castsPerSecond: 1,
+      healPerCast: 1,
+      mp5: stats.mp5,
+      spirit: stats.spirit,
+      intellect: stats.intellect,
+      spiritRegenWhileCasting: share,
+    })
+
+  expect(budget(0).spiritRegenPerSecond, 'untalented, Spirit contributes exactly nothing').toBe(0)
+  expect(budget(0).regenPerSecond).toBeCloseTo(stats.mp5 / 5, 10)
+  expect(budget(0.3).spiritRegenPerSecond).toBeCloseTo(spirit * 0.3, 10)
+  expect(budget(0.3).regenPerSecond).toBeCloseTo(stats.mp5 / 5 + spirit * 0.3, 10)
+
+  // And the rendered estimate reflects it.
+  expect(regenOf(bare)).toBeCloseTo(stats.mp5 / 5, 1)
+  expect(bare.summary, 'the estimate must state it as a fact about the build').toMatch(/no points in Meditation/i)
+  expect(regenOf(meditated)).toBeGreaterThan(regenOf(bare))
+  expect(meditated.summary).toMatch(/Meditation and its equivalents keep 30% of Spirit regen/i)
+  expect(meditated.summary, 'the old "not modelled" wording must be gone').not.toMatch(/are not modelled/i)
 })
 
 test('Flurry is solved analytically, and its value is gated hard by crit chance', () => {
@@ -4305,10 +4394,11 @@ test('Rogue talents are ingested per class, and two classes can share a talent n
 test('every role says what talents do for it, and the tank message is not the DPS one', () => {
   /*
    * A Mage spending 45 points watched the estimate go 462.5 -> 462.5 with nothing to explain it.
-   * Talent effects are ingested for six classes now — Warrior, Rogue, Hunter, Shaman, Druid, Paladin
-   * — but casters, healers and tanks still never receive them, because those three paths take no
-   * talent argument. Shaman and Paladin make that visible: both have ingested effects, and both still
-   * score identically talented on their caster and healer specs.
+   * All nine classes are ingested now, and the caster and healer paths receive them as of 2026-08-19
+   * — so the remaining silence is the **tank** path, plus the per-spell caster talents no closed-form
+   * model can express. Each gets its own sentence, and the point of this test is that they stay
+   * different: the tank message must never be the DPS one, because listing only the skipped talents
+   * would imply the rest are counted.
    *
    * The tank case is the one worth pinning hardest, because the first version of this got it wrong in
    * the confident direction: it gave Protection the DPS message, which names only the *skipped*
@@ -4335,11 +4425,16 @@ test('every role says what talents do for it, and the tank message is not the DP
     return calculateSimulation(character, gear, stats, role, [], undefined, points).unmodelledTalentNote
   }
 
-  // A class with no ingested effects must say so rather than silently doing nothing.
+  /*
+   * A Mage used to get the "no ingested effects for this class" message. That branch is now
+   * unreachable — all nine classes are ingested — so the Mage falls through to the per-build note,
+   * which names the talents it *took* that still reach nothing. That is a strictly better message and
+   * a strictly harder one to keep true, which is why it is asserted by content rather than by shape.
+   */
   const mage = noteFor('Mage', 'Fire', 'Caster DPS', spendFirstTree('Mage'))
-  expect(mage, 'a Mage spending points must be told they reach nothing').toBeTruthy()
-  expect(mage).toMatch(/only ingested for/i)
-  expect(mage, 'and that the talents themselves are real, not missing data').toMatch(/tree is complete/i)
+  expect(mage, 'a Mage spending points must still be told what does not reach the estimate').toBeTruthy()
+  expect(mage, 'the dead "no effects for this class" branch must not fire').not.toMatch(/only ingested for/i)
+  expect(mage).toMatch(/spent but not modelled/i)
 
   // The tank gets its own message, naming the real reason.
   const tank = noteFor('Warrior', 'Protection', 'Tank', spendFirstTree('Warrior'))

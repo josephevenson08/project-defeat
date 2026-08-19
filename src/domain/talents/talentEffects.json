@@ -11,7 +11,10 @@
       "sim/hunter/talents.go",
       "sim/shaman/talents.go",
       "sim/druid/talents.go",
-      "sim/paladin/talents.go"
+      "sim/paladin/talents.go",
+      "sim/mage/talents.go",
+      "sim/priest/talents.go",
+      "sim/warlock/talents.go"
     ]
   },
   "classes": [
@@ -20,10 +23,13 @@
     "Hunter",
     "Shaman",
     "Druid",
-    "Paladin"
+    "Paladin",
+    "Mage",
+    "Priest",
+    "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 30,
+  "effectCount": 44,
   "effects": [
     {
       "className": "Warrior",
@@ -299,6 +305,17 @@
       "source": "sim/shaman/talents.go"
     },
     {
+      "className": "Shaman",
+      "talentId": 583,
+      "talent": "Nature's Guidance",
+      "tree": "Restoration",
+      "maxRank": 3,
+      "kind": "spellHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/shaman/talents.go"
+    },
+    {
       "className": "Druid",
       "talentId": 798,
       "talent": "Sharpened Claws",
@@ -330,6 +347,39 @@
       "unit": "attack power per rank",
       "perRank": 35,
       "caveat": "Upstream scales by character level; folded in at 70, which is the only level this app models.",
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 1783,
+      "talent": "Balance of Power",
+      "tree": "Balance",
+      "maxRank": 2,
+      "kind": "spellHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 1790,
+      "talent": "Natural Perfection",
+      "tree": "Restoration",
+      "maxRank": 3,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 829,
+      "talent": "Intensity",
+      "tree": "Restoration",
+      "maxRank": 3,
+      "kind": "spiritRegenWhileCasting",
+      "unit": "fraction of Spirit regen retained while casting, per rank",
+      "perRank": 0.1,
       "source": "sim/druid/talents.go"
     },
     {
@@ -367,6 +417,120 @@
       "perRank": 0.01,
       "caveat": "Upstream omits the coefficient, which means 1.",
       "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1761,
+      "talent": "Sanctified Seals",
+      "tree": "Retribution",
+      "maxRank": 3,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank (implied coefficient of 1 upstream)",
+      "perRank": 0.01,
+      "caveat": "Upstream omits the coefficient, which means 1.",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1630,
+      "talent": "Precision",
+      "tree": "Protection",
+      "maxRank": 3,
+      "kind": "spellHitChance",
+      "unit": "fraction per rank (implied coefficient of 1 upstream)",
+      "perRank": 0.01,
+      "caveat": "Upstream omits the coefficient, which means 1.",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Mage",
+      "talentId": 421,
+      "talent": "Arcane Instability",
+      "tree": "Arcane",
+      "maxRank": 3,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/mage/talents.go"
+    },
+    {
+      "className": "Mage",
+      "talentId": 421,
+      "talent": "Arcane Instability",
+      "tree": "Arcane",
+      "maxRank": 3,
+      "kind": "spellDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/mage/talents.go"
+    },
+    {
+      "className": "Mage",
+      "talentId": 1730,
+      "talent": "Playing with Fire",
+      "tree": "Fire",
+      "maxRank": 3,
+      "kind": "spellDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Upstream applies this to all spell damage, not only Fire, and it is taken as written.",
+      "source": "sim/mage/talents.go"
+    },
+    {
+      "className": "Mage",
+      "talentId": 1142,
+      "talent": "Arcane Meditation",
+      "tree": "Arcane",
+      "maxRank": 3,
+      "kind": "spiritRegenWhileCasting",
+      "unit": "fraction of Spirit regen retained while casting, per rank",
+      "perRank": 0.1,
+      "source": "sim/mage/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 1202,
+      "talent": "Force of Will",
+      "tree": "Discipline",
+      "maxRank": 5,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 347,
+      "talent": "Meditation",
+      "tree": "Discipline",
+      "maxRank": 3,
+      "kind": "spiritRegenWhileCasting",
+      "unit": "fraction of Spirit regen retained while casting, per rank",
+      "perRank": 0.1,
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1817,
+      "talent": "Backlash",
+      "tree": "Destruction",
+      "maxRank": 3,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warlock/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1673,
+      "talent": "Demonic Tactics",
+      "tree": "Demonology",
+      "maxRank": 5,
+      "kind": "spellCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Upstream writes generic BonusCritRating; taken as spell crit, which is the only half a Warlock uses.",
+      "source": "sim/warlock/talents.go"
     }
   ],
   "skipped": [
@@ -534,6 +698,66 @@
       "className": "Paladin",
       "talent": "Crusade",
       "reason": "Gated on the target being a humanoid, demon, undead or elemental. No mob type here."
+    },
+    {
+      "className": "Mage",
+      "talent": "Ignite / Combustion / Winters Chill",
+      "reason": "Per-spell and school-scoped; the simulator models one generic cast and records no spell school."
+    },
+    {
+      "className": "Mage",
+      "talent": "Arcane Power / Presence of Mind / Icy Veins",
+      "reason": "Timed cooldowns. A closed-form model has no timeline to place them on."
+    },
+    {
+      "className": "Mage",
+      "talent": "Arcane Mind / Mind Mastery",
+      "reason": "Intellect scaling and Intellect-to-spell-power, which cascade through calculateStats instead."
+    },
+    {
+      "className": "Mage",
+      "talent": "Empowered Fireball / Frostbolt",
+      "reason": "Raise one spell's coefficient; the generic cast profile has no per-spell coefficient to raise."
+    },
+    {
+      "className": "Priest",
+      "talent": "Shadow Weaving / Misery",
+      "reason": "Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target."
+    },
+    {
+      "className": "Priest",
+      "talent": "Spiritual Guidance",
+      "reason": "Converts Spirit into spell power via a stat dependency, which belongs in calculateStats."
+    },
+    {
+      "className": "Priest",
+      "talent": "Inner Focus / Power Infusion",
+      "reason": "Timed cooldowns, which a closed-form model has no timeline to place."
+    },
+    {
+      "className": "Priest",
+      "talent": "Improved Renew / Empowered Healing",
+      "reason": "Per-spell coefficients; the healer path models one generic cast."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Master Demonologist",
+      "reason": "Gated on which demon is summoned. No pet model here."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Fel Intellect / Fel Stamina",
+      "reason": "Stat dependencies into mana and health, which belong in calculateStats."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Improved Shadow Bolt / Ruin / Emberstorm",
+      "reason": "Per-spell and school-scoped; no spell school is recorded anywhere in this simulator."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Soul Leech / Nightfall",
+      "reason": "Proc-driven, needing a timeline."
     }
   ]
 }

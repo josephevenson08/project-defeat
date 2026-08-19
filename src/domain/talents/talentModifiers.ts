@@ -60,6 +60,27 @@ export type TalentModifiers = {
    * depend on `EXPERTISE_RATING_PER_SKILL_POINT`, which is not what the talent says.
    */
   expertiseSkillPoints: number
+  /** Added to the raw spell crit chance, as a fraction. Arcane Instability, Force of Will, Backlash. */
+  spellCritChance: number
+  /**
+   * Added to the hit chance derived from **rating**, as a fraction, not to the final chance.
+   *
+   * That placement is the whole point: `computeSpellHitChance` floors the miss chance at 1%, so
+   * talent hit has to enter on the same side of that floor as rating does. Added to the result
+   * instead, a fully hit-capped caster would be pushed past 100%.
+   */
+  spellHitChance: number
+  /** Multiplies spell damage. Arcane Instability, Playing with Fire. 1 when untalented. */
+  spellDamageMultiplier: number
+  /**
+   * Share of out-of-combat Spirit regen that keeps running **while casting**, as a fraction.
+   *
+   * The one field here that changes a stat's whole worth rather than a number's size. wowsims applies
+   * Spirit regen mid-cast only when `SpiritRegenRateCasting` is non-zero, and that comes solely from
+   * talents — Meditation, Arcane Meditation, Intensity. Untalented it is 0, which is why this project
+   * correctly priced Spirit at nothing for healers. With points in it, Spirit starts mattering.
+   */
+  spiritRegenWhileCasting: number
 }
 
 export const noTalentModifiers: TalentModifiers = {
@@ -79,6 +100,10 @@ export const noTalentModifiers: TalentModifiers = {
   flatAttackPower: 0,
   rangedDamageMultiplier: 1,
   rangedAttackSpeedMultiplier: 1,
+  spellCritChance: 0,
+  spellHitChance: 0,
+  spellDamageMultiplier: 1,
+  spiritRegenWhileCasting: 0,
 }
 
 /** Which `TalentModifiers` field each extracted effect kind feeds, and how it combines. */
@@ -91,6 +116,9 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   expertiseSkill: 'expertiseSkillPoints',
   rangedCritChance: 'rangedCritChance',
   flatAttackPower: 'flatAttackPower',
+  spellCritChance: 'spellCritChance',
+  spellHitChance: 'spellHitChance',
+  spiritRegenWhileCasting: 'spiritRegenWhileCasting',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
@@ -102,6 +130,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   rangedAttackSpeedMultiplier: 'rangedAttackSpeedMultiplier',
   flurryHaste: 'flurryBonus',
   rageGeneratedMultiplier: 'rageGeneratedMultiplier',
+  spellDamageMultiplier: 'spellDamageMultiplier',
 }
 
 /*

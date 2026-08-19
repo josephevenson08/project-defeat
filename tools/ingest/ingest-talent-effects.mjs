@@ -315,6 +315,15 @@ const SHAMAN_EXTRACTORS = [
     re: /AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*([\d.]+)\*float64\(shaman\.Talents\.DualWieldSpecialization\)\)/,
     value: (m) => Number(m[1]) / 100,
   },
+  {
+    talent: "Nature's Guidance",
+    kind: 'spellHitChance',
+    unit: 'fraction per rank',
+    // The same talent already extracted for melee hit, one line above it upstream. Enhancement reads
+    // the melee half and Elemental and Restoration read this one.
+    re: /AddStat\(stats\.SpellHit,\s*float64\(shaman\.Talents\.NaturesGuidance\)\*([\d.]+)\*core\.SpellHitRatingPerHitChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
 ]
 
 const SHAMAN_SKIPPED = [
@@ -351,6 +360,28 @@ const DRUID_EXTRACTORS = [
     re: /AddStat\(stats\.AttackPower,\s*float64\(druid\.Talents\.PredatoryStrikes\)\*([\d.]+)\*float64\(core\.CharacterLevel\)\)/,
     value: (m) => Number(m[1]) * 70,
     caveat: 'Upstream scales by character level; folded in at 70, which is the only level this app models.',
+  },
+  {
+    talent: 'Balance of Power',
+    kind: 'spellHitChance',
+    unit: 'fraction per rank',
+    // Two percent per rank, not one -- the only spell-hit talent in this ingest that is not 1%/rank.
+    re: /AddStat\(stats\.SpellHit,\s*float64\(druid\.Talents\.BalanceOfPower\)\*([\d.]+)\*core\.SpellHitRatingPerHitChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Natural Perfection',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.SpellCrit,\s*float64\(druid\.Talents\.NaturalPerfection\)\*([\d.]+)\*core\.SpellCritRatingPerCritChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Intensity',
+    kind: 'spiritRegenWhileCasting',
+    unit: 'fraction of Spirit regen retained while casting, per rank',
+    re: /PseudoStats\.SpiritRegenRateCasting = float64\(druid\.Talents\.Intensity\) \* ([\d.]+)/,
+    value: (m) => Number(m[1]),
   },
 ]
 
@@ -396,6 +427,27 @@ const PALADIN_EXTRACTORS = [
     value: () => 0.01,
     caveat: 'Upstream omits the coefficient, which means 1.',
   },
+  /*
+   * Paladin's two hit/crit talents each grant the **spell** side as well, on the very next line
+   * upstream. Retribution never sees these -- it is scored on the physical path -- but Holy is, and
+   * a Holy Paladin taking Sanctified Seals is taking spell crit whether or not anything reads it.
+   */
+  {
+    talent: 'Sanctified Seals',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank (implied coefficient of 1 upstream)',
+    re: /AddStat\(stats\.SpellCrit,\s*core\.SpellCritRatingPerCritChance\*float64\(paladin\.Talents\.SanctifiedSeals\)\)/,
+    value: () => 0.01,
+    caveat: 'Upstream omits the coefficient, which means 1.',
+  },
+  {
+    talent: 'Precision',
+    kind: 'spellHitChance',
+    unit: 'fraction per rank (implied coefficient of 1 upstream)',
+    re: /AddStat\(stats\.SpellHit,\s*core\.SpellHitRatingPerHitChance\*float64\(paladin\.Talents\.Precision\)\)/,
+    value: () => 0.01,
+    caveat: 'Upstream omits the coefficient, which means 1.',
+  },
 ]
 
 const PALADIN_SKIPPED = [
@@ -405,6 +457,117 @@ const PALADIN_SKIPPED = [
   ['Crusade', 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
 ]
 
+/*
+ * The three pure caster classes, added once `calculateCasterDps` and `calculateHealing` could
+ * actually receive talents. Before that they were deliberately absent: this repo's recurring failure
+ * is shipping data nothing reads, and a Mage effect with no caster talent argument to reach would
+ * have been exactly that.
+ *
+ * What upstream offers them is narrow and uniform -- spell crit, spell damage, and the Spirit regen
+ * that keeps running mid-cast. Almost everything else a caster talent does is per-spell (Ignite,
+ * Shadow Weaving, improved-<nuke> lines) and lands on abilities this simulator models as one generic
+ * cast, so it is refused by name below rather than approximated.
+ */
+const MAGE_SOURCES = [{ path: 'sim/mage/talents.go', cache: 'sim_mage_talents.go' }]
+
+const MAGE_EXTRACTORS = [
+  {
+    talent: 'Arcane Instability',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.SpellCrit,\s*float64\(mage\.Talents\.ArcaneInstability\)\*([\d.]+)\*core\.SpellCritRatingPerCritChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Arcane Instability',
+    kind: 'spellDamageMultiplier',
+    unit: 'fraction per rank',
+    // The same talent grants crit and damage on consecutive lines. Two effects, one talent id.
+    re: /spellDamageMultiplier \+= float64\(mage\.Talents\.ArcaneInstability\) \* ([\d.]+)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Playing with Fire',
+    kind: 'spellDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /spellDamageMultiplier \+= float64\(mage\.Talents\.PlayingWithFire\) \* ([\d.]+)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Upstream applies this to all spell damage, not only Fire, and it is taken as written.',
+  },
+  {
+    talent: 'Arcane Meditation',
+    kind: 'spiritRegenWhileCasting',
+    unit: 'fraction of Spirit regen retained while casting, per rank',
+    re: /PseudoStats\.SpiritRegenRateCasting \+= float64\(mage\.Talents\.ArcaneMeditation\) \* ([\d.]+)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
+const MAGE_SKIPPED = [
+  ['Ignite / Combustion / Winters Chill', 'Per-spell and school-scoped; the simulator models one generic cast and records no spell school.'],
+  ['Arcane Power / Presence of Mind / Icy Veins', 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
+  ['Arcane Mind / Mind Mastery', 'Intellect scaling and Intellect-to-spell-power, which cascade through calculateStats instead.'],
+  ['Empowered Fireball / Frostbolt', 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
+]
+
+const PRIEST_SOURCES = [{ path: 'sim/priest/talents.go', cache: 'sim_priest_talents.go' }]
+
+const PRIEST_EXTRACTORS = [
+  {
+    talent: 'Force of Will',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.SpellCrit,\s*float64\(priest\.Talents\.ForceOfWill\)\*([\d.]+)\*core\.SpellCritRatingPerCritChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Meditation',
+    kind: 'spiritRegenWhileCasting',
+    unit: 'fraction of Spirit regen retained while casting, per rank',
+    // Note `=` rather than `+=`: upstream assigns for Priest and Druid, accumulates for Mage. It makes
+    // no difference at one source per class, and the pattern matches what is actually written.
+    re: /PseudoStats\.SpiritRegenRateCasting = float64\(priest\.Talents\.Meditation\) \* ([\d.]+)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
+const PRIEST_SKIPPED = [
+  ['Shadow Weaving / Misery', 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
+  ['Spiritual Guidance', 'Converts Spirit into spell power via a stat dependency, which belongs in calculateStats.'],
+  ['Inner Focus / Power Infusion', 'Timed cooldowns, which a closed-form model has no timeline to place.'],
+  ['Improved Renew / Empowered Healing', 'Per-spell coefficients; the healer path models one generic cast.'],
+]
+
+const WARLOCK_SOURCES = [{ path: 'sim/warlock/talents.go', cache: 'sim_warlock_talents.go' }]
+
+const WARLOCK_EXTRACTORS = [
+  {
+    talent: 'Backlash',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.SpellCrit,\s*float64\(warlock\.Talents\.Backlash\)\*([\d.]+)\*core\.SpellCritRatingPerCritChance\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Demonic Tactics',
+    kind: 'spellCritChance',
+    unit: 'fraction per rank',
+    // Upstream writes this to the generic `BonusCritRating`, which covers melee and spell alike. Only
+    // the spell half can matter to a Warlock, so it is recorded as spell crit rather than inventing a
+    // melee field no Warlock spec reads.
+    re: /PseudoStats\.BonusCritRating \+= float64\(warlock\.Talents\.DemonicTactics\) \* ([\d.]+) \* core\.SpellCritRatingPerCritChance/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Upstream writes generic BonusCritRating; taken as spell crit, which is the only half a Warlock uses.',
+  },
+]
+
+const WARLOCK_SKIPPED = [
+  ['Master Demonologist', 'Gated on which demon is summoned. No pet model here.'],
+  ['Fel Intellect / Fel Stamina', 'Stat dependencies into mana and health, which belong in calculateStats.'],
+  ['Improved Shadow Bolt / Ruin / Emberstorm', 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
+  ['Soul Leech / Nightfall', 'Proc-driven, needing a timeline.'],
+]
+
 const CLASSES = [
   { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: WARRIOR_EXTRACTORS, skipped: WARRIOR_SKIPPED },
   { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: ROGUE_EXTRACTORS, skipped: ROGUE_SKIPPED },
@@ -412,6 +575,9 @@ const CLASSES = [
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
   { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: DRUID_EXTRACTORS, skipped: DRUID_SKIPPED },
   { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: PALADIN_EXTRACTORS, skipped: PALADIN_SKIPPED },
+  { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: MAGE_EXTRACTORS, skipped: MAGE_SKIPPED },
+  { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: PRIEST_EXTRACTORS, skipped: PRIEST_SKIPPED },
+  { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: WARLOCK_EXTRACTORS, skipped: WARLOCK_SKIPPED },
 ]
 
 const effects = []

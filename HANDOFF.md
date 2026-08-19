@@ -65,6 +65,18 @@ forward-looking, not a bad ingest. Dropped, and the count exported as `excludedB
 is asserted rather than silent. See §"Findings" for both, and for why an item-level rule would have
 been wrong.
 
+**Talents then reached the caster and healer paths**, closing the item this file had listed as the
+top of the queue. `calculateCasterDps` and `calculateHealing` now take `TalentModifiers`, all nine
+classes are ingested (**30 → 44 effects**), and coverage goes **11 → 25 of 27 specs**. The plumbing
+went first on purpose: ingesting Mage effects with no caster talent argument to reach would have been
+this repo's signature failure, data wired to nothing.
+
+The gains are deliberately modest — **+1.5% to +7.6%** — because only the character-global half is
+expressible. Per-spell talents (Ignite, Shadow Weaving, Ruin) need a spell school and a per-spell
+coefficient, neither of which exists here, so **45 groups are refused by name**. The exception is
+**Meditation**, which changes what a *stat* is worth: it takes a Holy Priest's mid-cast regen from
+**11.6 to 24.6 mana/sec**, and Spirit stops pricing at zero.
+
 Then, on the owner's call, **main-hand and off-hand picks were separated into their own rankings.**
 A one-hander is catalogued `Main Hand` but is legal in either hand, so every one-hander the guide
 ranked under "Off Hand" was being filed as a main hand — a Fury warrior's Main Hand read
@@ -172,7 +184,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 127 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 128 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -242,6 +254,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | Target debuffs | 6, all unverified | **6**, each cited to a spell rank |
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
 | Talents | none | **579** across all 9 classes, 27 trees |
+| Talent *effects* | none | **44** across all 9 classes, reaching 25 of 27 specs |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
 | Icons | none, two-letter glyphs | **1,609 files** vendored, 2.8 MB — items, gems and talents |
 | Item effects | 14 curated, 0 ingested | **55 items**, 46 of 175 trinkets |
@@ -985,10 +998,34 @@ and each item here is a decision or a fresh piece of work.
 
 ### The work, in the order it is worth doing
 
-**Caster and healer talents are blocked on plumbing, not data.** `calculateCasterDps` and
-`calculateHealing` take no talent argument at all, so ingesting Mage, Priest or Warlock effects would
-produce data reaching nothing — the exact failure this session kept finding. **Do the plumbing
-first.** That covers **16 specs, not 9** — see the count correction below.
+~~**Caster and healer talents are blocked on plumbing, not data.**~~ **Done 2026-08-19.**
+`calculateCasterDps` and `calculateHealing` now take `TalentModifiers`, and all nine classes are
+ingested — **44 effects**, up from 30. Talents reach **25 of 27 specs**; the 2 Tank specs are the
+remaining gap, because `calculateTankSurvivability` still takes no talent argument.
+
+The plumbing came first deliberately, and the ingest second, because this repo's recurring failure is
+shipping data nothing reads — a Mage effect with no caster talent argument to reach would have been
+exactly that.
+
+**What the caster half carries is narrow, and saying so is the honest part.** Four kinds only: spell
+crit, spell hit, spell damage multiplier, and the Spirit regen that keeps running mid-cast. Measured
+gains are modest and should be: Mage Fire **+7.6%**, Druid Balance **+6.3%**, Warlock Destruction
+**+3.8%**, Shaman Elemental **+3.6%**, Priest Holy **+2.5%**, Priest Shadow **+2.4%**, Paladin Holy
+**+1.5%**. The larger half — Ignite, Shadow Weaving, Ruin, every "Improved &lt;nuke&gt;" line — is
+**per-spell**, and this simulator models one generic cast per spec and records no spell school, so
+**45 talent groups are refused by name** with a reason each rather than approximated.
+
+**The one that changes a stat's whole worth is Meditation.** wowsims gates Spirit regen during
+casting entirely behind `SpiritRegenRateCasting`, which comes only from talents — Meditation, Arcane
+Meditation, Intensity. Untalented it is exactly zero, which is why this project correctly priced
+Spirit at nothing for healers. With rank 3, a Holy Priest's mid-cast regen goes **11.6 → 24.6
+mana/sec**. The estimate's sentence about it is now *computed from the build* rather than written
+about the app: it used to say those talents "are not modelled", which was true when written and
+false the moment they were.
+
+**Two branches went unreachable and are kept as guards**, matching how `TalentsPanel` handles the
+same situation: `unmodelledTalentNoteFor`'s "this class has no ingested effects" path can no longer
+fire, and a test asserts it does not.
 
 **The "7 caster and 2 healer" figure was wrong wherever it appeared** (2026-08-18), which was this
 file twice, `featureFlags.ts` and a test comment. Counted from `getRoleForSpec` — the same source
@@ -1006,7 +1043,8 @@ time left in the fight — and **the mechanism is the entire content**. This sim
 at all. The recommendation is a per-spec closed-form extension on a short list, starting with Hunter
 (three specs, blocked only by an effect-type filter), not an ingest and not a general engine.
 
-**Protection Warrior’s tank path reads no talents.** Talents are applied in `calculatePhysicalDps`,
+**The tank path is now the only one that reads no talents** — and with the caster and healer halves
+closed, it is the whole of the remaining gap rather than one of three. Talents are applied in `calculatePhysicalDps`,
 and a tank is scored by `calculateTankSurvivability`. A test pins this so it reads as a decision. The
 seven formulas are already surveyed in §1.
 
@@ -1052,11 +1090,12 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   `deriveTalentModifiers` never changed. Largest gain is Hunter Beast Mastery **106.1 → 148.1
   (+39.6%)**, because **Serpent's Swiftness is +4% ranged attack speed a rank**.
 
-  **The other 16 specs are a different gap, and conflating them would be a mistake.** Those paths —
-  caster, healer and tank — take no talent argument at all, so ingesting their effects would produce
-  data reaching nothing, the exact failure this session kept finding. The estimate tells those
-  players so directly instead. (This paragraph said "7 caster and 2 healer" until 2026-08-18; the
-  real split is 9 Caster DPS, 5 Healer, 2 Tank, and it is asserted now rather than written.)
+  **Stage 3 closed the caster and healer half on 2026-08-19**, taking the ingest to **44 effects
+  across all nine classes** and coverage to **25 of 27 specs**. The paragraph that used to sit here
+  said those paths "take no talent argument at all" — true when written, and the reason the plumbing
+  went first. Only the **2 Tank specs** remain, because `calculateTankSurvivability` still takes none.
+  (This paragraph also said "7 caster and 2 healer" until 2026-08-18; the real split is 9 Caster DPS,
+  5 Healer, 2 Tank, and it is asserted now rather than written.)
 
   **Shared talent names across classes are real, and not always the same effect.** Three classes have
   a **Precision** (Warrior max 3, Rogue max 5, Paladin max 3 — same effect, different caps). Warrior

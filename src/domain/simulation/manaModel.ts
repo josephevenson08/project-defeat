@@ -32,9 +32,11 @@ export function mp5RegenPerSecond(mp5: number): number {
 /**
  * Spirit-driven regen, per second, **while not casting**.
  *
- * Exported and tested because it is the number Spirit is worth *if* the talents that let it run
- * during casting are ever modelled. Nothing in the healing estimate uses it today, deliberately: a
- * healer casting continuously gets none of it.
+ * This used to carry a note saying nothing consumed it, because the talents that let it run during
+ * casting were not modelled. They are now — Meditation, Arcane Meditation and Intensity all reach
+ * `TalentModifiers.spiritRegenWhileCasting` — so `computeManaBudget` takes a share of this figure.
+ * Untalented that share is still exactly zero, which is the real TBC behaviour rather than a
+ * shortcut, and it remains the reason Spirit prices at nothing for a healer with no points in it.
  */
 export function spiritRegenPerSecond(spirit: number, intellect: number): number {
   return 0.001 + spirit * Math.sqrt(intellect) * 0.009327
@@ -55,8 +57,10 @@ export function manaFromIntellect(intellect: number): number {
 export type ManaBudget = {
   /** Mana leaving the pool each second at the modelled cast rate. */
   spentPerSecond: number
-  /** Mana returning each second while casting — MP5 only, untalented. */
+  /** Mana returning each second while casting — MP5, plus the talented share of Spirit regen. */
   regenPerSecond: number
+  /** The Spirit-driven part of `regenPerSecond`. Exactly 0 without Meditation or an equivalent. */
+  spiritRegenPerSecond: number
   /** How far short the regen falls. Zero when the rate is genuinely sustainable. */
   deficitPerSecond: number
   /**
@@ -76,14 +80,34 @@ export function computeManaBudget(options: {
   castsPerSecond: number
   healPerCast: number
   mp5: number
+  spirit?: number
+  intellect?: number
+  /**
+   * Share of Spirit regen that keeps running while casting, from talents. Defaults to 0, which is
+   * both the untalented truth and what every caller passed before this existed.
+   */
+  spiritRegenWhileCasting?: number
 }): ManaBudget {
   const spentPerSecond = options.manaCostPerCast * options.castsPerSecond
-  const regenPerSecond = mp5RegenPerSecond(options.mp5)
+
+  /*
+   * The talented half of regen. wowsims gates Spirit regen during casting entirely behind
+   * `SpiritRegenRateCasting`, so with no points this term is exactly zero and the budget is MP5
+   * alone — which is what it always was. Rank 3 Meditation retains 30% of it.
+   */
+  const spiritShare = options.spiritRegenWhileCasting ?? 0
+  const spiritPart =
+    spiritShare > 0 && options.spirit && options.intellect
+      ? spiritRegenPerSecond(options.spirit, options.intellect) * spiritShare
+      : 0
+
+  const regenPerSecond = mp5RegenPerSecond(options.mp5) + spiritPart
   const deficitPerSecond = Math.max(0, spentPerSecond - regenPerSecond)
 
   return {
     spentPerSecond,
     regenPerSecond,
+    spiritRegenPerSecond: spiritPart,
     deficitPerSecond,
     sustainableFraction: spentPerSecond > 0 ? Math.min(1, regenPerSecond / spentPerSecond) : 1,
     healingPerMana: options.manaCostPerCast > 0 ? options.healPerCast / options.manaCostPerCast : 0,

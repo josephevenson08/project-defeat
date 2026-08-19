@@ -169,9 +169,11 @@ function unmodelledTalentNoteFor(
   if (pointsSpent === 0) return undefined
 
   /*
-   * The louder case, and the one that was silent: this class has no ingested talent effects at all,
-   * so every point spent changes the estimate by exactly nothing. A Mage could spend all 41 and watch
-   * the number not move, with no way to learn why.
+   * **Unreachable as of 2026-08-19, and kept as a guard** — the same treatment `TalentsPanel` gives
+   * its "class has no talents yet" path. All nine classes now carry ingested effects, so no class can
+   * take this branch. It was the loud case while it lasted: a Mage could spend all 41 points and watch
+   * the number not move, with nothing on screen to explain why. Deleting it would remove the safety
+   * net for a tenth class or a failed ingest, either of which should say this rather than go silent.
    */
   if (!classHasTalentEffects(character.className)) {
     return (
@@ -749,16 +751,30 @@ function calculateCasterDps(
   stats: StatBlock,
   target: SimulationTarget,
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
+  talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
 ): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_NUKE_CAST_TIME)
   const levelDiff = target.level - PLAYER_LEVEL
-  const spellHitChance = computeSpellHitChance(levelDiff, ratingToFraction(stats.spellHitRating, RATING_PER_PERCENT.spellHit))
-  const spellCritChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit)) + debuffs.spellCritTakenBonus
+  /*
+   * Talent hit joins the *rating-derived* figure rather than the finished chance, because
+   * `computeSpellHitChance` floors miss at 1% and talent hit has to sit on the same side of that
+   * floor. Added to the result instead, a hit-capped caster would be pushed past 100%.
+   */
+  const spellHitChance = computeSpellHitChance(
+    levelDiff,
+    ratingToFraction(stats.spellHitRating, RATING_PER_PERCENT.spellHit) + talents.spellHitChance,
+  )
+  const spellCritChance =
+    computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit) + talents.spellCritChance) +
+    debuffs.spellCritTakenBonus
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
-  const damagePerCast = (cast.baseAmount + stats.spellPower * cast.coefficient) * (1 + debuffs.spellDamageTakenMultiplier)
+  const damagePerCast =
+    (cast.baseAmount + stats.spellPower * cast.coefficient) *
+    (1 + debuffs.spellDamageTakenMultiplier) *
+    talents.spellDamageMultiplier
   const expectedDamagePerCast = damagePerCast * (1 + spellCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
   const dps = expectedDamagePerCast * spellHitChance * castsPerSecond
 
@@ -786,12 +802,19 @@ function calculateCasterDps(
   }
 }
 
-function calculateHealing(character: CharacterProfile, stats: StatBlock, unmodelledTalentNote?: string): SimulationResult {
+function calculateHealing(
+  character: CharacterProfile,
+  stats: StatBlock,
+  talents: TalentModifiers = noTalentModifiers,
+  unmodelledTalentNote?: string,
+): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_HEAL_CAST_TIME)
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
-  const critChance = computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit))
+  const critChance = computeSpellCritChance(
+    ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit) + talents.spellCritChance,
+  )
   const healPerCast = cast.baseAmount + stats.healingPower * cast.coefficient
   const expectedHealPerCast = healPerCast * (1 + critChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
   const hps = expectedHealPerCast * castsPerSecond
@@ -814,7 +837,18 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock, unmodel
    * any statement that the rate costs more than it earns, and by how much.
    */
   const manaCost = cast.ability?.resource?.type === 'Mana' ? cast.ability.resource.cost : 0
-  const mana = manaCost > 0 ? computeManaBudget({ manaCostPerCast: manaCost, castsPerSecond, healPerCast: expectedHealPerCast, mp5: stats.mp5 }) : undefined
+  const mana =
+    manaCost > 0
+      ? computeManaBudget({
+          manaCostPerCast: manaCost,
+          castsPerSecond,
+          healPerCast: expectedHealPerCast,
+          mp5: stats.mp5,
+          spirit: stats.spirit,
+          intellect: stats.intellect,
+          spiritRegenWhileCasting: talents.spiritRegenWhileCasting,
+        })
+      : undefined
 
   if (mana) {
     breakdown.push(
@@ -825,10 +859,22 @@ function calculateHealing(character: CharacterProfile, stats: StatBlock, unmodel
     )
   }
 
+  /*
+   * Spirit's worth is a fact about the *build*, not about the app, and that is the whole reason this
+   * sentence is computed rather than written. It used to say Spirit "prices near zero here" because
+   * Meditation and its equivalents "are not modelled" — true when written, false the moment they
+   * were, and precisely the rot this repo keeps finding. Now it reports which case the player is in.
+   */
+  const spiritNote = mana
+    ? mana.spiritRegenPerSecond > 0
+      ? ` Meditation and its equivalents keep ${toPercent(talents.spiritRegenWhileCasting)}% of Spirit regen running while casting, worth ${round(mana.spiritRegenPerSecond)} mana/sec of the figure above.`
+      : ' With no points in Meditation or its equivalents, none of your Spirit regen continues while casting, so MP5 is the whole of it and Spirit is worth nothing to this number — real TBC, not a gap in the model.'
+    : ''
+
   const manaNote = mana
     ? mana.deficitPerSecond > 0
-      ? ` **This rate is not sustainable.** ${cast.label} costs ${manaCost} mana and at ${round(castsPerSecond)} casts/sec that is ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained — a shortfall of ${round(mana.deficitPerSecond)}/sec, so regen alone funds ${toPercent(mana.sustainableFraction)}% of it. Note that while casting, an untalented healer regenerates from MP5 only: Spirit's contribution is gated behind Meditation and its equivalents, which are not modelled, so Spirit prices near zero here. How long you last before running dry is deliberately not given — that needs a mana pool, and class base mana is not in the pinned source.`
-      : ` At ${round(castsPerSecond)} casts/sec this costs ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained, so it is sustainable indefinitely.`
+      ? ` **This rate is not sustainable.** ${cast.label} costs ${manaCost} mana and at ${round(castsPerSecond)} casts/sec that is ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained — a shortfall of ${round(mana.deficitPerSecond)}/sec, so regen alone funds ${toPercent(mana.sustainableFraction)}% of it.${spiritNote} How long you last before running dry is deliberately not given — that needs a mana pool, and class base mana is not in the pinned source.`
+      : ` At ${round(castsPerSecond)} casts/sec this costs ${round(mana.spentPerSecond)} mana/sec against ${round(mana.regenPerSecond)} regained, so it is sustainable indefinitely.${spiritNote}`
     : ' Mana is not modelled for this spec — its signature ability records no mana cost.'
 
   const summary = cast.ability
@@ -1005,19 +1051,20 @@ export function calculateSimulation(
   talentPoints: TalentPoints = {},
 ): SimulationResult {
   const debuffs = aggregateTargetDebuffs(activeTargetDebuffIds)
-  // `talentEffects.json` covers six classes — Warrior, Rogue, Hunter, Shaman, Druid, Paladin — which
-  // is every class holding a Physical DPS spec. A spec with no ingested effects derives the identity
-  // modifiers, so this is a no-op elsewhere rather than a wrong answer.
+  // `talentEffects.json` covers all nine classes. A talent with no ingested effect derives the
+  // identity modifiers, so an unmodelled one contributes nothing rather than a wrong answer, and the
+  // ingest reports every talent group it refused and why.
   //
-  // Only `calculatePhysicalDps` below is handed the result. The caster, healer and tank paths take no
-  // talent argument at all, so widening coverage means changing those signatures first, not ingesting
-  // more effects — data reaching nothing is the failure this repo keeps rediscovering.
+  // Three of the four paths below now receive this. **The tank path still does not** — a Protection
+  // Warrior is scored by `calculateTankSurvivability`, which never takes it, so Toughness, Vitality,
+  // Anticipation and the shield talents reach nothing. That is the remaining honest gap, and a test
+  // pins it so it reads as a decision rather than an oversight.
   const talents = deriveTalentModifiers(talentPoints)
 
   const talentNote = unmodelledTalentNoteFor(character, talentPoints, role)
 
-  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talentNote)
-  if (role === 'Healer') return calculateHealing(character, stats, talentNote)
+  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote)
+  if (role === 'Healer') return calculateHealing(character, stats, talents, talentNote)
   if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talentNote)
   return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote)
 }

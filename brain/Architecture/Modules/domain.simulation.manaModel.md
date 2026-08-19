@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/manaModel.ts
-lines: 92
+lines: 116
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.manaModel
 
-`src/domain/simulation/manaModel.ts` · **domain** layer · 92 lines
+`src/domain/simulation/manaModel.ts` · **domain** layer · 116 lines
 
 From the top of the file:
 

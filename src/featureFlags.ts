@@ -33,10 +33,15 @@
  *   are a single-ability approximation, which understates any spec whose damage is spread across
  *   several buttons. This is the largest remaining gap and the main reason the estimate reads as
  *   indicative. See ROTATION-SCOPE.md.
- * - **Talents reach 11 specs of 27, and only the Physical DPS ones.** All 11 are covered, across six
- *   classes. The other 16 — 9 Caster DPS, 5 Healer, 2 Tank — reach `calculateCasterDps`,
- *   `calculateHealing` and `calculateTankSurvivability`, none of which take a talent argument at all.
- *   Those specs are told so on the tab rather than being quietly scored as if untalented were normal.
+ * - **Talents reach 25 specs of 27.** All nine classes are ingested — 44 effects — and the caster and
+ *   healer paths take them as of 2026-08-19. What they carry is narrow but real: spell crit, spell
+ *   hit, spell damage, and the Spirit regen that keeps running mid-cast. **The 2 Tank specs are the
+ *   remaining gap**, because a tank is scored by `calculateTankSurvivability`, which still takes no
+ *   talent argument, so Toughness, Vitality and the shield talents reach nothing. Asserted.
+ * - **What caster talents do *not* cover is the per-spell half**, and it is the larger half. Ignite,
+ *   Shadow Weaving, Ruin and every "Improved &lt;nuke&gt;" line modify one spell; this simulator models
+ *   one generic cast per spec and records no spell school, so 45 talent groups are refused by name
+ *   with a reason each rather than approximated. Expect a talented caster estimate to read low.
  * - **Melee DPS still reads low, and the remaining cause is rage income, not talents.** A talented
  *   Fury warrior's income is asserted to sit **above the 3.4/sec an untalented one makes and below
  *   the 7.5 Bloodthirst and Whirlwind want** — a band rather than a point, so verification work does
