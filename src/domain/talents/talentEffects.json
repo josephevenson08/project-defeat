@@ -29,7 +29,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 44,
+  "effectCount": 49,
   "effects": [
     {
       "className": "Warrior",
@@ -156,6 +156,39 @@
       "perRank": 0.16666666666666666,
       "caveat": "Assumes Berserker Rage is pressed on cooldown, which is what upstream does whenever rage is under 80. 5 rage per rank on a 30s cooldown.",
       "source": "sim/warrior/berserker_rage.go"
+    },
+    {
+      "className": "Warrior",
+      "talentId": 130,
+      "talent": "Deflection",
+      "tree": "Arms",
+      "maxRank": 5,
+      "kind": "parryChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "className": "Warrior",
+      "talentId": 138,
+      "talent": "Anticipation",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "defenseSkill",
+      "unit": "Defense skill points per rank",
+      "perRank": 4,
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "className": "Warrior",
+      "talentId": 1601,
+      "talent": "Shield Specialization",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "blockChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/warrior/talents.go"
     },
     {
       "className": "Rogue",
@@ -432,6 +465,28 @@
     },
     {
       "className": "Paladin",
+      "talentId": 1403,
+      "talent": "Deflection",
+      "tree": "Retribution",
+      "maxRank": 5,
+      "kind": "parryChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1629,
+      "talent": "Anticipation",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "defenseSkill",
+      "unit": "Defense skill points per rank",
+      "perRank": 4,
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
       "talentId": 1630,
       "talent": "Precision",
       "tree": "Protection",
@@ -576,8 +631,18 @@
     },
     {
       "className": "Warrior",
-      "talent": "Toughness / Vitality / Anticipation / Deflection / Defiance / Shield Mastery / Shield Specialization",
-      "reason": "Tank talents. Expressible, but out of scope for a pass whose falsification test is a Fury DPS number."
+      "talent": "Toughness / Vitality",
+      "reason": "Multiply armour, stamina and strength, which calculateStats owns. Taking them means talents reaching the always-visible stat rail, gear rankings and the upgrade finder — a product decision reserved for the repo owner, not an ingest."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Defiance",
+      "reason": "Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player's own attack table."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Shield Mastery",
+      "reason": "Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change."
     },
     {
       "className": "Rogue",
@@ -698,6 +763,16 @@
       "className": "Paladin",
       "talent": "Crusade",
       "reason": "Gated on the target being a humanoid, demon, undead or elemental. No mob type here."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Toughness",
+      "reason": "Multiplies item armour, which calculateStats owns — the same reason Warrior's is refused. Reaching it is a product decision about the stat rail, not an ingest."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Shield Specialization",
+      "reason": "Paladin's raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change."
     },
     {
       "className": "Mage",

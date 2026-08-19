@@ -33,15 +33,18 @@
  *   are a single-ability approximation, which understates any spec whose damage is spread across
  *   several buttons. This is the largest remaining gap and the main reason the estimate reads as
  *   indicative. See ROTATION-SCOPE.md.
- * - **Talents reach 25 specs of 27.** All nine classes are ingested — 44 effects — and the caster and
- *   healer paths take them as of 2026-08-19. What they carry is narrow but real: spell crit, spell
- *   hit, spell damage, and the Spirit regen that keeps running mid-cast. **The 2 Tank specs are the
- *   remaining gap**, because a tank is scored by `calculateTankSurvivability`, which still takes no
- *   talent argument, so Toughness, Vitality and the shield talents reach nothing. Asserted.
- * - **What caster talents do *not* cover is the per-spell half**, and it is the larger half. Ignite,
- *   Shadow Weaving, Ruin and every "Improved &lt;nuke&gt;" line modify one spell; this simulator models
- *   one generic cast per spec and records no spell school, so 45 talent groups are refused by name
- *   with a reason each rather than approximated. Expect a talented caster estimate to read low.
+ * - **Talents reach all 27 specs.** All nine classes are ingested — 49 effects — and every one of the
+ *   four role paths takes them as of 2026-08-19. Each reads only its own fields, which is asserted in
+ *   both directions: a Shaman's melee talent must move an Elemental score by exactly nothing, and a
+ *   Warrior's Cruelty must not move Effective Health.
+ * - **What that does *not* mean is that talents are fully modelled**, and the difference matters more
+ *   than the coverage figure. **49 talent groups are refused by name**, each with a reason. Two kinds
+ *   dominate. The **per-spell** ones — Ignite, Shadow Weaving, Ruin, every "Improved &lt;nuke&gt;" — need
+ *   a spell school and a per-spell coefficient, and this simulator models one generic cast per spec
+ *   and records no school at all. The **stat-pipeline** ones — Toughness, Vitality, Divine Strength —
+ *   multiply armour, stamina and strength, which `calculateStats` owns; routing talents there would
+ *   move the always-visible stat rail, the gear rankings and the upgrade finder, and that is a
+ *   product decision deliberately left to the repo owner. Expect a talented estimate to read low.
  * - **Melee DPS still reads low, and the remaining cause is rage income, not talents.** A talented
  *   Fury warrior's income is asserted to sit **above the 3.4/sec an untalented one makes and below
  *   the 7.5 Bloodthirst and Whirlwind want** — a band rather than a point, so verification work does

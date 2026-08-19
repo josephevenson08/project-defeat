@@ -184,15 +184,33 @@ function unmodelledTalentNoteFor(
   }
 
   /*
-   * Tanks receive no talents at all — they are applied in `calculatePhysicalDps`, and a tank is
-   * scored by `calculateTankSurvivability`. Listing only the *skipped* talents here would imply the
-   * rest are counted, which is the precise kind of wrong caveat this file keeps having to correct.
+   * The tank message used to say Effective Health read no talents at all. As of 2026-08-19 it reads
+   * three — Anticipation, Deflection and Shield Specialization — and the remaining gap is a *specific*
+   * one worth naming rather than a blanket absence, because the reason is a product decision rather
+   * than missing work: Toughness and Vitality multiply armour and stamina, which `calculateStats`
+   * owns, and routing talents there would move the always-visible stat rail, the gear rankings and
+   * the upgrade finder.
+   *
+   * Falling through to the generic per-build note would be wrong here — that one says the listed
+   * talents are "spent but not modelled", implying everything unlisted is counted, and for a tank the
+   * unlisted set includes the two biggest survivability talents in the tree.
    */
   if (role === 'Tank') {
+    /*
+     * Named per class rather than as a fixed list, because the two tanks genuinely differ: Warrior's
+     * Shield Specialization raises block **chance**, which the incoming-attack table rolls, while
+     * Paladin's talent of the same name raises block **value**, which the table does not model at
+     * all. Listing it for a Paladin would be a wrong caveat of exactly the kind this file keeps
+     * having to correct — and it would be wrong in the confident direction.
+     */
+    const read =
+      character.className === 'Warrior'
+        ? 'Anticipation, Deflection and Shield Specialization'
+        : 'Anticipation and Deflection'
     return (
-      `Effective Health does not read talents at all yet, so the ${pointsSpent} points spent here change ` +
-      'nothing. Toughness, Vitality, Anticipation, Defiance and the shield talents are all extractable — ' +
-      'the gap is that talents are applied on the damage path only.'
+      `Effective Health reads ${read}, which is where most of a tank tree's avoidance lives. Toughness ` +
+      'and Vitality are not counted: they multiply armour and stamina, and talents do not reach the stat ' +
+      'pipeline those come from — so this figure is low by whatever those two are worth to you.'
     )
   }
 
@@ -917,10 +935,18 @@ function calculateTankSurvivability(
   gear: EquippedGear,
   stats: StatBlock,
   target: SimulationTarget,
+  talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
 ): SimulationResult {
   const baseline = buildDefenderAvoidanceBaseline(target.level)
-  const defenseSkillPoints = stats.defenseRating / DEFENSE_RATING_PER_SKILL_POINT
+  /*
+   * Anticipation is added as **skill points**, alongside the figure derived from rating, for the same
+   * reason `expertiseSkillPoints` is: upstream grants it in points and the table converts rating to
+   * points anyway. It is much the most valuable of the three tank talents modelled, because a single
+   * Defense skill point moves miss, dodge, parry, block *and* the boss's crit chance at once — which
+   * is exactly why it is added here, before `fromDefense` is derived, rather than to one term.
+   */
+  const defenseSkillPoints = stats.defenseRating / DEFENSE_RATING_PER_SKILL_POINT + talents.defenseSkillPoints
   // One Defense Skill point moves each outcome by the same 0.04%, so this is added to every
   // avoidance term separately rather than summed once and scaled. The old code multiplied a single
   // combined bonus by 3, which happened to land near the right total while making the per-outcome
@@ -936,13 +962,18 @@ function calculateTankSurvivability(
 
   const canParry = PARRY_CAPABLE_CLASSES.has(character.className)
   const parryChance = canParry
-    ? Math.max(0, baseline.parry + ratingToFraction(stats.parryRating, RATING_PER_PERCENT.parry) + fromDefense)
+    ? Math.max(0, baseline.parry + ratingToFraction(stats.parryRating, RATING_PER_PERCENT.parry) + fromDefense + talents.parryChance)
     : 0
 
-  // Block is unavailable without a shield no matter how much block rating is stacked.
+  /*
+   * Block is unavailable without a shield no matter how much block rating is stacked — and Shield
+   * Specialization is inside that gate deliberately. A Protection Warrior who unequips the shield
+   * loses the talent's benefit too, which is what the game does and what the surrounding rule
+   * already encodes for rating.
+   */
   const hasShield = gear['Off Hand']?.item.weaponType === 'Shield'
   const blockChance = hasShield
-    ? Math.max(0, baseline.block + ratingToFraction(stats.blockRating, RATING_PER_PERCENT.block) + fromDefense)
+    ? Math.max(0, baseline.block + ratingToFraction(stats.blockRating, RATING_PER_PERCENT.block) + fromDefense + talents.blockChance)
     : 0
 
   // A swing that misses is avoided damage exactly as a dodge is, so it belongs in the total. The
@@ -1065,6 +1096,6 @@ export function calculateSimulation(
 
   if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote)
   if (role === 'Healer') return calculateHealing(character, stats, talents, talentNote)
-  if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talentNote)
+  if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talents, talentNote)
   return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote)
 }

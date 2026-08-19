@@ -150,6 +150,42 @@ const WARRIOR_EXTRACTORS = [
     caveat:
       'Assumes Berserker Rage is pressed on cooldown, which is what upstream does whenever rage is under 80. 5 rage per rank on a 30s cooldown.',
   },
+  /*
+   * The tank three, added once `calculateTankSurvivability` could receive talents. All land inside
+   * that function's own arithmetic, which is what makes them safe to take: Anticipation moves the
+   * Defense skill figure the table already derives from rating, and the other two move a single
+   * avoidance term each.
+   *
+   * Toughness and Vitality are deliberately NOT here. They multiply armour, stamina and strength,
+   * which `calculateStats` owns — reaching them means talents reaching the always-visible stat rail,
+   * gear rankings and the upgrade finder, which is a product decision this repo has explicitly
+   * reserved for its owner. They are refused by name below with that reason.
+   */
+  {
+    talent: 'Deflection',
+    kind: 'parryChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.Parry,\s*core\.ParryRatingPerParryChance\*([\d.]+)\*float64\(warrior\.Talents\.Deflection\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Anticipation',
+    kind: 'defenseSkill',
+    unit: 'Defense skill points per rank',
+    // The most valuable of the three by a distance: one Defense skill point moves miss, dodge, parry,
+    // block AND the boss's crit chance, all at once.
+    re: /AddStat\(stats\.Defense,\s*core\.DefenseRatingPerDefense\*([\d.]+)\*float64\(warrior\.Talents\.Anticipation\)\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Shield Specialization',
+    kind: 'blockChance',
+    unit: 'fraction per rank',
+    // Warrior's raises block CHANCE. Paladin's talent of the same name raises block VALUE, which this
+    // model does not track at all, so it is refused there rather than mapped onto this field.
+    re: /AddStat\(stats\.Block,\s*core\.BlockRatingPerBlockChance\*([\d.]+)\*float64\(warrior\.Talents\.ShieldSpecialization\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
 ]
 
 /*
@@ -165,7 +201,9 @@ const WARRIOR_SKIPPED = [
   ['Blood Frenzy', 'A debuff on the target rather than a change to the player.'],
   ['Mace/Sword/Poleaxe Specialization', 'Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet.'],
   ['Impale', 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
-  ['Toughness / Vitality / Anticipation / Deflection / Defiance / Shield Mastery / Shield Specialization', 'Tank talents. Expressible, but out of scope for a pass whose falsification test is a Fury DPS number.'],
+  ['Toughness / Vitality', 'Multiply armour, stamina and strength, which calculateStats owns. Taking them means talents reaching the always-visible stat rail, gear rankings and the upgrade finder — a product decision reserved for the repo owner, not an ingest.'],
+  ['Defiance', 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
+  ['Shield Mastery', 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
 ]
 
 const ROGUE_SOURCES = [{ path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' }]
@@ -441,6 +479,20 @@ const PALADIN_EXTRACTORS = [
     caveat: 'Upstream omits the coefficient, which means 1.',
   },
   {
+    talent: 'Deflection',
+    kind: 'parryChance',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.Parry,\s*core\.ParryRatingPerParryChance\*([\d.]+)\*float64\(paladin\.Talents\.Deflection\)\)/,
+    value: (m) => Number(m[1]) / 100,
+  },
+  {
+    talent: 'Anticipation',
+    kind: 'defenseSkill',
+    unit: 'Defense skill points per rank',
+    re: /AddStat\(stats\.Defense,\s*core\.DefenseRatingPerDefense\*([\d.]+)\*float64\(paladin\.Talents\.Anticipation\)\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
     talent: 'Precision',
     kind: 'spellHitChance',
     unit: 'fraction per rank (implied coefficient of 1 upstream)',
@@ -455,6 +507,8 @@ const PALADIN_SKIPPED = [
   ['Spell Warding / Improved Righteous Fury', 'Damage-taken reduction; no incoming-damage stream on the damage path.'],
   ['Vengeance / Sanctity Aura', 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
   ['Crusade', 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
+  ['Toughness', 'Multiplies item armour, which calculateStats owns — the same reason Warrior\'s is refused. Reaching it is a product decision about the stat rail, not an ingest.'],
+  ['Shield Specialization', 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
 ]
 
 /*

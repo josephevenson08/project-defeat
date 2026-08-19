@@ -3661,7 +3661,7 @@ test('nothing reachable offers gear from a later phase than this planner covers'
   expect(phaseIssue!.message).not.toMatch(/isn't legal for/)
 })
 
-test('talents reach every caster and healer spec, and still not the tank', () => {
+test('talents reach all 27 specs, and each role path reads only its own fields', () => {
   /*
    * This test used to assert the exact opposite, and that is the point of it.
    *
@@ -3715,34 +3715,41 @@ test('talents reach every caster and healer spec, and still not the tank', () =>
   ).toBe(scoreFor('Shaman', 'Elemental', 'Caster DPS', {}))
 
   /*
-   * The tank path is the one that genuinely still receives nothing, and it is a decision rather than
-   * an oversight: talents are applied in `calculatePhysicalDps`, and a tank is scored by
-   * `calculateTankSurvivability`. Kept asserted so the remaining gap stays visible now that the
-   * caster and healer halves have closed.
+   * Both tanks now respond too, which closes the last of the four paths. Anticipation is the fixture
+   * because it is the one that moves everything: a Defense skill point shifts miss, dodge, parry,
+   * block and the boss's crit chance at once.
    */
-  const protPoints = { [idOf('Warrior', 'Cruelty')]: 5 }
-  expect(deriveTalentModifiers(protPoints)).not.toEqual(noTalentModifiers)
+  for (const className of ['Warrior', 'Paladin'] as const) {
+    const points = { [idOf(className, 'Anticipation')]: 5, [idOf(className, 'Deflection')]: 5 }
+    expect(
+      scoreFor(className, 'Protection', 'Tank', points),
+      `${className} Protection must benefit from its avoidance talents`,
+    ).toBeGreaterThan(scoreFor(className, 'Protection', 'Tank', {}))
+  }
+
+  /*
+   * And the routing check on the tank side: a pure DPS talent must move a tank score by exactly
+   * nothing. Cruelty is melee crit, which the survivability table never rolls.
+   */
+  const cruelty = { [idOf('Warrior', 'Cruelty')]: 5 }
+  expect(deriveTalentModifiers(cruelty)).not.toEqual(noTalentModifiers)
   expect(
-    scoreFor('Warrior', 'Protection', 'Tank', protPoints),
-    'the tank path still does not receive talents — see the ingest\'s skipped list',
+    scoreFor('Warrior', 'Protection', 'Tank', cruelty),
+    'a melee crit talent must not move Effective Health',
   ).toBe(scoreFor('Warrior', 'Protection', 'Tank', {}))
 
   /*
-   * The figure `featureFlags.ts` quotes, computed rather than trusted. Talents reach every spec whose
-   * role is not Tank, so the count is the split itself — and every class is ingested, so no spec is
-   * excluded for want of data any more.
+   * The figure `featureFlags.ts` quotes, computed rather than trusted. Every class is ingested and
+   * every one of the four role paths now takes `TalentModifiers`, so the count is all 27.
    */
-  const reached: string[] = []
-  const blind: string[] = []
+  let specs = 0
   for (const entry of tbcClasses) {
-    for (const spec of entry.specs) {
-      const target = getRoleForSpec(entry.className, spec) === 'Tank' ? blind : reached
-      target.push(`${entry.className} ${spec}`)
+    for (const _spec of entry.specs) {
+      specs++
       expect(classHasTalentEffects(entry.className), `${entry.className} must have ingested effects`).toBe(true)
     }
   }
-  expect(reached, 'the "25 specs of 27" figure featureFlags.ts quotes').toHaveLength(25)
-  expect([...blind].sort(), 'and the two that cannot, both tanks').toEqual(['Paladin Protection', 'Warrior Protection'])
+  expect(specs, 'the "27 specs of 27" figure featureFlags.ts quotes').toBe(27)
 })
 
 test('Meditation is what makes Spirit worth anything to a healer, and the estimate says which case it is in', () => {
@@ -4287,18 +4294,18 @@ test('the estimate names unmodelled talents you actually took, and stays quiet o
   expect(note, 'and it should say which way the estimate is wrong').toMatch(/low by/i)
 })
 
-test('talent scaling covers both Warrior DPS specs, and deliberately not the tank', () => {
+test('talent scaling covers both Warrior DPS specs, and the tank reads its own', () => {
   /*
    * The scope described stage 1 as "Fury Warrior". Arms gets it free, and that is worth pinning
    * rather than leaving as a happy accident: `deriveTalentModifiers` is keyed by **talent id**, and
    * `warriorTalents.json` carries all three trees, so any spec that shares the class shares the
    * effects. Nothing about the mechanism is Fury-specific.
    *
-   * Protection is the honest gap. Talents are applied in `calculatePhysicalDps`, and a Protection
-   * Warrior is scored by `calculateTankSurvivability`, which never receives them — so Toughness,
-   * Vitality, Anticipation, Defiance and the shield talents all reach nothing. The ingest already
-   * refuses them by name with that reason, so the data side is consistent; it is the application
-   * side that stops at the DPS path.
+   * Protection used to be the honest gap, and this test asserted it received nothing at all. Since
+   * 2026-08-19 `calculateTankSurvivability` takes talents too, so the assertion below flipped: a
+   * *DPS* talent must still not move a tank score, which is the sharper claim. Toughness and Vitality
+   * remain uncounted, but for a stated reason — they multiply armour and stamina, which
+   * `calculateStats` owns — rather than because the path is blind.
    */
   const talents = getTalentData('Warrior')!
   const byName = new Map<string, number>()
@@ -4328,12 +4335,22 @@ test('talent scaling covers both Warrior DPS specs, and deliberately not the tan
     expect(talented, `${spec} must benefit from talents`).toBeGreaterThan(bare)
   }
 
-  // Protection is scored as a tank, and the tank path takes no talents. Asserted so the gap is a
-  // recorded decision rather than something a future reader assumes is already handled.
+  /*
+   * The DPS points above are Cruelty, Flurry and the rage talents — none of which the survivability
+   * table rolls. A tank scored with them must not move at all, which is what proves the fields are
+   * routed by destination rather than summed into one number.
+   */
   expect(
     scoreFor('Protection', 'Tank', points),
-    'the tank path does not receive talents yet — see the ingest\'s skipped list',
+    'DPS talents must not move Effective Health — the tank reads its own fields',
   ).toBe(scoreFor('Protection', 'Tank', {}))
+
+  // And the talents it *does* read must move it, or the line above passes for the wrong reason.
+  const anticipation = talents.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === 'Anticipation')!
+  expect(
+    scoreFor('Protection', 'Tank', { [anticipation.id]: 5 }),
+    'Anticipation is Defense skill, which the tank table does roll',
+  ).toBeGreaterThan(scoreFor('Protection', 'Tank', {}))
 })
 
 test('Rogue talents are ingested per class, and two classes can share a talent name safely', () => {
@@ -4437,10 +4454,22 @@ test('every role says what talents do for it, and the tank message is not the DP
   expect(mage).toMatch(/spent but not modelled/i)
 
   // The tank gets its own message, naming the real reason.
+  /*
+   * The tank message now names what it *does* read and what it does not, rather than claiming it
+   * reads nothing. The "must not be the DPS message" half is unchanged and is the point of the test:
+   * the generic note says the listed talents are "spent but not modelled", which implies everything
+   * unlisted is counted — and for a tank the unlisted set includes Toughness and Vitality, the two
+   * biggest survivability talents in the tree.
+   */
   const tank = noteFor('Warrior', 'Protection', 'Tank', spendFirstTree('Warrior'))
   expect(tank).toBeTruthy()
-  expect(tank, 'the tank path reads no talents at all').toMatch(/does not read talents at all/i)
+  expect(tank, 'the tank message must name the avoidance talents it reads').toMatch(/Anticipation/i)
+  expect(tank, 'and name the two it does not, with the reason').toMatch(/Toughness and Vitality are not counted/i)
   expect(tank, 'and must NOT imply the unlisted ones are counted').not.toMatch(/spent but not modelled/i)
+
+  // Paladin's Shield Specialization raises block value, which is unmodelled — so it must not be named.
+  const paladinTank = noteFor('Paladin', 'Protection', 'Tank', spendFirstTree('Paladin'))
+  expect(paladinTank, "a Paladin must not be told Shield Specialization is read").not.toMatch(/Shield Specialization/i)
 
   // Silence when there is nothing to say, which is what keeps the others readable.
   expect(noteFor('Mage', 'Fire', 'Caster DPS', {}), 'no points, no note').toBeUndefined()

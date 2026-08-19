@@ -81,6 +81,18 @@ export type TalentModifiers = {
    * correctly priced Spirit at nothing for healers. With points in it, Spirit starts mattering.
    */
   spiritRegenWhileCasting: number
+  /**
+   * Defense **skill points**, added to the figure derived from Defense rating. Anticipation.
+   *
+   * Skill points for the same reason `expertiseSkillPoints` uses them: the tank table converts rating
+   * to points anyway, and upstream grants this talent in points. One point moves miss, dodge, parry,
+   * block and the boss's crit all at once, which is why it is the most valuable of the three.
+   */
+  defenseSkillPoints: number
+  /** Added to the parry chance, as a fraction. Deflection. Warrior and Paladin alike. */
+  parryChance: number
+  /** Added to the block chance, as a fraction. Warrior's Shield Specialization only — see the ingest. */
+  blockChance: number
 }
 
 export const noTalentModifiers: TalentModifiers = {
@@ -104,6 +116,9 @@ export const noTalentModifiers: TalentModifiers = {
   spellHitChance: 0,
   spellDamageMultiplier: 1,
   spiritRegenWhileCasting: 0,
+  defenseSkillPoints: 0,
+  parryChance: 0,
+  blockChance: 0,
 }
 
 /** Which `TalentModifiers` field each extracted effect kind feeds, and how it combines. */
@@ -119,6 +134,9 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   spellCritChance: 'spellCritChance',
   spellHitChance: 'spellHitChance',
   spiritRegenWhileCasting: 'spiritRegenWhileCasting',
+  defenseSkill: 'defenseSkillPoints',
+  parryChance: 'parryChance',
+  blockChance: 'blockChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {

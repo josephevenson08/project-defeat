@@ -67,9 +67,14 @@ been wrong.
 
 **Talents then reached the caster and healer paths**, closing the item this file had listed as the
 top of the queue. `calculateCasterDps` and `calculateHealing` now take `TalentModifiers`, all nine
-classes are ingested (**30 → 44 effects**), and coverage goes **11 → 25 of 27 specs**. The plumbing
-went first on purpose: ingesting Mage effects with no caster talent argument to reach would have been
-this repo's signature failure, data wired to nothing.
+classes are ingested (**30 → 49 effects**), and coverage goes **11 → all 27 specs** once the tank
+path followed. The plumbing went first on purpose: ingesting Mage effects with no caster talent
+argument to reach would have been this repo's signature failure, data wired to nothing.
+
+**Coverage is not the same as completeness, and the second number is the honest one: 49 talent groups
+are still refused by name.** Two kinds dominate — per-spell talents needing a spell school this
+simulator does not record, and stat-pipeline talents (Toughness, Vitality) whose route runs through
+`calculateStats`, which is the owner's open decision. A talented estimate still reads low.
 
 The gains are deliberately modest — **+1.5% to +7.6%** — because only the character-global half is
 expressible. Per-spell talents (Ignite, Shadow Weaving, Ruin) need a spell school and a per-spell
@@ -254,7 +259,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 | Target debuffs | 6, all unverified | **6**, each cited to a spell rank |
 | Tier set bonuses | 9 sets, partly paraphrased | **34 sets** (T4 + T5), 71 bonuses, verbatim |
 | Talents | none | **579** across all 9 classes, 27 trees |
-| Talent *effects* | none | **44** across all 9 classes, reaching 25 of 27 specs |
+| Talent *effects* | none | **49** across all 9 classes, reaching all 27 specs |
 | Spec tier lists | none | **3 lists**, 28 placements, all 27 specs |
 | Icons | none, two-letter glyphs | **1,609 files** vendored, 2.8 MB — items, gems and talents |
 | Item effects | 14 curated, 0 ingested | **55 items**, 46 of 175 trinkets |
@@ -984,6 +989,11 @@ and each item here is a decision or a fresh piece of work.
 
 ### The three decisions only the repo owner can take
 
+**Decision 2 has grown teeth since it was written.** "Should talents reach `calculateStats`?" now
+gates a *named* list rather than a hypothetical: Toughness, Vitality and Divine Strength are ingested,
+refused, and reported to the player as uncounted. Every other route is closed, so this is the single
+remaining reason a talented estimate reads low for a tank.
+
 1. **Unhide the Simulation tab?** `src/featureFlags.ts` states what is actually true now and says
    outright that the decision has not been revisited. The argument has changed: the tab discloses
    its own limits honestly *per spec*, and talents reach 11 specs. The remaining argument against is
@@ -1000,8 +1010,8 @@ and each item here is a decision or a fresh piece of work.
 
 ~~**Caster and healer talents are blocked on plumbing, not data.**~~ **Done 2026-08-19.**
 `calculateCasterDps` and `calculateHealing` now take `TalentModifiers`, and all nine classes are
-ingested — **44 effects**, up from 30. Talents reach **25 of 27 specs**; the 2 Tank specs are the
-remaining gap, because `calculateTankSurvivability` still takes no talent argument.
+ingested — **49 effects**, up from 30. Talents reach **all 27 specs**: the tank path followed the
+caster and healer ones the same day, so every one of the four role paths now takes `TalentModifiers`.
 
 The plumbing came first deliberately, and the ingest second, because this repo's recurring failure is
 shipping data nothing reads — a Mage effect with no caster talent argument to reach would have been
@@ -1043,8 +1053,29 @@ time left in the fight — and **the mechanism is the entire content**. This sim
 at all. The recommendation is a per-spec closed-form extension on a short list, starting with Hunter
 (three specs, blocked only by an effect-type filter), not an ingest and not a general engine.
 
-**The tank path is now the only one that reads no talents** — and with the caster and healer halves
-closed, it is the whole of the remaining gap rather than one of three. Talents are applied in `calculatePhysicalDps`,
+~~**Protection Warrior's tank path reads no talents.**~~ **Done 2026-08-19 — all four role paths now
+take them, so talent coverage is 27 of 27.** `calculateTankSurvivability` reads **Anticipation**
+(+4 Defense skill/rank), **Deflection** (+1% parry/rank) and, for Warrior only, **Shield
+Specialization** (+1% block/rank). Measured: Warrior Protection **12,790.9 → 14,118.5 (+10.4%)**,
+Paladin Protection **11,607.6 → 12,791.8 (+10.2%)**, avoidance 22.1% → 29.5%.
+
+Anticipation carries most of that on its own, because one Defense skill point moves miss, dodge,
+parry, block **and** the boss's crit chance together — so it is added before `fromDefense` is derived
+rather than to any single term.
+
+**Two tank talents are still refused, and the reason is a decision rather than a gap.** Toughness and
+Vitality multiply armour, stamina and strength, which `calculateStats` owns — reaching them means
+talents reaching the always-visible stat rail, gear rankings and upgrade finder, which is the product
+decision this file lists as the owner's. The estimate now names them specifically rather than
+claiming the path reads nothing.
+
+**Paladin's Shield Specialization is deliberately not modelled and must not be named.** It raises
+block **value**, where Warrior's raises block **chance**; the incoming-attack table rolls the chance
+and does not track how much a block absorbs. The first version of the tank note listed it for both
+classes — a wrong caveat in the confident direction, caught before it shipped, and a test now asserts
+a Paladin is never told it is read.
+
+The superseded framing follows. Talents are applied in `calculatePhysicalDps`,
 and a tank is scored by `calculateTankSurvivability`. A test pins this so it reads as a decision. The
 seven formulas are already surveyed in §1.
 
@@ -1090,10 +1121,12 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   `deriveTalentModifiers` never changed. Largest gain is Hunter Beast Mastery **106.1 → 148.1
   (+39.6%)**, because **Serpent's Swiftness is +4% ranged attack speed a rank**.
 
-  **Stage 3 closed the caster and healer half on 2026-08-19**, taking the ingest to **44 effects
-  across all nine classes** and coverage to **25 of 27 specs**. The paragraph that used to sit here
-  said those paths "take no talent argument at all" — true when written, and the reason the plumbing
-  went first. Only the **2 Tank specs** remain, because `calculateTankSurvivability` still takes none.
+  **Stage 3 closed the caster, healer and tank halves on 2026-08-19**, taking the ingest to **49
+  effects across all nine classes** and coverage to **all 27 specs**. The paragraph that used to sit
+  here said those paths "take no talent argument at all" — true when written, and the reason the
+  plumbing went first each time. What remains is not coverage but **expressiveness**: 49 talent
+  groups are refused by name, dominated by per-spell effects and by the ones routing through
+  `calculateStats`.
   (This paragraph also said "7 caster and 2 healer" until 2026-08-18; the real split is 9 Caster DPS,
   5 Healer, 2 Tank, and it is asserted now rather than written.)
 
