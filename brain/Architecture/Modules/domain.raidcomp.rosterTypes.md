@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/rosterTypes.ts
-lines: 147
+lines: 156
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.rosterTypes
 
-`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 147 lines
+`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 156 lines
 
 From the top of the file:
 

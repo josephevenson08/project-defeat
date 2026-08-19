@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
+- [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
 - [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
@@ -43,6 +44,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`

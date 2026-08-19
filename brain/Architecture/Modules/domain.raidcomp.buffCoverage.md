@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/buffCoverage.ts
-lines: 225
+lines: 237
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.buffCoverage
 
-`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 225 lines
+`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 237 lines
 
 From the top of the file:
 
@@ -33,6 +33,7 @@ From the top of the file:
 - [[domain.buffs.sampleTargetDebuffs]] — `src/domain/buffs/sampleTargetDebuffs.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
+- [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 
 ## Imported by

@@ -3932,3 +3932,160 @@ input[type='text']:focus {
   filter: grayscale(1);
   opacity: 0.45;
 }
+
+/* ---------------------------------------------------------------------------
+   Full-bleed, fluid layout
+
+   The shell used to sit inside fixed containers, so a wide monitor showed a
+   column of content with dead space either side while a narrow one overflowed
+   at about 806px. Both are now fluid: the grid tracks collapse as the viewport
+   narrows rather than forcing a minimum width.
+   --------------------------------------------------------------------------- */
+
+.app-shell {
+  grid-template-columns: minmax(0, 288px) minmax(0, 1fr);
+  width: 100%;
+}
+
+.content {
+  /* Was a hard two-column grid, which is what set the floor. Panels now claim a
+     sensible minimum and wrap when there is not room for two. */
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+  padding: 28px clamp(16px, 2.5vw, 40px) 56px;
+  width: 100%;
+}
+
+.topbar {
+  padding: 0 clamp(16px, 2.5vw, 40px);
+}
+
+/* The raid planner is a wide-format tool: one full-bleed column, never split. */
+.raidcomp {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  /* The rail stops being a column and becomes a band above the content. */
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Class-grouped spec picker ------------------------------------------------ */
+
+.raidcomp-classes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.raidcomp-class-name {
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  /* Colour comes from the class itself, inline — see domain/character/classColors. */
+}
+
+.raidcomp-class-builds {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.raidcomp-class-builds .raidcomp-spec-add {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  padding: 6px 9px;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.raidcomp-class-builds .raidcomp-spec-add:hover:not([disabled]) {
+  background: var(--surface-3);
+  color: var(--text-strong);
+  border-color: var(--line-strong);
+}
+
+/* The coverage and suggestion rows carry long provider text ("+5 — Moonkin Aura,
+   Thorns, Innervate and 2 more"). It was `flex-shrink: 0`, which is right for a
+   short "3×" tag and wrong for a sentence: on a narrow viewport it pushed the row
+   past the screen. Allowed to shrink and wrap instead. */
+.raidcomp-entry-source,
+.raidcomp-entry-need {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.raidcomp-suggestions li,
+.raidcomp-missing li,
+.raidcomp-covered li {
+  flex-wrap: wrap;
+}
+
+/* Five top-level tabs do not fit a phone in one line. Wrapping rather than
+   horizontally scrolling, because a scrolled tab bar hides the tabs it clips and
+   a raid leader should not have to discover that Raids exists by swiping. */
+.tab-nav {
+  flex-wrap: wrap;
+}
+
+/* Buff checklist ----------------------------------------------------------- */
+
+.raidcomp-checklist-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Dense multi-column, like Wowhead's. Columns rather than rows so a long list
+     stays scannable without becoming a tall stripe down one side. */
+  columns: 2;
+  column-gap: 20px;
+}
+
+.raidcomp-checklist-rows li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  break-inside: avoid;
+}
+
+.raidcomp-check-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 12px;
+  text-align: right;
+  color: var(--text-strong);
+  flex-shrink: 0;
+}
+
+.raidcomp-checklist-rows li.is-missing .raidcomp-check-count {
+  color: var(--text-faint);
+}
+
+.raidcomp-check-name {
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.raidcomp-checklist-rows li.is-missing .raidcomp-check-name {
+  color: var(--text-faint);
+}
+
+/* Drained rather than hidden: a missing buff should still be findable by its art. */
+.raidcomp-checklist-rows li.is-missing .raidcomp-row-icon {
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+
+@media (max-width: 700px) {
+  .raidcomp-checklist-rows {
+    columns: 1;
+  }
+}

@@ -204,164 +204,169 @@
     "Druid|Balance": {
       "className": "Druid",
       "spec": "Balance",
-      "icon": "ability_druid_forceofnature",
+      "icon": "spell_nature_starfall",
       "fromTalent": "Force of Nature"
     },
     "Druid|Feral": {
       "className": "Druid",
       "spec": "Feral",
-      "icon": "ability_druid_mangle2",
+      "icon": "ability_druid_ferociousbite",
       "fromTalent": "Mangle"
     },
     "Druid|Restoration": {
       "className": "Druid",
       "spec": "Restoration",
-      "icon": "ability_druid_treeoflife",
+      "icon": "spell_nature_healingtouch",
       "fromTalent": "Tree of Life"
     },
     "Hunter|Beast Mastery": {
       "className": "Hunter",
       "spec": "Beast Mastery",
-      "icon": "ability_hunter_beastwithin",
+      "icon": "ability_hunter_beasttaming",
       "fromTalent": "The Beast Within"
     },
     "Hunter|Marksmanship": {
       "className": "Hunter",
       "spec": "Marksmanship",
-      "icon": "ability_theblackarrow",
+      "icon": "ability_marksmanship",
       "fromTalent": "Silencing Shot"
     },
     "Hunter|Survival": {
       "className": "Hunter",
       "spec": "Survival",
-      "icon": "ability_hunter_readiness",
+      "icon": "ability_hunter_swiftstrike",
       "fromTalent": "Readiness"
     },
     "Mage|Arcane": {
       "className": "Mage",
       "spec": "Arcane",
-      "icon": "spell_nature_slow",
+      "icon": "spell_holy_magicalsentry",
       "fromTalent": "Slow"
     },
     "Mage|Fire": {
       "className": "Mage",
       "spec": "Fire",
-      "icon": "inv_misc_head_dragon_01",
+      "icon": "spell_fire_firebolt02",
       "fromTalent": "Dragon's Breath"
     },
     "Mage|Frost": {
       "className": "Mage",
       "spec": "Frost",
-      "icon": "spell_frost_summonwaterelemental_2",
+      "icon": "spell_frost_frostbolt02",
       "fromTalent": "Summon Water Elemental"
     },
     "Paladin|Holy": {
       "className": "Paladin",
       "spec": "Holy",
-      "icon": "spell_holy_divineillumination",
+      "icon": "spell_holy_holybolt",
       "fromTalent": "Divine Illumination"
     },
     "Paladin|Protection": {
       "className": "Paladin",
       "spec": "Protection",
-      "icon": "spell_holy_avengersshield",
+      "icon": "spell_holy_devotionaura",
       "fromTalent": "Avenger's Shield"
     },
     "Paladin|Retribution": {
       "className": "Paladin",
       "spec": "Retribution",
-      "icon": "spell_holy_crusaderstrike",
+      "icon": "spell_holy_auraoflight",
       "fromTalent": "Crusader Strike"
     },
     "Priest|Discipline": {
       "className": "Priest",
       "spec": "Discipline",
-      "icon": "spell_holy_painsupression",
+      "icon": "spell_holy_wordfortitude",
       "fromTalent": "Pain Suppression"
     },
     "Priest|Holy": {
       "className": "Priest",
       "spec": "Holy",
-      "icon": "spell_holy_circleofrenewal",
+      "icon": "spell_holy_renew",
       "fromTalent": "Circle of Healing"
     },
     "Priest|Shadow": {
       "className": "Priest",
       "spec": "Shadow",
-      "icon": "spell_holy_stoicism",
+      "icon": "spell_shadow_shadowwordpain",
       "fromTalent": "Vampiric Touch"
     },
     "Rogue|Assassination": {
       "className": "Rogue",
       "spec": "Assassination",
-      "icon": "ability_rogue_shadowstrikes",
+      "icon": "ability_rogue_eviscerate",
       "fromTalent": "Mutilate"
     },
     "Rogue|Combat": {
       "className": "Rogue",
       "spec": "Combat",
-      "icon": "ability_rogue_surpriseattack",
+      "icon": "ability_backstab",
       "fromTalent": "Surprise Attacks"
     },
     "Rogue|Subtlety": {
       "className": "Rogue",
       "spec": "Subtlety",
-      "icon": "ability_rogue_shadowstep",
+      "icon": "ability_stealth",
       "fromTalent": "Shadowstep"
     },
     "Shaman|Elemental": {
       "className": "Shaman",
       "spec": "Elemental",
-      "icon": "spell_fire_totemofwrath",
+      "icon": "spell_nature_lightning",
       "fromTalent": "Totem of Wrath"
     },
     "Shaman|Enhancement": {
       "className": "Shaman",
       "spec": "Enhancement",
-      "icon": "spell_nature_shamanrage",
+      "icon": "spell_nature_lightningshield",
       "fromTalent": "Shamanistic Rage"
     },
     "Shaman|Restoration": {
       "className": "Shaman",
       "spec": "Restoration",
-      "icon": "spell_nature_skinofearth",
+      "icon": "spell_nature_magicimmunity",
       "fromTalent": "Earth Shield"
     },
     "Warlock|Affliction": {
       "className": "Warlock",
       "spec": "Affliction",
-      "icon": "spell_shadow_unstableaffliction_3",
+      "icon": "spell_shadow_deathcoil",
       "fromTalent": "Unstable Affliction"
     },
     "Warlock|Demonology": {
       "className": "Warlock",
       "spec": "Demonology",
-      "icon": "spell_shadow_summonfelguard",
+      "icon": "spell_shadow_metamorphosis",
       "fromTalent": "Summon Felguard"
     },
     "Warlock|Destruction": {
       "className": "Warlock",
       "spec": "Destruction",
-      "icon": "spell_shadow_shadowfury",
+      "icon": "spell_shadow_rainoffire",
       "fromTalent": "Shadowfury"
     },
     "Warrior|Arms": {
       "className": "Warrior",
       "spec": "Arms",
-      "icon": "ability_warrior_endlessrage",
+      "icon": "ability_warrior_savageblow",
       "fromTalent": "Endless Rage"
     },
     "Warrior|Fury": {
       "className": "Warrior",
       "spec": "Fury",
-      "icon": "ability_warrior_rampage",
+      "icon": "ability_warrior_innerrage",
       "fromTalent": "Rampage"
     },
     "Warrior|Protection": {
       "className": "Warrior",
       "spec": "Protection",
-      "icon": "inv_sword_11",
+      "icon": "ability_warrior_defensivestance",
       "fromTalent": "Devastate"
     }
+  },
+  "buildIcons": {
+    "druid-feral-tank": "ability_racial_bearform",
+    "druid-feral-cat": "ability_druid_ferociousbite",
+    "druid-dreamstate": "ability_druid_dreamstate"
   }
 }

@@ -171,9 +171,8 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   so spending points changes the estimate but not the paperdoll totals, the gear rankings, or the
   upgrade finder. That is deliberate — widening it is the open product decision above — but it means
   the two surfaces disagree by design.
-- **The app has a fixed minimum width of roughly 806px and is not mobile-responsive.** Measured at a
-  375px viewport every section overflows to the same figure, so this is the shell rather than any one
-  panel.
+- The layout is fluid and reflows to phone width. It previously had a ~806px floor from fixed
+  containers, a hard two-column content grid and a non-wrapping tab bar; all three are responsive now.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.
 - Saved builds live in this browser's local storage only. Clearing site data loses them, and they do
   not follow you to another browser or machine — use export/import for that.

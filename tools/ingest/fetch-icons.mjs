@@ -58,6 +58,9 @@ const raidcomp = JSON.parse(readFileSync(resolve(REPO, 'src/domain/raidcomp/raid
 const raidcompNames = [
   ...Object.values(raidcomp.spellIcons).map((entry) => entry.icon),
   ...Object.values(raidcomp.specIcons).map((entry) => entry.icon),
+  // The Feral split and Dreamstate are raid *builds* rather than specs, so their icons live in their
+  // own map. Forgetting them here left the bear paw named but never downloaded.
+  ...Object.values(raidcomp.buildIcons),
 ]
 
 const itemNames = new Set(Object.values(icons))

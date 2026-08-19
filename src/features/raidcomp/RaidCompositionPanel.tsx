@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { describeProvider } from '../../domain/buffs/buffTypes'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
-import type { CharacterRole, TbcClass, TbcSpec } from '../../domain/character/characterTypes'
-import { getRoleForSpec, tbcClasses } from '../../domain/character/tbcClasses'
-import type { RaidPlayerSize } from '../../domain/raids/raidTypes'
+import type { CharacterRole } from '../../domain/character/characterTypes'
+import { getClassColor } from '../../domain/character/classColors'
 import {
   PARTY_SIZE,
   RAID_SIZES,
@@ -13,12 +11,13 @@ import {
   describeSuggestion,
   emptyRoster,
   getBuffIcon,
-  getSpecIcon,
+  getRaidBuild,
   moveSeat,
+  raidBuildsByClass,
   renameSeat,
   resizeRoster,
 } from '../../domain/raidcomp'
-import type { CoverageSection, Roster, SeatRef } from '../../domain/raidcomp'
+import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
@@ -33,20 +32,27 @@ import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
 const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 'Caster DPS']
 
-/**
- * Rough shape of a working raid, shown as guidance rather than enforced. Real Phase 2 raids run 2-3
- * tanks and 5-7 healers depending on the fight, so the panel says what is unusual, never what is wrong.
+/*
+ * There used to be a "usually 2-3 tanks, 5-7 healers" band here, in amber when a roster fell outside
+ * it. Removed by request, and it was the right call: the range varies by fight far more than one
+ * static band can express, so it read as the app second-guessing a raid leader who knows their
+ * roster better than it does. The counts stay; the opinion goes.
  */
-const TYPICAL_SHAPE: Record<RaidPlayerSize, Partial<Record<CharacterRole, readonly [number, number]>>> = {
-  10: { Tank: [1, 2], Healer: [2, 3] },
-  25: { Tank: [2, 3], Healer: [5, 7] },
-}
-
-const ALL_SPECS = tbcClasses.flatMap((definition) =>
-  definition.specs.map((spec) => ({ className: definition.className, spec })),
-)
 
 const iconUrl = (name: string | undefined) => (name ? `${import.meta.env.BASE_URL}icons/${name}.jpg` : undefined)
+
+/**
+ * The build a seat represents.
+ *
+ * Falls back to the first build of that spec when a seat carries no `buildId` — which is every seat
+ * saved before builds existed, and every spec that only has one build anyway.
+ */
+function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
+  if (slot.buildId) return getRaidBuild(slot.buildId)
+  return raidBuildsByClass
+    .find((entry) => entry.className === slot.className)
+    ?.builds.find((build) => build.spec === slot.spec)
+}
 
 /** Wowhead shows granted buffs as a row of icons; the names live in the title, as they do there. */
 function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: string }) {
@@ -69,12 +75,35 @@ function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: 
   )
 }
 
-function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { section: CoverageSection<T>; label: string }) {
+/**
+ * The checklist: every buff and debuff in the game, with how many seats bring it.
+ *
+ * Modelled on Wowhead's own layout — a dense multi-column list where the *count* leads, because the
+ * question a raid leader is scanning for is "have I got one, and how many". Covered entries carry
+ * their provider count in class colour; missing ones are dimmed with a zero, so absence reads as a
+ * gap in a list rather than as a separate section you have to cross-reference.
+ *
+ * The earlier version split covered and missing into two stacks per category, which meant checking
+ * one buff involved finding which of six lists it was in.
+ */
+function BuffChecklist<T extends Buff | TargetDebuff>({
+  section,
+  label,
+}: {
+  section: CoverageSection<T>
+  label: string
+}) {
   const total = section.covered.length + section.missing.length
   const testLabel = label.toLowerCase().replace(/[^a-z]+/g, '-')
 
+  /* One list, sorted so what you have comes first and what you are missing is not buried. */
+  const rows = [
+    ...section.covered.map(({ entry, providedBy }) => ({ entry, count: providedBy, needs: undefined as string | undefined })),
+    ...section.missing.map(({ entry, needs }) => ({ entry, count: 0, needs })),
+  ]
+
   return (
-    <section className="raidcomp-coverage" aria-label={label}>
+    <section className="raidcomp-checklist" aria-label={label}>
       <header className="raidcomp-coverage-head">
         <h3>{label}</h3>
         <span className="raidcomp-coverage-count" data-testid={`raidcomp-${testLabel}-count`}>
@@ -82,32 +111,17 @@ function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { secti
         </span>
       </header>
 
-      {section.missing.length > 0 && (
-        <ul className="raidcomp-missing">
-          {section.missing.map(({ entry, needs }) => (
-            <li key={entry.id}>
-              <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
-              <span className="raidcomp-entry-name">{entry.name}</span>
-              <span className="raidcomp-entry-need">needs {needs}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {section.covered.length > 0 && (
-        <ul className="raidcomp-covered">
-          {section.covered.map(({ entry, providedBy }) => (
-            <li key={entry.id}>
-              <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
-              <span className="raidcomp-entry-name">{entry.name}</span>
-              <span className="raidcomp-entry-source">
-                {describeProvider(entry)}
-                {providedBy > 1 ? ` · ${providedBy}×` : ''}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="raidcomp-checklist-rows">
+        {rows.map(({ entry, count, needs }) => (
+          <li key={entry.id} className={count > 0 ? 'is-covered' : 'is-missing'} title={needs ? `Needs ${needs}` : undefined}>
+            <span className="raidcomp-check-count">{count}</span>
+            <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
+            <span className="raidcomp-check-name" style={{ color: count > 0 ? getClassColor(entry.providedByClass) : undefined }}>
+              {entry.name}
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
@@ -138,12 +152,13 @@ export function RaidCompositionPanel() {
   const firstGroupWithRoom = roster.groups.findIndex((group) => group.includes(undefined))
   const targetGroup = roster.groups[selectedGroup]?.includes(undefined) ? selectedGroup : firstGroupWithRoom
 
-  const shape = TYPICAL_SHAPE[roster.size]
   const title = `${roster.size}-player raid`
 
-  const place = (className: TbcClass, spec: TbcSpec) => {
+  const place = (build: RaidBuild) => {
     if (targetGroup === -1) return
-    setRoster((current) => addToGroup(current, targetGroup, { className, spec }))
+    setRoster((current) =>
+      addToGroup(current, targetGroup, { className: build.className, spec: build.spec, buildId: build.id }),
+    )
   }
 
   const sameSeat = (a: SeatRef | undefined, b: SeatRef) =>
@@ -207,44 +222,48 @@ export function RaidCompositionPanel() {
       </div>
 
       <section className="raidcomp-roles" aria-label="Role balance">
-        {ROLE_ORDER.map((role) => {
-          const band = shape[role]
-          const count = report.roleCounts[role]
-          const unusual = band !== undefined && report.filled > 0 && (count < band[0] || count > band[1])
-          return (
-            <div key={role} className="raidcomp-role" data-testid={`raidcomp-role-${role.replace(/\s+/g, '-').toLowerCase()}`}>
-              <span className="raidcomp-role-count">{count}</span>
-              <span className="raidcomp-role-label">{role}</span>
-              {band && (
-                <span className={unusual ? 'raidcomp-role-band is-unusual' : 'raidcomp-role-band'}>
-                  usually {band[0]}–{band[1]}
-                </span>
-              )}
-            </div>
-          )
-        })}
+        {ROLE_ORDER.map((role) => (
+          <div key={role} className="raidcomp-role" data-testid={`raidcomp-role-${role.replace(/\s+/g, '-').toLowerCase()}`}>
+            <span className="raidcomp-role-count">{report.roleCounts[role]}</span>
+            <span className="raidcomp-role-label">{role}</span>
+          </div>
+        ))}
       </section>
 
       <section className="raidcomp-picker" aria-label="Add a spec">
         <h3>
           Add to <span className="raidcomp-target">Group {targetGroup === -1 ? '—' : targetGroup + 1}</span>
         </h3>
-        <div className="raidcomp-spec-grid">
-          {ALL_SPECS.map(({ className, spec }) => (
-            <button
-              key={`${className}-${spec}`}
-              type="button"
-              className="raidcomp-spec-add"
-              disabled={targetGroup === -1}
-              onClick={() => place(className, spec)}
-              data-testid={`raidcomp-add-${className}-${spec}`.replace(/\s+/g, '-').toLowerCase()}
-              aria-label={`Add ${spec} ${className}`}
-            >
-              <img src={iconUrl(getSpecIcon(className, spec))} alt="" loading="lazy" decoding="async" />
-              <span>
-                {spec} {className}
-              </span>
-            </button>
+        {/*
+          Grouped by class rather than one flat grid of 27. Scanning "which Druid do I want" is the
+          actual question, and a single alphabetical wall made you read every entry to answer it. The
+          class name carries Blizzard's own colour for the same reason — it is what a raid leader
+          already recognises.
+        */}
+        <div className="raidcomp-classes">
+          {raidBuildsByClass.map(({ className, builds }) => (
+            <div key={className} className="raidcomp-class">
+              <h4 className="raidcomp-class-name" style={{ color: getClassColor(className) }}>
+                {className}
+              </h4>
+              <div className="raidcomp-class-builds">
+                {builds.map((build) => (
+                  <button
+                    key={build.id}
+                    type="button"
+                    className="raidcomp-spec-add"
+                    disabled={targetGroup === -1}
+                    onClick={() => place(build)}
+                    title={build.note}
+                    data-testid={`raidcomp-add-${build.id}`}
+                    aria-label={`Add ${build.label} ${className}`}
+                  >
+                    <img src={iconUrl(build.icon)} alt="" loading="lazy" decoding="async" />
+                    <span>{build.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -301,11 +320,11 @@ export function RaidCompositionPanel() {
                           draggable
                           onDragStart={() => setDragging(ref)}
                           onDragEnd={() => setDragging(undefined)}
-                          data-role={getRoleForSpec(slot.className, slot.spec)}
+                          data-role={buildForSlot(slot)?.role}
                         >
                           <img
                             className="raidcomp-seat-icon"
-                            src={iconUrl(getSpecIcon(slot.className, slot.spec))}
+                            src={iconUrl(buildForSlot(slot)?.icon)}
                             alt=""
                             loading="lazy"
                           />
@@ -346,13 +365,13 @@ export function RaidCompositionPanel() {
                                 {slot.playerName ? (
                                   <>
                                     <span className="raidcomp-seat-player">{slot.playerName}</span>
-                                    <span className="raidcomp-seat-spec">
-                                      {slot.spec} {slot.className}
+                                    <span className="raidcomp-seat-spec" style={{ color: getClassColor(slot.className) }}>
+                                      {buildForSlot(slot)?.label ?? slot.spec} {slot.className}
                                     </span>
                                   </>
                                 ) : (
-                                  <span className="raidcomp-seat-name">
-                                    {slot.spec} {slot.className}
+                                  <span className="raidcomp-seat-name" style={{ color: getClassColor(slot.className) }}>
+                                    {buildForSlot(slot)?.label ?? slot.spec} {slot.className}
                                   </span>
                                 )}
                               </button>
@@ -393,9 +412,9 @@ export function RaidCompositionPanel() {
       </section>
 
       <div className="raidcomp-columns">
-        <CoverageList section={report.raidWide} label="Raid-wide" />
-        <CoverageList section={report.partyScoped} label="Party buffs" />
-        <CoverageList section={report.debuffs} label="Debuffs" />
+        <BuffChecklist section={report.raidWide} label="Raid-wide" />
+        <BuffChecklist section={report.partyScoped} label="Party buffs" />
+        <BuffChecklist section={report.debuffs} label="Debuffs" />
       </div>
 
       {report.suggestions.length > 0 && (

@@ -34,10 +34,23 @@ export type TalentData = {
 export type TalentPoints = Readonly<Record<number, number>>
 
 /**
- * TBC gives 41 points at level 70: one per level from 10 to 70, plus one from the level 10 quest.
- * The deepest row of a tree therefore needs 40 points in that tree to reach.
+ * **61**, and it read 41 until 2026-08-19 — a real bug that made every build in the app unbuildable.
+ *
+ * The old comment gave the right derivation and the wrong answer: "one per level from 10 to 70" is
+ * 61 levels, not 41. 41 is the number of points needed to reach the *bottom* of a single tree, which
+ * is a different quantity that happens to appear near talent trees constantly.
+ *
+ * The formula is one point per level starting at 10, so `level - 9`. Anchored on a verified data
+ * point rather than recall: Wowhead's level-60 Classic talent guides publish builds as 17/34/0,
+ * 20/31/0, 31/20/0 — every one summing to **51**, and 60 - 9 = 51. At 70 the same formula gives 61,
+ * which is why TBC builds are written 17/44/0 and 33/28/0.
+ *
+ * Worth knowing: that Classic page was reached through a `/tbc/` URL. Wowhead redirected it, and its
+ * title says "WoW Classic" with 71 `/classic/` links and no `/tbc/` ones — the same wrong-expansion
+ * trap this repo already records for the enchant guides. The 51 is correct *for level 60*; taking it
+ * as TBC's figure would have replaced one wrong number with another.
  */
-export const TALENT_POINTS_AT_70 = 41
+export const TALENT_POINTS_AT_70 = 61
 
 /** A row is unlocked once this many points are in the tree — 5 per row above it. */
 export const POINTS_PER_ROW = 5

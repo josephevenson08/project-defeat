@@ -326,8 +326,9 @@ written below each note's manual marker.
 - **Talents do not reach the always-visible stat rail** — only the simulation. Widening that is an
   open product decision, and it is why spending points moves the estimate but not the paperdoll.
 - **No multi-iteration variance and no result charts.**
-- **The app has a fixed minimum width of roughly 806px and is not mobile-responsive.** This is the
-  shell rather than any one panel; every section overflows identically at 375px.
+- ~~**The app has a fixed minimum width of roughly 806px.**~~ **Fixed 2026-08-19.** The floor came
+  from fixed 940px containers, a hard two-column `.content` grid, and — the last 95px of it — a
+  five-tab bar that would not wrap. Measured at 375px: zero overflow.
 - No backend is planned; the app stays local-first, and saved builds live in browser storage only.
 
 Two entries that used to sit here are gone rather than fixed, and the reason is worth keeping. The

@@ -1,5 +1,5 @@
 import type { RaidPlayerSize } from '../../domain/raids/raidTypes'
-import { emptyRoster, groupCountFor, PARTY_SIZE } from '../../domain/raidcomp'
+import { emptyRoster, getRaidBuild, groupCountFor, PARTY_SIZE } from '../../domain/raidcomp'
 import type { Roster, RosterSlot } from '../../domain/raidcomp'
 import { getClassDefinition } from '../../domain/character/tbcClasses'
 
@@ -43,10 +43,11 @@ export function loadRoster(): Roster | undefined {
         const seat: unknown = stored[seatIndex]
         if (typeof seat !== 'object' || seat === null) return undefined
 
-        const { className, spec, playerName } = seat as {
+        const { className, spec, playerName, buildId } = seat as {
           className?: unknown
           spec?: unknown
           playerName?: unknown
+          buildId?: unknown
         }
         if (typeof className !== 'string' || typeof spec !== 'string') return undefined
 
@@ -54,14 +55,22 @@ export function loadRoster(): Roster | undefined {
         if (!definition || !(definition.specs as readonly string[]).includes(spec)) return undefined
 
         /*
-         * The name has to be carried through explicitly. An earlier version rebuilt the seat from
-         * class and spec alone, which validated correctly and silently dropped every player name on
-         * reload — the roster came back looking right, just anonymous.
+         * **Every optional field has to be carried through explicitly, and this has now bitten twice.**
+         * The validator rebuilds each seat from scratch rather than copying it, so anything not named
+         * here is silently dropped on reload: first `playerName`, which made restored rosters
+         * anonymous, then `buildId`, which turned every Feral tank back into a cat and read the tank
+         * count as zero. Both validated cleanly and looked right.
+         *
+         * Rebuilding is still the correct shape — copying an unvalidated object is how malformed
+         * storage gets into the model — but any field added to `RosterSlot` must be added here too.
          */
+        const validBuild = typeof buildId === 'string' && getRaidBuild(buildId)?.className === className
+
         return {
           className,
           spec,
           ...(typeof playerName === 'string' && playerName.trim() ? { playerName: playerName.trim() } : {}),
+          ...(validBuild ? { buildId: buildId as string } : {}),
         } as RosterSlot
       })
     })

@@ -94,6 +94,42 @@ outcomes keep changing and these have not: measure before designing, plumbing be
 before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
 invariant before trusting it.
 
+**`TALENT_POINTS_AT_70` was 61 all along and the code said 41** (fixed 2026-08-19, spotted by the repo
+owner). 41 is the points needed to reach the bottom of *one* tree; the total available at 70 is 61.
+The old comment gave the right derivation and the wrong answer — "one per level from 10 to 70" is 61
+levels. Anchored rather than recalled: Wowhead's **level-60** Classic guides publish builds as 17/34/0
+and 20/31/0, all summing to **51**, and 60 − 9 = 51. Same formula gives 61 at 70.
+
+**That page was reached through a `/tbc/` URL and served Classic** — title "WoW Classic", 71
+`/classic/` links, zero `/tbc/` ones. The same wrong-expansion redirect this file already records for
+the enchant guides. Its 51 is right *for level 60*; taking it as TBC's figure would have swapped one
+wrong number for another.
+
+**Raid builds are a raidcomp-local concept, deliberately not new `TbcSpec` members** (2026-08-19). A
+roster asks *what are you bringing tonight*, which distinguishes a bear from a cat where a gear
+planner does not. Widening `TbcSpec` would have meant inventing a BiS list and a talent tree for
+something Blizzard never shipped as a spec, so `RaidBuild` maps back to a real `(class, spec)` pair
+and **buff coverage matches on that pair, never on the build** — a bear and a cat are one talent tree
+in two forms and bring the same Leader of the Pack. **Role is the one axis that does differ**, and
+reading it from the spec is what made a seated bear report "0 Tank".
+
+29 builds: 27 specs, with Feral *replaced* by Bear and Cat, and Dreamstate *added* alongside
+Restoration. The difference matters — an earlier version had Dreamstate replacing Restoration, which
+silently removed Restoration Druid from the picker.
+
+**Dreamstate does not bring Moonkin Aura, and that is the fact most likely to be got wrong.** It is a
+**Balance** talent at row 6 (*"Regenerate mana equal to 10% of your Intellect every 5 sec, even while
+casting"*), so the build spends ~25 points in Balance and the rest in Restoration — which makes it
+tempting to model as Balance. But the aura only radiates in Moonkin Form, and a druid in Moonkin Form
+cannot cast healing spells in TBC, so a Dreamstate healer is never in the form that grants it.
+Modelled as Restoration, asserted both ways.
+
+**Spec icons are curated, not derived.** The deepest-talent rule was deterministic and
+unrecognisable — `inv_sword_11` for Protection Warrior, `inv_misc_head_dragon_01` for Fire Mage. They
+are now the conventional TBC spec icons, and `fetch-icons.mjs` downloads every name so a typo cannot
+ship as a broken image. **Build icons live in their own map** and were initially left out of that
+fetch, which named the bear paw without ever downloading it.
+
 **The planner then gained icons, drag-and-drop and player names** (2026-08-19, by request). Specs and
 buffs both render real artwork; granted buffs sit under each group as an icon row, the way Wowhead
 shows them, because 24 buff names under one group is a wall of text nobody reads.
@@ -255,7 +291,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 142 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 147 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -463,6 +499,14 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **`loadRoster` rebuilds each seat field by field, so any new field is silently dropped.** This has
+  now bitten twice: `playerName` (restored rosters came back anonymous) and `buildId` (every Feral
+  tank came back a cat, and the tank count read zero). Both validated cleanly and looked right.
+  Rebuilding is still the correct shape — copying unvalidated storage into the model is worse — but
+  **anything added to `RosterSlot` must be added there too.**
+- **The app is fluid now, and the floor was the tab bar.** Fixed 940px containers and a hard
+  two-column `.content` grid set a ~806px minimum; the last 95px after fixing those was five
+  top-level tabs refusing to wrap. Measured at 375px: zero overflow.
 - **Greater Blessing of Might's icon file is called `spell_holy_greaterblessingofkings`.** Not a
   mis-read: Blizzard reused a misleadingly named asset, and Wowhead's payload for spell 27141 says so
   with `name_enus` confirming the spell. Kings itself uses `spell_magic_greaterblessingofkings` — a

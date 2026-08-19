@@ -143,16 +143,71 @@ for (const entry of [...sampleBuffs, ...sampleTargetDebuffs]) {
   }
 }
 
+/**
+ * The conventional TBC spec icons, which is what players actually recognise.
+ *
+ * **The deepest-talent rule this used to apply was clever and wrong.** It is deterministic and it
+ * produced `inv_sword_11` for Protection Warrior and `inv_misc_head_dragon_01` for Fire Mage —
+ * defensible as data, unrecognisable as an interface. These are the icons the game and every
+ * community tool use for a spec, so they are curated rather than derived.
+ *
+ * Curated does not mean unverified: `fetch-icons.mjs` downloads every name here and fails loudly on a
+ * 404, so a typo cannot ship as a silently broken image.
+ */
+const SPEC_ICONS = {
+  'Warrior|Arms': 'ability_warrior_savageblow',
+  'Warrior|Fury': 'ability_warrior_innerrage',
+  'Warrior|Protection': 'ability_warrior_defensivestance',
+  'Paladin|Holy': 'spell_holy_holybolt',
+  'Paladin|Protection': 'spell_holy_devotionaura',
+  'Paladin|Retribution': 'spell_holy_auraoflight',
+  'Hunter|Beast Mastery': 'ability_hunter_beasttaming',
+  'Hunter|Marksmanship': 'ability_marksmanship',
+  'Hunter|Survival': 'ability_hunter_swiftstrike',
+  'Rogue|Assassination': 'ability_rogue_eviscerate',
+  'Rogue|Combat': 'ability_backstab',
+  'Rogue|Subtlety': 'ability_stealth',
+  'Priest|Discipline': 'spell_holy_wordfortitude',
+  'Priest|Holy': 'spell_holy_renew',
+  'Priest|Shadow': 'spell_shadow_shadowwordpain',
+  'Shaman|Elemental': 'spell_nature_lightning',
+  'Shaman|Enhancement': 'spell_nature_lightningshield',
+  'Shaman|Restoration': 'spell_nature_magicimmunity',
+  'Mage|Arcane': 'spell_holy_magicalsentry',
+  'Mage|Fire': 'spell_fire_firebolt02',
+  'Mage|Frost': 'spell_frost_frostbolt02',
+  'Warlock|Affliction': 'spell_shadow_deathcoil',
+  'Warlock|Demonology': 'spell_shadow_metamorphosis',
+  'Warlock|Destruction': 'spell_shadow_rainoffire',
+  'Druid|Balance': 'spell_nature_starfall',
+  // Feral splits into bear and cat in the raid planner; this is the shared fallback.
+  'Druid|Feral': 'ability_druid_ferociousbite',
+  'Druid|Restoration': 'spell_nature_healingtouch',
+}
+
+/** Icons for raid builds that are not a spec of their own — the Feral split and Dreamstate. */
+const BUILD_ICONS = {
+  'druid-feral-tank': 'ability_racial_bearform',
+  'druid-feral-cat': 'ability_druid_ferociousbite',
+  'druid-dreamstate': 'ability_druid_dreamstate',
+}
+
 const specIcons = {}
 for (const definition of tbcClasses) {
   const data = getTalentData(definition.className)
   for (const tree of data.trees) {
+    const key = `${definition.className}|${tree.spec}`
+    const curated = SPEC_ICONS[key]
+    if (!curated) {
+      failures.push(`${key}: no curated spec icon`)
+      continue
+    }
+    /* The deepest talent is still recorded, as the audit trail for what the icon used to be. */
     const deepest = tree.talents.reduce((a, b) => (b.row > a.row ? b : a))
-    specIcons[`${definition.className}|${tree.spec}`] = {
+    specIcons[key] = {
       className: definition.className,
       spec: tree.spec,
-      icon: deepest.icon,
-      /* Recorded so the choice is auditable rather than magic — this is the talent it came from. */
+      icon: curated,
       fromTalent: deepest.name,
     }
   }
@@ -164,6 +219,7 @@ const out = {
   note: 'Buff icons from each spell\'s id-keyed Wowhead payload, cross-checked on name_enus. Spec icons from each talent tree\'s deepest talent, derived from data already in the repo.',
   spellIcons,
   specIcons,
+  buildIcons: BUILD_ICONS,
 }
 
 writeFileSync(resolve(REPO, 'src/domain/raidcomp/raidcompIcons.json'), `${JSON.stringify(out, null, 2)}\n`)

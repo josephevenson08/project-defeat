@@ -15,3 +15,5 @@ export {
 export type { CoverageReport, CoverageSection, CoveredEntry, GroupCoverage, MissingEntry, Suggestion } from './buffCoverage'
 export { computeCoverage, describeSuggestion, getBuffScope, slotProvides } from './buffCoverage'
 export { buffIconCount, getBuffIcon, getSpecIcon, getSpecIconSource, specIconCount } from './raidcompIcons'
+export type { RaidBuild } from './raidBuilds'
+export { getRaidBuild, raidBuilds, raidBuildsByClass } from './raidBuilds'

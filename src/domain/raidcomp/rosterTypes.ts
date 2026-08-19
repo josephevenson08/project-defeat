@@ -12,6 +12,15 @@ export type RosterSlot = {
   className: TbcClass
   spec: TbcSpec
   /**
+   * Which raid build this seat signed up as — `druid-feral-tank` versus `druid-feral-cat`.
+   *
+   * Optional so that rosters saved before builds existed still load: absent means "the only build
+   * for this spec", which is true for 24 of the 27. **Coverage never reads it.** A bear and a cat are
+   * the same talent tree, so they bring the same buffs, and matching on the build rather than the
+   * spec would have quietly split Leader of the Pack in two.
+   */
+  buildId?: string
+  /**
    * Optional, and it stays optional deliberately.
    *
    * Coverage never reads it — a Shaman brings Strength of Earth whether or not you typed "Dave" — so

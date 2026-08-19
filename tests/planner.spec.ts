@@ -44,7 +44,10 @@ import {
   getBuffScope,
   getSpecIcon,
   getSpecIconSource,
+  getRaidBuild,
   moveSeat,
+  raidBuilds,
+  raidBuildsByClass,
   renameSeat,
   resizeRoster,
   seatAt,
@@ -4988,4 +4991,130 @@ test('a seat can be named through the UI, and the name survives a reload', async
   await page.reload()
   await page.getByTestId('section-raidcomp').click()
   await expect(page.getByText('Dave')).toBeVisible()
+})
+
+test('raid builds split Feral and add Dreamstate without touching the spec union', () => {
+  /*
+   * A raid roster asks a different question from a gear planner: *what are you bringing tonight*. The
+   * answer distinguishes a bear from a cat where `TbcSpec` does not, and `TbcSpec` must not learn to —
+   * BiS rankings, talent trees and tier lists all key off it, so adding "Feral Tank" there would mean
+   * inventing a BiS list for something Blizzard never shipped as a spec.
+   */
+  expect(raidBuilds).toHaveLength(29)
+
+  const druid = raidBuildsByClass.find((entry) => entry.className === 'Druid')!
+  expect(druid.builds.map((build) => build.label)).toEqual([
+    'Balance',
+    'Feral (Bear)',
+    'Feral (Cat)',
+    'Restoration',
+    'Dreamstate',
+  ])
+
+  /*
+   * Feral *replaces* its spec — a druid is a bear or a cat, and an undifferentiated third option
+   * would be a seat that means nothing. Dreamstate *adds* to Restoration, because a raid can field
+   * both and they are different players. An earlier version had Dreamstate replacing Restoration,
+   * which silently removed Restoration Druid from the picker.
+   */
+  expect(druid.builds.filter((build) => build.spec === 'Feral').map((b) => b.role)).toEqual([
+    'Tank',
+    'Physical DPS',
+  ])
+  expect(druid.builds.filter((build) => build.spec === 'Restoration')).toHaveLength(2)
+
+  // Every build resolves to a real spec of its own class, or buff matching silently finds nothing.
+  for (const build of raidBuilds) {
+    const definition = tbcClasses.find((entry) => entry.className === build.className)!
+    expect(definition.specs as readonly string[], `${build.id} names a spec its class lacks`).toContain(build.spec)
+    expect(build.icon, `${build.id} has no icon`).toBeTruthy()
+  }
+})
+
+test('a Feral bear and a Feral cat bring the same buffs but different roles', () => {
+  /*
+   * The whole point of the split, and the line it must not cross. They are the same talent tree
+   * wearing different forms, so Leader of the Pack comes either way — matching buffs on the *build*
+   * rather than the spec would have quietly halved it. Role is the one axis that does differ, and
+   * getting it from the spec is what made a seated bear read as "0 Tank".
+   */
+  const bear = getRaidBuild('druid-feral-tank')!
+  const cat = getRaidBuild('druid-feral-cat')!
+  expect(bear.spec).toBe(cat.spec)
+  expect(bear.role).toBe('Tank')
+  expect(cat.role).toBe('Physical DPS')
+
+  const withBear = computeCoverage(addToGroup(emptyRoster(25), 0, { className: 'Druid', spec: 'Feral', buildId: bear.id }))
+  const withCat = computeCoverage(addToGroup(emptyRoster(25), 0, { className: 'Druid', spec: 'Feral', buildId: cat.id }))
+
+  const buffNames = (report: ReturnType<typeof computeCoverage>) =>
+    report.groups[0].partyBuffs.map((buff) => buff.name).sort()
+  expect(buffNames(withBear), 'same tree, same buffs').toEqual(buffNames(withCat))
+  expect(buffNames(withBear)).toContain('Leader of the Pack')
+
+  expect(withBear.roleCounts.Tank).toBe(1)
+  expect(withBear.roleCounts['Physical DPS']).toBe(0)
+  expect(withCat.roleCounts.Tank).toBe(0)
+  expect(withCat.roleCounts['Physical DPS']).toBe(1)
+})
+
+test('Dreamstate heals and does not bring Moonkin Aura', () => {
+  /*
+   * The load-bearing fact about this build, and the one most likely to be got wrong.
+   *
+   * Dreamstate is a **Balance** talent at row 6 — "Regenerate mana equal to 10% of your Intellect
+   * every 5 sec, even while casting" — so the build spends ~25 points in Balance and the rest in
+   * Restoration. That makes it tempting to model as a Balance druid, which would credit the raid with
+   * Moonkin Aura. It must not: the aura only radiates in Moonkin Form, and a druid in Moonkin Form
+   * cannot cast healing spells at all in TBC, so a Dreamstate healer is never in the form that grants
+   * it.
+   */
+  const dreamstate = getRaidBuild('druid-dreamstate')!
+  expect(dreamstate.role).toBe('Healer')
+  expect(dreamstate.spec, 'modelled as Restoration, because that is what it casts as').toBe('Restoration')
+
+  const report = computeCoverage(
+    addToGroup(emptyRoster(25), 0, { className: 'Druid', spec: dreamstate.spec, buildId: dreamstate.id }),
+  )
+  const names = report.groups[0].partyBuffs.map((buff) => buff.name)
+  expect(names, 'the class-wide druid buffs still come').toContain('Gift of the Wild')
+  expect(names, 'but not the one that needs Moonkin Form').not.toContain('Moonkin Aura')
+  expect(names, 'nor the one that needs cat or bear form').not.toContain('Leader of the Pack')
+})
+
+test('every spec icon is a real vendored file, and the two Feral builds differ', () => {
+  /*
+   * Spec icons used to be derived from each tree's deepest talent, which was deterministic and
+   * unrecognisable — `inv_sword_11` for Protection Warrior. They are curated now, and curation only
+   * stays honest if the files actually exist.
+   */
+  const onDisk = new Set(readdirSync(resolve(process.cwd(), 'public/icons')).map((file) => file.replace(/\.jpg$/, '')))
+
+  for (const build of raidBuilds) {
+    expect(onDisk.has(build.icon), `${build.id}: ${build.icon}.jpg is named but not vendored`).toBe(true)
+  }
+
+  expect(getRaidBuild('druid-feral-tank')!.icon).toBe('ability_racial_bearform')
+  expect(getRaidBuild('druid-feral-cat')!.icon).toBe('ability_druid_ferociousbite')
+  expect(getRaidBuild('druid-dreamstate')!.icon).toBe('ability_druid_dreamstate')
+})
+
+test('a level 70 TBC character has 61 talent points', () => {
+  /*
+   * This read **41** until 2026-08-19, which made every build in the app unbuildable — 41 is the
+   * points needed to reach the bottom of one tree, not the total available. The old comment gave the
+   * right derivation and the wrong answer: "one per level from 10 to 70" is 61 levels.
+   *
+   * Anchored rather than recalled: Wowhead's level-60 Classic talent guides publish builds as 17/34/0
+   * and 20/31/0, every one summing to 51, and 60 - 9 = 51. The same formula gives 61 at level 70.
+   */
+  expect(TALENT_POINTS_AT_70).toBe(61)
+
+  /*
+   * And it has to be spendable. A tree's deepest row needs `(row - 1) * 5` points in that tree, so a
+   * 41-point budget could not fund the classic deep-plus-secondary builds the guides publish.
+   */
+  const warrior = getTalentData('Warrior')!
+  const deepestRow = Math.max(...warrior.trees.flatMap((tree) => tree.talents.map((talent) => talent.row)))
+  expect((deepestRow - 1) * POINTS_PER_ROW).toBeLessThan(TALENT_POINTS_AT_70)
 })

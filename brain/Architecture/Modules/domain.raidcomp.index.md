@@ -2,24 +2,25 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/index.ts
-lines: 18
+lines: 20
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.index
 
-`src/domain/raidcomp/index.ts` · **domain** layer · 18 lines
+`src/domain/raidcomp/index.ts` · **domain** layer · 20 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `addToGroup`, `buffIconCount`, `clearSeat`, `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `describeSuggestion`, `emptyRoster`, `filledSlots`, `getBuffIcon`, `getBuffScope`, `getSpecIcon`, `getSpecIconSource`, `groupCountFor`, `GroupCoverage`, `MissingEntry`, `moveSeat`, `PARTY_SIZE`, `RAID_SIZES`, `RaidGroup`, `renameSeat`, `resizeRoster`, `Roster`, `RosterSlot`, `seatAt`, `SeatRef`, `slotProvides`, `specIconCount`, `Suggestion`
+**re-export** — `addToGroup`, `buffIconCount`, `clearSeat`, `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `describeSuggestion`, `emptyRoster`, `filledSlots`, `getBuffIcon`, `getBuffScope`, `getRaidBuild`, `getSpecIcon`, `getSpecIconSource`, `groupCountFor`, `GroupCoverage`, `MissingEntry`, `moveSeat`, `PARTY_SIZE`, `RAID_SIZES`, `RaidBuild`, `raidBuilds`, `raidBuildsByClass`, `RaidGroup`, `renameSeat`, `resizeRoster`, `Roster`, `RosterSlot`, `seatAt`, `SeatRef`, `slotProvides`, `specIconCount`, `Suggestion`
 
 ## Imports
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 

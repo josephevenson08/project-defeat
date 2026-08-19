@@ -5,6 +5,7 @@ import { sampleBuffs } from '../buffs/sampleBuffs'
 import { sampleTargetDebuffs } from '../buffs/sampleTargetDebuffs'
 import type { CharacterRole, TbcClass, TbcSpec } from '../character/characterTypes'
 import { getRoleForSpec, tbcClasses } from '../character/tbcClasses'
+import { getRaidBuild } from './raidBuilds'
 import { filledSlots } from './rosterTypes'
 import type { RaidGroup, Roster, RosterSlot } from './rosterTypes'
 
@@ -196,7 +197,18 @@ export function computeCoverage(roster: Roster): CoverageReport {
     Healer: 0,
     Tank: 0,
   }
-  for (const slot of slots) roleCounts[getRoleForSpec(slot.className, slot.spec)]++
+  /*
+   * Role comes from the **build** where a seat names one, not from the spec.
+   *
+   * This is the whole reason Feral splits in two: `getRoleForSpec` classifies Druid/Feral as Physical
+   * DPS, so a bear seated as a tank was counted as DPS and the tank tally read zero with a tank in
+   * the raid. Buff coverage still matches on the spec — a bear and a cat bring the same totem — but
+   * *role* is exactly the axis the split exists to separate.
+   */
+  for (const slot of slots) {
+    const build = slot.buildId ? getRaidBuild(slot.buildId) : undefined
+    roleCounts[build?.role ?? getRoleForSpec(slot.className, slot.spec)]++
+  }
 
   const raidWide = sectionFor(RAID_WIDE_BUFFS, slots)
   const partyScoped = sectionFor(PARTY_BUFFS, slots)
