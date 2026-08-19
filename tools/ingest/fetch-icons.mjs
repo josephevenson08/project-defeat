@@ -48,9 +48,23 @@ registerHooks({
 const { icons } = JSON.parse(readFileSync(resolve(REPO, 'src/domain/icons/icons.json'), 'utf8'))
 const { talentIconNames } = await import(pathToFileURL(resolve(REPO, 'src/domain/talents/sampleTalents.ts')).href)
 
+/*
+ * The raid planner's icons join the same fetch rather than getting a downloader of their own: they
+ * are the same CDN, the same 56x56 size and the same folder, and splitting them would mean two
+ * scripts to run and two places for a missing file to hide. Most of them are already here — the spec
+ * icons come from talent artwork this repo vendored long ago, so only the buff icons are new.
+ */
+const raidcomp = JSON.parse(readFileSync(resolve(REPO, 'src/domain/raidcomp/raidcompIcons.json'), 'utf8'))
+const raidcompNames = [
+  ...Object.values(raidcomp.spellIcons).map((entry) => entry.icon),
+  ...Object.values(raidcomp.specIcons).map((entry) => entry.icon),
+]
+
 const itemNames = new Set(Object.values(icons))
-const names = [...new Set([...itemNames, ...talentIconNames])].sort()
-console.log(`${itemNames.size} item/gem icons + ${talentIconNames.length} talent icons -> ${names.length} distinct`)
+const names = [...new Set([...itemNames, ...talentIconNames, ...raidcompNames])].sort()
+console.log(
+  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp icons -> ${names.length} distinct`,
+)
 
 mkdirSync(OUT_DIR, { recursive: true })
 

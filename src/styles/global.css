@@ -3731,42 +3731,6 @@ input[type='text']:focus {
   align-items: stretch;
 }
 
-.raidcomp-seat button {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 7px 10px 7px 12px;
-  background: transparent;
-  border: 0;
-  border-left: 3px solid transparent;
-  color: var(--text);
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.raidcomp-seat button:hover {
-  background: var(--surface-3);
-}
-
-/* Same four role colours the PNG export draws, kept in step deliberately. */
-.raidcomp-seat button[data-role='Tank'] { border-left-color: #6a7fa8; }
-.raidcomp-seat button[data-role='Healer'] { border-left-color: #6f8f6a; }
-.raidcomp-seat button[data-role='Physical DPS'] { border-left-color: #9c7346; }
-.raidcomp-seat button[data-role='Caster DPS'] { border-left-color: #856a9c; }
-
-.raidcomp-seat-remove {
-  color: var(--text-faint);
-  font-size: 15px;
-  line-height: 1;
-}
-
-.raidcomp-seat button:hover .raidcomp-seat-remove {
-  color: var(--text-strong);
-}
-
 .raidcomp-seat-empty {
   padding: 7px 12px;
   color: var(--line-strong);
@@ -3805,4 +3769,166 @@ input[type='text']:focus {
   font-size: 12px;
   color: var(--text-faint);
   font-style: italic;
+}
+
+/* ---------------------------------------------------------------------------
+   Raid composition — icons, drag and naming
+
+   Buffs render as an icon row under each group, the way Wowhead's tool shows
+   them: the picture is the identifier and the name lives in the title, because
+   twenty-four buff names under one group is a wall of text nobody reads.
+   --------------------------------------------------------------------------- */
+
+.raidcomp-spec-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.raidcomp-spec-add img,
+.raidcomp-seat-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+/* Seats -------------------------------------------------------------------- */
+
+.raidcomp-seat-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 9px;
+  border-left: 3px solid transparent;
+  cursor: grab;
+  min-width: 0;
+}
+
+.raidcomp-seat-body:active {
+  cursor: grabbing;
+}
+
+/* Same four role colours the PNG export draws, kept in step deliberately. */
+.raidcomp-seat-body[data-role='Tank'] { border-left-color: #6a7fa8; }
+.raidcomp-seat-body[data-role='Healer'] { border-left-color: #6f8f6a; }
+.raidcomp-seat-body[data-role='Physical DPS'] { border-left-color: #9c7346; }
+.raidcomp-seat-body[data-role='Caster DPS'] { border-left-color: #856a9c; }
+
+.raidcomp-seat.is-dragging {
+  opacity: 0.4;
+}
+
+/* Every seat is a drop target, empty ones included. */
+.raidcomp-seat {
+  transition: background 120ms ease;
+}
+
+.raidcomp-seat-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.raidcomp-seat-label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: text;
+  min-width: 0;
+}
+
+.raidcomp-seat-name,
+.raidcomp-seat-player {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.raidcomp-seat-player {
+  color: var(--text-strong);
+}
+
+/* Demoted under the name, matching the exported chart's two-line seat. */
+.raidcomp-seat-spec {
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.raidcomp-seat-input {
+  width: 100%;
+  padding: 2px 4px;
+  background: var(--surface-0);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.raidcomp-seat-remove {
+  background: transparent;
+  border: 0;
+  color: var(--text-faint);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+
+.raidcomp-seat-body:hover .raidcomp-seat-remove {
+  color: var(--text-strong);
+}
+
+/* Buff icon rows ----------------------------------------------------------- */
+
+.raidcomp-buff-icons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.raidcomp-buff-icons img {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+/* A small icon beside each coverage row, so the two surfaces read alike. */
+.raidcomp-row-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: 6px;
+  vertical-align: -3px;
+}
+
+.raidcomp-missing li,
+.raidcomp-covered li {
+  align-items: center;
+}
+
+/* Missing entries keep the icon but drain it, so absence reads at a glance. */
+.raidcomp-missing .raidcomp-row-icon {
+  filter: grayscale(1);
+  opacity: 0.45;
 }

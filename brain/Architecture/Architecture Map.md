@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-149 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+151 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,7 +16,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 37 importers
+- [[domain.character.characterTypes]] — 38 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 15 importers
@@ -96,7 +96,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (98)
+### domain (100)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -125,7 +125,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.builds.buildSerialization]] · 3 importers
 - [[domain.builds.buildTypes]] · 4 importers
 - [[domain.character.applyRacialTraits]] · 1 importers
-- [[domain.character.characterTypes]] · 37 importers
+- [[domain.character.characterTypes]] · 38 importers
 - [[domain.character.races]] · 2 importers
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 10 importers
@@ -166,6 +166,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.sampleProfessionTiers]] · 2 importers
 - [[domain.raidcomp.buffCoverage]] · 1 importers
 - [[domain.raidcomp.index]] · 3 importers
+- [[domain.raidcomp.raidcompIcons]] · 1 importers
+- [[domain.raidcomp.raidcompIconsJson.d]] · 0 importers
 - [[domain.raidcomp.rosterTypes]] · 2 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
 - [[domain.raids.index]] · 5 importers

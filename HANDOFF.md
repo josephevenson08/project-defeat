@@ -94,6 +94,25 @@ outcomes keep changing and these have not: measure before designing, plumbing be
 before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
 invariant before trusting it.
 
+**The planner then gained icons, drag-and-drop and player names** (2026-08-19, by request). Specs and
+buffs both render real artwork; granted buffs sit under each group as an icon row, the way Wowhead
+shows them, because 24 buff names under one group is a wall of text nobody reads.
+
+**A spec has no icon of its own in TBC.** The convention is the tree's deepest talent — Mangle for
+Feral, Shadowstep for Subtlety, Avenger's Shield for Protection Paladin — so spec icons are *derived
+from talent data already in the repo*, with the source talent recorded so the choice stays auditable.
+Buff icons come from each spell's id-keyed Wowhead payload, cross-checked on `name_enus`.
+
+**One icon looks like a bug and is not.** Greater Blessing of Might's file is literally
+`spell_holy_greaterblessingofkings` — Blizzard reused a misleadingly named asset. An earlier pass
+assumed the parser had grabbed a neighbour and nearly "corrected" accurate data. A test now pins it,
+including that Kings itself uses the *different* `spell_magic_` file.
+
+**Two real bugs surfaced only by driving the UI**, neither visible to `tsc`. The name field was
+uncontrolled, so any roster re-render discarded what had been typed; it is controlled now. And
+`loadRoster` validated each seat by rebuilding it from class and spec alone, **silently dropping every
+player name on reload** — the roster came back looking correct, just anonymous.
+
 **Then the raid planner was rebuilt around groups, because the first version was wrong about TBC.**
 24 of the 33 raid buffs are **party-scoped** — every totem, every aura, both Warrior shouts, Arcane
 Brilliance, Gift of the Wild — and reach only the caster's group of five. Treating them as raid-wide
@@ -236,7 +255,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 136 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 142 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -288,6 +307,7 @@ node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 5
 node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-buff-scope.mjs         # party vs raid scope for all 39 buffs/debuffs
+node tools/ingest/ingest-raidcomp-icons.mjs     # 39 buff icons + 27 spec icons (deepest talent)
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
 node tools/ingest/ingest-item-effects.mjs       # 49 trinket/weapon procs and on-use effects
 node tools/ingest/ingest-meta-gems.mjs          # colour conditions for all 18 meta gems
@@ -443,6 +463,15 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **Greater Blessing of Might's icon file is called `spell_holy_greaterblessingofkings`.** Not a
+  mis-read: Blizzard reused a misleadingly named asset, and Wowhead's payload for spell 27141 says so
+  with `name_enus` confirming the spell. Kings itself uses `spell_magic_greaterblessingofkings` — a
+  different prefix — which is the only thing that makes the two distinguishable. A pass here assumed
+  the parser had grabbed a neighbouring entry and nearly "corrected" accurate data; a test pins it now.
+- **Raid-planner buffs render as icons, so assert their accessible name, not visible text.** A test
+  written against `getByText` passed while the buffs were text rows and broke the moment they became
+  icons. `getByAltText` is the stronger assertion regardless: an icon with no alt text fails it, and
+  fails a screen reader for the same reason.
 - **A "+9" in the raid planner's suggestions is buffs *and* debuffs together.** A Holy Paladin covers
   **8 buffs and 1 debuff**, and reading that as nine buffs is a mistake the first version of its own
   test made. The two counters are separate on screen; only the suggestion list totals them.

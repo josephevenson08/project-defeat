@@ -11,6 +11,21 @@ import type { RaidPlayerSize } from '../raids/raidTypes'
 export type RosterSlot = {
   className: TbcClass
   spec: TbcSpec
+  /**
+   * Optional, and it stays optional deliberately.
+   *
+   * Coverage never reads it — a Shaman brings Strength of Earth whether or not you typed "Dave" — so
+   * an unnamed roster is fully functional and naming is purely for the raid reading the exported
+   * chart. Keeping it out of the coverage model is also what stops the tool quietly becoming a
+   * roster-management database for other people's details.
+   */
+  playerName?: string
+}
+
+/** A seat's address. Drag-and-drop moves between two of these, so it is worth naming. */
+export type SeatRef = {
+  groupIndex: number
+  seatIndex: number
 }
 
 /** TBC parties are five, always. A 25-player raid is five of them; a 10-player raid is two. */
@@ -84,6 +99,47 @@ export function clearSeat(roster: Roster, groupIndex: number, seatIndex: number)
     index === groupIndex ? group.map((existing, position) => (position === seatIndex ? undefined : existing)) : group,
   )
   return { ...roster, groups }
+}
+
+/** Reads one seat, or undefined if the address is out of range or empty. */
+export function seatAt(roster: Roster, ref: SeatRef): RosterSlot | undefined {
+  return roster.groups[ref.groupIndex]?.[ref.seatIndex]
+}
+
+function writeSeat(roster: Roster, ref: SeatRef, slot: RosterSlot | undefined): Roster {
+  const groups = roster.groups.map((group, groupIndex) =>
+    groupIndex === ref.groupIndex
+      ? group.map((existing, seatIndex) => (seatIndex === ref.seatIndex ? slot : existing))
+      : group,
+  )
+  return { ...roster, groups }
+}
+
+/**
+ * Moves a seat, **swapping** when the destination is occupied rather than refusing or overwriting.
+ *
+ * Swap is the behaviour a raid leader expects from dragging one player onto another: they are
+ * trading places. Refusing would make reorganising a full raid impossible without first emptying a
+ * seat, and overwriting would silently delete somebody — the one outcome that loses work.
+ */
+export function moveSeat(roster: Roster, from: SeatRef, to: SeatRef): Roster {
+  if (from.groupIndex === to.groupIndex && from.seatIndex === to.seatIndex) return roster
+
+  const moving = seatAt(roster, from)
+  if (!moving) return roster
+
+  const displaced = seatAt(roster, to)
+  return writeSeat(writeSeat(roster, to, moving), from, displaced)
+}
+
+/** Sets or clears a seat's player name. An empty string clears it rather than storing "". */
+export function renameSeat(roster: Roster, ref: SeatRef, playerName: string): Roster {
+  const slot = seatAt(roster, ref)
+  if (!slot) return roster
+
+  const trimmed = playerName.trim()
+  const { playerName: _previous, ...rest } = slot
+  return writeSeat(roster, ref, trimmed ? { ...rest, playerName: trimmed } : rest)
 }
 
 /** Karazhan is the only 10-player raid in Phase 2; everything else is 25. */

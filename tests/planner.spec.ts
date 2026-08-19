@@ -34,7 +34,21 @@ import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import type { BisList } from '../src/domain/bis'
 import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
-import { addToGroup, computeCoverage, describeSuggestion, emptyRoster, filledSlots, getBuffScope, resizeRoster } from '../src/domain/raidcomp'
+import {
+  addToGroup,
+  computeCoverage,
+  describeSuggestion,
+  emptyRoster,
+  filledSlots,
+  getBuffIcon,
+  getBuffScope,
+  getSpecIcon,
+  getSpecIconSource,
+  moveSeat,
+  renameSeat,
+  resizeRoster,
+  seatAt,
+} from '../src/domain/raidcomp'
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
@@ -304,7 +318,7 @@ import {
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
 import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/domain/gear/obtainability'
@@ -4820,14 +4834,158 @@ test('the raid composition planner seats a raid, and buffs land per group', asyn
   await page.getByTestId('raidcomp-add-shaman-restoration').click()
   await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 25')
 
+  /*
+   * Granted buffs render as icons, the way Wowhead shows them, so this asserts the *accessible* name
+   * rather than visible text — which is the stronger check anyway: an icon with no alt text would
+   * pass a text query never and a screen reader never, and this catches both.
+   */
   const group1 = page.getByTestId('raidcomp-group-1')
   const group2 = page.getByTestId('raidcomp-group-2')
-  await expect(group1.getByText('Strength of Earth Totem')).toBeVisible()
-  await expect(group2.getByText('Strength of Earth Totem')).toHaveCount(0)
+  await expect(group1.getByAltText('Strength of Earth Totem')).toBeVisible()
+  await expect(group2.getByAltText('Strength of Earth Totem')).toHaveCount(0)
   await expect(group2.getByText('Empty group')).toBeVisible()
 
   // Removing the seat takes the buffs with it.
   await page.getByRole('button', { name: /Remove Restoration Shaman/ }).click()
   await expect(page.getByTestId('raidcomp-filled')).toContainText('0 of 25')
-  await expect(group1.getByText('Strength of Earth Totem')).toHaveCount(0)
+  await expect(group1.getByAltText('Strength of Earth Totem')).toHaveCount(0)
+})
+
+test('every spec and every buff has a real vendored icon', () => {
+  /*
+   * Icons are names in `domain/` and files in `public/icons/`, and the two drift silently: a missing
+   * file renders as a broken image, which looks like a styling bug rather than a data one. Both halves
+   * are asserted together so neither can rot alone.
+   *
+   * A spec has no icon of its own in TBC — the convention is the tree's deepest talent, which is why
+   * these are derived from talent data rather than fetched.
+   */
+  const iconDir = resolve(process.cwd(), 'public/icons')
+  const onDisk = new Set(readdirSync(iconDir).map((file) => file.replace(/\.jpg$/, '')))
+
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      const icon = getSpecIcon(definition.className, spec)
+      expect(icon, `${spec} ${definition.className} has no icon`).toBeDefined()
+      expect(onDisk.has(icon!), `${icon}.jpg is named but not vendored`).toBe(true)
+      // The talent it came from is recorded, so the choice stays auditable rather than magic.
+      expect(getSpecIconSource(definition.className, spec)).toBeTruthy()
+    }
+  }
+
+  for (const entry of [...sampleBuffs, ...sampleTargetDebuffs]) {
+    const icon = getBuffIcon(entry.id)
+    expect(icon, `${entry.name} has no icon`).toBeDefined()
+    expect(onDisk.has(icon!), `${icon}.jpg is named but not vendored`).toBe(true)
+  }
+})
+
+test("Greater Blessing of Might really does use the Kings icon file", () => {
+  /*
+   * Kept as a test because it looks exactly like a bug and is not one. Blizzard reused a misleadingly
+   * named asset: Wowhead's payload for spell 27141, with `name_enus` confirming the spell, gives the
+   * icon as `spell_holy_greaterblessingofkings`. An earlier pass here assumed the parser had grabbed a
+   * neighbouring entry and nearly "corrected" accurate data.
+   *
+   * Kings itself uses a different file — `spell_magic_…` rather than `spell_holy_…` — which is the
+   * detail that makes the two distinguishable at all.
+   */
+  expect(getBuffIcon('blessing-of-might')).toBe('spell_holy_greaterblessingofkings')
+  expect(getBuffIcon('blessing-of-kings')).toBe('spell_magic_greaterblessingofkings')
+  expect(getBuffIcon('blessing-of-might')).not.toBe(getBuffIcon('blessing-of-kings'))
+})
+
+test('dragging a seat onto an occupied one swaps rather than overwrites', () => {
+  /*
+   * Swap is what a raid leader means by dragging one player onto another — they are trading places.
+   * Overwriting would silently delete somebody, which is the one outcome that loses work, and
+   * refusing would make reorganising a full raid impossible without emptying a seat first.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+  roster = addToGroup(roster, 1, { className: 'Mage', spec: 'Fire' })
+
+  const from = { groupIndex: 0, seatIndex: 0 }
+  const to = { groupIndex: 1, seatIndex: 0 }
+  const swapped = moveSeat(roster, from, to)
+
+  expect(seatAt(swapped, to)?.className, 'the dragged player arrives').toBe('Shaman')
+  expect(seatAt(swapped, from)?.className, 'and the displaced one takes the empty seat').toBe('Mage')
+  expect(filledSlots(swapped), 'nobody is lost in a swap').toHaveLength(2)
+
+  // Moving onto an empty seat just moves; nothing comes back the other way.
+  const moved = moveSeat(roster, from, { groupIndex: 4, seatIndex: 3 })
+  expect(seatAt(moved, from)).toBeUndefined()
+  expect(seatAt(moved, { groupIndex: 4, seatIndex: 3 })?.className).toBe('Shaman')
+  expect(filledSlots(moved)).toHaveLength(2)
+})
+
+test('a party buff follows the player when they change group', () => {
+  /*
+   * The point of drag-and-drop in a TBC planner: moving the Shaman moves the totems. Asserted through
+   * coverage rather than through the roster, because that is the thing a raid leader is watching.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+
+  const before = computeCoverage(roster)
+  expect(before.groups[0].partyBuffs.length).toBeGreaterThan(0)
+  expect(before.groups[3].partyBuffs).toEqual([])
+
+  const after = computeCoverage(moveSeat(roster, { groupIndex: 0, seatIndex: 0 }, { groupIndex: 3, seatIndex: 0 }))
+  expect(after.groups[0].partyBuffs, 'the old group loses them').toEqual([])
+  expect(after.groups[3].partyBuffs.length, 'and the new group gains them').toBeGreaterThan(0)
+})
+
+test('naming a seat is optional, clearable, and never changes coverage', () => {
+  /*
+   * A Shaman brings Strength of Earth whether or not you typed "Dave". Keeping names out of the
+   * coverage model is what stops the planner quietly becoming a database of other people's details,
+   * and it means an unnamed roster is fully functional.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+  const ref = { groupIndex: 0, seatIndex: 0 }
+
+  const baseline = computeCoverage(roster).groups[0].partyBuffs.length
+
+  const named = renameSeat(roster, ref, '  Dave  ')
+  expect(seatAt(named, ref)?.playerName, 'trimmed on the way in').toBe('Dave')
+  expect(computeCoverage(named).groups[0].partyBuffs).toHaveLength(baseline)
+
+  // An empty string clears the field rather than storing "".
+  const cleared = renameSeat(named, ref, '   ')
+  expect(seatAt(cleared, ref)?.playerName).toBeUndefined()
+  expect('playerName' in seatAt(cleared, ref)!).toBe(false)
+})
+
+test('a seat can be named through the UI, and the name survives a reload', async ({ page }) => {
+  await openApp(page, 'raidcomp')
+
+  await page.getByTestId('raidcomp-add-shaman-restoration').click()
+  await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 25')
+
+  /*
+   * The naming field is controlled rather than uncontrolled, and this test is why. The first version
+   * used `defaultValue`, which lost whatever was typed whenever the roster re-rendered underneath it
+   * — real, and invisible until driven.
+   */
+  await page.getByRole('button', { name: /Name the Restoration Shaman/ }).click()
+  const input = page.getByTestId('raidcomp-name-input-1-1')
+  await input.fill('Dave')
+  await input.press('Enter')
+
+  await expect(page.getByText('Dave')).toBeVisible()
+
+  /*
+   * Persisted, not merely rendered — asserted on the stored payload first so a failure says which
+   * half broke. A roster that renders but does not save, and one that saves but does not reload,
+   * fail the same visible assertion for opposite reasons.
+   */
+  const stored = await page.evaluate(() => localStorage.getItem('project-defeat:roster:v1'))
+  expect(stored, 'the roster must reach storage').toContain('Dave')
+
+  await page.reload()
+  await page.getByTestId('section-raidcomp').click()
+  await expect(page.getByText('Dave')).toBeVisible()
 })

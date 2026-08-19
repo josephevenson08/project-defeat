@@ -43,13 +43,26 @@ export function loadRoster(): Roster | undefined {
         const seat: unknown = stored[seatIndex]
         if (typeof seat !== 'object' || seat === null) return undefined
 
-        const { className, spec } = seat as { className?: unknown; spec?: unknown }
+        const { className, spec, playerName } = seat as {
+          className?: unknown
+          spec?: unknown
+          playerName?: unknown
+        }
         if (typeof className !== 'string' || typeof spec !== 'string') return undefined
 
         const definition = getClassDefinition(className as never)
         if (!definition || !(definition.specs as readonly string[]).includes(spec)) return undefined
 
-        return { className, spec } as RosterSlot
+        /*
+         * The name has to be carried through explicitly. An earlier version rebuilt the seat from
+         * class and spec alone, which validated correctly and silently dropped every player name on
+         * reload — the roster came back looking right, just anonymous.
+         */
+        return {
+          className,
+          spec,
+          ...(typeof playerName === 'string' && playerName.trim() ? { playerName: playerName.trim() } : {}),
+        } as RosterSlot
       })
     })
 

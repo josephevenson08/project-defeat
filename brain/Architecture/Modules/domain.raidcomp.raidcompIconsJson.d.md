@@ -1,15 +1,15 @@
 ---
 type: module
-layer: app
-source: src/styles/global.css
-lines: 3935
+layer: domain
+source: src/domain/raidcomp/raidcompIconsJson.d.ts
+lines: 8
 generated: true
-tags: [brain/architecture, layer/app]
+tags: [brain/architecture, layer/domain]
 ---
 
-# styles.global
+# domain.raidcomp.raidcompIconsJson.d
 
-`src/styles/global.css` · **app** layer · 3935 lines
+`src/domain/raidcomp/raidcompIconsJson.d.ts` · **domain** layer · 8 lines
 
 _No doc comment at the top of this file._
 
@@ -23,7 +23,7 @@ _None._
 
 ## Imported by
 
-- [[main]] — `src/main.tsx`
+_None._
 
 ## Concepts & phases
 

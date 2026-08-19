@@ -43,6 +43,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`

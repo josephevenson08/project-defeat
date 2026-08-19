@@ -12,33 +12,30 @@ import {
   computeCoverage,
   describeSuggestion,
   emptyRoster,
+  getBuffIcon,
+  getSpecIcon,
+  moveSeat,
+  renameSeat,
   resizeRoster,
 } from '../../domain/raidcomp'
-import type { CoverageSection, Roster } from '../../domain/raidcomp'
+import type { CoverageSection, Roster, SeatRef } from '../../domain/raidcomp'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
 /**
  * The raid-composition planner: a seating chart in, buff coverage out.
  *
- * **It is built around groups because in TBC composition *is* group assignment.** 24 of the 33 raid
- * buffs are party-scoped — every totem, every aura, both Warrior shouts, Arcane Brilliance, Gift of
- * the Wild — so which group the Shaman sits in decides who actually receives Strength of Earth. The
- * first version of this panel treated every buff as raid-wide and told a raid leader Battle Shout
- * was covered when five of twenty-five players had it. Sourcing the scopes from the spell tooltips
- * is what turned this from a checklist into a planning tool.
- *
- * **A section rather than a planner panel** because nothing here belongs to the character in the
- * rail — the person planning a raid is usually not the person being geared.
+ * **Built around groups because in TBC composition *is* group assignment.** 24 of the 33 raid buffs
+ * are party-scoped — every totem, every aura, both Warrior shouts — so which group the Shaman sits in
+ * decides who actually receives Strength of Earth. The first version treated everything as raid-wide
+ * and told a raid leader Battle Shout was covered when five of twenty-five players had it.
  */
 
 const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 'Caster DPS']
 
 /**
- * Rough shape of a working raid, shown as guidance rather than enforced.
- *
- * Deliberately a range and deliberately soft: real Phase 2 raids run 2-3 tanks and 5-7 healers
- * depending on the fight. The panel says what is unusual; it never says what is wrong.
+ * Rough shape of a working raid, shown as guidance rather than enforced. Real Phase 2 raids run 2-3
+ * tanks and 5-7 healers depending on the fight, so the panel says what is unusual, never what is wrong.
  */
 const TYPICAL_SHAPE: Record<RaidPlayerSize, Partial<Record<CharacterRole, readonly [number, number]>>> = {
   10: { Tank: [1, 2], Healer: [2, 3] },
@@ -46,12 +43,31 @@ const TYPICAL_SHAPE: Record<RaidPlayerSize, Partial<Record<CharacterRole, readon
 }
 
 const ALL_SPECS = tbcClasses.flatMap((definition) =>
-  definition.specs.map((spec) => ({
-    className: definition.className,
-    spec,
-    role: getRoleForSpec(definition.className, spec),
-  })),
+  definition.specs.map((spec) => ({ className: definition.className, spec })),
 )
+
+const iconUrl = (name: string | undefined) => (name ? `${import.meta.env.BASE_URL}icons/${name}.jpg` : undefined)
+
+/** Wowhead shows granted buffs as a row of icons; the names live in the title, as they do there. */
+function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: string }) {
+  if (buffs.length === 0) return <span className="raidcomp-group-buffs-none">{emptyLabel}</span>
+
+  return (
+    <ul className="raidcomp-buff-icons">
+      {buffs.map((buff) => (
+        <li key={buff.id}>
+          <img
+            src={iconUrl(getBuffIcon(buff.id))}
+            alt={buff.name}
+            title={buff.name}
+            loading="lazy"
+            decoding="async"
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { section: CoverageSection<T>; label: string }) {
   const total = section.covered.length + section.missing.length
@@ -70,6 +86,7 @@ function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { secti
         <ul className="raidcomp-missing">
           {section.missing.map(({ entry, needs }) => (
             <li key={entry.id}>
+              <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
               <span className="raidcomp-entry-name">{entry.name}</span>
               <span className="raidcomp-entry-need">needs {needs}</span>
             </li>
@@ -81,6 +98,7 @@ function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { secti
         <ul className="raidcomp-covered">
           {section.covered.map(({ entry, providedBy }) => (
             <li key={entry.id}>
+              <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
               <span className="raidcomp-entry-name">{entry.name}</span>
               <span className="raidcomp-entry-source">
                 {describeProvider(entry)}
@@ -96,11 +114,20 @@ function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { secti
 
 export function RaidCompositionPanel() {
   const [roster, setRoster] = useState<Roster>(() => loadRoster() ?? emptyRoster(25))
-  /*
-   * Which group a picked spec lands in. Defaulting to the first group with room means a raid leader
-   * can fill 25 seats by clicking 25 specs, and only has to think about groups when they want to.
-   */
   const [selectedGroup, setSelectedGroup] = useState(0)
+  /** The seat currently being dragged. Held in state so the drop target can style itself. */
+  const [dragging, setDragging] = useState<SeatRef | undefined>()
+  /** Which seat has its name field open. One at a time keeps the chart readable. */
+  const [naming, setNaming] = useState<SeatRef | undefined>()
+  /**
+   * The in-progress name, held here rather than left to an uncontrolled input.
+   *
+   * An uncontrolled `defaultValue` field looked simpler and was subtly wrong: React re-renders this
+   * list on every roster change, and a re-render while the field is open discards whatever was typed
+   * because the DOM value is not the source of truth. Controlled state survives that, and it is also
+   * the only version a test can drive.
+   */
+  const [draftName, setDraftName] = useState('')
 
   const report = useMemo(() => computeCoverage(roster), [roster])
 
@@ -111,13 +138,16 @@ export function RaidCompositionPanel() {
   const firstGroupWithRoom = roster.groups.findIndex((group) => group.includes(undefined))
   const targetGroup = roster.groups[selectedGroup]?.includes(undefined) ? selectedGroup : firstGroupWithRoom
 
+  const shape = TYPICAL_SHAPE[roster.size]
+  const title = `${roster.size}-player raid`
+
   const place = (className: TbcClass, spec: TbcSpec) => {
     if (targetGroup === -1) return
     setRoster((current) => addToGroup(current, targetGroup, { className, spec }))
   }
 
-  const shape = TYPICAL_SHAPE[roster.size]
-  const title = `${roster.size}-player raid`
+  const sameSeat = (a: SeatRef | undefined, b: SeatRef) =>
+    a !== undefined && a.groupIndex === b.groupIndex && a.seatIndex === b.seatIndex
 
   return (
     <div className="panel raidcomp" data-testid="raidcomp-panel">
@@ -126,8 +156,8 @@ export function RaidCompositionPanel() {
         <p className="panel-copy">
           Seat a raid and see what each group actually receives. <strong>24 of the 33 raid buffs are
           party-scoped in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so
-          where someone sits matters as much as whether they are in the raid at all. Every scope is read
-          from the spell's own tooltip.
+          where someone sits matters as much as whether they are in the raid. Drag to move a player; click a
+          name to label the seat.
         </p>
       </header>
 
@@ -210,17 +240,20 @@ export function RaidCompositionPanel() {
               data-testid={`raidcomp-add-${className}-${spec}`.replace(/\s+/g, '-').toLowerCase()}
               aria-label={`Add ${spec} ${className}`}
             >
-              {spec} {className}
+              <img src={iconUrl(getSpecIcon(className, spec))} alt="" loading="lazy" decoding="async" />
+              <span>
+                {spec} {className}
+              </span>
             </button>
           ))}
         </div>
       </section>
 
-      {/* The working surface: seating on the left of each column, what that seating buys underneath. */}
       <section className="raidcomp-groups" aria-label="Groups">
         {report.groups.map((groupCoverage) => {
           const group = roster.groups[groupCoverage.groupIndex]
           const isTarget = groupCoverage.groupIndex === targetGroup
+
           return (
             <div
               key={groupCoverage.groupIndex}
@@ -240,49 +273,119 @@ export function RaidCompositionPanel() {
               </button>
 
               <ol className="raidcomp-seats">
-                {group.map((slot, seatIndex) => (
-                  <li key={seatIndex} className={slot ? 'raidcomp-seat is-filled' : 'raidcomp-seat'}>
-                    {slot ? (
-                      <button
-                        type="button"
-                        onClick={() => setRoster((current) => clearSeat(current, groupCoverage.groupIndex, seatIndex))}
-                        aria-label={`Remove ${slot.spec} ${slot.className} from group ${groupCoverage.groupIndex + 1}`}
-                        data-role={getRoleForSpec(slot.className, slot.spec)}
-                      >
-                        <span className="raidcomp-seat-name">
-                          {slot.spec} {slot.className}
-                        </span>
-                        <span className="raidcomp-seat-remove" aria-hidden="true">
-                          ×
-                        </span>
-                      </button>
-                    ) : (
-                      <span className="raidcomp-seat-empty">—</span>
-                    )}
-                  </li>
-                ))}
+                {group.map((slot, seatIndex) => {
+                  const ref: SeatRef = { groupIndex: groupCoverage.groupIndex, seatIndex }
+                  const isNaming = sameSeat(naming, ref)
+
+                  return (
+                    <li
+                      key={seatIndex}
+                      className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}`}
+                      /*
+                       * Every seat is a drop target, empty ones included — dragging into a gap is the
+                       * obvious way to move someone, and `moveSeat` swaps when the destination is
+                       * occupied so a drop never silently deletes anybody.
+                       */
+                      onDragOver={(event) => {
+                        if (dragging) event.preventDefault()
+                      }}
+                      onDrop={(event) => {
+                        event.preventDefault()
+                        if (dragging) setRoster((current) => moveSeat(current, dragging, ref))
+                        setDragging(undefined)
+                      }}
+                    >
+                      {slot ? (
+                        <div
+                          className="raidcomp-seat-body"
+                          draggable
+                          onDragStart={() => setDragging(ref)}
+                          onDragEnd={() => setDragging(undefined)}
+                          data-role={getRoleForSpec(slot.className, slot.spec)}
+                        >
+                          <img
+                            className="raidcomp-seat-icon"
+                            src={iconUrl(getSpecIcon(slot.className, slot.spec))}
+                            alt=""
+                            loading="lazy"
+                          />
+
+                          <span className="raidcomp-seat-text">
+                            {isNaming ? (
+                              <input
+                                className="raidcomp-seat-input"
+                                autoFocus
+                                value={draftName}
+                                placeholder="Player name"
+                                aria-label={`Name for ${slot.spec} ${slot.className}`}
+                                data-testid={`raidcomp-name-input-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
+                                onChange={(event) => setDraftName(event.target.value)}
+                                onBlur={() => {
+                                  setRoster((current) => renameSeat(current, ref, draftName))
+                                  setNaming(undefined)
+                                }}
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
+                                    setRoster((current) => renameSeat(current, ref, draftName))
+                                    setNaming(undefined)
+                                  }
+                                  // Escape abandons the edit, leaving whatever name was already there.
+                                  if (event.key === 'Escape') setNaming(undefined)
+                                }}
+                              />
+                            ) : (
+                              <button
+                                type="button"
+                                className="raidcomp-seat-label"
+                                onClick={() => {
+                                  setDraftName(slot.playerName ?? '')
+                                  setNaming(ref)
+                                }}
+                                aria-label={`Name the ${slot.spec} ${slot.className} in group ${groupCoverage.groupIndex + 1}`}
+                              >
+                                {slot.playerName ? (
+                                  <>
+                                    <span className="raidcomp-seat-player">{slot.playerName}</span>
+                                    <span className="raidcomp-seat-spec">
+                                      {slot.spec} {slot.className}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="raidcomp-seat-name">
+                                    {slot.spec} {slot.className}
+                                  </span>
+                                )}
+                              </button>
+                            )}
+                          </span>
+
+                          <button
+                            type="button"
+                            className="raidcomp-seat-remove"
+                            onClick={() => setRoster((current) => clearSeat(current, ref.groupIndex, ref.seatIndex))}
+                            aria-label={`Remove ${slot.spec} ${slot.className}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="raidcomp-seat-empty">—</span>
+                      )}
+                    </li>
+                  )
+                })}
               </ol>
 
               {/*
-                What this group receives, which is the whole reason the seating is on screen. Shown
-                per group and deliberately kept out of the exported image: this is the decision
-                surface, the image is the result.
+                What this seating buys, as icons — the same shape Wowhead uses, and deliberately kept
+                out of the exported image: this is the decision surface, the PNG is the result.
               */}
               <div className="raidcomp-group-buffs">
-                <span className="raidcomp-group-buffs-label">
-                  Party buffs · {groupCoverage.partyBuffs.length}
-                </span>
-                {groupCoverage.partyBuffs.length === 0 ? (
-                  <span className="raidcomp-group-buffs-none">
-                    {groupCoverage.filled === 0 ? 'Empty group' : 'None from this group'}
-                  </span>
-                ) : (
-                  <ul>
-                    {groupCoverage.partyBuffs.map((buff) => (
-                      <li key={buff.id}>{buff.name}</li>
-                    ))}
-                  </ul>
-                )}
+                <span className="raidcomp-group-buffs-label">Party buffs · {groupCoverage.partyBuffs.length}</span>
+                <BuffIcons
+                  buffs={groupCoverage.partyBuffs}
+                  emptyLabel={groupCoverage.filled === 0 ? 'Empty group' : 'None from this group'}
+                />
               </div>
             </div>
           )

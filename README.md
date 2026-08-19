@@ -50,7 +50,9 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   party-scoped in TBC**, so totems, auras and shouts reach only the caster's group; every scope is
   read from the spell's own Wowhead tooltip. Role balance, a ranked list of what one more seat would
   buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
-  persistence, and a **PNG export** of the seating chart for pasting into Discord
+  persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
+  spec and buff, **drag-and-drop** to move players between groups (occupied seats swap rather than
+  overwrite), and an optional player name per seat
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
@@ -59,7 +61,7 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,609 files, 2.8 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,625 files, 2.8 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against

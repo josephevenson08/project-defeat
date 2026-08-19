@@ -1,0 +1,367 @@
+{
+  "$schema": "raid composition icon names",
+  "generatedBy": "tools/ingest/ingest-raidcomp-icons.mjs",
+  "note": "Buff icons from each spell's id-keyed Wowhead payload, cross-checked on name_enus. Spec icons from each talent tree's deepest talent, derived from data already in the repo.",
+  "spellIcons": {
+    "battle-shout": {
+      "name": "Battle Shout",
+      "spellId": 2048,
+      "icon": "ability_warrior_battleshout"
+    },
+    "commanding-shout": {
+      "name": "Commanding Shout",
+      "spellId": 469,
+      "icon": "ability_warrior_rallyingcry"
+    },
+    "blessing-of-might": {
+      "name": "Greater Blessing of Might",
+      "spellId": 27141,
+      "icon": "spell_holy_greaterblessingofkings"
+    },
+    "blessing-of-kings": {
+      "name": "Greater Blessing of Kings",
+      "spellId": 25898,
+      "icon": "spell_magic_greaterblessingofkings"
+    },
+    "blessing-of-wisdom": {
+      "name": "Greater Blessing of Wisdom",
+      "spellId": 27143,
+      "icon": "spell_holy_greaterblessingofwisdom"
+    },
+    "blessing-of-salvation": {
+      "name": "Greater Blessing of Salvation",
+      "spellId": 25895,
+      "icon": "spell_holy_greaterblessingofsalvation"
+    },
+    "blessing-of-sanctuary": {
+      "name": "Greater Blessing of Sanctuary",
+      "spellId": 27169,
+      "icon": "spell_holy_greaterblessingofsanctuary"
+    },
+    "devotion-aura": {
+      "name": "Devotion Aura",
+      "spellId": 27149,
+      "icon": "spell_holy_devotionaura"
+    },
+    "retribution-aura": {
+      "name": "Retribution Aura",
+      "spellId": 27150,
+      "icon": "spell_holy_auraoflight"
+    },
+    "sanctity-aura": {
+      "name": "Sanctity Aura",
+      "spellId": 20218,
+      "icon": "spell_holy_mindvision"
+    },
+    "arcane-intellect": {
+      "name": "Arcane Brilliance",
+      "spellId": 27127,
+      "icon": "spell_holy_arcaneintellect"
+    },
+    "prayer-of-fortitude": {
+      "name": "Prayer of Fortitude",
+      "spellId": 25392,
+      "icon": "spell_holy_prayeroffortitude"
+    },
+    "prayer-of-spirit": {
+      "name": "Prayer of Spirit",
+      "spellId": 32999,
+      "icon": "spell_holy_prayerofspirit"
+    },
+    "shadow-protection": {
+      "name": "Shadow Protection",
+      "spellId": 25433,
+      "icon": "spell_shadow_antishadow"
+    },
+    "power-infusion": {
+      "name": "Power Infusion",
+      "spellId": 10060,
+      "icon": "spell_holy_powerinfusion"
+    },
+    "mark-of-the-wild": {
+      "name": "Gift of the Wild",
+      "spellId": 26991,
+      "icon": "spell_nature_giftofthewild"
+    },
+    "thorns": {
+      "name": "Thorns",
+      "spellId": 26992,
+      "icon": "spell_nature_thorns"
+    },
+    "innervate": {
+      "name": "Innervate",
+      "spellId": 29166,
+      "icon": "spell_nature_lightning"
+    },
+    "leader-of-the-pack": {
+      "name": "Leader of the Pack",
+      "spellId": 17007,
+      "icon": "spell_nature_unyeildingstamina"
+    },
+    "moonkin-aura": {
+      "name": "Moonkin Aura",
+      "spellId": 24858,
+      "icon": "spell_nature_forceofnature",
+      "spellName": "Moonkin Form"
+    },
+    "trueshot-aura": {
+      "name": "Trueshot Aura",
+      "spellId": 27066,
+      "icon": "ability_trueshot"
+    },
+    "ferocious-inspiration": {
+      "name": "Ferocious Inspiration",
+      "spellId": 34460,
+      "icon": "ability_hunter_ferociousinspiration"
+    },
+    "strength-of-earth-totem": {
+      "name": "Strength of Earth Totem",
+      "spellId": 25528,
+      "icon": "spell_nature_earthbindtotem"
+    },
+    "grace-of-air-totem": {
+      "name": "Grace of Air Totem",
+      "spellId": 25359,
+      "icon": "spell_nature_invisibilitytotem"
+    },
+    "mana-spring-totem": {
+      "name": "Mana Spring Totem",
+      "spellId": 25570,
+      "icon": "spell_nature_manaregentotem"
+    },
+    "totem-of-wrath": {
+      "name": "Totem of Wrath",
+      "spellId": 30706,
+      "icon": "spell_fire_totemofwrath"
+    },
+    "wrath-of-air-totem": {
+      "name": "Wrath of Air Totem",
+      "spellId": 3738,
+      "icon": "spell_nature_slowingtotem"
+    },
+    "windfury-totem": {
+      "name": "Windfury Totem",
+      "spellId": 25587,
+      "icon": "spell_nature_windfury"
+    },
+    "mana-tide-totem": {
+      "name": "Mana Tide Totem",
+      "spellId": 16190,
+      "icon": "spell_frost_summonwaterelemental"
+    },
+    "tranquil-air-totem": {
+      "name": "Tranquil Air Totem",
+      "spellId": 25908,
+      "icon": "spell_nature_brilliance"
+    },
+    "unleashed-rage": {
+      "name": "Unleashed Rage",
+      "spellId": 30806,
+      "icon": "spell_nature_unleashedrage"
+    },
+    "bloodlust": {
+      "name": "Bloodlust",
+      "spellId": 2825,
+      "icon": "spell_nature_bloodlust"
+    },
+    "blood-pact": {
+      "name": "Blood Pact",
+      "spellId": 27268,
+      "icon": "spell_shadow_bloodboil"
+    },
+    "sunder-armor": {
+      "name": "Sunder Armor",
+      "spellId": 25225,
+      "icon": "ability_warrior_sunder"
+    },
+    "curse-of-recklessness": {
+      "name": "Curse of Recklessness",
+      "spellId": 27226,
+      "icon": "spell_shadow_unholystrength"
+    },
+    "faerie-fire": {
+      "name": "Faerie Fire",
+      "spellId": 26993,
+      "icon": "spell_nature_faeriefire"
+    },
+    "improved-seal-of-the-crusader": {
+      "name": "Improved Seal of the Crusader",
+      "spellId": 20337,
+      "icon": "spell_holy_holysmite"
+    },
+    "curse-of-elements": {
+      "name": "Curse of the Elements",
+      "spellId": 27228,
+      "icon": "spell_shadow_chilltouch"
+    },
+    "winters-chill": {
+      "name": "Winter's Chill",
+      "spellId": 28595,
+      "icon": "spell_frost_chillingblast"
+    }
+  },
+  "specIcons": {
+    "Druid|Balance": {
+      "className": "Druid",
+      "spec": "Balance",
+      "icon": "ability_druid_forceofnature",
+      "fromTalent": "Force of Nature"
+    },
+    "Druid|Feral": {
+      "className": "Druid",
+      "spec": "Feral",
+      "icon": "ability_druid_mangle2",
+      "fromTalent": "Mangle"
+    },
+    "Druid|Restoration": {
+      "className": "Druid",
+      "spec": "Restoration",
+      "icon": "ability_druid_treeoflife",
+      "fromTalent": "Tree of Life"
+    },
+    "Hunter|Beast Mastery": {
+      "className": "Hunter",
+      "spec": "Beast Mastery",
+      "icon": "ability_hunter_beastwithin",
+      "fromTalent": "The Beast Within"
+    },
+    "Hunter|Marksmanship": {
+      "className": "Hunter",
+      "spec": "Marksmanship",
+      "icon": "ability_theblackarrow",
+      "fromTalent": "Silencing Shot"
+    },
+    "Hunter|Survival": {
+      "className": "Hunter",
+      "spec": "Survival",
+      "icon": "ability_hunter_readiness",
+      "fromTalent": "Readiness"
+    },
+    "Mage|Arcane": {
+      "className": "Mage",
+      "spec": "Arcane",
+      "icon": "spell_nature_slow",
+      "fromTalent": "Slow"
+    },
+    "Mage|Fire": {
+      "className": "Mage",
+      "spec": "Fire",
+      "icon": "inv_misc_head_dragon_01",
+      "fromTalent": "Dragon's Breath"
+    },
+    "Mage|Frost": {
+      "className": "Mage",
+      "spec": "Frost",
+      "icon": "spell_frost_summonwaterelemental_2",
+      "fromTalent": "Summon Water Elemental"
+    },
+    "Paladin|Holy": {
+      "className": "Paladin",
+      "spec": "Holy",
+      "icon": "spell_holy_divineillumination",
+      "fromTalent": "Divine Illumination"
+    },
+    "Paladin|Protection": {
+      "className": "Paladin",
+      "spec": "Protection",
+      "icon": "spell_holy_avengersshield",
+      "fromTalent": "Avenger's Shield"
+    },
+    "Paladin|Retribution": {
+      "className": "Paladin",
+      "spec": "Retribution",
+      "icon": "spell_holy_crusaderstrike",
+      "fromTalent": "Crusader Strike"
+    },
+    "Priest|Discipline": {
+      "className": "Priest",
+      "spec": "Discipline",
+      "icon": "spell_holy_painsupression",
+      "fromTalent": "Pain Suppression"
+    },
+    "Priest|Holy": {
+      "className": "Priest",
+      "spec": "Holy",
+      "icon": "spell_holy_circleofrenewal",
+      "fromTalent": "Circle of Healing"
+    },
+    "Priest|Shadow": {
+      "className": "Priest",
+      "spec": "Shadow",
+      "icon": "spell_holy_stoicism",
+      "fromTalent": "Vampiric Touch"
+    },
+    "Rogue|Assassination": {
+      "className": "Rogue",
+      "spec": "Assassination",
+      "icon": "ability_rogue_shadowstrikes",
+      "fromTalent": "Mutilate"
+    },
+    "Rogue|Combat": {
+      "className": "Rogue",
+      "spec": "Combat",
+      "icon": "ability_rogue_surpriseattack",
+      "fromTalent": "Surprise Attacks"
+    },
+    "Rogue|Subtlety": {
+      "className": "Rogue",
+      "spec": "Subtlety",
+      "icon": "ability_rogue_shadowstep",
+      "fromTalent": "Shadowstep"
+    },
+    "Shaman|Elemental": {
+      "className": "Shaman",
+      "spec": "Elemental",
+      "icon": "spell_fire_totemofwrath",
+      "fromTalent": "Totem of Wrath"
+    },
+    "Shaman|Enhancement": {
+      "className": "Shaman",
+      "spec": "Enhancement",
+      "icon": "spell_nature_shamanrage",
+      "fromTalent": "Shamanistic Rage"
+    },
+    "Shaman|Restoration": {
+      "className": "Shaman",
+      "spec": "Restoration",
+      "icon": "spell_nature_skinofearth",
+      "fromTalent": "Earth Shield"
+    },
+    "Warlock|Affliction": {
+      "className": "Warlock",
+      "spec": "Affliction",
+      "icon": "spell_shadow_unstableaffliction_3",
+      "fromTalent": "Unstable Affliction"
+    },
+    "Warlock|Demonology": {
+      "className": "Warlock",
+      "spec": "Demonology",
+      "icon": "spell_shadow_summonfelguard",
+      "fromTalent": "Summon Felguard"
+    },
+    "Warlock|Destruction": {
+      "className": "Warlock",
+      "spec": "Destruction",
+      "icon": "spell_shadow_shadowfury",
+      "fromTalent": "Shadowfury"
+    },
+    "Warrior|Arms": {
+      "className": "Warrior",
+      "spec": "Arms",
+      "icon": "ability_warrior_endlessrage",
+      "fromTalent": "Endless Rage"
+    },
+    "Warrior|Fury": {
+      "className": "Warrior",
+      "spec": "Fury",
+      "icon": "ability_warrior_rampage",
+      "fromTalent": "Rampage"
+    },
+    "Warrior|Protection": {
+      "className": "Warrior",
+      "spec": "Protection",
+      "icon": "inv_sword_11",
+      "fromTalent": "Devastate"
+    }
+  }
+}

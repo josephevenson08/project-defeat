@@ -111,6 +111,22 @@ function drawSeat(ctx: CanvasRenderingContext2D, slot: RosterSlot, x: number, ro
   ctx.fillStyle = ROLE_COLOURS[role]
   ctx.fillRect(x + 1, rowY + 1, 3, ROW_HEIGHT - 2)
 
+  /*
+   * A named seat leads with the name and demotes the spec to a second line, because the raid reading
+   * this is looking for themselves first and their spec second. An unnamed seat keeps the spec on one
+   * centred line rather than leaving an empty slot where a name would go.
+   */
+  if (slot.playerName) {
+    ctx.fillStyle = INK.text
+    ctx.font = '13px Inter, system-ui, sans-serif'
+    ctx.fillText(slot.playerName, x + 14, rowY + 5)
+
+    ctx.fillStyle = INK.dim
+    ctx.font = '11px Inter, system-ui, sans-serif'
+    ctx.fillText(`${slot.spec} ${slot.className}`, x + 14, rowY + 19)
+    return
+  }
+
   ctx.fillStyle = INK.text
   ctx.font = '13px Inter, system-ui, sans-serif'
   ctx.fillText(`${slot.spec} ${slot.className}`, x + 14, rowY + 10)
