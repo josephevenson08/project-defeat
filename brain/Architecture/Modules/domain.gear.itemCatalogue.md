@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/itemCatalogue.ts
-lines: 245
+lines: 264
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemCatalogue
 
-`src/domain/gear/itemCatalogue.ts` · **domain** layer · 245 lines
+`src/domain/gear/itemCatalogue.ts` · **domain** layer · 264 lines
 
 From the top of the file:
 
@@ -31,7 +31,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `getItemById`, `getItemByWowItemId`, `getItemsForSlot`
+**function** — `getItemById`, `getItemByWowItemId`, `getItemsForSlot`, `isWithinDefaultPhase`
 
 **const** — `allItems`, `catalogueConflicts`, `catalogueMeta`, `defaultMaxPhase`
 

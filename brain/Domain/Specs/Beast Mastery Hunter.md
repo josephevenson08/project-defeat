@@ -24,7 +24,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 
 ## Best in slot
 
-- **Phase 2** — 56 ranked entries across 15 slots · source: Beast Mastery Hunter DPS Best in Slot (BiS) Phase 2 Gear Guide
+- **Phase 2** — 55 ranked entries across 15 slots · source: Beast Mastery Hunter DPS Best in Slot (BiS) Phase 2 Gear Guide
 
 
 

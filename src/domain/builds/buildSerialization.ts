@@ -2,7 +2,7 @@ import { getClassDefinition, tbcClassNames } from '../character/tbcClasses'
 import type { CharacterProfile } from '../character/characterTypes'
 import { gearSlots } from '../gear/gearSlots'
 import type { GearSlot } from '../gear/gearSlots'
-import { getItemById } from '../gear/itemCatalogue'
+import { defaultMaxPhase, getItemById, isWithinDefaultPhase } from '../gear/itemCatalogue'
 import { isItemAllowedForCharacter } from '../gear/characterItemRules'
 import type { EquippedGear } from '../gear/itemTypes'
 import { isClassLegalForRace, racesByFaction } from '../character/races'
@@ -137,6 +137,20 @@ export function validateBuild(parsed: unknown): BuildImportResult {
       }
       if (!isItemAllowedForCharacter(item, character.className, character.spec)) {
         issues.push({ slot, message: `${slot}: ${item.name} isn't legal for a ${character.spec} ${character.className}.` })
+        return
+      }
+      /*
+       * A separate rejection from the one above, and it needs its own sentence. An imported build can
+       * legitimately come from someone playing further into the expansion, so the item is real, it is
+       * legal for the class, and it still cannot be worn here — the reason is the phase, not the
+       * character, and saying "isn't legal for a Fury Warrior" about a Black Temple sword would send
+       * the reader looking for a class restriction that does not exist.
+       */
+      if (!isWithinDefaultPhase(item)) {
+        issues.push({
+          slot,
+          message: `${slot}: ${item.name} is Phase ${item.phase} gear, and this planner covers Phase ${defaultMaxPhase}.`,
+        })
         return
       }
 

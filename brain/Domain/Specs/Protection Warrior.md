@@ -24,7 +24,7 @@ tags: [brain/domain, domain/spec, role/Tank]
 
 ## Best in slot
 
-- **Phase 2** — 57 ranked entries across 15 slots · source: Protection Warrior Tank Best in Slot (BiS) Phase 2 Gear Guide
+- **Phase 2** — 55 ranked entries across 15 slots · source: Protection Warrior Tank Best in Slot (BiS) Phase 2 Gear Guide
 
 
 

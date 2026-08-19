@@ -3,7 +3,7 @@ import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
 
-import { getItemsForSlot } from './itemCatalogue'
+import { getItemsForSlot, isWithinDefaultPhase } from './itemCatalogue'
 import { isObtainable } from './obtainability'
 import {
   EMPTY_OFF_HAND,
@@ -151,20 +151,39 @@ export function applyWeaponSlotRules(gear: EquippedGear): EquippedGear {
   return { ...gear, 'Off Hand': { item: EMPTY_OFF_HAND, gemIds: [] } }
 }
 
+/**
+ * Whether an already-equipped item may stay put through a normalisation pass.
+ *
+ * Two independent reasons to replace one, and they are deliberately checked together here because
+ * every caller of this function wants both: the character cannot *wear* it, or the content it comes
+ * from is not open yet.
+ *
+ * The phase half is the one that was missing, and it was reachable three ways — restoring a saved
+ * build, importing someone else's, and equipping straight off the Ranked Gear panel, which resolves
+ * by id and so never passes the slot query that filters by phase. The result was gear the Gear panel
+ * would not list and the upgrade finder would not consider, sitting equipped and counted in every
+ * stat total. `EMPTY_OFF_HAND` is exempt: it is a placeholder with no phase, and the off-hand refill
+ * below is what decides its fate.
+ */
+function isKeepable(item: GearItem, className: TbcClass, spec: TbcSpec): boolean {
+  if (!isItemAllowedForCharacter(item, className, spec)) return false
+  return item.id === EMPTY_OFF_HAND.id || isWithinDefaultPhase(item)
+}
+
 export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClass, spec: TbcSpec): EquippedGear {
   // Unique items already surviving the switch are withheld from the fallbacks. Two illegal paired
   // slots would otherwise both fall back to the same highest-item-level option and produce a doubled
   // unique — a state the gear panel refuses to let a player build by hand.
   const usedUniqueIds = new Set(
     Object.values(gear)
-      .filter((equipped) => isItemAllowedForCharacter(equipped.item, className, spec) && isUniqueRestricted(equipped.item))
+      .filter((equipped) => isKeepable(equipped.item, className, spec) && isUniqueRestricted(equipped.item))
       .map((equipped) => equipped.item.id),
   )
 
   const normalized = Object.fromEntries(
     Object.entries(gear).map(([slot, equippedSlot]) => {
       const gearSlot = slot as GearSlot
-      if (isItemAllowedForCharacter(equippedSlot.item, className, spec)) return [gearSlot, equippedSlot]
+      if (isKeepable(equippedSlot.item, className, spec)) return [gearSlot, equippedSlot]
 
       const options = getItemsForSlotAndCharacter(gearSlot, className, spec).filter((item) => !usedUniqueIds.has(item.id))
       const fallback = getDefaultItemForSlot(gearSlot, options)

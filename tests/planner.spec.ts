@@ -66,7 +66,17 @@ import {
   averageSwingDamage,
   computeSpecialDamagePerUse,
 } from '../src/domain/simulation/specialAttacks'
-import { allItems, getItemById, getItemByWowItemId, getItemsForSlot } from '../src/domain/gear/itemCatalogue'
+import {
+  allItems,
+  defaultMaxPhase,
+  getItemById,
+  getItemByWowItemId,
+  getItemsForSlot,
+  isWithinDefaultPhase,
+} from '../src/domain/gear/itemCatalogue'
+import { excludedByPhase } from '../src/domain/bis'
+import { validateBuild } from '../src/domain/builds/buildSerialization'
+import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
 import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
@@ -3514,6 +3524,93 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
 
   // And it must still be the figure the handoff records, so a drift here is visible immediately.
   expect(empty.score).toBe(192.3)
+})
+
+test('nothing reachable offers gear from a later phase than this planner covers', () => {
+  /*
+   * The app targets Phase 2 and `getItemsForSlot` enforces that — so the picker, the default set and
+   * the upgrade finder were always correct. The leak was everything that resolves an item by **id**
+   * and therefore never passes through a slot query: the Ranked Gear panel's Equip button, restoring
+   * a saved build, and importing someone else's. All three could seat Phase 3+ gear that the Gear
+   * panel would then refuse to list, counted in every stat total.
+   *
+   * Verified against real sources rather than trusting the phase number, because getting this
+   * backwards would have deleted legitimate rankings: Band of Eternity rewards *Champion's Pledge*,
+   * which requires Scale of the Sands — Mount Hyjal, Phase 3 — and Hailstone Pendant comes from the
+   * Ice Chest Ahune drops in the Slave Pens during Midsummer, added in 2.4.
+   *
+   * Note item level is NOT the test. Two genuinely Phase 1-2 crafted epics sit at ilvl 146, above the
+   * Tier 5 ceiling of 141, and an ilvl rule would wrongly strip both.
+   */
+  const outOfPhase = allItems.filter((item) => !isWithinDefaultPhase(item))
+  expect(outOfPhase.length, 'the catalogue still carries later-phase gear, deliberately').toBeGreaterThan(1000)
+
+  // 1. No ranked list may name one.
+  const ranked = bisLists.flatMap((list) =>
+    list.entries
+      .map((entry) => ({ list, entry, item: getItemById(entry.itemId) }))
+      .filter(({ item }) => item && !isWithinDefaultPhase(item))
+      .map(({ list, entry, item }) => `${list.className} ${list.spec} ${entry.slot}: ${item!.name} (phase ${item!.phase})`),
+  )
+  expect(ranked, 'no ranked entry may name gear from a later phase').toEqual([])
+  expect(excludedByPhase, 'and the ones dropped are counted rather than silently lost').toBe(5)
+
+  /*
+   * 2. The five slots a drop actually touched stay dense, or the panel renders "#1 #2 #3 #5".
+   *
+   * Scoped to those five deliberately. Rank density is **not** a property of this data generally, and
+   * asserting it everywhere fails on eight slot groups that predate this work: Hunter Main Hand is
+   * [1, 3, 4] because the guide's rank 2 resolves to an off-hand item and moves slots — the same
+   * section-versus-item-slot mismatch `bisLists.ts` already documents — and Warrior Arms and Fury
+   * carry *duplicate* Main Hand ranks because two guide sections, one per weapon style, both map
+   * there. Neither is caused by the phase filter and neither is obviously wrong: "best two-hander" and
+   * "best one-hander" are genuinely separate rankings. Widening this assertion means deciding that
+   * question first.
+   */
+  const touched: ReadonlyArray<readonly [string, string, string]> = [
+    ['Hunter', 'Beast Mastery', 'Finger 1'],
+    ['Hunter', 'Marksmanship', 'Finger 1'],
+    ['Hunter', 'Survival', 'Finger 1'],
+    ['Warrior', 'Protection', 'Finger 1'],
+    ['Warrior', 'Protection', 'Neck'],
+  ]
+  for (const [className, spec, slot] of touched) {
+    const list = bisLists.find((entry) => entry.className === className && entry.spec === spec)!
+    const ranks = list.entries.filter((entry) => entry.slot === slot).map((entry) => entry.rank).sort((a, b) => a - b)
+    expect(ranks.length, `${className} ${spec} ${slot} must still rank something`).toBeGreaterThan(0)
+    expect(ranks, `${className} ${spec} ${slot} ranks must be dense after the drop`).toEqual(
+      ranks.map((_, index) => index + 1),
+    )
+  }
+
+  // 3. Normalisation strips one that somehow got equipped — the saved-build and Equip-button path.
+  const bandOfEternity = getItemByWowItemId(29298)!
+  expect(bandOfEternity.phase, 'the fixture must still be out of phase, or this proves nothing').toBe(3)
+
+  // Dwarf, not Human — Humans cannot be Hunters in TBC, and `validateBuild` rejects the whole build
+  // on an illegal race/class pair, which would make the per-slot assertion below unreachable.
+  const character = { faction: 'Alliance', race: 'Dwarf', className: 'Hunter', spec: 'Beast Mastery' } as const
+  const smuggled = {
+    ...normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery'),
+    'Finger 1': { item: bandOfEternity, gemIds: [] },
+  }
+  const cleaned = normalizeGearForCharacter(smuggled, 'Hunter', 'Beast Mastery')
+  expect(cleaned['Finger 1'].item.id, 'normalisation must replace out-of-phase gear').not.toBe(bandOfEternity.id)
+  expect(isWithinDefaultPhase(cleaned['Finger 1'].item), 'and what replaces it must be in phase').toBe(true)
+
+  // 4. Importing one is rejected, and for the *right* stated reason.
+  const imported = validateBuild({
+    version: BUILD_FORMAT_VERSION,
+    character,
+    gear: { 'Finger 1': { itemId: bandOfEternity.id, gemIds: [] } },
+  })
+  expect(imported.ok, 'the build itself must be valid, or the slot issue below is unreachable').toBe(true)
+  const phaseIssue = imported.ok ? imported.issues.find((issue) => issue.slot === 'Finger 1') : undefined
+  expect(phaseIssue, 'importing later-phase gear must be reported').toBeDefined()
+  expect(phaseIssue!.message, 'and named as a phase problem, not a class-legality one').toMatch(
+    new RegExp(`Phase 3 gear.*Phase ${defaultMaxPhase}`),
+  )
+  expect(phaseIssue!.message).not.toMatch(/isn't legal for/)
 })
 
 test('the caster and healer paths are talent-blind, which is what featureFlags.ts claims', () => {

@@ -1,5 +1,5 @@
 export type { BisList, RankedGearEntry } from './bisTypes'
-export { bisLists, getBisListForSpec, requireBisList } from './bisLists'
+export { bisLists, excludedByPhase, getBisListForSpec, requireBisList } from './bisLists'
 
 import { requireBisList } from './bisLists'
 

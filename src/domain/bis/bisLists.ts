@@ -2,7 +2,7 @@ import rawRankings from './bisRankings.json' with { type: 'json' }
 import rawRecommendations from './bisRecommendations.json' with { type: 'json' }
 import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import type { GearSlot } from '../gear/gearSlots'
-import { getItemByWowItemId } from '../gear/itemCatalogue'
+import { getItemByWowItemId, isWithinDefaultPhase } from '../gear/itemCatalogue'
 import { getVisibleGearSlotsForSpec } from '../gear/slotVisibility'
 import type { BisList, RankedGearEntry } from './bisTypes'
 
@@ -85,13 +85,53 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
   }
 }
 
+/**
+ * Ranked entries dropped for naming gear later than `defaultMaxPhase` in `itemCatalogue`.
+ *
+ * Exported so it is asserted rather than described. A silent filter is exactly the kind of thing that
+ * would quietly grow — if raising the phase ceiling ever opens these up, this reaching 0 is the
+ * signal, and a test pins the current figure so a change has to be deliberate.
+ */
+export let excludedByPhase = 0
+
 function buildLists(): BisList[] {
   const lists: BisList[] = []
+  excludedByPhase = 0
 
   for (const spec of Object.values(rawRankings.specs) as RawSpec[]) {
     const entries: RankedGearEntry[] = []
     for (const rows of Object.values(spec.slots)) {
-      for (const row of rows) {
+      /*
+       * Wowhead's Phase 2 guides rank a few items Phase 2 cannot reach, labelled in their own notes
+       * as "Optional", "Alternative" or "Seasonal". Both were verified against the item's real source
+       * rather than trusted from the phase number: Band of Eternity is the reward from *Champion's
+       * Pledge*, which requires Scale of the Sands — the Mount Hyjal faction, Phase 3 — and Hailstone
+       * Pendant comes from the Ice Chest that Ahune drops in the Slave Pens during the Midsummer
+       * event, added in 2.4. wowsims' phase values are right in both cases.
+       *
+       * They are dropped rather than shown greyed out, because this panel's rows carry a working
+       * Equip button and the Gear panel will not list these items at all — so leaving them in offers
+       * a player gear the rest of the app then refuses to acknowledge. Dropped *here* rather than in
+       * the panel so every consumer sees one consistent Phase 2 list.
+       */
+      const inPhase = rows.filter((row) => {
+        const item = getItemByWowItemId(row.wowItemId)
+        return item ? isWithinDefaultPhase(item) : true
+      })
+      excludedByPhase += rows.length - inPhase.length
+
+      /*
+       * Renumbered densely so the panel does not render "#1 #2 #3 #5". The guide's ordering is
+       * preserved — this only closes the gaps a removal leaves. Note this can move rank 1, and with
+       * it the gem and enchant advice `toEntry` hangs off rank 1: that is correct, because the advice
+       * is published per spec rather than per item, so it belongs on whatever is actually best here.
+       */
+      const renumbered = inPhase
+        .slice()
+        .sort((a, b) => a.rank - b.rank)
+        .map((row, index) => ({ ...row, rank: index + 1 }))
+
+      for (const row of renumbered) {
         const item = getItemByWowItemId(row.wowItemId)
         if (!item) continue
 

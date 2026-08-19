@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/builds/buildSerialization.ts
-lines: 195
+lines: 209
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.builds.buildSerialization
 
-`src/domain/builds/buildSerialization.ts` · **domain** layer · 195 lines
+`src/domain/builds/buildSerialization.ts` · **domain** layer · 209 lines
 
 _No doc comment at the top of this file._
 

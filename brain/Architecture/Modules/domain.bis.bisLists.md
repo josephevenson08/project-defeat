@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisLists.ts
-lines: 151
+lines: 191
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisLists
 
-`src/domain/bis/bisLists.ts` · **domain** layer · 151 lines
+`src/domain/bis/bisLists.ts` · **domain** layer · 191 lines
 
 From the top of the file:
 

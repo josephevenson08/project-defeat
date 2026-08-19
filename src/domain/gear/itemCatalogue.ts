@@ -227,6 +227,25 @@ function withinPhase(item: GearItem, maxPhase: number) {
   return (item.phase ?? 0) <= maxPhase
 }
 
+/**
+ * Whether a Phase 2 character could have acquired this item at all.
+ *
+ * Separate from `isItemAllowedForCharacter`, which answers a different question — that one is about
+ * class and spec legality, this one is about whether the content is open yet. Keeping them apart
+ * matters at the one place both are reported to the player: importing a build distinguishes "a Rogue
+ * cannot wear that" from "that drops two phases from now", and collapsing them would give the wrong
+ * reason for the right rejection.
+ *
+ * **`getItemsForSlot` already applies this**, so the picker, the default set and the upgrade finder
+ * are covered by construction. This export exists for the paths that resolve an item by *id* and so
+ * never pass through a slot query: restoring a saved build, importing someone else's, and
+ * re-normalising gear after a spec change. Every one of those was a way to hold Phase 3+ gear that
+ * the Gear panel would then refuse to show.
+ */
+export function isWithinDefaultPhase(item: GearItem): boolean {
+  return withinPhase(item, defaultMaxPhase)
+}
+
 export function getItemsForSlot(slot: GearSlot, options: ItemQueryOptions = {}): readonly GearItem[] {
   const maxPhase = options.maxPhase ?? defaultMaxPhase
   return allItems.filter((item) => isItemCompatibleWithGearSlot(item, slot) && withinPhase(item, maxPhase))
