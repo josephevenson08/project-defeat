@@ -291,7 +291,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 147 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 150 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -499,6 +499,19 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **A new `.app-shell` rule placed after `.app-shell-no-rail` silently wins the cascade.** Both are
+  one class, so source order decides, and the later rule reinstated the 288px rail track on every
+  section that has no rail — Raid Composition, tier lists, professions rendered as a ~208px strip
+  with the rest of the page empty. Scoped with `:not(.app-shell-no-rail)` now, and falsifying it
+  reproduces the 208px exactly.
+- **`.content` is a two-track grid and every view is now a single panel**, so a lone panel took one
+  track and left the other blank. The talents page showed its three trees in a 557px box, wrapping
+  the third underneath. Fixed by spanning a lone panel across both tracks; asserted on rendered
+  geometry (all three trees share a `top`) rather than on CSS, because every rule involved was
+  individually valid and only the outcome was wrong.
+- **Verify a layout change at the width people actually use.** Both regressions above shipped because
+  the checks were done at 375px and in a narrow preview pane — never at desktop width, which is where
+  the app is used and where both were glaring.
 - **`loadRoster` rebuilds each seat field by field, so any new field is silently dropped.** This has
   now bitten twice: `playerName` (restored rosters came back anonymous) and `buildId` (every Feral
   tank came back a cat, and the tank count read zero). Both validated cleanly and looked right.

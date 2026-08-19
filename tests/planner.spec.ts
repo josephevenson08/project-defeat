@@ -5118,3 +5118,83 @@ test('a level 70 TBC character has 61 talent points', () => {
   const deepestRow = Math.max(...warrior.trees.flatMap((tree) => tree.talents.map((talent) => talent.row)))
   expect((deepestRow - 1) * POINTS_PER_ROW).toBeLessThan(TALENT_POINTS_AT_70)
 })
+
+test('a single-panel view fills the width, and the talent trees sit side by side', async ({ page }) => {
+  /*
+   * Both halves of a regression that shipped and had to be caught by eye.
+   *
+   * `.content` is a two-track grid, which was right when a tab stacked several panels. Every view is
+   * now one panel behind a sub-tab, so the panel took one track and left the other empty — the
+   * talents page rendered its three trees in a 557px box, wrapping the third underneath, with half
+   * the screen blank beside it.
+   *
+   * Asserted on the *rendered geometry* rather than on CSS, because the bug was entirely a layout
+   * outcome: every rule involved was individually valid.
+   */
+  await page.setViewportSize({ width: 1600, height: 900 })
+  await openApp(page)
+  // The planner sub-tabs are buttons, not ARIA tabs — see the nav assertion further up this file.
+  await page.getByRole('button', { name: 'Talents', exact: true }).click()
+
+  const trees = page.locator('.talent-tree')
+  await expect(trees).toHaveCount(3)
+
+  const boxes = await trees.evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const rect = node.getBoundingClientRect()
+      return { top: Math.round(rect.top), width: Math.round(rect.width) }
+    }),
+  )
+
+  // Side by side means one row: identical tops, and none of them squeezed.
+  expect(new Set(boxes.map((box) => box.top)).size, 'all three trees share a row').toBe(1)
+  for (const box of boxes) expect(box.width, 'a tree squeezed into a column is the symptom').toBeGreaterThan(300)
+
+  // The panel itself must be using the width it was given, not half of it.
+  const panelWidth = await page.locator('.content > .panel').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+  const contentWidth = await page.locator('.content').evaluate((node) => Math.round(node.getBoundingClientRect().width))
+  expect(panelWidth, 'the lone panel spans both tracks').toBeGreaterThan(contentWidth * 0.85)
+})
+
+test('a section with no rail uses the whole shell', async ({ page }) => {
+  /*
+   * The other half of the same regression, and a pure cascade bug: a new `.app-shell` rule was added
+   * *after* `.app-shell-no-rail` with equal specificity, so it silently won and reinstated the 288px
+   * rail track on every section that has no rail. Their content rendered as a narrow strip with the
+   * rest of the page empty.
+   */
+  await page.setViewportSize({ width: 1600, height: 900 })
+  await openApp(page, 'raidcomp')
+
+  const shell = page.locator('.app-shell')
+  await expect(shell).toHaveClass(/app-shell-no-rail/)
+
+  const [shellWidth, panelWidth] = await Promise.all([
+    shell.evaluate((node) => Math.round(node.getBoundingClientRect().width)),
+    page.locator('.raidcomp').evaluate((node) => Math.round(node.getBoundingClientRect().width)),
+  ])
+  expect(panelWidth, 'the panel uses the shell rather than a rail-sized track').toBeGreaterThan(shellWidth * 0.85)
+
+  // And the five groups sit in one row, which is the whole point of the width.
+  const tops = await page
+    .locator('.raidcomp-group')
+    .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().top)))
+  expect(tops).toHaveLength(5)
+  expect(new Set(tops).size, 'all five groups share a row at 1600px').toBe(1)
+})
+
+test('the layout reflows to phone width without overflowing', async ({ page }) => {
+  /*
+   * The app had a hard ~806px floor: fixed 940px containers, a two-column content grid, and a
+   * five-tab bar that would not wrap. Horizontal scroll is the symptom worth pinning, because it is
+   * what makes a page unusable on a phone rather than merely cramped.
+   */
+  await page.setViewportSize({ width: 375, height: 812 })
+  await openApp(page, 'raidcomp')
+
+  const overflow = await page.evaluate(() => ({
+    client: document.documentElement.clientWidth,
+    scroll: document.documentElement.scrollWidth,
+  }))
+  expect(overflow.scroll, 'no horizontal scroll at 375px').toBeLessThanOrEqual(overflow.client)
+})

@@ -3942,8 +3942,18 @@ input[type='text']:focus {
    narrows rather than forcing a minimum width.
    --------------------------------------------------------------------------- */
 
-.app-shell {
+/*
+ * Scoped with `:not()` deliberately. This rule sits after `.app-shell-no-rail` and carries the same
+ * specificity, so an unscoped `.app-shell` silently won the cascade and reinstated the rail column on
+ * the sections that have no rail — Raid Composition, tier lists, professions. Their content landed in
+ * the 288px track and rendered as a narrow strip with the rest of the page empty.
+ */
+.app-shell:not(.app-shell-no-rail) {
   grid-template-columns: minmax(0, 288px) minmax(0, 1fr);
+  width: 100%;
+}
+
+.app-shell-no-rail {
   width: 100%;
 }
 
@@ -3959,7 +3969,19 @@ input[type='text']:focus {
   padding: 0 clamp(16px, 2.5vw, 40px);
 }
 
-/* The raid planner is a wide-format tool: one full-bleed column, never split. */
+/*
+ * A view that renders one panel gets the whole width.
+ *
+ * `.content` is a two-track grid, which was right when a tab stacked several panels down one column.
+ * Every view is now a single panel behind a sub-tab, so the panel took one track and left the other
+ * empty — the talents page showed its three trees in a 557px box, wrapping the third underneath,
+ * with half the screen blank beside it.
+ *
+ * The two selectors are the two real shapes: sections with no sub-nav (`:only-child`), and planner
+ * views where the sub-tab bar is the first child and the panel the last.
+ */
+.content > .panel:only-child,
+.content > .tab-nav-sub + .panel:last-child,
 .raidcomp {
   grid-column: 1 / -1;
 }
