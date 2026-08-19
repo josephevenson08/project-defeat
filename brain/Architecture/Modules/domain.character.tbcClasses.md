@@ -30,7 +30,9 @@ _No doc comment at the top of this file._
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
+- [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

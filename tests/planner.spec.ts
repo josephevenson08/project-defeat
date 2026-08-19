@@ -34,7 +34,7 @@ import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import type { BisList } from '../src/domain/bis'
 import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
-import { computeCoverage, describeSuggestion } from '../src/domain/raidcomp'
+import { addToGroup, computeCoverage, describeSuggestion, emptyRoster, filledSlots, getBuffScope, resizeRoster } from '../src/domain/raidcomp'
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
@@ -4635,54 +4635,130 @@ test('every buff names a provider that actually exists, class and spec alike', (
   expect(entries.filter((entry) => entry.providedBySpec !== undefined)).toHaveLength(7)
 })
 
-test('raid coverage is exact, and an empty roster covers nothing', () => {
+
+test('buff scope is sourced for every entry, and party scope dominates', () => {
   /*
-   * The two ends of the range, because the middle is where an off-by-one hides. An empty roster
-   * covering anything would mean a provider matched a seat that does not exist; a full-coverage
-   * roster missing something would mean a buff no spec in the game can bring.
+   * The fact the whole composition tool rests on. In TBC most buffs reach only the caster's group of
+   * five — every totem, every aura, both Warrior shouts — and treating them as raid-wide tells a raid
+   * leader Battle Shout is covered when five of twenty-five players have it.
+   *
+   * Each scope is read from that spell's own Wowhead tooltip by `tools/ingest/ingest-buff-scope.mjs`,
+   * never inferred from the buff's name or class. The counts are asserted because a silent drift here
+   * would change every answer the planner gives while still looking plausible.
    */
-  const empty = computeCoverage({ size: 25, slots: [] })
-  expect(empty.buffs.covered, 'nobody in the raid, nothing covered').toEqual([])
-  expect(empty.buffs.missing).toHaveLength(sampleBuffs.length)
-  expect(empty.debuffs.missing).toHaveLength(sampleTargetDebuffs.length)
-  expect(empty.remaining).toBe(25)
+  const entries = [...sampleBuffs, ...sampleTargetDebuffs]
+  for (const entry of entries) {
+    expect(getBuffScope(entry.id), `${entry.name} has no sourced scope`).toBeDefined()
+  }
+
+  const counts = entries.reduce<Record<string, number>>((acc, entry) => {
+    const scope = getBuffScope(entry.id)!
+    return { ...acc, [scope]: (acc[scope] ?? 0) + 1 }
+  }, {})
+  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 6 })
 
   /*
-   * One of every spec covers everything. If this ever fails, a buff has been given a provider no
-   * player can be — which is exactly what a typo in `providedBySpec` produces.
+   * The five Raid-scoped buffs are exactly the Greater Blessings, which is what "Greater" buys — the
+   * single-target Blessings are a different spell. Named rather than counted, because "5" would still
+   * pass if the wrong five were scoped.
    */
-  const oneOfEach = tbcClasses.flatMap((definition) =>
-    definition.specs.map((spec) => ({ className: definition.className, spec })),
-  )
-  const total = computeCoverage({ size: 25, slots: oneOfEach })
-  expect(total.buffs.missing, 'every buff must be reachable by some spec').toEqual([])
+  const raidWide = sampleBuffs
+    .filter((buff) => getBuffScope(buff.id) === 'Raid')
+    .map((buff) => buff.name)
+    .sort()
+  expect(raidWide).toEqual([
+    'Greater Blessing of Kings',
+    'Greater Blessing of Might',
+    'Greater Blessing of Salvation',
+    'Greater Blessing of Sanctuary',
+    'Greater Blessing of Wisdom',
+  ])
+
+  // Every totem is party-scoped. This is the group the seating chart exists to serve.
+  for (const buff of sampleBuffs.filter((entry) => entry.name.includes('Totem'))) {
+    expect(getBuffScope(buff.id), `${buff.name} must be party-scoped`).toBe('Party')
+  }
+})
+
+test('a party buff reaches its own group and no other', () => {
+  /*
+   * The behaviour that separates this from a checklist, and the bug the first version shipped: a
+   * Shaman in group 1 buffs group 1. Asserting the *absence* in groups 2-5 matters more than the
+   * presence in group 1, because treating buffs as raid-wide passes the presence check too.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+
+  const report = computeCoverage(roster)
+  const totemIn = (index: number) =>
+    report.groups[index].partyBuffs.some((buff) => buff.name === 'Strength of Earth Totem')
+
+  expect(totemIn(0), "the Shaman's own group receives the totem").toBe(true)
+  for (const index of [1, 2, 3, 4]) {
+    expect(totemIn(index), `group ${index + 1} must not receive a totem from group 1`).toBe(false)
+  }
+
+  /*
+   * The raid-wide tally still counts it as present, because the raid *does* have it. Both readings
+   * are true and answer different questions — "do we have one" versus "who gets it" — which is why
+   * the panel shows both.
+   */
+  expect(report.partyScoped.covered.some((entry) => entry.entry.name === 'Strength of Earth Totem')).toBe(true)
+})
+
+test('raid coverage is exact, and an empty roster covers nothing', () => {
+  const empty = computeCoverage(emptyRoster(25))
+  expect(empty.raidWide.covered, 'nobody in the raid, nothing covered').toEqual([])
+  expect(empty.partyScoped.covered).toEqual([])
+  expect(empty.debuffs.missing).toHaveLength(sampleTargetDebuffs.length)
+  expect(empty.remaining).toBe(25)
+  for (const group of empty.groups) expect(group.partyBuffs).toEqual([])
+
+  /*
+   * One of every spec covers everything. If this fails, a buff has been given a provider no player
+   * can be — exactly what a typo in `providedBySpec` produces. Seated across groups deliberately: a
+   * party buff must still register raid-wide from wherever its provider sits.
+   */
+  let full = emptyRoster(25)
+  let seat = 0
+  for (const definition of tbcClasses) {
+    for (const spec of definition.specs) {
+      const group = Math.floor(seat / 5)
+      if (group < full.groups.length) full = addToGroup(full, group, { className: definition.className, spec })
+      seat++
+    }
+  }
+  const total = computeCoverage(full)
+  expect(total.raidWide.missing, 'every raid-wide buff must be reachable').toEqual([])
   expect(total.debuffs.missing, 'and every debuff too').toEqual([])
-  expect(total.suggestions, 'nothing left to suggest once everything is covered').toEqual([])
-  // 27 specs against 25 seats is deliberately over-filled, and the report says so rather than clamping.
-  expect(total.remaining).toBe(-2)
 })
 
 test('a missing buff names who would bring it, at the right specificity', () => {
   /*
    * The difference that decides a recruitment message. Any Shaman brings Strength of Earth; only an
-   * Elemental one brings Totem of Wrath. Collapsing those to "a Shaman" would send a raid leader
-   * looking for the wrong player.
+   * Elemental one brings Totem of Wrath.
    */
-  const noShamans = tbcClasses
-    .filter((definition) => definition.className !== 'Shaman')
-    .flatMap((definition) => definition.specs.map((spec) => ({ className: definition.className, spec })))
+  let roster = emptyRoster(25)
+  let seat = 0
+  for (const definition of tbcClasses) {
+    if (definition.className === 'Shaman') continue
+    for (const spec of definition.specs) {
+      const group = Math.floor(seat / 5)
+      if (group < roster.groups.length) roster = addToGroup(roster, group, { className: definition.className, spec })
+      seat++
+    }
+  }
 
-  const report = computeCoverage({ size: 25, slots: noShamans })
-  const needFor = (name: string) => report.buffs.missing.find((entry) => entry.entry.name === name)?.needs
+  const report = computeCoverage(roster)
+  const needFor = (name: string) => report.partyScoped.missing.find((entry) => entry.entry.name === name)?.needs
 
   expect(needFor('Strength of Earth Totem'), 'class-wide reads "any"').toBe('any Shaman')
   expect(needFor('Totem of Wrath'), 'spec-specific names the spec').toBe('an Elemental Shaman')
   expect(needFor('Mana Tide Totem')).toBe('a Restoration Shaman')
 
   /*
-   * And the suggestions distinguish the three Shaman specs by what only they bring. They each add
-   * the same seven class totems, so a raw list truncates to an identical prefix — the spec-specific
-   * entry is sorted first precisely so the rows read as three different choices.
+   * The three Shaman specs stay distinguishable by what only they bring, sorted first so the panel's
+   * truncation cannot hide the difference.
    */
   const shamanSuggestions = report.suggestions.filter((entry) => entry.className === 'Shaman')
   expect(shamanSuggestions).toHaveLength(3)
@@ -4691,53 +4767,67 @@ test('a missing buff names who would bring it, at the right specificity', () => 
     'Totem of Wrath',
     'Unleashed Rage',
   ])
-  for (const suggestion of shamanSuggestions) expect(suggestion.anySpec, 'these are not interchangeable').toBe(false)
 })
 
 test('interchangeable specs collapse into one suggestion', () => {
   /*
-   * All nine Paladin buffs are class-wide, so Holy, Protection and Retribution add exactly the same
-   * set. Listed separately that is three consecutive rows saying one thing — noise dressed as
-   * choice. Collapsed, it says what a raid leader needs: find a Paladin.
+   * All nine Paladin buffs are class-wide, so its three specs add an identical set. Listed separately
+   * that is three rows saying one thing. Shaman must NOT collapse, or the distinction above is gone.
    */
-  const report = computeCoverage({ size: 25, slots: [] })
+  const report = computeCoverage(emptyRoster(25))
   const paladin = report.suggestions.filter((entry) => entry.className === 'Paladin')
 
   expect(paladin, 'one row, not three').toHaveLength(1)
   expect(paladin[0].anySpec).toBe(true)
-  expect(paladin[0].specs).toHaveLength(3)
   expect(describeSuggestion(paladin[0])).toBe('Any Paladin')
-
-  // Shaman must NOT collapse, or the distinction the test above relies on has been flattened away.
   expect(report.suggestions.filter((entry) => entry.className === 'Shaman').length).toBeGreaterThan(1)
 })
 
-test('the raid composition planner is reachable and recomputes as seats are added', async ({ page }) => {
-  // Straight into the section: this one needs no character, which is the point of it being its own
-  // section rather than a planner panel.
+test('resizing a roster keeps the groups that fit', () => {
+  /*
+   * A raid leader mis-clicking 10-player must not lose the whole evening's planning. Going down drops
+   * groups 3-5 and there is no honest way around that; going back up adds empty groups rather than
+   * resurrecting anything.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+  roster = addToGroup(roster, 4, { className: 'Mage', spec: 'Fire' })
+  expect(filledSlots(roster)).toHaveLength(2)
+
+  const shrunk = resizeRoster(roster, 10)
+  expect(shrunk.groups).toHaveLength(2)
+  expect(filledSlots(shrunk), 'the group-5 Mage goes with its group').toHaveLength(1)
+  expect(filledSlots(shrunk)[0].className).toBe('Shaman')
+
+  const regrown = resizeRoster(shrunk, 25)
+  expect(regrown.groups).toHaveLength(5)
+  expect(filledSlots(regrown)).toHaveLength(1)
+})
+
+test('the raid composition planner seats a raid, and buffs land per group', async ({ page }) => {
+  // Straight into the section: it needs no character, which is why it is not a planner panel.
   await openApp(page, 'raidcomp')
 
   await expect(page.getByTestId('raidcomp-panel')).toBeVisible()
-  await expect(page.getByTestId('raidcomp-buffs-count')).toHaveText('0 / 33')
-  await expect(page.getByTestId('raidcomp-debuffs-count')).toHaveText('0 / 6')
   await expect(page.getByTestId('raidcomp-filled')).toContainText('0 of 25')
+  await expect(page.getByTestId('raidcomp-group-1')).toBeVisible()
+  await expect(page.getByTestId('raidcomp-group-5')).toBeVisible()
 
   /*
-   * One Paladin covers eight buffs and one debuff — the arithmetic, not merely "went up". The split
-   * is worth asserting separately: the suggestion list totals buffs and debuffs together, so a single
-   * Paladin shows as "+9" there, and reading that as nine *buffs* is a mistake this test exists to
-   * stop anyone repeating.
+   * A Shaman in group 1 gives group 1 its totems and gives group 2 nothing. Asserted through the UI
+   * as well as the domain because this is the claim the whole screen makes.
    */
-  await page.getByTestId('raidcomp-add-paladin-holy').click()
-  await expect(page.getByTestId('raidcomp-buffs-count')).toHaveText('8 / 33')
-  await expect(page.getByTestId('raidcomp-debuffs-count')).toHaveText('1 / 6')
+  await page.getByTestId('raidcomp-add-shaman-restoration').click()
   await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 25')
 
-  // Size is a real control: the same roster against 10 seats leaves nine open, not twenty-four.
-  await page.getByTestId('raidcomp-size-10').click()
-  await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 10')
+  const group1 = page.getByTestId('raidcomp-group-1')
+  const group2 = page.getByTestId('raidcomp-group-2')
+  await expect(group1.getByText('Strength of Earth Totem')).toBeVisible()
+  await expect(group2.getByText('Strength of Earth Totem')).toHaveCount(0)
+  await expect(group2.getByText('Empty group')).toBeVisible()
 
-  // And removing it returns the panel to empty rather than to some other state.
-  await page.getByRole('button', { name: 'Remove Holy Paladin' }).click()
-  await expect(page.getByTestId('raidcomp-buffs-count')).toHaveText('0 / 33')
+  // Removing the seat takes the buffs with it.
+  await page.getByRole('button', { name: /Remove Restoration Shaman/ }).click()
+  await expect(page.getByTestId('raidcomp-filled')).toContainText('0 of 25')
+  await expect(group1.getByText('Strength of Earth Totem')).toHaveCount(0)
 })

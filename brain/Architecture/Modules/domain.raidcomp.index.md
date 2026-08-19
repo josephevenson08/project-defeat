@@ -15,7 +15,7 @@ _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `describeSuggestion`, `emptyRoster`, `MissingEntry`, `RAID_SIZES`, `Roster`, `RosterSlot`, `slotProvides`, `Suggestion`
+**re-export** — `addToGroup`, `clearSeat`, `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `describeSuggestion`, `emptyRoster`, `filledSlots`, `getBuffScope`, `groupCountFor`, `GroupCoverage`, `MissingEntry`, `PARTY_SIZE`, `RAID_SIZES`, `RaidGroup`, `resizeRoster`, `Roster`, `RosterSlot`, `slotProvides`, `Suggestion`
 
 ## Imports
 
@@ -24,7 +24,9 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 
 ## Concepts & phases
 

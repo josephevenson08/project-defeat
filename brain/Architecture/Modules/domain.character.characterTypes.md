@@ -51,6 +51,7 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`

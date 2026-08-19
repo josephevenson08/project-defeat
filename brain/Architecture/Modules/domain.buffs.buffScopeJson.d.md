@@ -1,15 +1,15 @@
 ---
 type: module
-layer: app
-source: src/styles/global.css
-lines: 3809
+layer: domain
+source: src/domain/buffs/buffScopeJson.d.ts
+lines: 11
 generated: true
-tags: [brain/architecture, layer/app]
+tags: [brain/architecture, layer/domain]
 ---
 
-# styles.global
+# domain.buffs.buffScopeJson.d
 
-`src/styles/global.css` · **app** layer · 3809 lines
+`src/domain/buffs/buffScopeJson.d.ts` · **domain** layer · 11 lines
 
 _No doc comment at the top of this file._
 
@@ -23,7 +23,7 @@ _None._
 
 ## Imported by
 
-- [[main]] — `src/main.tsx`
+_None._
 
 ## Concepts & phases
 

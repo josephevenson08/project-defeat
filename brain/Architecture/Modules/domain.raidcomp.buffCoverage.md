@@ -2,31 +2,32 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/buffCoverage.ts
-lines: 206
+lines: 225
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.buffCoverage
 
-`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 206 lines
+`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 225 lines
 
 From the top of the file:
 
 > Whether a seat brings a given buff or debuff.
 > 
-> The whole reason `providedByClass` and `providedBySpec` are typed rather than parsed out of a
-> display string: this comparison has to be exact. A near-miss here does not throw, it silently
-> under-reports coverage, and a raid leader would go recruit a Shaman they already had.
+> The reason `providedByClass` and `providedBySpec` are typed rather than parsed out of a display
+> string: this comparison has to be exact. A near-miss does not throw, it silently under-reports
+> coverage, and a raid leader goes recruiting for a seat they already filled.
 
 ## Exports
 
 **function** — `computeCoverage`, `describeSuggestion`, `slotProvides`
 
-**type** — `CoverageReport`, `CoverageSection`, `CoveredEntry`, `MissingEntry`, `Suggestion`
+**type** — `CoverageReport`, `CoverageSection`, `CoveredEntry`, `GroupCoverage`, `MissingEntry`, `Suggestion`
 
 ## Imports
 
+- [[domain.buffs.buffScope]] — `src/domain/buffs/buffScope.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.buffs.sampleTargetDebuffs]] — `src/domain/buffs/sampleTargetDebuffs.ts`

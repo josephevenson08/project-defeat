@@ -94,6 +94,23 @@ outcomes keep changing and these have not: measure before designing, plumbing be
 before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
 invariant before trusting it.
 
+**Then the raid planner was rebuilt around groups, because the first version was wrong about TBC.**
+24 of the 33 raid buffs are **party-scoped** — every totem, every aura, both Warrior shouts, Arcane
+Brilliance, Gift of the Wild — and reach only the caster's group of five. Treating them as raid-wide
+told a raid leader Battle Shout was covered when **five of twenty-five** players had it. In TBC,
+composition *is* group assignment, which is exactly why Wowhead's tool has groups.
+
+The scopes are **sourced, not recalled**: `tools/ingest/ingest-buff-scope.mjs` reads each spell's own
+tooltip. Battle Shout says "all party members within 20 yards"; Greater Blessing of Might says "all
+members of the raid or group". 38 of 39 resolved from the tooltip alone; Unleashed Rage is a cited
+override because spell 30806's page carries no description at all. Final split: **Party 24, Raid 5
+(exactly the Greater Blessings), Single 4, Target 6.**
+
+The planner is now a seating chart — five groups of five, party buffs listed under each group — plus
+**roster persistence** and a **PNG export**. The image deliberately carries the seating only: on
+screen the buff lists are the decision surface, but what a raid wants pasted into Discord is "am I in
+group 3", and forty lines of buff annotation would bury it.
+
 **A raid-composition planner was added** (2026-08-19, by request, modelled on Wowhead's TBC tool). A
 fifth section: pick 10 or 25, add specs, see which of the 33 raid buffs and 6 target debuffs the
 roster actually brings, plus role balance and what one more seat would buy you.
@@ -219,7 +236,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 133 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 136 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -270,6 +287,7 @@ node tools/ingest/reconcile-curated.mjs --check-wowhead
 node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 579 talents
 node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
+node tools/ingest/ingest-buff-scope.mjs         # party vs raid scope for all 39 buffs/debuffs
 node tools/ingest/ingest-tier-lists.mjs         # 3 spec tier lists, 28 placements
 node tools/ingest/ingest-item-effects.mjs       # 49 trinket/weapon procs and on-use effects
 node tools/ingest/ingest-meta-gems.mjs          # colour conditions for all 18 meta gems

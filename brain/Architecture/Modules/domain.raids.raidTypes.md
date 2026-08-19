@@ -35,6 +35,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.serpentshrineCavernBosses]] — `src/domain/raids/serpentshrineCavernBosses.ts`
 - [[domain.raids.tempestKeepBosses]] — `src/domain/raids/tempestKeepBosses.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 
 ## Concepts & phases
 

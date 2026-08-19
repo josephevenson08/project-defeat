@@ -1,4 +1,4 @@
-export type { Roster, RosterSlot } from './rosterTypes'
-export { RAID_SIZES, emptyRoster } from './rosterTypes'
-export type { CoverageReport, CoverageSection, CoveredEntry, MissingEntry, Suggestion } from './buffCoverage'
-export { computeCoverage, describeSuggestion, slotProvides } from './buffCoverage'
+export type { RaidGroup, Roster, RosterSlot } from './rosterTypes'
+export { PARTY_SIZE, RAID_SIZES, addToGroup, clearSeat, emptyRoster, filledSlots, groupCountFor, resizeRoster } from './rosterTypes'
+export type { CoverageReport, CoverageSection, CoveredEntry, GroupCoverage, MissingEntry, Suggestion } from './buffCoverage'
+export { computeCoverage, describeSuggestion, getBuffScope, slotProvides } from './buffCoverage'

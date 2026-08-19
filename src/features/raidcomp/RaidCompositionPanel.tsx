@@ -1,46 +1,51 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { describeProvider } from '../../domain/buffs/buffTypes'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import type { CharacterRole, TbcClass, TbcSpec } from '../../domain/character/characterTypes'
 import { getRoleForSpec, tbcClasses } from '../../domain/character/tbcClasses'
 import type { RaidPlayerSize } from '../../domain/raids/raidTypes'
-import { RAID_SIZES, computeCoverage, describeSuggestion } from '../../domain/raidcomp'
-import type { CoverageSection, RosterSlot } from '../../domain/raidcomp'
+import {
+  PARTY_SIZE,
+  RAID_SIZES,
+  addToGroup,
+  clearSeat,
+  computeCoverage,
+  describeSuggestion,
+  emptyRoster,
+  resizeRoster,
+} from '../../domain/raidcomp'
+import type { CoverageSection, Roster } from '../../domain/raidcomp'
+import { downloadRosterImage } from './exportRosterImage'
+import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
 /**
- * The raid-composition planner: a roster in, buff and debuff coverage out.
+ * The raid-composition planner: a seating chart in, buff coverage out.
  *
- * **Why this is a section rather than another planner panel.** The planner answers "how good is my
- * character"; this answers "is my raid missing anything", and the person asking is usually not the
- * person being geared. Nothing on this screen is about the character in the rail, so putting it
- * under the planner would have inherited a rail that describes something else — the same mistake
- * the tier lists and raids sections already avoid by having no rail at all.
+ * **It is built around groups because in TBC composition *is* group assignment.** 24 of the 33 raid
+ * buffs are party-scoped — every totem, every aura, both Warrior shouts, Arcane Brilliance, Gift of
+ * the Wild — so which group the Shaman sits in decides who actually receives Strength of Earth. The
+ * first version of this panel treated every buff as raid-wide and told a raid leader Battle Shout
+ * was covered when five of twenty-five players had it. Sourcing the scopes from the spell tooltips
+ * is what turned this from a checklist into a planning tool.
  *
- * **Every buff counts here, including the fifteen the simulator marks `notModelled`.** That flag
- * means the stat model cannot express the effect; it says nothing about whether the buff matters. To
- * a raid leader Bloodlust is not a rounding error. This is the one surface where that dataset is
- * worth all 33 entries rather than the 18 `calculateStats` can apply, which is most of the reason
- * this feature is cheap: the data was already sourced and already correct.
+ * **A section rather than a planner panel** because nothing here belongs to the character in the
+ * rail — the person planning a raid is usually not the person being geared.
  */
 
-/** Roles in the order a raid leader counts them, not alphabetical. */
 const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 'Caster DPS']
 
 /**
  * Rough shape of a working raid, shown as guidance rather than enforced.
  *
- * Deliberately a *range* and deliberately soft. Real Phase 2 raids run 2-3 tanks and 5-7 healers
- * depending on the fight, and an app that turned that into a red error would be asserting a
- * precision the game does not have. The panel says what is unusual; it never says what is wrong.
+ * Deliberately a range and deliberately soft: real Phase 2 raids run 2-3 tanks and 5-7 healers
+ * depending on the fight. The panel says what is unusual; it never says what is wrong.
  */
 const TYPICAL_SHAPE: Record<RaidPlayerSize, Partial<Record<CharacterRole, readonly [number, number]>>> = {
   10: { Tank: [1, 2], Healer: [2, 3] },
   25: { Tank: [2, 3], Healer: [5, 7] },
 }
 
-type SpecOption = { className: TbcClass; spec: TbcSpec; role: CharacterRole }
-
-const ALL_SPECS: readonly SpecOption[] = tbcClasses.flatMap((definition) =>
+const ALL_SPECS = tbcClasses.flatMap((definition) =>
   definition.specs.map((spec) => ({
     className: definition.className,
     spec,
@@ -48,20 +53,15 @@ const ALL_SPECS: readonly SpecOption[] = tbcClasses.flatMap((definition) =>
   })),
 )
 
-function CoverageList<T extends Buff | TargetDebuff>({
-  section,
-  label,
-}: {
-  section: CoverageSection<T>
-  label: string
-}) {
+function CoverageList<T extends Buff | TargetDebuff>({ section, label }: { section: CoverageSection<T>; label: string }) {
   const total = section.covered.length + section.missing.length
+  const testLabel = label.toLowerCase().replace(/[^a-z]+/g, '-')
 
   return (
     <section className="raidcomp-coverage" aria-label={label}>
       <header className="raidcomp-coverage-head">
         <h3>{label}</h3>
-        <span className="raidcomp-coverage-count" data-testid={`raidcomp-${label.toLowerCase()}-count`}>
+        <span className="raidcomp-coverage-count" data-testid={`raidcomp-${testLabel}-count`}>
           {section.covered.length} / {total}
         </span>
       </header>
@@ -84,7 +84,6 @@ function CoverageList<T extends Buff | TargetDebuff>({
               <span className="raidcomp-entry-name">{entry.name}</span>
               <span className="raidcomp-entry-source">
                 {describeProvider(entry)}
-                {/* Redundancy is worth seeing: one Shaman covering ten totems is a single point of failure. */}
                 {providedBy > 1 ? ` · ${providedBy}×` : ''}
               </span>
             </li>
@@ -96,37 +95,39 @@ function CoverageList<T extends Buff | TargetDebuff>({
 }
 
 export function RaidCompositionPanel() {
-  const [size, setSize] = useState<RaidPlayerSize>(25)
-  const [slots, setSlots] = useState<readonly RosterSlot[]>([])
-
-  const report = useMemo(() => computeCoverage({ size, slots }), [size, slots])
-
-  const addSlot = (className: TbcClass, spec: TbcSpec) => setSlots((current) => [...current, { className, spec }])
-
+  const [roster, setRoster] = useState<Roster>(() => loadRoster() ?? emptyRoster(25))
   /*
-   * Removes the LAST matching seat rather than the first. Seats of the same spec are interchangeable,
-   * so which one goes is arbitrary — but taking the most recently added makes add-then-undo behave
-   * the way a person expects when they miscount.
+   * Which group a picked spec lands in. Defaulting to the first group with room means a raid leader
+   * can fill 25 seats by clicking 25 specs, and only has to think about groups when they want to.
    */
-  const removeSlot = (className: TbcClass, spec: TbcSpec) =>
-    setSlots((current) => {
-      const index = current.map((slot) => slot.className === className && slot.spec === spec).lastIndexOf(true)
-      return index === -1 ? current : [...current.slice(0, index), ...current.slice(index + 1)]
-    })
+  const [selectedGroup, setSelectedGroup] = useState(0)
 
-  const countOf = (className: TbcClass, spec: TbcSpec) =>
-    slots.filter((slot) => slot.className === className && slot.spec === spec).length
+  const report = useMemo(() => computeCoverage(roster), [roster])
 
-  const shape = TYPICAL_SHAPE[size]
+  useEffect(() => {
+    saveRoster(roster)
+  }, [roster])
+
+  const firstGroupWithRoom = roster.groups.findIndex((group) => group.includes(undefined))
+  const targetGroup = roster.groups[selectedGroup]?.includes(undefined) ? selectedGroup : firstGroupWithRoom
+
+  const place = (className: TbcClass, spec: TbcSpec) => {
+    if (targetGroup === -1) return
+    setRoster((current) => addToGroup(current, targetGroup, { className, spec }))
+  }
+
+  const shape = TYPICAL_SHAPE[roster.size]
+  const title = `${roster.size}-player raid`
 
   return (
     <div className="panel raidcomp" data-testid="raidcomp-panel">
       <header className="panel-head">
         <h2>Raid Composition</h2>
         <p className="panel-copy">
-          Build a roster and see which of the {report.buffs.covered.length + report.buffs.missing.length} raid buffs
-          and {report.debuffs.covered.length + report.debuffs.missing.length} target debuffs it actually brings. Every
-          entry is the same sourced data the Buffs panel uses, each cited to the spell rank it was read from.
+          Seat a raid and see what each group actually receives. <strong>24 of the 33 raid buffs are
+          party-scoped in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so
+          where someone sits matters as much as whether they are in the raid at all. Every scope is read
+          from the spell's own tooltip.
         </p>
       </header>
 
@@ -136,9 +137,9 @@ export function RaidCompositionPanel() {
             <button
               key={option}
               type="button"
-              className={option === size ? 'is-active' : ''}
-              aria-pressed={option === size}
-              onClick={() => setSize(option)}
+              className={option === roster.size ? 'is-active' : ''}
+              aria-pressed={option === roster.size}
+              onClick={() => setRoster((current) => resizeRoster(current, option))}
               data-testid={`raidcomp-size-${option}`}
             >
               {option}-player
@@ -148,22 +149,38 @@ export function RaidCompositionPanel() {
 
         <p className="raidcomp-filled" data-testid="raidcomp-filled">
           <strong>{report.filled}</strong> of {report.size} seats
-          {report.remaining < 0 ? ` · ${-report.remaining} over` : report.remaining > 0 ? ` · ${report.remaining} open` : ''}
+          {report.remaining > 0 ? ` · ${report.remaining} open` : ''}
         </p>
 
-        {slots.length > 0 && (
-          <button type="button" className="raidcomp-clear" onClick={() => setSlots([])}>
-            Clear roster
+        <div className="raidcomp-actions">
+          <button
+            type="button"
+            className="raidcomp-export"
+            onClick={() => downloadRosterImage(roster, title)}
+            data-testid="raidcomp-export"
+          >
+            Export image
           </button>
-        )}
+          {report.filled > 0 && (
+            <button
+              type="button"
+              className="raidcomp-clear"
+              onClick={() => {
+                setRoster(emptyRoster(roster.size))
+                clearStoredRoster()
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <section className="raidcomp-roles" aria-label="Role balance">
         {ROLE_ORDER.map((role) => {
           const band = shape[role]
           const count = report.roleCounts[role]
-          // "Unusual" rather than "wrong" — the band is guidance, and only shown where one exists.
-          const unusual = band !== undefined && slots.length > 0 && (count < band[0] || count > band[1])
+          const unusual = band !== undefined && report.filled > 0 && (count < band[0] || count > band[1])
           return (
             <div key={role} className="raidcomp-role" data-testid={`raidcomp-role-${role.replace(/\s+/g, '-').toLowerCase()}`}>
               <span className="raidcomp-role-count">{count}</span>
@@ -178,43 +195,103 @@ export function RaidCompositionPanel() {
         })}
       </section>
 
-      <section className="raidcomp-roster" aria-label="Add specs">
-        <h3>Roster</h3>
+      <section className="raidcomp-picker" aria-label="Add a spec">
+        <h3>
+          Add to <span className="raidcomp-target">Group {targetGroup === -1 ? '—' : targetGroup + 1}</span>
+        </h3>
         <div className="raidcomp-spec-grid">
-          {ALL_SPECS.map(({ className, spec }) => {
-            const count = countOf(className, spec)
-            return (
-              <div key={`${className}-${spec}`} className={count > 0 ? 'raidcomp-spec is-picked' : 'raidcomp-spec'}>
-                <button
-                  type="button"
-                  className="raidcomp-spec-add"
-                  onClick={() => addSlot(className, spec)}
-                  data-testid={`raidcomp-add-${className}-${spec}`.replace(/\s+/g, '-').toLowerCase()}
-                  aria-label={`Add ${spec} ${className}`}
-                >
-                  <span className="raidcomp-spec-name">
-                    {spec} {className}
-                  </span>
-                  {count > 0 && <span className="raidcomp-spec-count">{count}</span>}
-                </button>
-                {count > 0 && (
-                  <button
-                    type="button"
-                    className="raidcomp-spec-remove"
-                    onClick={() => removeSlot(className, spec)}
-                    aria-label={`Remove ${spec} ${className}`}
-                  >
-                    −
-                  </button>
-                )}
-              </div>
-            )
-          })}
+          {ALL_SPECS.map(({ className, spec }) => (
+            <button
+              key={`${className}-${spec}`}
+              type="button"
+              className="raidcomp-spec-add"
+              disabled={targetGroup === -1}
+              onClick={() => place(className, spec)}
+              data-testid={`raidcomp-add-${className}-${spec}`.replace(/\s+/g, '-').toLowerCase()}
+              aria-label={`Add ${spec} ${className}`}
+            >
+              {spec} {className}
+            </button>
+          ))}
         </div>
       </section>
 
+      {/* The working surface: seating on the left of each column, what that seating buys underneath. */}
+      <section className="raidcomp-groups" aria-label="Groups">
+        {report.groups.map((groupCoverage) => {
+          const group = roster.groups[groupCoverage.groupIndex]
+          const isTarget = groupCoverage.groupIndex === targetGroup
+          return (
+            <div
+              key={groupCoverage.groupIndex}
+              className={isTarget ? 'raidcomp-group is-target' : 'raidcomp-group'}
+              data-testid={`raidcomp-group-${groupCoverage.groupIndex + 1}`}
+            >
+              <button
+                type="button"
+                className="raidcomp-group-head"
+                onClick={() => setSelectedGroup(groupCoverage.groupIndex)}
+                aria-pressed={isTarget}
+              >
+                <span>Group {groupCoverage.groupIndex + 1}</span>
+                <span className="raidcomp-group-count">
+                  {groupCoverage.filled}/{PARTY_SIZE}
+                </span>
+              </button>
+
+              <ol className="raidcomp-seats">
+                {group.map((slot, seatIndex) => (
+                  <li key={seatIndex} className={slot ? 'raidcomp-seat is-filled' : 'raidcomp-seat'}>
+                    {slot ? (
+                      <button
+                        type="button"
+                        onClick={() => setRoster((current) => clearSeat(current, groupCoverage.groupIndex, seatIndex))}
+                        aria-label={`Remove ${slot.spec} ${slot.className} from group ${groupCoverage.groupIndex + 1}`}
+                        data-role={getRoleForSpec(slot.className, slot.spec)}
+                      >
+                        <span className="raidcomp-seat-name">
+                          {slot.spec} {slot.className}
+                        </span>
+                        <span className="raidcomp-seat-remove" aria-hidden="true">
+                          ×
+                        </span>
+                      </button>
+                    ) : (
+                      <span className="raidcomp-seat-empty">—</span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+
+              {/*
+                What this group receives, which is the whole reason the seating is on screen. Shown
+                per group and deliberately kept out of the exported image: this is the decision
+                surface, the image is the result.
+              */}
+              <div className="raidcomp-group-buffs">
+                <span className="raidcomp-group-buffs-label">
+                  Party buffs · {groupCoverage.partyBuffs.length}
+                </span>
+                {groupCoverage.partyBuffs.length === 0 ? (
+                  <span className="raidcomp-group-buffs-none">
+                    {groupCoverage.filled === 0 ? 'Empty group' : 'None from this group'}
+                  </span>
+                ) : (
+                  <ul>
+                    {groupCoverage.partyBuffs.map((buff) => (
+                      <li key={buff.id}>{buff.name}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </section>
+
       <div className="raidcomp-columns">
-        <CoverageList section={report.buffs} label="Buffs" />
+        <CoverageList section={report.raidWide} label="Raid-wide" />
+        <CoverageList section={report.partyScoped} label="Party buffs" />
         <CoverageList section={report.debuffs} label="Debuffs" />
       </div>
 

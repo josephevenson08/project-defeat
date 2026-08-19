@@ -2,29 +2,30 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/rosterTypes.ts
-lines: 30
+lines: 91
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.rosterTypes
 
-`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 30 lines
+`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 91 lines
 
 From the top of the file:
 
 > One seat in a raid, identified only by what the player brings.
 > 
-> Deliberately not a *person*. A raid leader planning a composition is asking "do I have a Shaman
-> for Bloodlust", not "is Dave online" — and a name field would invite storing other people's
-> details in a local-first app that has never held any. Seats are interchangeable within a spec, so
-> the roster is a plain list and two Fury Warriors are genuinely identical entries.
+> Deliberately not a *person*. A raid leader planning a composition is asking "do I have a Shaman in
+> group 3 for totems", not "is Dave online" — and a name field would invite storing other people's
+> details in a local-first app that has never held any.
 
 ## Exports
 
-**const** — `emptyRoster`, `RAID_SIZES`
+**function** — `addToGroup`, `clearSeat`, `emptyRoster`, `filledSlots`, `resizeRoster`
 
-**type** — `Roster`, `RosterSlot`
+**const** — `groupCountFor`, `PARTY_SIZE`, `RAID_SIZES`
+
+**type** — `RaidGroup`, `Roster`, `RosterSlot`
 
 ## Imports
 

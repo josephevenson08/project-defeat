@@ -3620,3 +3620,189 @@ input[type='text']:focus {
 .raidcomp-suggestions li + li {
   border-top: 1px solid var(--line);
 }
+
+/* ---------------------------------------------------------------------------
+   Raid composition — groups
+
+   The seating chart is the working surface: five columns of five, each with the
+   party buffs that seating actually buys underneath it. Role colour appears as a
+   left stripe on a filled seat, matching the exported PNG, so the image and the
+   screen read the same way.
+   --------------------------------------------------------------------------- */
+
+.raidcomp-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.raidcomp-export {
+  padding: 6px 12px;
+  background: var(--surface-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.raidcomp-export:hover {
+  color: var(--text-strong);
+}
+
+.raidcomp-picker h3,
+.raidcomp-groups h3 {
+  font-size: var(--heading-section);
+  margin: 0 0 8px;
+}
+
+.raidcomp-target {
+  font-family: var(--font-mono);
+  color: var(--text-strong);
+}
+
+.raidcomp-picker {
+  margin-bottom: 24px;
+}
+
+.raidcomp-spec-add[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Groups ------------------------------------------------------------------ */
+
+.raidcomp-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.raidcomp-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* The group a picked spec will land in. A border rather than a fill, so the
+   seating below stays the brightest thing in the column. */
+.raidcomp-group.is-target {
+  border-color: var(--line-strong);
+}
+
+.raidcomp-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.raidcomp-group.is-target .raidcomp-group-head {
+  color: var(--text-strong);
+}
+
+.raidcomp-group-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.raidcomp-seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raidcomp-seat {
+  border-bottom: 1px solid var(--line);
+  min-height: 34px;
+  display: flex;
+  align-items: stretch;
+}
+
+.raidcomp-seat button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 10px 7px 12px;
+  background: transparent;
+  border: 0;
+  border-left: 3px solid transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.raidcomp-seat button:hover {
+  background: var(--surface-3);
+}
+
+/* Same four role colours the PNG export draws, kept in step deliberately. */
+.raidcomp-seat button[data-role='Tank'] { border-left-color: #6a7fa8; }
+.raidcomp-seat button[data-role='Healer'] { border-left-color: #6f8f6a; }
+.raidcomp-seat button[data-role='Physical DPS'] { border-left-color: #9c7346; }
+.raidcomp-seat button[data-role='Caster DPS'] { border-left-color: #856a9c; }
+
+.raidcomp-seat-remove {
+  color: var(--text-faint);
+  font-size: 15px;
+  line-height: 1;
+}
+
+.raidcomp-seat button:hover .raidcomp-seat-remove {
+  color: var(--text-strong);
+}
+
+.raidcomp-seat-empty {
+  padding: 7px 12px;
+  color: var(--line-strong);
+  font-size: 13px;
+}
+
+/* What the seating buys. Never exported — this is the decision surface. */
+.raidcomp-group-buffs {
+  padding: 9px 12px 11px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-0);
+}
+
+.raidcomp-group-buffs-label {
+  display: block;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 5px;
+}
+
+.raidcomp-group-buffs ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raidcomp-group-buffs li {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.raidcomp-group-buffs-none {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-style: italic;
+}

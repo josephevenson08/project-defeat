@@ -1,0 +1,244 @@
+{
+  "$schema": "wowhead spell tooltip scope ingestion",
+  "source": "https://www.wowhead.com/tbc/spell=<id>",
+  "generatedBy": "tools/ingest/ingest-buff-scope.mjs",
+  "note": "Party vs Raid read from each spell tooltip. Entries whose tooltip states no scope are omitted and listed in `unresolved`.",
+  "scopes": {
+    "battle-shout": {
+      "name": "Battle Shout",
+      "spellId": 2048,
+      "scope": "Party",
+      "evidence": "Battle Shout Level 70 10 Rage Instant cast Requires Warrior Requires level 69 The warrior shouts, increasing the melee attack power of all party members within 20 yards by 306. Lasts 2 min."
+    },
+    "commanding-shout": {
+      "name": "Commanding Shout",
+      "spellId": 469,
+      "scope": "Party",
+      "evidence": "Commanding Shout 10 Rage Instant cast Requires Warrior Requires level 68 Increases maximum health of all party members within 20 yards by 1080. Lasts 2 min."
+    },
+    "blessing-of-might": {
+      "name": "Greater Blessing of Might",
+      "spellId": 27141,
+      "scope": "Raid",
+      "evidence": "Greater Blessing of Might 295 Mana 40 yd range Instant Requires Paladin Requires level 70 Reagents: Symbol of Kings Gives all members of the raid or group that share the same class with the target the"
+    },
+    "blessing-of-kings": {
+      "name": "Greater Blessing of Kings",
+      "spellId": 25898,
+      "scope": "Raid",
+      "evidence": "Greater Blessing of Kings 12% of base mana 40 yd range Instant Requires Paladin Requires level 60 Reagents: Symbol of Kings Gives all members of the raid or group that share the same class with the ta"
+    },
+    "blessing-of-wisdom": {
+      "name": "Greater Blessing of Wisdom",
+      "spellId": 27143,
+      "scope": "Raid",
+      "evidence": "Greater Blessing of Wisdom 310 Mana 40 yd range Instant Requires Paladin Requires level 65 Reagents: Symbol of Kings Gives all members of the raid or group that share the same class with the target th"
+    },
+    "blessing-of-salvation": {
+      "name": "Greater Blessing of Salvation",
+      "spellId": 25895,
+      "scope": "Raid",
+      "evidence": "Greater Blessing of Salvation 13% of base mana 40 yd range Instant Requires Paladin Requires level 60 Reagents: Symbol of Kings Gives all members of the raid or group that share the same class with th"
+    },
+    "blessing-of-sanctuary": {
+      "name": "Greater Blessing of Sanctuary",
+      "spellId": 27169,
+      "scope": "Raid",
+      "evidence": "Greater Blessing of Sanctuary 360 Mana 40 yd range Instant Requires Paladin Requires level 70 Reagents: Symbol of Kings Gives all members of the raid or group that share the same class with the target"
+    },
+    "devotion-aura": {
+      "name": "Devotion Aura",
+      "spellId": 27149,
+      "scope": "Party",
+      "evidence": "Devotion Aura Instant Requires Paladin Requires level 70 Gives 861 additional armor to party members within 30 yards. Players may only have one Aura on them per Paladin at any one time."
+    },
+    "retribution-aura": {
+      "name": "Retribution Aura",
+      "spellId": 27150,
+      "scope": "Party",
+      "evidence": "Retribution Aura Instant Requires Paladin Requires level 66 Causes 26 Holy damage to any creature that strikes a party member within 30 yards. Players may only have one Aura on them per Paladin at any"
+    },
+    "sanctity-aura": {
+      "name": "Sanctity Aura",
+      "spellId": 20218,
+      "scope": "Party",
+      "evidence": "Sanctity Aura Talent Instant Requires Paladin Increases Holy damage done by party members within 30 yards by 10%. Players may only have one Aura on them per Paladin at any one time."
+    },
+    "arcane-intellect": {
+      "name": "Arcane Brilliance",
+      "spellId": 27127,
+      "scope": "Party",
+      "evidence": "Arcane Brilliance 1800 Mana 40 yd range Instant Requires Mage Requires level 70 Reagents: Arcane Powder Infuses the target's party with brilliance, increasing their Intellect by 40 for 1 hour."
+    },
+    "prayer-of-fortitude": {
+      "name": "Prayer of Fortitude",
+      "spellId": 25392,
+      "scope": "Party",
+      "evidence": "Prayer of Fortitude 1800 Mana 40 yd range Instant Requires Priest Requires level 70 Reagents: Sacred Candle Power infuses the target's party, increasing their Stamina by 79 for 1 hour."
+    },
+    "prayer-of-spirit": {
+      "name": "Prayer of Spirit",
+      "spellId": 32999,
+      "scope": "Party",
+      "evidence": "Prayer of Spirit 1800 Mana 40 yd range Instant Requires Priest Requires level 70 Reagents: Sacred Candle Power infuses the target's party, increasing their Spirit by 50 for 1 hour."
+    },
+    "shadow-protection": {
+      "name": "Shadow Protection",
+      "spellId": 25433,
+      "scope": "Single",
+      "evidence": "Shadow Protection 810 Mana 30 yd range Instant Requires Priest Requires level 68 Increases the target's resistance to Shadow spells by 70 for 10 min."
+    },
+    "power-infusion": {
+      "name": "Power Infusion",
+      "spellId": 10060,
+      "scope": "Single",
+      "evidence": "Power Infusion Talent 16% of base mana 30 yd range Instant 3 min cooldown Requires Priest Infuses the target with power, increasing spell casting speed by 20% and reducing the mana cost of all spells "
+    },
+    "mark-of-the-wild": {
+      "name": "Gift of the Wild",
+      "spellId": 26991,
+      "scope": "Party",
+      "evidence": "Gift of the Wild 1515 Mana 40 yd range Instant Requires Druid Requires level 70 Reagents: Wild Quillvine Gives the Gift of the Wild to the target's party, increasing armor by 340, all attributes by 14"
+    },
+    "thorns": {
+      "name": "Thorns",
+      "spellId": 26992,
+      "scope": "Single",
+      "evidence": "Thorns 400 Mana 30 yd range Instant Requires Druid Requires level 64 Thorns sprout from the friendly target causing 25 Nature damage to attackers when hit. Lasts 10 min."
+    },
+    "innervate": {
+      "name": "Innervate",
+      "spellId": 29166,
+      "scope": "Single",
+      "evidence": "Innervate 4% of base mana 30 yd range Instant 6 min cooldown Requires Druid Requires level 40 Increases the target's Spirit based mana regeneration by 400% and allows full mana regeneration while cast"
+    },
+    "leader-of-the-pack": {
+      "name": "Leader of the Pack",
+      "spellId": 17007,
+      "scope": "Party",
+      "evidence": "Leader of the Pack Talent Requires Druid While in Cat, Bear or Dire Bear Form, the Leader of the Pack increases ranged and melee critical chance of all party members within 45 yards by 5%."
+    },
+    "moonkin-aura": {
+      "name": "Moonkin Aura",
+      "spellId": 24858,
+      "scope": "Party",
+      "evidence": "Moonkin Form Talent 22% of base mana Instant Requires Druid Shapeshift into Moonkin Form. While in this form the armor contribution from items is increased by 400%, attack power is increased by 150% o"
+    },
+    "trueshot-aura": {
+      "name": "Trueshot Aura",
+      "spellId": 27066,
+      "scope": "Party",
+      "evidence": "Trueshot Aura Talent Instant Requires Hunter Requires level 70 Increases the attack power of party members within 45 yards by 125. Lasts until cancelled."
+    },
+    "ferocious-inspiration": {
+      "name": "Ferocious Inspiration",
+      "spellId": 34460,
+      "scope": "Party",
+      "evidence": "Ferocious Inspiration Talent Requires Hunter When your pet scores a critical hit, all party members have all damage increased by 3% for 10 sec."
+    },
+    "strength-of-earth-totem": {
+      "name": "Strength of Earth Totem",
+      "spellId": 25528,
+      "scope": "Party",
+      "evidence": "Strength of Earth Totem 300 Mana Instant Requires Shaman Requires level 65 Tools: Earth Totem Summons a Strength of Earth Totem with 5 health at the feet of the caster. The totem increases the strengt"
+    },
+    "grace-of-air-totem": {
+      "name": "Grace of Air Totem",
+      "spellId": 25359,
+      "scope": "Party",
+      "evidence": "Grace of Air Totem 310 Mana Instant Requires Shaman Requires level 60 Tools: Air Totem Summons a Grace of Air Totem with 5 health at the feet of the caster. The totem increases the agility of party me"
+    },
+    "mana-spring-totem": {
+      "name": "Mana Spring Totem",
+      "spellId": 25570,
+      "scope": "Party",
+      "evidence": "Mana Spring Totem 120 Mana Instant Requires Shaman Requires level 65 Tools: Water Totem Summons a Mana Spring Totem with 5 health at the feet of the caster for 2 min that restores 20 mana every 2 seco"
+    },
+    "totem-of-wrath": {
+      "name": "Totem of Wrath",
+      "spellId": 30706,
+      "scope": "Party",
+      "evidence": "Totem of Wrath Talent 5% of base mana Instant Requires Shaman Tools: Fire Totem Summons a Totem of Wrath with 5 health at the feet of the caster. The totem increases the chance to hit and critically s"
+    },
+    "wrath-of-air-totem": {
+      "name": "Wrath of Air Totem",
+      "spellId": 3738,
+      "scope": "Party",
+      "evidence": "Wrath of Air Totem 320 Mana Instant Requires Shaman Requires level 64 Tools: Air Totem Summons a Wrath of Air Totem with 5 health at the feet of the caster. Party members within 20 yards of the totem "
+    },
+    "windfury-totem": {
+      "name": "Windfury Totem",
+      "spellId": 25587,
+      "scope": "Party",
+      "evidence": "Windfury Totem 325 Mana Instant Requires Shaman Requires level 70 Tools: Air Totem Summons a Windfury Totem with 5 health at the feet of the caster. The totem enchants all party members main-hand weap"
+    },
+    "mana-tide-totem": {
+      "name": "Mana Tide Totem",
+      "spellId": 16190,
+      "scope": "Party",
+      "evidence": "Mana Tide Totem Talent 3% of base mana Instant 5 min cooldown Requires Shaman Tools: Water Totem Summons a Mana Tide Totem with 5 health at the feet of the caster for 12 sec that restores 6% of total "
+    },
+    "tranquil-air-totem": {
+      "name": "Tranquil Air Totem",
+      "spellId": 25908,
+      "scope": "Party",
+      "evidence": "Tranquil Air Totem 6% of base mana Instant Requires Shaman Requires level 50 Tools: Air Totem Summons a Tranquil Air Totem with 5 health at the feet of the caster. The totem reduces the threat caused "
+    },
+    "unleashed-rage": {
+      "name": "Unleashed Rage",
+      "spellId": 30806,
+      "scope": "Party",
+      "evidence": "Spell page 30806 carries no description. The scope comes from this buff's own sourced rank-5 text, already in sampleBuffs: \"the Shaman's melee critical hits increase all party members' melee attack power by 10%\".",
+      "fromOverride": true
+    },
+    "bloodlust": {
+      "name": "Bloodlust",
+      "spellId": 2825,
+      "scope": "Party",
+      "evidence": "Bloodlust 750 Mana Instant 10 min cooldown Requires Shaman Requires level 70 Increases melee, ranged, and spell casting speed by 30% for all party members. Lasts 40 sec."
+    },
+    "blood-pact": {
+      "name": "Blood Pact",
+      "spellId": 27268,
+      "scope": "Party",
+      "evidence": "Blood Pact Level 70 20 yd range Instant Requires Warlock Requires level 62 Increases party members' Stamina by 70."
+    },
+    "sunder-armor": {
+      "name": "Sunder Armor",
+      "spellId": 25225,
+      "scope": "Target",
+      "evidence": "Sunder Armor 15 Rage Melee Range Instant cast Requires Warrior Requires level 67 Requires Melee Weapon Sunders the target's armor, reducing it by 520 per Sunder Armor and causes a high amount of threa"
+    },
+    "curse-of-recklessness": {
+      "name": "Curse of Recklessness",
+      "spellId": 27226,
+      "scope": "Target",
+      "evidence": "Curse of Recklessness 160 Mana 30 yd range Instant Requires Warlock Requires level 69 Curses the target with recklessness, increasing melee attack power by 135 but reducing armor by 800 for 2 min. Cur"
+    },
+    "faerie-fire": {
+      "name": "Faerie Fire",
+      "spellId": 26993,
+      "scope": "Target",
+      "evidence": "Faerie Fire 145 Mana 30 yd range Instant Requires Druid Requires level 66 Decrease the armor of the target by 610 for 40 sec. While affected, the target cannot stealth or turn invisible."
+    },
+    "improved-seal-of-the-crusader": {
+      "name": "Improved Seal of the Crusader",
+      "spellId": 20337,
+      "scope": "Target",
+      "evidence": "Improved Seal of the Crusader Talent Requires Paladin In addition to the normal effect, your Judgement of the Crusader spell will also increase the critical strike chance of all attacks made against t"
+    },
+    "curse-of-elements": {
+      "name": "Curse of the Elements",
+      "spellId": 27228,
+      "scope": "Target",
+      "evidence": "Curse of the Elements 260 Mana 30 yd range Instant Requires Warlock Requires level 69 Curses the target for 5 min, reducing Arcane, Fire, Frost, and Shadow resistances by 88 and increasing Arcane, Fir"
+    },
+    "winters-chill": {
+      "name": "Winter's Chill",
+      "spellId": 28595,
+      "scope": "Target",
+      "evidence": "Winter's Chill Talent Requires Mage Gives your Frost damage spells a 100% chance to apply the Winter's Chill effect, which increases the chance a Frost spell will critically hit the target by 2% for 1"
+    }
+  },
+  "unresolved": []
+}

@@ -45,9 +45,12 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
-- **Raid Composition section**: plan a 10 or 25-player roster and see which of the 33 sourced raid
-  buffs and 6 target debuffs it actually brings, with role balance and a ranked list of what one more
-  seat would buy you. Missing entries name who fixes them — "any Shaman", "an Elemental Shaman"
+- **Raid Composition section**: a seating chart for a 10 or 25-player raid — five groups of five,
+  with the buffs each group actually receives listed underneath it. **24 of the 33 raid buffs are
+  party-scoped in TBC**, so totems, auras and shouts reach only the caster's group; every scope is
+  read from the spell's own Wowhead tooltip. Role balance, a ranked list of what one more seat would
+  buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
+  persistence, and a **PNG export** of the seating chart for pasting into Discord
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
