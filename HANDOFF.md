@@ -46,6 +46,25 @@ activation.
 Also corrected: **"7 caster and 2 healer specs" was wrong in four places** and was never right — the
 split is 9 Caster DPS, 5 Healer, 11 Physical DPS, 2 Tank. It is asserted now, not written.
 
+**The 2026-08-19 session** audited the app against its own "Phase 2 and only Phase 2" target, and the
+headline is that the gate was **already right where it mattered** — `getItemsForSlot` applies
+`defaultMaxPhase = 2`, so the picker, the default set and the upgrade finder never offered later
+content, and 1,196 of the 4,554 catalogued items are hidden by it. Raids are the correct five. Tier
+sets stop at T5. There is no phase selector to get wrong.
+
+What leaked was narrower and worse: **three paths resolve items by id and so skip the gate entirely**
+— the Ranked Gear panel's Equip button, restoring a saved build, and importing one. All three could
+seat Phase 3+ gear that the Gear panel would then refuse to list, counted in every stat total. Closed
+with `isWithinDefaultPhase`, kept deliberately distinct from `isItemAllowedForCharacter` so an import
+says "is Phase 3 gear" rather than blaming the class.
+
+And **Wowhead's Phase 2 BiS guides genuinely rank five items Phase 2 cannot reach.** Both were traced
+to their real source before touching them — Band of Eternity needs Scale of the Sands (Mount Hyjal,
+Phase 3) and Hailstone Pendant drops from Ahune's Ice Chest (2.4) — so this was Wowhead being
+forward-looking, not a bad ingest. Dropped, and the count exported as `excludedByPhase` so the filter
+is asserted rather than silent. See §"Findings" for both, and for why an item-level rule would have
+been wrong.
+
 The Simulation tab is **still hidden**; that decision was deliberately left to the repo owner, and
 was re-confirmed on 2026-08-18.
 
@@ -146,7 +165,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 125 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 126 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -206,8 +225,8 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 
 | | Was | Now |
 |---|---|---|
-| Items | 230, inferred | **4,560** merged, validated |
-| BiS entries | 463, only 2 deeper than rank 1 | **1,440** across 27 specs |
+| Items | 230, inferred | **4,554** merged, validated |
+| BiS entries | 463, only 2 deeper than rank 1 | **1,435** across 27 specs |
 | Gems | 11 | **212** |
 | Enchants | 22 | **91** |
 | Consumables | 14 | **31** |
@@ -325,7 +344,7 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   `attackPowerToWhiteDps` is `AP/14`, and neither read `hasteRating`, so the rail displayed a stat
   that did nothing and the stat-weight engine priced it at exactly zero. Fixed: white damage scales
   by `(1 + haste)` and rage income with it. **It changes no current number**, because only 78 of
-  4,560 items carry melee haste and none is Phase 2 raid gear — so the test injects 158 rating
+  4,554 items carry melee haste and none is Phase 2 raid gear — so the test injects 158 rating
   (exactly +10%) rather than equipping something. Worth knowing before "fixing" it again: the
   absence is real TBC, not missing data.
 - **Icon names come from the upstream the catalogue already uses, not from scraping Wowhead.**
@@ -334,12 +353,17 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   `all_items.go` has no icon field at all, and Wowhead's item *listviews* carry `displayid` rather
   than an icon name, cap out around 1,720 rows, and apply their URL category filters client-side —
   `/tbc/items/head/quality:4` and `/tbc/items/quality:4` return byte-identical HTML.
-- **`allItems` is 4,560 while `itemCatalogue.json` is 4,505.** `itemCatalogue.ts` merges the ingested
+- **`allItems` is 4,554 while `itemCatalogue.json` is 4,505.** This figure read **4,560** until
+  2026-08-19, and the six-item drift is fully accounted for rather than merely corrected: **four**
+  fictional curated items were deleted (curated 230 → 226) and **two** real ones — Choker of Vile
+  Intent and The Sun King's Talisman — were given their `wowItemId`, so they now *match* an ingested
+  row instead of merging as separate entries. Read the count off `catalogueMeta.mergedCount`, which
+  is computed, rather than from prose. `itemCatalogue.ts` merges the ingested
   catalogue, the Wowhead-only supplement and the curated provenance layer. Any script deriving a
   per-item dataset must read `allItems`, not the JSON — reading the JSON silently missed "Blessed
   Book of Nagrand", which reached the paperdoll with no icon.
 - **Raid loot notes reading "not yet in the item catalog" went stale without anything editing them.**
-  That data was written when the catalogue held 230 hand-written items; it now holds 4,560, and 85 of
+  That data was written when the catalogue held 230 hand-written items; it now holds 4,554, and 85 of
   the 124 unlinked entries named an item that was already present. They carried no `itemId`, so they
   drew the `??` frame and the note was simply false. `tools/ingest/link-raid-loot.mjs` links by exact
   unique name — never guessing where a name matches two items — and trims only that one stale
@@ -349,6 +373,44 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
 - **The ten files in `src/domain/raids/` were marked read-only on disk**, alone in the whole repo —
   an artifact of the worktree agent that created them on 2026-07-30. Any scripted edit there fails
   with `EPERM` until the attribute is cleared. Nothing else under `src/` has it.
+- **The Phase 2 gate was real but partial, and the hole was every path that resolves an item by id**
+  (2026-08-19). `defaultMaxPhase = 2` is applied inside `getItemsForSlot`, so the picker, the default
+  set and the upgrade finder were always correct — the catalogue carries **1,196 later-phase items**
+  (540 P3, 137 P4, 519 P5) and hides all of them. But `getItemById` / `getItemByWowItemId` are bare
+  map lookups, and three surfaces used them: the Ranked Gear panel's **working Equip button**,
+  restoring a saved build, and importing someone else's. Gear the Gear panel refuses to list could
+  sit equipped and be counted in every stat total.
+
+  **Item level is not the test, and an ilvl rule would have been wrong.** Tier 5 tops out at 141, but
+  **Embrace of the Twisting Nether** and **Bulwark of the Ancient Kings** are genuinely Phase 1-2
+  crafted epics at **ilvl 146**. The `phase` field is the authority; ilvl is a red herring. (The only
+  other things above 141 are the eight already excluded as unobtainable.)
+
+  Fixed with `isWithinDefaultPhase` applied at the three id-resolving paths, kept deliberately
+  separate from `isItemAllowedForCharacter` — build import reports "is Phase 3 gear" rather than
+  "isn't legal for a Beast Mastery Hunter", because the item *is* legal and the reason is the phase.
+- **Wowhead's Phase 2 BiS guides rank five items Phase 2 cannot reach**, labelled in their own notes
+  as "Optional", "Alternative" and "Seasonal". Both were verified to their real source rather than
+  trusted from the phase number, because getting it backwards deletes legitimate rankings:
+
+  - **Band of Eternity** (29294/29298) rewards the quest *Champion's Pledge*, which requires **Scale
+    of the Sands** — the Mount Hyjal faction, and Hyjal is **Phase 3**. The quest text gives it away:
+    the ring "will grow in power as you prove yourself to the Scale of the Sands", which is the
+    29294 → 29295 → 29296 upgrade chain.
+  - **Hailstone Pendant** (35511) comes from the **Ice Chest** that **Ahune** drops in the Slave Pens
+    during the Midsummer event, added in **2.4** — Phase 5.
+
+  wowsims' phase values are right in both cases. The entries are dropped in `bisLists.ts` rather than
+  greyed out in the panel, because those rows carry an Equip button and the Gear panel will not list
+  the items — so keeping them offers gear the rest of the app then refuses to acknowledge.
+  `excludedByPhase` exports the count (**5**) so the filter is asserted rather than silent.
+- **BiS rank numbers are not dense, and that predates the phase work.** Eight slot groups have holes
+  or duplicates: Hunter Main Hand reads **[1, 3, 4]** because the guide's rank 2 resolves to an
+  off-hand item and changes slots, and **Warrior Arms and Fury carry duplicate Main Hand ranks**
+  because two guide sections — one per weapon style — both map there. Neither is obviously wrong:
+  "best two-hander" and "best one-hander" are separate rankings that happen to share a slot. A test
+  asserting density everywhere fails on all eight, so the phase test scopes its density check to the
+  five slots a drop actually touched. Deciding the general question is separate work.
 - **Wowhead's tier lists are markup, not prose, which makes them the easiest ingest in the repo.**
   `[tier-list=rows]` wraps `[tier]` blocks carrying `[tier-label bg=qN]S[/tier-label]` and a
   `[tier-content]` of `[spec-badge=arcane-mage]` slugs. Read the spec from the **badge**, never from
@@ -554,7 +616,7 @@ is no surplus for a dump. What is missing is not the dump — it is rage *income
 Unbridled Wrath, damage taken, and Flurry**.
 
 **Haste is now modelled and it is not the unlock it looked like.** White damage scales by
-`(1 + haste)` and rage income with it, so the mechanism is in place — but only **78 of 4,560**
+`(1 + haste)` and rage income with it, so the mechanism is in place — but only **78 of 4,554**
 catalogued items carry melee haste and **none at Phase 2 raid item level**, which is faithful to TBC
 rather than a data gap: the expansion put almost no haste rating on early gear. So modelling it moved
 no current number.
