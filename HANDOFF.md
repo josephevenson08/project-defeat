@@ -82,6 +82,24 @@ coefficient, neither of which exists here, so **45 groups are refused by name**.
 **Meditation**, which changes what a *stat* is worth: it takes a Holy Priest's mid-cast regen from
 **11.6 to 24.6 mana/sec**, and Spirit stops pricing at zero.
 
+**A raid-composition planner was added** (2026-08-19, by request, modelled on Wowhead's TBC tool). A
+fifth section: pick 10 or 25, add specs, see which of the 33 raid buffs and 6 target debuffs the
+roster actually brings, plus role balance and what one more seat would buy you.
+
+**It was cheap for one reason worth repeating: the data was already sourced and already correct.**
+The feature invents nothing — it is the same 33 buffs and 6 debuffs the Buffs panel shows, each cited
+to a spell rank. And it is the surface where **`notModelled` stops mattering**: 15 of the 33 cannot be
+expressed as a stat change, so `calculateStats` can only apply 18 — but a raid leader planning around
+Bloodlust does not care whether the simulator can price it. This is the first place that dataset is
+worth all of itself.
+
+**The one real change underneath was typing `providedBy`.** It was a display string — "Warrior",
+"Feral Druid" — which is fine for printing and wrong for matching. Coverage now compares
+`providedByClass` and `providedBySpec` exactly, because the failure mode of a near-miss is silent:
+the buff is never credited, coverage under-reports, and a raid leader recruits for a seat they had.
+The display string is now *derived* by `describeProvider`, so the two cannot drift. All 39 entries
+round-tripped back to their original strings before the old field was removed.
+
 Then, on the owner's call, **main-hand and off-hand picks were separated into their own rankings.**
 A one-hander is catalogued `Main Hand` but is legal in either hand, so every one-hander the guide
 ranked under "Off Hand" was being filed as a main hand — a Fury warrior's Main Hand read
@@ -189,7 +207,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 128 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 133 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -201,7 +219,7 @@ npm run brain                         # "0 written" — idempotent
 A local-first React + TypeScript + Vite planner for WoW TBC Classic, targeting Phase 2 (SSC/TK,
 Tier 5). No backend, no runtime network calls — typed data and generated JSON in the repo.
 
-**Layout:** intro → a **section picker** (Character Planner / Spec Tier Lists / Raids / Professions)
+**Layout:** intro → a **section picker** (Character Planner / Raid Composition / Spec Tier Lists / Raids / Professions)
 → the chosen section, with a tab bar for moving between them afterwards. Discord skeleton underneath:
 a left rail, one main pane, popups layered over rather than modes you travel between. Tesla's
 restraint in the palette, Nothing's detailing: flat surfaces, hairline rules, tracked uppercase mono
@@ -211,7 +229,7 @@ labels, tabular figures, no gradients.
 only its own panel. See §2b for why, and for the measurements behind it.
 
 **The rail is section-specific.** Planner: the character selects plus the stat readout. Raids: the
-raid switcher. Tier lists and Professions: none. A rail of numbers beside a loot table would describe
+raid switcher. Raid Composition, Tier lists and Professions: none. A rail of numbers beside a loot table would describe
 something not on screen. The stat rail is also **scoped to the spec** — 12 rows on a Fury Warrior
 rather than 26 — with a "show all" toggle; again §2b.
 
@@ -395,6 +413,18 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **A "+9" in the raid planner's suggestions is buffs *and* debuffs together.** A Holy Paladin covers
+  **8 buffs and 1 debuff**, and reading that as nine buffs is a mistake the first version of its own
+  test made. The two counters are separate on screen; only the suggestion list totals them.
+- **Suggestions collapse only where specs are genuinely interchangeable.** All nine Paladin entries
+  are class-wide, so Holy, Protection and Retribution add an identical set and render as one "Any
+  Paladin" row. The three Shaman specs do *not* collapse — each adds the same seven class totems plus
+  one thing only it brings — and their spec-specific entry is sorted **first** so the truncated list
+  shows the difference. Before that, three rows led with the same four totems and looked like a
+  duplication bug while actually describing three different recruitment problems.
+- **The app has a fixed minimum width of about 806px and is not mobile-responsive.** Measured at a
+  375px viewport, every section overflows to the same figure, so this is a property of the shell
+  rather than of any one panel. Worth knowing before "fixing" a panel that is merely matching it.
 - **The ten files in `src/domain/raids/` were marked read-only on disk**, alone in the whole repo —
   an artifact of the worktree agent that created them on 2026-07-30. Any scripted edit there fails
   with `EPERM` until the attribute is cleared. Nothing else under `src/` has it.

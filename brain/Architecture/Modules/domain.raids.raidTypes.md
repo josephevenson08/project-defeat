@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 - [[domain.raids.gruulsLairBosses]] — `src/domain/raids/gruulsLairBosses.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
 - [[domain.raids.karazhanBosses]] — `src/domain/raids/karazhanBosses.ts`
@@ -33,6 +34,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.sampleRaids]] — `src/domain/raids/sampleRaids.ts`
 - [[domain.raids.serpentshrineCavernBosses]] — `src/domain/raids/serpentshrineCavernBosses.ts`
 - [[domain.raids.tempestKeepBosses]] — `src/domain/raids/tempestKeepBosses.ts`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 
 ## Concepts & phases
 

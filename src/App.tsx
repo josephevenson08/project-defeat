@@ -29,6 +29,7 @@ import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatsRail } from './features/stats/StatsRail'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
+import { RaidCompositionPanel } from './features/raidcomp/RaidCompositionPanel'
 import { TierListsPanel } from './features/tierlists/TierListsPanel'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import { RaidPicker } from './features/raids/RaidPicker'
@@ -43,7 +44,7 @@ const initialCharacter: CharacterProfile = {
   spec: 'Fury',
 }
 
-type AppTab = 'planner' | 'simulation' | 'tierlists' | 'raids' | 'professions'
+type AppTab = 'planner' | 'simulation' | 'raidcomp' | 'tierlists' | 'raids' | 'professions'
 
 /**
  * Simulation is its own tab rather than more panels under the planner.
@@ -59,6 +60,7 @@ type AppTab = 'planner' | 'simulation' | 'tierlists' | 'raids' | 'professions'
 const APP_TABS: readonly TabDefinition<AppTab>[] = [
   { id: 'planner', label: 'Character Planner' },
   { id: 'simulation', label: 'Simulation' },
+  { id: 'raidcomp', label: 'Raid Composition' },
   { id: 'tierlists', label: 'Spec Tier Lists' },
   { id: 'raids', label: 'Raids' },
   { id: 'professions', label: 'Professions' },
@@ -326,6 +328,7 @@ function App() {
       {/* The character is passed only once it has been chosen deliberately. Marking the default Fury
           Warrior on the lists for someone who never picked it would answer "where do I stand" with a
           spec they never named. */}
+      {activeTab === 'raidcomp' && <RaidCompositionPanel />}
       {activeTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
       {activeTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}

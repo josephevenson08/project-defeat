@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleTargetDebuffs.ts
-lines: 106
+lines: 108
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleTargetDebuffs
 
-`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 106 lines
+`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 108 lines
 
 From the top of the file:
 
@@ -59,6 +59,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 

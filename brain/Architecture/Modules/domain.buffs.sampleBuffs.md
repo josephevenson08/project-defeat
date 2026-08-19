@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleBuffs.ts
-lines: 375
+lines: 381
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleBuffs
 
-`src/domain/buffs/sampleBuffs.ts` · **domain** layer · 375 lines
+`src/domain/buffs/sampleBuffs.ts` · **domain** layer · 381 lines
 
 From the top of the file:
 
@@ -54,6 +54,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 

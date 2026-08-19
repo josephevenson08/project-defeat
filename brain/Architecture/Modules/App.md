@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 338
+lines: 341
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 338 lines
+`src/App.tsx` · **app** layer · 341 lines
 
 _No doc comment at the top of this file._
 
@@ -40,6 +40,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raids.RaidPicker]] — `src/features/raids/RaidPicker.tsx`
 - [[features.raids.RaidRail]] — `src/features/raids/RaidRail.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`

@@ -1,4 +1,4 @@
-export type SectionId = 'planner' | 'tierlists' | 'raids' | 'professions'
+export type SectionId = 'planner' | 'raidcomp' | 'tierlists' | 'raids' | 'professions'
 
 type SectionDefinition = {
   id: SectionId
@@ -28,6 +28,13 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Gear, gems and talents',
     blurb: 'Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to.',
     accent: '#9c7346',
+  },
+  {
+    id: 'raidcomp',
+    label: 'Raid Composition',
+    tagline: 'Buff coverage',
+    blurb: 'Plan a 10 or 25-player roster and see which raid buffs and target debuffs it actually brings — and what one more seat would buy you.',
+    accent: '#9c6a6a',
   },
   {
     id: 'tierlists',
