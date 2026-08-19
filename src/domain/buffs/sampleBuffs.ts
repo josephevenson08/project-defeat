@@ -35,7 +35,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'battle-shout',
     name: 'Battle Shout',
-    providedBy: 'Warrior',
+    providedByClass: 'Warrior',
     spellId: 2048,
     roles: ['Physical DPS', 'Tank'],
     stats: { attackPower: 306 },
@@ -45,7 +45,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'commanding-shout',
     name: 'Commanding Shout',
-    providedBy: 'Warrior',
+    providedByClass: 'Warrior',
     spellId: 469,
     extraStats: { Health: 1080 },
     notModelled:
@@ -57,7 +57,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blessing-of-might',
     name: 'Greater Blessing of Might',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 27141,
     roles: ['Physical DPS', 'Tank'],
     stats: { attackPower: 220, rangedAttackPower: 220 },
@@ -67,7 +67,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blessing-of-kings',
     name: 'Greater Blessing of Kings',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 25898,
     statMultipliers: { strength: 0.1, agility: 0.1, stamina: 0.1, intellect: 0.1, spirit: 0.1 },
     notes:
@@ -76,7 +76,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blessing-of-wisdom',
     name: 'Greater Blessing of Wisdom',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 27143,
     roles: ['Caster DPS', 'Healer'],
     stats: { mp5: 41 },
@@ -86,7 +86,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blessing-of-salvation',
     name: 'Greater Blessing of Salvation',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 25895,
     roles: ['Physical DPS', 'Caster DPS', 'Healer'],
     notModelled:
@@ -95,7 +95,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blessing-of-sanctuary',
     name: 'Greater Blessing of Sanctuary',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 27169,
     roles: ['Tank'],
     notModelled:
@@ -104,7 +104,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'devotion-aura',
     name: 'Devotion Aura',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 27149,
     stats: { armor: 861 },
     notes:
@@ -113,7 +113,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'retribution-aura',
     name: 'Retribution Aura',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 27150,
     notModelled:
       'Causes 26 Holy damage to any creature that strikes a party member. Damage returned to the attacker, not a stat on the wearer. Improved Retribution Aura 2/2 raises it to 39.',
@@ -121,7 +121,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'sanctity-aura',
     name: 'Sanctity Aura',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 20218,
     notModelled:
       'Increases Holy damage done by party members by 10%. A school-specific damage multiplier, and this simulator applies no school multipliers. Improved Sanctity Aura 2/2 adds a further 2% to damage of all schools.',
@@ -131,7 +131,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'arcane-intellect',
     name: 'Arcane Brilliance',
-    providedBy: 'Mage',
+    providedByClass: 'Mage',
     spellId: 27127,
     roles: ['Caster DPS', 'Healer'],
     stats: { intellect: 40 },
@@ -143,7 +143,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'prayer-of-fortitude',
     name: 'Prayer of Fortitude',
-    providedBy: 'Priest',
+    providedByClass: 'Priest',
     spellId: 25392,
     stats: { stamina: 79 },
     notes:
@@ -152,7 +152,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'prayer-of-spirit',
     name: 'Prayer of Spirit',
-    providedBy: 'Priest',
+    providedByClass: 'Priest',
     spellId: 32999,
     roles: ['Caster DPS', 'Healer'],
     stats: { spirit: 50 },
@@ -162,7 +162,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'shadow-protection',
     name: 'Shadow Protection',
-    providedBy: 'Priest',
+    providedByClass: 'Priest',
     spellId: 25433,
     extraStats: { ShadowResistance: 70 },
     notModelled:
@@ -172,7 +172,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'power-infusion',
     name: 'Power Infusion',
-    providedBy: 'Priest',
+    providedByClass: 'Priest',
     spellId: 10060,
     roles: ['Caster DPS', 'Healer'],
     notModelled:
@@ -183,7 +183,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'mark-of-the-wild',
     name: 'Gift of the Wild',
-    providedBy: 'Druid',
+    providedByClass: 'Druid',
     spellId: 26991,
     stats: { strength: 14, agility: 14, stamina: 14, intellect: 14, spirit: 14, armor: 340 },
     extraStats: { ArcaneResistance: 25, FireResistance: 25, FrostResistance: 25, NatureResistance: 25, ShadowResistance: 25 },
@@ -193,7 +193,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'thorns',
     name: 'Thorns',
-    providedBy: 'Druid',
+    providedByClass: 'Druid',
     spellId: 26992,
     roles: ['Tank'],
     notModelled:
@@ -202,7 +202,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'innervate',
     name: 'Innervate',
-    providedBy: 'Druid',
+    providedByClass: 'Druid',
     spellId: 29166,
     roles: ['Caster DPS', 'Healer'],
     notModelled:
@@ -211,7 +211,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'leader-of-the-pack',
     name: 'Leader of the Pack',
-    providedBy: 'Feral Druid',
+    providedByClass: 'Druid',
+    providedBySpec: 'Feral',
     spellId: 17007,
     roles: ['Physical DPS'],
     stats: { critRating: 5 * RATING_PER_PERCENT.meleeCrit },
@@ -221,7 +222,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'moonkin-aura',
     name: 'Moonkin Aura',
-    providedBy: 'Balance Druid',
+    providedByClass: 'Druid',
+    providedBySpec: 'Balance',
     spellId: 24858,
     roles: ['Caster DPS', 'Healer'],
     stats: { spellCritRating: 5 * RATING_PER_PERCENT.spellCrit },
@@ -233,7 +235,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'trueshot-aura',
     name: 'Trueshot Aura',
-    providedBy: 'Hunter',
+    providedByClass: 'Hunter',
     spellId: 27066,
     roles: ['Physical DPS'],
     stats: { attackPower: 125, rangedAttackPower: 125 },
@@ -243,7 +245,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'ferocious-inspiration',
     name: 'Ferocious Inspiration',
-    providedBy: 'Beast Mastery Hunter',
+    providedByClass: 'Hunter',
+    providedBySpec: 'Beast Mastery',
     spellId: 34460,
     roles: ['Physical DPS', 'Caster DPS'],
     notModelled:
@@ -254,7 +257,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'strength-of-earth-totem',
     name: 'Strength of Earth Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 25528,
     roles: ['Physical DPS', 'Tank'],
     stats: { strength: 86 },
@@ -264,7 +267,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'grace-of-air-totem',
     name: 'Grace of Air Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 25359,
     roles: ['Physical DPS'],
     stats: { agility: 77 },
@@ -274,7 +277,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'mana-spring-totem',
     name: 'Mana Spring Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 25570,
     roles: ['Caster DPS', 'Healer'],
     stats: { mp5: 50 },
@@ -284,7 +287,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'totem-of-wrath',
     name: 'Totem of Wrath',
-    providedBy: 'Elemental Shaman',
+    providedByClass: 'Shaman',
+    providedBySpec: 'Elemental',
     spellId: 30706,
     roles: ['Caster DPS', 'Healer'],
     stats: {
@@ -297,7 +301,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'wrath-of-air-totem',
     name: 'Wrath of Air Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 3738,
     roles: ['Caster DPS', 'Healer'],
     stats: { spellPower: 101 },
@@ -307,7 +311,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'windfury-totem',
     name: 'Windfury Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 25587,
     roles: ['Physical DPS'],
     notModelled:
@@ -316,7 +320,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'mana-tide-totem',
     name: 'Mana Tide Totem',
-    providedBy: 'Restoration Shaman',
+    providedByClass: 'Shaman',
+    providedBySpec: 'Restoration',
     spellId: 16190,
     roles: ['Caster DPS', 'Healer'],
     notModelled:
@@ -325,7 +330,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'tranquil-air-totem',
     name: 'Tranquil Air Totem',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 25908,
     roles: ['Physical DPS', 'Caster DPS', 'Healer'],
     notModelled:
@@ -334,7 +339,8 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'unleashed-rage',
     name: 'Unleashed Rage',
-    providedBy: 'Enhancement Shaman',
+    providedByClass: 'Shaman',
+    providedBySpec: 'Enhancement',
     spellId: 30806,
     roles: ['Physical DPS'],
     notModelled:
@@ -344,7 +350,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'bloodlust',
     name: 'Bloodlust',
-    providedBy: 'Shaman',
+    providedByClass: 'Shaman',
     spellId: 2825,
     notModelled:
       'Increases melee, ranged and spell casting speed by 30% for all party members for 40 sec, on a 10 min cooldown. A raid cooldown rather than a sustained buff: applying 30% haste for the whole fight would overstate it by an order of magnitude, and averaging it over the cooldown understates a burst everyone times deliberately.',
@@ -355,7 +361,7 @@ export const sampleBuffs: readonly Buff[] = [
   {
     id: 'blood-pact',
     name: 'Blood Pact',
-    providedBy: 'Warlock',
+    providedByClass: 'Warlock',
     spellId: 27268,
     stats: { stamina: 70 },
     notes:

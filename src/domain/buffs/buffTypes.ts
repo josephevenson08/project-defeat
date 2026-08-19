@@ -1,10 +1,29 @@
+import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import type { BuildRole } from '../gear/itemTypes'
 import type { StatBlock } from '../stats/statTypes'
 
-export type Buff = {
+/**
+ * Who brings a buff or debuff, as data rather than as prose.
+ *
+ * This was a single `providedBy: string` reading "Warrior" or "Feral Druid", which was fine while
+ * the only consumer printed it. The raid composition planner has to *match* a roster against it, and
+ * matching on a display string is the trap this repo already has a section about — a renamed spec or
+ * a stray space silently stops a buff being credited, and the tool would under-report coverage with
+ * nothing looking wrong.
+ *
+ * `providedBySpec` is set only where the source genuinely is spec-specific: Leader of the Pack needs
+ * a Feral Druid, Totem of Wrath an Elemental Shaman. Left undefined, any spec of the class brings it.
+ *
+ * The display string is **derived** from these by `describeProvider`, so the two cannot drift.
+ */
+export type BuffProvider = {
+  providedByClass: TbcClass
+  providedBySpec?: TbcSpec
+}
+
+export type Buff = BuffProvider & {
   id: string
   name: string
-  providedBy: string
   /**
    * Wowhead spell id of the *exact rank* every number on this entry was read from. TBC ships each
    * buff at many ranks under different ids, and a raid uses the highest — recording which one was
@@ -33,10 +52,9 @@ export type Buff = {
   notes?: string
 }
 
-export type TargetDebuff = {
+export type TargetDebuff = BuffProvider & {
   id: string
   name: string
-  providedBy: string
   /**
    * Wowhead spell id of the *exact rank* every number on this entry was read from — the same
    * contract as `Buff.spellId`, and for the same reason. For a debuff delivered by a talent the id
@@ -76,4 +94,15 @@ export type TargetDebuff = {
   notModelled?: string
   needsVerification?: boolean
   notes?: string
+}
+
+/**
+ * The display string the panels used to store on every entry.
+ *
+ * Derived rather than stored so there is exactly one source of truth. "Feral Druid" reads better than
+ * "Druid (Feral)" and is what the buff panel has always shown, so the format is preserved verbatim —
+ * a test round-trips every entry through it against the strings that were there before.
+ */
+export function describeProvider(provider: BuffProvider): string {
+  return provider.providedBySpec ? `${provider.providedBySpec} ${provider.providedByClass}` : provider.providedByClass
 }

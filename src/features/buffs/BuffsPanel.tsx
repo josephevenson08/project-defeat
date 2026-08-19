@@ -1,5 +1,6 @@
 import { Panel } from '../../components/layout/Panel'
 import type { CharacterRole } from '../../domain/character/characterTypes'
+import { describeProvider } from '../../domain/buffs/buffTypes'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import { modelledBuffs, unmodelledBuffs } from '../../domain/buffs/sampleBuffs'
 import { statLabels } from '../../domain/stats/statTypes'
@@ -109,7 +110,7 @@ export function BuffsPanel({
                 <span>
                   <strong>{buff.name}</strong>
                   <small>
-                    {buff.providedBy} · {[statSummary(buff.stats), multiplierSummary(buff.statMultipliers)].filter(Boolean).join(', ')}
+                    {describeProvider(buff)} · {[statSummary(buff.stats), multiplierSummary(buff.statMultipliers)].filter(Boolean).join(', ')}
                   </small>
                 </span>
               </label>
@@ -131,7 +132,7 @@ export function BuffsPanel({
                   <span>
                     <strong>{buff.name}</strong>
                     <small>
-                      {buff.providedBy} · {buff.notModelled}
+                      {describeProvider(buff)} · {buff.notModelled}
                     </small>
                   </span>
                 </div>
@@ -187,7 +188,7 @@ export function BuffsPanel({
                 <span>
                   <strong>{debuff.name}</strong>
                   <small>
-                    {debuff.providedBy} · {targetDebuffSummary(debuff)}
+                    {describeProvider(debuff)} · {targetDebuffSummary(debuff)}
                   </small>
                 </span>
               </label>
@@ -211,7 +212,7 @@ export function BuffsPanel({
                     <span>
                       <strong>{debuff.name}</strong>
                       <small>
-                        {debuff.providedBy} · {debuff.notModelled}
+                        {describeProvider(debuff)} · {debuff.notModelled}
                       </small>
                     </span>
                   </div>

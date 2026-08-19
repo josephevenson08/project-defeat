@@ -39,7 +39,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'sunder-armor',
     name: 'Sunder Armor',
-    providedBy: 'Warrior',
+    providedByClass: 'Warrior',
     spellId: 25225,
     armorReduction: 2600,
     notes:
@@ -48,7 +48,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'curse-of-recklessness',
     name: 'Curse of Recklessness',
-    providedBy: 'Warlock',
+    providedByClass: 'Warlock',
     spellId: 27226,
     armorReduction: 800,
     notes:
@@ -57,7 +57,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'faerie-fire',
     name: 'Faerie Fire',
-    providedBy: 'Druid',
+    providedByClass: 'Druid',
     spellId: 26993,
     armorReduction: 610,
     notes:
@@ -66,7 +66,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'improved-seal-of-the-crusader',
     name: 'Improved Seal of the Crusader',
-    providedBy: 'Paladin',
+    providedByClass: 'Paladin',
     spellId: 20337,
     physicalCritTakenBonus: 0.03,
     spellCritTakenBonus: 0.03,
@@ -76,7 +76,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'curse-of-elements',
     name: 'Curse of the Elements',
-    providedBy: 'Warlock',
+    providedByClass: 'Warlock',
     spellId: 27228,
     spellDamageTakenMultiplier: 0.1,
     notes:
@@ -85,7 +85,9 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
     id: 'winters-chill',
     name: "Winter's Chill",
-    providedBy: 'Frost Mage',
+    providedByClass: 'Mage',
+
+    providedBySpec: 'Frost',
     spellId: 28595,
     notModelled:
       'Increases the chance a Frost spell will critically hit the target by 2% per application, stacking to 5 — +10% Frost spell crit at a full stack. Frost spells only, and this app does not record which school a spell belongs to, so the choice is to apply it to every caster or to none. Applying it to every caster is what the previous version did, and it handed +10% crit to Shadow Priests and Balance Druids, for whom it does nothing.',
