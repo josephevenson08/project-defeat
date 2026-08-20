@@ -51,8 +51,10 @@ import {
   seatContributions,
   renameSeat,
   resizeRoster,
+  setRosterMeta,
   seatAt,
 } from '../src/domain/raidcomp'
+import { exclusiveGroupFor, exclusiveGroups } from '../src/domain/buffs/buffExclusivity'
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
@@ -4733,9 +4735,12 @@ test('raid coverage is exact, and an empty roster covers nothing', () => {
   for (const group of empty.groups) expect(group.partyBuffs).toEqual([])
 
   /*
-   * One of every spec covers everything. If this fails, a buff has been given a provider no player
-   * can be — exactly what a typo in `providedBySpec` produces. Seated across groups deliberately: a
-   * party buff must still register raid-wide from wherever its provider sits.
+   * One of every spec reaches every buff **that a roster of that shape can maintain**.
+   *
+   * This used to assert nothing was missing at all, and that assertion was encoding the
+   * over-crediting: three Paladins cannot hold five Greater Blessings, so two are legitimately out of
+   * reach. What still must hold is that nothing is missing for want of a *provider* — a typo in
+   * `providedBySpec` would name somebody no player can be, and that is what this catches.
    */
   let full = emptyRoster(25)
   let seat = 0
@@ -4747,8 +4752,20 @@ test('raid coverage is exact, and an empty roster covers nothing', () => {
     }
   }
   const total = computeCoverage(full)
-  expect(total.raidWide.missing, 'every raid-wide buff must be reachable').toEqual([])
-  expect(total.debuffs.missing, 'and every debuff too').toEqual([])
+
+  // Anything still missing must be blocked by exclusivity, never by having no provider at all.
+  for (const entry of total.raidWide.missing) {
+    expect(
+      exclusiveGroupFor(entry.entry.id),
+      `${entry.entry.name} is missing but is not in an exclusive group — nobody can provide it`,
+    ).toBeDefined()
+    expect(entry.needs, 'and it must say the provider exists rather than "any X"').toMatch(/another /)
+  }
+  expect(total.debuffs.missing, 'no debuff is exclusive, so all six must be covered').toEqual([])
+
+  // The three Paladins hold three of the five blessings — the cap, not a coincidence.
+  const blessings = total.raidWide.covered.filter((entry) => entry.entry.name.startsWith('Greater Blessing'))
+  expect(blessings).toHaveLength(3)
 })
 
 test('a missing buff names who would bring it, at the right specificity', () => {
@@ -5252,4 +5269,127 @@ test('the seat contribution card is present and hidden until hover', async ({ pa
   await expect(card).toBeVisible()
   await expect(card).toContainText('Faerie Fire')
   await expect(card).toContainText('Gift of the Wild')
+})
+
+test('one provider supplies one buff from an exclusive group', () => {
+  /*
+   * The largest over-credit this tool ever had. One Paladin used to credit a raid with **all five**
+   * Greater Blessings and **all three** auras — the difference between bringing one Paladin and
+   * bringing four, reported as "you are fine".
+   *
+   * Both constraints are game rules with tooltip evidence, quoted in `buffExclusivity.ts`: spell
+   * 27141 says "Players may only have one Blessing on them per Paladin at any one time", and rank 8
+   * Devotion Aura says "Only one Paladin aura can be active per Paladin".
+   */
+  const seat = (className: TbcClass, spec: TbcSpec) => ({ className, spec })
+  const rosterOf = (seats: readonly { className: TbcClass; spec: TbcSpec }[]) =>
+    seats.reduce((roster, entry, index) => addToGroup(roster, Math.floor(index / 5), entry), emptyRoster(25))
+
+  const onePaladin = computeCoverage(rosterOf([seat('Paladin', 'Holy')]))
+  expect(onePaladin.raidWide.covered.map((entry) => entry.entry.name)).toEqual(['Greater Blessing of Kings'])
+  expect(onePaladin.partyScoped.covered.map((entry) => entry.entry.name)).toEqual(['Devotion Aura'])
+
+  // Three Paladins maintain three of each — the budget is providers, not buffs.
+  const threePaladins = computeCoverage(
+    rosterOf([seat('Paladin', 'Holy'), seat('Paladin', 'Protection'), seat('Paladin', 'Retribution')]),
+  )
+  expect(threePaladins.raidWide.covered).toHaveLength(3)
+  expect(threePaladins.partyScoped.covered).toHaveLength(3)
+
+  /*
+   * And the ones they cannot maintain read as a different kind of missing. "needs any Paladin" would
+   * be a lie when the Paladin is sitting right there holding a different Blessing.
+   */
+  const blocked = onePaladin.raidWide.missing.find((entry) => entry.entry.name === 'Greater Blessing of Might')!
+  expect(blocked.needs).toMatch(/another Paladin/)
+  expect(blocked.needs).not.toMatch(/^any /)
+})
+
+test('a warrior runs one shout, and a second warrior is what adds the other', () => {
+  /*
+   * Modelled as a **raid convention** rather than a game rule, and the distinction is recorded rather
+   * than blurred: neither tooltip states exclusivity and wowsims applies both shouts independently,
+   * so one warrior *could* maintain both. Raids do not — each shout costs rage and a global, and
+   * Commanding Shout is the lower priority — so the planner follows what rosters actually run.
+   *
+   * Battle Shout is first in the group's priority order, which is why a lone DPS warrior shows it.
+   */
+  const rosterOf = (specs: readonly TbcSpec[]) =>
+    specs.reduce((roster, spec) => addToGroup(roster, 0, { className: 'Warrior', spec }), emptyRoster(25))
+
+  const shoutsIn = (specs: readonly TbcSpec[]) =>
+    computeCoverage(rosterOf(specs))
+      .groups[0].partyBuffs.map((buff) => buff.name)
+      .filter((name) => name.includes('Shout'))
+
+  expect(shoutsIn(['Fury']), 'one warrior, one shout').toEqual(['Battle Shout'])
+  expect(shoutsIn(['Arms']), 'and it is Battle Shout by default').toEqual(['Battle Shout'])
+  expect(shoutsIn(['Fury', 'Arms']).sort()).toEqual(['Battle Shout', 'Commanding Shout'])
+  expect(shoutsIn(['Protection', 'Fury']).sort()).toEqual(['Battle Shout', 'Commanding Shout'])
+
+  /*
+   * Exclusivity is per **group**, not per raid — two warriors split across two groups give each group
+   * one shout, which is exactly the seating decision the planner exists to make visible.
+   */
+  let split = emptyRoster(25)
+  split = addToGroup(split, 0, { className: 'Warrior', spec: 'Fury' })
+  split = addToGroup(split, 1, { className: 'Warrior', spec: 'Protection' })
+  const report = computeCoverage(split)
+  for (const index of [0, 1]) {
+    const shouts = report.groups[index].partyBuffs.map((buff) => buff.name).filter((name) => name.includes('Shout'))
+    expect(shouts, `group ${index + 1} has one warrior, so one shout`).toEqual(['Battle Shout'])
+  }
+})
+
+test('every exclusive group names real buffs and states its basis', () => {
+  /*
+   * A group naming a buff id that does not exist would silently constrain nothing — the failure mode
+   * is invisible, which is why it is asserted. `basis` is checked too: a game rule quotes a tooltip,
+   * a raid convention is a defensible default, and collapsing the two would let an opinion pass as a
+   * mechanic.
+   */
+  const knownIds = new Set([...sampleBuffs, ...sampleTargetDebuffs].map((entry) => entry.id))
+
+  for (const group of exclusiveGroups) {
+    expect(group.buffIds.length, `${group.id} needs at least two competing buffs`).toBeGreaterThan(1)
+    expect(group.evidence.length, `${group.id} must say where the constraint comes from`).toBeGreaterThan(40)
+    expect(['game rule', 'raid convention']).toContain(group.basis)
+    for (const id of group.buffIds) {
+      expect(knownIds.has(id), `${group.id} names "${id}", which is not a buff`).toBe(true)
+    }
+  }
+
+  // The two Paladin groups are game rules; the shouts are explicitly not.
+  expect(exclusiveGroups.find((group) => group.id === 'paladin-blessings')!.basis).toBe('game rule')
+  expect(exclusiveGroups.find((group) => group.id === 'paladin-auras')!.basis).toBe('game rule')
+  expect(exclusiveGroups.find((group) => group.id === 'warrior-shouts')!.basis).toBe('raid convention')
+})
+
+test('raid details are optional, persist, and reach the exported chart', () => {
+  /*
+   * The export used to write the same filename every time — `25-player-raid.png` for every roster
+   * ever made — so each new one landed as `…(1).png` and opening the plain name gave you the *first*
+   * chart you had ever exported. It looked exactly like a stale export.
+   */
+  let roster = emptyRoster(25)
+  expect(roster.meta, 'an untouched roster carries no metadata at all').toBeUndefined()
+
+  roster = setRosterMeta(roster, 'title', '  SSC Progression  ')
+  expect(roster.meta?.title, 'trimmed on the way in').toBe('SSC Progression')
+
+  roster = setRosterMeta(roster, 'date', 'Tue 12 Aug')
+  roster = setRosterMeta(roster, 'startTime', '7:30pm ST')
+  roster = setRosterMeta(roster, 'description', 'Invites 7:15')
+
+  // Clearing every field drops the block rather than leaving empty strings behind.
+  let cleared = roster
+  for (const field of ['title', 'date', 'startTime', 'description'] as const) {
+    cleared = setRosterMeta(cleared, field, '')
+  }
+  expect(cleared.meta).toBeUndefined()
+
+  // Resizing must not discard it — rebuilding `{ size, groups }` dropped it once already.
+  const resized = resizeRoster(roster, 10)
+  expect(resized.meta?.title).toBe('SSC Progression')
+  expect(resized.groups).toHaveLength(2)
 })

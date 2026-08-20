@@ -16,6 +16,7 @@ import {
   raidBuildsByClass,
   renameSeat,
   seatContributions,
+  setRosterMeta,
   resizeRoster,
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
@@ -264,6 +265,49 @@ export function RaidCompositionPanel() {
           )}
         </div>
       </div>
+
+      {/*
+        Everything here is optional and free text. A raid leader wants "SSC — Tuesday" and an invite
+        time on the chart they paste into Discord; nobody wants a required form between them and a
+        PNG. The field sizes mirror the exported image's type scale — title largest, when it is next,
+        description smallest — so what you type looks like what you get.
+      */}
+      <section className="raidcomp-meta" aria-label="Raid details">
+        <input
+          className="raidcomp-meta-title"
+          value={roster.meta?.title ?? ''}
+          placeholder={`${roster.size}-player raid`}
+          aria-label="Raid title"
+          data-testid="raidcomp-meta-title"
+          onChange={(event) => setRoster((current) => setRosterMeta(current, 'title', event.target.value))}
+        />
+        <div className="raidcomp-meta-when">
+          <input
+            className="raidcomp-meta-date"
+            value={roster.meta?.date ?? ''}
+            placeholder="Date"
+            aria-label="Raid date"
+            data-testid="raidcomp-meta-date"
+            onChange={(event) => setRoster((current) => setRosterMeta(current, 'date', event.target.value))}
+          />
+          <input
+            className="raidcomp-meta-time"
+            value={roster.meta?.startTime ?? ''}
+            placeholder="Start time"
+            aria-label="Raid start time"
+            data-testid="raidcomp-meta-time"
+            onChange={(event) => setRoster((current) => setRosterMeta(current, 'startTime', event.target.value))}
+          />
+        </div>
+        <input
+          className="raidcomp-meta-description"
+          value={roster.meta?.description ?? ''}
+          placeholder="Description — loot rules, invites, anything the raid should read"
+          aria-label="Raid description"
+          data-testid="raidcomp-meta-description"
+          onChange={(event) => setRoster((current) => setRosterMeta(current, 'description', event.target.value))}
+        />
+      </section>
 
       <section className="raidcomp-roles" aria-label="Role balance">
         {ROLE_ORDER.map((role) => (

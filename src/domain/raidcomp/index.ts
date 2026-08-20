@@ -1,4 +1,4 @@
-export type { RaidGroup, Roster, RosterSlot, SeatRef } from './rosterTypes'
+export type { RaidGroup, Roster, RosterMeta, RosterSlot, SeatRef } from './rosterTypes'
 export {
   PARTY_SIZE,
   RAID_SIZES,
@@ -10,6 +10,7 @@ export {
   moveSeat,
   renameSeat,
   resizeRoster,
+  setRosterMeta,
   seatAt,
 } from './rosterTypes'
 export type { CoverageReport, CoverageSection, CoveredEntry, GroupCoverage, MissingEntry, Suggestion } from './buffCoverage'

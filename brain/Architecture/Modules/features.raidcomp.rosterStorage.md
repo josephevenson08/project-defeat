@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/rosterStorage.ts
-lines: 105
+lines: 121
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.rosterStorage
 
-`src/features/raidcomp/rosterStorage.ts` · **features** layer · 105 lines
+`src/features/raidcomp/rosterStorage.ts` · **features** layer · 121 lines
 
 From the top of the file:
 

@@ -54,7 +54,10 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   spec and buff, **drag-and-drop** to move players between groups (occupied seats swap rather than
   overwrite), an optional player name per seat, and a hover card on each seat listing everything that
   player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
-  that group actually receives
+  that group actually receives. **Buff exclusivity is modelled**: one Paladin holds one Greater
+  Blessing and one aura, one Warrior runs one shout, so coverage reflects what a roster can actually
+  maintain rather than everything its classes could theoretically cast. A fillable header (title,
+  date, start time, description) is drawn onto the exported chart
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/exportRosterImage.ts
-lines: 157
+lines: 214
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.exportRosterImage
 
-`src/features/raidcomp/exportRosterImage.ts` · **features** layer · 157 lines
+`src/features/raidcomp/exportRosterImage.ts` · **features** layer · 214 lines
 
 From the top of the file:
 

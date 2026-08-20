@@ -4194,3 +4194,62 @@ input[type='text']:focus {
   border-radius: 2px;
   flex-shrink: 0;
 }
+
+/* Raid details ------------------------------------------------------------- */
+
+/* The field sizes mirror the exported PNG's type scale — title largest, when it
+   is next, description smallest — so what you type looks like what you get. */
+.raidcomp-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+  max-width: 640px;
+}
+
+.raidcomp-meta input {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom-color: var(--line);
+  border-radius: 0;
+  color: var(--text);
+  font-family: inherit;
+  padding: 4px 2px;
+}
+
+.raidcomp-meta input:hover {
+  border-bottom-color: var(--line-strong);
+}
+
+.raidcomp-meta input:focus {
+  outline: none;
+  border-bottom-color: var(--text-dim);
+  background: var(--surface-1);
+}
+
+.raidcomp-meta input::placeholder {
+  color: var(--text-faint);
+}
+
+.raidcomp-meta-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.raidcomp-meta-when {
+  display: flex;
+  gap: 10px;
+}
+
+.raidcomp-meta-date,
+.raidcomp-meta-time {
+  font-size: 15px;
+  flex: 1;
+  min-width: 0;
+}
+
+.raidcomp-meta-description {
+  font-size: 12px;
+  color: var(--text-dim);
+}

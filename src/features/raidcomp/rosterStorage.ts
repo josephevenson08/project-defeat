@@ -75,7 +75,23 @@ export function loadRoster(): Roster | undefined {
       })
     })
 
-    return { size, groups }
+    /*
+     * `meta` is validated field by field for the same reason the seats are — and named here for the
+     * same reason too. This validator has now silently dropped `playerName`, then `buildId`, and
+     * would have dropped the whole title/date/description block next. **Anything added to `Roster`
+     * must be added here.**
+     */
+    const storedMeta = (candidate as { meta?: unknown }).meta
+    const meta =
+      typeof storedMeta === 'object' && storedMeta !== null
+        ? (Object.fromEntries(
+            (['title', 'description', 'date', 'startTime'] as const)
+              .map((field) => [field, (storedMeta as Record<string, unknown>)[field]])
+              .filter(([, value]) => typeof value === 'string' && value.trim()),
+          ) as Roster['meta'])
+        : undefined
+
+    return { size, groups, ...(meta && Object.keys(meta).length > 0 ? { meta } : {}) }
   } catch {
     // A corrupt or unreadable payload is not worth surfacing — the planner opens empty, which is a
     // recoverable state, where a thrown error mid-render is not.

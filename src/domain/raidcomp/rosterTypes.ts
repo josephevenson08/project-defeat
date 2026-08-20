@@ -54,9 +54,26 @@ export const PARTY_SIZE = 5
  */
 export type RaidGroup = readonly (RosterSlot | undefined)[]
 
+/**
+ * What the exported chart is titled, and when the raid is.
+ *
+ * Every field is optional and free text. A raid leader posting a chart into Discord wants "SSC —
+ * Tuesday" and an invite time on it; nobody wants a required form standing between them and a PNG.
+ * None of it reaches coverage — this is presentation, and keeping it out of the model is what stops
+ * the planner drifting into being a scheduling app.
+ */
+export type RosterMeta = {
+  title?: string
+  description?: string
+  /** Free text rather than a date type: "Tue 12 Aug", "this Saturday" and "8/12" are all valid here. */
+  date?: string
+  startTime?: string
+}
+
 export type Roster = {
   size: RaidPlayerSize
   groups: readonly RaidGroup[]
+  meta?: RosterMeta
 }
 
 export const groupCountFor = (size: RaidPlayerSize) => size / PARTY_SIZE
@@ -86,7 +103,9 @@ export function resizeRoster(roster: Roster, size: RaidPlayerSize): Roster {
     { length: target },
     (_, index) => roster.groups[index] ?? Array.from({ length: PARTY_SIZE }, () => undefined),
   )
-  return { size, groups }
+  // Spread rather than rebuild: returning `{ size, groups }` dropped `meta`, which is the third time
+  // a rebuild-from-parts has silently lost a field in this file. Keep the rest of the roster.
+  return { ...roster, size, groups }
 }
 
 /** Places a spec in the first free seat of a group, or returns the roster unchanged when it is full. */
@@ -153,3 +172,11 @@ export function renameSeat(roster: Roster, ref: SeatRef, playerName: string): Ro
 
 /** Karazhan is the only 10-player raid in Phase 2; everything else is 25. */
 export const RAID_SIZES: readonly RaidPlayerSize[] = [10, 25]
+
+/** Sets one metadata field, dropping it when cleared so an empty roster stays empty. */
+export function setRosterMeta(roster: Roster, field: keyof RosterMeta, value: string): Roster {
+  const trimmed = value.trim()
+  const meta = { ...roster.meta, [field]: trimmed || undefined }
+  const anySet = Object.values(meta).some(Boolean)
+  return { ...roster, meta: anySet ? meta : undefined }
+}

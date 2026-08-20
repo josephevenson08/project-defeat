@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-153 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+154 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -96,7 +96,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (102)
+### domain (103)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -117,6 +117,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.bisRecommendationsJson.d]] · 0 importers
 - [[domain.bis.bisTypes]] · 2 importers
 - [[domain.bis.index]] · 2 importers
+- [[domain.buffs.buffExclusivity]] · 1 importers
 - [[domain.buffs.buffScope]] · 1 importers
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
 - [[domain.buffs.buffTypes]] · 5 importers

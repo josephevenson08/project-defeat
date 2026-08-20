@@ -38,15 +38,33 @@ const INK = {
 const SCALE = 2 // Drawn at 2x so the PNG stays sharp when Discord scales it down.
 const COLUMN_WIDTH = 240
 const ROW_HEIGHT = 34
-const HEADER_HEIGHT = 74
 const GROUP_HEADER = 30
 const PADDING = 24
 const GAP = 12
 
-export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, title: string): void {
+/**
+ * Header height depends on how much the raid leader filled in, so it is measured rather than fixed.
+ *
+ * The type scale is deliberate and was specified: **title largest, then date and start time, then
+ * description**. A raid glancing at this in Discord reads "which raid" first, "when" second, and the
+ * detail last — so the sizes follow that order rather than a generic heading ramp.
+ */
+function headerHeight(roster: Roster): number {
+  const meta = roster.meta ?? {}
+  let height = PADDING + 26 /* title line */ + 20 /* seat count */
+  if (meta.date || meta.startTime) height += 22
+  if (meta.description) height += 20
+  return height + 14
+}
+
+export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, fallbackTitle: string): void {
+  const meta = roster.meta ?? {}
+  const title = meta.title?.trim() || fallbackTitle
+
   const columns = roster.groups.length
+  const headHeight = headerHeight(roster)
   const width = PADDING * 2 + columns * COLUMN_WIDTH + (columns - 1) * GAP
-  const height = HEADER_HEIGHT + GROUP_HEADER + PARTY_SIZE * ROW_HEIGHT + PADDING * 2
+  const height = headHeight + GROUP_HEADER + PARTY_SIZE * ROW_HEIGHT + PADDING * 2
 
   canvas.width = width * SCALE
   canvas.height = height * SCALE
@@ -57,20 +75,41 @@ export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, title: str
 
   ctx.fillStyle = INK.background
   ctx.fillRect(0, 0, width, height)
-
-  ctx.fillStyle = INK.text
-  ctx.font = '600 19px Inter, system-ui, sans-serif'
   ctx.textBaseline = 'top'
-  ctx.fillText(title, PADDING, PADDING)
+
+  let cursor = PADDING
+
+  // Title — the largest thing on the image.
+  ctx.fillStyle = INK.text
+  ctx.font = '600 22px Inter, system-ui, sans-serif'
+  ctx.fillText(title, PADDING, cursor)
+  cursor += 28
+
+  // Date and start time — below the title, above the description, and sized between them.
+  const when = [meta.date, meta.startTime].filter(Boolean).join(' · ')
+  if (when) {
+    ctx.fillStyle = INK.text
+    ctx.font = '15px Inter, system-ui, sans-serif'
+    ctx.fillText(when, PADDING, cursor)
+    cursor += 22
+  }
+
+  // Description — the smallest, because it is the part you read only if you care.
+  if (meta.description) {
+    ctx.fillStyle = INK.dim
+    ctx.font = '12px Inter, system-ui, sans-serif'
+    ctx.fillText(meta.description, PADDING, cursor)
+    cursor += 20
+  }
 
   const filled = roster.groups.flat().filter(Boolean).length
   ctx.fillStyle = INK.faint
-  ctx.font = '12px ui-monospace, Consolas, monospace'
-  ctx.fillText(`${filled} of ${roster.size} seats · TBC Phase 2`, PADDING, PADDING + 26)
+  ctx.font = '11px ui-monospace, Consolas, monospace'
+  ctx.fillText(`${filled} of ${roster.size} seats · TBC Phase 2`, PADDING, cursor)
 
   roster.groups.forEach((group, groupIndex) => {
     const x = PADDING + groupIndex * (COLUMN_WIDTH + GAP)
-    const y = HEADER_HEIGHT
+    const y = headHeight
 
     ctx.fillStyle = INK.panel
     ctx.fillRect(x, y, COLUMN_WIDTH, GROUP_HEADER + PARTY_SIZE * ROW_HEIGHT)
@@ -133,24 +172,42 @@ function drawSeat(ctx: CanvasRenderingContext2D, slot: RosterSlot, x: number, ro
 }
 
 /**
- * Triggers the download.
+ * Downloads the chart.
  *
  * `toBlob` rather than a data URL because a 25-seat chart at 2x exceeds what some browsers accept in
  * an `href`, and a silently truncated download is worse than none.
+ *
+ * **Two bugs lived here, and both looked like "the export is stale".**
+ *
+ * The filename was always the same — `25-player-raid.png` for every roster ever exported — so the
+ * browser saved each new one as `…(1).png`, `…(2).png`, and opening the un-suffixed file gave you the
+ * *first* chart you had ever made. It now carries the title and date, so two different raids cannot
+ * collide.
+ *
+ * And `revokeObjectURL` ran synchronously on the line after `click()`, which is a race: the browser
+ * may not have started reading the blob yet, and revoking early can cancel the download outright.
+ * Revoked on the next frame instead, once the click has been dispatched.
  */
-export function downloadRosterImage(roster: Roster, title: string): void {
+export function downloadRosterImage(roster: Roster, fallbackTitle: string): void {
   const canvas = document.createElement('canvas')
-  drawRoster(canvas, roster, title)
+  drawRoster(canvas, roster, fallbackTitle)
+
+  const meta = roster.meta ?? {}
+  const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const name = [slug(meta.title?.trim() || fallbackTitle), meta.date ? slug(meta.date) : '']
+    .filter(Boolean)
+    .join('-')
 
   canvas.toBlob((blob) => {
     if (!blob) return
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`
+    link.download = `${name || 'raid-composition'}.png`
     document.body.appendChild(link)
     link.click()
     link.remove()
-    URL.revokeObjectURL(url)
+    // Deferred, not immediate — see the note above.
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
   }, 'image/png')
 }

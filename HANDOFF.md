@@ -1,7 +1,39 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15.** Self-contained brief for picking this up
-in a fresh chat. If `git log` disagrees with this file, trust git.
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-19.** Self-contained
+brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-19)
+
+**The app is a working TBC Phase 2 planner, deployed and green.** Five sections: Character Planner,
+**Raid Composition**, Spec Tier Lists, Raids, Professions. `156 tests passing`, `tsc`/`lint`/`build`
+clean, brain idempotent, everything pushed to `origin/main`.
+
+**The last three sessions were dominated by one theme: the app confidently reporting things that were
+not true.** Seven false disclosures, a talent-point total that was wrong by 20, buff scopes that
+over-credited by 5×, and exclusivity that over-credited a single Paladin by 8 buffs. Every one was
+plausible, every one shipped, and most were caught by a person *using* the tool rather than by a
+test. That is the pattern to expect, and the reason so much of this file is about verification.
+
+**What most needs doing next**, in order:
+
+1. **Rotations.** 25 of 27 specs are a single-ability approximation — the largest accuracy gap and
+   the main reason the Simulation tab stays hidden. Scoped in `ROTATION-SCOPE.md`. **Not an ingest**;
+   read that document before estimating it. Hunter first.
+2. **The `calculateStats` decision** (owner's call, see §"three decisions"). Talents reach the
+   simulation only, so spending points moves the estimate but *not* the stat rail, gear rankings or
+   upgrade finder. The two surfaces disagree by design, and this is the single named reason a
+   talented tank estimate reads low.
+3. **Nothing else is blocking.** The raid planner, phase gating, talents, icons and layout are done.
+
+**Three traps that will cost you an hour each if you do not know them**, all documented in full
+below: `tests/planner.spec.ts` is **not type-checked**; the Browser pane does not composite while
+hidden (screenshots fail, lazy images never load); and a scripted edit against a CRLF working tree
+can match nothing and report success.
+
+---
 
 **The first 2026-08-15 session** shipped: the spec tier-list view; a merge of the target-debuff
 rebuild; item and gem icons; planner sub-tabs and a spec-scoped stat rail; talents for all nine
@@ -93,6 +125,19 @@ eight new entries in the Decision Log. They are written as process rather than o
 outcomes keep changing and these have not: measure before designing, plumbing before data, verify
 before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
 invariant before trusting it.
+
+**Buff exclusivity was the last correctness gap, and the biggest** (2026-08-19, spotted by the repo
+owner using the tool). One Paladin credited a raid with **all five Greater Blessings and all three
+auras**; one Warrior with both shouts. `domain/buffs/buffExclusivity.ts` now caps each group at the
+number of providers, in a stated priority order, and records whether the constraint is a **game
+rule** (Paladin blessings and auras — both quoted from tooltips) or a **raid convention** (Warrior
+shouts — neither tooltip states exclusivity, so this is what rosters actually run rather than what
+the client enforces).
+
+The planner also gained a **fillable header** — title, date, start time, description — drawn onto the
+exported PNG at a deliberate type scale: title largest, when it is next, description smallest. That
+work also fixed a real export bug the owner had hit: the filename was constant, so every export
+after the first landed as `…(1).png` and opening the plain name returned the *first chart ever made*.
 
 **`TALENT_POINTS_AT_70` was 61 all along and the code said 41** (fixed 2026-08-19, spotted by the repo
 owner). 41 is the points needed to reach the bottom of *one* tree; the total available at 70 is 61.
@@ -291,7 +336,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 152 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 156 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -499,6 +544,32 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   sentence, so notes carrying something else real ("Wizard of Oz variant only") keep it. Resolution
   went 148 → **233 of 272**; Karazhan 19 → 35 of 45. The remaining 39 are correctly unresolved:
   mounts, enchanting formulas and tier tokens are not gear and should not draw a gear icon.
+- **One provider supplies ONE buff from an exclusive group, and ignoring that was the largest
+  over-credit this tool ever had.** A single Paladin used to credit a raid with **all five Greater
+  Blessings and all three auras** — the difference between bringing one Paladin and bringing four,
+  reported as "you are fine". Both are game rules with tooltip evidence: spell 27141 says *"Players
+  may only have one Blessing on them per Paladin at any one time"*, and rank 8 Devotion Aura says
+  *"Only one Paladin aura can be active per Paladin"*. `domain/buffs/buffExclusivity.ts` caps each
+  group at the provider count, in a stated priority order.
+- **`basis` on an exclusive group is load-bearing, not decoration.** Paladin blessings and auras are
+  **game rules**; Warrior shouts are a **raid convention** — neither shout tooltip states exclusivity
+  and wowsims applies both independently, so one warrior *could* maintain both. Raids do not, so the
+  planner models one shout per warrior and says outright that this is a default rather than a
+  mechanic. Keeping the two labels distinct is what stops an opinion hardening into a fact.
+- **Exclusivity is per group, not per raid.** Two warriors in one party cover both shouts; the same
+  two split across two parties give each party one. That is the seating decision the tool exists to
+  make visible, and it is why `coverageForGroup` applies the constraint separately from `sectionFor`
+  — it originally had its own loop and missed it, so a lone Fury warrior showed both shouts in the
+  group row and one in the checklist.
+- **The exported PNG wrote the same filename every time.** `25-player-raid.png` for every roster ever
+  made, so each new export landed as `…(1).png` and opening the plain name gave you the **first**
+  chart you had ever exported — indistinguishable from a stale export. The filename now carries the
+  title and date. Separately, `revokeObjectURL` ran synchronously after `click()`, a race that can
+  cancel the download outright; it is deferred now.
+- **`tests/planner.spec.ts` is NOT type-checked.** `tsconfig.app.json` includes only `src`, so a
+  missing import in a test surfaces as a runtime `is not defined` **mid-suite**, minutes in, rather
+  than at `tsc`. That has now happened three times. Run the targeted test before trusting a green
+  `tsc` on test-only changes.
 - **The per-group buff row is party-scoped only, and that reads as a missing buff.** A Druid's Faerie
   Fire lands on the boss, so it is correctly absent from "what group 1 receives" — and correctly
   puzzling if you seated that Druid to get it. The coverage was always right (it shows under Debuffs);
