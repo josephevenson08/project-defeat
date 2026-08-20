@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/character/tbcClasses.ts
-lines: 42
+lines: 37
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.tbcClasses
 
-`src/domain/character/tbcClasses.ts` · **domain** layer · 42 lines
+`src/domain/character/tbcClasses.ts` · **domain** layer · 37 lines
 
 _No doc comment at the top of this file._
 
@@ -22,7 +22,6 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 
 ## Imported by
 

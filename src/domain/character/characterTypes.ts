@@ -1,4 +1,3 @@
-import type { StatBlock } from '../stats/statTypes'
 
 export type TbcClass =
   | 'Druid'
@@ -63,5 +62,4 @@ export type CharacterProfile = {
 export type ClassSpecOption = {
   className: TbcClass
   specs: readonly TbcSpec[]
-  baseStats: StatBlock
 }

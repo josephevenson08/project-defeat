@@ -268,6 +268,17 @@ async function selectSlotGem(page: Page, slot: string, colour: string, value: st
  * with this are about the engine rather than the panels — cat form swinging its own weapon, specials
  * layering onto white damage — so they are worth keeping and belong against the functions directly.
  */
+/**
+ * A race the class can actually be, chosen deterministically.
+ *
+ * Several tests below used `'Human'` for every class, which TBC does not allow for Druid, Hunter or
+ * Shaman. That was harmless while base stats were one invented block per class; it is a hard error
+ * now that they are read per race *and* class, which is the guard doing its job rather than a
+ * regression. Every first entry in `racesByClass` is an Alliance race, so the `faction: 'Alliance'`
+ * these fixtures pass alongside it stays correct.
+ */
+const legalRaceFor = (className: TbcClass): TbcRace => racesByClass[className][0]
+
 function simulateSpec(className: TbcClass, spec: TbcSpec, race: TbcRace, faction: Faction) {
   const character: CharacterProfile = { faction, race, className, spec }
   const gear = normalizeGearForCharacter(defaultGear, className, spec)
@@ -2703,7 +2714,7 @@ test('the upgrade finder still discloses when a gain rests on estimated stats', 
 
   for (const definition of tbcClasses) {
     for (const spec of definition.specs) {
-      const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: definition.className, spec }
+      const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(definition.className), className: definition.className, spec }
       const gear = normalizeGearForCharacter(defaultGear, definition.className, spec)
       const report = findUpgrades(character, gear, getRoleForSpec(definition.className, spec), [], [], [], defaultSimulationTarget)
 
@@ -3543,8 +3554,15 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
   const empty = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, {})
   expect(empty.scoreExact, 'passing an empty tree must equal passing nothing').toBe(omitted.scoreExact)
 
-  // And it must still be the figure the handoff records, so a drift here is visible immediately.
-  expect(empty.score).toBe(192.3)
+  /*
+   * And it must still be the figure the handoff records, so a drift here is visible immediately.
+   *
+   * **192.3 until 2026-08-20**, when base stats and the attribute conversions were sourced from
+   * wowsims rather than hand-written. A Human Fury Warrior's base Strength was 92 against a real
+   * 145, and Agility converted to crit at a rate no class uses. The old number was never a
+   * measurement of TBC; this one is.
+   */
+  expect(empty.score).toBe(215.3)
 })
 
 test('main-hand and off-hand picks are separate rankings, not one collided list', () => {
@@ -3701,7 +3719,7 @@ test('talents reach all 27 specs, and each role path reads only its own fields',
     getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
 
   const scoreFor = (className: TbcClass, spec: TbcSpec, role: CharacterRole, points: Record<number, number>) => {
-    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className, spec }
+    const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
     const gear = normalizeGearForCharacter(defaultGear, className, spec)
     const stats = calculateStats(character, gear)
     return calculateSimulation(character, gear, stats, role, [], undefined, points).scoreExact
@@ -3906,14 +3924,15 @@ test('talent modifiers come from the ingest, and reach the melee estimate', () =
   expect(critOf(after) - critOf(before)).toBeCloseTo(5, 6)
 
   expect(after.scoreExact, 'talents must raise melee DPS').toBeGreaterThan(before.scoreExact)
-  expect(after.score).toBe(224.3)
+  // 224.3 before the base stats and attribute conversions were sourced — see the untalented figure.
+  expect(after.score).toBe(254.7)
 })
 
 test('talents do NOT close the rage gap, which is what this pass set out to test', () => {
   /*
    * Recorded as a result rather than a defect. The scope committed in advance to a falsification
    * test: a talented Fury build should move DPS substantially AND close the rage shortfall. The
-   * first held — 192.3 to 224.3, +16.6%. The second did not.
+   * first held — 215.3 to 254.7, +18.3%. The second did not.
    *
    * Swings plus Bloodrage fund 3.4 rage/sec untalented. **Every talent-side source takes that to
    * 5.4** — Endless Rage scales the swing-speed term, Flurry raises the swing rate that income is
@@ -4121,7 +4140,7 @@ test('a stat called unmodelled must actually score zero', () => {
 
   for (const [className, spec, race, faction] of [
     ['Warrior', 'Fury', 'Human', 'Alliance'],
-    ['Hunter', 'Beast Mastery', 'Human', 'Alliance'],
+    ['Hunter', 'Beast Mastery', 'Dwarf', 'Alliance'],
     ['Mage', 'Fire', 'Human', 'Alliance'],
     ['Priest', 'Holy', 'Human', 'Alliance'],
   ] as const) {
@@ -4235,7 +4254,7 @@ test('every spec says what its own estimate misses, and none of them say the sam
   const races: Record<string, TbcRace> = {
     Warrior: 'Human',
     Paladin: 'Human',
-    Hunter: 'Human',
+    Hunter: 'Dwarf',
     Rogue: 'Human',
     Priest: 'Human',
     Shaman: 'Draenei',
@@ -4457,7 +4476,7 @@ test('every role says what talents do for it, and the tank message is not the DP
   }
 
   const noteFor = (className: TbcClass, spec: TbcSpec, role: CharacterRole, points: Record<number, number>) => {
-    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className, spec }
+    const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
     const gear = normalizeGearForCharacter(defaultGear, className, spec)
     const stats = calculateStats(character, gear)
     return calculateSimulation(character, gear, stats, role, [], undefined, points).unmodelledTalentNote
@@ -4550,8 +4569,8 @@ test('Hunter and Shaman talents land, and a shared talent name does not cross cl
 
   const shamanPoints = { [shamanWeaponMastery]: 5, [idOf('Shaman', 'Thundering Strikes')]: 5 }
   const cases: readonly (readonly [TbcClass, TbcSpec, TbcRace, Record<number, number>])[] = [
-    ['Hunter', 'Beast Mastery', 'Human', hunterPoints],
-    ['Hunter', 'Marksmanship', 'Human', hunterPoints],
+    ['Hunter', 'Beast Mastery', 'Dwarf', hunterPoints],
+    ['Hunter', 'Marksmanship', 'Dwarf', hunterPoints],
     ['Shaman', 'Enhancement', 'Draenei', shamanPoints],
   ]
   for (const [className, spec, race, points] of cases) {
@@ -5392,4 +5411,196 @@ test('raid details are optional, persist, and reach the exported chart', () => {
   const resized = resizeRoster(roster, 10)
   expect(resized.meta?.title).toBe('SSC Progression')
   expect(resized.groups).toHaveLength(2)
+})
+
+import { getBaseStats } from '../src/domain/character/baseStats'
+import { getAttributeConversions } from '../src/domain/character/attributeConversions'
+import { racesByFaction } from '../src/domain/character/races'
+
+/**
+ * Equips the default set, then re-runs with one attribute nudged, and reports what moved.
+ *
+ * `bonusStats` is folded in before the conversions run, which is the whole reason it exists — so a
+ * delta measured this way is exactly the conversion rate, per point.
+ */
+function conversionDelta(
+  className: TbcClass,
+  spec: TbcSpec,
+  race: TbcRace,
+  bonus: Record<string, number>,
+): Record<string, number> {
+  const faction: Faction = racesByFaction.Alliance.includes(race) ? 'Alliance' : 'Horde'
+  const character: CharacterProfile = { faction, race, className, spec }
+  const gear = normalizeGearForCharacter(defaultGear, className, spec)
+
+  const base = calculateStats(character, gear, [], [])
+  const probed = calculateStats(character, gear, [], [], bonus)
+
+  const delta: Record<string, number> = {}
+  for (const key of Object.keys(base)) delta[key] = probed[key as keyof typeof probed] - base[key as keyof typeof base]
+  return delta
+}
+
+test('attributes convert at the class-specific rates wowsims publishes, and never into spell power', async () => {
+  /*
+   * This replaces six uncited lines that were the app's only attribute conversions and were the
+   * always-visible rail's largest error. Each assertion below pins one of them to
+   * `tools/ingest/ingest-base-stats.mjs`, because the lesson this repo keeps relearning is that
+   * fixing an instance buys nothing — only the assertion does.
+   */
+
+  // Strength is 2 attack power to a Warrior and 1 to a Rogue. The old code used 2 for everyone,
+  // overstating every Rogue and Hunter.
+  expect(conversionDelta('Warrior', 'Fury', 'Human', { strength: 100 }).attackPower).toBeCloseTo(200, 6)
+  expect(conversionDelta('Rogue', 'Combat', 'Orc', { strength: 100 }).attackPower).toBeCloseTo(100, 6)
+
+  // Agility is melee attack power for a Rogue and *nothing at all* for a Warrior. The old flat
+  // `agility * 0.35` was a rate no class has, and it handed a Fury Warrior attack power it never had.
+  expect(conversionDelta('Rogue', 'Combat', 'Orc', { agility: 100 }).attackPower).toBeCloseTo(100, 6)
+  expect(conversionDelta('Warrior', 'Fury', 'Human', { agility: 100 }).attackPower).toBeCloseTo(0, 6)
+
+  // A Hunter's Agility goes to *ranged* attack power, and to melee not at all — and at 1 a point,
+  // where the old code used 1.8 for every class alike.
+  const hunter = conversionDelta('Hunter', 'Beast Mastery', 'Orc', { agility: 100 })
+  expect(hunter.rangedAttackPower).toBeCloseTo(100, 6)
+  expect(hunter.attackPower).toBeCloseTo(0, 6)
+
+  // 33 Agility is one percent of melee crit for a Warrior. The old `agility * 0.1` made it 0.15%,
+  // understating a geared Warrior by around five and a half percent crit.
+  expect(conversionDelta('Warrior', 'Fury', 'Human', { agility: 33 }).critRating).toBeCloseTo(RATING_PER_PERCENT.meleeCrit, 1)
+
+  // Agility grants 2 Armor to *every* class. Nothing in this app modelled it at all before, which
+  // cost a geared Rogue over 500 armor on a row the rail never hides.
+  for (const classOption of tbcClasses) {
+    const race = racesByClass[classOption.className][0]
+    const delta = conversionDelta(classOption.className, classOption.specs[0], race, { agility: 100 })
+    expect(delta.armor, `${classOption.className} gets 2 armor per point of Agility`).toBeCloseTo(200, 6)
+  }
+
+  /*
+   * The headline: **Intellect and Spirit grant no spell power and no healing power in TBC.** Every
+   * conversion of either into spell power is talent-gated upstream — Lunar Guidance, Mind Mastery,
+   * Spiritual Guidance — so there is no baseline one. The old code added `intellect * 0.8` and
+   * `spirit * 0.15`, which was inventing 46% of a Fire Mage's spell power and 52% of a Holy Priest's
+   * on the one surface that is always on screen.
+   */
+  const caster = conversionDelta('Mage', 'Fire', 'Gnome', { intellect: 1000, spirit: 1000 })
+  expect(caster.spellPower, 'Intellect and Spirit are not spell power in TBC').toBeCloseTo(0, 6)
+  expect(caster.healingPower, 'Intellect and Spirit are not healing power in TBC').toBeCloseTo(0, 6)
+
+  /*
+   * ...and the falsification, without which the two lines above would pass just as happily if the
+   * probe never reached the conversions at all. Intellect *does* buy spell crit, so a run that moves
+   * nothing is a broken probe rather than a proof.
+   */
+  expect(caster.spellCritRating, 'Intellect still buys spell crit, so the probe is reaching the conversions').toBeGreaterThan(0)
+})
+
+test('base stats are race-specific, and no class is born with spell power', async () => {
+  /*
+   * The app carried one hand-written block per class. They were invented — its Druid had 52 Strength
+   * against a real Night Elf Druid's 73 — and, worse, several granted spell power and healing power
+   * that TBC gives no one. `getBaseStats` reads all 52 race+class blocks from the pinned commit.
+   */
+
+  // Base stats depend on race, not just class. One block per class cannot express this.
+  const nightElf = getBaseStats('Priest', 'Night Elf')
+  const dwarf = getBaseStats('Priest', 'Dwarf')
+  expect(nightElf).not.toEqual(dwarf)
+  expect(nightElf.agility, 'a Night Elf is the more agile Priest').toBeGreaterThan(dwarf.agility)
+
+  // Nobody starts with spell power, healing power or armor. The old blocks granted all three —
+  // a Mage 132 spell power, a Priest 124 healing power, a Warrior 1400 armor — none of which exists.
+  const problems: string[] = []
+  for (const classOption of tbcClasses) {
+    for (const race of racesByClass[classOption.className]) {
+      const base = getBaseStats(classOption.className, race)
+      for (const stat of ['spellPower', 'healingPower', 'armor'] as const) {
+        if (base[stat] !== 0) problems.push(`${race} ${classOption.className} has base ${stat} ${base[stat]}`)
+      }
+    }
+  }
+  expect(problems, 'no class is born with spell power, healing power or armor in TBC').toEqual([])
+
+  // Every combination the character creator can reach must have a block, or that character silently
+  // reads low on the always-visible rail rather than failing.
+  for (const classOption of tbcClasses) {
+    for (const race of racesByClass[classOption.className]) {
+      expect(getBaseStats(classOption.className, race).stamina, `${race} ${classOption.className}`).toBeGreaterThan(0)
+    }
+  }
+})
+
+test('a conversion this app cannot source is absent rather than guessed', async () => {
+  /*
+   * wowsims implements what it needs to simulate, so its silences are not statements about TBC: a
+   * Priest has no Strength-to-attack-power entry because a Priest's melee swing does not affect
+   * healing output. Those gaps are left absent deliberately. This pins the two properties that make
+   * that safe — every gap falls in a row `statRelevance.ts` already hides, and no conversion anywhere
+   * produces spell power.
+   */
+  const spellPowerConversions: string[] = []
+  for (const classOption of tbcClasses) {
+    for (const spec of classOption.specs) {
+      for (const conversion of getAttributeConversions(classOption.className, spec)) {
+        if (conversion.to === 'spellPower' || conversion.to === 'healingPower') {
+          spellPowerConversions.push(`${classOption.className}/${spec}: ${conversion.upstream}`)
+        }
+      }
+    }
+  }
+  expect(spellPowerConversions, 'spell power comes from gear and talents in TBC, never from an attribute').toEqual([])
+
+  // Feral is the one spec with conversions its own class does not otherwise get, because cat form
+  // is what makes Agility and Feral Attack Power into attack power at all.
+  const feral = getAttributeConversions('Druid', 'Feral').map((conversion) => `${conversion.from}->${conversion.to}`)
+  const balance = getAttributeConversions('Druid', 'Balance').map((conversion) => `${conversion.from}->${conversion.to}`)
+  expect(feral).toContain('feralAttackPower->attackPower')
+  expect(feral).toContain('agility->attackPower')
+  expect(balance).not.toContain('feralAttackPower->attackPower')
+  expect(balance).not.toContain('agility->attackPower')
+})
+
+test('a racial this app applies itself is not also baked into the base stats', async () => {
+  /*
+   * wowsims applies Human's +10% Spirit and Gnome's +5% Intellect as stat dependencies in
+   * `sim/core/racials.go`, so its base tables are meant to be racial-free — and this app applies
+   * both itself, in `applyRacialTraits`. Where upstream forgets to divide one out, taking the row at
+   * face value multiplies it twice: a Human Priest's Spirit would read 21% high on the always-visible
+   * rail.
+   *
+   * Upstream forgets for Human Spirit in five of its six classes. The ingest divides those rows back
+   * out and reports every decision; this is what stops the correction being quietly dropped.
+   *
+   * **Gnome's Intellect is deliberately not corrected and must not start being.** Its rows measure
+   * 1.02x (Mage), 1.08x (Warlock), 1.18x (Rogue) and 1.21x (Warrior) against their peers — a scatter
+   * that is a real racial base bonus on small integers, not one multiplier applied inconsistently.
+   * The Mage row, the one upstream says it already divided by 1.05, is the lowest of the four.
+   */
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((a, b) => a - b)
+    const middle = Math.floor(sorted.length / 2)
+    return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle]
+  }
+
+  const problems: string[] = []
+  let compared = 0
+  for (const classOption of tbcClasses) {
+    const races = racesByClass[classOption.className]
+    if (!races.includes('Human')) continue
+
+    const human = getBaseStats(classOption.className, 'Human').spirit
+    const peers = races.filter((race) => race !== 'Human').map((race) => getBaseStats(classOption.className, race).spirit)
+    const ratio = human / median(peers)
+    compared += 1
+
+    // A real racial base difference between two races is a small integer. Ten percent of one stat,
+    // on the one stat this app multiplies for Humans anyway, is the racial counted twice.
+    if (ratio > 1.05) {
+      problems.push(`${classOption.className}: Human base Spirit ${human} is ${((ratio - 1) * 100).toFixed(1)}% above its peers`)
+    }
+  }
+
+  expect(compared, 'six classes a Human can be').toBe(6)
+  expect(problems, 'The Human Spirit is applied by applyRacialTraits, so it must not also sit in the base').toEqual([])
 })

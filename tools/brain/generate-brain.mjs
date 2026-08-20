@@ -251,6 +251,7 @@ async function scanModules() {
 const DOMAIN_ENTRY = `
 export { tbcClasses, getRoleForSpec } from '../../src/domain/character/tbcClasses'
 export { racesByFaction, racesByClass } from '../../src/domain/character/races'
+export { getBaseStats } from '../../src/domain/character/baseStats'
 export { gearSlots } from '../../src/domain/gear/gearSlots'
 export { sampleItems } from '../../src/domain/gear/sampleItems'
 export { sampleRaids } from '../../src/domain/raids/sampleRaids'
@@ -753,7 +754,7 @@ async function writeArchitectureMap(modules) {
 }
 
 async function writeDomainNotes(data, modules) {
-  const { tbcClasses, getRoleForSpec, racesByClass, racesByFaction, gearSlots, sampleItems } = data
+  const { tbcClasses, getRoleForSpec, racesByClass, racesByFaction, gearSlots, sampleItems, getBaseStats } = data
   const { sampleRaids, sampleRaidBosses, sampleAttunements, sampleSignatureAbilities } = data
   const { allProfessions, sampleProfessions, sampleBuffs, sampleTargetDebuffs, sampleConsumables } = data
   const { sampleEnchants, sampleGems, bisLists } = data
@@ -801,7 +802,13 @@ async function writeDomainNotes(data, modules) {
   // --- Classes ---------------------------------------------------------------------------------
   for (const entry of tbcClasses) {
     const legalRaces = racesByClass[entry.className] ?? []
-    const notableStats = Object.entries(entry.baseStats)
+    /*
+     * Base stats are race *and* class, so a class note has to name which race it is quoting. They
+     * used to hang off `tbcClasses` as one invented block per class; they are read per race from
+     * the pinned wowsims commit now, and a Night Elf Druid and a Tauren Druid genuinely differ.
+     */
+    const statsRace = legalRaces[0]
+    const notableStats = Object.entries(statsRace ? getBaseStats(entry.className, statsRace) : {})
       .filter(([, value]) => typeof value === 'number' && value > 0)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8)
@@ -829,13 +836,18 @@ async function writeDomainNotes(data, modules) {
         }),
       ),
       '',
-      '## Base stats at 70',
+      `## Base stats at 70${statsRace ? ` (${statsRace})` : ''}`,
       '',
       notableStats.join(' · '),
       '',
       '## Where this lives in the code',
       '',
-      bullets(moduleLinks(['domain/character/tbcClasses.ts', 'domain/character/races.ts'], modules)),
+      bullets(
+        moduleLinks(
+          ['domain/character/tbcClasses.ts', 'domain/character/races.ts', 'domain/character/baseStats.ts'],
+          modules,
+        ),
+      ),
       '',
       `Up: ${link('TBC Knowledge Map')}`,
     ].join('\n')

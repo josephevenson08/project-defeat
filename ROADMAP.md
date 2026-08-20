@@ -241,7 +241,7 @@ the simulator can price it.
 
 ## How decisions get made here
 
-Six patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as
+Seven patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as
 outcomes, because the outcomes above will keep changing and these have not.
 
 **Measure before designing, because the obvious fix is often wrong.** This file once proposed capping
@@ -254,6 +254,15 @@ planner column was 11,206px rather than the ~25,000px assumed, and that the real
 `calculateCasterDps` took a talent argument, and ingesting them first would have produced the
 project's signature failure: real, sourced data wired to nothing. That failure has happened three
 times here (buffs panel, gem procs, signature-ability prose), which is why the order is now a rule.
+
+**Correcting a source needs evidence for the specific row, not a plausible rule.** wowsims bakes
+Human's +10% Spirit into five of its six Human base-stat rows while applying the multiplier again at
+runtime, so those rows have to be divided back out. Gnome's +5% Intellect looked like exactly the
+same defect — and is not: its rows measure 1.02x to 1.21x against their peers, which is a real racial
+bonus on small integers rather than one multiplier applied inconsistently. The first rule written
+here, "divide when it moves the value closer to the other races", would have wrongly corrected three
+of the four Gnome rows. The rule that survived measures whether the row already sits *at* the
+multiplier, and prints every decision either way.
 
 **Verify before correcting, especially when the data looks wrong.** Five BiS entries named items
 Phase 2 cannot reach. The tempting read is "bad ingest". Tracing them to source showed Band of
@@ -293,6 +302,11 @@ Every dataset is now ingested from a pinned source and regenerable:
   HTML, which is reproducible in a way that driving a browser is not.
 - **Buffs, debuffs, talents, item effects, meta gem conditions** — each cited to the spell rank or
   upstream source file its numbers were read from.
+- **Base stats and attribute conversions** — all 52 race+class base stat blocks and every
+  attribute-to-stat rate, read from the same pinned commit. This closed the last hand-written
+  numbers in the stat pipeline: `calculateStats` had ended with six uncited lines, two of which
+  granted spell power for Intellect and Spirit, which TBC does not do without a talent. They were
+  inventing 46% of a Fire Mage's spell power on the always-visible rail.
 
 The reason this matters is recorded rather than asserted: when the hand-written catalogue was checked
 against the ingest, **87 of 98 overlapping entries disagreed**, and all 119 verifiable conflicts

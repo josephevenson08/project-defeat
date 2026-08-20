@@ -20,14 +20,15 @@ tags: [brain/domain, domain/class]
 - [[Undead]] (Horde)
 - [[Blood Elf]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Human)
 
-`spellPower` 126 · `intellect` 96 · `stamina` 76 · `spirit` 68 · `spellHitRating` 20 · `spellCritRating` 19
+`intellect` 133 · `spirit` 130.9091 · `critRating` 97.8144 · `attackPower` 86 · `stamina` 76 · `agility` 58 · `strength` 51 · `spellCritRating` 37.4698
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 

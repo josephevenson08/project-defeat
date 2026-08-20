@@ -27,9 +27,9 @@ _None._
 
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
+- [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
-- [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`

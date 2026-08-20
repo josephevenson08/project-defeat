@@ -1,30 +1,32 @@
 ---
 type: module
 layer: domain
-source: src/domain/stats/statUtils.ts
-lines: 43
+source: src/domain/character/attributeConversions.ts
+lines: 84
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
-# domain.stats.statUtils
+# domain.character.attributeConversions
 
-`src/domain/stats/statUtils.ts` · **domain** layer · 43 lines
+`src/domain/character/attributeConversions.ts` · **domain** layer · 84 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `addStats`, `applyStatMultipliers`, `createEmptyStats`, `scaleStats`
+**function** — `applyAttributeConversions`, `getAttributeConversions`
+
+**type** — `AttributeConversion`
 
 ## Imports
 
+- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
+- [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
 
 ## Imported by
 
-- [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
-- [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

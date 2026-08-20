@@ -19,14 +19,15 @@ tags: [brain/domain, domain/class]
 - [[Draenei]] (Alliance)
 - [[Blood Elf]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Human)
 
-`armor` 1200 · `attackPower` 92 · `healingPower` 92 · `stamina` 84 · `strength` 76 · `intellect` 72 · `spirit` 48 · `defenseRating` 20
+`attackPower` 190 · `strength` 126 · `stamina` 120 · `spirit` 88.1818 · `intellect` 83 · `agility` 77 · `spellCritRating` 73.69 · `critRating` 14.35
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 

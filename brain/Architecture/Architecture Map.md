@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-154 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+156 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,7 +16,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 40 importers
+- [[domain.character.characterTypes]] — 42 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 15 importers
@@ -62,7 +62,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.builds.BuildPanel]] · 1 importers
 - [[features.builds.buildStorage]] · 2 importers
 - [[features.character.CharacterCreator]] · 1 importers
-- [[features.character.characterData]] · 6 importers
+- [[features.character.characterData]] · 5 importers
 - [[features.character.CharacterRail]] · 1 importers
 - [[features.character.characterTypes]] · 15 importers
 - [[features.gear.gearData]] · 8 importers
@@ -96,7 +96,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (103)
+### domain (105)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -126,9 +126,11 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.builds.buildSerialization]] · 3 importers
 - [[domain.builds.buildTypes]] · 4 importers
 - [[domain.character.applyRacialTraits]] · 1 importers
-- [[domain.character.characterTypes]] · 40 importers
+- [[domain.character.attributeConversions]] · 1 importers
+- [[domain.character.baseStats]] · 1 importers
+- [[domain.character.characterTypes]] · 42 importers
 - [[domain.character.classColors]] · 1 importers
-- [[domain.character.races]] · 2 importers
+- [[domain.character.races]] · 3 importers
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 10 importers
 - [[domain.character.sampleRacialTraits]] · 1 importers
@@ -194,7 +196,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.stats.describeStats]] · 3 importers
 - [[domain.stats.statRelevance]] · 1 importers
 - [[domain.stats.statTypes]] · 15 importers
-- [[domain.stats.statUtils]] · 2 importers
+- [[domain.stats.statUtils]] · 3 importers
 - [[domain.talents.sampleTalents]] · 2 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers
 - [[domain.talents.talentModifiers]] · 1 importers

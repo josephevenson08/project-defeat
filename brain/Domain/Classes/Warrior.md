@@ -24,14 +24,15 @@ tags: [brain/domain, domain/class]
 - [[Tauren]] (Horde)
 - [[Troll]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Human)
 
-`armor` 1400 · `attackPower` 120 · `strength` 92 · `stamina` 82 · `agility` 54 · `defenseRating` 24 · `critRating` 18 · `hitRating` 12
+`attackPower` 190 · `strength` 145 · `stamina` 133 · `agility` 96 · `spirit` 50.9091 · `intellect` 33 · `critRating` 25.1712 · `dodgeRating` 14.1923
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 

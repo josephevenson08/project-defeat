@@ -1,5 +1,6 @@
 import { applyRacialTraits } from '../../domain/character/applyRacialTraits'
-import { getClassDefinition } from '../character/characterData'
+import { applyAttributeConversions } from '../../domain/character/attributeConversions'
+import { getBaseStats } from '../../domain/character/baseStats'
 import type { CharacterProfile } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
 import { getBuffById } from '../../domain/buffs/sampleBuffs'
@@ -24,8 +25,7 @@ export function calculateStats(
    */
   bonusStats?: Partial<StatBlock>,
 ): StatBlock {
-  const classDefinition = getClassDefinition(character.className)
-  let total: StatBlock = { ...classDefinition.baseStats }
+  let total: StatBlock = getBaseStats(character.className, character.race)
 
   /*
    * Every gem equipped, gathered before anything is summed, because a meta gem's condition is about
@@ -98,21 +98,17 @@ export function calculateStats(
   // Human's Spirit) reaches the spell power and healing power that stat feeds.
   total = applyRacialTraits(total, character.race, character.className, gear)
 
-  total.attackPower += Math.round(total.strength * 2 + total.agility * 0.35)
-
-  // Feral Attack Power adds 1:1 into attack power, but only while shapeshifted. The stat's own
-  // wording is "in Cat, Bear, Dire Bear and Moonkin forms only", and of the specs this app models
-  // only Feral both shapeshifts and reads attack power — a Moonkin has no use for it. Applying it
-  // unconditionally would hand it to every class wearing a druid weapon.
-  if (character.className === 'Druid' && character.spec === 'Feral') {
-    total.attackPower += total.feralAttackPower
-  }
-
-  total.rangedAttackPower += Math.round(total.agility * 1.8)
-  total.spellPower += Math.round(total.intellect * 0.8 + total.spirit * 0.15)
-  total.healingPower += Math.round(total.intellect * 0.9 + total.spirit * 0.35)
-  total.critRating += Math.round(total.agility * 0.1)
-  total.spellCritRating += Math.round(total.intellect * 0.08)
-
-  return total
+  /*
+   * Attributes become attack power, armor and ratings last, once every source above has been summed.
+   *
+   * The rates are class-specific and sourced — see `attributeConversions.ts`, which replaced six
+   * uncited lines that had been the app's only conversions. Two of those lines granted spell power
+   * and healing power for Intellect and Spirit, which TBC does not do at any point without a talent;
+   * they were inventing roughly half of every caster's spell power on the always-visible rail.
+   *
+   * Feral Attack Power is folded in here too rather than by hand. It adds 1:1 into attack power but
+   * only while shapeshifted — the stat's own wording is "in Cat, Bear, Dire Bear and Moonkin forms
+   * only" — so it arrives as part of the cat-form block, gated on the same spec check as before.
+   */
+  return applyAttributeConversions(total, character.className, character.spec)
 }

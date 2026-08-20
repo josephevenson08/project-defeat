@@ -30,6 +30,10 @@ of having written it first.** It required DPS to move *and* the rage gap to clos
 | | Untalented | Talented |
 |---|---|---|
 | Fury DPS | 192.3 | **224.3** (+16.6%) ✅ |
+
+(Both DPS figures moved to 215.3 → 254.7, +18.3%, on 2026-08-20 when base stats and the attribute
+conversions were sourced from wowsims rather than hand-written. The talent effect is unchanged.)
+
 | Rage/sec | 3.4 | **5.4**, against 7.5 needed ❌ |
 | Heroic Strike | excluded | **still excluded** ❌ |
 

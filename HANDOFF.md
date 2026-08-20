@@ -1,7 +1,83 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-19.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-20.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-20)
+
+**The stat rail was wrong about gear, and it had nothing to do with talents.** The session opened on
+the `calculateStats` decision — should talents reach the always-visible rail — and the audit that
+preceded it found the rail was misreporting *gear* first, for reasons that decision does not touch.
+The decision is still open and is now worth taking against numbers that are true.
+
+`calculateStats` ended with six hand-written lines that were the app's **only** attribute
+conversions. They were the one uncited block in a file where every other decision carries a sourced
+paragraph, and they predate the ingest era. Three of the five were not TBC mechanics:
+
+1. **Intellect and Spirit never grant spell power or healing power in TBC.** Every Int-to-spell-power
+   conversion upstream is talent-gated (Lunar Guidance, Mind Mastery) and every Spirit one is
+   Spiritual Guidance; there is no baseline. `intellect * 0.8 + spirit * 0.15` was **inventing 46%
+   of a Fire Mage's spell power and 52% of a Holy Priest's**, on the surface that is always on screen.
+2. **The rates are class-specific.** Strength is 2 attack power to a Warrior and **1** to a Rogue or
+   Hunter. Agility is melee attack power for Rogues and cat-form Druids, *ranged* attack power for
+   Hunters, and nothing for anyone else — the flat `agility * 0.35` matched no class in the game.
+3. **Agility-to-crit is a per-class divisor** (Warrior 33, Druid/Paladin/Shaman 25, Rogue/Hunter 40),
+   so `agility * 0.1` understated melee crit **five to seven times over**: a geared Fury Warrior was
+   missing about 5.5% crit, a Combat Rogue the same.
+
+Three conversions were **missing outright**: the *universal* Agility-to-Armor at 2 a point (a geared
+Rogue was short over 500 armor on a row the rail never hides), Agility-to-Dodge, and Warrior
+Strength-to-Block-Value.
+
+**Base stats were invented too, and are race+class rather than class alone.** The app carried one
+hand-written block per class — its Druid had 52 Strength against a real Night Elf Druid's 73, and
+granted 72 spell power and 86 healing power that no druid has ever had. All **52 race+class blocks**
+are now read from the pinned commit, and an import-time guard fails if any of the 51 combinations the
+character creator can reach lacks one.
+
+**What moved, measured against the app's own default sets:**
+
+| | Spell Power was | now | of which was invented |
+|---|---|---|---|
+| Fire Mage | 1110 | **602** | 508 |
+| Holy Priest | 819 | **393** | 426 |
+| Resto Shaman | 674 | **305** | 369 |
+
+Crit went the other way: a Fury Warrior's Agility-derived crit rating **21 → 143**, a Combat Rogue's
+**27 → 150**, a Fire Mage's Intellect-derived spell crit **35 → 119**. The Fury Warrior reference
+figures this file quotes moved with them — **192.3 → 215.3** untalented and **224.3 → 254.7**
+talented, so the talent gain reads **+18.3%** where it read +16.6%.
+
+**The finding most likely to be got wrong is upstream's, not this repo's.** wowsims applies Human's
++10% Spirit and Gnome's +5% Intellect as runtime stat dependencies, so its base tables are meant to
+be racial-free — and it says so, in a comment dividing Gnome Mage Intellect by 1.05. But it leaves
+**The Human Spirit baked into five of its six Human rows** while applying the multiplier again. Taken
+at face value this app would have multiplied a third time: a Human Priest's Spirit reading 21% high.
+Those five rows are divided back out at ingest, each decision printed with its evidence.
+
+**Gnome Intellect is deliberately *not* corrected, and the measurement is the reason.** The same
+double-count looked just as likely, but the Gnome rows measure 1.02x (Mage), 1.08x (Warlock), 1.18x
+(Rogue) and 1.21x (Warrior) against their peers — a scatter that is a real racial base bonus on small
+integers, not one multiplier applied inconsistently. A "divide when it moves closer to the peers"
+rule was written first and **would have wrongly divided three of those four**; the Mage row, the one
+upstream states it already divided, is the lowest of the four. Correcting a source needs evidence for
+the specific row, not a plausible rule.
+
+**wowsims' silences are not game facts, and the gaps are left as gaps.** It implements what it needs
+to simulate, so a Priest has no Strength-to-attack-power entry and a Rogue no Intellect-to-spell-crit
+entry. Every one of those falls in a row `statRelevance.ts` already hides for that spec, so none is
+visible by default — but they are recorded as absent rather than guessed at.
+
+**Four assertions now pin all of this**, and each was falsified before being trusted: re-adding
+`intellect * 0.8` fails the spell-power test on the exact line, and disabling the racial
+normalisation fails naming all five inflated rows. The tests also caught that several fixtures built
+**Human Druids and Human Hunters** — combinations TBC does not allow, harmless while base stats were
+one invented block per class and a hard error once they are read per race.
+
+**Still open, and now worth taking:** whether talents should reach `calculateStats`. Nothing about
+that decision changed except that the base it would layer onto is now correct.
 
 ---
 
@@ -120,7 +196,7 @@ approximations", "no talent scaling anywhere", a `training-sword` bug fixed by d
 item, and `src/data`, which no longer exists. `README.md` still said "No talent trees". The generated
 Known Limitations still called the catalogue "largely representative sample gear".
 
-**Six process patterns are now recorded in `ROADMAP.md` under "How decisions get made here"**, and
+**Six process patterns were recorded in `ROADMAP.md` under "How decisions get made here"**, and
 eight new entries in the Decision Log. They are written as process rather than outcome because the
 outcomes keep changing and these have not: measure before designing, plumbing before data, verify
 before correcting, coverage is not completeness, a caveat needs something that fails, and falsify an
@@ -488,8 +564,8 @@ node tools/ingest/fetch-icons.mjs               # the artwork itself -> public/i
   away and gave it two one-handers. Feral is unchanged, correctly, because cat form swings its own
   weapon.
 
-  **Those were the current figures against the 10,643-armor target.** They are now 192.3 / 236 /
-  185.6-ish against 7,700 — the fix they describe is still real, but read the numbers as a record of
+  **Those were the current figures against the 10,643-armor target.** They were then 192.3 / 236 /
+  185.6-ish against 7,700, and moved again on 2026-08-20 with the sourced base stats (Fury 215.3) — the fix they describe is still real, but read the numbers as a record of
   what that fix did rather than as today's readouts.
 
   **The reverse rule is what the first attempt got wrong, and it is the subtle half.** An empty off
@@ -863,8 +939,8 @@ require the defender to be *facing* the attacker, and a melee DPS is behind the 
 against a level 73 target that deleted 14% parry plus 5% block from every swing. Fixing it moved a
 Fury Warrior from 125 to 148 DPS at the time and took hit chance from 21.7% to 39.2%. (That 148 is
 history, and so is the 165.6 it became after the unobtainable-item and two-hander fixes changed
-which weapons it holds. The same character now reads **192.3**, after the boss armor moved to
-7,700.) `attacksFromBehind` is now
+which weapons it holds. That character read **192.3** after the boss armor moved to 7,700, and
+**215.3** since base stats and the attribute conversions were sourced on 2026-08-20.) `attacksFromBehind` is now
 a required input on both builders, so a future front-facing caller has to state its position.
 
 **Rage is now modelled, and the result was not the one expected.** `domain/simulation/rageModel.ts`
@@ -1338,6 +1414,9 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   `3301fca5` — the framing below, that this needed prose extraction, was wrong: wowsims implements
   talents as *code*. 10 effects extracted, 9 talent groups refused by name with a reason each.
 - **Result.** Fury DPS **192.3 → 224.3 (+16.6%)**, crit 8.1% → 13.1%, rage **3.4 → 5.4/sec**.
+  (Both figures moved to **215.3 → 254.7, +18.3%** on 2026-08-20 when base stats and the attribute
+  conversions stopped being hand-written. The talent effect is unchanged; the base it applies to was
+  wrong.)
   (Post-7,700-armor figures. Against the old 10,643 target they read 165.6 → 193.2.)
 - **Stage 2 is complete for every spec that can receive talents.** All **11 Physical DPS specs** are
   covered — Warrior Arms and Fury, all three Rogue, all three Hunter, Shaman Enhancement, Druid Feral,

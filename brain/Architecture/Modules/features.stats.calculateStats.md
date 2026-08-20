@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/stats/calculateStats.ts
-lines: 119
+lines: 115
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.stats.calculateStats
 
-`src/features/stats/calculateStats.ts` · **features** layer · 119 lines
+`src/features/stats/calculateStats.ts` · **features** layer · 115 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,8 @@ _No doc comment at the top of this file._
 
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
+- [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.armorValues]] — `src/domain/gear/armorValues.ts`
@@ -28,7 +30,6 @@ _No doc comment at the top of this file._
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
-- [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`

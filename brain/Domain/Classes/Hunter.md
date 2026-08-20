@@ -22,14 +22,15 @@ tags: [brain/domain, domain/class]
 - [[Troll]] (Horde)
 - [[Blood Elf]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Dwarf)
 
-`rangedAttackPower` 124 · `agility` 102 · `attackPower` 88 · `stamina` 70 · `intellect` 58 · `strength` 48 · `spirit` 42 · `critRating` 24
+`agility` 147 · `rangedAttackPower` 130 · `attackPower` 120 · `stamina` 111 · `spirit` 82 · `intellect` 76 · `strength` 66
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 

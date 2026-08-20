@@ -19,14 +19,15 @@ tags: [brain/domain, domain/class]
 - [[Tauren]] (Horde)
 - [[Troll]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Draenei)
 
-`healingPower` 98 · `spellPower` 86 · `attackPower` 84 · `intellect` 80 · `stamina` 74 · `strength` 66 · `agility` 64 · `spirit` 52
+`spirit` 122 · `attackPower` 120 · `stamina` 113 · `intellect` 109 · `strength` 103 · `agility` 61 · `spellCritRating` 47.89 · `critRating` 37.07
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 

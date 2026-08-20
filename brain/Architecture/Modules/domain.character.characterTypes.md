@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/character/characterTypes.ts
-lines: 68
+lines: 66
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.characterTypes
 
-`src/domain/character/characterTypes.ts` · **domain** layer · 68 lines
+`src/domain/character/characterTypes.ts` · **domain** layer · 66 lines
 
 _No doc comment at the top of this file._
 
@@ -19,7 +19,7 @@ _No doc comment at the top of this file._
 
 ## Imports
 
-- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
+_None._
 
 ## Imported by
 
@@ -31,6 +31,8 @@ _No doc comment at the top of this file._
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
+- [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
 - [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`

@@ -17,14 +17,15 @@ tags: [brain/domain, domain/class]
 - [[Night Elf]] (Alliance)
 - [[Tauren]] (Horde)
 
-## Base stats at 70
+## Base stats at 70 (Night Elf)
 
-`armor` 950 · `healingPower` 86 · `intellect` 82 · `spirit` 78 · `stamina` 72 · `spellPower` 72 · `agility` 58 · `strength` 52
+`spirit` 133 · `intellect` 120 · `stamina` 82 · `agility` 75 · `strength` 73 · `spellCritRating` 40.6 · `critRating` 21.1968
 
 ## Where this lives in the code
 
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
+- [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 
 Up: [[TBC Knowledge Map]]
 
