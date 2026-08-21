@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/featureFlags.ts
-lines: 74
+lines: 93
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # featureFlags
 
-`src/featureFlags.ts` · **app** layer · 74 lines
+`src/featureFlags.ts` · **app** layer · 93 lines
 
 From the top of the file:
 
@@ -26,7 +26,7 @@ From the top of the file:
 
 ## Imports
 
-_None._
+- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 
 ## Imported by
 

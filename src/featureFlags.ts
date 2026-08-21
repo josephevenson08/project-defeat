@@ -1,3 +1,5 @@
+import type { CharacterRole } from './domain/character/characterTypes'
+
 /**
  * Surfaces that are built but deliberately not shown yet.
  *
@@ -6,6 +8,17 @@
  * would lose the work; leaving it visible would present numbers the project knows to be wrong. This
  * is the third option.
  */
+
+/**
+ * The roles the Simulation tab is shown for.
+ *
+ * **The tab is a DPS surface, by the repo owner's call on 2026-08-21.** It answers "how much damage
+ * does this build do", which is a question only a damage spec is asking. A Healer's estimate and a
+ * Tank's Effective Health are both still computed and still tested — the math did not go anywhere —
+ * but neither is put in front of someone as a headline number, because neither is what this project
+ * is for.
+ */
+const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Physical DPS', 'Caster DPS'])
 
 /**
  * The Simulation tab — the encounter settings, the DPS/HPS estimate, the stat weights derived from
@@ -27,7 +40,8 @@
  * it. That is weaker, and it is called out rather than papered over: this file has twice claimed
  * more rigour than it had.
  *
- * **Still hidden, and here is what is actually true now.**
+ * **Shown for DPS specs since 2026-08-21, hidden for Healer and Tank**, and here is what is
+ * actually true about it now.
  *
  * - **Rotations cover 2 specs of 27.** Warrior Arms and Fury press three buttons each; the other 25
  *   are a single-ability approximation, which understates any spec whose damage is spread across
@@ -60,14 +74,19 @@
  * - **Spell school is not modelled anywhere**, which is why Winter's Chill is `notModelled` and
  *   Curse of the Elements is approximate.
  *
- * Whether that is still disqualifying is a judgement, and it is deliberately not taken here. The
- * original argument stands on its own terms — a caveat under a confident-looking number is not
- * enough when the number is off by this much, because people read the number and skip the caveat.
- * The counter-argument is that the estimate is now honest about its own gaps on the tab itself.
+ * **That judgement was taken on 2026-08-21 and it was taken per role, not globally.** The argument
+ * against showing it — a caveat under a confident-looking number is not enough when the number is
+ * off by this much, because people read the number and skip the caveat — is unchanged. What changed
+ * is who sees it: a DPS spec is the audience the estimate was built for, and the tab discloses its
+ * own gaps per spec. Healer and Tank stay hidden, so the two role paths whose output nobody is here
+ * to read cannot be mistaken for a headline.
  *
- * Everything behind it still builds, and every test of the underlying math still runs. Append
- * `?simulation=1` to the URL to bring the tab back, which is how the browser tests reach it.
+ * `?simulation=1` still forces the tab on for any role. It is an escape hatch for development and
+ * for the browser tests that exercise the healer and tank math, **not** a second product decision.
  */
-export function isSimulationEnabled(search: string = typeof window === 'undefined' ? '' : window.location.search) {
-  return new URLSearchParams(search).has('simulation')
+export function isSimulationEnabled(
+  role: CharacterRole,
+  search: string = typeof window === 'undefined' ? '' : window.location.search,
+) {
+  return SIMULATION_ROLES.has(role) || new URLSearchParams(search).has('simulation')
 }

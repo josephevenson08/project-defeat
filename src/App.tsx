@@ -126,8 +126,6 @@ function App() {
    * ceremony rather than a journey.
    */
   const [characterChosen, setCharacterChosen] = useState(() => Boolean(loadBuildFromStorage()))
-  // Read once at mount: the flag comes from the URL and nothing in-session changes it.
-  const [simulationEnabled] = useState(isSimulationEnabled)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
   // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
   const [plannerView, setPlannerView] = useState<PlannerView>('gear')
@@ -178,6 +176,22 @@ function App() {
   const role = getRoleForSpec(character.className, character.spec)
 
   /*
+   * Recomputed per render rather than read once at mount, because it now depends on the character:
+   * the Simulation tab is a DPS surface, so changing spec from Fury to Protection takes it away.
+   *
+   * `currentTab` is **derived** rather than corrected afterwards. Storing `'simulation'` and fixing
+   * it up in an effect would leave one render where the tab bar and the pane disagree, and would put
+   * a `setState` inside an effect for something that is already a pure function of state.
+   *
+   * It is a guard rather than a path a player can walk today: the character selects live on the
+   * planner's rail, and the Simulation tab has no rail, so the spec cannot change while that tab is
+   * the one on screen. Saying so is the point — `activeTab` is session state that could be
+   * persisted later, and this is what stops that becoming a blank pane.
+   */
+  const simulationEnabled = isSimulationEnabled(role)
+  const currentTab: AppTab = activeTab === 'simulation' && !simulationEnabled ? 'planner' : activeTab
+
+  /*
    * Talents now reach the stat rail, the gear rankings and the upgrade finder, not the hidden
    * simulator alone. An empty tree is the identity, so an untalented character reads exactly as it
    * did before — which is the invariant that made widening this safe to do at all.
@@ -192,7 +206,7 @@ function App() {
   // information you want visible while gearing rather than something to press a button for.
   const statWeights = useMemo(
     () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints),
-    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
+    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
   )
 
   function updateGear(slot: GearSlot, equippedSlot: EquippedSlot) {
@@ -264,7 +278,7 @@ function App() {
 
   // Creation runs before the planner rather than inside it: the whole tab is about a character, so
   // there is nothing worth showing until there is one. Reachable again from the rail's "Start over".
-  if (activeTab === 'planner' && !characterChosen) {
+  if (currentTab === 'planner' && !characterChosen) {
     return (
       <CharacterCreator
         initial={character}
@@ -282,22 +296,22 @@ function App() {
       // Stats belong to a character, and only the planner has one in play. A rail of numbers next to
       // a raid's loot table would be describing something that is not on screen.
       rail={
-        activeTab === 'planner' ? (
+        currentTab === 'planner' ? (
           <>
             <CharacterRail character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
             <StatsRail stats={stats} role={role} className={character.className} spec={character.spec} />
           </>
-        ) : activeTab === 'raids' && selectedRaidId ? (
+        ) : currentTab === 'raids' && selectedRaidId ? (
           // Same argument as the planner's stat rail: the rail holds the thing you keep returning to
           // while reading the main pane. Here that is the list of other raids.
           <RaidRail selectedRaidId={selectedRaidId} onSelect={setSelectedRaidId} onBackToPicker={() => setSelectedRaidId(undefined)} />
         ) : undefined
       }
       tabs={visibleTabs(simulationEnabled)}
-      activeTab={activeTab}
+      activeTab={currentTab}
       onTabChange={setActiveTab}
     >
-      {activeTab === 'planner' && (
+      {currentTab === 'planner' && (
         <>
           {/* The character selects live in the rail now — see CharacterRail. This tab is what you
               are doing, not who you are. */}
@@ -325,7 +339,7 @@ function App() {
           {plannerView === 'build' && <BuildPanel state={buildState} role={role} onImport={importBuild} />}
         </>
       )}
-      {activeTab === 'simulation' && simulationEnabled && (
+      {currentTab === 'simulation' && simulationEnabled && (
         <>
           <EncounterPanel target={target} role={role} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
@@ -336,11 +350,11 @@ function App() {
       {/* The character is passed only once it has been chosen deliberately. Marking the default Fury
           Warrior on the lists for someone who never picked it would answer "where do I stand" with a
           spec they never named. */}
-      {activeTab === 'raidcomp' && <RaidCompositionPanel />}
-      {activeTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
-      {activeTab === 'raids' &&
+      {currentTab === 'raidcomp' && <RaidCompositionPanel />}
+      {currentTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
+      {currentTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
-      {activeTab === 'professions' && <ProfessionsPanel />}
+      {currentTab === 'professions' && <ProfessionsPanel />}
     </AppShell>
   )
 }

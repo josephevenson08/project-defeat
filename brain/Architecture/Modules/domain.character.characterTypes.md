@@ -53,6 +53,7 @@ _None._
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 - [[domain.tierlists.tierListTypes]] — `src/domain/tierlists/tierListTypes.ts`
+- [[featureFlags]] — `src/featureFlags.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`

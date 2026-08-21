@@ -16,7 +16,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 42 importers
+- [[domain.character.characterTypes]] — 43 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 16 importers
@@ -128,7 +128,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
-- [[domain.character.characterTypes]] · 42 importers
+- [[domain.character.characterTypes]] · 43 importers
 - [[domain.character.classColors]] · 1 importers
 - [[domain.character.races]] · 3 importers
 - [[domain.character.racialTypes]] · 2 importers

@@ -371,10 +371,15 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
-  // Simulation is deliberately NOT offered: the tab is hidden while its estimates are known to be
-  // wrong (src/featureFlags.ts). Asserted as absent rather than simply dropped, so that un-hiding it
-  // is a decision someone makes on purpose rather than something that drifts back in.
-  await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toHaveCount(0)
+  /*
+   * Simulation **is** offered here, and this assertion flipped on 2026-08-21 rather than being
+   * dropped. The default character is a Fury Warrior, and the tab is now shown to DPS specs and
+   * hidden from Healer and Tank ones — see `SIMULATION_ROLES` in src/featureFlags.ts.
+   *
+   * It stays asserted in both directions for the same reason it was asserted as absent before: the
+   * rule should change because someone decided to change it, not because it drifted.
+   */
+  await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toHaveCount(1)
 
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
   await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
@@ -5786,4 +5791,55 @@ test('no talent is refused for a reason the code no longer has', async () => {
   // Health and Mana are the honest remaining stat-shaped gap: `StatBlock` has no field for either.
   const remaining = rawTalentEffects.skipped.filter((entry) => /Health|Mana/i.test(entry.reason))
   expect(remaining.length, 'the stat-shaped refusals that are left are the Health and Mana ones').toBeGreaterThan(0)
+})
+
+import { isSimulationEnabled } from '../src/featureFlags'
+
+test('the Simulation tab is offered to DPS specs and to nobody else', async () => {
+  /*
+   * The repo owner's call on 2026-08-21: the estimate answers "how much damage does this build do",
+   * which is a question only a damage spec is asking. The healer and tank paths are still computed
+   * and still tested — the math did not go anywhere — but neither is put on screen as a headline.
+   *
+   * Asserted over every spec rather than over a couple of examples, because the rule is about the
+   * role and there are four of them.
+   */
+  const offered: string[] = []
+  const withheld: string[] = []
+
+  for (const classOption of tbcClasses) {
+    for (const spec of classOption.specs) {
+      const role = getRoleForSpec(classOption.className, spec)
+      const label = `${classOption.className} ${spec} (${role})`
+      // No query string: this is what a visitor to the deployed site gets.
+      if (isSimulationEnabled(role, '')) offered.push(label)
+      else withheld.push(label)
+    }
+  }
+
+  const wrongOffers = offered.filter((label) => label.includes('(Healer)') || label.includes('(Tank)'))
+  expect(wrongOffers, 'a healer or tank must never be offered the Simulation tab').toEqual([])
+
+  const wrongWithholds = withheld.filter((label) => label.includes('DPS'))
+  expect(wrongWithholds, 'every DPS spec is offered it').toEqual([])
+
+  // Both sides are non-empty, or one of the two assertions above would hold vacuously.
+  expect(offered.length, 'the 20 DPS specs').toBe(20)
+  expect(withheld.length, 'the 5 healer and 2 tank specs').toBe(7)
+})
+
+test('the simulation URL override is an escape hatch, not a second product decision', async () => {
+  /*
+   * `?simulation=1` still forces the tab on for any role, which is how the browser tests here reach
+   * the healer and tank math. It is deliberately not role-aware — if it became so, those tests would
+   * start silently exercising nothing.
+   */
+  expect(isSimulationEnabled('Healer', '')).toBe(false)
+  expect(isSimulationEnabled('Tank', '')).toBe(false)
+  expect(isSimulationEnabled('Healer', '?simulation=1')).toBe(true)
+  expect(isSimulationEnabled('Tank', '?simulation=1')).toBe(true)
+
+  // And a DPS spec does not need it.
+  expect(isSimulationEnabled('Physical DPS', '')).toBe(true)
+  expect(isSimulationEnabled('Caster DPS', '')).toBe(true)
 })

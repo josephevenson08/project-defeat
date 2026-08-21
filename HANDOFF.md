@@ -5,6 +5,39 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-21, later)
+
+**This project is for DPS.** The repo owner's call: healers and tanks are out of scope. The math for
+both still exists, still runs and is still tested — nothing was deleted — but neither is somewhere to
+spend effort, and neither is put on screen as a headline number.
+
+**Decision 1 is therefore taken too, and taken per role rather than globally.** The Simulation tab is
+**shown for the 20 DPS specs and hidden for the 5 Healer and 2 Tank specs**. The old argument for
+hiding it outright — a caveat under a confident-looking number is not enough, because people read the
+number and skip the caveat — is unchanged; what changed is that a DPS spec is the audience the
+estimate was built for. `?simulation=1` still forces it on for any role, and is now explicitly an
+escape hatch for development and for the browser tests that exercise the healer and tank math, not a
+second product decision.
+
+The tab is **derived, not corrected**: `currentTab` falls back to the planner when the active tab is
+one the bar no longer offers, instead of an effect writing state back. That path is a guard rather
+than one a player can walk — the character selects live on the planner's rail and the Simulation tab
+has no rail, so the spec cannot change while that tab is on screen — and the comment says so rather
+than implying otherwise.
+
+**Two follow-ups from the talent pass are dropped by this rule**, and are recorded as dropped rather
+than pending: the healing half of Spiritual Guidance and Lunar Guidance, and any tank mitigation work.
+What is still worth doing on the talent side is DPS-only — Hunter's Combat Experience, Warlock's Fel
+Stamina, and Heart of the Wild's Intellect half for Balance.
+
+**A bug this introduced and the linter caught:** the stat-weights `useMemo` read `talentPoints`
+without depending on it, so spending points would have left the stat priority showing the untalented
+ordering until something else moved. Worth noting because `react-hooks/exhaustive-deps` is a warning
+rather than an error here — it was only visible because the same run flagged a `setState` in an
+effect as an error and made someone read the output.
+
+---
+
 ## Start here (2026-08-21)
 
 **Decision 2 is taken: talents reach `calculateStats`.** Spending points now moves the always-visible
@@ -1373,10 +1406,10 @@ Strength were the named list it gated; all three now apply, and a talented tank 
 for that reason. What remains refused for a stat reason is narrower and honest: Health and Mana have
 no `StatBlock` field.
 
-1. **Unhide the Simulation tab?** `src/featureFlags.ts` states what is actually true now and says
-   outright that the decision has not been revisited. The argument has changed: the tab discloses
-   its own limits honestly *per spec*, and talents reach 11 specs. The remaining argument against is
-   that **25 of 27 specs are single-ability approximations**. Nothing blocks a flip either way.
+1. ~~**Unhide the Simulation tab?**~~ **Taken 2026-08-21, per role.** Shown for the 20 DPS specs,
+   hidden for the 5 Healer and 2 Tank ones, because this project is for DPS. `?simulation=1` remains
+   an escape hatch for development and tests. **25 of 27 specs are still single-ability
+   approximations**, which is now the top of the queue rather than a reason to hide the tab.
 2. ~~**Should talents reach `calculateStats`?**~~ **Taken 2026-08-21 — yes.** They now move the
    always-visible stat rail, gear rankings, stat weights and the upgrade finder. "An empty tree
    reproduces today's numbers exactly" is a hard invariant, asserted across all 27 specs.
