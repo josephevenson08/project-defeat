@@ -23,7 +23,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 
 ## Best in slot
 
-- **Phase 2** — 58 ranked entries across 15 slots · source: Enhancement Shaman DPS Best in Slot (BiS) Phase 2 Gear Guide
+- **Phase 2** — 57 ranked entries across 15 slots · source: Enhancement Shaman DPS Best in Slot (BiS) Phase 2 Gear Guide
 
 
 

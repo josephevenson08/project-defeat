@@ -25,6 +25,59 @@ const UPSTREAM_SHA = '3301fca59306a747e521274c36e073e69acc7b77'
 const UPSTREAM_URL = `https://raw.githubusercontent.com/wowsims/tbc/${UPSTREAM_SHA}/sim/core/items/all_items.go`
 
 const CACHE_PATH = resolve(HERE, `.cache/all_items.${UPSTREAM_SHA.slice(0, 8)}.go`)
+/** The tooltip dump, shared with `ingest-icons.mjs`. Read here to cross-check hand types. */
+const TOOLTIP_URL = `https://raw.githubusercontent.com/wowsims/tbc/${UPSTREAM_SHA}/assets/item_data/all_item_tooltips.csv`
+const TOOLTIP_CACHE_PATH = resolve(HERE, `.cache/all_item_tooltips.${UPSTREAM_SHA.slice(0, 8)}.csv`)
+
+/**
+ * The inventory slot a weapon's own tooltip states, keyed by item id.
+ *
+ * **Upstream's `HandType` disagrees with the tooltip for eight weapons**, and the disagreement is not
+ * cosmetic: `isOffHandEligible` lets a one-hander into the off hand, so a weapon wrongly typed
+ * `OneHand` can be dual-wielded when the game does not allow it. All eight are the Outland crafted
+ * upgrade chains — Planar Edge to Wicked Edge of the Planes, Drakefist Hammer to Dragonstrike — which
+ * are Main Hand only.
+ *
+ * Cross-checked rather than trusted in one direction: 706 weapons are compared and 698 already agree,
+ * which is what makes correcting the remaining eight a repair rather than a guess.
+ */
+async function loadTooltipWeaponSlots() {
+  let csv
+  if (existsSync(TOOLTIP_CACHE_PATH)) {
+    csv = readFileSync(TOOLTIP_CACHE_PATH, 'utf8')
+  } else {
+    const res = await fetch(TOOLTIP_URL)
+    if (!res.ok) throw new Error(`${TOOLTIP_URL} -> HTTP ${res.status}`)
+    csv = await res.text()
+    mkdirSync(dirname(TOOLTIP_CACHE_PATH), { recursive: true })
+    writeFileSync(TOOLTIP_CACHE_PATH, csv)
+  }
+
+  const slots = new Map()
+  for (const line of csv.split('\n')) {
+    const comma = line.indexOf(',')
+    if (comma <= 0) continue
+    const id = Number(line.slice(0, comma))
+    if (!Number.isInteger(id)) continue
+    const slot = line.match(/<td>(One-Hand|Main Hand|Off Hand|Two-Hand|Held In Off-hand)<\/td>/)?.[1]
+    if (slot) slots.set(id, slot)
+  }
+  if (slots.size === 0) throw new Error('no weapon slots parsed — the tooltip format may have moved')
+  return slots
+}
+
+/**
+ * What each tooltip slot means as a `handType`. `Held In Off-hand` and `Off Hand` are two names for
+ * the same restriction — shields and tomes respectively — so both map to `Off Hand` rather than one
+ * of them counting as a mismatch.
+ */
+const HAND_TYPE_BY_TOOLTIP_SLOT = {
+  'One-Hand': 'One Hand',
+  'Main Hand': 'Main Hand',
+  'Off Hand': 'Off Hand',
+  'Held In Off-hand': 'Off Hand',
+  'Two-Hand': 'Two Hand',
+}
 const OUT_PATH = resolve(REPO, 'src/domain/gear/itemCatalogue.json')
 
 // ---------------------------------------------------------------------------
@@ -289,6 +342,8 @@ async function loadSource() {
 }
 
 const source = await loadSource()
+const tooltipWeaponSlots = await loadTooltipWeaponSlots()
+const handTypeCorrections = []
 const unmappedTally = new Map()
 const items = []
 const skipped = []
@@ -303,6 +358,18 @@ for (const line of source.split('\n')) {
     skipped.push(parsed.skipped)
     continue
   }
+  /*
+   * The tooltip wins where the two disagree, and every correction is reported. Only weapons are
+   * checked, and only when the tooltip actually states a slot — an item the dump does not cover is
+   * left exactly as upstream had it rather than being guessed at.
+   */
+  const tooltipSlot = tooltipWeaponSlots.get(parsed.item.wowItemId)
+  const expected = tooltipSlot ? HAND_TYPE_BY_TOOLTIP_SLOT[tooltipSlot] : undefined
+  if (parsed.item.handType && expected && parsed.item.handType !== expected) {
+    handTypeCorrections.push(`${parsed.item.name} (${parsed.item.wowItemId}): ${parsed.item.handType} -> ${expected}`)
+    parsed.item.handType = expected
+  }
+
   items.push(parsed.item)
   if (parsed.setName) setNames.set(slugify(parsed.setName), parsed.setName)
 }
@@ -336,6 +403,11 @@ if (changed) writeFileSync(OUT_PATH, json)
 // ---------------------------------------------------------------------------
 // Report
 // ---------------------------------------------------------------------------
+
+if (handTypeCorrections.length > 0) {
+  console.log(`\nhand type corrected from the tooltip for ${handTypeCorrections.length} weapon(s):`)
+  for (const correction of handTypeCorrections) console.log(`  ${correction}`)
+}
 
 const bySlot = {}
 for (const item of items) bySlot[item.slot] = (bySlot[item.slot] ?? 0) + 1

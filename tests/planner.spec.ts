@@ -2675,6 +2675,14 @@ test('the paperdoll renders real item icons rather than the placeholder glyphs',
   expect(await fallbacks.count(), 'only genuinely empty slots may fall back to a glyph').toBe(emptySlots)
 
   // Present in the DOM is not the same as loaded. A wrong path 404s and still renders an <img>.
+  /*
+   * Gear arrives mid-test now rather than at mount, so the icons begin loading the moment the import
+   * lands and this assertion would otherwise race them. Waiting for every image to report complete is
+   * what separates "the file is missing" from "the file had not arrived yet" — the suite reported
+   * twelve perfectly valid icons as broken before this, and only when run alongside everything else.
+   */
+  await expect.poll(async () => icons.evaluateAll((nodes) => nodes.every((n) => (n as HTMLImageElement).complete))).toBe(true)
+
   // Reports the filenames rather than a count: a bare  tells you an icon is missing and
   // leaves you to find out which of nineteen it was.
   const broken = await icons.evaluateAll((nodes) =>
@@ -5886,4 +5894,48 @@ test('the simulation URL override is an escape hatch, not a second product decis
   // And a DPS spec does not need it.
   expect(isSimulationEnabled('Physical DPS', '')).toBe(true)
   expect(isSimulationEnabled('Caster DPS', '')).toBe(true)
+})
+
+test('a Main Hand weapon is never offered to the off hand, whatever upstream typed it as', async () => {
+  /*
+   * Reported from the app: two copies of Dragonstrike could be equipped at once. The reason was not
+   * the one it looked like — Dragonstrike is **not** Unique-Equipped, its tooltip says so — but that
+   * wowsims types it `HandTypeOneHand` while the game makes it **Main Hand only**. `isOffHandEligible`
+   * lets any one-hander into the off hand, so the wrong type is enough to allow the pairing.
+   *
+   * Eight weapons disagreed, and they are exactly the two Outland crafted upgrade chains plus two
+   * dungeon maces. The ingest cross-checks all 706 catalogued weapons against their own tooltips and
+   * corrects only where they disagree, which is what makes this a repair rather than a guess.
+   */
+  const mainHandOnly = [
+    [28431, 'The Planar Edge'],
+    [28432, 'Black Planar Edge'],
+    [28433, 'Wicked Edge of the Planes'],
+    [28437, 'Drakefist Hammer'],
+    [28438, 'Dragonmaw'],
+    [28439, 'Dragonstrike'],
+    [28657, "Fool's Bane"],
+    [28767, 'The Decapitator'],
+  ] as const
+
+  for (const [wowItemId, name] of mainHandOnly) {
+    const item = getItemByWowItemId(wowItemId)
+    expect(item, `${name} is in the catalogue`).toBeDefined()
+    expect(item!.name).toBe(name)
+    expect(item!.handType, `${name} is Main Hand only`).toBe('Main Hand')
+    expect(isItemCompatibleWithGearSlot(item!, 'Off Hand'), `${name} must not be dual-wieldable`).toBe(false)
+    expect(isItemCompatibleWithGearSlot(item!, 'Main Hand'), `${name} still belongs in the main hand`).toBe(true)
+  }
+
+  /*
+   * And the falsification: a genuine one-hander must still reach the off hand. Without this the
+   * assertions above would pass just as happily if `isOffHandEligible` had been broken outright, and
+   * every dual-wielding spec would quietly have lost its second weapon.
+   */
+  const oneHanders = getItemsForSlot('Main Hand').filter((item) => item.handType === 'One Hand')
+  expect(oneHanders.length, 'the catalogue still holds real one-handers').toBeGreaterThan(100)
+  expect(
+    oneHanders.every((item) => isItemCompatibleWithGearSlot(item, 'Off Hand')),
+    'every true one-hander is still dual-wieldable',
+  ).toBe(true)
 })

@@ -26200,7 +26200,7 @@
         "rangedAttackPower": 42
       },
       "weaponType": "Axe",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 159,
       "weaponDamageMax": 296
@@ -26219,7 +26219,7 @@
         "rangedAttackPower": 44
       },
       "weaponType": "Axe",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 172,
       "weaponDamageMax": 320
@@ -26238,7 +26238,7 @@
         "rangedAttackPower": 48
       },
       "weaponType": "Axe",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 184,
       "weaponDamageMax": 343
@@ -26313,7 +26313,7 @@
       "phase": 1,
       "stats": {},
       "weaponType": "Mace",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 159,
       "weaponDamageMax": 296
@@ -26330,7 +26330,7 @@
         "stamina": 9
       },
       "weaponType": "Mace",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 172,
       "weaponDamageMax": 320
@@ -26347,7 +26347,7 @@
         "stamina": 19
       },
       "weaponType": "Mace",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.7,
       "weaponDamageMin": 184,
       "weaponDamageMax": 343
@@ -29008,7 +29008,7 @@
         "rangedAttackPower": 30
       },
       "weaponType": "Mace",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.6,
       "weaponDamageMin": 159,
       "weaponDamageMax": 296,
@@ -31146,7 +31146,7 @@
         "critRating": 27
       },
       "weaponType": "Axe",
-      "handType": "One Hand",
+      "handType": "Main Hand",
       "weaponSpeed": 2.6,
       "weaponDamageMin": 167,
       "weaponDamageMax": 312
