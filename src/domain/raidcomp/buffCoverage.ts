@@ -5,8 +5,8 @@ import { applyExclusivity, exclusiveGroupFor } from '../buffs/buffExclusivity'
 import type { ExclusiveGroup } from '../buffs/buffExclusivity'
 import { sampleBuffs } from '../buffs/sampleBuffs'
 import { sampleTargetDebuffs } from '../buffs/sampleTargetDebuffs'
-import type { CharacterRole, TbcClass, TbcSpec } from '../character/characterTypes'
-import { getRoleForSpec, tbcClasses } from '../character/tbcClasses'
+import type { CharacterRole } from '../character/characterTypes'
+import { getRoleForSpec } from '../character/tbcClasses'
 import { getRaidBuild } from './raidBuilds'
 import { filledSlots } from './rosterTypes'
 import type { RaidGroup, Roster, RosterSlot } from './rosterTypes'
@@ -75,13 +75,6 @@ export type GroupCoverage = {
   missingPartyBuffs: readonly Buff[]
 }
 
-export type Suggestion = {
-  className: TbcClass
-  specs: readonly TbcSpec[]
-  anySpec: boolean
-  wouldAdd: readonly string[]
-}
-
 export type CoverageReport = {
   filled: number
   size: number
@@ -99,7 +92,6 @@ export type CoverageReport = {
    */
   partyScoped: CoverageSection<Buff>
   groups: readonly GroupCoverage[]
-  suggestions: readonly Suggestion[]
 }
 
 /**
@@ -169,67 +161,7 @@ function sectionFor<T extends BuffProvider & { id: string }>(
   return { covered, missing }
 }
 
-function suggestionsFor(missingProviders: readonly BuffProvider[], names: readonly string[]): Suggestion[] {
-  const suggestions: Suggestion[] = []
 
-  for (const definition of tbcClasses) {
-    /*
-     * Specs of a class are grouped by the exact set they would add, because listing them separately
-     * is noise dressed as choice. An empty roster otherwise opens with three consecutive Paladin
-     * rows each claiming the identical blessings, which tells a raid leader nothing except that they
-     * need *a* Paladin. Grouping only collapses rows that are genuinely identical.
-     */
-    const byAddedSet = new Map<string, { specs: TbcSpec[]; wouldAdd: string[] }>()
-
-    for (const spec of definition.specs) {
-      const slot: RosterSlot = { className: definition.className, spec }
-      /*
-       * Spec-specific entries first. The three Shaman specs each add the same class totems plus one
-       * thing only they bring — Totem of Wrath, Unleashed Rage, Mana Tide — and the panel truncates,
-       * so in data order all three rendered an identical prefix and looked like a duplication bug
-       * while actually describing three different recruitment problems.
-       */
-      const wouldAdd = missingProviders
-        .map((provider, index) =>
-          slotProvides(slot, provider) ? { name: names[index], specific: provider.providedBySpec !== undefined } : undefined,
-        )
-        .filter((hit): hit is { name: string; specific: boolean } => hit !== undefined)
-        .sort((a, b) => Number(b.specific) - Number(a.specific))
-        .map((hit) => hit.name)
-
-      if (wouldAdd.length === 0) continue
-
-      const key = wouldAdd.join(' ')
-      const group = byAddedSet.get(key)
-      if (group) group.specs.push(spec)
-      else byAddedSet.set(key, { specs: [spec], wouldAdd })
-    }
-
-    for (const { specs, wouldAdd } of byAddedSet.values()) {
-      suggestions.push({
-        className: definition.className,
-        specs,
-        anySpec: specs.length === definition.specs.length,
-        wouldAdd,
-      })
-    }
-  }
-
-  return suggestions.sort(
-    (a, b) =>
-      b.wouldAdd.length - a.wouldAdd.length ||
-      a.className.localeCompare(b.className) ||
-      a.specs[0].localeCompare(b.specs[0]),
-  )
-}
-
-/** "Any Paladin", "Elemental Shaman", "Feral or Restoration Druid" — the label the panel shows. */
-export function describeSuggestion(suggestion: Suggestion): string {
-  if (suggestion.anySpec) return `Any ${suggestion.className}`
-  const specs = [...suggestion.specs].sort()
-  const joined = specs.length === 1 ? specs[0] : `${specs.slice(0, -1).join(', ')} or ${specs[specs.length - 1]}`
-  return `${joined} ${suggestion.className}`
-}
 
 const PARTY_BUFFS = sampleBuffs.filter((buff) => isPartyScoped(buff.id))
 const RAID_WIDE_BUFFS = sampleBuffs.filter((buff) => !isPartyScoped(buff.id))
@@ -297,12 +229,6 @@ export function computeCoverage(roster: Roster): CoverageReport {
   const partyScoped = sectionFor(PARTY_BUFFS, slots)
   const debuffs = sectionFor(sampleTargetDebuffs, slots)
 
-  const missingProviders = [
-    ...raidWide.missing.map((entry) => entry.entry),
-    ...partyScoped.missing.map((entry) => entry.entry),
-    ...debuffs.missing.map((entry) => entry.entry),
-  ]
-
   return {
     filled: slots.length,
     size: roster.size,
@@ -312,7 +238,6 @@ export function computeCoverage(roster: Roster): CoverageReport {
     partyScoped,
     debuffs,
     groups: roster.groups.map(coverageForGroup),
-    suggestions: suggestionsFor(missingProviders, missingProviders.map((entry) => entry.name)),
   }
 }
 

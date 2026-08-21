@@ -81,16 +81,6 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
         <span className="gear-glyph" aria-hidden="true">
           <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
           {equipped.item.itemLevel ? <span className="gear-ilvl">{equipped.item.itemLevel}</span> : null}
-          {equipped.item.sockets?.length ? (
-            <span className="gear-gems">
-              {equipped.item.sockets.map((socket, index) => (
-                <i
-                  key={`${slot}-${socket}-${index}`}
-                  className={`socket-dot socket-${socket.toLowerCase()} ${equipped.gemIds[index] ? 'socket-filled' : ''}`.trim()}
-                />
-              ))}
-            </span>
-          ) : null}
         </span>
 
         <span className="gear-cell-text">
@@ -99,6 +89,22 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
             {equipped.item.name}
           </span>
           {enchant ? <span className="gear-enchant">{enchant.name}</span> : <span className="gear-enchant gear-enchant-empty">No enchant</span>}
+          {/*
+            Sockets sit under the name rather than on top of the icon. They used to be 7px dots
+            overlaying the artwork, where they competed with it and were too small to read a colour
+            from — which is the whole job of a socket dot. Off the icon they can be twice the size
+            and still cost less attention.
+          */}
+          {equipped.item.sockets?.length ? (
+            <span className="gear-gems" aria-hidden="true">
+              {equipped.item.sockets.map((socket, index) => (
+                <i
+                  key={`${slot}-${socket}-${index}`}
+                  className={`socket-dot socket-${socket.toLowerCase()} ${equipped.gemIds[index] ? 'socket-filled' : ''}`.trim()}
+                />
+              ))}
+            </span>
+          ) : null}
           {!isValid && <span className="stale-slot-warning">Not valid for this spec</span>}
         </span>
       </button>

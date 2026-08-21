@@ -37,7 +37,6 @@ import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import {
   addToGroup,
   computeCoverage,
-  describeSuggestion,
   emptyRoster,
   filledSlots,
   getBuffIcon,
@@ -4866,32 +4865,6 @@ test('a missing buff names who would bring it, at the right specificity', () => 
   expect(needFor('Strength of Earth Totem'), 'class-wide reads "any"').toBe('any Shaman')
   expect(needFor('Totem of Wrath'), 'spec-specific names the spec').toBe('an Elemental Shaman')
   expect(needFor('Mana Tide Totem')).toBe('a Restoration Shaman')
-
-  /*
-   * The three Shaman specs stay distinguishable by what only they bring, sorted first so the panel's
-   * truncation cannot hide the difference.
-   */
-  const shamanSuggestions = report.suggestions.filter((entry) => entry.className === 'Shaman')
-  expect(shamanSuggestions).toHaveLength(3)
-  expect(shamanSuggestions.map((entry) => entry.wouldAdd[0]).sort()).toEqual([
-    'Mana Tide Totem',
-    'Totem of Wrath',
-    'Unleashed Rage',
-  ])
-})
-
-test('interchangeable specs collapse into one suggestion', () => {
-  /*
-   * All nine Paladin buffs are class-wide, so its three specs add an identical set. Listed separately
-   * that is three rows saying one thing. Shaman must NOT collapse, or the distinction above is gone.
-   */
-  const report = computeCoverage(emptyRoster(25))
-  const paladin = report.suggestions.filter((entry) => entry.className === 'Paladin')
-
-  expect(paladin, 'one row, not three').toHaveLength(1)
-  expect(paladin[0].anySpec).toBe(true)
-  expect(describeSuggestion(paladin[0])).toBe('Any Paladin')
-  expect(report.suggestions.filter((entry) => entry.className === 'Shaman').length).toBeGreaterThan(1)
 })
 
 test('resizing a roster keeps the groups that fit', () => {

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/buffCoverage.ts
-lines: 320
+lines: 245
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.buffCoverage
 
-`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 320 lines
+`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 245 lines
 
 From the top of the file:
 
@@ -21,9 +21,9 @@ From the top of the file:
 
 ## Exports
 
-**function** — `computeCoverage`, `describeSuggestion`, `seatContributions`, `slotProvides`
+**function** — `computeCoverage`, `seatContributions`, `slotProvides`
 
-**type** — `CoverageReport`, `CoverageSection`, `CoveredEntry`, `GroupCoverage`, `MissingEntry`, `SeatContributions`, `Suggestion`
+**type** — `CoverageReport`, `CoverageSection`, `CoveredEntry`, `GroupCoverage`, `MissingEntry`, `SeatContributions`
 
 ## Imports
 

@@ -8,7 +8,6 @@ import {
   addToGroup,
   clearSeat,
   computeCoverage,
-  describeSuggestion,
   emptyRoster,
   getBuffIcon,
   getRaidBuild,
@@ -508,22 +507,6 @@ export function RaidCompositionPanel() {
         <BuffChecklist section={report.debuffs} label="Debuffs" />
       </div>
 
-      {report.suggestions.length > 0 && (
-        <section className="raidcomp-suggestions" aria-label="What to add next">
-          <h3>What one more seat would buy you</h3>
-          <ul>
-            {report.suggestions.slice(0, 5).map((suggestion) => (
-              <li key={`${suggestion.className}-${suggestion.specs.join('-')}`}>
-                <span className="raidcomp-entry-name">{describeSuggestion(suggestion)}</span>
-                <span className="raidcomp-entry-source">
-                  +{suggestion.wouldAdd.length} — {suggestion.wouldAdd.slice(0, 4).join(', ')}
-                  {suggestion.wouldAdd.length > 4 ? ` and ${suggestion.wouldAdd.length - 4} more` : ''}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
     </div>
   )
 }

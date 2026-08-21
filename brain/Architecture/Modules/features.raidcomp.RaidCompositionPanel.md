@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/RaidCompositionPanel.tsx
-lines: 530
+lines: 513
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.RaidCompositionPanel
 
-`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 530 lines
+`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 513 lines
 
 _No doc comment at the top of this file._
 
