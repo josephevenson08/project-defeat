@@ -167,7 +167,9 @@ export function applyWeaponSlotRules(gear: EquippedGear): EquippedGear {
  */
 function isKeepable(item: GearItem, className: TbcClass, spec: TbcSpec): boolean {
   if (!isItemAllowedForCharacter(item, className, spec)) return false
-  return item.id === EMPTY_OFF_HAND.id || isWithinDefaultPhase(item)
+  // Any empty placeholder is exempt, not just the off hand's: a newly created character starts with
+  // every slot empty, and a placeholder has no phase to be within.
+  return isEmptySlotItem(item) || isWithinDefaultPhase(item)
 }
 
 export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClass, spec: TbcSpec): EquippedGear {
@@ -210,8 +212,14 @@ export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClas
    * has to fill it again — otherwise the placeholder survives `isItemAllowedForCharacter`, which has
    * no restrictions to fail, and the slot stays empty forever. That cost a Protection Warrior its
    * shield, and with it every block calculation in Effective Health.
+   *
+   * **Gated on the main hand holding something**, which is what makes it a *restore* rather than a
+   * fabrication. A newly created character has both hands empty, and without this gate the rule read
+   * that as "switched out of a two-hander" and handed them an off-hand weapon they never picked —
+   * the only item on an otherwise bare paperdoll, quietly worth 52 attack power and 20 expertise on
+   * the stat rail.
    */
-  if (isEmptySlotItem(normalized['Off Hand']?.item)) {
+  if (isEmptySlotItem(normalized['Off Hand']?.item) && !isEmptySlotItem(normalized['Main Hand']?.item)) {
     const options = getItemsForSlotAndCharacter('Off Hand', className, spec).filter((item) => !usedUniqueIds.has(item.id))
     const fallback = getDefaultItemForSlot('Off Hand', options)
     if (fallback) {

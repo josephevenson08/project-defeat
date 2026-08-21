@@ -4,7 +4,9 @@ export { allItems as placeholderGear, getItemById, getItemsForSlot } from '../..
 export { applyWeaponSlotRules, getItemsForSlotAndCharacter, isItemAllowedForCharacter, normalizeGearForCharacter } from '../../domain/gear/characterItemRules'
 export { getGearSlotDisplayName, getVisibleGearSlotsForSpec } from '../../domain/gear/slotVisibility'
 export {
+  emptyGear,
   getPairedGearSlots,
+  isEmptySlotItem,
   isItemBlockedByUniqueInGear,
   isItemCompatibleWithGearSlot,
   isPairedGearSlot,

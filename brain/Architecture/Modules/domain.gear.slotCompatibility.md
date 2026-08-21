@@ -2,22 +2,22 @@
 type: module
 layer: domain
 source: src/domain/gear/slotCompatibility.ts
-lines: 98
+lines: 117
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.slotCompatibility
 
-`src/domain/gear/slotCompatibility.ts` · **domain** layer · 98 lines
+`src/domain/gear/slotCompatibility.ts` · **domain** layer · 117 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `getDefaultItemForSlot`, `getPairedGearSlots`, `isEmptySlotItem`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `isUniqueRestricted`, `twoHanderOccupiesOffHand`
+**function** — `emptyItemForSlot`, `getDefaultItemForSlot`, `getPairedGearSlots`, `isEmptySlotItem`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `isUniqueRestricted`, `twoHanderOccupiesOffHand`
 
-**const** — `EMPTY_OFF_HAND`
+**const** — `EMPTY_OFF_HAND`, `emptyGear`
 
 ## Imports
 

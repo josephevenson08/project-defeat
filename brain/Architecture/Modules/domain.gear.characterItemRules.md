@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/characterItemRules.ts
-lines: 224
+lines: 232
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.characterItemRules
 
-`src/domain/gear/characterItemRules.ts` · **domain** layer · 224 lines
+`src/domain/gear/characterItemRules.ts` · **domain** layer · 232 lines
 
 _No doc comment at the top of this file._
 

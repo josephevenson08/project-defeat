@@ -1,4 +1,4 @@
-import type { GearSlot } from './gearSlots'
+import { gearSlots, type GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem } from './itemTypes'
 
 const fingerSlots = ['Finger 1', 'Finger 2'] as const satisfies readonly GearSlot[]
@@ -42,17 +42,36 @@ export function isItemCompatibleWithGearSlot(item: GearItem, gearSlot: GearSlot)
  * It is a model construct rather than game data, hence a `Common` "Empty" with an obvious id — it
  * should never be mistaken for a catalogue item.
  */
-export const EMPTY_OFF_HAND: GearItem = {
-  id: 'empty-off-hand',
-  name: 'Empty',
-  slot: 'Off Hand',
-  quality: 'Common',
-  stats: {},
+export function emptyItemForSlot(slot: GearSlot): GearItem {
+  return { id: `empty-slot:${slot}`, name: 'Empty', slot, quality: 'Common', stats: {} }
 }
 
+/**
+ * Every empty placeholder, by id.
+ *
+ * Membership rather than an `id.startsWith('empty-')` test, and that is not fussiness: the catalogue
+ * holds **Empty Mug of Direbrew**, a real trinket whose id is `empty-mug-of-direbrew`. A prefix check
+ * would have read it as an unfilled slot and thrown its stats away.
+ */
+const EMPTY_SLOT_IDS: ReadonlySet<string> = new Set(gearSlots.map((slot) => emptyItemForSlot(slot).id))
+
+export const EMPTY_OFF_HAND: GearItem = emptyItemForSlot('Off Hand')
+
 export function isEmptySlotItem(item: GearItem | undefined) {
-  return item?.id === EMPTY_OFF_HAND.id
+  return item !== undefined && EMPTY_SLOT_IDS.has(item.id)
 }
+
+/**
+ * A paperdoll with nothing on it, which is where a newly created character starts.
+ *
+ * The app used to open holding the highest-item-level legal piece in every slot. That is a strange
+ * thing to hand someone who has just picked a race: it looks like their character, it is not, and
+ * every stat on the rail is describing gear they never chose.
+ */
+export const emptyGear: EquippedGear = gearSlots.reduce((gear, slot) => {
+  gear[slot] = { item: emptyItemForSlot(slot), gemIds: [] }
+  return gear
+}, {} as EquippedGear)
 
 /**
  * A two-handed weapon occupies both hands, so nothing may sit in the off hand alongside it.

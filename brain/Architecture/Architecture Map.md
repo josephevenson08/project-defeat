@@ -60,7 +60,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.bis.BisPanel]] · 1 importers
 - [[features.buffs.BuffsPanel]] · 1 importers
 - [[features.builds.BuildPanel]] · 1 importers
-- [[features.builds.buildStorage]] · 2 importers
+- [[features.builds.buildStorage]] · 1 importers
 - [[features.character.CharacterCreator]] · 1 importers
 - [[features.character.characterData]] · 5 importers
 - [[features.character.CharacterRail]] · 1 importers

@@ -2,20 +2,20 @@
 type: module
 layer: features
 source: src/features/gear/gearData.ts
-lines: 12
+lines: 14
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.gearData
 
-`src/features/gear/gearData.ts` · **features** layer · 12 lines
+`src/features/gear/gearData.ts` · **features** layer · 14 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `applyWeaponSlotRules`, `defaultGear`, `gearSlots`, `getGearSlotDisplayName`, `getItemById`, `getItemsForSlot`, `getItemsForSlotAndCharacter`, `getPairedGearSlots`, `getVisibleGearSlotsForSpec`, `isItemAllowedForCharacter`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `normalizeGearForCharacter`, `placeholderGear`
+**re-export** — `applyWeaponSlotRules`, `defaultGear`, `emptyGear`, `gearSlots`, `getGearSlotDisplayName`, `getItemById`, `getItemsForSlot`, `getItemsForSlotAndCharacter`, `getPairedGearSlots`, `getVisibleGearSlotsForSpec`, `isEmptySlotItem`, `isItemAllowedForCharacter`, `isItemBlockedByUniqueInGear`, `isItemCompatibleWithGearSlot`, `isPairedGearSlot`, `normalizeGearForCharacter`, `placeholderGear`
 
 ## Imports
 

@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
 import { BisPanel } from './features/bis/BisPanel'
 import { BuildPanel } from './features/builds/BuildPanel'
-import { loadBuildFromStorage, saveBuildToStorage } from './features/builds/buildStorage'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
 import type { SavedBuild } from './domain/builds/buildTypes'
 import { CharacterCreator } from './features/character/CharacterCreator'
@@ -14,7 +13,7 @@ import type { TalentPoints } from './domain/talents/talentTypes'
 import { deriveTalentModifiers } from './domain/talents/talentModifiers'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
-import { applyWeaponSlotRules, defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
+import { applyWeaponSlotRules, defaultGear, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
@@ -113,30 +112,32 @@ function gearFromBuild(build: SavedBuild): EquippedGear {
 }
 
 function App() {
-  // Read storage exactly once, and seed every piece of state from it via lazy initializers. Restoring
-  // in an effect instead would let the first autosave fire against the default state and overwrite
-  // the very build being restored.
-  const [restoredBuild] = useState(loadBuildFromStorage)
-
+  /*
+   * **A load starts clean, deliberately.** The app used to restore the autosaved build at mount, so
+   * it opened as whoever you were last time, already wearing the highest-item-level item in every
+   * slot and holding whatever talents you had spent.
+   *
+   * Three things were wrong with that. Creation is where you say who you are, and skipping it made
+   * the character feel assumed rather than chosen. A full set of gear nobody picked makes every
+   * number on the stat rail describe someone else. And talents carried across a reload without
+   * anyone asking for them.
+   *
+   * Builds still persist — through **named saves and export/import in the Build panel**, which is
+   * explicit. What was removed is the implicit restore, not the ability to keep a build.
+   */
   const [introComplete, setIntroComplete] = useState(false)
   const [sectionChosen, setSectionChosen] = useState(false)
-  /*
-   * Whether the character has been chosen deliberately this session. A restored build counts — being
-   * walked through creation again every time you reload, having already made the choices, would be a
-   * ceremony rather than a journey.
-   */
-  const [characterChosen, setCharacterChosen] = useState(() => Boolean(loadBuildFromStorage()))
+  /** Whether the character has been chosen this session. Always false at mount — creation runs first. */
+  const [characterChosen, setCharacterChosen] = useState(false)
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
   // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
   const [plannerView, setPlannerView] = useState<PlannerView>('gear')
-  const [character, setCharacter] = useState<CharacterProfile>(() => restoredBuild?.character ?? initialCharacter)
-  const [gear, setGear] = useState<EquippedGear>(() =>
-    restoredBuild ? gearFromBuild(restoredBuild) : normalizeGearForCharacter(defaultGear, initialCharacter.className, initialCharacter.spec),
-  )
-  const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>(() => restoredBuild?.activeBuffIds ?? [])
-  const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>(() => restoredBuild?.activeConsumableIds ?? [])
-  const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>(() => restoredBuild?.activeTargetDebuffIds ?? [])
-  const [talentPoints, setTalentPoints] = useState<TalentPoints>(() => restoredBuild?.talentPoints ?? {})
+  const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
+  const [gear, setGear] = useState<EquippedGear>(emptyGear)
+  const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
+  const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>([])
+  const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>([])
+  const [talentPoints, setTalentPoints] = useState<TalentPoints>({})
   /*
    * Which raid's loot is being read. Undefined means the picker: five loot tables stacked on one page
    * is several hundred rows, and nobody arrives wanting all five — they arrive wanting one.
@@ -158,10 +159,6 @@ function App() {
   const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target }
-
-  useEffect(() => {
-    saveBuildToStorage({ character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target })
-  }, [character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target])
 
   function importBuild(build: SavedBuild) {
     setCharacter(build.character)

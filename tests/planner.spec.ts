@@ -122,32 +122,65 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
  * a way in, not the only way to move between sections.
  */
 async function openApp(page: Page, section: 'planner' | 'raidcomp' | 'tierlists' | 'raids' | 'professions' = 'planner') {
-  await page.goto('/')
+  /*
+   * `?simulation=1` is on for every test, which is the escape hatch `featureFlags.ts` describes.
+   *
+   * It is set here, once, rather than by reloading mid-test. The Simulation tab is offered to DPS
+   * specs only, so a test working on a Healer or Tank used to have to reload with the flag to reach
+   * it — and that reload now **resets the character**, because a load starts clean since the autosave
+   * was removed. A test that switched to Holy Priest and then reloaded would have quietly gone back
+   * to simulating a Fury Warrior.
+   *
+   * The role rule itself is asserted directly, both as a pure function over all 27 specs and against
+   * the DOM without this flag, so nothing is lost by having it on here.
+   */
+  await page.goto('/?simulation=1')
   await page.getByTestId(`section-${section}`).click()
 
   // The planner runs character creation first, and every test starts with empty storage so it always
   // appears. The four steps open on the defaults — Alliance, Human, Warrior, Fury — which is the
   // character the suite has always assumed, so this walks through without choosing anything. Tests
   // that want a different character change it afterwards through the rail, exactly as before.
-  if (section === 'planner') {
-    for (let step = 0; step < 3; step++) await page.getByTestId('creator-next').click()
-    await page.getByTestId('creator-confirm').click()
-  }
+  if (section === 'planner') await completeCharacterCreation(page)
+}
+
+/**
+ * Walks the four creation steps on their defaults — Alliance, Human, Warrior, Fury — which is the
+ * character this suite has always assumed.
+ *
+ * Its own function because creation now runs on **every** load, not just the first: a reload no
+ * longer restores an autosaved build, so any test that reloads has to walk it again before the
+ * planner is on screen at all.
+ */
+async function completeCharacterCreation(page: Page) {
+  for (let step = 0; step < 3; step++) await page.getByTestId('creator-next').click()
+  await page.getByTestId('creator-confirm').click()
+}
+
+/**
+ * Fills every slot with the old starting set, for the few tests that need a dressed paperdoll.
+ *
+ * A newly created character now wears nothing, which is the point — but "does the paperdoll draw
+ * real item icons" is a question about items, and it needs some. Driven through import rather than
+ * by clicking nineteen slots.
+ */
+async function equipDefaultGear(page: Page) {
+  await openPlannerView(page, 'Build')
+  const exported = JSON.parse(await page.getByTestId('build-export-output').inputValue())
+  exported.gear = Object.fromEntries(
+    gearSlots.map((slot) => [slot, { itemId: defaultGear[slot].item.id, gemIds: defaultGear[slot].gemIds.map(() => '') }]),
+  )
+  await page.getByTestId('build-import-input').fill(JSON.stringify(exported))
+  await page.getByTestId('build-import-button').click()
+  await openPlannerView(page, 'Gear')
 }
 
 async function openSimulationTab(page: Page) {
-  // The tab is hidden from the app by default while the estimates are known to be wrong (see
-  // src/featureFlags.ts). The math behind it is still worth testing, so these tests opt back in with
-  // the URL override. The reload is safe because the build autosaves — gear and buffs set before
-  // this point come back with it, which is what lets `readSimulationScore` be called mid-test.
-  if ((await page.getByRole('button', { name: 'Simulation', exact: true }).count()) === 0) {
-    const url = new URL(page.url())
-    url.searchParams.set('simulation', '1')
-    await page.goto(url.toString())
-    // The reload drops back to the section picker, so re-enter before looking for the tab.
-    await page.getByTestId('section-planner').click()
-  }
-
+  /*
+   * Just a click now. `openApp` carries `?simulation=1`, so the tab is present whatever the role and
+   * there is nothing to reload — which matters because a reload no longer preserves anything a test
+   * set beforehand.
+   */
   await page.getByRole('button', { name: 'Simulation', exact: true }).click()
   await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
 }
@@ -1471,39 +1504,41 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
   expect(Math.abs(after - before - topDelta)).toBeLessThan(0.5)
 })
 
-test('a build autosaves and is restored after a reload', async ({ page }) => {
+test('a reload starts clean, and a named build is what brings one back', async ({ page }) => {
+  /*
+   * This used to assert the opposite: that the working build autosaved and came back on reload. That
+   * was removed on 2026-08-21 — a load now runs character creation and opens on an empty paperdoll
+   * with no talents spent, because opening as whoever you were last time made the character feel
+   * assumed rather than chosen.
+   *
+   * The test is rewritten rather than deleted, because the new promise is the one worth pinning: an
+   * unsaved build is **gone** after a refresh, and a named slot is the thing that survives. If that
+   * ever silently reverts, someone should have to see this fail.
+   */
   await openApp(page)
   await expect(page.getByLabel('Class')).toHaveValue('Warrior')
 
   await page.getByLabel('Class').selectOption('Mage')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
+  await expect(page.getByLabel('Class')).toHaveValue('Mage')
 
-  // The autosave runs in an effect, so wait for it to actually reach storage before reloading.
-  await expect
-    .poll(async () => {
-      const raw = await page.evaluate(() => localStorage.getItem('project-defeat:build:v1'))
-      return raw ? JSON.parse(raw).character.spec : null
-    })
-    .toBe('Fire')
+  await openPlannerView(page, 'Build')
+  await page.getByTestId('build-slot-name').fill('Fire alt')
+  await page.getByTestId('build-slot-save').click()
+  await expect(page.getByTestId('build-slot-list')).toContainText('Fire alt')
 
-  // The encounter target used to be set through the UI here, to prove the non-character half of the
-  // build persists too. That panel is hidden with the simulator, but the target is still part of the
-  // saved payload, so assert it survives in storage rather than dropping the coverage.
-  const savedTarget = await page.evaluate(() => {
-    const raw = localStorage.getItem('project-defeat:build:v1')
-    return raw ? JSON.parse(raw).target : null
-  })
-  expect(savedTarget, 'the saved build must carry the encounter target, not just the character').toBeTruthy()
-
-  // A reload starts over at the section picker — the chosen section is deliberately session state,
-  // not something persisted. The *build* is what has to survive, which is what this asserts next.
+  // The reload drops everything: the section choice, the sub-tab, and the character itself.
   await page.reload()
   await page.getByTestId('section-planner').click()
+  await completeCharacterCreation(page)
+  await expect(page.getByLabel('Class'), 'a reload does not reopen as the Mage').toHaveValue('Warrior')
 
+  // The named slot is what brings it back, and it is deliberate rather than automatic.
+  await openPlannerView(page, 'Build')
+  await page.getByTestId('build-slot-load-Fire alt').click()
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
   await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
 })
-
 test('a build can be exported and imported back', async ({ page }) => {
   await openApp(page)
   await openPlannerView(page, 'Build')
@@ -2444,6 +2479,7 @@ test('named build slots survive a character switch that would overwrite the auto
   // before looking for them.
   await page.reload()
   await page.getByTestId('section-planner').click()
+  await completeCharacterCreation(page)
   await openPlannerView(page, 'Build')
   await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
 
@@ -2621,6 +2657,7 @@ test('every catalogued item with a real item id resolves to a vendored icon file
 
 test('the paperdoll renders real item icons rather than the placeholder glyphs', async ({ page }) => {
   await openApp(page)
+  await equipDefaultGear(page)
 
   // The frames were always sized to the icon that would replace the two-letter glyph, so this is the
   // assertion that the swap actually happened rather than the glyph still being there.
@@ -2638,10 +2675,14 @@ test('the paperdoll renders real item icons rather than the placeholder glyphs',
   expect(await fallbacks.count(), 'only genuinely empty slots may fall back to a glyph').toBe(emptySlots)
 
   // Present in the DOM is not the same as loaded. A wrong path 404s and still renders an <img>.
+  // Reports the filenames rather than a count: a bare  tells you an icon is missing and
+  // leaves you to find out which of nineteen it was.
   const broken = await icons.evaluateAll((nodes) =>
-    nodes.filter((n) => !(n as HTMLImageElement).complete || (n as HTMLImageElement).naturalWidth === 0).length,
+    nodes
+      .filter((n) => !(n as HTMLImageElement).complete || (n as HTMLImageElement).naturalWidth === 0)
+      .map((n) => n.getAttribute('src')),
   )
-  expect(broken, 'no icon should fail to load').toBe(0)
+  expect(broken, 'no icon should fail to load').toEqual([])
 
   // Wowhead's "large" is 56x56, and the frames are 40-44px. Downscaling is deliberate; if this ever
   // reports 36 the fetch script has quietly switched to "medium" and the paperdoll is upscaling.
@@ -4222,17 +4263,20 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
    */
   await openApp(page)
 
-  // Plant a build carrying a deliberately wrong target, exactly as an older save would look.
-  await page.evaluate(() => {
-    const raw = localStorage.getItem('project-defeat:build:v1')
-    if (!raw) throw new Error('expected an autosaved build')
-    const build = JSON.parse(raw)
-    build.target = { id: 'stale', name: 'Stale caster target', level: 70, armor: 3500 }
-    localStorage.setItem('project-defeat:build:v1', JSON.stringify(build))
-  })
+  /*
+   * Driven through **import** rather than through the autosave, which no longer exists — a load
+   * starts clean since 2026-08-21. That is not a weakening of this test: the comment above already
+   * said the autosave was only one of the two ways in, and import is the one that survives, because
+   * anyone can paste a build exported before the encounter was fixed.
+   */
+  await openPlannerView(page, 'Build')
+  const exported = await page.getByTestId('build-export-output').inputValue()
+  const stale = JSON.parse(exported)
+  stale.target = { id: 'stale', name: 'Stale caster target', level: 70, armor: 3500 }
 
-  await page.reload()
-  await page.getByTestId('section-planner').click()
+  await page.getByTestId('build-import-input').fill(JSON.stringify(stale))
+  await page.getByTestId('build-import-button').click()
+
   await openSimulationTab(page)
 
   // The fixed target wins. 7,700 / 18,257.5 = 42.2%; the planted 3,500 would read 24.9%.

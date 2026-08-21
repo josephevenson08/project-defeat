@@ -1,13 +1,16 @@
-import { parseBuild, serializeBuild, validateBuild, type BuildState } from '../../domain/builds/buildSerialization'
+import { serializeBuild, validateBuild, type BuildState } from '../../domain/builds/buildSerialization'
 import type { SavedBuild } from '../../domain/builds/buildTypes'
 
-/** The single working build, autosaved on every change so a refresh never loses anything. */
-const STORAGE_KEY = 'project-defeat:build:v1'
-
 /**
- * Named slots, stored separately from the working build. Keeping them apart is what makes the
- * autosave safe: it can keep overwriting the working build every keystroke without ever touching
- * something the user deliberately saved.
+ * Named slots. **The only persistence there is**, since 2026-08-21.
+ *
+ * There used to be an autosave alongside these: the working build was written on every change and
+ * restored at mount, so a reload reopened as whoever you were last time. That was removed with the
+ * decision that a load starts clean — see `App`. Keeping the write without the restore would have
+ * left this module storing something nothing reads.
+ *
+ * The consequence is worth stating plainly: **an accidental refresh now loses an unsaved build.**
+ * Saving a named slot, or exporting the text, is what keeps one.
  */
 const NAMED_STORAGE_KEY = 'project-defeat:builds:v1'
 
@@ -23,48 +26,6 @@ function safeLocalStorage(): Storage | undefined {
     return typeof window === 'undefined' ? undefined : window.localStorage
   } catch {
     return undefined
-  }
-}
-
-export function saveBuildToStorage(state: BuildState) {
-  const storage = safeLocalStorage()
-  if (!storage) return
-
-  try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(serializeBuild(state)))
-  } catch {
-    // Quota exceeded or storage disabled mid-session. Autosave is a convenience, not a guarantee.
-  }
-}
-
-/**
- * Returns the stored build, or undefined when there isn't one or it can't be trusted. A stored build
- * that fails validation is discarded rather than partially applied — a half-restored character is
- * harder to notice, and harder to recover from, than simply starting fresh.
- */
-export function loadBuildFromStorage(): SavedBuild | undefined {
-  const storage = safeLocalStorage()
-  if (!storage) return undefined
-
-  let raw: string | null
-  try {
-    raw = storage.getItem(STORAGE_KEY)
-  } catch {
-    return undefined
-  }
-  if (!raw) return undefined
-
-  const result = parseBuild(raw)
-  return result.ok ? result.build : undefined
-}
-
-export function clearStoredBuild() {
-  const storage = safeLocalStorage()
-  if (!storage) return
-  try {
-    storage.removeItem(STORAGE_KEY)
-  } catch {
-    // Nothing useful to do; the caller is resetting state anyway.
   }
 }
 

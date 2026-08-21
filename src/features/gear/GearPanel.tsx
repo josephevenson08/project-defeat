@@ -4,7 +4,7 @@ import { getActiveSets } from '../../domain/gear/itemSets'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import type { CharacterProfile } from '../character/characterTypes'
 import { SetBonuses } from './SetBonuses'
-import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
+import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isEmptySlotItem, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 import { ItemIcon } from './ItemIcon'
 import { ItemPopup } from './ItemPopup'
@@ -59,7 +59,9 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
     const equipped = gear[slot]
     const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
     const options = getItemsForSlotAndCharacter(slot, character.className, character.spec)
-    const isValid = options.some((option) => option.id === equipped.item.id)
+    // An empty slot is neither valid nor invalid — it is empty, and saying "Not valid for this spec"
+    // about a slot nobody has filled reads as a fault in a character that was just created.
+    const isValid = isEmptySlotItem(equipped.item) || options.some((option) => option.id === equipped.item.id)
     const enchant = equipped.enchantId ? getEnchantById(equipped.enchantId) : undefined
 
     return (
