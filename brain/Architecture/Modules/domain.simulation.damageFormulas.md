@@ -24,7 +24,6 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
-- [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`
 
 ## Concepts & phases
 

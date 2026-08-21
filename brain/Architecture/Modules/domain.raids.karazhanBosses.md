@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raids/karazhanBosses.ts
-lines: 212
+lines: 221
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.karazhanBosses
 
-`src/domain/raids/karazhanBosses.ts` · **domain** layer · 212 lines
+`src/domain/raids/karazhanBosses.ts` · **domain** layer · 221 lines
 
 From the top of the file:
 

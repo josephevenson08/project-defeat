@@ -19,7 +19,6 @@ import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearT
 import { calculateSimulation } from './features/simulator/calculateSimulation'
 import { isSimulationEnabled } from './featureFlags'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
-import { EncounterPanel } from './features/simulator/EncounterPanel'
 import { findUpgrades } from './features/simulator/findUpgrades'
 import { SimulatorPanel } from './features/simulator/SimulatorPanel'
 import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
@@ -338,7 +337,6 @@ function App() {
       )}
       {currentTab === 'simulation' && simulationEnabled && (
         <>
-          <EncounterPanel target={target} role={role} />
           <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
           <StatWeightsPanel weights={statWeights} role={role} />
           <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />

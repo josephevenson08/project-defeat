@@ -32,11 +32,11 @@ Requires 'The Master's Key' — a long chain ending in a Black Morass run. Night
 - [[Maiden of Virtue]] — encounter 3 · 3 notable drops
 - [[Opera Event]] — encounter 4 · 4 notable drops
 - [[The Curator]] — encounter 5 · 6 notable drops
-- [[Shade of Aran]] — encounter 6 · 3 notable drops
-- [[Chess Event]] — encounter 7 · 3 notable drops
-- [[Prince Malchezaar]] — encounter 8 · 9 notable drops
 - [[Terestian Illhoof]] _(optional)_ · 3 notable drops
+- [[Shade of Aran]] — encounter 7 · 3 notable drops
 - [[Netherspite]] _(optional)_ · 2 notable drops
+- [[Chess Event]] — encounter 9 · 3 notable drops
+- [[Prince Malchezaar]] — encounter 10 · 9 notable drops
 - [[Nightbane]] _(optional)_ · 4 notable drops
 
 ## Notable trash drops

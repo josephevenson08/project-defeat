@@ -2345,11 +2345,6 @@ input[type='number']:focus {
   box-shadow: none;
 }
 
-.encounter-summary small {
-  color: var(--text-dim);
-  display: block;
-  margin-top: 8px;
-}
 
 .upgrades-panel-shell {
   grid-column: 1 / -1;

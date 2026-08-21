@@ -1,6 +1,7 @@
 ---
 type: boss
 raid: Karazhan
+order: 6
 optional: true
 generated: true
 tags: [brain/domain, domain/boss]

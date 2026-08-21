@@ -1,14 +1,14 @@
 ---
 type: boss
 raid: Karazhan
-order: 6
+order: 7
 generated: true
 tags: [brain/domain, domain/boss]
 ---
 
 # Shade of Aran
 
-[[Karazhan]] · encounter 6
+[[Karazhan]] · encounter 7
 
 ## Mechanics
 

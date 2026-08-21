@@ -103,6 +103,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'terestian-illhoof',
     name: 'Terestian Illhoof',
     raidId: 'karazhan',
+    encounterOrder: 6,
     optional: true,
     mechanics:
       'Kil\'rek, the imp pet, applies a stacking armour debuff to the tank and must be killed on each respawn. Illhoof chains a random player to a Demon Chain that drains their life; the chains have to be broken fast or the target dies. Continuous imp adds spawn from a portal and are handled with AoE. This is an off-the-critical-path boss most groups still kill for The Lightning Capacitor.',
@@ -119,7 +120,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'shade-of-aran',
     name: 'Shade of Aran',
     raidId: 'karazhan',
-    encounterOrder: 6,
+    encounterOrder: 7,
     mechanics:
       'No threat table — Aran attacks whoever he likes, so there is no tank. Flame Wreath burns a ring on the floor and anyone who moves at all detonates it and likely wipes the raid; stop moving the instant it is cast. Blizzard sweeps the room and has to be walked away from, and Arcane Explosion is countered by running to the wall. At 40% he drains all raid mana and casts Elementals; at 20% he Pyroblasts everyone unless interrupted.',
     roleNotes: [
@@ -136,6 +137,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'netherspite',
     name: 'Netherspite',
     raidId: 'karazhan',
+    encounterOrder: 8,
     optional: true,
     mechanics:
       'Three coloured beams shine from portals and each must be intercepted by a specific person: red for the tank (damage taken up, health drain), green for a healer (healing done up, mana drain), blue for a caster (damage done up, mana drain). Beam holders swap out before their stacking debuff becomes lethal. Every 60 seconds Netherspite banishes himself for 30 seconds and chases the raid with a Void Zone phase. Nobody who is not assigned to a beam should ever touch one.',
@@ -152,7 +154,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'chess-event',
     name: 'Chess Event',
     raidId: 'karazhan',
-    encounterOrder: 7,
+    encounterOrder: 9,
     mechanics:
       'A scripted game of chess where each raider controls a piece by standing on it. There is no gear check and no wipe risk worth planning around — the loot is guaranteed. Kill the enemy king; healers should take the healer pieces and keep the friendly king topped up. It sits on the critical path to Prince Malchezaar, so it is never skipped.',
     loot: [
@@ -165,7 +167,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'prince-malchezaar',
     name: 'Prince Malchezaar',
     raidId: 'karazhan',
-    encounterOrder: 8,
+    encounterOrder: 10,
     mechanics:
       'Three phases. Phase 1 is a tank-and-spank with Enfeeble, which drops five random players to 1 health for eight seconds — those players must not be hit by anything, so the raid spreads and healers stop panicking and just wait it out. At 60% he dual-wields and adds Shadow Word: Pain; at 30% he starts an Amplify Damage tank debuff and Enfeeble stops. Infernals rain down all fight and permanently deny floor space, which is the real enrage timer — the room runs out of safe ground.',
     roleNotes: [
@@ -195,6 +197,13 @@ export const karazhanBosses: readonly RaidBoss[] = [
     id: 'nightbane',
     name: 'Nightbane',
     raidId: 'karazhan',
+    /*
+     * After Prince, and that is deliberate rather than an accident of being optional. Nightbane is
+     * summoned with the Blackened Urn rather than standing in the way, so a group reaches it when it
+     * chooses — but every published clear order lists it last, and Prince is the last *required*
+     * boss. Ordering it 11 says both things at once.
+     */
+    encounterOrder: 11,
     optional: true,
     mechanics:
       'Summoned on Medivh\'s Terrace with the Blackened Urn, which requires its own quest chain and Honored with The Violet Eye. He alternates a ground phase (Bellowing Roar fear, Charred Earth on the floor, a tank cleave) with an air phase where he rains Rain of Bones and spawns skeletons that must be AoE\'d down. Fear Ward or a Tremor Totem on the tank is close to mandatory. Phase 2 raiders come here specifically for the Blazing Signet, half of the Serpentshrine Cavern attunement.',

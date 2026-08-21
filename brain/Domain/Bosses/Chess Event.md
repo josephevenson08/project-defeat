@@ -1,14 +1,14 @@
 ---
 type: boss
 raid: Karazhan
-order: 7
+order: 9
 generated: true
 tags: [brain/domain, domain/boss]
 ---
 
 # Chess Event
 
-[[Karazhan]] · encounter 7
+[[Karazhan]] · encounter 9
 
 ## Mechanics
 

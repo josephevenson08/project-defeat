@@ -1,14 +1,14 @@
 ---
 type: boss
 raid: Karazhan
-order: 8
+order: 10
 generated: true
 tags: [brain/domain, domain/boss]
 ---
 
 # Prince Malchezaar
 
-[[Karazhan]] · encounter 8
+[[Karazhan]] · encounter 10
 
 ## Mechanics
 

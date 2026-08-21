@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 360
+lines: 358
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 360 lines
+`src/App.tsx` · **app** layer · 358 lines
 
 _No doc comment at the top of this file._
 
@@ -46,7 +46,6 @@ _Nothing exported (side-effect or style module)._
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
-- [[features.simulator.EncounterPanel]] — `src/features/simulator/EncounterPanel.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.simulationTypes]] — `src/features/simulator/simulationTypes.ts`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`

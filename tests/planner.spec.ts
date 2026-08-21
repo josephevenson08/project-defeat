@@ -366,6 +366,7 @@ import {
 } from '../src/domain/talents/talentModifiers'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
+import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
 import { existsSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -1402,29 +1403,24 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
 })
 
-test('the encounter is stated, not configured, and the fixed target is the one the model uses', async ({ page }) => {
+test('the encounter is disclosed by the result, not by a panel of its own', async ({ page }) => {
   /*
-   * The panel used to offer a target-level select, an armor field and three armor presets. All of it
-   * was removed by request — the tab exists to gear a character and press Run, and the reference TBC
-   * simulators fix a standard raid target rather than asking first.
+   * The Encounter panel is gone (2026-08-21, by request). It had already lost its controls — a target
+   * level select, an armor field and three presets — and what was left was a card restating a fixed
+   * value above the button you came to press.
    *
-   * The target is still *named*, which is a different thing from being configurable: a DPS figure
-   * means nothing without knowing what it was measured against.
+   * Removing it must not remove the reader's ability to know what the number means, which is the
+   * whole reason the panel survived its own controls. So the assertion moves to where the figure now
+   * lives: **the estimate names its own target**, and nothing on the tab offers to change it.
    */
   await openApp(page)
   await openSimulationTab(page)
 
-  // DR = armor / (armor + K), K = 467.5 * 70 - 22167.5 = 10557.5, so 7700 / 18257.5 = 42.2%.
-  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('42.2%')
-  await expect(page.getByText(/level 73/i).first()).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Encounter', exact: true }), 'the panel is gone').toHaveCount(0)
+  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveCount(0)
 
-  // No controls survive. Asserted against the panel rather than the page, so this cannot pass by the
-  // panel having failed to render at all.
-  const encounter = page.getByRole('region', { name: 'Encounter', exact: true })
-  await expect(encounter).toBeVisible()
-  await expect(encounter.locator('select')).toHaveCount(0)
-  await expect(encounter.locator('input')).toHaveCount(0)
-  await expect(encounter.locator('.encounter-preset')).toHaveCount(0)
+  await page.getByRole('button', { name: /run simulation/i }).click()
+  await expect(page.getByText(/vs\. a level 73 target/i), 'the estimate still says what it ran against').toBeVisible()
 })
 
 test('armor and target level still reach the simulation, now that nothing sets them by hand', () => {
@@ -4286,12 +4282,12 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
 
   await openSimulationTab(page)
 
-  // The fixed target wins. 7,700 / 18,257.5 = 42.2%; the planted 3,500 would read 24.9%.
-  await expect(page.getByTestId('encounter-armor-mitigation')).toHaveText('42.2%')
-  await expect(page.getByText(/level 73/i).first()).toBeVisible()
+  // The planted target must not surface anywhere.
   await expect(page.getByText(/3,500/)).toHaveCount(0)
 
-  // And the estimate itself must run against the fixed boss, not the planted one.
+  // And the estimate itself must run against the fixed boss, not the planted one. This is the whole
+  // assertion now that the Encounter panel is gone — it was the sharper half of it anyway, since a
+  // panel could have shown the right number while the model used the planted one.
   await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/vs\. a level 73 target/i)).toBeVisible()
 })
@@ -5911,4 +5907,45 @@ test('a Main Hand weapon is never offered to the off hand, whatever upstream typ
     oneHanders.every((item) => isItemCompatibleWithGearSlot(item, 'Off Hand')),
     'every true one-hander is still dual-wieldable',
   ).toBe(true)
+})
+
+test('every raid lists its bosses in clear order, with nothing left to sort by accident', async () => {
+  /*
+   * Karazhan rendered Prince Malchezaar eighth of eleven, with Terestian Illhoof, Netherspite and
+   * Nightbane after him. None of them was misplaced on purpose: `getBossesForRaid` sorts on
+   * `encounterOrder` and pushes anything without one to the end, and those three carried only
+   * `optional: true`.
+   *
+   * **Optional and out-of-order are different claims.** A skippable boss still stands at a definite
+   * point in a clear. Requiring a contiguous 1..N is what stops the two being conflated again — a
+   * boss with no order would otherwise land at the end and look deliberate.
+   */
+  const problems: string[] = []
+
+  for (const raid of sampleRaids) {
+    const bosses = getBossesForRaid(raid.id)
+    const orders = bosses.map((boss) => boss.encounterOrder)
+
+    const missing = bosses.filter((boss) => boss.encounterOrder === undefined).map((boss) => boss.name)
+    if (missing.length > 0) problems.push(`${raid.name}: no clear-order position for ${missing.join(', ')}`)
+
+    const expected = bosses.map((_, index) => index + 1)
+    if (missing.length === 0 && JSON.stringify(orders) !== JSON.stringify(expected)) {
+      problems.push(`${raid.name}: orders are ${orders.join(',')} rather than a contiguous ${expected.join(',')}`)
+    }
+  }
+
+  expect(problems, 'every boss sits at a stated point in the clear').toEqual([])
+
+  /*
+   * And the specific thing that was reported. Prince is the last boss anyone has to kill; Nightbane
+   * follows him in every published order but is summoned with the Blackened Urn rather than standing
+   * in the way, so it is last *and* optional — which is why "Prince is last" and "Nightbane is after
+   * Prince" are both true and neither is the whole answer.
+   */
+  const karazhan = getBossesForRaid('karazhan')
+  const required = karazhan.filter((boss) => !boss.optional)
+  expect(required[required.length - 1].name, 'Prince is the last required boss').toBe('Prince Malchezaar')
+  expect(karazhan[karazhan.length - 1].name, 'Nightbane is last overall').toBe('Nightbane')
+  expect(karazhan[karazhan.length - 1].optional, 'and is marked skippable').toBe(true)
 })
