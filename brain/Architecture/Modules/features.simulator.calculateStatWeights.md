@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateStatWeights.ts
-lines: 181
+lines: 188
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateStatWeights
 
-`src/features/simulator/calculateStatWeights.ts` · **features** layer · 181 lines
+`src/features/simulator/calculateStatWeights.ts` · **features** layer · 188 lines
 
 From the top of the file:
 
@@ -26,6 +26,8 @@ From the top of the file:
 ## Imports
 
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

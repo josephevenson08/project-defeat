@@ -1,6 +1,15 @@
 import rawTalentEffects from './talentEffects.json' with { type: 'json' }
 import { getTalentData } from './sampleTalents'
 import type { TalentPoints } from './talentTypes'
+import type { StatBlock } from '../stats/statTypes'
+
+/** An attribute-to-stat conversion a talent grants outright, in the shape the base rates already use. */
+export type TalentStatConversion = {
+  from: keyof StatBlock
+  to: keyof StatBlock
+  /** How much of `to` one point of `from` grants, at the ranks actually allocated. */
+  perPoint: number
+}
 
 /**
  * What a talent build changes about the character, collapsed into one record.
@@ -11,6 +20,15 @@ import type { TalentPoints } from './talentTypes'
  * damage, attack speed and rage income, none of which is a stat at all. The debuff record already
  * solved the same problem: a small typed set of fields, each applied at one named point in the
  * calculation, where a field with nothing to apply to contributes nothing by construction.
+ *
+ * **Three fields are the exception, and they are why this record now reaches `calculateStats`.**
+ * `statFactors`, `statConversions` and `itemArmorMultiplier` genuinely do act on `StatBlock`, which
+ * is exactly why the ingest had to refuse ten talent groups by name for as long as talents reached
+ * the simulation alone — Vitality and Toughness multiply stamina, strength and armour, and Lunar
+ * Guidance, Mind Mastery and Spiritual Guidance are the *only* way Intellect or Spirit becomes spell
+ * power in TBC. They are kept structured rather than exploded into a field per stat because the two
+ * shapes already exist: they are the same multiplier and per-point-conversion the sourced base rates
+ * in `attributeConversions.ts` use.
  *
  * Every field is an identity value when no points are spent, so an empty tree — which is the default
  * — has to reproduce the previous numbers exactly. A test pins that.
@@ -93,6 +111,22 @@ export type TalentModifiers = {
   parryChance: number
   /** Added to the block chance, as a fraction. Warrior's Shield Specialization only — see the ingest. */
   blockChance: number
+  /**
+   * Multiplies a stat outright, as the **factor itself** (1.06), not the `+0.06` fraction that
+   * `applyStatMultipliers` takes for buffs and racials. Vitality, Divine Strength, Arcane Mind.
+   * A stat absent from this record is simply unmultiplied, so `{}` is the identity.
+   */
+  statFactors: Partial<Record<keyof StatBlock, number>>
+  /** Conversions a talent grants that no character has untalented. Lunar Guidance, Mind Mastery. */
+  statConversions: readonly TalentStatConversion[]
+  /**
+   * Multiplies armour from **equipped items only**. Toughness, Thick Hide. 1 when untalented.
+   *
+   * Deliberately not a `statFactors.armor` entry: upstream reads `Equip.Stats()[stats.Armor]`, so
+   * armour from Agility, buffs or consumables is not multiplied. Folding it into the total would
+   * quietly overpay every tank.
+   */
+  itemArmorMultiplier: number
 }
 
 export const noTalentModifiers: TalentModifiers = {
@@ -119,10 +153,22 @@ export const noTalentModifiers: TalentModifiers = {
   defenseSkillPoints: 0,
   parryChance: 0,
   blockChance: 0,
+  statFactors: {},
+  statConversions: [],
+  itemArmorMultiplier: 1,
 }
 
+/**
+ * The fields that are plain numbers, which is what the two dispatch maps below can target with
+ * `+=` and `*=`. `statFactors` and `statConversions` are deliberately excluded: they carry a target
+ * stat, so they are dispatched by name further down rather than through a map.
+ */
+type NumericModifierKey = {
+  [Key in keyof TalentModifiers]: TalentModifiers[Key] extends number ? Key : never
+}[keyof TalentModifiers]
+
 /** Which `TalentModifiers` field each extracted effect kind feeds, and how it combines. */
-const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
+const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   meleeCritChance: 'meleeCritChance',
   meleeHitChance: 'meleeHitChance',
   targetDodgeReduction: 'targetDodgeReduction',
@@ -139,7 +185,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
   blockChance: 'blockChance',
 }
 
-const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
+const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   attackPowerMultiplier: 'attackPowerMultiplier',
   offHandDamageMultiplier: 'offHandDamageMultiplier',
   twoHandedDamageMultiplier: 'twoHandedDamageMultiplier',
@@ -157,7 +203,17 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, keyof TalentModifiers>> = {
  * asserted its value rather than just asserting DPS went up. This check turns that class of mistake
  * from a wrong number into a failed import.
  */
-const DISPATCHED_KINDS = new Set([...Object.keys(ADDITIVE_BY_KIND), ...Object.keys(MULTIPLICATIVE_BY_KIND)])
+/**
+ * Kinds that carry a target stat and so cannot be dispatched by a name-to-field map. Listed here so
+ * the "every kind has a destination" check below still covers them.
+ */
+const STRUCTURED_KINDS = new Set(['statFactor', 'statConversion', 'itemArmorMultiplier'])
+
+const DISPATCHED_KINDS = new Set([
+  ...Object.keys(ADDITIVE_BY_KIND),
+  ...Object.keys(MULTIPLICATIVE_BY_KIND),
+  ...STRUCTURED_KINDS,
+])
 const undispatched = rawTalentEffects.effects.map((effect) => effect.kind).filter((kind) => !DISPATCHED_KINDS.has(kind))
 if (undispatched.length > 0) {
   throw new Error(
@@ -174,11 +230,39 @@ if (undispatched.length > 0) {
  * nothing — which is correct rather than lossy, because the ingest reports what it skipped and why.
  */
 export function deriveTalentModifiers(points: TalentPoints): TalentModifiers {
-  const modifiers: TalentModifiers = { ...noTalentModifiers }
+  // Fresh copies of the two reference fields: a shallow spread would alias them to the shared
+  // identity constant, and one in-place mutation would then corrupt it for the whole process.
+  const modifiers: TalentModifiers = { ...noTalentModifiers, statFactors: {}, statConversions: [] }
 
   for (const effect of rawTalentEffects.effects) {
     const rank = points[effect.talentId] ?? 0
     if (rank <= 0) continue
+
+    const targeted = effect as { stat?: string; from?: string; to?: string }
+
+    if (effect.kind === 'statFactor') {
+      const stat = targeted.stat as keyof StatBlock
+      const factor = effect.flatValue ?? 1 + (effect.perRank ?? 0) * rank
+      modifiers.statFactors = { ...modifiers.statFactors, [stat]: (modifiers.statFactors[stat] ?? 1) * factor }
+      continue
+    }
+
+    if (effect.kind === 'statConversion') {
+      modifiers.statConversions = [
+        ...modifiers.statConversions,
+        {
+          from: targeted.from as keyof StatBlock,
+          to: targeted.to as keyof StatBlock,
+          perPoint: effect.flatValue ?? (effect.perRank ?? 0) * rank,
+        },
+      ]
+      continue
+    }
+
+    if (effect.kind === 'itemArmorMultiplier') {
+      modifiers.itemArmorMultiplier *= effect.flatValue ?? 1 + (effect.perRank ?? 0) * rank
+      continue
+    }
 
     const additive = ADDITIVE_BY_KIND[effect.kind]
     if (additive) {

@@ -17,6 +17,11 @@ declare module "*/talentEffects.json" {
       perRank?: number
       /** Present for effects that do not scale with rank (Anger Management, Endless Rage). */
       flatValue?: number
+      /** Which `StatBlock` key a `statFactor` multiplies. */
+      stat?: string
+      /** Source and destination of a `statConversion`. */
+      from?: string
+      to?: string
       caveat?: string
       source: string
     }[]

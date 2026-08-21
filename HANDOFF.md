@@ -1,7 +1,82 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-20.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-21.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-21)
+
+**Decision 2 is taken: talents reach `calculateStats`.** Spending points now moves the always-visible
+stat rail, the gear rankings, the stat weights and the upgrade finder, not the hidden estimate alone.
+The two surfaces used to disagree *by design*, and this file listed that as the single named reason a
+talented tank read low. It is closed.
+
+**It was done in this order deliberately: the base first, the talents second.** Layering talents onto
+the stat pipeline while that pipeline still invented half of every caster's spell power would have
+produced a number that moved for the right reason and landed in the wrong place.
+
+**The mechanism is three shapes, not fifteen fields.** `TalentModifiers` was shaped after the debuff
+record precisely because almost nothing a talent does fits `StatBlock` — but the stat-routed half
+genuinely does, so it gains `statFactors` (multiply a stat), `statConversions` (so much of one stat
+per point of another) and `itemArmorMultiplier`. The first two are **the same two shapes the sourced
+base rates already use**, which is why `applyAttributeConversions` needed one extra argument rather
+than a second mechanism.
+
+**13 effects across six classes**, taking the ingest from 49 to **62**, and the refusal list from 49
+groups to **43**:
+
+| | | |
+|---|---|---|
+| Warrior | Vitality, Toughness | stamina x1.05, strength x1.10, item armour x1.10 at 5 points |
+| Paladin | Divine Strength, Toughness | strength x1.10, item armour x1.10 |
+| Rogue | Vitality, Sinister Calling | agility x1.05 and x1.15, **compounding to x1.2075** |
+| Mage | Arcane Mind, Mind Mastery | intellect x1.15, then 0.25 spell power per Intellect |
+| Priest | Spiritual Guidance | 0.25 spell power per point of Spirit |
+| Druid | Lunar Guidance, Thick Hide | 0.25 spell power per Intellect, item armour x1.167 |
+
+Measured against the app's own default sets: Protection Warrior **armour +9.6%, strength +10%,
+stamina +5%**; Holy Priest **spell power +17.7%**; Fire Mage **spell power +23.4%, intellect +15%**;
+Combat Rogue **agility +20.8%, crit +12.7%**.
+
+**Toughness raises armour from items and nothing else**, which is the subtlest thing here and the
+easiest to get invisibly wrong. Upstream reads `Equip.Stats()[stats.Armor]`, so the Agility-derived
+armour this app added in the previous pass is *not* multiplied — that is why the Warrior's total moves
+9.6% rather than 10%. The test gives a character 500 extra Agility and asserts the Toughness bonus is
+**unchanged**; falsified by moving the multiplier after the conversions, which inflated it by exactly
+the 100 armour that Agility's 1000 should not have earned.
+
+**The empty-tree identity is asserted across all 27 specs**, not just Fury Warrior. It is what made
+widening this safe: `talentPoints` defaults to `{}` everywhere, so if the modifiers were not exactly
+the identity at zero points, every stat expectation in the suite would move at once.
+
+**Three disclosures had already gone false, and one was a count in prose.** `featureFlags.ts` said
+"**49 talent groups are refused by name**" — a number that went stale the instant the ingest changed,
+with nothing failing, which is the repo's own rule about counts in prose proving itself again. The
+count is now asserted from the data instead. `calculateSimulation`'s header said `talentPoints`
+"reaches the simulation and **deliberately nothing else**". And **three refusal reasons still named
+`calculateStats` as the blocker** — a test now asserts that none may, since it is not one any more.
+
+**A talent that is both ingested and refused is the failure this pass could most easily have shipped**,
+and it very nearly did: Paladin's Toughness was extracted while its "this is a product decision, not
+an ingest" refusal stayed in place. The test that compares the two lists caught it. Nothing else would
+have — the JSON would simply have contained a working effect and prose swearing it did not exist.
+
+**Two talents carry a caveat rather than a second number.** Spiritual Guidance and Lunar Guidance
+raise spell damage *and healing* in game, but wowsims has **no healer implemented for either class**
+at the pinned commit — only Shadow Priest — so upstream models the damage half alone. The sourced half
+is ingested; the healing half is recorded as a caveat rather than guessed, so a healer's estimate
+still reads low by it. Sourcing that needs the tooltip, which is a different ingest.
+
+**Thick Hide is read from the `else` branch on purpose.** Upstream gives 0.5/3 a rank in Bear form
+and 0.1/3 otherwise; this app models Feral as **cat**, the same call that gates `feralAttackPower` and
+the cat-form attribute conversions. Matching the Bear branch would have handed every druid, Balance
+and Restoration included, a bear's armour.
+
+**Still open:** the Health and Mana talents (Survivalist, Fel Intellect, Mental Strength) have no
+`StatBlock` field to land in and stay refused. Combat Experience, Fel Stamina and Heart of the Wild's
+Intellect half are **expressible now and simply not ingested yet** — the refusals say so in those
+words rather than claiming they are blocked.
 
 ---
 
@@ -179,8 +254,10 @@ classes are ingested (**30 → 49 effects**), and coverage goes **11 → all 27 
 path followed. The plumbing went first on purpose: ingesting Mage effects with no caster talent
 argument to reach would have been this repo's signature failure, data wired to nothing.
 
-**Coverage is not the same as completeness, and the second number is the honest one: 49 talent groups
-are still refused by name.** Two kinds dominate — per-spell talents needing a spell school this
+**Coverage is not the same as completeness, and the second number is the honest one: a named list of
+talent groups is still refused.** (That sentence said "49" until 2026-08-21, when six of them started
+applying and the number quietly became wrong — it is computed from the data now, in four places that
+used to write it down.) Two kinds dominated — per-spell talents needing a spell school this
 simulator does not record, and stat-pipeline talents (Toughness, Vitality) whose route runs through
 `calculateStats`, which is the owner's open decision. A talented estimate still reads low.
 
@@ -1291,19 +1368,18 @@ and each item here is a decision or a fresh piece of work.
 
 ### The three decisions only the repo owner can take
 
-**Decision 2 has grown teeth since it was written.** "Should talents reach `calculateStats`?" now
-gates a *named* list rather than a hypothetical: Toughness, Vitality and Divine Strength are ingested,
-refused, and reported to the player as uncounted. Every other route is closed, so this is the single
-remaining reason a talented estimate reads low for a tank.
+**Decision 2 was taken on 2026-08-21 and is no longer open.** Toughness, Vitality and Divine
+Strength were the named list it gated; all three now apply, and a talented tank no longer reads low
+for that reason. What remains refused for a stat reason is narrower and honest: Health and Mana have
+no `StatBlock` field.
 
 1. **Unhide the Simulation tab?** `src/featureFlags.ts` states what is actually true now and says
    outright that the decision has not been revisited. The argument has changed: the tab discloses
    its own limits honestly *per spec*, and talents reach 11 specs. The remaining argument against is
    that **25 of 27 specs are single-ability approximations**. Nothing blocks a flip either way.
-2. **Should talents reach `calculateStats`?** Today they reach `calculateSimulation` only, which
-   keeps the blast radius inside a hidden tab. Widening it moves the always-visible stat rail, gear
-   rankings and the upgrade finder — more correct, much more visible, and it makes "an empty tree
-   reproduces today’s numbers exactly" a hard invariant.
+2. ~~**Should talents reach `calculateStats`?**~~ **Taken 2026-08-21 — yes.** They now move the
+   always-visible stat rail, gear rankings, stat weights and the upgrade finder. "An empty tree
+   reproduces today's numbers exactly" is a hard invariant, asserted across all 27 specs.
 3. **Is 7,700 the right boss armor?** Set this session, replacing 10,643. Both are community
    approximations rather than tooltip-exact, which is why the encounter still carries
    `needsVerification`.
@@ -1429,9 +1505,9 @@ stat rail, gear rankings and upgrade finder are untouched. Widening that is a se
   **Stage 3 closed the caster, healer and tank halves on 2026-08-19**, taking the ingest to **49
   effects across all nine classes** and coverage to **all 27 specs**. The paragraph that used to sit
   here said those paths "take no talent argument at all" — true when written, and the reason the
-  plumbing went first each time. What remains is not coverage but **expressiveness**: 49 talent
-  groups are refused by name, dominated by per-spell effects and by the ones routing through
-  `calculateStats`.
+  plumbing went first each time. What remains is not coverage but **expressiveness**: a named list of
+  talent groups is refused, dominated by per-spell effects. The ones routing through
+  `calculateStats` left that list on 2026-08-21, when talents reached the stat pipeline.
   (This paragraph also said "7 caster and 2 healer" until 2026-08-18; the real split is 9 Caster DPS,
   5 Healer, 2 Tank, and it is asserted now rather than written.)
 

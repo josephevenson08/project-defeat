@@ -1064,13 +1064,17 @@ function calculateTankSurvivability(
 }
 
 /**
- * `talentPoints` reaches the simulation and **deliberately nothing else**.
+ * `talentPoints` reaches the simulation, and since 2026-08-20 the stat pipeline as well.
  *
- * Talents change plenty that `calculateStats` would care about — Vitality's Stamina, Toughness's
- * armour — but routing them there moves the always-visible stat rail, every gear ranking and the
- * upgrade finder at once, on the strength of a model that has not been checked yet. Starting here
- * keeps the blast radius inside a tab that is hidden anyway, and leaves widening it as a later
- * decision rather than a side effect of this one.
+ * It was confined here first on purpose — routing talents into `calculateStats` moves the
+ * always-visible stat rail, every gear ranking and the upgrade finder at once — and widening it was
+ * held back until the stat pipeline itself had been sourced rather than hand-written. The two are
+ * now consistent by construction: the `stats` this function receives already carry the build, so the
+ * estimate and the rail cannot disagree the way they did by design until then.
+ *
+ * What still stops here is everything that is **not** a stat — crit chance, hit chance, damage and
+ * attack-speed multipliers, and the whole rage model. Those have no `StatBlock` field to land in,
+ * which is the same reason `TalentModifiers` was never shaped like one.
  */
 export function calculateSimulation(
   character: CharacterProfile,

@@ -5604,3 +5604,186 @@ test('a racial this app applies itself is not also baked into the base stats', a
   expect(compared, 'six classes a Human can be').toBe(6)
   expect(problems, 'The Human Spirit is applied by applyRacialTraits, so it must not also sit in the base').toEqual([])
 })
+
+import { deriveTalentModifiers as deriveStatTalents, noTalentModifiers as noStatTalents } from '../src/domain/talents/talentModifiers'
+import rawTalentEffects from '../src/domain/talents/talentEffects.json' with { type: 'json' }
+
+/** Talent id by class and name, the same lookup the other talent tests use. */
+const talentId = (className: string, name: string) =>
+  getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+function statsFor(className: TbcClass, spec: TbcSpec, points: Record<number, number> = {}) {
+  const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
+  const gear = normalizeGearForCharacter(defaultGear, className, spec)
+  return calculateStats(character, gear, [], [], undefined, deriveStatTalents(points))
+}
+
+test('an empty talent tree leaves the stat totals byte-for-byte unchanged', async () => {
+  /*
+   * The invariant that made widening talents into `calculateStats` safe to do at all. Talents used
+   * to reach the hidden simulator alone; they now reach the always-visible rail, the gear rankings
+   * and the upgrade finder. `talentPoints` defaults to `{}` everywhere, so if the modifiers were not
+   * exactly the identity at zero points, every stat expectation in this file would move at once.
+   */
+  for (const classOption of tbcClasses) {
+    for (const spec of classOption.specs) {
+      const character: CharacterProfile = {
+        faction: 'Alliance',
+        race: legalRaceFor(classOption.className),
+        className: classOption.className,
+        spec,
+      }
+      const gear = normalizeGearForCharacter(defaultGear, classOption.className, spec)
+
+      const untalented = calculateStats(character, gear, [], [])
+      const emptyTree = calculateStats(character, gear, [], [], undefined, deriveStatTalents({}))
+      const explicitIdentity = calculateStats(character, gear, [], [], undefined, noStatTalents)
+
+      expect(emptyTree, `${classOption.className} ${spec} with an empty tree`).toEqual(untalented)
+      expect(explicitIdentity, `${classOption.className} ${spec} with the identity modifiers`).toEqual(untalented)
+    }
+  }
+})
+
+test('Toughness raises armour from items only, never armour from Agility', async () => {
+  /*
+   * Upstream reads `Equip.Stats()[stats.Armor]`, so the multiplier applies to gear and nothing else.
+   * Folding it into the total instead would overpay every tank, and would do so invisibly — the
+   * number would simply be a bit high.
+   */
+  const toughness = { [talentId('Warrior', 'Toughness')]: 5 }
+  const plain = statsFor('Warrior', 'Protection')
+  const talented = statsFor('Warrior', 'Protection', toughness)
+
+  const gain = talented.armor - plain.armor
+  expect(gain, 'five points of Toughness is worth something').toBeGreaterThan(0)
+
+  /*
+   * The load-bearing half: a character carrying *more Agility* must get the same Toughness bonus,
+   * because Agility's 2-armor-a-point is not item armour. If the multiplier were applied to the
+   * total, this extra Agility would inflate the bonus and these two would differ.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Protection' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Protection')
+  const bonus = { agility: 500 }
+  const plainWithAgility = calculateStats(character, gear, [], [], bonus)
+  const talentedWithAgility = calculateStats(character, gear, [], [], bonus, deriveStatTalents(toughness))
+
+  expect(talentedWithAgility.armor - plainWithAgility.armor, 'Agility armour is not multiplied by Toughness').toBeCloseTo(gain, 6)
+  expect(plainWithAgility.armor - plain.armor, '500 Agility is 1000 armour, at 2 a point').toBeCloseTo(1000, 6)
+})
+
+test('the talents that multiply an attribute reach the rail, and multiply the right one', async () => {
+  // Warrior Vitality: 1% Stamina and 2% Strength a rank, which is 5% and 10% at five points.
+  const plain = statsFor('Warrior', 'Protection')
+  const vitality = statsFor('Warrior', 'Protection', { [talentId('Warrior', 'Vitality')]: 5 })
+  expect(vitality.stamina / plain.stamina).toBeCloseTo(1.05, 6)
+  expect(vitality.strength / plain.strength).toBeCloseTo(1.1, 6)
+
+  // Strength cascades into attack power, which is the point of it reaching `calculateStats` at all.
+  expect(vitality.attackPower).toBeGreaterThan(plain.attackPower)
+
+  // Paladin's Divine Strength is Strength alone — it must not move Stamina.
+  const paladinPlain = statsFor('Paladin', 'Protection')
+  const divineStrength = statsFor('Paladin', 'Protection', { [talentId('Paladin', 'Divine Strength')]: 5 })
+  expect(divineStrength.strength / paladinPlain.strength).toBeCloseTo(1.1, 6)
+  expect(divineStrength.stamina).toBeCloseTo(paladinPlain.stamina, 6)
+
+  // Two talents multiplying the same attribute compound rather than adding: Rogue Vitality is 1% a
+  // rank and Sinister Calling 3% a rank, so five of each is 1.05 * 1.15, not 1.20.
+  const roguePlain = statsFor('Rogue', 'Combat')
+  const rogueBoth = statsFor('Rogue', 'Combat', {
+    [talentId('Rogue', 'Vitality')]: 5,
+    [talentId('Rogue', 'Sinister Calling')]: 5,
+  })
+  expect(rogueBoth.agility / roguePlain.agility).toBeCloseTo(1.05 * 1.15, 6)
+})
+
+test('a talent is the only thing in TBC that turns an attribute into spell power', async () => {
+  /*
+   * The other half of the base-stat pass. Intellect and Spirit grant no spell power at all in TBC —
+   * and these are the talents that are the exception, which is exactly why they could not apply
+   * while talents reached the hidden simulator alone.
+   */
+  const priestPlain = statsFor('Priest', 'Holy')
+  const guidance = statsFor('Priest', 'Holy', { [talentId('Priest', 'Spiritual Guidance')]: 5 })
+
+  // Rank 5 is 25% of Spirit, and Spirit itself is untouched.
+  expect(guidance.spirit).toBeCloseTo(priestPlain.spirit, 6)
+  expect(guidance.spellPower - priestPlain.spellPower).toBeCloseTo(priestPlain.spirit * 0.25, 6)
+
+  /*
+   * Multipliers have to run before conversions, or Mind Mastery would read an Intellect total that
+   * Arcane Mind had not raised yet. Asserted against the *post-multiplier* Intellect, which is the
+   * only figure that distinguishes the two orders.
+   */
+  const magePlain = statsFor('Mage', 'Fire')
+  const mage = statsFor('Mage', 'Fire', {
+    [talentId('Mage', 'Arcane Mind')]: 5,
+    [talentId('Mage', 'Mind Mastery')]: 5,
+  })
+  expect(mage.intellect / magePlain.intellect).toBeCloseTo(1.15, 6)
+  expect(mage.spellPower - magePlain.spellPower).toBeCloseTo(mage.intellect * 0.25, 6)
+  expect(mage.spellPower - magePlain.spellPower, 'and not the Intellect before Arcane Mind raised it').not.toBeCloseTo(
+    magePlain.intellect * 0.25,
+    6,
+  )
+})
+
+test('no talent is both ingested and refused by name', async () => {
+  /*
+   * The refusal list said ten groups routed through `calculateStats` and so could not apply. Six of
+   * those now do. A talent left in both places would be the repo's own recurring failure wearing new
+   * clothes: data that applies, described by prose saying it does not.
+   */
+  const ingested = new Set(rawTalentEffects.effects.map((effect) => `${effect.className}/${effect.talent}`))
+
+  const contradictions: string[] = []
+  for (const entry of rawTalentEffects.skipped) {
+    // A skip entry can name a group ("Toughness / Vitality"), so each side is checked on its own.
+    for (const name of entry.talent.split(' / ')) {
+      if (ingested.has(`${entry.className}/${name}`)) {
+        contradictions.push(`${entry.className}/${name} is ingested and also refused: "${entry.reason}"`)
+      }
+    }
+  }
+  expect(contradictions, 'a talent is either applied or refused, never both').toEqual([])
+
+  // And the six that moved really are gone from the refusals, rather than merely reworded.
+  for (const [className, talent] of [
+    ['Warrior', 'Toughness'],
+    ['Warrior', 'Vitality'],
+    ['Paladin', 'Divine Strength'],
+    ['Rogue', 'Sinister Calling'],
+    ['Mage', 'Mind Mastery'],
+    ['Priest', 'Spiritual Guidance'],
+  ] as const) {
+    expect(ingested.has(`${className}/${talent}`), `${className} ${talent} reaches the stat rail now`).toBe(true)
+  }
+})
+
+test('no talent is refused for a reason the code no longer has', async () => {
+  /*
+   * Ten refusal reasons said, in words, that a talent could not apply because it routed through
+   * `calculateStats` and talents reached the hidden simulator alone. Every one of them became false
+   * on 2026-08-20 when that route opened. A confident wrong caveat is worse than no caveat, and this
+   * repo has watched `featureFlags.ts` rot twice for exactly this reason — so the sentence is pinned
+   * rather than merely corrected.
+   */
+  const stale = rawTalentEffects.skipped.filter((entry) => /calculateStats/i.test(entry.reason))
+  expect(
+    stale.map((entry) => `${entry.className}/${entry.talent}: ${entry.reason}`),
+    'talents reach calculateStats now, so nothing may still be refused for not reaching it',
+  ).toEqual([])
+
+  /*
+   * The count belongs in an assertion computed from the data, never in prose. `featureFlags.ts` said
+   * "49 talent groups are refused by name" until this pass moved six of them, and nothing failed —
+   * which is precisely how the repo's own rule about counts in prose got written.
+   */
+  expect(rawTalentEffects.effectCount, 'the published count matches the list it describes').toBe(rawTalentEffects.effects.length)
+
+  // Health and Mana are the honest remaining stat-shaped gap: `StatBlock` has no field for either.
+  const remaining = rawTalentEffects.skipped.filter((entry) => /Health|Mana/i.test(entry.reason))
+  expect(remaining.length, 'the stat-shaped refusals that are left are the Health and Mana ones').toBeGreaterThan(0)
+})

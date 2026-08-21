@@ -29,7 +29,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 49,
+  "effectCount": 62,
   "effects": [
     {
       "className": "Warrior",
@@ -191,6 +191,41 @@
       "source": "sim/warrior/talents.go"
     },
     {
+      "className": "Warrior",
+      "talentId": 1653,
+      "talent": "Vitality",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "stamina",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "className": "Warrior",
+      "talentId": 1653,
+      "talent": "Vitality",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "stat": "strength",
+      "source": "sim/warrior/talents.go"
+    },
+    {
+      "className": "Warrior",
+      "talentId": 140,
+      "talent": "Toughness",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "itemArmorMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/warrior/talents.go"
+    },
+    {
       "className": "Rogue",
       "talentId": 270,
       "talent": "Malice",
@@ -233,6 +268,42 @@
       "unit": "expertise skill points per rank",
       "perRank": 5,
       "caveat": "Expertise skill points, not rating — the attack table takes skill points directly.",
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1705,
+      "talent": "Vitality",
+      "tree": "Combat",
+      "maxRank": 2,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "agility",
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1705,
+      "talent": "Vitality",
+      "tree": "Combat",
+      "maxRank": 2,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "stat": "stamina",
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1712,
+      "talent": "Sinister Calling",
+      "tree": "Subtlety",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.03,
+      "stat": "agility",
       "source": "sim/rogue/talents.go"
     },
     {
@@ -416,6 +487,32 @@
       "source": "sim/druid/talents.go"
     },
     {
+      "className": "Druid",
+      "talentId": 1782,
+      "talent": "Lunar Guidance",
+      "tree": "Balance",
+      "maxRank": 3,
+      "kind": "statConversion",
+      "unit": "spell power per point of Intellect, per rank",
+      "perRank": 0.08333333333333333,
+      "from": "intellect",
+      "to": "spellPower",
+      "caveat": "Upstream models the spell-damage half only, because wowsims has no healer implemented for this class at the pinned commit. The talent raises healing by the same amount in game, so a healer estimate here reads low by it; sourcing that half needs the tooltip itself, which is not this file.",
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 794,
+      "talent": "Thick Hide",
+      "tree": "Feral",
+      "maxRank": 3,
+      "kind": "itemArmorMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.03333333333333333,
+      "caveat": "Cat/caster form rate. Bear form is 5x this upstream, and this app does not model bear.",
+      "source": "sim/druid/talents.go"
+    },
+    {
       "className": "Paladin",
       "talentId": 1761,
       "talent": "Sanctified Seals",
@@ -498,6 +595,29 @@
       "source": "sim/paladin/talents.go"
     },
     {
+      "className": "Paladin",
+      "talentId": 1450,
+      "talent": "Divine Strength",
+      "tree": "Holy",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "stat": "strength",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1423,
+      "talent": "Toughness",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "itemArmorMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "source": "sim/paladin/talents.go"
+    },
+    {
       "className": "Mage",
       "talentId": 421,
       "talent": "Arcane Instability",
@@ -543,6 +663,31 @@
       "source": "sim/mage/talents.go"
     },
     {
+      "className": "Mage",
+      "talentId": 77,
+      "talent": "Arcane Mind",
+      "tree": "Arcane",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.03,
+      "stat": "intellect",
+      "source": "sim/mage/talents.go"
+    },
+    {
+      "className": "Mage",
+      "talentId": 1728,
+      "talent": "Mind Mastery",
+      "tree": "Arcane",
+      "maxRank": 5,
+      "kind": "statConversion",
+      "unit": "spell power per point of Intellect, per rank",
+      "perRank": 0.05,
+      "from": "intellect",
+      "to": "spellPower",
+      "source": "sim/mage/talents.go"
+    },
+    {
       "className": "Priest",
       "talentId": 1202,
       "talent": "Force of Will",
@@ -562,6 +707,20 @@
       "kind": "spiritRegenWhileCasting",
       "unit": "fraction of Spirit regen retained while casting, per rank",
       "perRank": 0.1,
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 402,
+      "talent": "Spiritual Guidance",
+      "tree": "Holy",
+      "maxRank": 5,
+      "kind": "statConversion",
+      "unit": "spell power per point of Spirit, per rank",
+      "perRank": 0.05,
+      "from": "spirit",
+      "to": "spellPower",
+      "caveat": "Upstream models the spell-damage half only, because wowsims has no healer implemented for this class at the pinned commit. The talent raises healing by the same amount in game, so a healer estimate here reads low by it; sourcing that half needs the tooltip itself, which is not this file.",
       "source": "sim/priest/talents.go"
     },
     {
@@ -631,11 +790,6 @@
     },
     {
       "className": "Warrior",
-      "talent": "Toughness / Vitality",
-      "reason": "Multiply armour, stamina and strength, which calculateStats owns. Taking them means talents reaching the always-visible stat rail, gear rankings and the upgrade finder — a product decision reserved for the repo owner, not an ingest."
-    },
-    {
-      "className": "Warrior",
       "talent": "Defiance",
       "reason": "Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player's own attack table."
     },
@@ -643,11 +797,6 @@
       "className": "Warrior",
       "talent": "Shield Mastery",
       "reason": "Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change."
-    },
-    {
-      "className": "Rogue",
-      "talent": "Vitality / Sinister Calling",
-      "reason": "Both multiply Agility, which cascades into attack power and crit inside calculateStats. Talents deliberately reach only the simulation, so applying these would mean re-deriving what calculateStats already derives."
     },
     {
       "className": "Rogue",
@@ -681,8 +830,13 @@
     },
     {
       "className": "Hunter",
-      "talent": "Combat Experience / Survivalist",
-      "reason": "Multiply Agility and Health, which cascade inside calculateStats. Talents deliberately reach only the simulation."
+      "talent": "Survivalist",
+      "reason": "Multiplies Health, which StatBlock has no field for — health is derived from Stamina here."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Combat Experience",
+      "reason": "Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested."
     },
     {
       "className": "Hunter",
@@ -726,13 +880,13 @@
     },
     {
       "className": "Druid",
-      "talent": "Survival of the Fittest / Thick Hide",
-      "reason": "Tank-facing crit-taken and armour. Talents reach the damage path only."
+      "talent": "Survival of the Fittest",
+      "reason": "Reduces the chance to be crit, which the damage path does not model."
     },
     {
       "className": "Druid",
       "talent": "Heart of the Wild / Furor",
-      "reason": "Multiply Strength, Intellect or the form itself, cascading through calculateStats."
+      "reason": "Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model."
     },
     {
       "className": "Druid",
@@ -743,11 +897,6 @@
       "className": "Druid",
       "talent": "Omen of Clarity / Primal Fury",
       "reason": "Proc-driven energy and combo points, needing a timeline."
-    },
-    {
-      "className": "Paladin",
-      "talent": "Divine Strength",
-      "reason": "Multiplies Strength, which cascades into attack power inside calculateStats."
     },
     {
       "className": "Paladin",
@@ -766,11 +915,6 @@
     },
     {
       "className": "Paladin",
-      "talent": "Toughness",
-      "reason": "Multiplies item armour, which calculateStats owns — the same reason Warrior's is refused. Reaching it is a product decision about the stat rail, not an ingest."
-    },
-    {
-      "className": "Paladin",
       "talent": "Shield Specialization",
       "reason": "Paladin's raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change."
     },
@@ -786,11 +930,6 @@
     },
     {
       "className": "Mage",
-      "talent": "Arcane Mind / Mind Mastery",
-      "reason": "Intellect scaling and Intellect-to-spell-power, which cascade through calculateStats instead."
-    },
-    {
-      "className": "Mage",
       "talent": "Empowered Fireball / Frostbolt",
       "reason": "Raise one spell's coefficient; the generic cast profile has no per-spell coefficient to raise."
     },
@@ -798,11 +937,6 @@
       "className": "Priest",
       "talent": "Shadow Weaving / Misery",
       "reason": "Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target."
-    },
-    {
-      "className": "Priest",
-      "talent": "Spiritual Guidance",
-      "reason": "Converts Spirit into spell power via a stat dependency, which belongs in calculateStats."
     },
     {
       "className": "Priest",
@@ -822,7 +956,7 @@
     {
       "className": "Warlock",
       "talent": "Fel Intellect / Fel Stamina",
-      "reason": "Stat dependencies into mana and health, which belong in calculateStats."
+      "reason": "Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested."
     },
     {
       "className": "Warlock",

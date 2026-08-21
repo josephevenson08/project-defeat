@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/findUpgrades.ts
-lines: 221
+lines: 236
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.findUpgrades
 
-`src/features/simulator/findUpgrades.ts` · **features** layer · 221 lines
+`src/features/simulator/findUpgrades.ts` · **features** layer · 236 lines
 
 _No doc comment at the top of this file._
 
@@ -26,6 +26,8 @@ _No doc comment at the top of this file._
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`

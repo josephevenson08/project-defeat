@@ -19,7 +19,7 @@ The modules everything else leans on — change these carefully.
 - [[domain.character.characterTypes]] — 42 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
-- [[domain.stats.statTypes]] — 15 importers
+- [[domain.stats.statTypes]] — 16 importers
 - [[features.character.characterTypes]] — 15 importers
 - [[components.layout.Panel]] — 12 importers
 - [[domain.abilities.abilityTypes]] — 11 importers
@@ -195,12 +195,12 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.spellTable]] · 1 importers
 - [[domain.stats.describeStats]] · 3 importers
 - [[domain.stats.statRelevance]] · 1 importers
-- [[domain.stats.statTypes]] · 15 importers
+- [[domain.stats.statTypes]] · 16 importers
 - [[domain.stats.statUtils]] · 3 importers
 - [[domain.talents.sampleTalents]] · 2 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers
-- [[domain.talents.talentModifiers]] · 1 importers
-- [[domain.talents.talentTypes]] · 5 importers
+- [[domain.talents.talentModifiers]] · 6 importers
+- [[domain.talents.talentTypes]] · 7 importers
 - [[domain.tierlists.index]] · 1 importers
 - [[domain.tierlists.tierLists]] · 1 importers
 - [[domain.tierlists.tierListsJson.d]] · 0 importers

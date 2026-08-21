@@ -11,6 +11,7 @@ import { CharacterCreator } from './features/character/CharacterCreator'
 import { CharacterRail } from './features/character/CharacterRail'
 import { TalentsPanel } from './features/talents/TalentsPanel'
 import type { TalentPoints } from './domain/talents/talentTypes'
+import { deriveTalentModifiers } from './domain/talents/talentModifiers'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
 import { applyWeaponSlotRules, defaultGear, normalizeGearForCharacter } from './features/gear/gearData'
@@ -176,14 +177,21 @@ function App() {
 
   const role = getRoleForSpec(character.className, character.spec)
 
+  /*
+   * Talents now reach the stat rail, the gear rankings and the upgrade finder, not the hidden
+   * simulator alone. An empty tree is the identity, so an untalented character reads exactly as it
+   * did before — which is the invariant that made widening this safe to do at all.
+   */
+  const talentModifiers = useMemo(() => deriveTalentModifiers(talentPoints), [talentPoints])
+
   const stats = useMemo(
-    () => calculateStats(character, gear, activeBuffIds, activeConsumableIds),
-    [character, gear, activeBuffIds, activeConsumableIds],
+    () => calculateStats(character, gear, activeBuffIds, activeConsumableIds, undefined, talentModifiers),
+    [character, gear, activeBuffIds, activeConsumableIds, talentModifiers],
   )
   // Cheap enough to keep live (a handful of pure re-runs of the sim), and stat priority is reference
   // information you want visible while gearing rather than something to press a button for.
   const statWeights = useMemo(
-    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
+    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints),
     [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
   )
 
@@ -223,13 +231,13 @@ function App() {
   const toggleTargetDebuff = useMemo(() => toggleId(setActiveTargetDebuffIds), [toggleId])
 
   const upgradeReport = useMemo(
-    () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target),
-    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target],
+    () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints),
+    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
   )
 
   function runSimulation() {
-    // Talents reach the simulation and nothing else — `calculateStats` deliberately still does not
-    // see them, so the always-visible stat rail, gear rankings and upgrade finder are untouched.
+    // `stats` already carries the talent build, so the estimate and the rail agree by construction
+    // rather than by coincidence. They disagreed by design until 2026-08-20.
     setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints))
   }
 

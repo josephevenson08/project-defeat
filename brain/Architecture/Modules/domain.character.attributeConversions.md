@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/character/attributeConversions.ts
-lines: 84
+lines: 95
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.attributeConversions
 
-`src/domain/character/attributeConversions.ts` · **domain** layer · 84 lines
+`src/domain/character/attributeConversions.ts` · **domain** layer · 95 lines
 
 _No doc comment at the top of this file._
 
@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 
 ## Imported by
 

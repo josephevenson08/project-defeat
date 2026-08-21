@@ -192,6 +192,39 @@ const WARRIOR_EXTRACTORS = [
  * Deliberately not extracted, and why. Listed rather than omitted so a reader can tell the
  * difference between "wowsims has no such talent" and "this project has nowhere to put it".
  */
+/*
+ * The stat-routed half, which was refused by name until 2026-08-20 for one reason: it lands on
+ * `StatBlock`, so it could not apply until talents reached `calculateStats` rather than the hidden
+ * simulator alone. Vitality and Toughness are the two this file's own skip list named.
+ */
+const WARRIOR_STAT_EXTRACTORS = [
+  {
+    talent: 'Vitality',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /stamBonus := 1 \+ ([\d.]+)\*float64\(warrior\.Talents\.Vitality\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Vitality',
+    kind: 'statFactor',
+    stat: 'strength',
+    unit: 'fraction per rank',
+    re: /strBonus := 1 \+ ([\d.]+)\*float64\(warrior\.Talents\.Vitality\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Toughness',
+    kind: 'itemArmorMultiplier',
+    unit: 'fraction per rank',
+    // Reads `Equip.Stats()`, so it raises armour from gear and nothing else — not the armour a
+    // character gets from Agility, buffs or consumables.
+    re: /AddStat\(stats\.Armor,\s*warrior\.Equip\.Stats\(\)\[stats\.Armor\]\*([\d.]+)\*float64\(warrior\.Talents\.Toughness\)\)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
 const WARRIOR_SKIPPED = [
   ['Deep Wounds', 'A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials.'],
   ['Death Wish', 'An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has.'],
@@ -201,7 +234,6 @@ const WARRIOR_SKIPPED = [
   ['Blood Frenzy', 'A debuff on the target rather than a change to the player.'],
   ['Mace/Sword/Poleaxe Specialization', 'Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet.'],
   ['Impale', 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
-  ['Toughness / Vitality', 'Multiply armour, stamina and strength, which calculateStats owns. Taking them means talents reaching the always-visible stat rail, gear rankings and the upgrade finder — a product decision reserved for the repo owner, not an ingest.'],
   ['Defiance', 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
   ['Shield Mastery', 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
 ]
@@ -247,8 +279,34 @@ const ROGUE_EXTRACTORS = [
   },
 ]
 
+const ROGUE_STAT_EXTRACTORS = [
+  {
+    talent: 'Vitality',
+    kind: 'statFactor',
+    stat: 'agility',
+    unit: 'fraction per rank',
+    re: /agiBonus := 1 \+ ([\d.]+)\*float64\(rogue\.Talents\.Vitality\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Vitality',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /stamBonus := 1 \+ ([\d.]+)\*float64\(rogue\.Talents\.Vitality\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Sinister Calling',
+    kind: 'statFactor',
+    stat: 'agility',
+    unit: 'fraction per rank',
+    re: /agiBonus := 1 \+ ([\d.]+)\*float64\(rogue\.Talents\.SinisterCalling\)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
 const ROGUE_SKIPPED = [
-  ['Vitality / Sinister Calling', 'Both multiply Agility, which cascades into attack power and crit inside calculateStats. Talents deliberately reach only the simulation, so applying these would mean re-deriving what calculateStats already derives.'],
   ['Murder', 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
   ['Serrated Blades', 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
   ['Combat Potency', 'Energy returned on off-hand hits. The energy budget is a flat 10/sec, with no income model to feed.'],
@@ -308,7 +366,8 @@ const HUNTER_EXTRACTORS = [
 
 const HUNTER_SKIPPED = [
   ['Ferocity / Animal Handler / Unleashed Fury / Frenzy / Focused Fire / The Beast Within', 'Pet talents. There is no pet in this model, which is also why Beast Mastery is the spec its own note flags as most understated.'],
-  ['Combat Experience / Survivalist', 'Multiply Agility and Health, which cascade inside calculateStats. Talents deliberately reach only the simulation.'],
+  ['Survivalist', 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
+  ['Combat Experience', 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
   ['Mortal Shots', 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
   ['Expose Weakness', 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
   ['Master Tactician / Thrill of the Hunt / Readiness', 'Procs and cooldowns needing a timeline.'],
@@ -423,10 +482,37 @@ const DRUID_EXTRACTORS = [
   },
 ]
 
+const DRUID_STAT_EXTRACTORS = [
+  {
+    talent: 'Lunar Guidance',
+    kind: 'statConversion',
+    from: 'intellect',
+    to: 'spellPower',
+    unit: 'spell power per point of Intellect, per rank',
+    re: /bonus := \(([\d.]+) \/ ([\d.]+)\) \* float64\(druid\.Talents\.LunarGuidance\)/,
+    value: (m) => Number(m[1]) / Number(m[2]),
+    caveat: 'Upstream models the spell-damage half only, because wowsims has no healer implemented for this class at the pinned commit. The talent raises healing by the same amount in game, so a healer estimate here reads low by it; sourcing that half needs the tooltip itself, which is not this file.',
+  },
+  {
+    talent: 'Thick Hide',
+    kind: 'itemArmorMultiplier',
+    unit: 'fraction per rank',
+    /*
+     * Upstream branches: `InForm(Bear)` gets 0.5/3 a rank, everything else 0.1/3. The pattern anchors
+     * on the `else` deliberately, because this app models Feral as **cat** form — the same call that
+     * gates `feralAttackPower` and the cat-form attribute conversions. Matching the Bear branch would
+     * hand every druid, Balance and Restoration included, a bear's armour.
+     */
+    re: /\} else \{\s*druid\.AddStat\(stats\.Armor, druid\.Equip\.Stats\(\)\[stats\.Armor\]\*\(([\d.]+)\/([\d.]+)\)\*float64\(druid\.Talents\.ThickHide\)\)/,
+    value: (m) => Number(m[1]) / Number(m[2]),
+    caveat: 'Cat/caster form rate. Bear form is 5x this upstream, and this app does not model bear.',
+  },
+]
+
 const DRUID_SKIPPED = [
   ['Subtlety', 'Reduces threat, which nothing here scores.'],
-  ['Survival of the Fittest / Thick Hide', 'Tank-facing crit-taken and armour. Talents reach the damage path only.'],
-  ['Heart of the Wild / Furor', 'Multiply Strength, Intellect or the form itself, cascading through calculateStats.'],
+  ['Survival of the Fittest', 'Reduces the chance to be crit, which the damage path does not model.'],
+  ['Heart of the Wild / Furor', 'Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model.'],
   ['Moonkin Form / Tree of Life', 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
   ['Omen of Clarity / Primal Fury', 'Proc-driven energy and combo points, needing a timeline.'],
 ]
@@ -502,12 +588,28 @@ const PALADIN_EXTRACTORS = [
   },
 ]
 
+const PALADIN_STAT_EXTRACTORS = [
+  {
+    talent: 'Divine Strength',
+    kind: 'statFactor',
+    stat: 'strength',
+    unit: 'fraction per rank',
+    re: /bonus := 1 \+ ([\d.]+)\*float64\(paladin\.Talents\.DivineStrength\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Toughness',
+    kind: 'itemArmorMultiplier',
+    unit: 'fraction per rank',
+    re: /AddStat\(stats\.Armor,\s*paladin\.Equip\.Stats\(\)\[stats\.Armor\]\*([\d.]+)\*float64\(paladin\.Talents\.Toughness\)\)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
 const PALADIN_SKIPPED = [
-  ['Divine Strength', 'Multiplies Strength, which cascades into attack power inside calculateStats.'],
   ['Spell Warding / Improved Righteous Fury', 'Damage-taken reduction; no incoming-damage stream on the damage path.'],
   ['Vengeance / Sanctity Aura', 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
   ['Crusade', 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
-  ['Toughness', 'Multiplies item armour, which calculateStats owns — the same reason Warrior\'s is refused. Reaching it is a product decision about the stat rail, not an ingest.'],
   ['Shield Specialization', 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
 ]
 
@@ -557,10 +659,29 @@ const MAGE_EXTRACTORS = [
   },
 ]
 
+const MAGE_STAT_EXTRACTORS = [
+  {
+    talent: 'Arcane Mind',
+    kind: 'statFactor',
+    stat: 'intellect',
+    unit: 'fraction per rank',
+    re: /return intellect \* \(1\.0 \+ ([\d.]+)\*float64\(mage\.Talents\.ArcaneMind\)\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Mind Mastery',
+    kind: 'statConversion',
+    from: 'intellect',
+    to: 'spellPower',
+    unit: 'spell power per point of Intellect, per rank',
+    re: /return spellPower \+ intellect\*([\d.]+)\*float64\(mage\.Talents\.MindMastery\)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
 const MAGE_SKIPPED = [
   ['Ignite / Combustion / Winters Chill', 'Per-spell and school-scoped; the simulator models one generic cast and records no spell school.'],
   ['Arcane Power / Presence of Mind / Icy Veins', 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
-  ['Arcane Mind / Mind Mastery', 'Intellect scaling and Intellect-to-spell-power, which cascade through calculateStats instead.'],
   ['Empowered Fireball / Frostbolt', 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
 ]
 
@@ -585,9 +706,22 @@ const PRIEST_EXTRACTORS = [
   },
 ]
 
+const PRIEST_STAT_EXTRACTORS = [
+  {
+    talent: 'Spiritual Guidance',
+    kind: 'statConversion',
+    from: 'spirit',
+    to: 'spellPower',
+    unit: 'spell power per point of Spirit, per rank',
+    // Written as a total over max rank, so the per-rank share is the division itself.
+    re: /bonus := \(([\d.]+) \/ ([\d.]+)\) \* float64\(priest\.Talents\.SpiritualGuidance\)/,
+    value: (m) => Number(m[1]) / Number(m[2]),
+    caveat: 'Upstream models the spell-damage half only, because wowsims has no healer implemented for this class at the pinned commit. The talent raises healing by the same amount in game, so a healer estimate here reads low by it; sourcing that half needs the tooltip itself, which is not this file.',
+  },
+]
+
 const PRIEST_SKIPPED = [
   ['Shadow Weaving / Misery', 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
-  ['Spiritual Guidance', 'Converts Spirit into spell power via a stat dependency, which belongs in calculateStats.'],
   ['Inner Focus / Power Infusion', 'Timed cooldowns, which a closed-form model has no timeline to place.'],
   ['Improved Renew / Empowered Healing', 'Per-spell coefficients; the healer path models one generic cast.'],
 ]
@@ -617,20 +751,20 @@ const WARLOCK_EXTRACTORS = [
 
 const WARLOCK_SKIPPED = [
   ['Master Demonologist', 'Gated on which demon is summoned. No pet model here.'],
-  ['Fel Intellect / Fel Stamina', 'Stat dependencies into mana and health, which belong in calculateStats.'],
+  ['Fel Intellect / Fel Stamina', 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
   ['Improved Shadow Bolt / Ruin / Emberstorm', 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
   ['Soul Leech / Nightfall', 'Proc-driven, needing a timeline.'],
 ]
 
 const CLASSES = [
-  { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: WARRIOR_EXTRACTORS, skipped: WARRIOR_SKIPPED },
-  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: ROGUE_EXTRACTORS, skipped: ROGUE_SKIPPED },
+  { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: [...WARRIOR_EXTRACTORS, ...WARRIOR_STAT_EXTRACTORS], skipped: WARRIOR_SKIPPED },
+  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS], skipped: ROGUE_SKIPPED },
   { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
-  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: DRUID_EXTRACTORS, skipped: DRUID_SKIPPED },
-  { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: PALADIN_EXTRACTORS, skipped: PALADIN_SKIPPED },
-  { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: MAGE_EXTRACTORS, skipped: MAGE_SKIPPED },
-  { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: PRIEST_EXTRACTORS, skipped: PRIEST_SKIPPED },
+  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS], skipped: DRUID_SKIPPED },
+  { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: [...PALADIN_EXTRACTORS, ...PALADIN_STAT_EXTRACTORS], skipped: PALADIN_SKIPPED },
+  { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: [...MAGE_EXTRACTORS, ...MAGE_STAT_EXTRACTORS], skipped: MAGE_SKIPPED },
+  { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: [...PRIEST_EXTRACTORS, ...PRIEST_STAT_EXTRACTORS], skipped: PRIEST_SKIPPED },
   { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: WARLOCK_EXTRACTORS, skipped: WARLOCK_SKIPPED },
 ]
 
@@ -681,6 +815,11 @@ for (const entry of CLASSES) {
       unit: extractor.unit,
       perRank: extractor.flat ? undefined : extractor.value(hit.m, second),
       flatValue: extractor.flat ? extractor.value(hit.m, second) : undefined,
+      // Only the three stat-routed kinds carry these; every other kind names its destination by
+      // `kind` alone.
+      stat: extractor.stat,
+      from: extractor.from,
+      to: extractor.to,
       caveat: extractor.caveat,
       source: hit.path,
     })

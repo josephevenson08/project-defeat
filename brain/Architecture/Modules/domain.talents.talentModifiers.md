@@ -2,28 +2,16 @@
 type: module
 layer: domain
 source: src/domain/talents/talentModifiers.ts
-lines: 287
+lines: 371
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentModifiers
 
-`src/domain/talents/talentModifiers.ts` · **domain** layer · 287 lines
+`src/domain/talents/talentModifiers.ts` · **domain** layer · 371 lines
 
-From the top of the file:
-
-> What a talent build changes about the character, collapsed into one record.
-> 
-> Shaped after `aggregateTargetDebuffs` rather than after `StatBlock`, and that is the load-bearing
-> choice. `StatBlock` holds flat amounts and *ratings*; almost nothing a talent does fits there. A
-> talent grants crit **chance**, not crit rating — the conversion only runs one way — and multiplies
-> damage, attack speed and rage income, none of which is a stat at all. The debuff record already
-> solved the same problem: a small typed set of fields, each applied at one named point in the
-> calculation, where a field with nothing to apply to contributes nothing by construction.
-> 
-> Every field is an identity value when no points are spent, so an empty tree — which is the default
-> — has to reproduce the previous numbers exactly. A test pins that.
+_No doc comment at the top of this file._
 
 ## Exports
 
@@ -31,16 +19,22 @@ From the top of the file:
 
 **const** — `classesWithTalentEffects`, `noTalentModifiers`, `unmodelledTalents`
 
-**type** — `TalentModifiers`
+**type** — `TalentModifiers`, `TalentStatConversion`
 
 ## Imports
 
+- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 
 ## Imported by
 
+- [[App]] — `src/App.tsx`
+- [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
+- [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
+- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 

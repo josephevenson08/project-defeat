@@ -252,6 +252,7 @@ const DOMAIN_ENTRY = `
 export { tbcClasses, getRoleForSpec } from '../../src/domain/character/tbcClasses'
 export { racesByFaction, racesByClass } from '../../src/domain/character/races'
 export { getBaseStats } from '../../src/domain/character/baseStats'
+export { default as talentEffects } from '../../src/domain/talents/talentEffects.json' with { type: 'json' }
 export { gearSlots } from '../../src/domain/gear/gearSlots'
 export { sampleItems } from '../../src/domain/gear/sampleItems'
 export { sampleRaids } from '../../src/domain/raids/sampleRaids'
@@ -1193,6 +1194,11 @@ async function writeDomainNotes(data, modules) {
     // batch landed, while the README promised the vault "cannot drift from the code" — which was
     // only true of the parts that were actually derived from it.
     itemsFlagged: sampleItems.filter((item) => item.needsVerification).length,
+    // Same rule, and the same lesson learned twice: "49 talent groups are refused by name" was
+    // written into four documents and the brain generator, and every copy went stale on the day the
+    // ingest changed, with nothing failing.
+    talentEffects: data.talentEffects.effects.length,
+    talentGroupsRefused: data.talentEffects.skipped.length,
     bisEntries: bisLists.reduce((total, list) => total + list.entries.length, 0),
     bisEntriesRankedDeeperThanOne: bisLists.reduce(
       (total, list) => total + list.entries.filter((entry) => entry.rank > 1).length,
@@ -1389,9 +1395,9 @@ async function writeProjectNotes(modules, counts) {
       '',
       '## Talents',
       '',
-      '- Talents reach all 27 specs, but **coverage is not completeness**: 49 talent groups are refused by name, each with a reason. A talented estimate reads low, especially for casters.',
+      `- Talents reach all 27 specs, but **coverage is not completeness**: ${counts.talentGroupsRefused} talent groups are refused by name, each with a reason. A talented estimate reads low, especially for casters.`,
       '- The two kinds refused are per-spell effects (needing a spell school) and stat-pipeline effects like Toughness and Vitality (needing `calculateStats`).',
-      '- **Talents do not reach the always-visible stat rail** — only the simulation. Spending points moves the estimate but not the paperdoll totals, gear rankings or upgrade finder. Widening that is an open product decision.',
+      '- **Two talents that raise healing are modelled for their damage half only.** Spiritual Guidance and Lunar Guidance raise spell damage *and* healing in game, but wowsims implements no healer for either class at the pinned commit, so only the sourced half is ingested. A healer estimate reads low by it.',
       '',
       '## Data',
       '',
@@ -1474,7 +1480,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       '## Coverage is not completeness, and the refusal count goes next to it',
       '',
-      'Talents reach 27 of 27 specs *and* 49 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped — 48 item effects, 49 talent groups — and the surfaces that quote a coverage number quote the refusal beside it.',
+      `Talents reach 27 of 27 specs *and* ${counts.talentGroupsRefused} talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.`,
       '',
       '## Verify before correcting, even when the data looks obviously wrong',
       '',

@@ -11,6 +11,7 @@ import { getGemById, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { metaGemIsActive } from '../../domain/gems/gemTypes'
 import { effectUptime } from '../../domain/simulation/combatConstants'
 import { addStats, applyStatMultipliers, scaleStats } from '../../domain/stats/statUtils'
+import { noTalentModifiers, type TalentModifiers } from '../../domain/talents/talentModifiers'
 import { type StatBlock } from './statsTypes'
 
 export function calculateStats(
@@ -24,8 +25,24 @@ export function calculateStats(
    * time; leave undefined for a normal character calculation.
    */
   bonusStats?: Partial<StatBlock>,
+  /**
+   * What the talent build changes about the character's *stats*, as opposed to its damage.
+   *
+   * Defaulted, and the default is the identity, so an empty tree reproduces the untalented totals
+   * exactly — the invariant a test pins. Only three of the fields reach here: the rest of
+   * `TalentModifiers` describes damage, rage and attack-table effects that are not stats at all.
+   */
+  talents: TalentModifiers = noTalentModifiers,
 ): StatBlock {
   let total: StatBlock = getBaseStats(character.className, character.race)
+
+  /*
+   * Where armour stood before any gear was counted, so the gear loop's contribution can be
+   * multiplied on its own afterwards. Toughness and Thick Hide raise "the armor value from your
+   * items" and nothing else — armour from Agility, buffs or consumables is untouched, and folding
+   * the multiplier into the total would quietly overpay every tank.
+   */
+  const armorBeforeGear = total.armor
 
   /*
    * Every gem equipped, gathered before anything is summed, because a meta gem's condition is about
@@ -80,6 +97,8 @@ export function calculateStats(
     total = addStats(total, getEnchantById(slot.enchantId)?.stats)
   })
 
+  total.armor = armorBeforeGear + (total.armor - armorBeforeGear) * talents.itemArmorMultiplier
+
   activeBuffIds.forEach((id) => {
     const buff = getBuffById(id)
     if (!buff) return
@@ -99,6 +118,19 @@ export function calculateStats(
   total = applyRacialTraits(total, character.race, character.className, gear)
 
   /*
+   * Talent stat multipliers land beside the racials, and for the same reason: both multiply a
+   * finished total, and both have to be in before the conversions below read it — Arcane Mind has to
+   * raise Intellect before Mind Mastery turns Intellect into spell power. Their order relative to
+   * each other does not matter, since multiplication commutes.
+   *
+   * `statFactors` holds the factor itself rather than the `+0.06` fraction `applyStatMultipliers`
+   * takes, so it is applied directly.
+   */
+  for (const [stat, factor] of Object.entries(talents.statFactors)) {
+    total[stat as keyof StatBlock] *= factor
+  }
+
+  /*
    * Attributes become attack power, armor and ratings last, once every source above has been summed.
    *
    * The rates are class-specific and sourced — see `attributeConversions.ts`, which replaced six
@@ -110,5 +142,5 @@ export function calculateStats(
    * only while shapeshifted — the stat's own wording is "in Cat, Bear, Dire Bear and Moonkin forms
    * only" — so it arrives as part of the cat-form block, gated on the same spec check as before.
    */
-  return applyAttributeConversions(total, character.className, character.spec)
+  return applyAttributeConversions(total, character.className, character.spec, talents.statConversions)
 }

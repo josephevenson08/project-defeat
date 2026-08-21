@@ -38,13 +38,17 @@
  *   both directions: a Shaman's melee talent must move an Elemental score by exactly nothing, and a
  *   Warrior's Cruelty must not move Effective Health.
  * - **What that does *not* mean is that talents are fully modelled**, and the difference matters more
- *   than the coverage figure. **49 talent groups are refused by name**, each with a reason. Two kinds
- *   dominate. The **per-spell** ones — Ignite, Shadow Weaving, Ruin, every "Improved &lt;nuke&gt;" — need
- *   a spell school and a per-spell coefficient, and this simulator models one generic cast per spec
- *   and records no school at all. The **stat-pipeline** ones — Toughness, Vitality, Divine Strength —
- *   multiply armour, stamina and strength, which `calculateStats` owns; routing talents there would
- *   move the always-visible stat rail, the gear rankings and the upgrade finder, and that is a
- *   product decision deliberately left to the repo owner. Expect a talented estimate to read low.
+ *   than the coverage figure. Talent groups are still refused by name, each with a reason — but the
+ *   **count is asserted from the data rather than written here**, because the figure that used to sit
+ *   in this sentence went stale the moment the ingest changed, which is this file's own recurring
+ *   failure. The **per-spell** ones — Ignite, Shadow Weaving, Ruin, every "Improved &lt;nuke&gt;" —
+ *   need a spell school and a per-spell coefficient, and this simulator models one generic cast per
+ *   spec and records no school at all.
+ * - **The stat-pipeline group is no longer among them** (2026-08-20). Toughness, Vitality, Divine
+ *   Strength, Sinister Calling, Arcane Mind and the Intellect- and Spirit-to-spell-power talents now
+ *   reach `calculateStats`, so they move the stat rail, the gear rankings and the upgrade finder as
+ *   well as the estimate. A talented tank no longer reads low for that reason. What is still refused
+ *   for a stat reason is narrower: Health and Mana, which `StatBlock` has no field for.
  * - **Melee DPS still reads low, and the remaining cause is rage income, not talents.** A talented
  *   Fury warrior's income is asserted to sit **above the 3.4/sec an untalented one makes and below
  *   the 7.5 Bloodthirst and Whirlwind want** — a band rather than a point, so verification work does

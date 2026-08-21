@@ -1,4 +1,5 @@
 import rawBaseStats from './baseStats.json' with { type: 'json' }
+import type { TalentStatConversion } from '../talents/talentModifiers'
 import type { StatBlock } from '../stats/statTypes'
 import { addStats } from '../stats/statUtils'
 import type { TbcClass, TbcSpec } from './characterTypes'
@@ -72,10 +73,20 @@ export function getAttributeConversions(className: TbcClass, spec: TbcSpec): rea
  * output depend on the order the ingest happened to emit, which is not something this should be
  * sensitive to.
  */
-export function applyAttributeConversions(total: StatBlock, className: TbcClass, spec: TbcSpec): StatBlock {
+export function applyAttributeConversions(
+  total: StatBlock,
+  className: TbcClass,
+  spec: TbcSpec,
+  /**
+   * Conversions a talent build grants that no character has untalented — Lunar Guidance, Mind
+   * Mastery, Spiritual Guidance. They run in the same pass, and off the same pre-conversion totals,
+   * because they are the same shape: so much of `to` per point of `from`.
+   */
+  talentConversions: readonly TalentStatConversion[] = [],
+): StatBlock {
   const next = { ...total }
 
-  for (const conversion of getAttributeConversions(className, spec)) {
+  for (const conversion of [...getAttributeConversions(className, spec), ...talentConversions]) {
     next[conversion.to] += total[conversion.from] * conversion.perPoint
   }
 

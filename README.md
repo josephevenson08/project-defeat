@@ -167,8 +167,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
 - **Talents reach all 27 specs, but coverage is not completeness.** 579 talents are ingested across
-  all nine classes and 49 machine-readable effects reach the simulation; **49 talent groups are
-  refused by name**, each with a reason. Two kinds dominate: per-spell effects (Ignite, Shadow
+  all nine classes, and since 2026-08-21 their machine-readable effects reach the always-visible stat
+  rail, the gear rankings and the upgrade finder as well as the estimate. **A named list of talent
+  groups is still refused**, each with a reason — the count is asserted from the data rather than
+  written here, because the figure that used to sit in this sentence went stale the moment the ingest
+  changed. Two kinds dominate: per-spell effects (Ignite, Shadow
   Weaving, Ruin, every "Improved &lt;nuke&gt;") need a spell school this simulator does not record,
   and stat-pipeline effects (Toughness, Vitality) would have to route through `calculateStats`, which
   is a deliberate open decision. **Expect a talented estimate to read low**, especially for casters.

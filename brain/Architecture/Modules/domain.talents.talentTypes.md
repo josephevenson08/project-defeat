@@ -31,6 +31,8 @@ _None._
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
+- [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases

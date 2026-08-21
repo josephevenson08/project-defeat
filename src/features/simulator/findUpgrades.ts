@@ -1,3 +1,5 @@
+import { deriveTalentModifiers } from '../../domain/talents/talentModifiers'
+import type { TalentPoints } from '../../domain/talents/talentTypes'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { sampleGems } from '../../domain/gems/sampleGems'
 import type { SocketColor } from '../../domain/gear/itemTypes'
@@ -43,10 +45,12 @@ function pickBestGemPerColor(
   activeConsumableIds: readonly string[],
   activeTargetDebuffIds: readonly string[],
   target: SimulationTarget | undefined,
+  talentPoints: TalentPoints,
 ): Map<SocketColor, string> {
+  const talents = deriveTalentModifiers(talentPoints)
   const scoreWithBonus = (bonusStats: Parameters<typeof calculateStats>[4]) => {
-    const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats)
-    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target).scoreExact
+    const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats, talents)
+    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints).scoreExact
   }
 
   const baseline = scoreWithBonus(undefined)
@@ -131,15 +135,26 @@ export function findUpgrades(
   activeConsumableIds: readonly string[] = [],
   activeTargetDebuffIds: readonly string[] = [],
   target?: SimulationTarget,
+  talentPoints: TalentPoints = {},
   limit = 12,
 ): UpgradeReport {
+  const talents = deriveTalentModifiers(talentPoints)
   const scoreFor = (candidateGear: EquippedGear) => {
-    const stats = calculateStats(character, candidateGear, activeBuffIds, activeConsumableIds)
-    return calculateSimulation(character, candidateGear, stats, role, activeTargetDebuffIds, target)
+    const stats = calculateStats(character, candidateGear, activeBuffIds, activeConsumableIds, undefined, talents)
+    return calculateSimulation(character, candidateGear, stats, role, activeTargetDebuffIds, target, talentPoints)
   }
 
   const baseline = scoreFor(gear)
-  const bestGemPerColor = pickBestGemPerColor(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target)
+  const bestGemPerColor = pickBestGemPerColor(
+    character,
+    gear,
+    role,
+    activeBuffIds,
+    activeConsumableIds,
+    activeTargetDebuffIds,
+    target,
+    talentPoints,
+  )
   const gemsForItem = (item: GearItem) => (item.sockets ?? []).map((socket) => bestGemPerColor.get(socket) ?? '')
 
   const candidates: UpgradeCandidate[] = []

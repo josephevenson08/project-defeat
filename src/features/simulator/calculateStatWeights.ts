@@ -1,3 +1,5 @@
+import { deriveTalentModifiers } from '../../domain/talents/talentModifiers'
+import type { TalentPoints } from '../../domain/talents/talentTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
 import { calculateStats } from '../stats/calculateStats'
@@ -139,10 +141,15 @@ export function calculateStatWeights(
   activeConsumableIds: readonly string[] = [],
   activeTargetDebuffIds: readonly string[] = [],
   target?: SimulationTarget,
+  talentPoints: TalentPoints = {},
 ): StatWeightsResult {
+  // Derived once rather than per probe: the weights run the whole simulation a dozen times over, and
+  // the modifiers depend only on the point allocation.
+  const talents = deriveTalentModifiers(talentPoints)
+
   const runScore = (bonusStats?: Partial<StatBlock>) => {
-    const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats)
-    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target)
+    const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats, talents)
+    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints)
   }
 
   const baseline = runScore()

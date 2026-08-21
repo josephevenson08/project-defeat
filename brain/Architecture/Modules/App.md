@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 341
+lines: 349
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 341 lines
+`src/App.tsx` · **app** layer · 349 lines
 
 _No doc comment at the top of this file._
 
@@ -26,6 +26,7 @@ _Nothing exported (side-effect or style module)._
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`

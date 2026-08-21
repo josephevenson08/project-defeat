@@ -173,8 +173,8 @@ each pinned by an assertion these days.
 - **The healer mana constraint** — MP5, Spirit regen and the Intellect-to-mana conversion, from
   wowsims' `mana.go`. Reported as a deficit rather than used to throttle the headline, because a
   healer who casts flat out and one who paces are both real.
-- **Talent scaling, on all 27 specs** — 579 talents ingested across nine classes, 49 machine-readable
-  effects reaching every one of the four role paths.
+- **Talent scaling, on all 27 specs** — 579 talents ingested across nine classes, 62 machine-readable
+  effects reaching every one of the four role paths, and since 2026-08-21 the stat pipeline as well.
 
 **Still open, and these are the honest ones:**
 
@@ -182,8 +182,10 @@ each pinned by an assertion these days.
   Simulation tab stays hidden. Scoped in `ROTATION-SCOPE.md`, which corrects this file's earlier
   assumption that it would be an ingest like talents: wowsims implements rotations as *imperative
   state machines over an event timeline*, and this engine is closed-form.
-- **49 talent groups are refused by name.** Coverage is not completeness. Per-spell effects need a
-  spell school the simulator does not record; Toughness and Vitality need the stat pipeline.
+- **Talent groups are still refused by name**, and the count lives in an assertion rather than in this
+  sentence — the figure that used to sit here went stale the moment the ingest changed. Coverage is not
+  completeness. Per-spell effects need a spell school the simulator does not record; Health and Mana
+  have no `StatBlock` field. Toughness and Vitality are no longer among them.
 - **No multi-iteration variance and no result charts** — every number is a point estimate.
 - **Set bonuses are surfaced, not scored.**
 
@@ -271,8 +273,10 @@ the Midsummer event: the phase values were right and Wowhead was being forward-l
 other way would have deleted legitimate rankings.
 
 **Coverage is not completeness, and the second number is the honest one.** Talents reach 27 of 27
-specs *and* 49 talent groups are refused by name. Quoting only the first would be true and
-misleading. Every surface that quotes a coverage figure now quotes the refusal count beside it.
+specs *and* a named list of talent groups is still refused. Quoting only the first would be true and
+misleading. Every surface that quotes a coverage figure quotes the refusal count beside it — computed
+from the data, because the version of this paragraph that wrote the number down was wrong within a
+day of the ingest changing.
 
 **A caveat needs something that fails when it stops being true.** Seven user-facing statements have
 been found *wrong* here, every one of them true when written — because closing a gap never edits the
@@ -334,11 +338,13 @@ written below each note's manual marker.
 
 - **Rotations cover 2 specs of 27.** Every other spec is modelled from a single signature ability,
   which understates any spec whose damage is spread across several buttons. See `ROTATION-SCOPE.md`.
-- **Talents reach all 27 specs but 49 talent groups are refused by name**, dominated by per-spell
-  effects and by the ones that would have to route through `calculateStats`. A talented estimate
-  reads low.
-- **Talents do not reach the always-visible stat rail** — only the simulation. Widening that is an
-  open product decision, and it is why spending points moves the estimate but not the paperdoll.
+- **Talents reach all 27 specs but a named list of groups is still refused**, dominated by per-spell
+  effects that need a spell school this simulator does not record. The stat-pipeline ones are no
+  longer among them.
+- **Two talents that raise healing are modelled for their damage half only.** Spiritual Guidance and
+  Lunar Guidance raise spell damage *and* healing in game, but wowsims has no healer implemented for
+  either class at the pinned commit, so only the sourced half is ingested. A healer estimate reads low
+  by it, and the effect carries that as a caveat rather than a guessed second number.
 - **No multi-iteration variance and no result charts.**
 - ~~**The app has a fixed minimum width of roughly 806px.**~~ **Fixed 2026-08-19.** The floor came
   from fixed 940px containers, a hard two-column `.content` grid, and — the last 95px of it — a
