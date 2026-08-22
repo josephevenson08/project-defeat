@@ -64,9 +64,16 @@ const raidcompNames = [
 ]
 
 const itemNames = new Set(Object.values(icons))
-const names = [...new Set([...itemNames, ...talentIconNames, ...raidcompNames])].sort()
+
+/*
+ * Professions are the fourth source. Their trade-skill artwork is not item artwork, so nothing in
+ * the generated item mapping covers it -- the tab drew no icons at all until this was added.
+ */
+const { professionIconNames } = await import(pathToFileURL(resolve(REPO, 'src/domain/professions/sampleProfessions.ts')).href)
+
+const names = [...new Set([...itemNames, ...talentIconNames, ...raidcompNames, ...professionIconNames])].sort()
 console.log(
-  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp icons -> ${names.length} distinct`,
+  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp + ${professionIconNames.length} profession icons -> ${names.length} distinct`,
 )
 
 mkdirSync(OUT_DIR, { recursive: true })

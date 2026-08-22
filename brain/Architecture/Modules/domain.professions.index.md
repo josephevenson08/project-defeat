@@ -15,7 +15,7 @@ _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `allProfessions`, `craftingLevelingPaths`, `gatheringMaterialFarming`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `MaterialFarmSpot`, `Profession`, `ProfessionCategory`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RecipeLeveling`, `sampleProfessions`
+**re-export** — `allProfessions`, `craftingLevelingPaths`, `gatheringMaterialFarming`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `MaterialFarmSpot`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RecipeLeveling`, `sampleProfessions`
 
 ## Imports
 

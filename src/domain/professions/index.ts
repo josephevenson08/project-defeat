@@ -10,4 +10,4 @@ export type {
 export { professionTiers, getProfessionTiers } from './sampleProfessionTiers'
 export { gatheringMaterialFarming, getMaterialFarmSpots } from './sampleGatheringMaterials'
 export { craftingLevelingPaths, getCraftingLevelingPath } from './sampleCraftingGuides'
-export { allProfessions, sampleProfessions, getProfessionProfile } from './sampleProfessions'
+export { allProfessions, sampleProfessions, getProfessionProfile, professionIconNames } from './sampleProfessions'

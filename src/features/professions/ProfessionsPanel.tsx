@@ -1,12 +1,23 @@
 import { useState } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { allProfessions, getProfessionProfile } from '../../domain/professions'
-import type { Profession, ProfessionCategory } from '../../domain/professions'
+import type { Profession, ProfessionProfile } from '../../domain/professions'
 
-const CATEGORY_ORDER: readonly ProfessionCategory[] = ['Gathering', 'Crafting', 'Secondary']
-
-function categoryOf(profession: Profession) {
-  return getProfessionProfile(profession)?.category
+/**
+ * What each card says under the name, computed from the profile rather than written.
+ *
+ * A gathering profession is described by where you farm it, a crafting one by how many recipe steps
+ * its path has. Quoting "13 tiers" for all of them would be true, identical for every card, and
+ * therefore useless.
+ */
+function describeProfession(profile: ProfessionProfile): string {
+  if (profile.materialFarming?.length) {
+    return `${profile.materialFarming.length} farm ${profile.materialFarming.length === 1 ? 'spot' : 'spots'}`
+  }
+  if (profile.levelingPath?.length) {
+    return `${profile.levelingPath.length} recipe ${profile.levelingPath.length === 1 ? 'step' : 'steps'}`
+  }
+  return `${profile.tiers.length} skill tiers`
 }
 
 export function ProfessionsPanel() {
@@ -20,26 +31,38 @@ export function ProfessionsPanel() {
         unconfirmed details are flagged &quot;needs verification&quot; rather than stated as fact.
       </p>
 
-      <div className="professions-picker">
-        {CATEGORY_ORDER.map((category) => (
-          <div className="professions-picker-group" key={category}>
-            <span className="professions-picker-label">{category}</span>
-            <div className="professions-picker-buttons">
-              {allProfessions
-                .filter((profession) => categoryOf(profession) === category)
-                .map((profession) => (
-                  <button
-                    key={profession}
-                    type="button"
-                    className={`tab-nav-button ${profession === selected ? 'tab-nav-button-active' : ''}`.trim()}
-                    onClick={() => setSelected(profession)}
-                  >
-                    {profession}
-                  </button>
-                ))}
-            </div>
-          </div>
-        ))}
+      {/*
+        A card grid rather than rows of text buttons, following the raid picker: this is the same kind
+        of choice — thirteen things, pick the one you came for — and it was the one screen in the app
+        with no artwork on it at all.
+
+        Colour comes from the *category* rather than one hue per profession. Three muted accents carry
+        a real distinction (what you gather, what you craft, what is secondary); thirteen would be
+        decoration, and the palette here deliberately spends colour only where it means something.
+      */}
+      <div className="profession-picker-grid">
+        {allProfessions.map((profession) => {
+          const entry = getProfessionProfile(profession)
+          if (!entry) return null
+
+          return (
+            <button
+              key={profession}
+              type="button"
+              className={`profession-card ${profession === selected ? 'profession-card-selected' : ''}`.trim()}
+              data-category={entry.category}
+              aria-pressed={profession === selected}
+              onClick={() => setSelected(profession)}
+              data-testid={`profession-pick-${profession.toLowerCase().replaceAll(' ', '-')}`}
+            >
+              <img className="profession-card-icon" src={`${import.meta.env.BASE_URL}icons/${entry.icon}.jpg`} alt="" loading="lazy" />
+              <span className="profession-card-name">{profession}</span>
+              <span className="profession-card-meta">
+                {entry.category} · {describeProfession(entry)}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {profile ? (
@@ -49,6 +72,23 @@ export function ProfessionsPanel() {
             <span>{profile.category}</span>
           </div>
           {profile.notes && <p className="panel-copy">{profile.notes}</p>}
+
+          {/*
+            Linked rather than reproduced. wow-professions.com's routes and recipe orders are their
+            work; copying them here would be taking it, and it would go stale the moment they fixed
+            something. This app carries the parts it can source and cite — tiers, trainers, farm
+            spots — and sends you there for the step-by-step.
+          */}
+          <div className="profession-guides">
+            <a className="profession-guide-link" href={profile.guideUrl} target="_blank" rel="noopener noreferrer">
+              Leveling guide on wow-professions.com
+            </a>
+            {profile.specializationUrl && (
+              <a className="profession-guide-link" href={profile.specializationUrl} target="_blank" rel="noopener noreferrer">
+                Specializations
+              </a>
+            )}
+          </div>
 
           <h4>Skill Tiers (cap {profile.skillCap})</h4>
           <div className="profession-tier-list">

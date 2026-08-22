@@ -366,6 +366,7 @@ import {
 } from '../src/domain/talents/talentModifiers'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
+import { allProfessions, getProfessionProfile } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
 import { existsSync, readdirSync } from 'node:fs'
@@ -1318,7 +1319,7 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
   await expect(detail.getByText('Master', { exact: true })).toBeVisible()
   await expect(detail.getByText('Copper Ore')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Alchemy', exact: true }).click()
+  await page.getByTestId('profession-pick-alchemy').click()
   await expect(detail.getByRole('heading', { name: 'Alchemy', exact: true })).toBeVisible()
   await expect(detail.getByText('Copper Ore')).toHaveCount(0)
 
@@ -6011,4 +6012,42 @@ test('every raid loot row can draw an icon', async () => {
     const item = entry!.itemId ? getItemById(entry!.itemId) : undefined
     expect(getIconName(entry!.wowItemId ?? item?.wowItemId), `${name} has artwork`).toBeTruthy()
   }
+})
+
+test('every profession has vendored artwork and a guide to send you to', async () => {
+  /*
+   * The Professions tab was the one screen in the app with no artwork on it at all — thirteen text
+   * buttons — which is what made it read as unfinished beside the raid and gear tabs.
+   *
+   * Two halves, and both can fail silently. An icon *name* that maps to no vendored file renders an
+   * empty box rather than an error, which is the same failure the item icons already guard against.
+   * And the guide URLs are recorded per profession rather than built from the name, because
+   * wow-professions.com's own paths are inconsistent — some end `-tbc-classic`, others
+   * `-burning-crusade-classic` — so a constructed URL would 404 for about half of them.
+   */
+  const missingArtwork: string[] = []
+  const wrongHost: string[] = []
+
+  for (const profession of allProfessions) {
+    const profile = getProfessionProfile(profession)
+    expect(profile, `${profession} has a profile`).toBeDefined()
+
+    if (!existsSync(resolve(process.cwd(), 'public/icons', `${profile!.icon}.jpg`))) {
+      missingArtwork.push(`${profession} -> ${profile!.icon}.jpg`)
+    }
+    for (const url of [profile!.guideUrl, profile!.specializationUrl].filter(Boolean)) {
+      if (!url!.startsWith('https://www.wow-professions.com/')) wrongHost.push(`${profession} -> ${url}`)
+    }
+  }
+
+  expect(missingArtwork, 'every profession icon is vendored on disk').toEqual([])
+  expect(wrongHost, 'guides are links out, not content copied in').toEqual([])
+
+  /*
+   * The five with specializations in TBC. Named rather than counted, because "5 have one" would pass
+   * just as well if the wrong five did — and Jewelcrafting is the one most likely to be added by
+   * mistake, since it is a TBC profession that sounds like it should have them.
+   */
+  const withSpecializations = allProfessions.filter((profession) => getProfessionProfile(profession)?.specializationUrl)
+  expect([...withSpecializations].sort()).toEqual(['Alchemy', 'Blacksmithing', 'Engineering', 'Leatherworking', 'Tailoring'])
 })

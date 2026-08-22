@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/sampleProfessions.ts
-lines: 65
+lines: 124
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.sampleProfessions
 
-`src/domain/professions/sampleProfessions.ts` · **domain** layer · 65 lines
+`src/domain/professions/sampleProfessions.ts` · **domain** layer · 124 lines
 
 _No doc comment at the top of this file._
 
@@ -17,7 +17,7 @@ _No doc comment at the top of this file._
 
 **function** — `getProfessionProfile`
 
-**const** — `allProfessions`, `sampleProfessions`
+**const** — `allProfessions`, `professionIconNames`, `sampleProfessions`
 
 ## Imports
 

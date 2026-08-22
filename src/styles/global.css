@@ -2234,6 +2234,110 @@ select:focus,
   grid-column: 1 / -1;
 }
 
+/*
+ * The profession picker, built like the raid picker because it is the same kind of choice: thirteen
+ * things, pick the one you came for.
+ *
+ * This was the one screen in the app with no artwork at all — a column of text buttons — which is
+ * what made it read as unfinished next to the raid and gear tabs.
+ *
+ * **Colour is per category, not per profession.** Three muted accents carry a real distinction (what
+ * you gather, what you craft, what is secondary). Thirteen hues would be decoration, and the palette
+ * here spends colour only where it means something — the icons bring the rest.
+ */
+.profession-picker-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  margin-bottom: 22px;
+}
+
+.profession-card {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--profession-accent, var(--line-strong));
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 2px 10px;
+  grid-template-columns: 34px 1fr;
+  padding: 10px 12px;
+  text-align: left;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.profession-card[data-category='Gathering'] {
+  --profession-accent: #6f8f6a;
+}
+
+.profession-card[data-category='Crafting'] {
+  --profession-accent: #6a7fa8;
+}
+
+.profession-card[data-category='Secondary'] {
+  --profession-accent: #9a8558;
+}
+
+.profession-card:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+  border-top-color: var(--profession-accent, var(--line-strong));
+}
+
+/* The selected card is the one the detail below belongs to, so it reads as attached rather than merely hovered. */
+.profession-card-selected {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+}
+
+.profession-card-icon {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  grid-row: 1 / span 2;
+  height: 34px;
+  width: 34px;
+}
+
+.profession-card-name {
+  color: var(--text-strong);
+  font-size: 13px;
+}
+
+.profession-card-meta {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+/* Outbound guides. Underlined because they leave the app, which a button-shaped link would hide. */
+.profession-guides {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 18px;
+}
+
+.profession-guide-link {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.profession-guide-link:hover {
+  color: var(--text-strong);
+}
+
+.profession-guide-link::after {
+  content: ' ↗';
+  color: var(--text-faint);
+}
+
 .professions-picker {
   display: grid;
   gap: 14px;

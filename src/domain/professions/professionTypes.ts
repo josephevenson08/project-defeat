@@ -76,6 +76,22 @@ export type ProfessionProfile = {
   tiers: readonly ProfessionTier[]
   /** For gathering professions (and gathering-adjacent callouts): raw material farm spots by skill range. */
   materialFarming?: readonly MaterialFarmSpot[]
+  /** Wowhead icon name, vendored into public/icons by `fetch-icons.mjs`. */
+  icon: string
+  /**
+   * The leveling guide on wow-professions.com.
+   *
+   * **Linked, never copied.** Their routes, vendor lists and recipe orders are the work of that site;
+   * reproducing them here would be taking it, and it would go stale the moment they corrected
+   * something. A link stays current for free and sends the credit where it belongs.
+   *
+   * Recorded per profession rather than built from the name, because the site's own URLs are not
+   * consistent — some end `-tbc-classic` and others `-burning-crusade-classic`, and Herbalism,
+   * Mining, Skinning and Cooking do not follow the same rule as the crafting professions.
+   */
+  guideUrl: string
+  /** The specialization guide, for the five professions that have specializations in TBC. */
+  specializationUrl?: string
   /** For crafting/secondary professions: a concise recommended leveling path. */
   levelingPath?: readonly RecipeLeveling[]
   needsVerification?: boolean
