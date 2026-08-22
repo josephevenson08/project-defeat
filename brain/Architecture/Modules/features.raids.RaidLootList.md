@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidLootList.tsx
-lines: 64
+lines: 66
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidLootList
 
-`src/features/raids/RaidLootList.tsx` · **features** layer · 64 lines
+`src/features/raids/RaidLootList.tsx` · **features** layer · 66 lines
 
 _No doc comment at the top of this file._
 

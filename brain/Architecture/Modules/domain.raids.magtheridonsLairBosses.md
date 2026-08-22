@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raids/magtheridonsLairBosses.ts
-lines: 39
+lines: 46
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.magtheridonsLairBosses
 
-`src/domain/raids/magtheridonsLairBosses.ts` · **domain** layer · 39 lines
+`src/domain/raids/magtheridonsLairBosses.ts` · **domain** layer · 46 lines
 
 _No doc comment at the top of this file._
 

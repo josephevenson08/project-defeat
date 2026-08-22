@@ -2646,8 +2646,25 @@ test('every catalogued item with a real item id resolves to a vendored icon file
   // Items share artwork heavily, which is the whole reason vendoring is ~2 MB rather than tens of
   // megabytes. If this ever inverts, the vendoring decision deserves revisiting.
   expect(seen.size).toBeLessThan(allItems.length / 2)
-  expect(distinctIconCount).toBe(1238)
-  expect(mappedIconCount).toBe(4741)
+
+  /*
+   * These used to read `toBe(1238)` and `toBe(4741)`, and both broke the moment raid loot icons were
+   * added — legitimately, since the mapping had genuinely grown. A written-down count pins the size
+   * of the data rather than any property of it, which is the defect this repo already names about
+   * counts in prose; it just happened to be wearing a test.
+   *
+   * What is worth asserting is that the **published counts describe the file they ship in**. A stale
+   * `mappedCount` is a real failure — it is what the panel would quote — and it cannot be caught by
+   * comparing against a number someone typed.
+   */
+  const iconNames = allItems.map((item) => item.wowItemId).filter((id): id is number => Boolean(id)).map((id) => getIconName(id))
+  expect(mappedIconCount, 'the published mapping covers at least every catalogued item').toBeGreaterThanOrEqual(
+    new Set(allItems.filter((item) => item.wowItemId).map((item) => item.wowItemId)).size,
+  )
+  expect(distinctIconCount, 'and the distinct count is not larger than the mapping it summarises').toBeLessThanOrEqual(mappedIconCount)
+  expect(new Set(iconNames.filter(Boolean)).size, 'the catalogue alone accounts for most of the distinct icons').toBeLessThanOrEqual(
+    distinctIconCount,
+  )
 })
 
 test('the paperdoll renders real item icons rather than the placeholder glyphs', async ({ page }) => {
@@ -5948,4 +5965,50 @@ test('every raid lists its bosses in clear order, with nothing left to sort by a
   expect(required[required.length - 1].name, 'Prince is the last required boss').toBe('Prince Malchezaar')
   expect(karazhan[karazhan.length - 1].name, 'Nightbane is last overall').toBe('Nightbane')
   expect(karazhan[karazhan.length - 1].optional, 'and is marked skippable').toBe(true)
+})
+
+test('every raid loot row can draw an icon', async () => {
+  /*
+   * 39 rows drew a "??" glyph, which reads as a broken icon rather than as an item with no gear
+   * stats. Two separate causes, and the split matters because only one of them was a data gap:
+   *
+   * 1. `RaidLootList` passed the **catalogue** item's id to `ItemIcon` while the line below it
+   *    already computed `entry.wowItemId ?? item?.wowItemId` for the id it prints. So an entry
+   *    carrying its own id still drew nothing.
+   * 2. 37 rows name a real item the gear catalogue will never hold — tier tokens, enchant formulas,
+   *    mounts, attunement quest items — because it holds equippable gear and these are not. They are
+   *    resolved from the tooltip dump, which covers 29,047 items rather than 4,505.
+   *
+   * A row naming six items was the last one, and it was not an icon problem at all: splitting it
+   * revealed six weapons that were in the catalogue the whole time.
+   */
+  const problems: string[] = []
+
+  for (const boss of sampleRaidBosses) {
+    for (const entry of boss.loot) {
+      const item = entry.itemId ? getItemById(entry.itemId) : undefined
+      const wowItemId = entry.wowItemId ?? item?.wowItemId
+
+      if (!wowItemId) {
+        problems.push(`${boss.name} / ${entry.name}: no wowItemId, so no icon can be found`)
+        continue
+      }
+      if (!getIconName(wowItemId)) problems.push(`${boss.name} / ${entry.name}: id ${wowItemId} maps to no icon`)
+    }
+  }
+
+  expect(problems, 'every loot row resolves to a real icon').toEqual([])
+
+  /*
+   * And the falsification: the assertion above would hold just as well if the loot tables were empty.
+   * These are the five the walkthrough named, each a different reason for having been iconless.
+   */
+  const named = ["Fiery Warhorse's Reins", 'Formula: Enchant Weapon - Mongoose', 'Gloves of the Fallen Champion', 'Helm of the Fallen Hero', 'Blazing Signet']
+  const allLoot = sampleRaidBosses.flatMap((boss) => boss.loot)
+  for (const name of named) {
+    const entry = allLoot.find((candidate) => candidate.name === name)
+    expect(entry, `${name} is still in a loot table`).toBeDefined()
+    const item = entry!.itemId ? getItemById(entry!.itemId) : undefined
+    expect(getIconName(entry!.wowItemId ?? item?.wowItemId), `${name} has artwork`).toBeTruthy()
+  }
 })

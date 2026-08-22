@@ -18,9 +18,9 @@ export const magtheridonsLairBosses: readonly RaidBoss[] = [
       { itemId: 'soul-eaters-handwraps', name: "Soul-Eater's Handwraps", dropType: 'Boss', roles: ['Caster DPS'] },
       { itemId: 'aegis-of-the-vindicator', name: 'Aegis of the Vindicator', dropType: 'Boss', roles: ['Tank'] },
       { itemId: 'eredar-wand-of-obliteration', name: 'Eredar Wand of Obliteration', dropType: 'Boss', roles: ['Caster DPS'] },
-      { name: 'Chestguard of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 chest token — Paladin, Priest, Warlock.' },
-      { name: 'Chestguard of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 chest token — Warrior, Priest, Druid.' },
-      { name: 'Chestguard of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 chest token — Hunter, Mage, Rogue, Shaman.' },
+      { wowItemId: 29754, name: 'Chestguard of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 chest token — Paladin, Priest, Warlock.' },
+      { wowItemId: 29753, name: 'Chestguard of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 chest token — Warrior, Priest, Druid.' },
+      { wowItemId: 29755, name: 'Chestguard of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 chest token — Hunter, Mage, Rogue, Shaman.' },
       { itemId: 'breastplate-of-malorne', name: 'Breastplate of Malorne', dropType: 'Tier Token', roles: ['Tank', 'Physical DPS'], notes: 'Druid T4 chest, redeemed from Chestguard of the Fallen Defender.' },
       { itemId: 'justicar-chestguard', name: 'Justicar Chestguard', dropType: 'Tier Token', roles: ['Tank'], notes: 'Paladin T4 chest, redeemed from Chestguard of the Fallen Champion.' },
       { itemId: 'eye-of-magtheridon', name: 'Eye of Magtheridon', dropType: 'Boss', roles: ['Caster DPS'] },
@@ -32,7 +32,14 @@ export const magtheridonsLairBosses: readonly RaidBoss[] = [
       { itemId: 'girdle-of-the-endless-pit', name: 'Girdle of the Endless Pit', dropType: 'Boss', roles: ['Tank'] },
       { itemId: 'crystalheart-pulse-staff', name: 'Crystalheart Pulse-Staff', dropType: 'Boss', roles: ['Healer'] },
       { itemId: 'glaive-of-the-pit', name: 'Glaive of the Pit', dropType: 'Boss', roles: ['Physical DPS'] },
-      { name: "Magtheridon's Head", dropType: 'Quest Reward', notes: 'Raid-wide quest item turned in for a reputation reward and a necklace choice.' },
+      {
+        // Two items, one per faction, identical in name and icon. 32385 is used for the artwork; the
+        // note carries both so the row is not quietly asserting which side the reader plays.
+        wowItemId: 32385,
+        name: "Magtheridon's Head",
+        dropType: 'Quest Reward',
+        notes: 'Raid-wide quest item turned in for a reputation reward and a necklace choice. Alliance turn-in is 32385, Horde 32386.',
+      },
     ],
   },
 ]

@@ -25,7 +25,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
         roles: ['Physical DPS'],
       },
       { itemId: 'steelhawk-crossbow', name: 'Steelhawk Crossbow', dropType: 'Boss', roles: ['Physical DPS'] },
-      { name: "Fiery Warhorse's Reins", dropType: 'Boss', needsVerification: true, notes: 'Mount, very low drop rate. Not in the item catalog.' },
+      { wowItemId: 30480, name: "Fiery Warhorse's Reins", dropType: 'Boss', needsVerification: true, notes: 'Mount, very low drop rate. Not in the item catalog.' },
     ],
   },
   {
@@ -41,7 +41,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     ],
     loot: [
       { itemId: 'edgewalker-longboots', name: 'Edgewalker Longboots', wowItemId: 28545, dropType: 'Boss', roles: ['Physical DPS'] },
-      { name: 'Formula: Enchant Weapon - Mongoose', dropType: 'Boss', needsVerification: true, notes: 'Enchanting formula, still one of the top Phase 2 weapon enchants. Not in the item catalog.' },
+      { wowItemId: 22559, name: 'Formula: Enchant Weapon - Mongoose', dropType: 'Boss', needsVerification: true, notes: 'Enchanting formula, still one of the top Phase 2 weapon enchants. Not in the item catalog.' },
       { itemId: 'moroes-lucky-pocket-watch', name: "Moroes' Lucky Pocket Watch", dropType: 'Boss', roles: ['Tank'] },
     ],
   },
@@ -92,9 +92,9 @@ export const karazhanBosses: readonly RaidBoss[] = [
     ],
     loot: [
       { itemId: 'garonas-signet-ring', name: "Garona's Signet Ring", wowItemId: 28649, dropType: 'Boss', roles: ['Physical DPS'] },
-      { name: 'Gloves of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 gloves token — Paladin, Priest, Warlock.' },
-      { name: 'Gloves of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 gloves token — Warrior, Priest, Druid.' },
-      { name: 'Gloves of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 gloves token — Hunter, Mage, Rogue, Shaman.' },
+      { wowItemId: 29757, name: 'Gloves of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 gloves token — Paladin, Priest, Warlock.' },
+      { wowItemId: 29758, name: 'Gloves of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 gloves token — Warrior, Priest, Druid.' },
+      { wowItemId: 29756, name: 'Gloves of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 gloves token — Hunter, Mage, Rogue, Shaman.' },
       { itemId: 'voidheart-gloves', name: 'Voidheart Gloves', dropType: 'Tier Token', roles: ['Caster DPS'], notes: 'Warlock T4 gloves, redeemed from Gloves of the Fallen Champion.' },
       { itemId: 'staff-of-infinite-mysteries', name: 'Staff of Infinite Mysteries', dropType: 'Boss', roles: ['Tank'], needsVerification: true, notes: 'Feral druid tanking staff.' },
     ],
@@ -113,7 +113,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
     loot: [
       { itemId: 'the-lightning-capacitor', name: 'The Lightning Capacitor', wowItemId: 28785, dropType: 'Boss', roles: ['Caster DPS'], notes: 'Still a Phase 2 best-in-slot caster trinket for several specs, which is why Phase 2 groups keep killing this optional boss.' },
       { itemId: 'terestians-stranglestaff', name: "Terestian's Stranglestaff", dropType: 'Boss', roles: ['Tank'] },
-      { name: 'Formula: Enchant Weapon - Soulfrost', dropType: 'Boss', needsVerification: true, notes: 'Enchanting formula. Not in the item catalog.' },
+      { wowItemId: 22561, name: 'Formula: Enchant Weapon - Soulfrost', dropType: 'Boss', needsVerification: true, notes: 'Enchanting formula. Not in the item catalog.' },
     ],
   },
   {
@@ -186,9 +186,9 @@ export const karazhanBosses: readonly RaidBoss[] = [
         needsVerification: true,
         notes: 'Sources place this on Prince Malchezaar in Karazhan, but the item catalog currently records it as Tempest Keep / Kael\'thas Sunstrider. The catalog entry needs correcting.',
       },
-      { name: 'Helm of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 helm token — Paladin, Priest, Warlock.' },
-      { name: 'Helm of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 helm token — Warrior, Priest, Druid.' },
-      { name: 'Helm of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 helm token — Hunter, Mage, Rogue, Shaman.' },
+      { wowItemId: 29760, name: 'Helm of the Fallen Champion', dropType: 'Tier Token', notes: 'T4 helm token — Paladin, Priest, Warlock.' },
+      { wowItemId: 29761, name: 'Helm of the Fallen Defender', dropType: 'Tier Token', notes: 'T4 helm token — Warrior, Priest, Druid.' },
+      { wowItemId: 29759, name: 'Helm of the Fallen Hero', dropType: 'Tier Token', notes: 'T4 helm token — Hunter, Mage, Rogue, Shaman.' },
       { itemId: 'gorehowl', name: 'Gorehowl', dropType: 'Boss', roles: ['Physical DPS'] },
       { itemId: 'the-decapitator', name: 'The Decapitator', dropType: 'Boss', roles: ['Physical DPS'] },
     ],
@@ -211,7 +211,7 @@ export const karazhanBosses: readonly RaidBoss[] = [
       { role: 'Tank', note: 'Bellowing Roar fear will pull you off the platform — keep Fear Ward or a Tremor Totem up.' },
     ],
     loot: [
-      { name: 'Blazing Signet', dropType: 'Quest Reward', notes: "Quest item for 'The Cudgel of Kar'desh'. This is the reason Phase 2 groups still summon Nightbane." },
+      { wowItemId: 31751, name: 'Blazing Signet', dropType: 'Quest Reward', notes: "Quest item for 'The Cudgel of Kar'desh'. This is the reason Phase 2 groups still summon Nightbane." },
       { itemId: 'talisman-of-nightbane', name: 'Talisman of Nightbane', dropType: 'Boss', roles: ['Tank'] },
       { itemId: 'dragonheart-flameshield', name: 'Dragonheart Flameshield', dropType: 'Boss', roles: ['Healer'] },
       { itemId: 'shield-of-impenetrable-darkness', name: 'Shield of Impenetrable Darkness', dropType: 'Boss', roles: ['Tank'] },

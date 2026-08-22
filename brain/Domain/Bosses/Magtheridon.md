@@ -45,7 +45,7 @@ The fight opens against five Hellfire Channelers keeping Magtheridon banished; t
 - **Crystalheart Pulse-Staff** (Boss) — [[Healer]]
 - **Glaive of the Pit** (Boss) — [[Physical DPS]]
 - **Magtheridon's Head** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
-  Raid-wide quest item turned in for a reputation reward and a necklace choice.
+  Raid-wide quest item turned in for a reputation reward and a necklace choice. Alliance turn-in is 32385, Horde 32386.
 
 
 

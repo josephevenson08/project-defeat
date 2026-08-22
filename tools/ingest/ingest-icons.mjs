@@ -86,11 +86,24 @@ for (const line of csv.split('\n')) {
  */
 const { allItems } = await import(pathToFileURL(resolve(REPO, 'src/domain/gear/itemCatalogue.ts')).href)
 const gems = JSON.parse(readFileSync(resolve(REPO, 'src/domain/gems/gemCatalogue.json'), 'utf8'))
+const { sampleRaidBosses } = await import(pathToFileURL(resolve(REPO, 'src/domain/raids/sampleRaidBosses.ts')).href)
+
+/*
+ * Raid loot is a third source, and it is the one that is easy to forget: 37 loot rows name a real
+ * item the gear catalogue will never hold — tier tokens, enchant formulas, mounts, attunement quest
+ * items — because the catalogue is equippable gear and none of these are. Sourcing the wanted list
+ * from the catalogue alone left them drawing a "??" glyph, which reads as a broken icon rather than
+ * as an item with no gear stats.
+ */
+const raidLoot = sampleRaidBosses.flatMap((boss) =>
+  boss.loot.filter((entry) => entry.wowItemId).map((entry) => ({ id: entry.wowItemId, label: entry.name, kind: 'raid loot' })),
+)
 
 /** Everything the UI can put an icon on, as {wowItemId, label} pairs. */
 const wanted = [
   ...allItems.map((item) => ({ id: item.wowItemId, label: item.name, kind: 'item' })),
   ...gems.gems.map((gem) => ({ id: gem.wowItemId, label: gem.name, kind: 'gem' })),
+  ...raidLoot,
 ]
 
 const icons = {}

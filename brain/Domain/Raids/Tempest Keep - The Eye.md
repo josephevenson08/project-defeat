@@ -31,7 +31,7 @@ Full chain: [[The Trial of the Naaru]] (5 steps) · [[Attunement]]
 - [[Al'ar]] — encounter 1 · 12 notable drops
 - [[Void Reaver]] — encounter 2 · 20 notable drops
 - [[High Astromancer Solarian]] — encounter 3 · 13 notable drops
-- [[Kael'thas Sunstrider]] — encounter 4 · 32 notable drops
+- [[Kael'thas Sunstrider]] — encounter 4 · 37 notable drops
 
 ## Notable trash drops
 

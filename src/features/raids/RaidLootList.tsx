@@ -30,7 +30,9 @@ export function RaidLootList({ entries, nameColor }: RaidLootListProps) {
         return (
           <div className="raid-loot-row" key={`${entry.dropType}-${entry.itemId ?? entry.name}`} data-testid={`loot-${entry.itemId ?? entry.name}`}>
             <span className="raid-loot-frame" aria-hidden="true">
-              <ItemIcon wowItemId={item?.wowItemId} fallback={item?.slot ? slotGlyph(item.slot) : '??'} />
+              {/* The entry's own id first: tier tokens, formulas and mounts are real items with real
+                  artwork, and none of them is in the gear catalogue. */}
+              <ItemIcon wowItemId={wowItemId} fallback={item?.slot ? slotGlyph(item.slot) : '??'} />
               {item?.itemLevel ? <span className="raid-loot-ilvl">{item.itemLevel}</span> : null}
             </span>
 

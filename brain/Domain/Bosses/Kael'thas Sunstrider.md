@@ -21,7 +21,7 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
 - [[Caster DPS]] — A warlock tanks Capernian at range; everyone else stays spread through Gravity Lapse.
 - [[Healer]] — Gravity Lapse removes your ability to stand still and cast — plan instant heals and pre-hots for it.
 
-## Notable drops (32)
+## Notable drops (37)
 
 - **Chestguard of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 chest token — Paladin, Priest, Warlock.
@@ -63,8 +63,18 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
 - **Sunshower Light Cloak** (Boss) — [[Healer]]
 - **Warp Slicer** (Boss) — [[Physical DPS]]
   One of the seven Sunstrider weapons; Kael'thas drops one of the set per kill. The item catalog records it as a Void Reaver drop, which needs correcting.
-- **Cosmic Infuser / Devastation / Infinity Blade / Netherstrand Longbow / Phaseshift Bulwark / Staff of Disintegration** (Boss) _(not in item catalog — [[Needs Verification]])_
-  The other six Sunstrider weapons. Kael'thas drops one weapon from the seven-item set per kill; none of these six are in the item catalog yet.
+- **Cosmic Infuser** (Boss) — [[Healer]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
+- **Devastation** (Boss) — [[Physical DPS]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
+- **Infinity Blade** (Boss) — [[Tank]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
+- **Netherstrand Longbow** (Boss) — [[Physical DPS]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
+- **Phaseshift Bulwark** (Boss) — [[Tank]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
+- **Staff of Disintegration** (Boss) — [[Caster DPS]]
+  One of the seven Sunstrider weapons. Kael'thas drops a single weapon from the set per kill.
 - **Telonicus's Pendant of Mayhem** (Quest Reward) — [[Physical DPS]]
   Chosen from the quest 'Kael'thas and the Verdant Sphere', started by the Verdant Sphere that Kael'thas drops. The item catalog records it as a High Astromancer Solarian drop, which needs correcting.
 - **Lord Sanguinar's Claim** (Quest Reward) — [[Tank]]
