@@ -1,7 +1,117 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-21.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-22.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-22)
+
+**Thirteen commits, and the through-line is that the app was confidently wrong about numbers a player
+reads on every screen.** `0ee9148..f0cfcef`. 180 tests passing, `tsc`/`lint`/`build` clean, every
+ingest and the brain idempotent, everything on `origin/main`.
+
+**This project is for DPS.** Owner's call, 2026-08-21: healers and tanks are out of scope. Their math
+still exists, still runs and is still tested — nothing was deleted — but neither is somewhere to spend
+effort, and neither is put on screen as a headline. The Simulation tab is gated on role because of it.
+
+---
+
+### The stat pipeline was inventing numbers, and that came first
+
+`calculateStats` ended with **six hand-written lines that were the app's only attribute conversions**,
+uncited, predating the ingest era. Three of the five were not TBC mechanics:
+
+- **Intellect and Spirit never grant spell power in TBC.** Every such conversion is talent-gated
+  upstream (Lunar Guidance, Mind Mastery, Spiritual Guidance); there is no baseline. `intellect * 0.8`
+  was inventing **46% of a Fire Mage's spell power and 52% of a Holy Priest's**.
+- **The rates are class-specific.** Strength is 2 attack power to a Warrior, **1** to a Rogue. Agility
+  is melee AP for Rogues and cat-form Druids, *ranged* AP for Hunters, nothing for anyone else — the
+  flat `agility * 0.35` matched no class.
+- **Agility-to-crit is a per-class divisor**, so `agility * 0.1` understated melee crit **five to seven
+  times**: a geared Fury Warrior was missing ~5.5% crit.
+
+Three conversions were missing outright, including the **universal Agility-to-Armor** (2 a point — a
+geared Rogue was short 500+ armor on a row the rail never hides). Base stats were invented too, and
+are **race+class** rather than class alone: all 52 blocks now come from the pinned commit, with an
+import-time guard covering the 51 combinations creation can reach.
+
+**The finding most likely to be re-broken is upstream's.** wowsims applies Human's +10% Spirit and
+Gnome's +5% Intellect as runtime dependencies, so its base tables are meant to be racial-free — and it
+says so, in a comment dividing Gnome Mage Intellect by 1.05. But it leaves **The Human Spirit baked
+into five of its six Human rows** while applying the multiplier again. Those five are divided back out
+at ingest, each decision printed.
+
+**Gnome Intellect is deliberately NOT corrected**, and the measurement is why: its rows measure 1.02x
+(Mage), 1.08x (Warlock), 1.18x (Rogue), 1.21x (Warrior) against their peers — a real racial bonus on
+small integers, not one multiplier applied inconsistently. A "divide when it moves closer to the peers"
+rule was written first and **would have wrongly corrected three of the four**. Correcting a source
+needs evidence for the specific row.
+
+### Talents then reached `calculateStats` — the decision this file had listed as the owner's
+
+Spending points now moves the stat rail, gear rankings, stat weights and upgrade finder. Verified:
+Protection Warrior armour **+9.6%**, strength **+10%**; Holy Priest spell power **+17.7%**; Fire Mage
+**+23.4%**; Combat Rogue agility **+20.8%**. The empty-tree identity is asserted across **all 27 specs**
+— that is what made widening it safe.
+
+**Toughness raises armour from items only**, which is the subtlest thing here. Upstream reads
+`Equip.Stats()[stats.Armor]`, so the Agility-derived armour is *not* multiplied — that is why the
+Warrior's total moves 9.6% rather than 10%. The test gives the character 500 extra Agility and asserts
+the bonus is unchanged.
+
+Ingest went **49 → 62 effects**, refusals **49 → 44**. The Fury Warrior reference figures moved to
+**215.3 untalented / 254.7 talented (+18.3%)**.
+
+### Then a walkthrough, and thirteen pieces of feedback
+
+Nine are done. Each commit message carries the reasoning; the ones worth knowing:
+
+- **A character starts bare.** Creation runs on every load, the paperdoll is empty, no talents spent.
+  The autosave was **removed** rather than left writing something nothing reads — named builds and
+  export/import are the persistence now. **An accidental refresh loses an unsaved build**, which is the
+  tradeoff and was accepted deliberately.
+- **Two Dragonstrikes** was reported as unique-equipped. It is not — the tooltip says so. It is **Main
+  Hand only**, and wowsims types it `OneHand`. 706 weapons cross-checked against their own cached
+  tooltips, 698 agree, **8 corrected** (the two Outland crafted chains plus Fool's Bane and The
+  Decapitator). A first attempt ingesting Unique-Equipped was **reverted**: all 155 such items already
+  carried wowsims' `Unique: true`, so it was 155 redundant flags changing nothing.
+- **Every raid loot row has an icon** (39 → 0). One line passed the catalogue item's id where the entry
+  had its own; 37 rows name items the gear catalogue will never hold. A row named "Cosmic Infuser /
+  Devastation / Infinity Blade / …" could not resolve because six items is not one item — splitting it
+  revealed **all six were in the catalogue the whole time**.
+- **Karazhan is in clear order.** Illhoof, Netherspite and Nightbane carried `optional: true` and no
+  position, and the sort sends anything positionless to the end — so all three rendered after Prince.
+  Optional and out-of-order are different claims. Prince is 10th (last **required**); Nightbane is 11th.
+- **One Shaman was credited with all four air totems.** They share one slot and there was no exclusivity
+  group — the same over-credit the Blessings had. Note the reported "Enhancement drops Grace of Air and
+  Windfury" is **not possible**: both are Air.
+- **Four buffs came from a talent and were attributed to the whole class** — Trueshot Aura
+  (Marksmanship), Power Infusion (Discipline), Improved Seal of the Crusader (Retribution), and
+  **Expose Weakness was missing entirely** (Survival). Checked against this repo's own talent trees.
+
+### What is left, in order
+
+1. **Faerie Fire on Balance/Dreamstate only — needs a decision, not code.** *Any* Druid can cast Faerie
+   Fire; only **Improved** Faerie Fire is a Balance talent. Restricting the base debuff encodes a raid
+   convention as a game rule, which `ExclusiveGroup.basis` exists to keep separate. Ask before doing it.
+2. **Generalise the assignment picker.** The domain already assigns any exclusive buff — that is how
+   totem assignment works today — but the UI picker is still gated on `className === 'Paladin'`. Small.
+3. **The attunement tab.** `sampleAttunements.ts` and `getAttunementChainForRaid` already exist, so this
+   is likely less work than it looks.
+4. **The simulation rebuild.** Still the big one, still `ROTATION-SCOPE.md`: 25 of 27 specs are a single
+   ability on repeat, and the app has **no timeline at all**. Matching WoWSims means building that
+   engine, then a rotation per spec. Multiple sessions, and the honest reason DPS reads ~4x low.
+
+### Three traps this session hit that are not yet elsewhere in this file
+
+- **`grep -c` exits 1 when the count is zero**, so `grep -c foo file && next-command` silently skips
+  `next-command`. Cost one round of tests that were never appended and a confusing "0 tests in 0 files".
+- **Backticks inside a JS template literal** break a patch script written to stdout. Hit four times.
+  Escape them, or avoid code formatting in strings a script generates.
+- **A `.replace()` on a marker two types share takes the first.** `icon` and `guideUrl` landed on
+  `ProfessionTier` instead of `ProfessionProfile` because both end with the same two optional lines.
+  Anchor on something only the target has.
 
 ---
 
@@ -1399,7 +1509,17 @@ gate. Documented in place, and a test pins the reasoning so it is not mistaken f
 Everything below is open. Nothing is half-finished — every commit was green before it was pushed,
 and each item here is a decision or a fresh piece of work.
 
-### The three decisions only the repo owner can take
+### Decisions only the repo owner can take
+
+**Two of the three below were taken on 2026-08-21 and are struck through.** What is open now is the
+boss armor figure, and one new one:
+
+0. **Should Faerie Fire be restricted to Balance and Dreamstate Druids?** Asked for in the walkthrough
+   and *not* done, because it is a modelling choice rather than a fact. **Any Druid can cast Faerie
+   Fire**; only **Improved** Faerie Fire is a Balance talent. Restricting the base debuff would encode
+   a raid convention as a game rule, and `ExclusiveGroup.basis` exists precisely to keep those apart.
+   Three honest options: leave it class-wide, restrict it as a stated *convention*, or split base from
+   improved. Do not guess.
 
 **Decision 2 was taken on 2026-08-21 and is no longer open.** Toughness, Vitality and Divine
 Strength were the named list it gated; all three now apply, and a talented tank no longer reads low
