@@ -173,6 +173,8 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'power-infusion',
     name: 'Power Infusion',
     providedByClass: 'Priest',
+    // A 31-point Discipline talent. A Holy or Shadow Priest cannot cast it.
+    providedBySpec: 'Discipline',
     spellId: 10060,
     roles: ['Caster DPS', 'Healer'],
     notModelled:
@@ -236,6 +238,8 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'trueshot-aura',
     name: 'Trueshot Aura',
     providedByClass: 'Hunter',
+    // A 31-point Marksmanship talent, so a Beast Mastery or Survival Hunter brings none of it.
+    providedBySpec: 'Marksmanship',
     spellId: 27066,
     roles: ['Physical DPS'],
     stats: { attackPower: 125, rangedAttackPower: 125 },

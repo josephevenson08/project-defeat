@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleTargetDebuffs.ts
-lines: 108
+lines: 130
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleTargetDebuffs
 
-`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 108 lines
+`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 130 lines
 
 From the top of the file:
 

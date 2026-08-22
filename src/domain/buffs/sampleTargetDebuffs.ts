@@ -67,6 +67,8 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     id: 'improved-seal-of-the-crusader',
     name: 'Improved Seal of the Crusader',
     providedByClass: 'Paladin',
+    // A Retribution talent — the name says "Improved", and the improvement is what the raid wants.
+    providedBySpec: 'Retribution',
     spellId: 20337,
     physicalCritTakenBonus: 0.03,
     spellCritTakenBonus: 0.03,
@@ -93,6 +95,26 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
       'Increases the chance a Frost spell will critically hit the target by 2% per application, stacking to 5 — +10% Frost spell crit at a full stack. Frost spells only, and this app does not record which school a spell belongs to, so the choice is to apply it to every caster or to none. Applying it to every caster is what the previous version did, and it handed +10% crit to Shadow Priests and Balance Druids, for whom it does nothing.',
     notes:
       'Talent rank 5/5, spell 28595 — the id wowsims cites too, where it lands in `BonusFrostCritRating` and is read only under `spell.SpellSchool.Matches(SpellSchoolFrost)`. The effect that lands on the target is spell 12579, whose tooltip carries no values. Ranks 1-4 apply the same 2% per stack at a lower chance to apply it; rank 5 is 100%.',
+  },
+  {
+    id: 'expose-weakness',
+    name: 'Expose Weakness',
+    providedByClass: 'Hunter',
+    providedBySpec: 'Survival',
+    spellId: 34503,
+    /*
+     * Missing from this file entirely until 2026-08-21, which mattered: Expose Weakness is the reason
+     * a raid brings a Survival Hunter at all, and the spec's own estimate note already said its
+     * personal damage is not the point.
+     *
+     * Not modelled, and the reason is structural rather than a gap to fill in later: the value is
+     * **25% of the Hunter's Agility**, which is another player's stat. This app models one character
+     * and has no way to reach a second one's gear.
+     */
+    notModelled:
+      "Applies a debuff worth 25% of the Hunter's Agility as attack power to everyone attacking the target. wowsims procs it on a ranged crit, at rank/3 chance — 100% at 3/3. The value depends on another player's Agility, which this app has no way to read.",
+    notes:
+      'Survival talent, and the spec\'s raid slot. wowsims applies it as core.ExposeWeaknessAura with hunter.GetStat(stats.Agility) * 0.25, refreshed only when the new value beats the one already on the target — so two Survival Hunters do not stack, the higher Agility simply wins.',
   },
 ]
 

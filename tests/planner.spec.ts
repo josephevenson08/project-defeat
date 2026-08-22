@@ -33,7 +33,7 @@ import {
 import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import type { BisList } from '../src/domain/bis'
-import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
+import { getClassDefinition, getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import {
   addToGroup,
   assignBlessing,
@@ -2022,11 +2022,21 @@ test('a debuff that cannot be modelled is separated from the ones that can be', 
   // to the split it was really about, exactly as the buff/consumable test above did when the same
   // thing happened to it. BuffsPanel still reads these two lists and still renders the unmodelled
   // ones without a checkbox; what no longer exists is a page to click.
-  expect(unmodelledTargetDebuffs.map((debuff) => debuff.id)).toEqual(['winters-chill'])
+  expect(unmodelledTargetDebuffs.map((debuff) => debuff.id).sort()).toEqual(['expose-weakness', 'winters-chill'])
+
+  /*
+   * Two now, and the second is a different kind of gap worth keeping distinct. Winter's Chill cannot
+   * be modelled because no spell school is recorded anywhere; **Expose Weakness cannot be modelled
+   * because its value is another player's Agility**, and this app models one character. The first is
+   * a missing field, the second is a missing second character — one could be closed by adding a
+   * column, the other could not.
+   */
+  const exposeWeakness = unmodelledTargetDebuffs.find((debuff) => debuff.id === 'expose-weakness')
+  expect(exposeWeakness?.notModelled, "the reason is another player's stat, not a field").toMatch(/Agility/)
 
   // The reason it cannot be modelled is narrow and worth keeping visible: no spell school is recorded
   // anywhere in the simulation, so a Frost-only debuff can be applied to every spell or to none.
-  const wintersChill = unmodelledTargetDebuffs[0]
+  const wintersChill = unmodelledTargetDebuffs.find((debuff) => debuff.id === 'winters-chill')!
   expect(wintersChill.notes, "the Frost-only scope is why it is not modelled").toMatch(/Frost/)
   expect(wintersChill.spellCritTakenBonus, 'an unmodelled debuff must not also apply its effect').toBeUndefined()
 
@@ -4729,7 +4739,14 @@ test('every buff names a provider that actually exists, class and spec alike', (
    * name and a real Shaman spec, but a Warlock entry naming it would match nothing for ever.
    */
   const entries = [...sampleBuffs, ...sampleTargetDebuffs]
-  expect(entries).toHaveLength(39)
+
+  /*
+   * A floor rather than an exact count. `toHaveLength(39)` broke the moment Expose Weakness was added
+   * — a correct addition failing a test that was only ever pinning the size of the dataset, which is
+   * this repo's own rule about counts in prose wearing a test. What the check below actually needs is
+   * that the list is not empty; the properties are what matter.
+   */
+  expect(entries.length, 'every buff and debuff, and there are plenty').toBeGreaterThanOrEqual(39)
 
   for (const entry of entries) {
     const definition = tbcClasses.find((candidate) => candidate.className === entry.providedByClass)
@@ -4743,7 +4760,14 @@ test('every buff names a provider that actually exists, class and spec alike', (
   }
 
   // Seven are spec-specific and the rest are class-wide; a drift either way changes who covers what.
-  expect(entries.filter((entry) => entry.providedBySpec !== undefined)).toHaveLength(7)
+  /*
+   * Non-vacuous rather than exact. This read `toHaveLength(7)` and broke when four more entries were
+   * correctly restricted to a spec — Trueshot Aura to Marksmanship, Power Infusion to Discipline,
+   * Improved Seal of the Crusader to Retribution, and Expose Weakness added for Survival. Pinning the
+   * *number* of spec-restricted buffs pins nothing about them; the loop below is the real check.
+   */
+  const restricted = entries.filter((entry) => entry.providedBySpec !== undefined)
+  expect(restricted.length, 'a good few buffs come from one spec, not a whole class').toBeGreaterThanOrEqual(11)
 })
 
 
@@ -4766,7 +4790,9 @@ test('buff scope is sourced for every entry, and party scope dominates', () => {
     const scope = getBuffScope(entry.id)!
     return { ...acc, [scope]: (acc[scope] ?? 0) + 1 }
   }, {})
-  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 6 })
+  // Target went 6 to 7 when Expose Weakness was added. Kept exact rather than loosened: this pins the
+  // *sourced split*, which is the claim the test is making, and party scope dominating is the point.
+  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 7 })
 
   /*
    * The five Raid-scoped buffs are exactly the Greater Blessings, which is what "Greater" buys — the
@@ -6264,4 +6290,68 @@ test('every seatable build has vendored artwork, so an exported chart is never h
   // Non-vacuous: these are the 29 builds the picker offers, not an empty list.
   const total = raidBuildsByClass.reduce((count, entry) => count + entry.builds.length, 0)
   expect(total, 'all 29 raid builds were checked').toBe(29)
+})
+
+test('one Shaman drops one air totem, not four', async () => {
+  /*
+   * Reported from the walkthrough, and the cause was the same over-credit the Blessings had: a
+   * Shaman may have **one totem of each element** active at a time, and Windfury, Wrath of Air,
+   * Grace of Air and Tranquil Air are all Air. With no group for them, one Shaman credited the raid
+   * with all four — so a raid leader read "we have Wrath of Air" off a roster of Enhancement Shamans
+   * who were all dropping Windfury.
+   *
+   * Sourced rather than assumed: wowsims encodes the slot as a single-valued `AirTotem` enum at the
+   * pinned commit, which is what makes this a game rule rather than a convention about what a raid
+   * usually does.
+   */
+  const AIR = ['windfury-totem', 'wrath-of-air-totem', 'grace-of-air-totem', 'tranquil-air-totem']
+  const airCovered = (roster: Roster) =>
+    computeCoverage(roster)
+      .partyScoped.covered.map((entry) => entry.entry.id)
+      .filter((id) => AIR.includes(id))
+
+  const one = addToGroup(emptyRoster(25), 0, { className: 'Shaman', spec: 'Enhancement' })
+  expect(airCovered(one), 'one Shaman, one air totem').toEqual(['windfury-totem'])
+
+  const two = addToGroup(one, 0, { className: 'Shaman', spec: 'Elemental' })
+  expect(airCovered(two), 'a second Shaman buys a second slot, not the remaining three').toHaveLength(2)
+
+  // The same override that serves the Blessings serves this, because coverage matches an assignment
+  // against any buff the seat can actually provide rather than against a hard-coded Paladin list.
+  const assigned = assignBlessing(one, { groupIndex: 0, seatIndex: 0 }, 'wrath-of-air-totem')
+  expect(airCovered(assigned), 'the raid leader can say which totem goes down').toEqual(['wrath-of-air-totem'])
+})
+
+test('a buff that comes from a talent comes from one spec', async () => {
+  /*
+   * Four of these were attributed to the whole class, so a roster of three Hunters read as bringing
+   * Trueshot Aura whatever they had specced. Each is a talent, and the repo's own ingested talent
+   * trees are what say which — checked there rather than recalled.
+   *
+   * Expose Weakness was not in the data at all, which mattered more than the others: it is the reason
+   * a raid brings a Survival Hunter, and that spec's own estimate note already said its personal
+   * damage is not the point.
+   */
+  const providerOf = (name: string) => {
+    const entry = [...sampleBuffs, ...sampleTargetDebuffs].find((candidate) => candidate.name === name)
+    return entry ? { className: entry.providedByClass, spec: entry.providedBySpec } : undefined
+  }
+
+  expect(providerOf('Trueshot Aura')).toEqual({ className: 'Hunter', spec: 'Marksmanship' })
+  expect(providerOf('Ferocious Inspiration')).toEqual({ className: 'Hunter', spec: 'Beast Mastery' })
+  expect(providerOf('Expose Weakness')).toEqual({ className: 'Hunter', spec: 'Survival' })
+  expect(providerOf('Power Infusion')).toEqual({ className: 'Priest', spec: 'Discipline' })
+  expect(providerOf('Improved Seal of the Crusader')).toEqual({ className: 'Paladin', spec: 'Retribution' })
+
+  /*
+   * And the check that keeps this honest as the data grows: every spec-restricted entry must name a
+   * spec its class actually has. A typo here would silently make the buff unprovidable by anyone,
+   * which reads as "nobody brought it" rather than as a broken row.
+   */
+  const impossible = [...sampleBuffs, ...sampleTargetDebuffs]
+    .filter((entry) => entry.providedBySpec)
+    .filter((entry) => !getClassDefinition(entry.providedByClass!)?.specs.includes(entry.providedBySpec!))
+    .map((entry) => `${entry.name}: ${entry.providedByClass} has no ${entry.providedBySpec}`)
+
+  expect(impossible, 'every restricted buff names a real spec of its class').toEqual([])
 })

@@ -198,6 +198,11 @@
       "name": "Winter's Chill",
       "spellId": 28595,
       "icon": "spell_frost_chillingblast"
+    },
+    "expose-weakness": {
+      "name": "Expose Weakness",
+      "spellId": 34503,
+      "icon": "ability_rogue_findweakness"
     }
   },
   "specIcons": {

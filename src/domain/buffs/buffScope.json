@@ -238,6 +238,12 @@
       "spellId": 28595,
       "scope": "Target",
       "evidence": "Winter's Chill Talent Requires Mage Gives your Frost damage spells a 100% chance to apply the Winter's Chill effect, which increases the chance a Frost spell will critically hit the target by 2% for 1"
+    },
+    "expose-weakness": {
+      "name": "Expose Weakness",
+      "spellId": 34503,
+      "scope": "Target",
+      "evidence": "Expose Weakness Talent Requires Hunter Your ranged criticals have a 100% chance to apply an Expose Weakness effect to the target. Expose Weakness increases the attack power of all attackers against th"
     }
   },
   "unresolved": []
