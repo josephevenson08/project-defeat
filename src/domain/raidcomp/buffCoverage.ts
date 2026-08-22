@@ -133,7 +133,19 @@ function sectionFor<T extends BuffProvider & { id: string }>(
    * this tool, and it read as "you are fine" to a raid leader who was four Paladins short.
    */
   const canProvide = entries.filter((entry) => slots.some((slot) => slotProvides(slot, entry))).map((entry) => entry.id)
-  const allowed = applyExclusivity(canProvide, (group) => providerBudget(group, entries, slots))
+
+  /*
+   * Only assignments whose seat can actually supply the buff count. A Paladin carrying a stale
+   * `blessingId` from before a class switch must not hold a slot open for something they cannot cast.
+   */
+  const assigned = new Set(
+    slots
+      .filter((slot) => slot.blessingId)
+      .filter((slot) => entries.some((entry) => entry.id === slot.blessingId && slotProvides(slot, entry)))
+      .map((slot) => slot.blessingId as string),
+  )
+
+  const allowed = applyExclusivity(canProvide, (group) => providerBudget(group, entries, slots), assigned)
 
   const covered: CoveredEntry<T>[] = []
   const missing: MissingEntry<T>[] = []

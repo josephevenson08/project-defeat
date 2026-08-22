@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/buffExclusivity.ts
-lines: 119
+lines: 138
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.buffExclusivity
 
-`src/domain/buffs/buffExclusivity.ts` · **domain** layer · 119 lines
+`src/domain/buffs/buffExclusivity.ts` · **domain** layer · 138 lines
 
 From the top of the file:
 
@@ -43,6 +43,7 @@ _None._
 ## Imported by
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 
 ## Concepts & phases
 

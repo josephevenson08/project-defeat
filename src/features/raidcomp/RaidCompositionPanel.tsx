@@ -6,6 +6,7 @@ import {
   PARTY_SIZE,
   RAID_SIZES,
   addToGroup,
+  assignBlessing,
   clearSeat,
   computeCoverage,
   emptyRoster,
@@ -19,6 +20,8 @@ import {
   resizeRoster,
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
+import { exclusiveGroups } from '../../domain/buffs/buffExclusivity'
+import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
@@ -54,6 +57,17 @@ function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
     .find((entry) => entry.className === slot.className)
     ?.builds.find((build) => build.spec === slot.spec)
 }
+
+/**
+ * The five Greater Blessings, in the order a raid fills them.
+ *
+ * Read from the exclusivity group rather than listed again here, so the picker and the coverage
+ * calculation cannot disagree about what the group contains.
+ */
+const GREATER_BLESSINGS = (exclusiveGroups.find((group) => group.id === 'paladin-blessings')?.buffIds ?? []).map((id) => ({
+  id,
+  name: getBuffById(id)?.name ?? id,
+}))
 
 /**
  * What one seated player brings, revealed on hover or keyboard focus.
@@ -462,6 +476,32 @@ export function RaidCompositionPanel() {
                                   </span>
                                 )}
                               </button>
+                            )}
+
+                            {/*
+                              A Paladin brings one Blessing, and which one is a decision only the raid
+                              leader can make. Coverage used to fill Kings, Might, Wisdom by a fixed
+                              order, so three Paladins could never reach Salvation or Sanctuary at all.
+                              Left unset it still falls back to that order, so this is an override
+                              rather than a form to complete.
+                            */}
+                            {slot.className === 'Paladin' && (
+                              <select
+                                className="raidcomp-seat-blessing"
+                                value={slot.blessingId ?? ''}
+                                aria-label={`Blessing for the ${slot.spec} Paladin in group ${groupCoverage.groupIndex + 1}`}
+                                data-testid={`raidcomp-blessing-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
+                                onChange={(event) =>
+                                  setRoster((current) => assignBlessing(current, ref, event.target.value || undefined))
+                                }
+                              >
+                                <option value="">Blessing: auto</option>
+                                {GREATER_BLESSINGS.map((blessing) => (
+                                  <option key={blessing.id} value={blessing.id}>
+                                    {blessing.name.replace(/^Greater Blessing of /, '')}
+                                  </option>
+                                ))}
+                              </select>
                             )}
                           </span>
 

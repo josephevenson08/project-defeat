@@ -43,11 +43,12 @@ export function loadRoster(): Roster | undefined {
         const seat: unknown = stored[seatIndex]
         if (typeof seat !== 'object' || seat === null) return undefined
 
-        const { className, spec, playerName, buildId } = seat as {
+        const { className, spec, playerName, buildId, blessingId } = seat as {
           className?: unknown
           spec?: unknown
           playerName?: unknown
           buildId?: unknown
+          blessingId?: unknown
         }
         if (typeof className !== 'string' || typeof spec !== 'string') return undefined
 
@@ -71,6 +72,9 @@ export function loadRoster(): Roster | undefined {
           spec,
           ...(typeof playerName === 'string' && playerName.trim() ? { playerName: playerName.trim() } : {}),
           ...(validBuild ? { buildId: buildId as string } : {}),
+          // Third field to be carried through here, and the comment above is why it is not the third
+          // to be silently dropped.
+          ...(typeof blessingId === 'string' && blessingId ? { blessingId } : {}),
         } as RosterSlot
       })
     })

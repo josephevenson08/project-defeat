@@ -36,6 +36,7 @@ import type { BisList } from '../src/domain/bis'
 import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import {
   addToGroup,
+  assignBlessing,
   computeCoverage,
   emptyRoster,
   filledSlots,
@@ -6050,4 +6051,80 @@ test('every profession has vendored artwork and a guide to send you to', async (
    */
   const withSpecializations = allProfessions.filter((profession) => getProfessionProfile(profession)?.specializationUrl)
   expect([...withSpecializations].sort()).toEqual(['Alchemy', 'Blacksmithing', 'Engineering', 'Leatherworking', 'Tailoring'])
+})
+
+test('a raid leader picks which Blessing each Paladin brings, and the default still holds', async () => {
+  /*
+   * Reported from the walkthrough: three Paladins never covered Salvation or Sanctuary. The cap was
+   * right — a Paladin brings one Blessing, and listing five for one Paladin was this tool's largest
+   * over-credit — but the *order* filling it was a guess standing in for a decision. Raids assign
+   * blessings by what they need.
+   *
+   * So assignment wins where it is given, and the fixed order still fills the rest. Both halves are
+   * asserted, because a change that made assignment work by abandoning the cap would be the old
+   * over-credit wearing a new interface.
+   */
+  const coveredBlessings = (roster: Roster) =>
+    computeCoverage(roster)
+      .raidWide.covered.map((entry) => entry.entry.id)
+      .filter((id) => id.startsWith('blessing-of-'))
+      .sort()
+
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Holy' })
+  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Protection' })
+  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Retribution' })
+
+  // Untouched, the priority order fills it exactly as before.
+  expect(coveredBlessings(roster), 'three Paladins default to Kings, Might, Wisdom').toEqual([
+    'blessing-of-kings',
+    'blessing-of-might',
+    'blessing-of-wisdom',
+  ])
+
+  // Assigning two moves them in, and the third seat still falls back to the top of the order.
+  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-salvation')
+  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 1 }, 'blessing-of-sanctuary')
+  expect(coveredBlessings(roster), 'the two assigned, plus Kings for the seat that said nothing').toEqual([
+    'blessing-of-kings',
+    'blessing-of-salvation',
+    'blessing-of-sanctuary',
+  ])
+
+  // The cap is unchanged: three Paladins still cover three, never five.
+  expect(coveredBlessings(roster)).toHaveLength(3)
+
+  // Clearing one puts it back to the default for that seat.
+  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 0 }, undefined)
+  expect(coveredBlessings(roster)).toEqual(['blessing-of-kings', 'blessing-of-might', 'blessing-of-sanctuary'])
+})
+
+test('an assignment cannot buy coverage the roster has no provider for', async () => {
+  /*
+   * The failure mode of "assignment wins" is that it wins over reality too. A single Paladin assigned
+   * a blessing must still cover exactly one, and an assignment carried on a seat that cannot cast it
+   * — a stale id left behind when the class changed — must count for nothing rather than holding a
+   * slot open.
+   */
+  let one = emptyRoster(25)
+  one = addToGroup(one, 0, { className: 'Paladin', spec: 'Holy' })
+  one = assignBlessing(one, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-sanctuary')
+
+  const covered = computeCoverage(one)
+    .raidWide.covered.map((entry) => entry.entry.id)
+    .filter((id) => id.startsWith('blessing-of-'))
+  expect(covered, 'one Paladin, one Blessing — the one they were assigned').toEqual(['blessing-of-sanctuary'])
+
+  /*
+   * A Shaman carrying a Paladin's blessing id. `assignBlessing` will write it, because the seat model
+   * does not police class — the coverage calculation is what has to, and this is where that is pinned.
+   */
+  let stale = emptyRoster(25)
+  stale = addToGroup(stale, 0, { className: 'Shaman', spec: 'Restoration' })
+  stale = assignBlessing(stale, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-kings')
+
+  const fromStale = computeCoverage(stale)
+    .raidWide.covered.map((entry) => entry.entry.id)
+    .filter((id) => id.startsWith('blessing-of-'))
+  expect(fromStale, 'a Shaman cannot bring a Blessing, however the seat is labelled').toEqual([])
 })

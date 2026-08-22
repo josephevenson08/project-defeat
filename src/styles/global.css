@@ -3964,6 +3964,26 @@ input[type='text']:focus {
   font-family: inherit;
 }
 
+/* The Paladin blessing override. Small and quiet, because most seats never need it. */
+.raidcomp-seat-blessing {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  margin-top: 3px;
+  max-width: 100%;
+  padding: 1px 3px;
+  text-transform: uppercase;
+}
+
+.raidcomp-seat-blessing:hover {
+  border-color: var(--line-strong);
+  color: var(--text-dim);
+}
+
 .raidcomp-seat-remove {
   background: transparent;
   border: 0;

@@ -87,6 +87,15 @@ export function exclusiveGroupFor(buffId: string): ExclusiveGroup | undefined {
 export function applyExclusivity(
   candidateIds: readonly string[],
   providerCountFor: (group: ExclusiveGroup) => number,
+  /**
+   * Buffs a provider has been explicitly assigned, which take the group's budget before the priority
+   * order gets any of it.
+   *
+   * The priority order is a sensible default standing in for a decision — a raid assigns blessings by
+   * what it needs, not by a list. Where that decision has been made, it wins; where it has not,
+   * nothing changes.
+   */
+  assignedIds: ReadonlySet<string> = new Set(),
 ): Set<string> {
   const kept = new Set<string>()
   const usedPerGroup = new Map<string, number>()
@@ -102,8 +111,18 @@ export function applyExclusivity(
     const budget = providerCountFor(group)
     if (budget <= 0) continue
 
+    // Assignments first, in the group's own order so two Paladins assigned the same blessing cannot
+    // consume two of the budget between them.
     for (const buffId of group.buffIds) {
-      if (!candidates.has(buffId)) continue
+      if (!assignedIds.has(buffId) || !candidates.has(buffId)) continue
+      const used = usedPerGroup.get(group.id) ?? 0
+      if (used >= budget) break
+      kept.add(buffId)
+      usedPerGroup.set(group.id, used + 1)
+    }
+
+    for (const buffId of group.buffIds) {
+      if (!candidates.has(buffId) || kept.has(buffId)) continue
       const used = usedPerGroup.get(group.id) ?? 0
       if (used >= budget) break
       kept.add(buffId)
