@@ -21,7 +21,9 @@ import {
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
 import { exclusiveGroups } from '../../domain/buffs/buffExclusivity'
+import { describeProvider } from '../../domain/buffs/buffTypes'
 import { getBuffById } from '../../domain/buffs/sampleBuffs'
+import { describeStats } from '../../domain/stats/describeStats'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 
@@ -112,21 +114,56 @@ function SeatContributionCard({ slot }: { slot: RosterSlot }) {
   )
 }
 
-/** Wowhead shows granted buffs as a row of icons; the names live in the title, as they do there. */
+/**
+ * What one buff actually is, on hover or keyboard focus.
+ *
+ * The row under each group was a wall of unlabelled icons with the name in a `title` — which is the
+ * browser's tooltip, appears after a delay, cannot be reached by keyboard, and says the name and
+ * nothing else. "Which of these is the one I care about" was unanswerable without knowing the
+ * artwork already.
+ *
+ * The effect is **derived from the same fields the stat totals read**, not written again here, so the
+ * card cannot describe something the planner is not applying. A buff whose value this app cannot
+ * express as a stat change says so in its own words instead — 15 of the 33 are like that, and
+ * Bloodlust reading "not modelled" is more use than Bloodlust reading nothing.
+ */
+function BuffCard({ buff }: { buff: Buff }) {
+  /*
+   * Flat stats only, and that is not an omission. The one buff in TBC whose whole value is a
+   * *multiplier* — Greater Blessing of Kings, +10% to every attribute — is raid-scoped, so it never
+   * appears in this row: the row shows what a **party** receives. A percentage describer was written
+   * here first and could not fire, which is the "module nothing renders" this repo has shipped three
+   * times before.
+   *
+   * A test asserts no party-scoped buff carries `statMultipliers`, so if that ever changes the gap
+   * fails rather than quietly showing a buff with no effect line.
+   */
+  const effect = describeStats(buff.stats)
+
+  return (
+    <div className="raidcomp-buff-card" role="tooltip">
+      <span className="raidcomp-buff-card-name">{buff.name}</span>
+      <span className="raidcomp-buff-card-source">{describeProvider(buff)}</span>
+      {effect && <span className="raidcomp-buff-card-effect">{effect}</span>}
+      {buff.notModelled && <span className="raidcomp-buff-card-unmodelled">{buff.notModelled}</span>}
+    </div>
+  )
+}
+
+/** Wowhead shows granted buffs as a row of icons; hovering one says what it is. */
 function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: string }) {
   if (buffs.length === 0) return <span className="raidcomp-group-buffs-none">{emptyLabel}</span>
 
   return (
     <ul className="raidcomp-buff-icons">
       {buffs.map((buff) => (
-        <li key={buff.id}>
-          <img
-            src={iconUrl(getBuffIcon(buff.id))}
-            alt={buff.name}
-            title={buff.name}
-            loading="lazy"
-            decoding="async"
-          />
+        /*
+         * `tabIndex` so the card is reachable without a mouse: the CSS reveals it on `:focus-within`
+         * exactly as the seat card does, and an icon row nobody can tab through is a row of secrets.
+         */
+        <li key={buff.id} tabIndex={0} data-testid={`raidcomp-buff-${buff.id}`}>
+          <img src={iconUrl(getBuffIcon(buff.id))} alt={buff.name} loading="lazy" decoding="async" />
+          <BuffCard buff={buff} />
         </li>
       ))}
     </ul>

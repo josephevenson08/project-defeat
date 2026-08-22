@@ -4244,6 +4244,73 @@ input[type='text']:focus {
   z-index: 20;
 }
 
+/*
+ * The buff card, on the same reveal as the seat card: hover or keyboard focus, no delay.
+ *
+ * These icons carried a browser `title` before, which appears after a pause, cannot be tabbed to,
+ * and says only the name. The row is the decision surface for a raid leader checking coverage, so
+ * it needs to answer what a buff does rather than only what it is called.
+ */
+.raidcomp-buff-icons > li {
+  position: relative;
+}
+
+.raidcomp-buff-icons > li:focus-visible {
+  outline: 1px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.raidcomp-buff-card {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 6px;
+  z-index: 5;
+  display: grid;
+  gap: 3px;
+  min-width: 170px;
+  max-width: 260px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 100ms ease;
+  pointer-events: none;
+}
+
+.raidcomp-buff-icons > li:hover .raidcomp-buff-card,
+.raidcomp-buff-icons > li:focus-within .raidcomp-buff-card {
+  opacity: 1;
+  visibility: visible;
+}
+
+.raidcomp-buff-card-name {
+  color: var(--text-strong);
+  font-size: 12px;
+}
+
+.raidcomp-buff-card-source {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.raidcomp-buff-card-effect {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+/* A buff this app cannot price still says what it does, in its own words. */
+.raidcomp-buff-card-unmodelled {
+  color: var(--text-faint);
+  font-size: 11px;
+  font-style: italic;
+}
+
 .raidcomp-seat-card {
   position: absolute;
   left: 100%;

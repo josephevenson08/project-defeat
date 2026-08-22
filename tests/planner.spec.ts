@@ -6128,3 +6128,53 @@ test('an assignment cannot buy coverage the roster has no provider for', async (
     .filter((id) => id.startsWith('blessing-of-'))
   expect(fromStale, 'a Shaman cannot bring a Blessing, however the seat is labelled').toEqual([])
 })
+
+test('hovering a party buff says what it does, not just what it is called', async ({ page }) => {
+  /*
+   * The row under each group was unlabelled icons with the name in a browser `title` — which appears
+   * after a delay, cannot be reached by keyboard, and says the name and nothing else. It is the
+   * surface a raid leader scans to check coverage, so it has to answer what a buff *does*.
+   *
+   * Driven by focus rather than hover, which also proves the keyboard path: an icon row nobody can
+   * tab through is a row of secrets.
+   */
+  await openApp(page, 'raidcomp')
+
+  await page.getByTestId('raidcomp-add-warrior-fury').click()
+
+  const battleShout = page.getByTestId('raidcomp-buff-battle-shout').first()
+  await expect(battleShout).toBeVisible()
+
+  const card = battleShout.locator('.raidcomp-buff-card')
+  await expect(card, 'the card stays out of the way until asked for').toBeHidden()
+
+  await battleShout.focus()
+  await expect(card).toBeVisible()
+  await expect(card).toContainText('Battle Shout')
+  await expect(card).toContainText('Warrior')
+  await expect(card, 'the effect is the same number the stat totals use').toContainText('+306 Attack Power')
+})
+
+test('a party buff whose value is a multiplier would have no effect line, and none exists', async () => {
+  /*
+   * The buff card describes flat stats only. That is safe precisely because of this: the one buff in
+   * TBC whose whole value is a *multiplier* — Greater Blessing of Kings, +10% to every attribute — is
+   * raid-scoped, so it never appears in the party row.
+   *
+   * A percentage describer was written for the card first and could not fire, which is the "module
+   * nothing renders" this repo has shipped three times. It was deleted rather than left in reach of
+   * nothing — and this is what stops that decision quietly becoming wrong: if a party-scoped buff
+   * ever gains a multiplier, it would render with a blank effect and this fails instead.
+   */
+  const partyScopedWithMultipliers = sampleBuffs
+    .filter((buff) => getBuffScope(buff.id) === 'Party')
+    .filter((buff) => buff.statMultipliers && Object.keys(buff.statMultipliers).length > 0)
+    .map((buff) => buff.name)
+
+  expect(partyScopedWithMultipliers, 'no party-scoped buff is described by a multiplier alone').toEqual([])
+
+  // And the falsification: the multiplier buff does exist, it is simply not party-scoped.
+  const kings = sampleBuffs.find((buff) => buff.id === 'blessing-of-kings')
+  expect(kings?.statMultipliers, 'Kings is still a multiplier buff').toBeTruthy()
+  expect(getBuffScope('blessing-of-kings'), 'and is still raid-scoped').toBe('Raid')
+})

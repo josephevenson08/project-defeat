@@ -192,7 +192,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers
-- [[domain.stats.describeStats]] · 3 importers
+- [[domain.stats.describeStats]] · 4 importers
 - [[domain.stats.statRelevance]] · 1 importers
 - [[domain.stats.statTypes]] · 16 importers
 - [[domain.stats.statUtils]] · 3 importers

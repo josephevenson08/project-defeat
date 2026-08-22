@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
 
 ## Concepts & phases
