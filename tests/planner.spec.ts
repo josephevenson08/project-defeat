@@ -367,6 +367,7 @@ import {
 } from '../src/domain/talents/talentModifiers'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
+import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
 import { allProfessions, getProfessionProfile } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -6177,4 +6178,90 @@ test('a party buff whose value is a multiplier would have no effect line, and no
   const kings = sampleBuffs.find((buff) => buff.id === 'blessing-of-kings')
   expect(kings?.statMultipliers, 'Kings is still a multiplier buff').toBeTruthy()
   expect(getBuffScope('blessing-of-kings'), 'and is still raid-scoped').toBe('Raid')
+})
+
+test('the raid date and time are pickers, and the time carries a zone', async ({ page }) => {
+  /*
+   * These were free text — "Tue 12 Aug", "this Saturday" and "8/12" were all valid. Defensible for a
+   * field nobody should be forced to fill, and poor for the field everybody fills the same way.
+   *
+   * The zone matters more than it looks: a start time is ambiguous the moment the chart leaves the
+   * room, which is exactly what exporting a PNG is for.
+   */
+  await openApp(page, 'raidcomp')
+
+  await expect(page.getByTestId('raidcomp-meta-date')).toHaveAttribute('type', 'date')
+  await expect(page.getByTestId('raidcomp-meta-time')).toHaveAttribute('type', 'time')
+
+  const timezone = page.getByTestId('raidcomp-meta-timezone')
+  const chosen = await timezone.inputValue()
+  const local = await page.evaluate(() => Intl.DateTimeFormat().resolvedOptions().timeZone)
+  expect(chosen, 'defaults to the reader\'s own zone rather than asking').toBe(local)
+
+  // And it survives a round trip through storage, which is where this app has lost fields before.
+  await page.getByTestId('raidcomp-meta-date').fill('2026-08-25')
+  await timezone.selectOption('UTC')
+  await page.reload()
+  await page.getByTestId('section-raidcomp').click()
+
+  await expect(page.getByTestId('raidcomp-meta-date')).toHaveValue('2026-08-25')
+  await expect(page.getByTestId('raidcomp-meta-timezone'), 'the zone is carried through the validator').toHaveValue('UTC')
+})
+
+test('an ISO raid date is written out long, and never a day early', async () => {
+  /*
+   * The exported chart shows the date to people, and nobody says "the raid is on 2026-08-25".
+   *
+   * The trap this pins is real and silent: `new Date('2026-08-25')` is **midnight UTC**, so formatting
+   * it in any negative-offset zone gives the day *before*. A raid in Chicago would have been
+   * advertised on the 24th for a chart made on the 25th — right for the author, wrong for half the
+   * readers, and impossible to notice from the code.
+   */
+  expect(formatRaidDate('2026-08-25')).toBe('Tue, 25 Aug 2026')
+
+  // The falsification: the naive parse really does slip a day, so the UTC handling is load-bearing.
+  const naive = new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'America/Chicago',
+  }).format(new Date('2026-08-25'))
+  expect(naive, 'which is why the date is parsed and formatted as UTC').toBe('Mon, 24 Aug 2026')
+
+  // Free text from a roster saved before the picker existed is passed through rather than lost.
+  expect(formatRaidDate('this Saturday')).toBe('this Saturday')
+  expect(formatRaidDate(undefined)).toBeUndefined()
+})
+
+test('every seatable build has vendored artwork, so an exported chart is never half-iconed', async () => {
+  /*
+   * The exported PNG now draws each seat's spec icon and colours the name by class, replacing a 3px
+   * role stripe. The stripe was legible but abstract — it asked the reader to know that teal meant
+   * healer — where class colour is the one convention every WoW player reads without being told.
+   *
+   * The failure this guards is quiet by construction: `drawImage` draws nothing for an image that
+   * failed to load, and `loadSeatIcons` resolves a failed load rather than rejecting, because one
+   * missing icon should cost that seat its artwork rather than cost the raid leader their chart. So
+   * a missing file produces a chart that looks *finished* and is missing a row's icon.
+   */
+  const missing: string[] = []
+
+  for (const { className, builds } of raidBuildsByClass) {
+    for (const build of builds) {
+      if (!build.icon) {
+        missing.push(`${className} ${build.label}: no icon name at all`)
+        continue
+      }
+      if (!existsSync(resolve(process.cwd(), 'public/icons', `${build.icon}.jpg`))) {
+        missing.push(`${className} ${build.label} -> ${build.icon}.jpg`)
+      }
+    }
+  }
+
+  expect(missing, 'every build a seat can hold has artwork on disk').toEqual([])
+
+  // Non-vacuous: these are the 29 builds the picker offers, not an empty list.
+  const total = raidBuildsByClass.reduce((count, entry) => count + entry.builds.length, 0)
+  expect(total, 'all 29 raid builds were checked').toBe(29)
 })

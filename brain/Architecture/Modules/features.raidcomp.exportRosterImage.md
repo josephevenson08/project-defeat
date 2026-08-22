@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/exportRosterImage.ts
-lines: 214
+lines: 312
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.exportRosterImage
 
-`src/features/raidcomp/exportRosterImage.ts` · **features** layer · 214 lines
+`src/features/raidcomp/exportRosterImage.ts` · **features** layer · 312 lines
 
 From the top of the file:
 
@@ -28,12 +28,11 @@ From the top of the file:
 
 ## Exports
 
-**function** — `downloadRosterImage`, `drawRoster`
+**function** — `downloadRosterImage`, `drawRoster`, `formatRaidDate`
 
 ## Imports
 
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
+- [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
 
 ## Imported by

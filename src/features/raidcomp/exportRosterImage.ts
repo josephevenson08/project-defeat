@@ -1,6 +1,5 @@
-import type { CharacterRole } from '../../domain/character/characterTypes'
-import { getRoleForSpec } from '../../domain/character/tbcClasses'
-import { PARTY_SIZE } from '../../domain/raidcomp'
+import { getClassColor } from '../../domain/character/classColors'
+import { PARTY_SIZE, getRaidBuild, raidBuildsByClass } from '../../domain/raidcomp'
 import type { Roster, RosterSlot } from '../../domain/raidcomp'
 
 /**
@@ -18,13 +17,6 @@ import type { Roster, RosterSlot } from '../../domain/raidcomp'
  * same on every machine, which a screenshot does not.
  */
 
-const ROLE_COLOURS: Record<CharacterRole, string> = {
-  Tank: '#6a7fa8',
-  Healer: '#6f8f6a',
-  'Physical DPS': '#9c7346',
-  'Caster DPS': '#856a9c',
-}
-
 /** Matches the app's own surfaces, so a pasted image still reads as coming from this tool. */
 const INK = {
   background: '#0a0a0a',
@@ -38,6 +30,7 @@ const INK = {
 const SCALE = 2 // Drawn at 2x so the PNG stays sharp when Discord scales it down.
 const COLUMN_WIDTH = 240
 const ROW_HEIGHT = 34
+const ICON_SIZE = 22
 const GROUP_HEADER = 30
 const PADDING = 24
 const GAP = 12
@@ -49,6 +42,81 @@ const GAP = 12
  * description**. A raid glancing at this in Discord reads "which raid" first, "when" second, and the
  * detail last — so the sizes follow that order rather than a generic heading ramp.
  */
+/**
+ * `2026-08-25` as `Tue 25 Aug 2026`.
+ *
+ * The date is stored ISO because that is what a date input produces and what sorts; it is displayed
+ * long because the chart is read by people, and nobody says "the raid is on 2026-08-25".
+ *
+ * Parsed as UTC and formatted as UTC on purpose. A bare `new Date('2026-08-25')` is midnight UTC,
+ * which in any negative-offset zone formats as the day *before* — the raid would be advertised a day
+ * early for every reader west of Greenwich.
+ *
+ * Anything that is not an ISO date is passed through untouched, so a roster saved before the picker
+ * existed still shows whatever free text it held rather than losing it.
+ */
+/** The spec's artwork, the same icon the seat shows on screen. */
+function iconNameFor(slot: RosterSlot): string | undefined {
+  const build = slot.buildId ? getRaidBuild(slot.buildId) : undefined
+  if (build) return build.icon
+  return raidBuildsByClass
+    .find((entry) => entry.className === slot.className)
+    ?.builds.find((candidate) => candidate.spec === slot.spec)?.icon
+}
+
+/**
+ * Loads every icon the chart needs, before a single pixel is drawn.
+ *
+ * `drawImage` silently draws nothing for an image that has not finished loading, so this cannot be
+ * done lazily inside the seat loop — the export would come out with icons or without them depending
+ * on what the browser happened to have cached, which is the worst of both.
+ *
+ * A failed load resolves to `undefined` rather than rejecting: one missing icon should cost that
+ * seat its artwork, not cost the raid leader their chart.
+ */
+async function loadSeatIcons(roster: Roster): Promise<Map<string, HTMLImageElement>> {
+  const names = new Set<string>()
+  for (const group of roster.groups) {
+    for (const slot of group) {
+      const name = slot ? iconNameFor(slot) : undefined
+      if (name) names.add(name)
+    }
+  }
+
+  const loaded = new Map<string, HTMLImageElement>()
+  await Promise.all(
+    [...names].map(
+      (name) =>
+        new Promise<void>((resolve) => {
+          const image = new Image()
+          image.onload = () => {
+            loaded.set(name, image)
+            resolve()
+          }
+          image.onerror = () => resolve()
+          image.src = `${import.meta.env.BASE_URL}icons/${name}.jpg`
+        }),
+    ),
+  )
+  return loaded
+}
+
+export function formatRaidDate(date: string | undefined): string | undefined {
+  if (!date) return undefined
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date
+
+  const parsed = new Date(`${date}T00:00:00Z`)
+  if (Number.isNaN(parsed.getTime())) return date
+
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(parsed)
+}
+
 function headerHeight(roster: Roster): number {
   const meta = roster.meta ?? {}
   let height = PADDING + 26 /* title line */ + 20 /* seat count */
@@ -57,7 +125,16 @@ function headerHeight(roster: Roster): number {
   return height + 14
 }
 
-export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, fallbackTitle: string): void {
+export function drawRoster(
+  canvas: HTMLCanvasElement,
+  roster: Roster,
+  fallbackTitle: string,
+  /**
+   * Preloaded seat artwork. Defaulted to empty so the chart still draws without it — a caller that
+   * forgets to await the icons gets a chart with no icons rather than no chart.
+   */
+  icons: Map<string, HTMLImageElement> = new Map(),
+): void {
   const meta = roster.meta ?? {}
   const title = meta.title?.trim() || fallbackTitle
 
@@ -86,7 +163,7 @@ export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, fallbackTi
   cursor += 28
 
   // Date and start time — below the title, above the description, and sized between them.
-  const when = [meta.date, meta.startTime].filter(Boolean).join(' · ')
+  const when = [formatRaidDate(meta.date), meta.startTime, meta.startTime ? meta.timezone : undefined].filter(Boolean).join(' · ')
   if (when) {
     ctx.fillStyle = INK.text
     ctx.font = '15px Inter, system-ui, sans-serif'
@@ -137,38 +214,55 @@ export function drawRoster(canvas: HTMLCanvasElement, roster: Roster, fallbackTi
         return
       }
 
-      drawSeat(ctx, slot, x, rowY)
+      drawSeat(ctx, slot, x, rowY, icons)
     })
   })
 }
 
-function drawSeat(ctx: CanvasRenderingContext2D, slot: RosterSlot, x: number, rowY: number): void {
-  const role = getRoleForSpec(slot.className, slot.spec)
-
-  // A role stripe rather than coloured text: the label stays high-contrast while the colour still
-  // lets a raid leader scan tank and healer distribution down a column at a glance.
-  ctx.fillStyle = ROLE_COLOURS[role]
-  ctx.fillRect(x + 1, rowY + 1, 3, ROW_HEIGHT - 2)
+function drawSeat(
+  ctx: CanvasRenderingContext2D,
+  slot: RosterSlot,
+  x: number,
+  rowY: number,
+  icons: Map<string, HTMLImageElement>,
+): void {
+  /*
+   * The spec's own icon, and the name in its class colour.
+   *
+   * This replaced a 3px role stripe down the edge of the row. The stripe was legible but abstract —
+   * it asked the reader to know that teal meant healer — where a class colour is the one convention
+   * every WoW player already reads without being told, and the icon says the spec outright.
+   */
+  const iconName = iconNameFor(slot)
+  const icon = iconName ? icons.get(iconName) : undefined
+  if (icon) {
+    ctx.drawImage(icon, x + 8, rowY + (ROW_HEIGHT - ICON_SIZE) / 2, ICON_SIZE, ICON_SIZE)
+  }
 
   /*
    * A named seat leads with the name and demotes the spec to a second line, because the raid reading
    * this is looking for themselves first and their spec second. An unnamed seat keeps the spec on one
    * centred line rather than leaving an empty slot where a name would go.
    */
-  if (slot.playerName) {
-    ctx.fillStyle = INK.text
-    ctx.font = '13px Inter, system-ui, sans-serif'
-    ctx.fillText(slot.playerName, x + 14, rowY + 5)
+  const textX = x + 8 + ICON_SIZE + 8
+  const classColour = getClassColor(slot.className)
 
+  if (slot.playerName) {
+    ctx.fillStyle = classColour
+    ctx.font = '13px Inter, system-ui, sans-serif'
+    ctx.fillText(slot.playerName, textX, rowY + 5)
+
+    // The spec stays dim: the name is what the reader is scanning for, and two coloured lines would
+    // make neither of them lead.
     ctx.fillStyle = INK.dim
     ctx.font = '11px Inter, system-ui, sans-serif'
-    ctx.fillText(`${slot.spec} ${slot.className}`, x + 14, rowY + 19)
+    ctx.fillText(`${slot.spec} ${slot.className}`, textX, rowY + 19)
     return
   }
 
-  ctx.fillStyle = INK.text
+  ctx.fillStyle = classColour
   ctx.font = '13px Inter, system-ui, sans-serif'
-  ctx.fillText(`${slot.spec} ${slot.className}`, x + 14, rowY + 10)
+  ctx.fillText(`${slot.spec} ${slot.className}`, textX, rowY + 10)
 }
 
 /**
@@ -188,9 +282,13 @@ function drawSeat(ctx: CanvasRenderingContext2D, slot: RosterSlot, x: number, ro
  * may not have started reading the blob yet, and revoking early can cancel the download outright.
  * Revoked on the next frame instead, once the click has been dispatched.
  */
-export function downloadRosterImage(roster: Roster, fallbackTitle: string): void {
+export async function downloadRosterImage(roster: Roster, fallbackTitle: string): Promise<void> {
+  // Awaited, because `drawImage` silently draws nothing for an image still loading — the chart would
+  // come out with or without icons depending on what the browser had cached.
+  const icons = await loadSeatIcons(roster)
+
   const canvas = document.createElement('canvas')
-  drawRoster(canvas, roster, fallbackTitle)
+  drawRoster(canvas, roster, fallbackTitle, icons)
 
   const meta = roster.meta ?? {}
   const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')

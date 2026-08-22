@@ -60,6 +60,21 @@ function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
     ?.builds.find((build) => build.spec === slot.spec)
 }
 
+/** The reader's own zone, which is the right default for the person filling the chart in. */
+const LOCAL_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+
+/**
+ * Every IANA zone the browser knows, with the local one guaranteed present.
+ *
+ * `supportedValuesOf` is not universal, so the fallback is the local zone plus UTC rather than a
+ * hand-written list of "common" zones — a short list is wrong for exactly the people it excludes,
+ * and a raid roster crosses time zones by nature.
+ */
+const TIMEZONES: readonly string[] = (() => {
+  const supported = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : []
+  return [...new Set([LOCAL_TIMEZONE, 'UTC', ...supported])].sort()
+})()
+
 /**
  * The five Greater Blessings, in the order a raid fills them.
  *
@@ -296,7 +311,9 @@ export function RaidCompositionPanel() {
           <button
             type="button"
             className="raidcomp-export"
-            onClick={() => downloadRosterImage(roster, title)}
+            // Async now: the seat icons are loaded before anything is drawn, because drawImage
+            // silently draws nothing for an image that has not finished loading.
+            onClick={() => void downloadRosterImage(roster, title)}
             data-testid="raidcomp-export"
           >
             Export image
@@ -331,23 +348,46 @@ export function RaidCompositionPanel() {
           data-testid="raidcomp-meta-title"
           onChange={(event) => setRoster((current) => setRosterMeta(current, 'title', event.target.value))}
         />
+        {/*
+          Real pickers rather than free text. Every browser draws its own calendar and clock for these,
+          which is both more familiar than anything built here and correct on a phone without any
+          extra work.
+        */}
         <div className="raidcomp-meta-when">
           <input
+            type="date"
             className="raidcomp-meta-date"
             value={roster.meta?.date ?? ''}
-            placeholder="Date"
             aria-label="Raid date"
             data-testid="raidcomp-meta-date"
             onChange={(event) => setRoster((current) => setRosterMeta(current, 'date', event.target.value))}
           />
           <input
+            type="time"
             className="raidcomp-meta-time"
             value={roster.meta?.startTime ?? ''}
-            placeholder="Start time"
             aria-label="Raid start time"
             data-testid="raidcomp-meta-time"
             onChange={(event) => setRoster((current) => setRosterMeta(current, 'startTime', event.target.value))}
           />
+          {/*
+            A start time is ambiguous the moment the chart leaves the room, which is what exporting a
+            PNG is for. Defaulted to the reader's own zone rather than asked for — right nearly always,
+            and visibly wrong when it is not.
+          */}
+          <select
+            className="raidcomp-meta-timezone"
+            value={roster.meta?.timezone ?? LOCAL_TIMEZONE}
+            aria-label="Raid time zone"
+            data-testid="raidcomp-meta-timezone"
+            onChange={(event) => setRoster((current) => setRosterMeta(current, 'timezone', event.target.value))}
+          >
+            {TIMEZONES.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone.replaceAll('_', ' ')}
+              </option>
+            ))}
+          </select>
         </div>
         <input
           className="raidcomp-meta-description"

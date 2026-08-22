@@ -89,7 +89,7 @@ export function loadRoster(): Roster | undefined {
     const meta =
       typeof storedMeta === 'object' && storedMeta !== null
         ? (Object.fromEntries(
-            (['title', 'description', 'date', 'startTime'] as const)
+            (['title', 'description', 'date', 'startTime', 'timezone'] as const)
               .map((field) => [field, (storedMeta as Record<string, unknown>)[field]])
               .filter(([, value]) => typeof value === 'string' && value.trim()),
           ) as Roster['meta'])

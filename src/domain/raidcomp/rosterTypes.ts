@@ -77,9 +77,29 @@ export type RaidGroup = readonly (RosterSlot | undefined)[]
 export type RosterMeta = {
   title?: string
   description?: string
-  /** Free text rather than a date type: "Tue 12 Aug", "this Saturday" and "8/12" are all valid here. */
+  /**
+   * ISO `YYYY-MM-DD`, written by a real date picker.
+   *
+   * This was free text — "Tue 12 Aug", "this Saturday" and "8/12" were all valid — which was a
+   * defensible call for a field nobody should be forced to fill in, and a poor one for the field
+   * everybody fills in the same way. A stored ISO date also sorts, and formats into whatever the
+   * reader's locale wants rather than whatever the person typing it happened to use.
+   *
+   * A roster saved with free text before this simply shows an empty picker: the value is kept in
+   * storage but a date input will not display it, and inventing a date from "this Saturday" would be
+   * worse than asking again.
+   */
   date?: string
+  /** 24-hour `HH:MM`, from a time picker. */
   startTime?: string
+  /**
+   * IANA zone id — `America/Chicago`, `Europe/London`.
+   *
+   * A start time without one is ambiguous the moment the chart leaves the room, which is exactly
+   * what an exported PNG does. Defaulted to the raid leader's own zone rather than asked for, since
+   * that is right nearly always and wrong visibly.
+   */
+  timezone?: string
 }
 
 export type Roster = {
