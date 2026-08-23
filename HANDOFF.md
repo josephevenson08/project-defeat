@@ -1,7 +1,84 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-22.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-23.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-23)
+
+**Three of the four items the last session queued are done.** `39758d9..67fdc20`, three commits, 187
+tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on `origin/main`.
+What is left is the simulation rebuild, item 4, unchanged and still the big one.
+
+### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
+
+The walkthrough asked to restrict Faerie Fire to **Balance/Dreamstate Druids**. That is not what
+shipped, because this repo's own ingested talent trees say it is backwards: **Improved Faerie Fire is
+Balance** (row 6, 3 ranks), **Faerie Fire (Feral) is Feral Combat** (row 4, 1 rank), and
+**Restoration — the tree Dreamstate lives in — has neither**. Restricting the base spell would have
+credited the one Druid tree with no Faerie Fire talent while excluding the one with a dedicated one.
+
+Base Faerie Fire is trainer-taught to every Druid, so it **stays class-wide**. The Balance-only half
+the request was really about is now its own entry — **Improved Faerie Fire, spell 33602** — on the
+same principle as Trueshot Aura and Power Infusion.
+
+**The +3% is modelled, not just named.** `physicalHitTakenBonus` is a new `TargetDebuff` field; the
+old note said the app "has no field for" it, which was true when written. It is attacker hit rather
+than target avoidance, so it joins the same `missReduction` term as hit rating and talent hit — one
+term reaching white swings, specials and the ranged table, each flooring miss at zero. Measured on
+the reference Fury Warrior: miss **6.9% → 3.9%**, DPS **215.3 → 221.6 (+3.0%)**. A test pins that a
+Fire Mage's spell hit and score are byte-identical with it active, because the tooltip says melee and
+ranged.
+
+### 2. The assignment picker is general now, and the blocker was the seat shape
+
+The domain had assigned any exclusive buff since totems got a group. The **interface** was gated on
+`className === 'Paladin'`, so three of the four groups were decided by the priority order with no way
+to say otherwise.
+
+**Ungating it was not enough, and this is the part worth knowing.** `RosterSlot.blessingId` held one
+answer and a Paladin has two — they bring a Blessing *and* an aura — so assigning the aura would have
+silently cleared the Blessing. Assignments are now keyed by `ExclusiveGroup.id`, `assignBlessing`
+became `assignBuff(roster, ref, groupId, buffId)`, and coverage reads every group's assignment while
+still checking the seat can actually provide the buff. **A group key is never trusted on its own.**
+
+Saved rosters migrate on read: `blessingId` is looked up through `exclusiveGroupFor` rather than
+assumed to be a Blessing, so no branch can file it under the wrong group. Option labels are derived
+by `trimSharedWords` — the version it replaced was a literal `.replace(/^Greater Blessing of /, '')`,
+correct for the one group the picker could reach and silently wrong for the three it could not.
+
+### 3. The attunement tab already existed; Karazhan's chain did not
+
+Worth knowing before trusting a queue item's framing: the tab, component, styles and a test had
+shipped with the raids rework. The gap was **data** — only SSC and Tempest Keep had chains, while
+SSC's own prerequisites already assumed you had done Karazhan's.
+
+Karazhan now has **eight steps, each cited to the Wowhead quest id its wording came from** (9824,
+9825, 9826, 9829, 9831, 9832, 9836, 9837 → The Master's Key, item 24490), cross-checked against Icy
+Veins. Still `needsVerification`, and the note says precisely what is unsettled — the level the chain
+requires, and whether Anniversary realms drop it in 2.4 — rather than flagging it vaguely.
+
+**README and ROADMAP were both claiming per-role callouts the Raids tab has not rendered since the
+loot-only rework.** Corrected rather than edited around; the mechanics data is still there and
+deliberately unsurfaced, and ROADMAP now says so.
+
+### What is left
+
+1. **The simulation rebuild.** Still `ROTATION-SCOPE.md`, still 25 of 27 specs modelled as a single
+   ability on repeat, still no timeline at all. Multiple sessions, and the honest reason DPS reads
+   ~4x low.
+2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
+   sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
+   per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
+   Found while measuring the picker's layout. The "reflows to phone width" test misses it.
+
+### One trap this session hit
+
+**Python eats `\'` inside a triple-quoted string**, so a patch script writing TypeScript emitted
+`'Cedric's reply'` and produced sixty parse errors. The repo already records the backtick version of
+this; this is the same failure through a different quote. Write the TS string double-quoted instead
+of escaping the apostrophe.
 
 ---
 
@@ -92,13 +169,14 @@ Nine are done. Each commit message carries the reasoning; the ones worth knowing
 
 ### What is left, in order
 
-1. **Faerie Fire on Balance/Dreamstate only — needs a decision, not code.** *Any* Druid can cast Faerie
-   Fire; only **Improved** Faerie Fire is a Balance talent. Restricting the base debuff encodes a raid
-   convention as a game rule, which `ExclusiveGroup.basis` exists to keep separate. Ask before doing it.
-2. **Generalise the assignment picker.** The domain already assigns any exclusive buff — that is how
-   totem assignment works today — but the UI picker is still gated on `className === 'Paladin'`. Small.
-3. **The attunement tab.** `sampleAttunements.ts` and `getAttunementChainForRaid` already exist, so this
-   is likely less work than it looks.
+1. ~~**Faerie Fire on Balance/Dreamstate only.**~~ **Done 2026-08-23 — asked, and the answer was to
+   split.** The base debuff stays class-wide; Improved Faerie Fire is a separate Balance entry whose
+   +3% melee and ranged hit is modelled. The requested restriction was inverted — see the top of this
+   file.
+2. ~~**Generalise the assignment picker.**~~ **Done 2026-08-23.** Larger than "small" looked: the
+   domain was ready, but a seat held one `blessingId` and a Paladin needs two.
+3. ~~**The attunement tab.**~~ **Done 2026-08-23 — and it already existed.** The gap was Karazhan's
+   chain, which was missing from the data entirely.
 4. **The simulation rebuild.** Still the big one, still `ROTATION-SCOPE.md`: 25 of 27 specs are a single
    ability on repeat, and the app has **no timeline at all**. Matching WoWSims means building that
    engine, then a rotation per spec. Multiple sessions, and the honest reason DPS reads ~4x low.
@@ -632,7 +710,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 156 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 187 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -1514,12 +1592,12 @@ and each item here is a decision or a fresh piece of work.
 **Two of the three below were taken on 2026-08-21 and are struck through.** What is open now is the
 boss armor figure, and one new one:
 
-0. **Should Faerie Fire be restricted to Balance and Dreamstate Druids?** Asked for in the walkthrough
-   and *not* done, because it is a modelling choice rather than a fact. **Any Druid can cast Faerie
-   Fire**; only **Improved** Faerie Fire is a Balance talent. Restricting the base debuff would encode
-   a raid convention as a game rule, and `ExclusiveGroup.basis` exists precisely to keep those apart.
-   Three honest options: leave it class-wide, restrict it as a stated *convention*, or split base from
-   improved. Do not guess.
+0. ~~**Should Faerie Fire be restricted to Balance and Dreamstate Druids?**~~ **Taken 2026-08-23 —
+   split base from improved.** Of the three options offered, the owner chose the one that keeps the
+   base debuff class-wide (which is what the game does) and gives Balance its own entry carrying the
+   +3% melee and ranged hit, modelled rather than named. The restriction as requested would have been
+   inverted: Dreamstate is a Restoration talent, and Restoration is the one Druid tree with no Faerie
+   Fire talent at all.
 
 **Decision 2 was taken on 2026-08-21 and is no longer open.** Toughness, Vitality and Divine
 Strength were the named list it gated; all three now apply, and a talented tank no longer reads low
