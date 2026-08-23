@@ -174,7 +174,10 @@ expect at least one of them to be wrong: the talent scope doc's central predicti
   already warns that a naive second energy ability would double-count the budget — Shred at 60 plus
   Mangle at 45 claims 20 energy/sec against the 10 that exists.
 - **Druid Feral.** Same energy problem, and the existing comment says the guard "does not make the
-  answer right".
+  answer right". **Checked 2026-08-23 and the tier is wrong in an instructive way:** the single-Shred
+  model is already the best answer *available*, because the second button costs the same energy and
+  returns less of it. Feral is badly wrong because it is missing **bleeds**, not because it is missing
+  buttons — see the stage 2 rewrite.
 - **Hunter, all three.** Blocked by the effect-type filter rather than by data.
 
 **Structurally different, decide separately:**
@@ -238,9 +241,54 @@ Upstream applies it as a blanket `RangedDamageDealtMultiplier` with no proc mask
 own wording ("ranged weapon") could be read either way. The repo's `rangedDamageMultiplier` field
 documented itself as white-only and was wrong about its own scope.
 
-**Stage 2 — the melee data thinning.** Feral, Retribution, Enhancement, and Protection get their
+~~**Stage 2 — the melee data thinning.** Feral, Retribution, Enhancement, and Protection get their
 second and third buttons. The resolver already handles the budgets; this is `sampleSignatureAbilities`
-entries plus per-ability sourcing. Rogue is deliberately *not* here — see stage 4.
+entries plus per-ability sourcing.~~
+
+**Re-scoped 2026-08-23, and none of the four specs survived contact.** This section predicted "at
+least one of them is wrong" — it was all of them, and for four different reasons. The stage as
+written does not exist; what replaces it is below.
+
+**"The resolver already handles the budgets" was the load-bearing error.** It does not share a budget
+between abilities, it hands it out **greedily in priority order**: the first ability takes what its
+own rate allows and later ones divide what is left. So a second ability costing the *same* resource
+does not add damage, it **moves damage from one use to another** — and only pays off if the second
+use is worth more per point of resource than the first. That reframes the whole stage from "add
+entries" to "prove the swap is a gain", and it applies to stage 4 too.
+
+- **Protection is out of scope and this doc predates the decision.** The owner ruled on 2026-08-21
+  that this project is for DPS; Protection is a Tank spec and the Simulation tab is hidden for it.
+  Listed here in 2026-08-18. Nothing to do.
+
+- **Feral: adding Mangle (Cat) alone makes the estimate *worse*, and that is measured.** Energy is the
+  binding budget, and Shred returns **11.8 damage per energy against 10.6 for Mangle**. Maintaining
+  Mangle on its 12s debuff costs 3.75 of the 10 energy/sec and loses about **4%** of the total.
+
+  The reason it does not pay itself back is a data error this repo was carrying: Shred's own notes
+  said Mangle applies a "+30% Shred/bleed debuff". **In TBC it is bleeds only.** Upstream implements
+  the aura as `PeriodicPhysicalDamageTakenMultiplier *= 1.3` for 12s, and Shred is direct damage. The
+  "Shred and Ravage" wording belongs to a later expansion. With no bleed modelled for this spec, the
+  debuff multiplies nothing at all.
+
+  So **Rake is the prerequisite, not the sibling**. Once a bleed exists, Mangle and Rake become worth
+  adding together and neither is worth adding alone. A test pins the per-energy comparison so this is
+  not rediscovered by someone adding Mangle helpfully.
+
+- **Retribution needs a type change, not an entry**, and its own notes already said so before this
+  pass. Judgement of Blood is the one genuinely computable addition — 10s cooldown, and it does not
+  even trigger the GCD — but it is **Holy-school damage scaling off spell power while rolling crit off
+  the melee table**, so it is neither a clean `Melee Special` nor a clean `Direct Damage`. Adding it
+  today is data nothing consumes.
+
+- **Enhancement's gap is not a button at all.** Its notes say the spec is dominated by **Windfury
+  Weapon procs on white swings**, with Flametongue on the off-hand. A weapon imbue proc is not a
+  rotational ability and has no place in `SignatureAbility`; modelling it means a proc-rate model
+  against the main-hand swing rate the melee context already computes. That is the single largest
+  in-scope item left in this stage, and it is a mechanism rather than data.
+
+**What stage 2 actually is, restated:** one mechanism (weapon-proc damage, for Enhancement), one
+type change (hybrid Holy-off-melee-crit, for Retribution), and one item that is really stage 3
+(bleeds, for Feral). None of it is "sampleSignatureAbilities entries plus sourcing".
 
 **Stage 3 — DoT uptime for casters.** Affliction and Shadow, which are where the caster estimate is
 worst. This needs a genuinely new piece: a concurrent-DoT uptime model, plus a filler that fits in

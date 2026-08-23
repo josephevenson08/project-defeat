@@ -83,9 +83,12 @@ import {
   computeAttackerBaseCritChance,
 } from '../src/domain/simulation/attackTable'
 import {
+  CAT_FORM_WEAPON,
+  ENERGY_PER_SECOND,
   OFF_HAND_DAMAGE_PENALTY,
   averageSwingDamage,
   computeSpecialDamagePerUse,
+  computeUsageRate,
 } from '../src/domain/simulation/specialAttacks'
 import {
   allItems,
@@ -391,7 +394,6 @@ import {
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
-import { computeUsageRate } from '../src/domain/simulation/specialAttacks'
 import { computeManaBudget, manaFromIntellect, mp5RegenPerSecond, spiritRegenPerSecond } from '../src/domain/simulation/manaModel'
 import { EMPTY_OFF_HAND, isEmptySlotItem } from '../src/domain/gear/slotCompatibility'
 import { applyWeaponSlotRules } from '../src/domain/gear/characterItemRules'
@@ -4520,6 +4522,74 @@ test('all three hunter specs gain the shot, and no other spec moves', () => {
   expect(furyResult.breakdown.some((entry) => /Steady Shot/.test(entry.label))).toBe(false)
   expect(furyResult.breakdown.some((entry) => entry.label === 'Mana per second spent')).toBe(false)
   expect(furyResult.breakdown.some((entry) => /Bloodthirst/.test(entry.label)), 'its own specials still land').toBe(true)
+})
+
+test('a second energy ability would cost a cat more than it pays, until a bleed exists', () => {
+  /*
+   * ROTATION-SCOPE listed Feral in stage 2 as "gets its second and third buttons", on the reasoning
+   * that Mangle (Cat) is sourced and computable from a fixed energy cost. Both halves of that are
+   * true and the conclusion is still wrong, which is why this is a test rather than a paragraph.
+   *
+   * **Energy is the binding budget and Shred is the more efficient way to spend it.** The resolver
+   * hands the budget out in priority order, so a second energy ability does not add damage — it
+   * moves damage from a better use to a worse one.
+   *
+   * **And Mangle's debuff does not pay the difference back**, which is the part that was mis-recorded
+   * in this repo's own data. Upstream implements the TBC aura as
+   * `PeriodicPhysicalDamageTakenMultiplier *= 1.3` for 12s: **periodic physical damage only**. Shred
+   * is direct damage and is not multiplied by it. The "Shred and Ravage" wording people remember is
+   * from a later expansion.
+   *
+   * So Rake is the prerequisite rather than the sibling: with no bleed modelled, Mangle's debuff
+   * multiplies nothing at all.
+   */
+  const shred = getRotationAbilities('Druid', 'Feral').find((ability) => ability.name === 'Shred')!
+  expect(shred.resource?.type).toBe('Energy')
+
+  const attackPower = 1100
+
+  /*
+   * Mangle is not in the ability data — that is the point — so it is built here from the constants
+   * this repo already sourced into Shred's own notes: rank 3, spell 33983, 45 energy, 160% of
+   * un-normalised cat-form weapon damage plus a flat 264.
+   */
+  const mangle = {
+    ...shred,
+    name: 'Mangle (Cat)',
+    spellId: 33983,
+    resource: { type: 'Energy' as const, cost: 45 },
+    scaling: {
+      basis: 'weapon damage' as const,
+      weaponDamageMultiplier: 1.6,
+      normalizedWeaponDamage: false,
+      flatWeaponDamageBonus: 264,
+    },
+  }
+
+  const perEnergy = (ability: typeof shred) =>
+    computeSpecialDamagePerUse(ability, CAT_FORM_WEAPON, undefined, attackPower) / ability.resource!.cost
+
+  const shredPerEnergy = perEnergy(shred)
+  const manglePerEnergy = perEnergy(mangle)
+
+  expect(shredPerEnergy, 'Shred is the more efficient use of a cat\'s energy').toBeGreaterThan(manglePerEnergy)
+
+  /*
+   * Quantified, because "worse" and "4% worse" are different claims and only one of them is
+   * checkable. Maintaining Mangle on its 12s debuff costs 45/12 = 3.75 of the 10 energy/sec.
+   */
+  const shredOnly = shredPerEnergy * ENERGY_PER_SECOND
+  const mangleUpkeep = 45 / 12
+  const withMangle = manglePerEnergy * mangleUpkeep + shredPerEnergy * (ENERGY_PER_SECOND - mangleUpkeep)
+
+  expect(withMangle, 'maintaining Mangle is a net loss while nothing bleeds').toBeLessThan(shredOnly)
+  expect((shredOnly - withMangle) / shredOnly).toBeCloseTo(0.037, 2)
+
+  // And the resolver really does spend the whole budget on the first ability, which is what makes
+  // the priority order decisive rather than cosmetic.
+  const rate = computeUsageRate(shred)
+  expect(rate.basis).toBe('energy')
+  expect(rate.usesPerSecond * shred.resource!.cost).toBeCloseTo(ENERGY_PER_SECOND, 6)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
