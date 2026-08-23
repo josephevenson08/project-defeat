@@ -238,7 +238,7 @@ machine; export/import covers that. Gear comparison, source/cost planning, and a
 are unstarted.
 
 **Raid Composition landed here** (2026-08-19), as a fifth section rather than a planner panel: pick
-10 or 25, add specs, and see which of the 33 raid buffs and 6 target debuffs the roster brings, with
+10 or 25, add specs, and see which of the 33 raid buffs and 8 target debuffs the roster brings, with
 role balance and a ranked list of what one more seat would buy. It is a workflow feature in the Phase
 5 sense — it plans something — but it belongs to nobody's character, which is why it has no rail.
 

@@ -643,7 +643,7 @@ screen the buff lists are the decision surface, but what a raid wants pasted int
 group 3", and forty lines of buff annotation would bury it.
 
 **A raid-composition planner was added** (2026-08-19, by request, modelled on Wowhead's TBC tool). A
-fifth section: pick 10 or 25, add specs, see which of the 33 raid buffs and 6 target debuffs the
+fifth section: pick 10 or 25, add specs, see which of the 33 raid buffs and 8 target debuffs the
 roster actually brings, plus role balance and what one more seat would buy you.
 
 **It was cheap for one reason worth repeating: the data was already sourced and already correct.**
