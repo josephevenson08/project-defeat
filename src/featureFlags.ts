@@ -47,6 +47,17 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   are a single-ability approximation, which understates any spec whose damage is spread across
  *   several buttons. This is the largest remaining gap and the main reason the estimate reads as
  *   indicative. See ROTATION-SCOPE.md.
+ * - **And "single-ability approximation" was itself too generous until 2026-08-23**, which is worth
+ *   keeping here rather than quietly fixing: the three hunter specs had *no* ability modelled at all.
+ *   `resolveRotation` filtered on the literal `'Melee Special'`, so Steady Shot — catalogued,
+ *   sourced and correct — reached nothing, and a hunter's estimate was auto shots alone without
+ *   naming the button they press all fight. Stage 1 of ROTATION-SCOPE closed it: the shot is bounded
+ *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
+ *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
+ *   is the size of the hole a filter literal was hiding.
+ * - **A hunter's shot rate is not capped by mana, and the readout says so.** `StatBlock` has no mana
+ *   field, so the estimate reports the mana per second the rate spends rather than enforcing a pool
+ *   it would have to invent. Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.
  * - **Talents reach all 27 specs.** All nine classes are ingested — 49 effects — and every one of the
  *   four role paths takes them as of 2026-08-19. Each reads only its own fields, which is asserted in
  *   both directions: a Shaman's melee talent must move an Elemental score by exactly nothing, and a

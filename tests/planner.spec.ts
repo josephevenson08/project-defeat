@@ -391,6 +391,7 @@ import {
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
+import { computeUsageRate } from '../src/domain/simulation/specialAttacks'
 import { computeManaBudget, manaFromIntellect, mp5RegenPerSecond, spiritRegenPerSecond } from '../src/domain/simulation/manaModel'
 import { EMPTY_OFF_HAND, isEmptySlotItem } from '../src/domain/gear/slotCompatibility'
 import { applyWeaponSlotRules } from '../src/domain/gear/characterItemRules'
@@ -1621,11 +1622,19 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   expect(breakdownValue(combat.result, /Sinister Strike DPS/i)).toBeGreaterThan(0)
   expect(combat.result.summary).toMatch(/energy against 10\/sec regen/i)
 
-  // Hunter: Steady Shot is mana-costed with no cooldown, so its sustained rate depends on auto-shot
-  // weaving that isn't modelled. It must be named as excluded rather than silently omitted.
+  /*
+   * Hunter: this assertion used to read the other way round, and it was right to. Steady Shot is
+   * mana-costed with no cooldown, so its rate was described as depending on "auto-shot weaving that
+   * isn't modelled" and it was named as excluded rather than silently omitted.
+   *
+   * ROTATION-SCOPE stage 1 modelled the weave, so the exclusion note is now the false claim and the
+   * shot is layered on like any other special. **The test failing is the test doing its job** — the
+   * scope doc said in advance that closing this gap should break the assertions describing it.
+   */
   const hunter = simulateSpec('Hunter', 'Beast Mastery', 'Dwarf', 'Alliance')
-  expect(breakdownValue(hunter.result, /Steady Shot DPS/i)).toBeUndefined()
-  expect(hunter.result.summary).toMatch(/Steady Shot is not included/i)
+  expect(breakdownValue(hunter.result, /Steady Shot DPS/i)).toBeGreaterThan(0)
+  expect(hunter.result.summary).not.toMatch(/Steady Shot is not included/i)
+  expect(hunter.result.summary, 'and it says which ceiling set the rate').toMatch(/woven one per auto shot/i)
 })
 
 test('Raids opens on a picker, then shows one raid’s loot with the rest in the rail', async ({ page }) => {
@@ -4413,6 +4422,104 @@ test('the rotation-coverage claim on the Simulation panel matches the ability da
 
   expect(multiAbility, 'exactly two specs have a real multi-ability rotation').toEqual(['Warrior Arms', 'Warrior Fury'])
   expect(singleAbility, 'and the other 25 are single-ability approximations').toBe(25)
+})
+
+test('a hunter fires the button they press all fight, at a rate with two stated ceilings', () => {
+  /*
+   * ROTATION-SCOPE stage 1. Steady Shot was catalogued, sourced and correct, and reached the
+   * simulation nowhere: `resolveRotation` filtered on the literal `'Melee Special'`, so a hunter's
+   * estimate was white auto-shot damage and did not so much as name the shot. Not missing data and
+   * not a missing mechanism — one word in a filter.
+   *
+   * The rate is bounded by two things, both read off wowsims at the pinned commit rather than
+   * judged here:
+   *
+   *   1. **The hunter GCD is locked at 1.5s and ranged haste does not reduce it** — upstream sets
+   *      `IgnoreHaste: true` with that comment. The cast time *is* hasted, so it drops below the GCD
+   *      and stops being the constraint.
+   *   2. **One shot per auto-shot cycle.** Casting delays the next auto rather than clipping it, and
+   *      upstream prices that delay and avoids paying it. A second shot inside one cycle would buy
+   *      its damage by pushing a white shot back.
+   */
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Marksmanship' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Marksmanship')
+  const stats = calculateStats(hunter, gear)
+  const result = calculateSimulation(hunter, gear, stats, 'Physical DPS')
+
+  // Named in the breakdown, which is the half that was missing entirely.
+  const steady = result.breakdown.find((entry) => /Steady Shot/.test(entry.label))
+  expect(steady, 'Steady Shot must reach the estimate, not just the catalogue').toBeDefined()
+  expect(steady!.value, 'and contribute damage').toBeGreaterThan(0)
+
+  // The white shot is still there underneath it: this layers on top rather than replacing.
+  expect(result.breakdown.find((entry) => entry.label === 'Attack power')?.value).toBeGreaterThan(0)
+
+  /*
+   * The falsification test ROTATION-SCOPE asked for, stated before the work: the modelled rate must
+   * not exceed the budget the spec actually has. Both ceilings are asserted rather than the one that
+   * happens to bind with this gear.
+   */
+  const steadyShot = getRotationAbilities('Hunter', 'Marksmanship').find((a) => a.name === 'Steady Shot')!
+  const rangedSpeed = gear['Ranged']?.item?.weaponSpeed
+  expect(rangedSpeed, 'the default hunter set must have something to shoot with').toBeGreaterThan(0)
+
+  const rate = computeUsageRate(steadyShot, { rangedSwingSeconds: rangedSpeed }).usesPerSecond
+  expect(rate, 'never more often than the 1.5s hunter GCD allows').toBeLessThanOrEqual(1 / 1.5 + 1e-9)
+  expect(rate, 'and never more than one per auto-shot cycle').toBeLessThanOrEqual(1 / rangedSpeed! + 1e-9)
+  expect(computeUsageRate(steadyShot, { rangedSwingSeconds: rangedSpeed }).basis).toBe('weave')
+
+  /*
+   * The GCD ceiling is the one that binds only at speeds no TBC bow reaches, so it is exercised
+   * directly rather than left to a gear change to discover.
+   */
+  const fast = computeUsageRate(steadyShot, { rangedSwingSeconds: 0.8 })
+  expect(fast.usesPerSecond).toBeCloseTo(1 / 1.5, 6)
+  expect(fast.explanation, 'and it says which ceiling it hit').toMatch(/global cooldown/)
+
+  // Nothing equipped to shoot with is a stated exclusion, not a silent zero.
+  const bare = computeUsageRate(steadyShot, {})
+  expect(bare.usesPerSecond).toBe(0)
+  expect(bare.basis).toBe('unmodelled')
+  expect(bare.explanation).toMatch(/ranged slot/)
+})
+
+test('all three hunter specs gain the shot, and no other spec moves', () => {
+  /*
+   * All three trees run the same Steady Shot weave in TBC — the specs differ in what they layer on
+   * top, which their own notes record — so all three must gain it. And the refactor that let a
+   * ranged special through must not have touched the melee path it shares a function with, which is
+   * the other half of what this asserts.
+   */
+  const gearFor = (spec: TbcSpec) => normalizeGearForCharacter(defaultGear, 'Hunter', spec)
+
+  for (const spec of ['Beast Mastery', 'Marksmanship', 'Survival'] as const) {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec }
+    const gear = gearFor(spec)
+    const stats = calculateStats(character, gear)
+    const result = calculateSimulation(character, gear, stats, 'Physical DPS')
+
+    expect(
+      result.breakdown.some((entry) => /Steady Shot/.test(entry.label)),
+      `${spec} should fire Steady Shot`,
+    ).toBe(true)
+
+    /*
+     * The mana the rate assumes is shown rather than buried. `StatBlock` has no mana field, so the
+     * shot is not capped by mana — and an estimate that quietly assumed infinite mana without saying
+     * so would be exactly the kind of confident silence this project keeps correcting.
+     */
+    const mana = result.breakdown.find((entry) => entry.label === 'Mana per second spent')
+    expect(mana, `${spec} must show what the rate costs`).toBeDefined()
+    expect(mana!.value).toBeGreaterThan(0)
+  }
+
+  // A melee spec shares `resolveRotation` and must be untouched: no ranged special, no mana row.
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.breakdown.some((entry) => /Steady Shot/.test(entry.label))).toBe(false)
+  expect(furyResult.breakdown.some((entry) => entry.label === 'Mana per second spent')).toBe(false)
+  expect(furyResult.breakdown.some((entry) => /Bloodthirst/.test(entry.label)), 'its own specials still land').toBe(true)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

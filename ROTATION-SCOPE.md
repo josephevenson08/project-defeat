@@ -208,11 +208,35 @@ A second, sharper one for the Affliction case:
 
 ## Recommendation
 
-**Stage 1 — Hunter, and nothing else.** Three specs, one change in kind: let `resolveRotation` accept
-`Ranged Special`. The data is already there and already correct; the resolver excludes it by one
-literal in a filter. The real work is deriving Steady Shot's sustained rate against auto-shot weaving
-and a mana cost, which is one closed-form derivation of the kind this codebase has done three times
-now. **Best ratio of specs bought to novel work in the whole list.**
+~~**Stage 1 — Hunter, and nothing else.**~~ **Done 2026-08-23**, and the estimate of the work was
+right: `resolveRotation` now takes a `RangedShotContext`, picks `Ranged Special` when it has one, and
+rolls it on the ranged table — no dodge, parry, block or glance, which reusing the melee special table
+would have charged it for.
+
+**The sustained rate came out as two ceilings rather than one derivation**, both read off wowsims at
+the pinned commit rather than judged:
+
+- **The hunter GCD is locked at 1.5s and ranged haste does not reduce it** — upstream says so
+  explicitly with `IgnoreHaste: true`. The cast time *is* divided by ranged swing speed, so it drops
+  below the GCD with any haste at all and stops being the constraint. This was the surprise: the
+  obvious model, "cast time bounds the rate", is wrong in the direction that would have overstated.
+- **One shot per auto-shot cycle.** Casting *delays* the next auto rather than clipping it, priced
+  upstream as `max(0, (gcdAt + castTime) - shootAt)`, and its rotation avoids paying that. So a second
+  shot inside one cycle buys its damage by pushing a white shot back — the 1:1 weave hunters gear for.
+
+**Mana is deliberately not a third ceiling.** `StatBlock` has no mana field, so a cap would have meant
+inventing the income as well as the pool. The rate's mana drain is reported in the breakdown instead,
+which keeps the assumption visible rather than silent.
+
+**Measured: Steady Shot is worth 174.4 DPS to a Marksmanship hunter on the default set** — 102.8 to
+277.2 — at one shot per 3.0s and 36.7 mana/sec. The size of that number is the point: a filter
+literal was hiding most of the spec's damage, and `featureFlags.ts` was calling it a "single-ability
+approximation" when the count was zero.
+
+Also learned, and it generalises to stage 2: **Ranged Weapon Specialization reaches Steady Shot.**
+Upstream applies it as a blanket `RangedDamageDealtMultiplier` with no proc mask, where the talent's
+own wording ("ranged weapon") could be read either way. The repo's `rangedDamageMultiplier` field
+documented itself as white-only and was wrong about its own scope.
 
 **Stage 2 — the melee data thinning.** Feral, Retribution, Enhancement, and Protection get their
 second and third buttons. The resolver already handles the budgets; this is `sampleSignatureAbilities`

@@ -66,7 +66,12 @@ export type TalentModifiers = {
   flatAttackPower: number
   /** Added to ranged crit chance only. Hunter's Lethal Shots. */
   rangedCritChance: number
-  /** Multiplies ranged white damage. Hunter's Ranged Weapon Specialization. 1 when untalented. */
+  /**
+   * Multiplies **all** ranged damage, Steady Shot included — not white damage only, which is what
+   * this comment used to say. Upstream applies Hunter's Ranged Weapon Specialization as a blanket
+   * `RangedDamageDealtMultiplier` with no proc mask, and the talent's own wording is ambiguous
+   * enough that the narrower reading looked right until it was checked. 1 when untalented.
+   */
   rangedDamageMultiplier: number
   /** Multiplies ranged attack speed. Hunter's Serpent's Swiftness. 1 when untalented. */
   rangedAttackSpeedMultiplier: number

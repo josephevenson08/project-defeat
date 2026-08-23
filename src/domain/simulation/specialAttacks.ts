@@ -93,7 +93,19 @@ export function averageSwingDamage(item: WeaponDamageProfile | undefined, attack
  */
 export const OFF_HAND_DAMAGE_PENALTY = 0.5
 
-export type SpecialUsageBasis = 'cooldown' | 'energy' | 'unmodelled'
+export type SpecialUsageBasis = 'cooldown' | 'energy' | 'weave' | 'unmodelled'
+
+/**
+ * What `computeUsageRate` needs from outside the ability to price a rate.
+ *
+ * Only the weave case uses it so far. Passed rather than derived because the effective swing speed
+ * is a gear-and-talent figure the caller has already computed, and recomputing it here would be a
+ * second place for haste to be applied differently.
+ */
+export type SpecialUsageContext = {
+  /** Seconds between auto shots after haste, or undefined when nothing is equipped to shoot with. */
+  rangedSwingSeconds?: number
+}
 
 export type SpecialAttackEstimate = {
   /** Average damage of a single use, before the attack table and before armor. */
@@ -110,11 +122,17 @@ export type SpecialAttackEstimate = {
  *
  * A cooldown gives a hard, defensible ceiling and a raiding character presses these on cooldown, so
  * that's the rate. An energy cost against the fixed 10/second regen gives an equally computable
- * rate. Rage and mana costs without a cooldown do not: sustained rage income depends on damage taken
- * and dealt, and a mana-costed shot rotation depends on auto-attack weaving. Rather than invent a
- * number for those, they're reported as unmodelled.
+ * rate. Rage without a cooldown does not: sustained rage income depends on damage taken and dealt.
+ * Rather than invent a number for that, it is reported as unmodelled.
+ *
+ * **A ranged special is the weave case, and it used to be reported as unmodelled with it.** It is
+ * not the same problem: a shot rotation is bounded by two things that are both computable, and
+ * `rangedSwingSeconds` is the piece that was missing rather than the mechanism.
  */
-export function computeUsageRate(ability: SignatureAbility): { usesPerSecond: number; basis: SpecialUsageBasis; explanation: string } {
+export function computeUsageRate(
+  ability: SignatureAbility,
+  context: SpecialUsageContext = {},
+): { usesPerSecond: number; basis: SpecialUsageBasis; explanation: string } {
   const gcd = ability.gcdSeconds || 1.5
 
   if (ability.cooldownSeconds) {
@@ -133,6 +151,45 @@ export function computeUsageRate(ability: SignatureAbility): { usesPerSecond: nu
       usesPerSecond: rate,
       basis: 'energy',
       explanation: `${ability.resource.cost} energy against ${ENERGY_PER_SECOND}/sec regen, so roughly one per ${(1 / rate).toFixed(1)}s`,
+    }
+  }
+
+  if (ability.effectType === 'Ranged Special') {
+    /*
+     * The shot weave, and the two ceilings are both read off upstream rather than judged here.
+     *
+     * **The GCD is locked at 1.5s and is not hasted.** wowsims sets `IgnoreHaste: true` on the
+     * hunter GCD with that exact comment at the pinned commit, which is why a hasted hunter does not
+     * simply press the button more often. The cast time *is* divided by ranged swing speed, so it
+     * falls below the GCD as soon as there is any haste and stops being the constraint.
+     *
+     * **One shot per auto-shot cycle is the other.** Casting delays the next auto shot rather than
+     * clipping it — upstream prices exactly that as
+     * `max(0, (gcdAt + castTime) - shootAt)` and its rotation avoids paying it — so a second shot
+     * inside one cycle buys its damage by pushing a white shot back. That is the 1:1 weave hunters
+     * gear for, and this ability's own notes already say so.
+     *
+     * Whichever is slower wins. **Mana is deliberately not a third ceiling**: `StatBlock` has no
+     * mana field, so a cap would have to be invented, and inventing one is what this function
+     * exists to refuse. The drain the rate implies is surfaced by the caller instead.
+     */
+    const weaveCeiling = context.rangedSwingSeconds
+    if (!weaveCeiling || weaveCeiling <= 0) {
+      return {
+        usesPerSecond: 0,
+        basis: 'unmodelled',
+        explanation: 'nothing is equipped in the ranged slot, so there is no auto shot to weave around',
+      }
+    }
+
+    const interval = Math.max(weaveCeiling, gcd)
+    return {
+      usesPerSecond: 1 / interval,
+      basis: 'weave',
+      explanation:
+        weaveCeiling >= gcd
+          ? `woven one per auto shot, so one per ${interval.toFixed(2)}s`
+          : `capped by the 1.5s hunter global cooldown, which ranged haste does not reduce, rather than by the ${weaveCeiling.toFixed(2)}s auto shot`,
     }
   }
 
@@ -194,8 +251,9 @@ export function estimateSpecialAttack(
   mainHand: WeaponDamageProfile | undefined,
   offHand: WeaponDamageProfile | undefined,
   attackPower: number,
+  context: SpecialUsageContext = {},
 ): SpecialAttackEstimate {
-  const { usesPerSecond, basis, explanation } = computeUsageRate(ability)
+  const { usesPerSecond, basis, explanation } = computeUsageRate(ability, context)
   return {
     damagePerUse: computeSpecialDamagePerUse(ability, mainHand, offHand, attackPower),
     usesPerSecond,

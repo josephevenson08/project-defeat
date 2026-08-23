@@ -19,6 +19,7 @@ import {
   estimateSpecialAttack,
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
+import type { WeaponDamageProfile } from '../../domain/simulation/specialAttacks'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -273,6 +274,11 @@ type ResolvedRotation = {
   specials: ResolvedSpecial[]
   /** Abilities in the spec's rotation whose sustained rate can't be defended, named so their absence is visible. */
   excluded: { name: string; explanation: string }[]
+  /**
+   * Mana per second the modelled shot rate spends. Reported, never enforced: nothing in `StatBlock`
+   * holds a mana pool, so capping the rate on it would mean inventing the income too.
+   */
+  manaPerSecond?: number
   /** True when a shared budget — the GCD, energy or rage — rather than an ability's own cooldown limited the modelled rate. */
   contended: boolean
   /** Rage income, for the breakdown. Undefined for specs that do not use rage. */
@@ -294,6 +300,26 @@ type MeleeSwingContext = {
   ragePerMainHandSwing: number
   /** Expected damage of the main-hand swing a replacement displaces, after the white attack table. */
   displacedSwingDamage: number
+}
+
+/**
+ * What the ranged white-shot model already worked out, handed to the rotation the same way
+ * `MeleeSwingContext` is.
+ *
+ * Passed rather than recomputed because every one of these is a gear-and-talent figure the caller
+ * has already derived. Deriving them twice is how haste ends up applied differently in two places,
+ * which is the failure the melee context was introduced to avoid.
+ */
+type RangedShotContext = {
+  /** Seconds between auto shots after gear and talent haste. Undefined with nothing in the slot. */
+  swingSeconds: number | undefined
+  weapon: WeaponDamageProfile | undefined
+  /** Ranged attack power, which is a different stat from the melee figure for every class that has both. */
+  attackPower: number
+  /** Ranged crit including Lethal Shots, matching the white-shot table rather than the shared figure. */
+  rawCritChance: number
+  /** Ranged Weapon Specialization. Upstream applies it to every ranged attack, Steady Shot included. */
+  damageMultiplier: number
 }
 
 /**
@@ -328,17 +354,39 @@ function resolveRotation(
   rawCritChance: number,
   melee?: MeleeSwingContext,
   talents: TalentModifiers = noTalentModifiers,
+  ranged?: RangedShotContext,
 ): ResolvedRotation {
+  /*
+   * Which kind of yellow damage this spec layers on. The filter used to be the literal
+   * `'Melee Special'`, and that one word is what kept every hunter's Steady Shot out of the model —
+   * not missing data, and not a missing mechanism. The ability was catalogued, sourced and correct,
+   * and `resolveRotation` simply never looked at it, so a hunter's estimate did not so much as name
+   * the button they press all fight.
+   */
+  const effectType = ranged ? 'Ranged Special' : 'Melee Special'
   const abilities = getRotationAbilities(character.className, character.spec).filter(
-    (ability) => ability.effectType === 'Melee Special',
+    (ability) => ability.effectType === effectType,
   )
 
   const expertiseSkillPoints = stats.expertiseRating / EXPERTISE_RATING_PER_SKILL_POINT + talents.expertiseSkillPoints
-  // A melee DPS spends the whole fight behind the boss, where parry and block cannot happen.
-  const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
-  // Blocked specials still land, just reduced; the block value itself isn't modelled, so a blocked
-  // hit is counted at full damage here rather than pretending to know the reduction.
-  const effectiveMultiplier = table.hit + table.block + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
+
+  /*
+   * A ranged special is rolled on the ranged table, which has no dodge, parry, block or glance —
+   * a shot taken from outside melee range cannot be any of them. Reusing the melee special table
+   * would have subtracted a dodge chance that does not exist.
+   */
+  let effectiveMultiplier: number
+  if (ranged) {
+    const table = buildRangedAttackTable({ skillDiff, missReduction, rawCritChance: ranged.rawCritChance })
+    // No block term to add: a shot from range cannot be blocked, so there is nothing to fold in.
+    effectiveMultiplier = table.hit + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
+  } else {
+    // A melee DPS spends the whole fight behind the boss, where parry and block cannot happen.
+    const table = buildSpecialAttackTable({ skillDiff, expertiseSkillPoints, missReduction, rawCritChance, attacksFromBehind: true })
+    // Blocked specials still land, just reduced; the block value itself isn't modelled, so a blocked
+    // hit is counted at full damage here rather than pretending to know the reduction.
+    effectiveMultiplier = table.hit + table.block + table.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
+  }
 
   const specials: ResolvedSpecial[] = []
   const excluded: ResolvedRotation['excluded'] = []
@@ -347,16 +395,24 @@ function resolveRotation(
   // A third shared budget, and the one that was missing. Cooldown abilities spend from it in
   // priority order and whatever survives funds the dump at the bottom of the list.
   let rageBudget = melee?.ragePerSecond ?? 0
+  // Counted, not budgeted — see `manaPerSecond` on the return type for why the distinction matters.
+  let manaSpent = 0
   let contended = false
 
   // Cat form swings its own internal weapon, so a Feral druid's specials must not read the equipped
   // item's damage dice — and it has no off-hand to strike with.
   const catForm = usesCatFormWeapon(character.className, character.spec)
-  const mainHandProfile = catForm ? CAT_FORM_WEAPON : gear['Main Hand']?.item
-  const offHandProfile = catForm ? undefined : gear['Off Hand']?.item
+  const mainHandProfile = ranged ? ranged.weapon : catForm ? CAT_FORM_WEAPON : gear['Main Hand']?.item
+  const offHandProfile = ranged || catForm ? undefined : gear['Off Hand']?.item
+
+  // Steady Shot normalises to the 2.8s ranged speed and scales off *ranged* attack power. Handing it
+  // the melee figure would have been silently wrong for every hunter, since the two differ.
+  const specialAttackPower = ranged ? ranged.attackPower : stats.attackPower
 
   for (const ability of abilities) {
-    const estimate = estimateSpecialAttack(ability, mainHandProfile, offHandProfile, stats.attackPower)
+    const estimate = estimateSpecialAttack(ability, mainHandProfile, offHandProfile, specialAttackPower, {
+      rangedSwingSeconds: ranged?.swingSeconds,
+    })
     const rageCost = ability.resource?.type === 'Rage' ? ability.resource.cost : 0
 
     /*
@@ -453,11 +509,21 @@ function resolveRotation(
     gcdBudget -= usesPerSecond
     energyBudget -= usesPerSecond * energyCost
     rageBudget = Math.max(0, rageBudget - usesPerSecond * rageCost)
+    if (ability.resource?.type === 'Mana') manaSpent += usesPerSecond * ability.resource.cost
 
     if (usesPerSecond > 0) {
+      /*
+       * Ranged Weapon Specialization multiplies this too. wowsims applies it as a blanket
+       * `RangedDamageDealtMultiplier` at the pinned commit rather than gating it on a proc mask, so
+       * it reaches Steady Shot exactly as it reaches an auto shot — read from `sim/hunter/talents.go`
+       * rather than assumed from the talent's wording, which says "ranged weapon" and could be taken
+       * either way. The melee path applies no equivalent to its specials, and that asymmetry is a
+       * pre-existing gap rather than something this introduced.
+       */
+      const damageMultiplier = ranged ? ranged.damageMultiplier : 1
       specials.push({
         name: ability.name,
-        dps: estimate.damagePerUse * effectiveMultiplier * usesPerSecond,
+        dps: estimate.damagePerUse * effectiveMultiplier * damageMultiplier * usesPerSecond,
         explanation: estimate.explanation,
       })
     } else {
@@ -470,7 +536,7 @@ function resolveRotation(
     }
   }
 
-  return { specials, excluded, contended, ragePerSecond: melee?.ragePerSecond }
+  return { specials, excluded, contended, ragePerSecond: melee?.ragePerSecond, manaPerSecond: manaSpent }
 }
 
 /** Says which specials were skipped and why, so a missing yellow-damage layer is visible rather than silent. */
@@ -546,6 +612,9 @@ function calculatePhysicalDps(
   // Only the melee path builds this. A Hunter's ranged auto attacks generate no rage at all, so
   // leaving it undefined is what keeps the rage budget from being offered to a spec that has none.
   let meleeContext: MeleeSwingContext | undefined
+  // And its mirror. Exactly one of the two is ever set, which is what tells `resolveRotation` which
+  // kind of special this spec layers and which table to roll it on.
+  let rangedContext: RangedShotContext | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -560,6 +629,24 @@ function calculatePhysicalDps(
       gearAttackSpeedMultiplier *
       talents.rangedAttackSpeedMultiplier *
       talents.rangedDamageMultiplier
+    /*
+     * Everything the shot rotation needs, taken from the figures this branch has already derived
+     * rather than recomputed. The swing interval is the white-shot speed after gear haste and
+     * Serpent's Swiftness — the same two multipliers `rawDps` above is scaled by, which is the point
+     * of reading it from here instead of deriving it a second time.
+     */
+    const rangedSwingSeconds = rangedItem?.weaponSpeed
+      ? rangedItem.weaponSpeed / (gearAttackSpeedMultiplier * talents.rangedAttackSpeedMultiplier)
+      : undefined
+
+    rangedContext = {
+      swingSeconds: rangedSwingSeconds,
+      weapon: rangedItem,
+      attackPower: stats.rangedAttackPower,
+      rawCritChance: rawCritChance + talents.rangedCritChance,
+      damageMultiplier: talents.rangedDamageMultiplier,
+    }
+
     breakdown = [
       { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
       { label: 'Weapon damage', value: round(weaponDps) },
@@ -725,10 +812,25 @@ function calculatePhysicalDps(
     ]
   }
 
-  // Yellow (special) damage, layered on top of the white swing model above. Only the melee path gets
-  // this: the ranged special (Steady Shot) is mana-costed with no cooldown, so its sustained rate
-  // depends on auto-shot weaving that isn't modelled.
-  const rotation = resolveRotation(character, gear, stats, skillDiff, missReduction, rawCritChance, meleeContext, talents)
+  /*
+   * Yellow (special) damage, layered on top of the white model above — for both paths now.
+   *
+   * The comment that stood here said the ranged special was excluded because "its sustained rate
+   * depends on auto-shot weaving that isn't modelled". That was true when written and is the reason
+   * this was worth doing: the weave is now two computable ceilings rather than an unknown, so
+   * Steady Shot reaches all three hunter specs. See `computeUsageRate`'s weave branch.
+   */
+  const rotation = resolveRotation(
+    character,
+    gear,
+    stats,
+    skillDiff,
+    missReduction,
+    rawCritChance,
+    meleeContext,
+    talents,
+    rangedContext,
+  )
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
@@ -741,6 +843,16 @@ function calculatePhysicalDps(
   // the priority is worth anything, so a reader can see why it contributes what it does.
   if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
+  }
+
+  /*
+   * The same treatment for the other direction. `StatBlock` has no mana field, so the shot rate is
+   * **not** capped by mana — which means the drain it assumes has to be visible rather than buried,
+   * or the estimate would quietly assume infinite mana and say nothing about it. A hunter sustains
+   * this with Aspect of the Viper, Judgement of Wisdom and potions, none of which are modelled here.
+   */
+  if (rotation.manaPerSecond !== undefined && rotation.manaPerSecond > 0) {
+    breakdown.push({ label: 'Mana per second spent', value: round(rotation.manaPerSecond) })
   }
 
   // Only shown when there is any, so it does not add a permanent 0 row to every melee readout —
