@@ -61,9 +61,12 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   **25.8 DPS on the default set**, against 36 for Stormstrike. The main hand is *assumed* to carry
  *   the imbue, since there is no weapon-imbue slot to read, and Elemental Weapons is not applied
  *   because it has no ingested talent effect.
- * - **A hunter's shot rate is not capped by mana, and the readout says so.** `StatBlock` has no mana
- *   field, so the estimate reports the mana per second the rate spends rather than enforcing a pool
- *   it would have to invent. Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.
+ * - **No mana-costed ability is capped by mana, and the readout says so.** `StatBlock` has no mana
+ *   field, so the estimate reports the mana per second the modelled rate spends rather than enforcing
+ *   a pool it would have to invent. It reaches every mana-costed physical ability, not just the
+ *   hunter shot that prompted it — an Enhancement shaman sees it for Stormstrike, which is the spec
+ *   where TBC mana pressure actually bites. Aspect of the Viper, Judgement of Wisdom, Shamanistic
+ *   Rage and potions are all unmodelled.
  * - **Talents reach all 27 specs.** All nine classes are ingested — 49 effects — and every one of the
  *   four role paths takes them as of 2026-08-19. Each reads only its own fields, which is asserted in
  *   both directions: a Shaman's melee talent must move an Elemental score by exactly nothing, and a

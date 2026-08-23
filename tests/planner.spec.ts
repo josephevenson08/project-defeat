@@ -4626,6 +4626,16 @@ test('an Enhancement shaman is paid for the imbue their damage actually comes fr
    */
   expect(result.breakdown.some((entry) => /Stormstrike DPS/.test(entry.label))).toBe(true)
 
+  /*
+   * And the mana row reaches this spec too. It was added for the hunter shot weave, but Stormstrike
+   * is mana-costed as well and nothing caps either on mana, so the disclosure belongs on both —
+   * verified in the running app rather than assumed, which is how the hunter-only wording in the
+   * docs was caught.
+   */
+  const mana = result.breakdown.find((entry) => entry.label === 'Mana per second spent')
+  expect(mana, 'Stormstrike costs mana and nothing caps it, so the drain must be visible').toBeDefined()
+  expect(mana!.value).toBeGreaterThan(0)
+
   // No other melee class carries the imbue — a Warrior must show no such row.
   const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
   const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')

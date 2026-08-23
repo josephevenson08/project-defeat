@@ -173,9 +173,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   attacks at +475 attack power. The main hand is *assumed* to carry the imbue, since the app has no
   weapon-imbue slot to read; Flametongue on the off-hand and the Elemental Weapons talent are not
   modelled.
-- **A hunter's shot rate is not capped by mana** — `StatBlock` has no mana field, so the breakdown
-  reports the mana per second the rate spends rather than enforcing a pool it would have to invent.
-  Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.
+- **No mana-costed ability is capped by mana** — `StatBlock` has no mana field, so the breakdown
+  reports the mana per second the modelled rate spends rather than enforcing a pool it would have to
+  invent. This applies to every mana-costed physical ability, not just the hunter shot that prompted
+  it: an Enhancement shaman sees it for Stormstrike. Aspect of the Viper, Judgement of Wisdom,
+  Shamanistic Rage and potions are all unmodelled.
 - Feral Druid is modelled in cat form, which in TBC swings a fixed internal weapon rather than the
   equipped one — so weapon damage and speed genuinely don't matter for Feral. What matters is Feral
   Attack Power, an explicit stat TBC prints on druid weapons, which is now modelled and adds 1:1 into
