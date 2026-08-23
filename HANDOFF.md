@@ -7,9 +7,10 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Start here (2026-08-23)
 
-**Three of the four items the last session queued are done.** `39758d9..67fdc20`, three commits, 187
-tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on `origin/main`.
-What is left is the simulation rebuild, item 4, unchanged and still the big one.
+**All four queued items were opened, and three closed outright.** `39758d9..b126222`, five commits,
+189 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on
+`origin/main`. Item 4 is the simulation rebuild: **stage 1 of `ROTATION-SCOPE.md` is done**, stages
+2-4 are not started.
 
 ### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
 
@@ -63,11 +64,40 @@ requires, and whether Anniversary realms drop it in 2.4 — rather than flagging
 loot-only rework.** Corrected rather than edited around; the mechanics data is still there and
 deliberately unsurfaced, and ROADMAP now says so.
 
+### 4. Rotation stage 1 — a hunter now fires the button they press all fight
+
+**Steady Shot reached the simulation nowhere**, and the cause was one word: `resolveRotation`
+filtered on the literal `'Melee Special'`. The ability was catalogued, sourced and correct the whole
+time. `featureFlags.ts` was calling the other 25 specs "a single-ability approximation" when for the
+three hunter specs the count was **zero** — that correction is in the file rather than quietly fixed.
+
+**The rate is two ceilings, both read off wowsims rather than judged.** The obvious model — cast time
+bounds the rate — is wrong in the overstating direction. The **hunter GCD is locked at 1.5s and
+ranged haste does not reduce it** (`IgnoreHaste: true` upstream), while the cast time *is* hasted and
+so stops being the constraint. The other is **one shot per auto-shot cycle**: casting delays the next
+auto rather than clipping it, upstream prices that delay and avoids paying it.
+
+**Mana is deliberately not a third ceiling** — `StatBlock` has no mana field, so a cap would mean
+inventing the income too. The drain is reported in the breakdown instead.
+
+Measured: Marksmanship **102.8 → 277.2 DPS**, one shot per 3.0s, 36.7 mana/sec. A ranged special
+rolls on the **ranged** table (no dodge, parry, block or glance) and scales off ranged attack power.
+
+Also sourced: **Ranged Weapon Specialization reaches Steady Shot** — a blanket
+`RangedDamageDealtMultiplier` with no proc mask. This repo's `rangedDamageMultiplier` field
+documented itself as white-only and was wrong about its own scope.
+
+**One existing test failed, and that was it doing its job** — it pinned "Steady Shot is not
+included". `ROTATION-SCOPE.md` predicted that in advance.
+
 ### What is left
 
-1. **The simulation rebuild.** Still `ROTATION-SCOPE.md`, still 25 of 27 specs modelled as a single
-   ability on repeat, still no timeline at all. Multiple sessions, and the honest reason DPS reads
-   ~4x low.
+1. **Rotation stages 2-4.** `ROTATION-SCOPE.md` has stage 1 struck through with what it actually
+   taught. Stage 2 is the melee data thinning (Feral, Retribution, Enhancement, Protection get their
+   second and third buttons — the resolver already handles the budgets). Stage 3 is DoT uptime for
+   Affliction and Shadow, the first stage that adds a mechanism, and it runs into the missing spell
+   school. Stage 4 is combo points, and needs a type change. **Do not build a general engine for all
+   27** — the doc argues that case and it still holds.
 2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
    sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
    per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
@@ -710,7 +740,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 187 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 189 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
