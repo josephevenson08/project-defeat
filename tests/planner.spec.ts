@@ -370,6 +370,7 @@ import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
 import { allProfessions, getProfessionProfile } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
+import { getAttunementChainForRaid, sampleAttunements } from '../src/domain/raids/sampleAttunements'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
 import { existsSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -1661,8 +1662,9 @@ test('Raids opens on a picker, then shows one raid’s loot with the rest in the
   await page.getByTestId('rail-raid-tempest-keep').click()
   await expect(page.getByTestId('raid-detail')).toContainText(/Al'ar|Void Reaver|Kael/)
 
-  // Attunement chains exist only for Serpentshrine Cavern and Tempest Keep, and are access
-  // information rather than a fight guide, so they survive the loot-only rework.
+  // Attunement chains are access information rather than a fight guide, so they survive the
+  // loot-only rework. Karazhan, Serpentshrine and Tempest Keep have one; the two that open to any
+  // level 70 raid do not, and the test below walks that split.
   await page.getByRole('button', { name: 'Attunement', exact: true }).click()
   const attunement = page.getByTestId('raid-attunement')
   await expect(attunement).toBeVisible()
@@ -1671,6 +1673,88 @@ test('Raids opens on a picker, then shows one raid’s loot with the rest in the
   // And the picker is reachable again.
   await page.getByTestId('raids-back-to-picker').click()
   await expect(page.getByTestId('raid-pick-karazhan')).toBeVisible()
+})
+
+test('the raid every character attunes for first has its chain, and the ones with none show no tab', async ({
+  page,
+}) => {
+  /*
+   * Karazhan's chain was the conspicuous hole in this data. The attunement view has existed since the
+   * raids rework, but only Serpentshrine and Tempest Keep had anything to show — so the first
+   * attunement every TBC character actually grinds was the one the app could not describe, while
+   * Serpentshrine's own prerequisites already assumed you had done it.
+   *
+   * Gruul's Lair and Magtheridon's Lair have no chain because they have none in the game. That is a
+   * fact about TBC rather than missing data, and the absence of the tab is how the app says so.
+   */
+  await openApp(page, 'raids')
+  await page.getByTestId('raid-pick-karazhan').click()
+
+  await page.getByRole('button', { name: 'Attunement', exact: true }).click()
+  const chain = page.getByTestId('raid-attunement')
+  await expect(chain).toBeVisible()
+  await expect(chain).toContainText("The Master's Key")
+
+  // Eight steps, and the ones that decide whether a group can start at all.
+  await expect(chain.locator('.raid-attunement-step')).toHaveCount(8)
+  await expect(chain).toContainText('Arcane Disturbances')
+  await expect(chain).toContainText('Return to Khadgar')
+
+  /*
+   * The prerequisites are the point of listing them separately: the eight quests are not what makes
+   * this long, the three keys you must already hold are.
+   */
+  await expect(chain.locator('.raid-attunement-prereqs')).toContainText('Arcatraz')
+
+  // A raid with no attunement offers no tab at all, rather than an empty one.
+  await page.getByTestId('raids-back-to-picker').click()
+  await page.getByTestId('raid-pick-gruuls-lair').click()
+  await expect(page.getByRole('button', { name: 'Attunement', exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('raid-detail')).toBeVisible()
+})
+
+test('every attunement step says where it happens and cites what it was read from', () => {
+  /*
+   * The chain is only worth having if a reader can check it. Every step therefore carries a location
+   * and a requirement, and Karazhan's carry the Wowhead quest id each was read from — this repo's
+   * recurring failure is confident recall presented as sourced, and a quest id is the cheapest
+   * possible defence against it.
+   */
+  expect(sampleAttunements.map((chain) => chain.raidId).sort()).toEqual([
+    'karazhan',
+    'serpentshrine-cavern',
+    'tempest-keep',
+  ])
+
+  for (const chain of sampleAttunements) {
+    expect(chain.prerequisites.length, `${chain.name} must say what is needed before step 1`).toBeGreaterThan(0)
+    expect(chain.reward, `${chain.name} must say what completing it grants`).toBeTruthy()
+
+    // Steps are numbered from 1 with no gaps, because the UI renders them in this order and a
+    // duplicate `order` is a React key collision as well as a wrong walkthrough.
+    expect(chain.steps.map((step) => step.order)).toEqual(chain.steps.map((_, index) => index + 1))
+
+    for (const step of chain.steps) {
+      expect(step.location, `${chain.name} step ${step.order} must say where`).toBeTruthy()
+      expect(step.requirement, `${chain.name} step ${step.order} must say what to do`).toBeTruthy()
+    }
+  }
+
+  const karazhan = getAttunementChainForRaid('karazhan')!
+  expect(karazhan.steps).toHaveLength(8)
+
+  // Every Karazhan step names the quest it is, and cites the id that wording came from.
+  for (const step of karazhan.steps) {
+    expect(step.questName, `Karazhan step ${step.order} is a quest and should name it`).toBeTruthy()
+    expect(step.notes ?? '', `Karazhan step ${step.order} must cite its Wowhead quest id`).toMatch(/\b9(8[0-9]{2})\b/)
+  }
+
+  /*
+   * And it stays flagged. Two things these sources do not settle: the level the chain requires, and
+   * whether Anniversary realms drop the attunement in 2.4 as previous Classic runs did.
+   */
+  expect(karazhan.needsVerification, 'sourced is not the same as verified').toBe(true)
+  expect(karazhan.notes ?? '').toMatch(/Wowhead/)
 })
 
 test('the Warrior talent trees are complete and their spending rules hold', async () => {

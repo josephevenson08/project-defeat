@@ -1,14 +1,123 @@
 import type { AttunementChain } from './raidTypes'
 
 /**
- * The two attunement chains a Phase 2 player actually has to grind. Both are gated behind other
- * attunements (Karazhan for SSC, the Arcatraz key for TK), which is why the prerequisites are listed
- * separately from the steps — the steps alone badly understate how long this takes.
+ * The attunement chains a Phase 2 player actually has to grind. Each is gated behind other
+ * attunements — Karazhan for SSC, the Arcatraz key for TK, and Karazhan's own chain behind three
+ * dungeon keys — which is why the prerequisites are listed separately from the steps. The steps
+ * alone badly understate how long any of this takes.
+ *
+ * **Karazhan's chain was missing until 2026-08-23**, which was the conspicuous gap: it is the first
+ * attunement every TBC character grinds, and Serpentshrine's own prerequisites already referred to
+ * having done it. Its eight steps are each cited to the Wowhead quest id the wording was read from,
+ * so a reader can check any line without trusting this file.
+ *
+ * Gruul's Lair and Magtheridon's Lair have no chains here because they have none in the game — both
+ * open to any level 70 raid, which is why they are where a fresh 25-player group starts.
  *
  * Blizzard removed these attunements in patch 2.4 on previous Classic runs. They are required during
  * Phase 2, but the exact patch where they are dropped on Anniversary realms is flagged as unverified.
  */
 export const sampleAttunements: readonly AttunementChain[] = [
+  {
+    id: 'karazhan-attunement',
+    raidId: 'karazhan',
+    name: "The Master's Key",
+    summary:
+      "Eight quests that cross two continents and four dungeons, and the longest attunement in Phase 2 by some distance. The quest chain itself is not the expensive part — three of its steps need dungeon keys or attunements you must already hold, and the last one is a full Black Morass clear where an escort NPC has to survive eighteen waves.",
+    prerequisites: [
+      'Level 70. Karazhan itself opens at 68, but the chain sends you through level-70 dungeons.',
+      'The Shadow Labyrinth Key, from Talon King Ikiss in Sethekk Halls — needed for the first fragment.',
+      'The Key to the Arcatraz, itself a quest chain, for the third fragment.',
+      'Attunement to the Black Morass (the Caverns of Time chain through Old Hillsbrad), for the final step.',
+      'A group for four level-70 dungeons: Shadow Labyrinth, The Steamvault, The Arcatraz and The Black Morass.',
+    ],
+    steps: [
+      {
+        order: 1,
+        questName: 'Arcane Disturbances',
+        title: 'Take two crystal readings under Karazhan',
+        requirement:
+          "Accept from Archmage Alturus at the foot of Karazhan's steps, then use the Violet Scrying Crystal at the Underground Well and the Underground Pond in the Master's Cellar and return to him.",
+        location: 'Deadwind Pass',
+        difficulty: 'Outdoor',
+        notes: 'Wowhead quest 9824. Given alongside Restless Activity, and the cellar is the same trip, so they are done together rather than in sequence.',
+      },
+      {
+        order: 2,
+        questName: 'Restless Activity',
+        title: 'Collect 10 Ghostly Essence',
+        requirement:
+          'Kill the ghosts in the same cellar until you have 10 Ghostly Essence, and hand them to Archmage Alturus.',
+        location: 'Deadwind Pass',
+        difficulty: 'Outdoor',
+        notes: 'Wowhead quest 9825.',
+      },
+      {
+        order: 3,
+        questName: 'Contact from Dalaran',
+        title: "Carry Alturus's Report to Dalaran",
+        requirement: "Take Alturus's Report to Archmage Cedric, outside the Dalaran dome in the Alterac Mountains.",
+        location: 'Alterac Mountains',
+        difficulty: 'Outdoor',
+        notes: 'Wowhead quest 9826. A long ride north through the Eastern Kingdoms, and the reason people run this chain with a mage or a hearthstone plan.',
+      },
+      {
+        order: 4,
+        questName: 'Khadgar',
+        title: 'Report to Khadgar in Shattrath',
+        requirement: "Take Cedric's reply through the Dark Portal to Khadgar, in the centre of Shattrath City.",
+        location: 'Shattrath City (Terokkar Forest)',
+        difficulty: 'Outdoor',
+        notes: 'Wowhead quest 9829.',
+      },
+      {
+        order: 5,
+        questName: 'Entry Into Karazhan',
+        title: 'Loot the First Key Fragment',
+        requirement:
+          'Clear Shadow Labyrinth to Murmur and take the First Key Fragment from the arcane container in his chamber, then return to Khadgar.',
+        location: 'Shadow Labyrinth (Auchindoun, Terokkar Forest)',
+        difficulty: 'Normal',
+        notes: 'Wowhead quest 9831. Normal difficulty is enough for all three fragments — none of this chain needs Heroic.',
+      },
+      {
+        order: 6,
+        questName: 'The Second and Third Fragments',
+        title: 'Loot the remaining two fragments',
+        requirement:
+          'Take the Second Key Fragment from an arcane container in Coilfang Reservoir — The Steamvault, in the water by Hydromancer Thespia — and the Third from an arcane container in Tempest Keep, on the upper floor of The Arcatraz. Return both to Khadgar.',
+        location: 'The Steamvault (Zangarmarsh) and The Arcatraz (Netherstorm)',
+        difficulty: 'Normal',
+        notes:
+          "Wowhead quest 9832, which words them as Khadgar's own hiding places: the second at the bottom of Serpent Lake before Coilfang drained it, the third in a Tempest Keep chamber that \"has become a prison\". The Arcatraz needs its key, which is why that is listed as a prerequisite rather than as part of this step.",
+      },
+      {
+        order: 7,
+        questName: "The Master's Touch",
+        title: 'Have Medivh charge the key',
+        requirement:
+          "Take the Restored Apprentice's Key into the Black Morass and defend Medivh through all eighteen waves. He enables the key when the portal closes.",
+        location: 'The Black Morass (Caverns of Time, Tanaris)',
+        difficulty: 'Normal',
+        notes:
+          'Wowhead quest 9836. The step that fails groups: Medivh has to survive, so a wipe on the last waves costs the whole run rather than a corpse walk.',
+      },
+      {
+        order: 8,
+        questName: 'Return to Khadgar',
+        title: "Turn in for The Master's Key",
+        requirement:
+          "Show the charged key to Khadgar in Shattrath City. He hands back The Master's Key, which is the permanent attunement.",
+        location: 'Shattrath City (Terokkar Forest)',
+        difficulty: 'Outdoor',
+        notes: 'Wowhead quest 9837, rewarding item 24490.',
+      },
+    ],
+    reward: "The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on.",
+    needsVerification: true,
+    notes:
+      'Quest names, ids, givers and objectives read from Wowhead\'s TBC Classic quest pages (9824, 9825, 9826, 9829, 9831, 9832, 9836, 9837) and cross-checked against the Icy Veins attunement guide, which agrees on the order and the fragment locations. Flagged because two things are not settled by those sources: the exact level the chain requires (Karazhan opens at 68, and the quests are listed as level 70), and whether Anniversary realms drop this attunement in 2.4 as previous Classic runs did.',
+  },
   {
     id: 'serpentshrine-cavern-attunement',
     raidId: 'serpentshrine-cavern',

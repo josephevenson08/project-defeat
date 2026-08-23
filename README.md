@@ -38,9 +38,11 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   - Healer
   - Tank
 - Result breakdown panel
-- Raids tab: all five Phase 1/2 raids boss by boss, with per-role callouts, notable drops colour-coded
-  by item quality where the drop exists in the catalog, and step-by-step attunement chains for
-  Serpentshrine Cavern and Tempest Keep
+- Raids tab: all five Phase 1/2 raids boss by boss, with notable drops colour-coded by item quality
+  where the drop exists in the catalog, and step-by-step attunement chains for Karazhan,
+  Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
+  callouts are still in the domain data but are deliberately not rendered: the tab answers "what
+  drops here", and a fight guide is a different question asked at a different time
 - Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.

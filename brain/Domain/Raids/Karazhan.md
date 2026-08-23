@@ -23,7 +23,7 @@ The tower at the south end of Deadwind Pass, between Duskwood and the Swamp of S
 
 Requires 'The Master's Key' — a long chain ending in a Black Morass run. Nightbane additionally needs Honored with The Violet Eye and the Blackened Urn.
 
-[[Attunement]]
+Full chain: [[The Master's Key]] (8 steps) · [[Attunement]]
 
 ## Bosses (11)
 

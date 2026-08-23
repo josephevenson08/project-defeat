@@ -320,11 +320,17 @@ look like, which is exactly why it was uniformly plausible. Plausibility is not 
 ## Raid Reference Data
 
 A separate raids domain (`src/domain/raids/`) covers all five Phase 1/2 raids — Karazhan, Gruul's Lair,
-Magtheridon's Lair, Serpentshrine Cavern, and Tempest Keep — boss by boss, with mechanics written to
-cover only what changes how a raider plays the fight, per-role callouts, notable drops linked to the
-item catalog where the item exists, and full ordered attunement chains for SSC and Tempest Keep.
-Surfaced in its own Raids tab. Drops that are real but not yet catalogued are listed by name and
-flagged `needsVerification` rather than given an invented item id.
+Magtheridon's Lair, Serpentshrine Cavern, and Tempest Keep — boss by boss, with notable drops linked to
+the item catalog where the item exists, and full ordered attunement chains for Karazhan, SSC and
+Tempest Keep. Those are the three raids that have one: Gruul's Lair and Magtheridon's Lair open to any
+level 70 raid, and the absence of the tab is how the app says so. Surfaced in its own Raids tab. Drops
+that are real but not yet catalogued are listed by name and flagged `needsVerification` rather than
+given an invented item id.
+
+The domain also holds boss mechanics and per-role callouts, and the Raids tab **does not render
+them** — the loot-only rework took that out deliberately, because the tab answers "what drops here"
+and a fight guide is a different question. Recorded here rather than left implied, since data nothing
+reads is this repo's recurring failure mode and this is a case where it is the intended state.
 
 ## Project Brain (Obsidian vault)
 
