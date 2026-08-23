@@ -7,10 +7,14 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Start here (2026-08-23)
 
-**All four queued items were opened, and three closed outright.** `39758d9..HEAD`, seven commits,
-190 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on
-`origin/main`. Item 4 is the simulation rebuild: **stage 1 of `ROTATION-SCOPE.md` is done and stage 2
-was re-scoped rather than built**, because none of its four specs survived contact.
+**All four queued items were opened, three closed outright, and the fourth advanced two stages.**
+`39758d9..HEAD`, eleven commits, 192 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain
+idempotent, all on `origin/main`.
+
+On `ROTATION-SCOPE.md`: **stage 1 is done** (hunters), **stage 2 was re-scoped rather than built**
+because none of its four specs survived contact, and then **the one real mechanism inside it was
+built** (Windfury, for Enhancement). What is left of stage 2 is the Retribution type change; Feral
+turns out to belong to stage 3.
 
 ### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
 
@@ -112,13 +116,43 @@ All four specs then failed for four different reasons:
   power rolling crit on the melee table. Its own notes already said so.
 - **Enhancement's gap is Windfury Weapon**, a white-swing proc, not a rotational button.
 
+### 6. Windfury Weapon — the one real mechanism inside stage 2, now built
+
+The Shaman ability notes had said it for as long as they existed: Stormstrike is a 10s cooldown and a
+small share of the output, while "Enhancement damage is dominated by Windfury Weapon procs on white
+swings". The model counted none of them. **Worth 25.8 DPS on the default set** — 149.9 → 175.7,
+against 36 for Stormstrike.
+
+**A weapon imbue is not a rotational ability**, so there is no `SignatureAbility` entry. It lives in
+`domain/simulation/weaponImbues.ts` and is folded into white damage. **Two ceilings, neither on the
+tooltip**, both from `sim/shaman/weapon_imbues.go`: 20% per **landed** main-hand swing (so miss,
+dodge and parry cannot roll it, while glance and block can), and a **3s internal cooldown**. The
+cooldown does not bind at Phase 2 speeds and is tested directly anyway, because a bare percentage
+would overstate any future fast-weapon build.
+
+The closed form holds because **the extra attacks cannot re-proc** (`ProcMaskEmpty` upstream), so the
+rate is linear in the swing rate. Each proc is two extra main-hand attacks at **+475 attack power**.
+
+**Two things are stated rather than modelled:** the main hand is *assumed* to carry the imbue, since
+there is no weapon-imbue slot to read, and **Elemental Weapons is not applied** — it multiplies
+Windfury by 13.33% per point upstream but has no ingested talent effect here.
+
+**A wording bug came out of driving the app rather than reading the code.** The mana-drain row
+appears for an Enhancement shaman too, because Stormstrike is mana-costed — correct behaviour, but
+three docs described the disclosure as a hunter thing. Corrected, and pinned by a test on both paths.
+
 ### What is left
 
-1. **Rotation stages 2-4, as rewritten.** Stage 2 is now one mechanism (weapon-proc damage, for
-   Enhancement — the largest in-scope item left), one type change (Retribution), and one item that is
-   really stage 3 (bleeds, for Feral). Stage 3 is DoT uptime for Affliction and Shadow and runs into
-   the missing spell school. Stage 4 is combo points and needs a type change. **Do not build a general
-   engine for all 27** — the doc argues that case and it still holds.
+1. **Rotation stages 2-4, as rewritten.** Stage 2 is down to the **Retribution type change** —
+   Judgement of Blood is Holy damage off spell power rolling crit on the melee table, so it is
+   neither a clean `Melee Special` nor a clean `Direct Damage`. Feral's bleeds moved to stage 3, which
+   is DoT uptime for Affliction and Shadow and runs into the missing spell school. Stage 4 is combo
+   points and needs a type change. **Do not build a general engine for all 27** — the doc argues that
+   case and it still holds.
+2. **The greedy-budget rule now applies to stage 4 as well.** A shared budget is spent in priority
+   order, so a second same-resource ability moves damage rather than adding it. Rogue is entirely
+   builder/finisher on one energy pool, so that stage has to prove the swap is a gain, not just
+   source the abilities.
 2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
    sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
    per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
@@ -767,7 +801,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 190 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 192 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
