@@ -36,7 +36,7 @@ import type { BisList } from '../src/domain/bis'
 import { getClassDefinition, getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import {
   addToGroup,
-  assignBlessing,
+  assignBuff,
   computeCoverage,
   emptyRoster,
   filledSlots,
@@ -5169,6 +5169,54 @@ test('a seat can be named through the UI, and the name survives a reload', async
   await expect(page.getByText('Dave')).toBeVisible()
 })
 
+test('a roster saved with a single blessingId still loads, keyed by its group', async ({ page }) => {
+  /*
+   * The stored seat changed from one `blessingId` to one assignment per exclusive group. A raid
+   * leader who saved a 25-person roster the evening before must not open it to find their Paladin
+   * back on the default, so the old field is migrated on read.
+   *
+   * The group is **looked up from the buff** rather than assumed, which is what makes the migration
+   * safe: there is no branch that can file a stored id under the wrong group, because nothing names
+   * a group. And the same validation applies to the new shape — a pair whose key is not the group
+   * its buff belongs to is dropped rather than trusted.
+   */
+  await openApp(page, 'raidcomp')
+
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'project-defeat:roster:v1',
+      JSON.stringify({
+        size: 25,
+        groups: [
+          [
+            { className: 'Paladin', spec: 'Holy', playerName: 'Dave', blessingId: 'blessing-of-salvation' },
+            { className: 'Shaman', spec: 'Enhancement', assignments: { 'shaman-air-totem': 'wrath-of-air-totem' } },
+            { className: 'Warrior', spec: 'Fury', assignments: { 'paladin-blessings': 'battle-shout' } },
+          ],
+        ],
+      }),
+    )
+  })
+
+  await page.reload()
+  await page.getByTestId('section-raidcomp').click()
+
+  await expect(page.getByText('Dave')).toBeVisible()
+  await expect(
+    page.getByTestId('raidcomp-assign-paladin-blessings-1-1'),
+    'the v1 field arrives under the group its buff belongs to',
+  ).toHaveValue('blessing-of-salvation')
+
+  // The new shape round-trips untouched.
+  await expect(page.getByTestId('raidcomp-assign-shaman-air-totem-1-2')).toHaveValue('wrath-of-air-totem')
+
+  // And a mis-keyed pair is dropped on read: Battle Shout is a Warrior shout, not a Blessing.
+  await expect(
+    page.getByTestId('raidcomp-assign-warrior-shouts-1-3'),
+    'a key that does not match its buff is not honoured',
+  ).toHaveValue('')
+})
+
 test('raid builds split Feral and add Dreamstate without touching the spec union', () => {
   /*
    * A raid roster asks a different question from a gear planner: *what are you bringing tonight*. The
@@ -6177,8 +6225,8 @@ test('a raid leader picks which Blessing each Paladin brings, and the default st
   ])
 
   // Assigning two moves them in, and the third seat still falls back to the top of the order.
-  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-salvation')
-  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 1 }, 'blessing-of-sanctuary')
+  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-salvation')
+  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 1 }, 'paladin-blessings', 'blessing-of-sanctuary')
   expect(coveredBlessings(roster), 'the two assigned, plus Kings for the seat that said nothing').toEqual([
     'blessing-of-kings',
     'blessing-of-salvation',
@@ -6189,7 +6237,7 @@ test('a raid leader picks which Blessing each Paladin brings, and the default st
   expect(coveredBlessings(roster)).toHaveLength(3)
 
   // Clearing one puts it back to the default for that seat.
-  roster = assignBlessing(roster, { groupIndex: 0, seatIndex: 0 }, undefined)
+  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', undefined)
   expect(coveredBlessings(roster)).toEqual(['blessing-of-kings', 'blessing-of-might', 'blessing-of-sanctuary'])
 })
 
@@ -6202,7 +6250,7 @@ test('an assignment cannot buy coverage the roster has no provider for', async (
    */
   let one = emptyRoster(25)
   one = addToGroup(one, 0, { className: 'Paladin', spec: 'Holy' })
-  one = assignBlessing(one, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-sanctuary')
+  one = assignBuff(one, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-sanctuary')
 
   const covered = computeCoverage(one)
     .raidWide.covered.map((entry) => entry.entry.id)
@@ -6210,12 +6258,13 @@ test('an assignment cannot buy coverage the roster has no provider for', async (
   expect(covered, 'one Paladin, one Blessing — the one they were assigned').toEqual(['blessing-of-sanctuary'])
 
   /*
-   * A Shaman carrying a Paladin's blessing id. `assignBlessing` will write it, because the seat model
+   * A Shaman carrying a Paladin's blessing id. `assignBuff` will write it, because the seat model
    * does not police class — the coverage calculation is what has to, and this is where that is pinned.
+   * The group key is not what makes it real either: coverage checks that the seat provides the buff.
    */
   let stale = emptyRoster(25)
   stale = addToGroup(stale, 0, { className: 'Shaman', spec: 'Restoration' })
-  stale = assignBlessing(stale, { groupIndex: 0, seatIndex: 0 }, 'blessing-of-kings')
+  stale = assignBuff(stale, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-kings')
 
   const fromStale = computeCoverage(stale)
     .raidWide.covered.map((entry) => entry.entry.id)
@@ -6385,8 +6434,80 @@ test('one Shaman drops one air totem, not four', async () => {
 
   // The same override that serves the Blessings serves this, because coverage matches an assignment
   // against any buff the seat can actually provide rather than against a hard-coded Paladin list.
-  const assigned = assignBlessing(one, { groupIndex: 0, seatIndex: 0 }, 'wrath-of-air-totem')
+  const assigned = assignBuff(one, { groupIndex: 0, seatIndex: 0 }, 'shaman-air-totem', 'wrath-of-air-totem')
   expect(airCovered(assigned), 'the raid leader can say which totem goes down').toEqual(['wrath-of-air-totem'])
+})
+
+test('a seat holds one assignment per exclusive group, not one in total', async () => {
+  /*
+   * The shape this replaced was a single `blessingId` per seat, and it could not express the thing a
+   * Paladin actually does: bring a Blessing **and** an aura. Two decisions competed for one field, so
+   * assigning the aura would have silently cleared the Blessing.
+   *
+   * Keyed by group, both are held at once and neither touches the other.
+   */
+  let roster = emptyRoster(25)
+  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Holy' })
+  const seat = { groupIndex: 0, seatIndex: 0 }
+
+  roster = assignBuff(roster, seat, 'paladin-blessings', 'blessing-of-salvation')
+  roster = assignBuff(roster, seat, 'paladin-auras', 'sanctity-aura')
+
+  expect(seatAt(roster, seat)?.assignments).toEqual({
+    'paladin-blessings': 'blessing-of-salvation',
+    'paladin-auras': 'sanctity-aura',
+  })
+
+  const covered = computeCoverage(roster)
+  const coveredIds = [...covered.raidWide.covered, ...covered.partyScoped.covered].map((entry) => entry.entry.id)
+  expect(coveredIds, 'both halves of what one Paladin brings').toContain('blessing-of-salvation')
+  expect(coveredIds).toContain('sanctity-aura')
+
+  // Clearing one group leaves the other alone — the failure the single field made unavoidable.
+  roster = assignBuff(roster, seat, 'paladin-blessings', undefined)
+  expect(seatAt(roster, seat)?.assignments).toEqual({ 'paladin-auras': 'sanctity-aura' })
+
+  /*
+   * And clearing the last one leaves no empty object behind. Same reason `renameSeat` rebuilds rather
+   * than assigning undefined: a serialised `assignments: {}` is a difference that reads as a change.
+   */
+  roster = assignBuff(roster, seat, 'paladin-auras', undefined)
+  expect(seatAt(roster, seat)).not.toHaveProperty('assignments')
+})
+
+test('every exclusive group a seat competes in is reachable from the interface', async ({ page }) => {
+  /*
+   * The domain has assigned any exclusive buff since totems got a group, and the test above proves
+   * it. The **picker** was still gated on `className === 'Paladin'`, so three of the four groups were
+   * decided by the priority order with no way to say otherwise. This walks the interface itself.
+   */
+  await openApp(page, 'raidcomp')
+
+  const pickerFor = (groupId: string) => page.getByTestId(`raidcomp-assign-${groupId}-1-1`)
+
+  // A Shaman competes in one group, and it is now on screen.
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
+  await expect(pickerFor('shaman-air-totem'), 'a Shaman can be told which air totem to drop').toBeVisible()
+  await expect(pickerFor('paladin-blessings'), 'and is offered nothing they cannot cast').toHaveCount(0)
+
+  // The option labels drop the noun the group's own label already carries.
+  await expect(pickerFor('shaman-air-totem')).toContainText('Windfury')
+  await expect(pickerFor('shaman-air-totem'), 'the group label says "totem" once, not four times').not.toContainText(
+    'Windfury Totem',
+  )
+
+  // Choosing one moves coverage, which is the whole point of the control existing.
+  await pickerFor('shaman-air-totem').selectOption('wrath-of-air-totem')
+  await expect(pickerFor('shaman-air-totem')).toHaveValue('wrath-of-air-totem')
+
+  // A Paladin competes in two, and gets a picker for each rather than one that has to choose.
+  await page.getByTestId('raidcomp-add-paladin-holy').click()
+  await expect(page.getByTestId('raidcomp-assign-paladin-blessings-1-2')).toBeVisible()
+  await expect(page.getByTestId('raidcomp-assign-paladin-auras-1-2')).toBeVisible()
+
+  // A Mage competes in none, so nothing is offered at all.
+  await page.getByTestId('raidcomp-add-mage-fire').click()
+  await expect(page.locator('[data-testid^="raidcomp-assign-"][data-testid$="-1-3"]')).toHaveCount(0)
 })
 
 test('a buff that comes from a talent comes from one spec', async () => {

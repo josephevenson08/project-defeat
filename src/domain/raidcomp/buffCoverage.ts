@@ -136,13 +136,18 @@ function sectionFor<T extends BuffProvider & { id: string }>(
 
   /*
    * Only assignments whose seat can actually supply the buff count. A Paladin carrying a stale
-   * `blessingId` from before a class switch must not hold a slot open for something they cannot cast.
+   * assignment from before a class switch must not hold a slot open for something they cannot cast.
+   *
+   * The group key is not trusted either: what makes an assignment real is that some entry has that
+   * **id** and this seat provides it. A key naming the wrong group, or a group that no longer exists,
+   * therefore contributes nothing rather than being honoured on the strength of its label.
    */
   const assigned = new Set(
-    slots
-      .filter((slot) => slot.blessingId)
-      .filter((slot) => entries.some((entry) => entry.id === slot.blessingId && slotProvides(slot, entry)))
-      .map((slot) => slot.blessingId as string),
+    slots.flatMap((slot) =>
+      Object.values(slot.assignments ?? {}).filter((buffId) =>
+        entries.some((entry) => entry.id === buffId && slotProvides(slot, entry)),
+      ),
+    ),
   )
 
   const allowed = applyExclusivity(canProvide, (group) => providerBudget(group, entries, slots), assigned)

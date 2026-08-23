@@ -116,7 +116,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.bisRecommendationsJson.d]] · 0 importers
 - [[domain.bis.bisTypes]] · 2 importers
 - [[domain.bis.index]] · 2 importers
-- [[domain.buffs.buffExclusivity]] · 2 importers
+- [[domain.buffs.buffExclusivity]] · 3 importers
 - [[domain.buffs.buffScope]] · 1 importers
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
 - [[domain.buffs.buffTypes]] · 5 importers

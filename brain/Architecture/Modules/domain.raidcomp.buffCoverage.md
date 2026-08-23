@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/buffCoverage.ts
-lines: 257
+lines: 262
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.buffCoverage
 
-`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 257 lines
+`src/domain/raidcomp/buffCoverage.ts` · **domain** layer · 262 lines
 
 From the top of the file:
 

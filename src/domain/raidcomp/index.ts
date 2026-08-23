@@ -8,7 +8,7 @@ export {
   filledSlots,
   groupCountFor,
   moveSeat,
-  assignBlessing,
+  assignBuff,
   renameSeat,
   resizeRoster,
   setRosterMeta,

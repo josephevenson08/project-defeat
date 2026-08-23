@@ -3964,8 +3964,17 @@ input[type='text']:focus {
   font-family: inherit;
 }
 
-/* The Paladin blessing override. Small and quiet, because most seats never need it. */
-.raidcomp-seat-blessing {
+/*
+ * Exclusive-group overrides. Small and quiet, because most seats never need one — and a Paladin
+ * needs two, so they wrap rather than forcing the seat wider.
+ */
+.raidcomp-seat-assignments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.raidcomp-seat-assignment {
   background: var(--surface-0);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -3979,7 +3988,7 @@ input[type='text']:focus {
   text-transform: uppercase;
 }
 
-.raidcomp-seat-blessing:hover {
+.raidcomp-seat-assignment:hover {
   border-color: var(--line-strong);
   color: var(--text-dim);
 }

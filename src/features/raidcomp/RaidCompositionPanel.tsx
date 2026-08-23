@@ -6,7 +6,7 @@ import {
   PARTY_SIZE,
   RAID_SIZES,
   addToGroup,
-  assignBlessing,
+  assignBuff,
   clearSeat,
   computeCoverage,
   emptyRoster,
@@ -18,6 +18,7 @@ import {
   seatContributions,
   setRosterMeta,
   resizeRoster,
+  slotProvides,
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
 import { exclusiveGroups } from '../../domain/buffs/buffExclusivity'
@@ -76,15 +77,61 @@ const TIMEZONES: readonly string[] = (() => {
 })()
 
 /**
- * The five Greater Blessings, in the order a raid fills them.
+ * Strips whatever leading and trailing words every option in a group shares.
  *
- * Read from the exclusivity group rather than listed again here, so the picker and the coverage
- * calculation cannot disagree about what the group contains.
+ * "Greater Blessing of Kings" alongside four siblings becomes "Kings"; "Windfury Totem" becomes
+ * "Windfury"; "Battle Shout" becomes "Battle". The group's own label already says which noun was
+ * removed, so repeating it in every option only costs width in a control that has none to spare.
+ *
+ * Derived rather than listed, because the version this replaced was a literal
+ * `.replace(/^Greater Blessing of /, '')` — correct for the one group the picker could reach and
+ * silently wrong for the three it could not.
  */
-const GREATER_BLESSINGS = (exclusiveGroups.find((group) => group.id === 'paladin-blessings')?.buffIds ?? []).map((id) => ({
-  id,
-  name: getBuffById(id)?.name ?? id,
-}))
+function trimSharedWords(names: readonly string[]): string[] {
+  if (names.length < 2) return [...names]
+
+  const split = names.map((name) => name.split(' '))
+  const shortest = Math.min(...split.map((words) => words.length))
+
+  // Never strip a name down to nothing: both loops stop one word short of consuming the shortest
+  // option entirely, so a group whose names differ only by a shared affix still reads.
+  let lead = 0
+  while (lead < shortest - 1 && split.every((words) => words[lead] === split[0][lead])) lead += 1
+
+  let tail = 0
+  while (
+    tail < shortest - lead - 1 &&
+    split.every((words) => words[words.length - 1 - tail] === split[0][split[0].length - 1 - tail])
+  )
+    tail += 1
+
+  return split.map((words) => words.slice(lead, words.length - tail).join(' '))
+}
+
+/**
+ * The exclusive groups this seat competes in, with the buffs it can actually cast in each.
+ *
+ * **This used to be a hardcoded Paladin list.** The domain has assigned any exclusive buff since
+ * totems were given a group — coverage matches an assignment against whatever the seat provides —
+ * but the interface only ever offered Blessings, so a raid leader could not tell one Shaman to drop
+ * Wrath of Air, or a second Warrior to run Commanding Shout, and the priority order decided both.
+ *
+ * A group is offered only where the seat has **more than one** option in it. One option is not a
+ * decision, and a control whose only choice is what would have happened anyway is noise.
+ */
+function assignableGroupsFor(slot: RosterSlot) {
+  return exclusiveGroups
+    .map((group) => {
+      const buffs = group.buffIds.map((id) => getBuffById(id)).filter((buff): buff is Buff => Boolean(buff))
+      const provided = buffs.filter((buff) => slotProvides(slot, buff))
+      const labels = trimSharedWords(provided.map((buff) => buff.name))
+      return {
+        group,
+        options: provided.map((buff, index) => ({ id: buff.id, label: labels[index] || buff.name })),
+      }
+    })
+    .filter((entry) => entry.options.length > 1)
+}
 
 /**
  * What one seated player brings, revealed on hover or keyboard focus.
@@ -473,6 +520,7 @@ export function RaidCompositionPanel() {
                 {group.map((slot, seatIndex) => {
                   const ref: SeatRef = { groupIndex: groupCoverage.groupIndex, seatIndex }
                   const isNaming = sameSeat(naming, ref)
+                  const assignable = slot ? assignableGroupsFor(slot) : []
 
                   return (
                     <li
@@ -556,29 +604,36 @@ export function RaidCompositionPanel() {
                             )}
 
                             {/*
-                              A Paladin brings one Blessing, and which one is a decision only the raid
-                              leader can make. Coverage used to fill Kings, Might, Wisdom by a fixed
-                              order, so three Paladins could never reach Salvation or Sanctuary at all.
-                              Left unset it still falls back to that order, so this is an override
-                              rather than a form to complete.
+                              One picker per exclusive group this seat competes in. A Paladin brings a
+                              Blessing *and* an aura, which is why these are keyed by group rather than
+                              held as a single choice — one answer per seat made the two decisions
+                              compete for the same control.
+
+                              Left unset, each group still falls back to its priority order, so these
+                              are overrides rather than a form to complete.
                             */}
-                            {slot.className === 'Paladin' && (
-                              <select
-                                className="raidcomp-seat-blessing"
-                                value={slot.blessingId ?? ''}
-                                aria-label={`Blessing for the ${slot.spec} Paladin in group ${groupCoverage.groupIndex + 1}`}
-                                data-testid={`raidcomp-blessing-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
-                                onChange={(event) =>
-                                  setRoster((current) => assignBlessing(current, ref, event.target.value || undefined))
-                                }
-                              >
-                                <option value="">Blessing: auto</option>
-                                {GREATER_BLESSINGS.map((blessing) => (
-                                  <option key={blessing.id} value={blessing.id}>
-                                    {blessing.name.replace(/^Greater Blessing of /, '')}
-                                  </option>
+                            {assignable.length > 0 && (
+                              <span className="raidcomp-seat-assignments">
+                                {assignable.map(({ group: exclusive, options }) => (
+                                  <select
+                                    key={exclusive.id}
+                                    className="raidcomp-seat-assignment"
+                                    value={slot.assignments?.[exclusive.id] ?? ''}
+                                    aria-label={`${exclusive.label} for the ${slot.spec} ${slot.className} in group ${groupCoverage.groupIndex + 1}`}
+                                    data-testid={`raidcomp-assign-${exclusive.id}-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
+                                    onChange={(event) =>
+                                      setRoster((current) => assignBuff(current, ref, exclusive.id, event.target.value || undefined))
+                                    }
+                                  >
+                                    <option value="">{exclusive.label}: auto</option>
+                                    {options.map((option) => (
+                                      <option key={option.id} value={option.id}>
+                                        {option.label}
+                                      </option>
+                                    ))}
+                                  </select>
                                 ))}
-                              </select>
+                              </span>
                             )}
                           </span>
 

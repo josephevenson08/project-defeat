@@ -2,6 +2,7 @@ import type { RaidPlayerSize } from '../../domain/raids/raidTypes'
 import { emptyRoster, getRaidBuild, groupCountFor, PARTY_SIZE } from '../../domain/raidcomp'
 import type { Roster, RosterSlot } from '../../domain/raidcomp'
 import { getClassDefinition } from '../../domain/character/tbcClasses'
+import { exclusiveGroupFor } from '../../domain/buffs/buffExclusivity'
 
 /**
  * Persistence for a planned raid.
@@ -43,12 +44,13 @@ export function loadRoster(): Roster | undefined {
         const seat: unknown = stored[seatIndex]
         if (typeof seat !== 'object' || seat === null) return undefined
 
-        const { className, spec, playerName, buildId, blessingId } = seat as {
+        const { className, spec, playerName, buildId, blessingId, assignments } = seat as {
           className?: unknown
           spec?: unknown
           playerName?: unknown
           buildId?: unknown
           blessingId?: unknown
+          assignments?: unknown
         }
         if (typeof className !== 'string' || typeof spec !== 'string') return undefined
 
@@ -67,6 +69,28 @@ export function loadRoster(): Roster | undefined {
          */
         const validBuild = typeof buildId === 'string' && getRaidBuild(buildId)?.className === className
 
+        /*
+         * Assignments are validated pair by pair rather than trusted as a block: an entry survives
+         * only when its value names a buff in an exclusive group *and* the key is that group's id.
+         * A hand-edited or stale key therefore drops out here instead of reaching coverage.
+         *
+         * The `blessingId` branch is the v1 shape, and it is a migration rather than a fallback —
+         * a roster saved before assignments were keyed by group holds one Blessing, and the group is
+         * looked up from the buff rather than assumed, so it cannot be filed under the wrong one.
+         */
+        const validAssignments: Record<string, string> = {}
+        if (typeof blessingId === 'string' && blessingId) {
+          const migrated = exclusiveGroupFor(blessingId)
+          if (migrated) validAssignments[migrated.id] = blessingId
+        }
+        if (typeof assignments === 'object' && assignments !== null) {
+          for (const [groupId, buffId] of Object.entries(assignments as Record<string, unknown>)) {
+            if (typeof buffId !== 'string' || !buffId) continue
+            if (exclusiveGroupFor(buffId)?.id !== groupId) continue
+            validAssignments[groupId] = buffId
+          }
+        }
+
         return {
           className,
           spec,
@@ -74,7 +98,7 @@ export function loadRoster(): Roster | undefined {
           ...(validBuild ? { buildId: buildId as string } : {}),
           // Third field to be carried through here, and the comment above is why it is not the third
           // to be silently dropped.
-          ...(typeof blessingId === 'string' && blessingId ? { blessingId } : {}),
+          ...(Object.keys(validAssignments).length > 0 ? { assignments: validAssignments } : {}),
         } as RosterSlot
       })
     })

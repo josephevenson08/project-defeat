@@ -30,17 +30,24 @@ export type RosterSlot = {
    */
   playerName?: string
   /**
-   * Which Greater Blessing this Paladin is assigned, if the raid leader has said.
+   * Which buff this seat is assigned out of each exclusive group it competes in, keyed by
+   * `ExclusiveGroup.id`.
    *
    * **Coverage used to decide this by a fixed priority order**, capping each exclusive group at the
    * number of providers and filling Kings, then Might, then Wisdom. Three Paladins therefore could
    * never reach Salvation or Sanctuary, whatever the raid actually intended — the cap was right and
    * the order was a guess standing in for a decision only the raid leader can make.
    *
-   * Optional, and unassigned still falls back to that order, so an untouched roster reads exactly as
-   * it did. Meaningful on Paladin seats alone; anything else ignores it.
+   * **Keyed by group rather than held as one id**, which is what a single `blessingId` could not
+   * express: a Paladin competes in two groups at once and brings a Blessing *and* an aura, so one
+   * slot for one answer forced a raid leader to give up one decision to make the other. A Shaman has
+   * one air totem, a Warrior one shout, and both were unreachable from the interface entirely.
+   *
+   * Optional at every level, and an unassigned group still falls back to the priority order, so an
+   * untouched roster reads exactly as it did. An entry naming a group the seat does not compete in,
+   * or a buff it cannot cast, is ignored by coverage rather than trusted — see `sectionFor`.
    */
-  blessingId?: string
+  assignments?: Readonly<Record<string, string>>
 }
 
 /** A seat's address. Drag-and-drop moves between two of these, so it is worth naming. */
@@ -203,17 +210,26 @@ export function renameSeat(roster: Roster, ref: SeatRef, playerName: string): Ro
 }
 
 /**
- * Assigns a Greater Blessing to one Paladin seat, or clears it when passed nothing.
+ * Assigns one seat's pick out of a single exclusive group, or clears it when passed nothing.
  *
- * Shaped like `renameSeat` — rebuild the slot without the field, then add it back — so that clearing
- * leaves no `blessingId: undefined` key behind to be serialised.
+ * Shaped like `renameSeat` — rebuild without the field, then add it back — so that clearing the last
+ * assignment leaves no empty `assignments: {}` key behind to be serialised, and clearing one group
+ * leaves the others alone.
+ *
+ * Takes the group id rather than deriving it from the buff, so that clearing has something to name:
+ * "this Paladin has no assigned Blessing" is a statement about a group, and there is no buff id to
+ * look one up from.
  */
-export function assignBlessing(roster: Roster, ref: SeatRef, blessingId: string | undefined): Roster {
+export function assignBuff(roster: Roster, ref: SeatRef, groupId: string, buffId: string | undefined): Roster {
   const slot = seatAt(roster, ref)
   if (!slot) return roster
 
-  const { blessingId: _previous, ...rest } = slot
-  return writeSeat(roster, ref, blessingId ? { ...rest, blessingId } : rest)
+  const { assignments: previous, ...rest } = slot
+  const next = { ...previous }
+  if (buffId) next[groupId] = buffId
+  else delete next[groupId]
+
+  return writeSeat(roster, ref, Object.keys(next).length > 0 ? { ...rest, assignments: next } : rest)
 }
 
 /** Karazhan is the only 10-player raid in Phase 2; everything else is 25. */

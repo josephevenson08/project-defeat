@@ -15,7 +15,7 @@ _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `addToGroup`, `assignBlessing`, `buffIconCount`, `clearSeat`, `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `emptyRoster`, `filledSlots`, `getBuffIcon`, `getBuffScope`, `getRaidBuild`, `getSpecIcon`, `getSpecIconSource`, `groupCountFor`, `GroupCoverage`, `MissingEntry`, `moveSeat`, `PARTY_SIZE`, `RAID_SIZES`, `RaidBuild`, `raidBuilds`, `raidBuildsByClass`, `RaidGroup`, `renameSeat`, `resizeRoster`, `Roster`, `RosterMeta`, `RosterSlot`, `seatAt`, `seatContributions`, `SeatContributions`, `SeatRef`, `setRosterMeta`, `slotProvides`, `specIconCount`
+**re-export** — `addToGroup`, `assignBuff`, `buffIconCount`, `clearSeat`, `computeCoverage`, `CoverageReport`, `CoverageSection`, `CoveredEntry`, `emptyRoster`, `filledSlots`, `getBuffIcon`, `getBuffScope`, `getRaidBuild`, `getSpecIcon`, `getSpecIconSource`, `groupCountFor`, `GroupCoverage`, `MissingEntry`, `moveSeat`, `PARTY_SIZE`, `RAID_SIZES`, `RaidBuild`, `raidBuilds`, `raidBuildsByClass`, `RaidGroup`, `renameSeat`, `resizeRoster`, `Roster`, `RosterMeta`, `RosterSlot`, `seatAt`, `seatContributions`, `SeatContributions`, `SeatRef`, `setRosterMeta`, `slotProvides`, `specIconCount`
 
 ## Imports
 

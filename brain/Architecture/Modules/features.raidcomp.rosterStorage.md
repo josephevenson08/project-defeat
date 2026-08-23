@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/rosterStorage.ts
-lines: 125
+lines: 149
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.rosterStorage
 
-`src/features/raidcomp/rosterStorage.ts` · **features** layer · 125 lines
+`src/features/raidcomp/rosterStorage.ts` · **features** layer · 149 lines
 
 From the top of the file:
 
@@ -27,6 +27,7 @@ From the top of the file:
 
 ## Imports
 
+- [[domain.buffs.buffExclusivity]] — `src/domain/buffs/buffExclusivity.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
