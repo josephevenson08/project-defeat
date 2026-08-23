@@ -55,6 +55,12 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
  *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
  *   is the size of the hole a filter literal was hiding.
+ * - **Windfury Weapon is modelled for Enhancement, and it is not an ability.** It is a proc against
+ *   the main-hand swing rate — 20% per landed swing, capped by a 3s internal cooldown, two extra
+ *   attacks at +475 attack power — folded into white damage rather than layered as a special. Worth
+ *   **25.8 DPS on the default set**, against 36 for Stormstrike. The main hand is *assumed* to carry
+ *   the imbue, since there is no weapon-imbue slot to read, and Elemental Weapons is not applied
+ *   because it has no ingested talent effect.
  * - **A hunter's shot rate is not capped by mana, and the readout says so.** `StatBlock` has no mana
  *   field, so the estimate reports the mana per second the rate spends rather than enforcing a pool
  *   it would have to invent. Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.

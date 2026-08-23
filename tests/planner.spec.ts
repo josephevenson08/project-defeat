@@ -394,6 +394,13 @@ import {
   ragePerSecondFromWeapon,
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
+import {
+  WINDFURY_BONUS_ATTACK_POWER,
+  WINDFURY_EXTRA_ATTACKS,
+  WINDFURY_INTERNAL_COOLDOWN_SECONDS,
+  WINDFURY_PROC_CHANCE,
+  estimateWindfury,
+} from '../src/domain/simulation/weaponImbues'
 import { computeManaBudget, manaFromIntellect, mp5RegenPerSecond, spiritRegenPerSecond } from '../src/domain/simulation/manaModel'
 import { EMPTY_OFF_HAND, isEmptySlotItem } from '../src/domain/gear/slotCompatibility'
 import { applyWeaponSlotRules } from '../src/domain/gear/characterItemRules'
@@ -4590,6 +4597,86 @@ test('a second energy ability would cost a cat more than it pays, until a bleed 
   const rate = computeUsageRate(shred)
   expect(rate.basis).toBe('energy')
   expect(rate.usesPerSecond * shred.resource!.cost).toBeCloseTo(ENERGY_PER_SECOND, 6)
+})
+
+test('an Enhancement shaman is paid for the imbue their damage actually comes from', () => {
+  /*
+   * ROTATION-SCOPE filed Enhancement under "gets its second and third buttons". It does not need
+   * one: the spec's own ability notes already said its damage "is dominated by Windfury Weapon procs
+   * on white swings", and the model counted none of them. A weapon imbue is not a rotational
+   * ability, which is why this is not a `SignatureAbility` and why the stage was re-scoped.
+   */
+  const shaman: CharacterProfile = { faction: 'Alliance', race: 'Draenei', className: 'Shaman', spec: 'Enhancement' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Shaman', 'Enhancement')
+  const stats = calculateStats(shaman, gear)
+  const result = calculateSimulation(shaman, gear, stats, 'Physical DPS')
+
+  const windfury = result.breakdown.find((entry) => entry.label === 'Windfury Weapon DPS')
+  expect(windfury, 'Windfury must reach the estimate').toBeDefined()
+  expect(windfury!.value).toBeGreaterThan(0)
+
+  // The proc rate is reported too, because a damage figure with no rate behind it cannot be checked.
+  const rate = result.breakdown.find((entry) => entry.label === 'Windfury procs per minute')
+  expect(rate, 'the rate has to be visible for the damage to be checkable').toBeDefined()
+  expect(rate!.value).toBeGreaterThan(0)
+
+  /*
+   * Stormstrike is still there underneath it. Windfury is white damage folded into the swing model
+   * rather than a special layered on top, and the two must not have displaced each other.
+   */
+  expect(result.breakdown.some((entry) => /Stormstrike DPS/.test(entry.label))).toBe(true)
+
+  // No other melee class carries the imbue — a Warrior must show no such row.
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.breakdown.some((entry) => /Windfury/.test(entry.label))).toBe(false)
+})
+
+test('Windfury is bounded by the swing rate and by its internal cooldown, whichever is slower', () => {
+  /*
+   * Same shape as the hunter shot weave, and asserted the same way: the ceiling that binds today is
+   * not the only one that has to be right. Both constants are read from wowsims at the pinned commit
+   * rather than from the tooltip, which states neither.
+   */
+  const damagePerExtraAttack = 500
+
+  // A Phase 2 main hand: roughly one proc per 17 seconds, nowhere near the cooldown ceiling.
+  const slow = estimateWindfury({
+    mainHandSwingsPerSecond: 1 / 2.7,
+    landedFraction: 0.7,
+    damagePerExtraAttack,
+  })
+  expect(slow.procsPerSecond).toBeCloseTo((1 / 2.7) * 0.7 * WINDFURY_PROC_CHANCE, 6)
+  expect(slow.limitedByInternalCooldown, 'no Phase 2 weapon speed reaches the cap').toBe(false)
+  expect(slow.dps).toBeCloseTo(slow.procsPerSecond * WINDFURY_EXTRA_ATTACKS * damagePerExtraAttack, 6)
+
+  /*
+   * Pushed past it, the 3s internal cooldown takes over. This is the branch a bare percentage model
+   * would have got wrong, and nothing in Phase 2 gear exercises it — which is exactly why it is
+   * tested directly rather than left for a future weapon to discover.
+   */
+  const fast = estimateWindfury({
+    mainHandSwingsPerSecond: 10,
+    landedFraction: 1,
+    damagePerExtraAttack,
+  })
+  expect(fast.procsPerSecond).toBeCloseTo(1 / WINDFURY_INTERNAL_COOLDOWN_SECONDS, 6)
+  expect(fast.limitedByInternalCooldown).toBe(true)
+
+  /*
+   * Linear in the swing rate below the cap, which is the closed form's load-bearing assumption: the
+   * extra attacks carry `ProcMaskEmpty` upstream and cannot re-proc, so there is no cascade.
+   */
+  const half = estimateWindfury({ mainHandSwingsPerSecond: 0.2, landedFraction: 0.7, damagePerExtraAttack })
+  const double = estimateWindfury({ mainHandSwingsPerSecond: 0.4, landedFraction: 0.7, damagePerExtraAttack })
+  expect(double.procsPerSecond).toBeCloseTo(half.procsPerSecond * 2, 6)
+
+  // A swing that never lands cannot roll the proc, because upstream gates it on Landed().
+  expect(estimateWindfury({ mainHandSwingsPerSecond: 1, landedFraction: 0, damagePerExtraAttack }).dps).toBe(0)
+
+  // And the bonus attack power is the rank 5 figure, not the relic-boosted one.
+  expect(WINDFURY_BONUS_ATTACK_POWER, 'Totem of the Astral Winds raises this to 555 and is not modelled').toBe(475)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

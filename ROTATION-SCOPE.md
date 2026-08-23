@@ -280,15 +280,37 @@ entries" to "prove the swap is a gain", and it applies to stage 4 too.
   the melee table**, so it is neither a clean `Melee Special` nor a clean `Direct Damage`. Adding it
   today is data nothing consumes.
 
-- **Enhancement's gap is not a button at all.** Its notes say the spec is dominated by **Windfury
-  Weapon procs on white swings**, with Flametongue on the off-hand. A weapon imbue proc is not a
-  rotational ability and has no place in `SignatureAbility`; modelling it means a proc-rate model
-  against the main-hand swing rate the melee context already computes. That is the single largest
-  in-scope item left in this stage, and it is a mechanism rather than data.
+- ~~**Enhancement's gap is not a button at all.**~~ **Done 2026-08-23.** Its notes said the spec is
+  dominated by **Windfury Weapon procs on white swings**, and the model counted none of them. A
+  weapon imbue is not a rotational ability and has no place in `SignatureAbility`, so it lives in
+  `domain/simulation/weaponImbues.ts` and is folded into white damage rather than layered as a
+  special.
+
+  **Two ceilings again, the same shape as the hunter weave:** 20% per *landed* main-hand swing, and a
+  **3-second internal cooldown**. Neither is on the tooltip — both are read from
+  `sim/shaman/weapon_imbues.go` at the pinned commit. The cooldown is not binding at Phase 2 speeds
+  (a 2.7s main hand procs about once per 19 seconds against a ceiling of one per 3), but modelling it
+  as a bare percentage would silently overstate any future fast-weapon or high-haste build, so it is
+  in and tested directly.
+
+  The closed form holds because **the extra attacks cannot re-proc it** — upstream gives them
+  `ProcMaskEmpty`, so the rate stays linear in the swing rate with no cascade to simulate. Each proc
+  is two extra main-hand attacks at **+475 attack power**, rolled through the same white table.
+
+  **Worth 25.8 DPS on the default set**, taking Enhancement from 149.9 to 175.7 — more than two
+  thirds of what Stormstrike contributes, from a source that had no representation at all.
+
+  Two things are stated rather than modelled: the main hand is *assumed* to carry Windfury, since
+  this app has no weapon-imbue slot to read, and **Elemental Weapons is not applied** — it multiplies
+  Windfury damage by 13.33% per point upstream, but it has no ingested talent effect in this repo, so
+  applying it would be inventing a number.
 
 **What stage 2 actually is, restated:** one mechanism (weapon-proc damage, for Enhancement), one
 type change (hybrid Holy-off-melee-crit, for Retribution), and one item that is really stage 3
 (bleeds, for Feral). None of it is "sampleSignatureAbilities entries plus sourcing".
+
+**The mechanism landed 2026-08-23.** What remains of stage 2 is the Retribution type change, and
+Feral's bleeds, which belong to stage 3.
 
 **Stage 3 — DoT uptime for casters.** Affliction and Shadow, which are where the caster estimate is
 worst. This needs a genuinely new piece: a concurrent-DoT uptime model, plus a filler that fits in

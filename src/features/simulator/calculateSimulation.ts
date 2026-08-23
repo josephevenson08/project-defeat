@@ -20,6 +20,7 @@ import {
   usesCatFormWeapon,
 } from '../../domain/simulation/specialAttacks'
 import type { WeaponDamageProfile } from '../../domain/simulation/specialAttacks'
+import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simulation/weaponImbues'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -615,6 +616,9 @@ function calculatePhysicalDps(
   // And its mirror. Exactly one of the two is ever set, which is what tells `resolveRotation` which
   // kind of special this spec layers and which table to roll it on.
   let rangedContext: RangedShotContext | undefined
+  // Windfury is white damage rather than a special, so it is folded into `rawDps` inside the melee
+  // branch and kept here only so the breakdown and the summary can name what it contributed.
+  let windfury: ReturnType<typeof estimateWindfury> | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -735,6 +739,46 @@ function calculatePhysicalDps(
      */
     const mainHandSwingDamage = averageSwingDamage(mainHandItem, attackPower, false)
 
+    /*
+     * Windfury Weapon, which is most of what an Enhancement shaman does and reached nothing until
+     * now — the spec's own ability notes said its damage "is dominated by Windfury Weapon procs on
+     * white swings" while the model counted none of them.
+     *
+     * Gated on the class rather than the spec deliberately: Shaman's only Physical DPS spec is
+     * Enhancement, so this branch is already the Enhancement branch, and naming the spec would add a
+     * condition that cannot be false. Elemental and Restoration never reach here at all.
+     *
+     * **Assumed, and worth stating: the main hand carries Windfury.** That is what an Enhancement
+     * shaman runs in Phase 2, but this app has no weapon-imbue slot to read, so it is a stated
+     * convention rather than something the character told us. Flametongue on the off-hand is not
+     * modelled, and upstream's higher 36% chance for *both* hands imbued is therefore not used.
+     */
+    if (character.className === 'Shaman' && mainHandItem) {
+      /*
+       * Landed, not swung. Upstream gates the proc on `Landed()`, so miss, dodge and parry cannot
+       * roll it — while a glance and a block both can, which is why they are in this sum.
+       */
+      const landedFraction = fullTable.hit + fullTable.crit + fullTable.glance + fullTable.block
+
+      /*
+       * The extra attack swings the main hand with +475 attack power, and is a normal white attack:
+       * it rolls the same table, glancing included. It does **not** take `attackSpeedMultiplier` —
+       * haste already reached this through the proc rate, and applying it again would count it twice.
+       */
+      const damagePerExtraAttack =
+        averageSwingDamage(mainHandItem, attackPower + WINDFURY_BONUS_ATTACK_POWER, false) *
+        effectiveMultiplier *
+        physicalMultiplier
+
+      windfury = estimateWindfury({
+        mainHandSwingsPerSecond,
+        landedFraction,
+        damagePerExtraAttack,
+      })
+
+      rawDps += windfury.dps
+    }
+
     const mainHandRageInput = {
       damagePerLandedSwing: mainHandSwingDamage * (1 - armorMitigation),
       swingsPerSecond: mainHandSwingsPerSecond,
@@ -843,6 +887,15 @@ function calculatePhysicalDps(
   // the priority is worth anything, so a reader can see why it contributes what it does.
   if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
+  }
+
+  /*
+   * Windfury is folded into white damage rather than layered as a special, so without this row a
+   * reader would see a shaman's total move with no line saying why.
+   */
+  if (windfury && windfury.dps > 0) {
+    breakdown.push({ label: 'Windfury Weapon DPS', value: round(windfury.dps * (1 - armorMitigation)) })
+    breakdown.push({ label: 'Windfury procs per minute', value: round(windfury.procsPerSecond * 60) })
   }
 
   /*

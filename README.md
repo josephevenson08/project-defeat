@@ -168,6 +168,11 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   Warrior**, which press Whirlwind alongside their signature button against a shared global-cooldown
   budget. Every other spec still models a single ability, so melee specs remain understated by
   differing amounts.
+- **Windfury Weapon is modelled for Enhancement**, as a proc against the main-hand swing rate rather
+  than as an ability — 20% per landed swing, capped by a 3-second internal cooldown, two extra
+  attacks at +475 attack power. The main hand is *assumed* to carry the imbue, since the app has no
+  weapon-imbue slot to read; Flametongue on the off-hand and the Elemental Weapons talent are not
+  modelled.
 - **A hunter's shot rate is not capped by mana** — `StatBlock` has no mana field, so the breakdown
   reports the mana per second the rate spends rather than enforcing a pool it would have to invent.
   Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.
