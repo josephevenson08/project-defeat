@@ -254,11 +254,12 @@ function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
       return {
         armorReduction: totals.armorReduction + (debuff.armorReduction ?? 0),
         physicalCritTakenBonus: totals.physicalCritTakenBonus + (debuff.physicalCritTakenBonus ?? 0),
+        physicalHitTakenBonus: totals.physicalHitTakenBonus + (debuff.physicalHitTakenBonus ?? 0),
         spellCritTakenBonus: totals.spellCritTakenBonus + (debuff.spellCritTakenBonus ?? 0),
         spellDamageTakenMultiplier: totals.spellDamageTakenMultiplier + (debuff.spellDamageTakenMultiplier ?? 0),
       }
     },
-    { armorReduction: 0, physicalCritTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
+    { armorReduction: 0, physicalCritTakenBonus: 0, physicalHitTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
   )
 }
 
@@ -505,7 +506,14 @@ function calculatePhysicalDps(
    */
   const rawCritChance =
     ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus + talents.meleeCritChance
-  const missReduction = ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit) + talents.meleeHitChance
+  /*
+   * Debuff hit joins here rather than anywhere downstream because it is attacker hit, not target
+   * avoidance: Improved Faerie Fire raises the chance an attack lands, exactly as hit rating does.
+   * One term therefore reaches all three tables — white swings, specials through `resolveRotation`,
+   * and the ranged table — and each floors miss at zero, so a raid at the hit cap gains nothing.
+   */
+  const missReduction =
+    ratingToFraction(stats.hitRating, RATING_PER_PERCENT.meleeHit) + talents.meleeHitChance + debuffs.physicalHitTakenBonus
 
   // Improved Berserker Stance multiplies attack power, so it has to land before any of the
   // attack-power-derived damage below rather than being added to the total afterwards.

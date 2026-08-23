@@ -2013,6 +2013,72 @@ test('the armor debuffs subtract flat armor and stack with each other', async ()
   expect(breakdownValue(withDebuffs, /Armor mitigation/)!).toBeLessThan(breakdownValue(sunderOnly, /Armor mitigation/)!)
 })
 
+test('Improved Faerie Fire is split from the base debuff, and only the Balance half is spec-restricted', () => {
+  /*
+   * A walkthrough asked for Faerie Fire to be restricted to "Balance/Dreamstate". It is not, and this
+   * repo's own ingested talent trees are the reason: Improved Faerie Fire is Balance (row 6, 3 ranks),
+   * Faerie Fire (Feral) is Feral Combat (row 4, 1 rank), and Restoration — the tree Dreamstate lives
+   * in — has neither. The requested restriction is inverted: it would credit the one tree with no
+   * Faerie Fire talent at all and exclude the one with a dedicated one.
+   *
+   * So the base spell stays class-wide, which is what the game does, and the Balance-only half it was
+   * really asking about became its own entry.
+   */
+  const base = getTargetDebuffById('faerie-fire')
+  const improved = getTargetDebuffById('improved-faerie-fire')
+
+  expect(base?.providedByClass).toBe('Druid')
+  expect(base?.providedBySpec, 'every Druid is taught Faerie Fire, so the base debuff is class-wide').toBeUndefined()
+  expect(base?.armorReduction).toBe(610)
+  expect(base?.physicalHitTakenBonus, 'the hit bonus is the talent, not the base spell').toBeUndefined()
+
+  expect(improved?.providedByClass).toBe('Druid')
+  expect(improved?.providedBySpec).toBe('Balance')
+  expect(improved?.spellId, 'rank 3/3 is the rank the 3% is read from').toBe(33602)
+  expect(improved?.physicalHitTakenBonus).toBe(0.03)
+
+  // The armor lives on exactly one of the two. Repeating it here would double-count it as soon as a
+  // raid ticks both, which is the normal case rather than an edge one.
+  expect(improved?.armorReduction, 'the armor is the base spell and must not be repeated').toBeUndefined()
+})
+
+test('Improved Faerie Fire reaches the melee and ranged attack tables but not the spell one', () => {
+  /*
+   * The tooltip says "melee and ranged attacks", and this is the assertion that keeps it there. Spell
+   * hit is a separate table with its own 1% miss floor, and a debuff leaking across into it is
+   * exactly the error Winter's Chill was corrected for in the other direction.
+   */
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyStats = calculateStats(fury, furyGear)
+  const withoutMelee = calculateSimulation(fury, furyGear, furyStats, 'Physical DPS', [])
+  const withMelee = calculateSimulation(fury, furyGear, furyStats, 'Physical DPS', ['improved-faerie-fire'])
+
+  // Three percentage points off miss, because it is attacker hit rather than target avoidance.
+  expect(breakdownValue(withoutMelee, /Miss chance/)! - breakdownValue(withMelee, /Miss chance/)!).toBeCloseTo(3, 1)
+  expect(withMelee.scoreExact, 'landing more swings has to raise the estimate').toBeGreaterThan(withoutMelee.scoreExact)
+
+  // Ranged reads the same term, so a Hunter gets it too.
+  // Night Elf rather than Human: Humans cannot be Hunters in TBC, and `getBaseStats` throws on the pair.
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Marksmanship' }
+  const hunterGear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Marksmanship')
+  const hunterStats = calculateStats(hunter, hunterGear)
+  const withoutRanged = calculateSimulation(hunter, hunterGear, hunterStats, 'Physical DPS', [])
+  const withRanged = calculateSimulation(hunter, hunterGear, hunterStats, 'Physical DPS', ['improved-faerie-fire'])
+  expect(breakdownValue(withoutRanged, /Miss chance/)! - breakdownValue(withRanged, /Miss chance/)!).toBeCloseTo(3, 1)
+
+  // And the caster path must not move at all.
+  const mage: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Mage', spec: 'Fire' }
+  const mageGear = normalizeGearForCharacter(defaultGear, 'Mage', 'Fire')
+  const mageStats = calculateStats(mage, mageGear)
+  const withoutSpell = calculateSimulation(mage, mageGear, mageStats, 'Caster DPS', [])
+  const withSpell = calculateSimulation(mage, mageGear, mageStats, 'Caster DPS', ['improved-faerie-fire'])
+  expect(breakdownValue(withSpell, /Spell hit chance/), 'melee and ranged only').toBe(
+    breakdownValue(withoutSpell, /Spell hit chance/),
+  )
+  expect(withSpell.scoreExact).toBe(withoutSpell.scoreExact)
+})
+
 test('a debuff that cannot be modelled is separated from the ones that can be', () => {
   // Same treatment the fifteen unmodelled raid buffs get, for the same reason: Winter's Chill is a
   // real raid debuff, and dropping it would read as an oversight rather than a stated limit.
@@ -4790,9 +4856,10 @@ test('buff scope is sourced for every entry, and party scope dominates', () => {
     const scope = getBuffScope(entry.id)!
     return { ...acc, [scope]: (acc[scope] ?? 0) + 1 }
   }, {})
-  // Target went 6 to 7 when Expose Weakness was added. Kept exact rather than loosened: this pins the
-  // *sourced split*, which is the claim the test is making, and party scope dominating is the point.
-  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 7 })
+  // Target went 6 to 7 when Expose Weakness was added, and 7 to 8 when Improved Faerie Fire was split
+  // off the base debuff. Kept exact rather than loosened: this pins the *sourced split*, which is the
+  // claim the test is making, and party scope dominating is the point.
+  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 8 })
 
   /*
    * The five Raid-scoped buffs are exactly the Greater Blessings, which is what "Greater" buys — the
@@ -6342,6 +6409,10 @@ test('a buff that comes from a talent comes from one spec', async () => {
   expect(providerOf('Expose Weakness')).toEqual({ className: 'Hunter', spec: 'Survival' })
   expect(providerOf('Power Infusion')).toEqual({ className: 'Priest', spec: 'Discipline' })
   expect(providerOf('Improved Seal of the Crusader')).toEqual({ className: 'Paladin', spec: 'Retribution' })
+  expect(providerOf('Improved Faerie Fire')).toEqual({ className: 'Druid', spec: 'Balance' })
+
+  // And the other half of that split: the base spell every Druid is taught stays unrestricted.
+  expect(providerOf('Faerie Fire')).toEqual({ className: 'Druid', spec: undefined })
 
   /*
    * And the check that keeps this honest as the data grows: every spec-restricted entry must name a

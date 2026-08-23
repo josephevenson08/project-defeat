@@ -184,6 +184,11 @@
       "spellId": 26993,
       "icon": "spell_nature_faeriefire"
     },
+    "improved-faerie-fire": {
+      "name": "Improved Faerie Fire",
+      "spellId": 33602,
+      "icon": "spell_nature_faeriefire"
+    },
     "improved-seal-of-the-crusader": {
       "name": "Improved Seal of the Crusader",
       "spellId": 20337,

@@ -81,6 +81,19 @@ export type TargetDebuff = BuffProvider & {
   physicalCritTakenBonus?: number
   /** Increases the target's chance to be critically struck by spells, as a fraction (e.g. 0.03 for +3%). */
   spellCritTakenBonus?: number
+  /**
+   * Increases the chance **melee and ranged attacks** land on the target, as a fraction (e.g. 0.03
+   * for +3%). Improved Faerie Fire is the only source in TBC.
+   *
+   * This is attacker hit, not target avoidance, so it joins `missReduction` alongside hit rating and
+   * talent hit rather than being subtracted from dodge or parry. The attack tables floor miss at
+   * zero, so a raid already at the hit cap gains nothing from it — which is correct, and the same
+   * thing that happens to hit rating past the cap.
+   *
+   * Deliberately **not** applied to spells: the tooltip says "melee and ranged attacks", and spell
+   * hit is a separate table with its own 1% miss floor.
+   */
+  physicalHitTakenBonus?: number
   /** Increases spell damage the target takes, as a fraction (e.g. 0.1 for +10%). */
   spellDamageTakenMultiplier?: number
   /**

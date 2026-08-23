@@ -221,6 +221,12 @@
       "scope": "Target",
       "evidence": "Faerie Fire 145 Mana 30 yd range Instant Requires Druid Requires level 66 Decrease the armor of the target by 610 for 40 sec. While affected, the target cannot stealth or turn invisible."
     },
+    "improved-faerie-fire": {
+      "name": "Improved Faerie Fire",
+      "spellId": 33602,
+      "scope": "Target",
+      "evidence": "Improved Faerie Fire Talent Requires Druid Your Faerie Fire spell also increases the chance the target will be hit by melee and ranged attacks by 3%."
+    },
     "improved-seal-of-the-crusader": {
       "name": "Improved Seal of the Crusader",
       "spellId": 20337,

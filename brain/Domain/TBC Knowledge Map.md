@@ -26,7 +26,7 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **212** gems
 - **91** enchants
 - **33** buffs
-- **7** debuffs
+- **8** debuffs
 - **31** consumables
 - **31** abilities
 - **18** slots

@@ -51,6 +51,7 @@ function targetDebuffSummary(debuff: TargetDebuff) {
   // one back as "-24%" is how the wrong unit survived in this data for as long as it did.
   if (debuff.armorReduction) parts.push(`-${debuff.armorReduction} target armor`)
   if (debuff.physicalCritTakenBonus) parts.push(`+${Math.round(debuff.physicalCritTakenBonus * 100)}% physical crit taken`)
+  if (debuff.physicalHitTakenBonus) parts.push(`+${Math.round(debuff.physicalHitTakenBonus * 100)}% melee and ranged hit taken`)
   if (debuff.spellCritTakenBonus) parts.push(`+${Math.round(debuff.spellCritTakenBonus * 100)}% spell crit taken`)
   if (debuff.spellDamageTakenMultiplier) parts.push(`+${Math.round(debuff.spellDamageTakenMultiplier * 100)}% spell damage taken`)
   return parts.join(', ')

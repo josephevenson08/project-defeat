@@ -2,18 +2,18 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleTargetDebuffs.ts
-lines: 130
+lines: 170
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleTargetDebuffs
 
-`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 130 lines
+`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 170 lines
 
 From the top of the file:
 
-> The six raid debuffs applied to the simulated target.
+> The raid debuffs applied to the simulated target.
 > 
 > Same treatment the thirty-three raid buffs got, and it found the same thing. Every number below
 > was read by hand off the Wowhead tooltip of the spell rank named in `spellId`, then cross-checked
@@ -34,6 +34,10 @@ From the top of the file:
 >   getting nothing from a debuff that helps them exactly as much as it helps a Warrior.
 > 
 > Curse of the Elements' 10% is the one value that survived intact.
+> 
+> **Two entries have been added since that audit**, both to the same standard and both because a
+> talent-provided effect was being credited to a whole class: Expose Weakness (Survival) on
+> 2026-08-21, and Improved Faerie Fire (Balance) on 2026-08-23.
 > 
 > **Where the two sources conflict, the tooltip wins** — the rule the buff pass set. Here nothing
 > conflicted: all six agreed to the digit, including the numbers that overturned what shipped.
