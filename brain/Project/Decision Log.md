@@ -78,6 +78,24 @@ Seven user-facing statements have been found **wrong** here, and every one of th
 
 So a claim carrying a number gets an assertion rather than a promise. A stat flagged unmodelled must score exactly zero. "2 specs of 27" must match the ability data. The test pinning the caster path as talent-blind was written *to fail* on the day someone wired it, as the reminder to rewrite the flag — and when that day came, it did.
 
+## A shared budget is spent greedily, so a second button moves damage rather than adding it
+
+The rotation resolver does not divide a resource between abilities — it hands it out in priority order, first ability first, later ones dividing what is left. So adding a second ability that costs the *same* resource is not additive: it moves damage from one use to another, and only pays off if the new use returns more per point of resource than the old one.
+
+This overturned a planned piece of work rather than being a note about one. Adding Mangle (Cat) alongside Shred was queued as straightforward data, and it is a **measured 4% loss**: Shred returns 11.8 damage per energy against 10.6 for Mangle, and the Mangle debuff multiplies periodic physical damage, of which the Feral model has none. The right question for any second button is therefore "is the swap a gain", not "is the ability sourced". See [[Feral Druid]].
+
+## A buff that comes from a talent belongs to the spec, never to the class
+
+Trueshot Aura is Marksmanship, Power Infusion is Discipline, Expose Weakness is Survival — attributing them to the class credited a roster with buffs nobody in it had specced. The same rule split **Improved Faerie Fire** out of Faerie Fire: the base spell is trainer-taught to every Druid and stays class-wide, while the Balance talent that improves it became its own entry.
+
+The counterpart rule is what stopped that going too far. A walkthrough asked to restrict *base* Faerie Fire to Balance and Dreamstate Druids, which would encode a raid convention as a game rule — and it was inverted besides, since Dreamstate is a Restoration talent and Restoration is the one Druid tree with no Faerie Fire talent at all. `ExclusiveGroup.basis` exists to keep game rules and raid conventions apart, and the same distinction applies to provider attribution.
+
+## Model what a seat competes in, not what one class happens to need
+
+Seat assignments were a single `blessingId`, which was the shape of the first thing that needed one. A Paladin competes in **two** exclusive groups at once — a Blessing and an aura — so one answer per seat made two decisions fight over one field, and assigning the aura would have silently cleared the Blessing.
+
+Assignments are now keyed by `ExclusiveGroup.id`. The tell that the original shape was wrong was visible long before it broke: the domain had been able to assign *any* exclusive buff since totems got a group, and a test was already assigning an air totem through a function called `assignBlessing`.
+
 ## Falsify an invariant before trusting it
 
 A test that has never been seen to fail is a hypothesis. This repo has already shipped a green suite that asserted nothing: `expect(locator).toHaveCount(0)` is vacuously true wherever the panel is not rendered, which only became possible once the planner grew sub-tabs. Every invariant added since is checked by breaking the thing it guards and confirming the failure names the real defect.

@@ -121,9 +121,13 @@ The physical path now layers a spec's signature melee special on top of white da
 separate "yellow" attack table — specials can't glance and don't take the dual-wield miss penalty, and
 getting either wrong would misprice every melee spec. Usage rate is only claimed where it can be
 defended: an ability with a cooldown is used on cooldown, and an energy-costed ability is bounded by
-energy's fixed 10/sec regen. Rage-costed abilities without a cooldown, and Hunter's mana-costed Steady
-Shot, are deliberately excluded and named in the result summary, since rage income and auto-shot
-weaving aren't modelled.
+energy's fixed 10/sec regen. Rage-costed abilities without a cooldown are deliberately excluded and
+named in the result summary, since rage income depends on damage taken.
+
+Hunter's mana-costed Steady Shot was excluded here on the same grounds — "auto-shot weaving isn't
+modelled" — until 2026-08-23, when it turned out the weave is two computable ceilings rather than an
+unknown: the hunter global cooldown is locked at 1.5s and ranged haste does not reduce it, and a
+second shot inside one auto-shot cycle would only buy its damage by delaying a white shot.
 
 ### Simulation work landed since, and the calls made along the way
 
@@ -178,10 +182,25 @@ each pinned by an assertion these days.
 
 **Still open, and these are the honest ones:**
 
-- **Rotations cover 2 specs of 27.** The largest remaining gap by a distance, and the main reason the
-  Simulation tab stays hidden. Scoped in `ROTATION-SCOPE.md`, which corrects this file's earlier
-  assumption that it would be an ingest like talents: wowsims implements rotations as *imperative
-  state machines over an event timeline*, and this engine is closed-form.
+- **Rotations cover 2 specs of 27.** The largest remaining gap by a distance. Scoped in
+  `ROTATION-SCOPE.md`, which corrects this file's earlier assumption that it would be an ingest like
+  talents: wowsims implements rotations as *imperative state machines over an event timeline*, and
+  this engine is closed-form. It is no longer "the reason the Simulation tab stays hidden" — that tab
+  is shown for the 20 DPS specs as of 2026-08-21, and the gap is a caveat on it rather than a reason
+  to withhold it.
+
+  **Stage 1 landed 2026-08-23** and the three hunter specs now fire Steady Shot, worth 174 DPS to
+  Marksmanship on the default set. It had reached nothing at all: `resolveRotation` filtered on the
+  literal `'Melee Special'`, so "single-ability approximation" was overstating hunter coverage, where
+  the real count was zero.
+
+  **Stage 2 was re-scoped the same day and none of its four specs survived contact.** Protection is
+  out of scope under the DPS-only rule; Feral loses about 4% if its second button is added before
+  bleeds exist; Retribution needs a new effect type rather than an entry; and Enhancement's gap is
+  Windfury Weapon, a white-swing proc, not a rotational button. The premise that broke it — "the
+  resolver already handles the budgets" — is wrong in a way worth carrying forward: the resolver
+  spends a shared budget **greedily in priority order**, so a second same-resource ability moves
+  damage rather than adding it.
 - **Talent groups are still refused by name**, and the count lives in an assertion rather than in this
   sentence — the figure that used to sit here went stale the moment the ingest changed. Coverage is not
   completeness. Per-spell effects need a spell school the simulator does not record; Health and Mana
@@ -343,7 +362,10 @@ written below each note's manual marker.
 ## Current Known Limitations
 
 - **Rotations cover 2 specs of 27.** Every other spec is modelled from a single signature ability,
-  which understates any spec whose damage is spread across several buttons. See `ROTATION-SCOPE.md`.
+  which understates any spec whose damage is spread across several buttons. See `ROTATION-SCOPE.md`,
+  whose stage 2 was rewritten on 2026-08-23 after none of its four specs survived contact — the
+  resolver spends a shared budget greedily in priority order, so a second same-resource ability moves
+  damage rather than adding it.
 - **Talents reach all 27 specs but a named list of groups is still refused**, dominated by per-spell
   effects that need a spell school this simulator does not record. The stat-pipeline ones are no
   longer among them.

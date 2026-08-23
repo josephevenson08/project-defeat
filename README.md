@@ -12,9 +12,13 @@ model says so on the surface that would otherwise imply it had.
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear
-catalogue, BiS rankings, talents, buffs, raids and professions are all real and sourced; the
-simulation behind them is built and tested but **hidden by default** while its estimates are known to
-be indicative — see `src/featureFlags.ts`, which states exactly what is and is not modelled.
+catalogue, BiS rankings, talents, buffs, raids and professions are all real and sourced.
+
+**This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
+neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab
+is shown for the **20 DPS specs** and hidden for the 5 Healer and 2 Tank ones — see
+`src/featureFlags.ts`, which states exactly what is and is not modelled, and carries an assertion
+behind every claim of its that quotes a number.
 
 ## Current Features
 
@@ -57,8 +61,12 @@ be indicative — see `src/featureFlags.ts`, which states exactly what is and is
   overwrite), an optional player name per seat, and a hover card on each seat listing everything that
   player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
   that group actually receives. **Buff exclusivity is modelled**: one Paladin holds one Greater
-  Blessing and one aura, one Warrior runs one shout, so coverage reflects what a roster can actually
-  maintain rather than everything its classes could theoretically cast. A fillable header (title,
+  Blessing and one aura, one Shaman drops one air totem, one Warrior runs one shout, so coverage
+  reflects what a roster can actually maintain rather than everything its classes could theoretically
+  cast. **The raid leader overrides any of it per seat** — every exclusive group a seat competes in
+  gets its own picker, so a Paladin can be told which Blessing *and* which aura to bring, and a
+  Shaman which totem to drop. Left alone, each group falls back to its priority order, so these are
+  overrides rather than a form to fill in. A fillable header (title,
   date, start time, description) is drawn onto the exported chart
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
@@ -152,13 +160,17 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
 ## Known Limitations
 
 - The physical DPS path models white damage plus **one** signature special per spec, and only when
-  that special's sustained rate is defensible: a cooldown, or an energy cost against energy's fixed
-  10/sec regen. Rage-costed abilities with no cooldown and Hunter's Steady Shot are excluded, because
-  rage income and auto-shot weaving aren't tracked — the simulation names what it left out rather than
-  guessing a rate. Multi-ability rotations have started but cover **only Fury and Arms Warrior**,
-  which press Whirlwind alongside their signature button against a shared global-cooldown budget.
-  Every other spec still models a single ability, so melee specs remain understated by differing
-  amounts.
+  that special's sustained rate is defensible: a cooldown, an energy cost against energy's fixed
+  10/sec regen, or — since 2026-08-23 — a hunter's shot weave, bounded by the 1.5s hunter global
+  cooldown and by one shot per auto-shot cycle. **Rage-costed abilities with no cooldown are still
+  excluded**, because rage income depends on damage taken, and the simulation names what it left out
+  rather than guessing a rate. Multi-ability rotations have started but cover **only Fury and Arms
+  Warrior**, which press Whirlwind alongside their signature button against a shared global-cooldown
+  budget. Every other spec still models a single ability, so melee specs remain understated by
+  differing amounts.
+- **A hunter's shot rate is not capped by mana** — `StatBlock` has no mana field, so the breakdown
+  reports the mana per second the rate spends rather than enforcing a pool it would have to invent.
+  Aspect of the Viper, Judgement of Wisdom and potions are all unmodelled.
 - Feral Druid is modelled in cat form, which in TBC swings a fixed internal weapon rather than the
   equipped one — so weapon damage and speed genuinely don't matter for Feral. What matters is Feral
   Attack Power, an explicit stat TBC prints on druid weapons, which is now modelled and adds 1:1 into

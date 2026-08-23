@@ -10,7 +10,9 @@ Kept deliberately blunt. A planner that overstates its accuracy is worse than on
 
 ## Simulation
 
-- **Rotations cover 2 specs of 27** — Warrior Arms and Fury. Every other spec is modelled from a single signature ability, which understates any spec whose damage is spread across several buttons. This is the largest remaining gap and the main reason the Simulation tab stays hidden.
+- **Rotations cover 2 specs of 27** — Warrior Arms and Fury. Every other spec is modelled from a single signature ability, which understates any spec whose damage is spread across several buttons. This is the largest remaining gap. It is **not** why the Simulation tab is hidden for some roles: that tab is shown for the 20 DPS specs and hidden for the 5 Healer and 2 Tank ones because this project is for DPS.
+- **"Single-ability approximation" overstated hunter coverage until 2026-08-23**, when the real count was zero — the rotation resolver filtered on `'Melee Special'` and never looked at Steady Shot. It is modelled now, bounded by the 1.5s hunter global cooldown and by one shot per auto-shot cycle.
+- **A hunter's shot rate is not capped by mana.** `StatBlock` has no mana field, so the estimate reports the mana per second the rate spends rather than enforcing a pool it would have to invent.
 - The caster and healer paths model one real ability per spec ([[Signature Abilities]]) — no cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate with no error bar.
 - Spell school is not recorded anywhere, which is why school-scoped debuffs and per-spell caster talents cannot be applied.

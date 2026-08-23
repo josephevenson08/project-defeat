@@ -7,10 +7,10 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Start here (2026-08-23)
 
-**All four queued items were opened, and three closed outright.** `39758d9..b126222`, five commits,
-189 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on
-`origin/main`. Item 4 is the simulation rebuild: **stage 1 of `ROTATION-SCOPE.md` is done**, stages
-2-4 are not started.
+**All four queued items were opened, and three closed outright.** `39758d9..HEAD`, seven commits,
+190 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent, all on
+`origin/main`. Item 4 is the simulation rebuild: **stage 1 of `ROTATION-SCOPE.md` is done and stage 2
+was re-scoped rather than built**, because none of its four specs survived contact.
 
 ### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
 
@@ -90,14 +90,35 @@ documented itself as white-only and was wrong about its own scope.
 **One existing test failed, and that was it doing its job** — it pinned "Steady Shot is not
 included". `ROTATION-SCOPE.md` predicted that in advance.
 
+### 5. Rotation stage 2 — re-scoped, and the premise was the error
+
+Stage 2 read "Feral, Retribution, Enhancement and Protection get their second and third buttons; the
+resolver already handles the budgets". **The resolver does not share a budget — it spends it greedily
+in priority order.** The first ability takes what its own rate allows and later ones divide what is
+left, so a second ability costing the *same* resource **moves** damage rather than adding it, and
+only pays off if the new use returns more per point of resource. That reframes the stage from "add
+entries" to "prove the swap is a gain", and it lands on stage 4's Rogue plan too.
+
+All four specs then failed for four different reasons:
+
+- **Protection is out of scope.** The doc was written 2026-08-18; the DPS-only rule was taken
+  2026-08-21. Nothing to do.
+- **Feral loses about 4% if Mangle is added before bleeds exist**, measured: Shred returns 11.8 damage
+  per energy against 10.6 for Mangle. The repo's own note said Mangle applies a "+30% Shred/bleed
+  debuff" — **in TBC it is bleeds only** (`PeriodicPhysicalDamageTakenMultiplier *= 1.3`), and the
+  "Shred and Ravage" wording is a later expansion's. With no bleed modelled the debuff multiplies
+  nothing. **Rake is the prerequisite, not the sibling.** A test pins the per-energy comparison.
+- **Retribution needs a new effect type**, not an entry — Judgement of Blood is Holy damage off spell
+  power rolling crit on the melee table. Its own notes already said so.
+- **Enhancement's gap is Windfury Weapon**, a white-swing proc, not a rotational button.
+
 ### What is left
 
-1. **Rotation stages 2-4.** `ROTATION-SCOPE.md` has stage 1 struck through with what it actually
-   taught. Stage 2 is the melee data thinning (Feral, Retribution, Enhancement, Protection get their
-   second and third buttons — the resolver already handles the budgets). Stage 3 is DoT uptime for
-   Affliction and Shadow, the first stage that adds a mechanism, and it runs into the missing spell
-   school. Stage 4 is combo points, and needs a type change. **Do not build a general engine for all
-   27** — the doc argues that case and it still holds.
+1. **Rotation stages 2-4, as rewritten.** Stage 2 is now one mechanism (weapon-proc damage, for
+   Enhancement — the largest in-scope item left), one type change (Retribution), and one item that is
+   really stage 3 (bleeds, for Feral). Stage 3 is DoT uptime for Affliction and Shadow and runs into
+   the missing spell school. Stage 4 is combo points and needs a type change. **Do not build a general
+   engine for all 27** — the doc argues that case and it still holds.
 2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
    sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
    per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
@@ -108,7 +129,13 @@ included". `ROTATION-SCOPE.md` predicted that in advance.
 **Python eats `\'` inside a triple-quoted string**, so a patch script writing TypeScript emitted
 `'Cedric's reply'` and produced sixty parse errors. The repo already records the backtick version of
 this; this is the same failure through a different quote. Write the TS string double-quoted instead
-of escaping the apostrophe.
+of escaping the apostrophe — and note that escaping it through a *bash heredoc* does not work either,
+because the backslash is eaten a layer earlier. The reliable fix is to **write the patch script to a
+file and run it**, or to avoid the apostrophe in the prose altogether.
+
+**`cat > file` with no stdin hangs forever.** A stray `cat > /tmp/probe.ts 2>/dev/null;` at the front
+of a command chain blocked on stdin, which read as a slow test run rather than as a hang, and the
+rest of the chain never executed.
 
 ---
 
@@ -740,7 +767,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 189 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 190 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
