@@ -116,15 +116,29 @@ function resolveCastProfile(character: CharacterProfile, fallbackCastTime: numbe
     }
   }
 
-  // Periodic effects deliver over a duration rather than per cast, so the cast-time divisor for a
-  // DoT/HoT is its channel/duration rather than its cast time; an instant DoT would otherwise
-  // divide by zero and report infinite casts per second.
+  /*
+   * Periodic effects deliver over a duration rather than per cast, so the divisor for a DoT or HoT is
+   * its duration — `baseAmount` below is the **whole** periodic total, and dividing that by a cast
+   * time would deliver the entire DoT every time it is cast.
+   *
+   * **This used to be guarded on `castTimeSeconds === 0` and that was wrong.** The zero check was
+   * written for the divide-by-zero an instant DoT causes, and a DoT that *has* a cast time fell
+   * straight past it: Unstable Affliction is a 1.5s cast with an 18-second duration, so the model
+   * delivered its full 18s of damage every 1.5 seconds — twelve times over, and enough to make
+   * Affliction the one spec in the game that read *above* what players actually parse.
+   *
+   * `Math.max` rather than a branch, because both bounds are real: a DoT cannot be re-applied faster
+   * than it can be cast, nor faster than it runs. Mind Flay is a 3s channel over a 3s duration and is
+   * unaffected either way, which is the check that this is the right shape rather than a patch aimed
+   * at one ability.
+   */
   const periodicDuration = ability.periodic?.durationSeconds
+  const isPeriodic = ability.effectType === 'DoT' || ability.effectType === 'HoT'
   const castTimeSeconds =
-    ability.castTimeSeconds > 0
-      ? ability.castTimeSeconds
-      : (ability.effectType === 'DoT' || ability.effectType === 'HoT') && periodicDuration
-        ? periodicDuration
+    isPeriodic && periodicDuration
+      ? Math.max(ability.castTimeSeconds, periodicDuration)
+      : ability.castTimeSeconds > 0
+        ? ability.castTimeSeconds
         : ability.gcdSeconds
 
   const periodicTotal = ability.periodic?.totalBaseAmount ?? 0

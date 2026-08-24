@@ -99,6 +99,8 @@ import {
   isWithinDefaultPhase,
 } from '../src/domain/gear/itemCatalogue'
 import { excludedByPhase } from '../src/domain/bis'
+import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
+import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
 import { validateBuild } from '../src/domain/builds/buildSerialization'
 import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
 import { sampleItemSets } from '../src/domain/gear/itemSets'
@@ -4940,6 +4942,129 @@ test('Windfury rolls on both hands, and the proc rate is the one a real log show
   })
   expect(fast.procsPerSecond).toBeCloseTo(1 / WINDFURY_INTERNAL_COOLDOWN_SECONDS, 6)
   expect(fast.limitedByInternalCooldown).toBe(true)
+})
+
+/**
+ * Dresses a spec in its own rank-1 BiS, buffs and consumables it fully, and fills its primary talent
+ * tree to the 61-point cap — the strongest character this app can currently describe.
+ *
+ * Not a claim that a real raider looks like this. It is a **ceiling**, and the point of measuring the
+ * ceiling is that anything below it in the comparison table is a gap in the model rather than a gap
+ * in what the player brought.
+ */
+function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterRole) {
+  const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
+
+  let gear = normalizeGearForCharacter(defaultGear, className, spec)
+  const list = getBisListForSpec(className, spec)
+  const filled = new Set<string>()
+  for (const entry of list?.entries ?? []) {
+    if (entry.rank !== 1 || filled.has(entry.slot)) continue
+    const item = getItemById(entry.itemId)
+    if (!item) continue
+    filled.add(entry.slot)
+    gear = { ...gear, [entry.slot]: { ...(gear as Record<string, unknown>)[entry.slot], item } } as typeof gear
+  }
+
+  /*
+   * The primary tree, filled in listed order and stopped at 61 — the real level-70 budget. Maxing a
+   * whole tree overruns it (Enhancement alone is 65 points), and a ceiling that spends points the
+   * game does not give would flatter the model in exactly the direction this table exists to check.
+   */
+  const tree = getTalentData(className)?.trees.find((entry) => entry.spec === spec)
+  const points: Record<number, number> = {}
+  let spent = 0
+  for (const talent of tree?.talents ?? []) {
+    if (spent >= 61) break
+    const rank = Math.min(talent.maxRank, 61 - spent)
+    points[talent.id] = rank
+    spent += rank
+  }
+
+  const stats = calculateStats(
+    character,
+    gear,
+    sampleBuffs.map((buff) => buff.id),
+    sampleConsumables.map((consumable) => consumable.id),
+    undefined,
+    deriveTalentModifiers(points),
+  )
+
+  return { result: calculateSimulation(character, gear, stats, role, [], undefined, points), slots: filled.size }
+}
+
+test('every DPS spec is measured against what players actually parse', () => {
+  /*
+   * **The simulator had no way to be wrong.** Every number it produced was internally consistent and
+   * nothing compared any of them to reality, so a spec reading 522 where players do 1,693 looked
+   * exactly like a spec reading correctly. `featureFlags.ts` has claimed "roughly 4x low" on one
+   * person's judgement for months.
+   *
+   * This is that judgement turned into a measurement, against `dpsReference` — archon.gg's observed
+   * averages for the phase this app is scoped to. The table it prints is the point of the test; the
+   * assertions below are the parts that can fail.
+   */
+  const rows: { spec: string; modelled: number; target: number; ratio: number; slots: number }[] = []
+
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      const role = getRoleForSpec(entry.className, spec)
+      const reference = getDpsReference(entry.className, spec)
+
+      if (role !== 'Physical DPS' && role !== 'Caster DPS') {
+        expect(reference, `${entry.className} ${spec} is not DPS and must not have a DPS reference`).toBeUndefined()
+        continue
+      }
+
+      expect(reference, `${entry.className} ${spec} is a DPS spec and needs a reference`).toBeDefined()
+
+      const { result, slots } = bestCaseSimulation(entry.className, spec, role)
+      rows.push({
+        spec: `${entry.className} ${spec}`,
+        modelled: Math.round(result.scoreExact),
+        target: reference!.dps,
+        ratio: reference!.dps / result.scoreExact,
+        slots,
+      })
+    }
+  }
+
+  rows.sort((a, b) => b.ratio - a.ratio)
+  console.log(`\nDPS calibration vs ${DPS_REFERENCE_SOURCE}`)
+  console.log('spec'.padEnd(26), 'modelled'.padStart(9), 'target'.padStart(7), 'ratio'.padStart(6), 'bis slots'.padStart(10))
+  for (const row of rows) {
+    console.log(
+      row.spec.padEnd(26),
+      String(row.modelled).padStart(9),
+      String(row.target).padStart(7),
+      (row.ratio.toFixed(1) + 'x').padStart(6),
+      String(row.slots).padStart(10),
+    )
+  }
+
+  // Every DPS spec has a reference, and the reference set covers nothing else.
+  expect(rows).toHaveLength(20)
+  expect(dpsReference).toHaveLength(20)
+
+  /*
+   * **No spec may read above its reference**, and this is the assertion with teeth.
+   *
+   * The model understates everywhere, so a spec that suddenly reads *high* is not good news — it is a
+   * double-count, a multiplier applied twice, or a proc rate taken literally when it should not have
+   * been. That failure mode has already happened once this session: upstream's 0.36 Windfury constant
+   * predicted nearly double the procs a real log shows. A one-directional bound catches the next one
+   * without needing to be retuned every time the model improves.
+   */
+  for (const row of rows) {
+    expect(row.modelled, `${row.spec} reads above what players parse, which means something is counted twice`).toBeLessThan(
+      row.target,
+    )
+  }
+
+  // And every spec produced a real number rather than a zero from an empty BiS list.
+  for (const row of rows) {
+    expect(row.modelled, `${row.spec} produced no damage at all`).toBeGreaterThan(0)
+  }
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

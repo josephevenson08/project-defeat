@@ -376,6 +376,38 @@ T5, 2,000+ for Sunwell" from memory and flagged it as unsourced. A real parse su
 owner puts a Phase 2 Enhancement shaman at **1,709.3 DPS on Hydross** — see the calibration table
 below, which replaces the guess.
 
+### Calibrated against every spec, 2026-08-23
+
+One parse calibrates one spec. `src/domain/simulation/dpsReference.ts` now carries **archon.gg's
+observed averages for all 20 DPS specs** in this phase, and a test dresses each spec in its own rank-1
+BiS, every buff and consumable, and its primary tree filled to the 61-point cap, then prints the
+comparison. Enhancement's reference of **1,693** lands within 1% of the owner's own Hydross parse at
+1,709, which is the only independent check available on the table and a reassuring one.
+
+The model is **2.0x to 4.0x low across the board**, with Feral Druid worst at 4.0x and Marksmanship
+Hunter and Frost Mage closest at 2.1x and 2.0x. That is a tighter and more uniform spread than
+expected, and it argues that the missing damage is mostly *shared* machinery — haste, crit, proc
+handling — rather than twenty separate per-spec holes.
+
+**The test found a real bug on its first run, which is the argument for having it.** Every spec read
+low except **Warlock Affliction, which read 1,731 against a target of 1,629** — the one spec in the
+game reading *above* what players parse. The cause: `resolveCast` guarded the "use the DoT's duration
+as the divisor" rule on `castTimeSeconds === 0`, a check written for the divide-by-zero an instant DoT
+causes. Unstable Affliction is a **1.5s cast with an 18-second duration**, so it fell past the guard
+and delivered its entire 18 seconds of damage every 1.5 seconds — twelve times over. It is
+`Math.max(castTime, duration)` now, because both bounds are real. Mind Flay is a 3s channel over a 3s
+duration and is unaffected either way, which is the check that the fix is the right shape rather than
+one aimed at a single ability.
+
+Corrected, Affliction reads **144** and is now the *worst* spec at 11.3x — which is honest, and is
+what its own ability notes have always said: "a DoT-only model will understate Affliction", for a spec
+that really maintains five DoTs plus a filler.
+
+**The assertion that caught it is deliberately one-directional**: no spec may read *above* its
+reference. The model understates everywhere, so a spec reading high is not good news — it is a
+double-count, a multiplier applied twice, or a proc rate taken literally. That bound needs no
+retuning as the model improves, which is what makes it survivable.
+
 ### Calibrated against a real parse, 2026-08-23
 
 The repo owner supplied their own Warcraft Logs breakdown for **Hydross the Unstable, Serpentshrine
