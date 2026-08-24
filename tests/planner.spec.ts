@@ -4990,7 +4990,16 @@ function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterR
     deriveTalentModifiers(points),
   )
 
-  return { result: calculateSimulation(character, gear, stats, role, [], undefined, points), slots: filled.size }
+  /*
+   * **Every modelled target debuff, because a raid always has them.** Leaving them off was the first
+   * version of this harness and it understated every physical spec by about 28%: Sunder, Faerie Fire
+   * and Curse of Recklessness strip 4,010 armour between them, which against this app's 7,700-armour
+   * target is the difference between 42.2% mitigation and 25.9%. A "best case" that omits what every
+   * real parse has would be measuring the wrong thing.
+   */
+  const debuffs = modelledTargetDebuffs.map((debuff) => debuff.id)
+
+  return { result: calculateSimulation(character, gear, stats, role, debuffs, undefined, points), slots: filled.size }
 }
 
 test('every DPS spec is measured against what players actually parse', () => {

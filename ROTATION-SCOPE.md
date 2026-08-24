@@ -384,10 +384,18 @@ BiS, every buff and consumable, and its primary tree filled to the 61-point cap,
 comparison. Enhancement's reference of **1,693** lands within 1% of the owner's own Hydross parse at
 1,709, which is the only independent check available on the table and a reassuring one.
 
-The model is **2.0x to 4.0x low across the board**, with Feral Druid worst at 4.0x and Marksmanship
-Hunter and Frost Mage closest at 2.1x and 2.0x. That is a tighter and more uniform spread than
-expected, and it argues that the missing damage is mostly *shared* machinery — haste, crit, proc
-handling — rather than twenty separate per-spec holes.
+The model is **1.6x to 3.5x low across the board** (Affliction excepted at 10.1x, for its own
+reasons below), with Priest Shadow worst and Marksmanship Hunter closest. That is a tighter and more
+uniform spread than expected, and it argues that the missing damage is mostly *shared* machinery —
+haste, crit, proc handling — rather than twenty separate per-spec holes.
+
+**The first version of this harness was itself wrong by about 28%, and it is worth recording which
+way.** It ran with **no target debuffs**, where every real parse has Sunder Armor, Faerie Fire and
+Curse of Recklessness. Those strip 4,010 armour between them, and against this app's 7,700-armour
+target that is the difference between **42.2%** mitigation and **25.9%** — so the harness was
+measuring the model against a boss no raid ever fights. Correcting it moved Enhancement from 669 to
+**912** and Fury Warrior from 707 to **961** without a line of model code changing. A calibration
+rig can be wrong in the same direction as the thing it measures, and this one was.
 
 **The test found a real bug on its first run, which is the argument for having it.** Every spec read
 low except **Warlock Affliction, which read 1,731 against a target of 1,629** — the one spec in the
