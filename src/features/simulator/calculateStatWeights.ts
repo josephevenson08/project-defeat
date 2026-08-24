@@ -149,7 +149,7 @@ export function calculateStatWeights(
 
   const runScore = (bonusStats?: Partial<StatBlock>) => {
     const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats, talents)
-    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints)
+    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds)
   }
 
   const baseline = runScore()

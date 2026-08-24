@@ -253,8 +253,15 @@ export const sampleBuffs: readonly Buff[] = [
     providedBySpec: 'Beast Mastery',
     spellId: 34460,
     roles: ['Physical DPS', 'Caster DPS'],
-    notModelled:
-      'When the Hunter\'s pet scores a critical hit, all party members have all damage increased by 3% for 10 sec. A whole-damage multiplier gated on someone else\'s pet critting, so it has no fixed uptime to average over.',
+    /*
+     * 3% to all damage done by the party, at the **97.71% uptime** the reference parse records — near
+     * enough permanent with a Beast Mastery hunter in the group, and 0.03 x 0.9771 rounds to 0.029.
+     *
+     * It went unmodelled because there was nowhere to put it: it multiplies *damage dealt*, and no
+     * `StatBlock` field is "damage". `damageMultiplier` is that field. School-scoped versions are
+     * still refused — Sanctity Aura's 10% is Holy only and nothing here records a spell school.
+     */
+    damageMultiplier: 0.029,
   },
 
   // ---- Shaman ----
@@ -372,8 +379,23 @@ export const sampleBuffs: readonly Buff[] = [
     name: 'Bloodlust',
     providedByClass: 'Shaman',
     spellId: 2825,
-    notModelled:
-      'Increases melee, ranged and spell casting speed by 30% for all party members for 40 sec, on a 10 min cooldown. A raid cooldown rather than a sustained buff: applying 30% haste for the whole fight would overstate it by an order of magnitude, and averaging it over the cooldown understates a burst everyone times deliberately.',
+    /*
+     * 30% haste at the **34.51% uptime** the reference Hydross parse records — 0.3 x 0.3451, rounded
+     * to 0.104.
+     *
+     * **The refusal here was a genuine argument, not an oversight, and it is answered rather than
+     * overruled.** It said applying 30% for a whole fight "would overstate it by an order of
+     * magnitude", which is right, and that "averaging it over the cooldown understates a burst
+     * everyone times deliberately", which is also right. The reply is that *not modelling it at all*
+     * understates by the whole of its value, and averaging understates by a fraction of it — so
+     * averaging is strictly the better of the two available wrongs.
+     *
+     * **The uptime is tied to fight length and that is a real limit.** 34.51% of 116 seconds is one
+     * 40-second Bloodlust, so a longer fight dilutes this and a shorter one concentrates it. There is
+     * no fight length in this model to scale it by, which is why the figure is stated rather than
+     * derived.
+     */
+    hastePercent: 0.104,
     notes: 'Horde only; the Alliance equivalent is Heroism (spell 32182), identical in every value.',
   },
 

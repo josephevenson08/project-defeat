@@ -403,10 +403,32 @@ rather than merely multiplies:
     Paladin Retribution  727 ->  767
     Hunter Beast Mastery 932 ->  932   (ranged attack power, correctly untouched)
 
-Still unmodelled and still shared: **Bloodlust** (+30% haste at 34.51% uptime in the parse),
-**Ferocious Inspiration** (+3% damage at 97.71%), and the crit gap — 38.8% modelled against the
-parse's 50.0%. Each needs a field the `Buff` type does not have yet: a percentage haste, and a flat
-damage multiplier.
+**Bloodlust and Ferocious Inspiration followed, and needed a route rather than a field.** Both were
+refused because they are not stats: percentage haste and a damage multiplier have no `StatBlock` to
+land in. `aggregateBuffEffects` gives them one, mirroring `aggregateTargetDebuffs`, and
+`calculateSimulation` takes the buff id list it was already handing to `calculateStats`.
+
+Bloodlust's refusal was a real argument and is answered rather than overruled. It said applying 30%
+for a whole fight "would overstate it by an order of magnitude" — right — and that averaging
+"understates a burst everyone times deliberately" — also right. The reply: **not modelling it
+understates by all of its value, averaging by a fraction of it**, so averaging is the better of the
+two available wrongs. At 34.51% measured uptime that is 10.4% haste. The limit worth stating is that
+uptime is fight-length bound: 34.51% of 116 seconds is one 40-second Bloodlust, and there is no fight
+length here to scale it by.
+
+    Shaman Enhancement    966 -> 1076   (1.8x -> 1.6x)
+    Warrior Fury         1030 -> 1131   (2.0x -> 1.8x)
+    Hunter Marksmanship   847 ->  954   (1.6x -> 1.4x)
+    Mage Arcane           751 ->  853   (2.8x -> 2.4x)
+
+**The crit gap was mostly an error in the comparison, not in the model.** This file recorded 38.8%
+modelled against the parse's 50.0%. Warcraft Logs reports crit as a share of **hits that landed**;
+the model reports it as a share of **all swings**. The log's 59 crits over 136 swings is **43.4%** on
+the model's terms, so the real gap is **4.6 points**, not 11. Worth keeping as a caution: two numbers
+with the same name and different denominators.
+
+Still unmodelled and still shared: school-scoped multipliers like Sanctity Aura's 10% Holy, which
+need a spell school — the same prerequisite stage 3 has been waiting on.
 
 ### Calibrated against every spec, 2026-08-23
 

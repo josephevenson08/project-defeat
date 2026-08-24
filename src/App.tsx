@@ -248,7 +248,7 @@ function App() {
   function runSimulation() {
     // `stats` already carries the talent build, so the estimate and the rail agree by construction
     // rather than by coincidence. They disagreed by design until 2026-08-20.
-    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints))
+    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds))
   }
 
   const completeIntro = useCallback(() => {

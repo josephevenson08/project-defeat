@@ -50,7 +50,7 @@ function pickBestGemPerColor(
   const talents = deriveTalentModifiers(talentPoints)
   const scoreWithBonus = (bonusStats: Parameters<typeof calculateStats>[4]) => {
     const stats = calculateStats(character, gear, activeBuffIds, activeConsumableIds, bonusStats, talents)
-    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints).scoreExact
+    return calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds).scoreExact
   }
 
   const baseline = scoreWithBonus(undefined)
@@ -141,7 +141,7 @@ export function findUpgrades(
   const talents = deriveTalentModifiers(talentPoints)
   const scoreFor = (candidateGear: EquippedGear) => {
     const stats = calculateStats(character, candidateGear, activeBuffIds, activeConsumableIds, undefined, talents)
-    return calculateSimulation(character, candidateGear, stats, role, activeTargetDebuffIds, target, talentPoints)
+    return calculateSimulation(character, candidateGear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds)
   }
 
   const baseline = scoreFor(gear)

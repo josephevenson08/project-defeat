@@ -1,6 +1,7 @@
 import { getRotationAbilities, getSignatureAbility } from '../../domain/abilities'
 import type { SignatureAbility } from '../../domain/abilities'
 import { getTargetDebuffById } from '../../domain/buffs/sampleTargetDebuffs'
+import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import {
   buildDefenderAvoidanceBaseline,
   buildIncomingAttackTable,
@@ -277,6 +278,28 @@ function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
       }
     },
     { armorReduction: 0, physicalCritTakenBonus: 0, physicalHitTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
+  )
+}
+
+/**
+ * Sums the buff effects that are **not** stats, and so could not reach the simulator through
+ * `calculateStats` like everything else.
+ *
+ * Flat and multiplied stats already arrive folded into `stats`. Percentage haste and a damage
+ * multiplier have no `StatBlock` field to land in, which is precisely why every buff of that shape
+ * was `notModelled` — the caveat described a missing field rather than a missing mechanic.
+ */
+function aggregateBuffEffects(activeBuffIds: readonly string[]) {
+  return activeBuffIds.reduce(
+    (totals, id) => {
+      const buff = getBuffById(id)
+      if (!buff) return totals
+      return {
+        hastePercent: totals.hastePercent + (buff.hastePercent ?? 0),
+        damageMultiplier: totals.damageMultiplier + (buff.damageMultiplier ?? 0),
+      }
+    },
+    { hastePercent: 0, damageMultiplier: 0 },
   )
 }
 
@@ -576,6 +599,7 @@ function calculatePhysicalDps(
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
   talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
+  buffs: ReturnType<typeof aggregateBuffEffects> = { hastePercent: 0, damageMultiplier: 0 },
 ): SimulationResult {
   const skillDiff = computeSkillDiff(target.level)
   const targetArmor = Math.max(0, target.armor - debuffs.armorReduction)
@@ -621,7 +645,11 @@ function calculatePhysicalDps(
   const hasteFraction = ratingToFraction(stats.hasteRating, RATING_PER_PERCENT.meleeHaste)
   // Gear haste only. Flurry multiplies on top of this inside the melee branch below, where the
   // attack table exists — it needs the crit chance that actually occurs, not the raw one.
-  const gearAttackSpeedMultiplier = 1 + hasteFraction
+  /*
+   * Percentage haste from buffs joins gear haste additively, which is how TBC stacks them — Bloodlust
+   * is 30% whatever the gear says, and it does not pass through the rating conversion at all.
+   */
+  const gearAttackSpeedMultiplier = 1 + hasteFraction + buffs.hastePercent
 
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
@@ -943,7 +971,12 @@ function calculatePhysicalDps(
    * quietly shaved a third off it against a raid boss.
    */
   const unmitigatedDps = paladinHoly?.totalDps ?? 0
-  const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps
+  /*
+   * A buff damage multiplier scales everything, physical and Holy alike — Ferocious Inspiration is
+   * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
+   */
+  const damageMultiplier = 1 + buffs.damageMultiplier
+  const mitigatedDps = ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier
 
   for (const entry of rotation.specials) {
     breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
@@ -1029,6 +1062,7 @@ function calculateCasterDps(
   debuffs: ReturnType<typeof aggregateTargetDebuffs>,
   talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
+  buffs: ReturnType<typeof aggregateBuffEffects> = { hastePercent: 0, damageMultiplier: 0 },
 ): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_NUKE_CAST_TIME)
   const levelDiff = target.level - PLAYER_LEVEL
@@ -1044,7 +1078,9 @@ function calculateCasterDps(
   const spellCritChance =
     computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit) + talents.spellCritChance) +
     debuffs.spellCritTakenBonus
-  const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste)
+  // Percentage haste from buffs is not rating and does not pass through the conversion: Bloodlust is
+  // 30% of cast speed whatever the gear says, exactly as it is 30% of swing speed for a melee spec.
+  const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste) + buffs.hastePercent
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
   const damagePerCast =
@@ -1052,7 +1088,12 @@ function calculateCasterDps(
     (1 + debuffs.spellDamageTakenMultiplier) *
     talents.spellDamageMultiplier
   const expectedDamagePerCast = damagePerCast * (1 + spellCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
-  const dps = expectedDamagePerCast * spellHitChance * castsPerSecond
+  /*
+   * A buff damage multiplier scales the finished figure. School-scoped ones are still refused —
+   * Sanctity Aura is Holy only and nothing here records a spell school — so what lands is the
+   * school-agnostic kind, which today is Ferocious Inspiration.
+   */
+  const dps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier)
 
   const breakdown: SimulationBreakdownEntry[] = [
     { label: 'Base damage per cast', value: round(cast.baseAmount) },
@@ -1342,6 +1383,12 @@ export function calculateSimulation(
   activeTargetDebuffIds: readonly string[] = [],
   target: SimulationTarget = defaultSimulationTarget,
   talentPoints: TalentPoints = {},
+  /**
+   * The same list `calculateStats` was given. Stats already arrive folded into `stats`; this is here
+   * for the buff effects that are **not** stats — percentage haste and a damage multiplier — which
+   * have no `StatBlock` field and so could not travel that way.
+   */
+  activeBuffIds: readonly string[] = [],
 ): SimulationResult {
   const debuffs = aggregateTargetDebuffs(activeTargetDebuffIds)
   // `talentEffects.json` covers all nine classes. A talent with no ingested effect derives the
@@ -1356,8 +1403,15 @@ export function calculateSimulation(
 
   const talentNote = unmodelledTalentNoteFor(character, talentPoints, role)
 
-  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote)
+  /*
+   * Buff effects that are not stats. The healer and tank paths deliberately do not take them: this
+   * project is for DPS, and wiring a damage multiplier into a survivability score would be a claim
+   * nobody has checked.
+   */
+  const buffs = aggregateBuffEffects(activeBuffIds)
+
+  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote, buffs)
   if (role === 'Healer') return calculateHealing(character, stats, talents, talentNote)
   if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talents, talentNote)
-  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote)
+  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote, buffs)
 }

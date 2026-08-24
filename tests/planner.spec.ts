@@ -1966,7 +1966,9 @@ test('every raid buff is sourced to a spell rank and is either applied or explic
     // `statMultipliersAfterConversion` counts as applying, and forgetting it here is how a buff that
     // does contribute gets reported as contributing nothing — which is what happened the day
     // Unleashed Rage was modelled.
-    const applies = Boolean(buff.stats || buff.statMultipliers || buff.statMultipliersAfterConversion)
+    const applies = Boolean(
+      buff.stats || buff.statMultipliers || buff.statMultipliersAfterConversion || buff.hastePercent || buff.damageMultiplier,
+    )
     if (applies && buff.notModelled) problems.push(`${buff.id}: both applies stats and claims to be unmodelled`)
     if (!applies && !buff.notModelled) problems.push(`${buff.id}: contributes nothing and does not say why`)
   }
@@ -2038,7 +2040,7 @@ test('every unmodelled buff carries text a panel could render', async () => {
   // would put 15 rows on screen with a name and nothing else.
   // 15 until Unleashed Rage was modelled on 2026-08-23: its own note said an attack-power multiplier
   // would land before attack power was derived, and `statMultipliersAfterConversion` answered that.
-  expect(unmodelledBuffs.length, '14 of the 33 cannot be expressed as stats').toBe(14)
+  expect(unmodelledBuffs.length, '12 of the 33 cannot be expressed as stats').toBe(12)
 
   for (const buff of unmodelledBuffs) {
     expect(buff.stats, `${buff.id} must contribute no stats`).toBeUndefined()
@@ -2046,9 +2048,18 @@ test('every unmodelled buff carries text a panel could render', async () => {
     expect(buff.notModelled!.length, `${buff.id} needs a real explanation, not a placeholder`).toBeGreaterThan(40)
   }
 
-  // Bloodlust is the example worth pinning: it is the buff a reader would most expect to find, and
-  // its explanation has to carry the actual effect rather than just saying it is unsupported.
-  expect(getBuffById('bloodlust')?.notModelled).toContain('30%')
+  /*
+   * Sanctity Aura is the exemplar now: its explanation has to carry the actual effect rather than
+   * just saying it is unsupported.
+   *
+   * This used to pin Bloodlust, which was the buff a reader would most expect to find here. It is
+   * modelled as of 2026-08-23, at 30% haste weighted by the 34.51% uptime a real parse measured, so
+   * it is no longer an example of anything unmodelled. Sanctity Aura is refused for a reason that
+   * has not moved: it is a **school-scoped** multiplier, and nothing in this simulator records a
+   * spell school.
+   */
+  expect(getBuffById('sanctity-aura')?.notModelled).toContain('10%')
+  expect(getBuffById('bloodlust')?.notModelled, 'Bloodlust is modelled now').toBeUndefined()
 })
 
 test('the target-debuff corrections that had real wrong values stay corrected', async () => {
@@ -4986,10 +4997,11 @@ function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterR
     spent += rank
   }
 
+  const buffIds = sampleBuffs.map((buff) => buff.id)
   const stats = calculateStats(
     character,
     gear,
-    sampleBuffs.map((buff) => buff.id),
+    buffIds,
     sampleConsumables.map((consumable) => consumable.id),
     undefined,
     deriveTalentModifiers(points),
@@ -5004,7 +5016,16 @@ function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterR
    */
   const debuffs = modelledTargetDebuffs.map((debuff) => debuff.id)
 
-  return { result: calculateSimulation(character, gear, stats, role, debuffs, undefined, points), slots: filled.size }
+  /*
+   * `buffIds` goes to the simulator as well as to `calculateStats`, and forgetting the second half is
+   * silent: stat buffs arrive folded into `stats` either way, so the run still looks right while
+   * percentage haste and damage multipliers contribute nothing. Which is exactly what happened the
+   * first time Bloodlust was modelled — the table did not move by a single point.
+   */
+  return {
+    result: calculateSimulation(character, gear, stats, role, debuffs, undefined, points, buffIds),
+    slots: filled.size,
+  }
 }
 
 test('every DPS spec is measured against what players actually parse', () => {
@@ -5122,6 +5143,57 @@ test('a multiplier on a derived stat is applied after the stat is derived', () =
   const rage = getBuffById('unleashed-rage')!
   expect(rage.notModelled, 'it is modelled now, so it must not still say otherwise').toBeUndefined()
   expect(rage.statMultipliersAfterConversion?.attackPower).toBe(0.094)
+})
+
+test('buff effects that are not stats reach the simulator, and only through the simulator', () => {
+  /*
+   * Percentage haste and a damage multiplier have no `StatBlock` field, which is the entire reason
+   * every buff of that shape was `notModelled`. The caveats described a missing field rather than a
+   * missing mechanic, and `aggregateBuffEffects` is the field.
+   *
+   * **The failure mode this guards is silent.** Stat buffs arrive folded into `stats` whether or not
+   * the id list also reaches `calculateSimulation`, so a caller that passes buffs to `calculateStats`
+   * and forgets the simulator still produces a plausible number with the haste and damage halves
+   * missing. That is exactly what happened the first time Bloodlust was modelled: the calibration
+   * table did not move by a single point.
+   */
+  const melee: CharacterProfile = { faction: 'Alliance', race: 'Draenei', className: 'Shaman', spec: 'Enhancement' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Shaman', 'Enhancement')
+  const stats = calculateStats(melee, gear)
+
+  const withoutBuffIds = calculateSimulation(melee, gear, stats, 'Physical DPS', [], undefined, {})
+  const withBuffIds = calculateSimulation(melee, gear, stats, 'Physical DPS', [], undefined, {}, [
+    'bloodlust',
+    'ferocious-inspiration',
+  ])
+
+  // Same stats both times — only the non-stat effects differ, which isolates what is being tested.
+  expect(withBuffIds.scoreExact, 'haste and damage multipliers must reach the estimate').toBeGreaterThan(
+    withoutBuffIds.scoreExact,
+  )
+
+  /*
+   * Bloodlust is haste and Ferocious Inspiration is damage, so together they multiply. Asserted
+   * loosely because the haste half runs through the attack table rather than scaling the total.
+   */
+  const ratio = withBuffIds.scoreExact / withoutBuffIds.scoreExact
+  expect(ratio).toBeGreaterThan(1.05)
+  expect(ratio, 'and cannot exceed what the two buffs actually grant').toBeLessThan(1.104 * 1.029 + 0.01)
+
+  // Casters take the same path: Bloodlust is cast speed for them, and the damage multiplier applies.
+  const caster: CharacterProfile = { faction: 'Alliance', race: 'Draenei', className: 'Shaman', spec: 'Elemental' }
+  const casterGear = normalizeGearForCharacter(defaultGear, 'Shaman', 'Elemental')
+  const casterStats = calculateStats(caster, casterGear)
+  const casterBare = calculateSimulation(caster, casterGear, casterStats, 'Caster DPS', [], undefined, {})
+  const casterBuffed = calculateSimulation(caster, casterGear, casterStats, 'Caster DPS', [], undefined, {}, [
+    'bloodlust',
+  ])
+  expect(casterBuffed.scoreExact, 'Bloodlust is cast speed too').toBeGreaterThan(casterBare.scoreExact)
+
+  // Both are sourced to a measured uptime rather than applied whole, which is the honest half.
+  expect(getBuffById('bloodlust')?.hastePercent).toBe(0.104)
+  expect(getBuffById('ferocious-inspiration')?.damageMultiplier).toBe(0.029)
+  expect(getBuffById('bloodlust')?.notModelled, 'it is modelled now').toBeUndefined()
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

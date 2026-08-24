@@ -52,6 +52,26 @@ export type Buff = BuffProvider & {
    */
   statMultipliersAfterConversion?: Partial<Record<keyof StatBlock, number>>
   /**
+   * A flat percentage of haste, as a fraction — **not** haste rating.
+   *
+   * TBC's percentage haste effects do not go through the rating conversion at all: Bloodlust is 30%
+   * regardless of gear, and expressing it as rating would both scale wrongly and put a number on the
+   * always-visible stat rail that no item grants. It reaches attack speed and cast speed directly.
+   *
+   * Where the effect is a cooldown rather than an aura, this holds the **uptime-weighted** value and
+   * the entry says so, the same averaging item procs get.
+   */
+  hastePercent?: number
+  /**
+   * A flat multiplier on damage dealt, as a fraction — Ferocious Inspiration's 3%.
+   *
+   * Distinct from `statMultipliers` because it multiplies the *output*, not an input: there is no
+   * stat that "damage dealt" is, so there was nowhere to put this and buffs of this shape were all
+   * `notModelled`. School-scoped versions still are — Sanctity Aura's 10% is Holy only, and nothing
+   * here records a spell school.
+   */
+  damageMultiplier?: number
+  /**
    * Set on buffs whose whole value is something this app cannot express as a stat change — threat,
    * maximum health, resistances, damage multipliers, weapon procs and timed raid cooldowns. Holds
    * the real effect, so the buff can be listed and read without pretending it is being applied.
