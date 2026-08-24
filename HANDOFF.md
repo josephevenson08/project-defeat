@@ -188,7 +188,16 @@ says. Measured, with rank-1 BiS in every slot the list names:
 - **+ every Enhancement talent maxed: 522**, 38.8% crit, 11.8% miss
 
 **The inputs are fine** — 2,543 AP and 38.8% crit are realistic Phase 2 numbers — so this is the
-damage model, at about the 4x `featureFlags.ts` already advertises. `ROTATION-SCOPE.md` now carries
+damage model, at about the 4x `featureFlags.ts` already advertises.
+
+**Calibrated against a real parse the same day.** The repo owner supplied their own Hydross (SSC) log:
+116s, boss-only, **1,709.3 DPS**. Per-source, the model is 3.2x low on white damage, **5.7x low on
+Windfury**, 1.6x on Stormstrike, and models Earth Shock / Flame Shock / Fire Nova / Flamecap at zero
+(150.3 DPS, 8.8%, between them). Two mechanical facts came straight out of it: **Windfury is on both
+weapons** (two log rows at a 2:1 damage ratio, and no Flametongue at all), so the 36% two-imbue rate
+applies and off-hand Windfury is uncounted; and **Flurry runs at 94.16% uptime**, which is why real
+swing rate is 1.17/sec against the 1.10x multiplier the model produces. `ROTATION-SCOPE.md` carries
+the full table and the resulting order of work. `ROTATION-SCOPE.md` now carries
 the full breakdown; the headline is that **talents reach three fields out of twenty-one**, and
 **Shaman's Flurry is refused by name** for a rank-scale reason rather than a mechanism one, which
 makes it the biggest single item and a tractable one — the melee path already calls

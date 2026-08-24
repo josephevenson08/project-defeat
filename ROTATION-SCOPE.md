@@ -371,10 +371,72 @@ buffed are realistic Phase 2 figures. The gap is in the damage model, and it is 
 project already advertises — so the honest reading is that `featureFlags.ts` is right and the causes
 below are what "4x" is made of.
 
-**What a Phase 2 Enhancement shaman should actually read is itself worth sourcing before it is used
-as a target.** Community parses for T5-era Enhancement are commonly quoted around 1,100-1,400, with
-2,000+ belonging to the Sunwell era — but that is recollection, not a source, and this repo has a
-decision note about exactly that kind of number. Whatever the target, 522 is well under it.
+**The target is now sourced rather than recalled.** This section originally guessed "1,100-1,400 for
+T5, 2,000+ for Sunwell" from memory and flagged it as unsourced. A real parse supplied by the repo
+owner puts a Phase 2 Enhancement shaman at **1,709.3 DPS on Hydross** — see the calibration table
+below, which replaces the guess.
+
+### Calibrated against a real parse, 2026-08-23
+
+The repo owner supplied their own Warcraft Logs breakdown for **Hydross the Unstable, Serpentshrine
+Cavern** — 116 seconds, boss-only damage (the spawns are excluded in the table), 198.1k total,
+**1,709.3 DPS**. That is a real Phase 2 Enhancement shaman and it is the number to calibrate against,
+in place of the recollection this file previously carried.
+
+| Source | Parse DPS | Share | This model | Gap |
+| --- | --- | --- | --- | --- |
+| Melee (white) | 921.2 | 53.9% | ~286 | **3.2x** |
+| Windfury Attack (two lines) | 493.7 | 28.9% | 86.9 | **5.7x** |
+| Stormstrike (two lines) | 144.1 | 8.4% | 88.8 | 1.6x |
+| Earth Shock | 52.1 | 3.1% | 0 | not modelled |
+| Flame Shock | 50.9 | 3.0% | 0 | not modelled |
+| Fire Nova Totem | 38.5 | 2.3% | 0 | not modelled |
+| Flamecap Fire | 8.8 | 0.5% | 0 | not modelled |
+| **Total** | **1,709.3** | | **522** | **3.3x** |
+
+**Windfury is on both weapons, and there is no Flametongue at all.** The parse shows *two* separate
+`Windfury Attack` rows with average hits of 2.0k and 962.2 — a 2:1 ratio, which is main hand and off
+hand. Two consequences, both of which this repo currently gets wrong:
+
+- Upstream's **36%** proc chance for two imbued hands is the one that applies, not the 20% modelled.
+- **Off-hand Windfury attacks are real damage that is not counted at all.**
+
+The same shape appears on Stormstrike — two rows, 1.2k and 653.4 average — which is `hitsBothWeapons`
+working correctly, and is why Stormstrike is the closest source in the table at 1.6x. That is a useful
+control: where the two-weapon handling is already right, the residual gap is small.
+
+**Haste is the other half, and it compounds.** The parse lands **136 melee swings in 116 seconds** =
+**1.17 swings/sec**. Two 2.6s weapons unhasted give 0.77/sec, so the real multiplier is about
+**1.5x** against the **1.10** this model produces. The log says where it comes from:
+
+| Source | Uptime |
+| --- | --- |
+| Flurry | **94.16%** |
+| Mongoose (`Lightning Speed`), 10 procs | 53.48% |
+| Bloodlust | 34.51% |
+| Drums of Battle | 25.57% |
+
+**Flurry at 94% uptime is effectively permanent**, and it is the talent the ingest refuses by name.
+It scales white damage *and* the Windfury proc rate, so it is the single highest-leverage item in
+this file — one talent sitting underneath both of the two largest gaps.
+
+Melee crit in the parse is **50.0%** against 38.8% in the fully buffed and talented model.
+
+**Four abilities are modelled at zero and are worth 150.3 DPS together (8.8%)**: Earth Shock, Flame
+Shock, Fire Nova Totem and Flamecap Fire. Note that three of the four are *spell* damage on a melee
+spec, which runs into the missing spell school the same way stage 3 does.
+
+**Order of work this implies**, by leverage rather than by tidiness:
+
+1. **Flurry** — under both of the top two gaps.
+2. **Windfury on the off hand, at the 36% two-imbue rate** — 28.9% of real damage, currently 5.7x low.
+3. **Earth Shock and Flame Shock** — 6.1% together, and the honest start of "Enhancement presses more
+   than two buttons".
+4. **Elemental Weapons** — +13.33% per point to Windfury, which multiplies whatever item 2 fixes.
+
+One caveat kept deliberately: this is **one parse, on one fight, with visible downtime** — the DPS
+trace falls off after roughly 0:50. It is a far better target than recollection, and it is still a
+single sample. Numbers derived from it should say so.
 
 ### Talents reach three fields out of twenty-one
 
