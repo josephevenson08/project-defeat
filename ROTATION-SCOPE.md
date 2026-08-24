@@ -352,6 +352,63 @@ deliver most of the accuracy without it.
 
 ---
 
+## The measured gap, 2026-08-23 — where the missing DPS actually is
+
+The doc above reasons about rotations. This section is a **measurement**, prompted by the repo owner
+observing that a Phase 2 BiS Enhancement shaman should read far higher than the app says.
+
+Reproduce it by equipping the rank-1 entry of `requireBisList('Shaman', 'Enhancement')` into every
+slot it names, then running `calculateStats` / `calculateSimulation` with progressively more input:
+
+| Setup | DPS | Attack power | Crit | Miss |
+| --- | --- | --- | --- | --- |
+| BiS gear only | 245 | 1,214 | 17.4% | 19% |
+| + all 33 raid buffs and all 31 consumables | 437 | 2,543 | 33.8% | 17.8% |
+| + every Enhancement talent at max rank | **522** | 2,543 | 38.8% | 11.8% |
+
+**The inputs are not the problem, and that is the finding.** 2,543 attack power and 38.8% crit fully
+buffed are realistic Phase 2 figures. The gap is in the damage model, and it is roughly the 4x this
+project already advertises — so the honest reading is that `featureFlags.ts` is right and the causes
+below are what "4x" is made of.
+
+**What a Phase 2 Enhancement shaman should actually read is itself worth sourcing before it is used
+as a target.** Community parses for T5-era Enhancement are commonly quoted around 1,100-1,400, with
+2,000+ belonging to the Sunwell era — but that is recollection, not a source, and this repo has a
+decision note about exactly that kind of number. Whatever the target, 522 is well under it.
+
+### Talents reach three fields out of twenty-one
+
+With every Enhancement talent maxed, `deriveTalentModifiers` moves exactly three values:
+`meleeCritChance 0.05` (Thundering Strikes), `meleeHitChance 0.06` (Dual Wield Specialization) and
+`physicalDamageMultiplier 1.1` (Weapon Mastery). Everything else in the tree reaches nothing.
+
+- **Flurry is refused by name**, and the recorded reason is specific: *"Shaman has its own Flurry at a
+  different rank scale; the analytic derivation is Warrior-shaped."* Warrior's Flurry is modelled and
+  the melee path already calls `flurrySpeedMultiplier`, so this is a **rank-scale problem rather than
+  a mechanism problem** — the single biggest item on this list, at +30% melee attack speed for 5/5.
+- **Elemental Weapons reaches nothing**, which is already recorded against the Windfury work: it
+  multiplies Windfury damage by 13.33% per point, so 5/5 would take that 86.9 DPS to roughly 144.
+- **Unleashed Rage reaches nothing.** Attack power is identical with and without talents, which is the
+  tell — a +10% attack power talent that moves attack power by zero.
+
+### Mechanics that are not modelled at all
+
+- **Flametongue Weapon.** Enhancement runs Windfury main-hand and Flametongue off-hand; only the
+  first exists. `weaponImbues.ts` is the right home and the shape is already there.
+- **Windfury is main-hand only.** Upstream uses a **36%** proc chance when both hands are imbued
+  against the 20% modelled here, so a two-imbue build is understated twice over.
+- **Earth Shock and Lightning Shield.** Real Enhancement presses both; the single-ability
+  approximation covers neither.
+
+### A stale refusal reason, which is a bug rather than a gap
+
+Two Shaman refusals read *"Spell-side talents, and `calculateCasterDps` takes no talents yet."* That
+stopped being true on **2026-08-19**, when all four role paths were given `TalentModifiers`. There is
+a test named *"no talent is refused for a reason the code no longer has"* and it does not catch this
+one, which makes the test the more interesting half of the finding.
+
+---
+
 ## Consequences worth deciding before, not during
 
 - **The `featureFlags.ts` claim moves the moment stage 1 lands.** It currently says "Rotations cover 2

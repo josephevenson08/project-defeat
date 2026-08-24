@@ -178,6 +178,29 @@ Command is not implemented upstream at all, so it has one source and no invented
   being read. Twenty-one markers across four ability files; the oldest predates this session by
   months.
 
+### 9. The DPS gap was measured, and it is talents plus imbues rather than rotations alone
+
+Prompted by the repo owner: a Phase 2 BiS Enhancement shaman should read far higher than the app
+says. Measured, with rank-1 BiS in every slot the list names:
+
+- **BiS gear only: 245 DPS**, 1,214 attack power
+- **+ all 33 buffs and all 31 consumables: 437**, 2,543 attack power, 33.8% crit
+- **+ every Enhancement talent maxed: 522**, 38.8% crit, 11.8% miss
+
+**The inputs are fine** — 2,543 AP and 38.8% crit are realistic Phase 2 numbers — so this is the
+damage model, at about the 4x `featureFlags.ts` already advertises. `ROTATION-SCOPE.md` now carries
+the full breakdown; the headline is that **talents reach three fields out of twenty-one**, and
+**Shaman's Flurry is refused by name** for a rank-scale reason rather than a mechanism one, which
+makes it the biggest single item and a tractable one — the melee path already calls
+`flurrySpeedMultiplier`.
+
+Also unmodelled: Flametongue Weapon, Windfury on the off hand (upstream uses **36%** when both hands
+are imbued, against the 20% modelled), Earth Shock and Lightning Shield.
+
+**And one actual bug:** two Shaman talent refusals still say `calculateCasterDps` "takes no talents
+yet", which stopped being true on 2026-08-19. The test named *"no talent is refused for a reason the
+code no longer has"* does not catch it, which is the more interesting half.
+
 ### What is left
 
 1. **Rotation stage 3, then 4.** Stage 3 is DoT uptime — Affliction and Shadow, plus **Feral's
