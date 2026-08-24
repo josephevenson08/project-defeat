@@ -274,11 +274,32 @@ entries" to "prove the swap is a gain", and it applies to stage 4 too.
   adding together and neither is worth adding alone. A test pins the per-energy comparison so this is
   not rediscovered by someone adding Mangle helpfully.
 
-- **Retribution needs a type change, not an entry**, and its own notes already said so before this
-  pass. Judgement of Blood is the one genuinely computable addition — 10s cooldown, and it does not
-  even trigger the GCD — but it is **Holy-school damage scaling off spell power while rolling crit off
-  the melee table**, so it is neither a clean `Melee Special` nor a clean `Direct Damage`. Adding it
-  today is data nothing consumes.
+- ~~**Retribution needs a type change**, not an entry.~~ **Done 2026-08-23, and it needed neither.**
+  The predicted blocker was that Judgement is "neither a clean `Melee Special` nor a clean
+  `Direct Damage`" — true, and it turned out not to matter, because the answer was not to widen
+  `AbilityEffectType` at all. Ret's Holy damage lives in `domain/simulation/paladinSeals.ts`, the same
+  shape `weaponImbues.ts` uses, and `resolveRotation` was not touched.
+
+  **The bigger finding is that the judgement was never the main event.** The seal is: Seal of Blood
+  adds 35% of weapon damage to **every** landed white hit, and Seal of Command 70% at 7 PPM. Together
+  with the judgement that is **112.5 DPS to a Horde Ret and 70.6 to an Alliance one** — more than half
+  of what the spec does, and the reason its own notes calling Ret "the spec where the special-attack
+  share of damage is smallest" was true and misleading. The missing share was not special-attack
+  damage.
+
+  **It is faction-split and the gap is enormous.** Seal of Blood is a Blood Elf spell, Horde-only in
+  Phase 2 before 2.4 gave Alliance the identical Seal of the Martyr. Judgement of Blood deals 295-325;
+  Judgement of Command deals 68-73. Modelling one seal for both factions would have been wrong by
+  about a factor of four on that component, so the model reads `character.faction`.
+
+  **Holy damage is not reduced by armor**, which is the first unmitigated damage on the physical path.
+  `calculatePhysicalDps` now adds it after mitigation rather than inside it; folding it into `rawDps`
+  like every other source would have quietly shaved ~42% off it against this app's own target. A test
+  moves the target's armor with debuffs and asserts the physical rows move while the Holy rows do not.
+
+  Two claims in the repo's own notes were wrong and are corrected: the judgement **does** trigger the
+  GCD, and Judgement of Command is not implemented by upstream at all, so its numbers come from the
+  Seal of Command tooltip with no second source and no spell-power coefficient applied.
 
 - ~~**Enhancement's gap is not a button at all.**~~ **Done 2026-08-23.** Its notes said the spec is
   dominated by **Windfury Weapon procs on white swings**, and the model counted none of them. A
@@ -309,8 +330,13 @@ entries" to "prove the swap is a gain", and it applies to stage 4 too.
 type change (hybrid Holy-off-melee-crit, for Retribution), and one item that is really stage 3
 (bleeds, for Feral). None of it is "sampleSignatureAbilities entries plus sourcing".
 
-**The mechanism landed 2026-08-23.** What remains of stage 2 is the Retribution type change, and
-Feral's bleeds, which belong to stage 3.
+**Both landed 2026-08-23**, and neither was what this section predicted: Enhancement needed a
+proc model rather than buttons, and Retribution needed a damage *school* rather than a type change.
+**Stage 2 is closed.** What was filed under it for Feral is really stage 3, since bleeds are the
+prerequisite for its second button being worth anything.
+
+**The one prediction that held is the warning at the top of this file** — that the tiering was
+unsourced judgement and at least one entry would be wrong. Every entry was.
 
 **Stage 3 — DoT uptime for casters.** Affliction and Shadow, which are where the caster estimate is
 worst. This needs a genuinely new piece: a concurrent-DoT uptime model, plus a filler that fits in

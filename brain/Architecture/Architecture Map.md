@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-156 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+157 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,7 +16,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 41 importers
+- [[domain.character.characterTypes]] — 42 importers
 - [[domain.gear.itemTypes]] — 26 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 16 importers
@@ -95,7 +95,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (106)
+### domain (107)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -127,7 +127,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
-- [[domain.character.characterTypes]] · 41 importers
+- [[domain.character.characterTypes]] · 42 importers
 - [[domain.character.classColors]] · 2 importers
 - [[domain.character.races]] · 3 importers
 - [[domain.character.racialTypes]] · 2 importers
@@ -188,6 +188,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.damageFormulas]] · 1 importers
 - [[domain.simulation.encounterTypes]] · 5 importers
 - [[domain.simulation.manaModel]] · 1 importers
+- [[domain.simulation.paladinSeals]] · 1 importers
 - [[domain.simulation.rageModel]] · 1 importers
 - [[domain.simulation.sampleEncounters]] · 3 importers
 - [[domain.simulation.specialAttacks]] · 1 importers

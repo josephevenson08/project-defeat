@@ -21,6 +21,7 @@ import {
 } from '../../domain/simulation/specialAttacks'
 import type { WeaponDamageProfile } from '../../domain/simulation/specialAttacks'
 import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simulation/weaponImbues'
+import { estimatePaladinHolyDamage } from '../../domain/simulation/paladinSeals'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -619,6 +620,12 @@ function calculatePhysicalDps(
   // Windfury is white damage rather than a special, so it is folded into `rawDps` inside the melee
   // branch and kept here only so the breakdown and the summary can name what it contributed.
   let windfury: ReturnType<typeof estimateWindfury> | undefined
+  /*
+   * Retribution's seal and judgement, which are **Holy** and therefore not reduced by armor. Kept out
+   * of `rawDps` for exactly that reason: everything in `rawDps` gets mitigated once at the end, and
+   * this must not be.
+   */
+  let paladinHoly: ReturnType<typeof estimatePaladinHolyDamage> | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -779,6 +786,27 @@ function calculatePhysicalDps(
       rawDps += windfury.dps
     }
 
+    /*
+     * Retribution's Holy damage: the seal on every landed swing, and the judgement on its cooldown.
+     *
+     * Gated on the class rather than the spec for the same reason Windfury is: Retribution is the
+     * only Paladin spec that reaches this branch, since Holy is a Healer and Protection a Tank.
+     *
+     * **Faction decides which seal, and the gap is enormous.** Seal of Blood is a Blood Elf spell, so
+     * Horde only in Phase 2 — Judgement of Blood hits for 295-325 against Judgement of Command's
+     * 68-73. Modelling one for both factions would have been wrong by a factor of four.
+     */
+    if (character.className === 'Paladin' && mainHandItem) {
+      paladinHoly = estimatePaladinHolyDamage({
+        faction: character.faction,
+        mainHandSwingsPerSecond,
+        landedFraction: fullTable.hit + fullTable.crit + fullTable.glance + fullTable.block,
+        mainHandSwingDamage,
+        spellPower: stats.spellPower,
+        critChance: fullTable.crit,
+      })
+    }
+
     const mainHandRageInput = {
       damagePerLandedSwing: mainHandSwingDamage * (1 - armorMitigation),
       swingsPerSecond: mainHandSwingsPerSecond,
@@ -877,7 +905,14 @@ function calculatePhysicalDps(
   )
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
-  const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation)
+  /*
+   * Armor reduces physical damage and nothing else, so the Holy total is added **after** mitigation
+   * rather than inside it. Before Retribution's seals existed every damage source on this path was
+   * physical and the distinction could not arise; folding Holy damage into `rawDps` would have
+   * quietly shaved a third off it against a raid boss.
+   */
+  const unmitigatedDps = paladinHoly?.totalDps ?? 0
+  const mitigatedDps = (rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps
 
   for (const entry of rotation.specials) {
     breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
@@ -887,6 +922,15 @@ function calculatePhysicalDps(
   // the priority is worth anything, so a reader can see why it contributes what it does.
   if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
+  }
+
+  /*
+   * Named individually rather than as one "Holy damage" line, because which seal a paladin is running
+   * is a faction fact a reader will want to see stated rather than inferred from a number.
+   */
+  if (paladinHoly && paladinHoly.totalDps > 0) {
+    breakdown.push({ label: `${paladinHoly.sealName} DPS`, value: round(paladinHoly.sealDps) })
+    breakdown.push({ label: `${paladinHoly.judgementName} DPS`, value: round(paladinHoly.judgementDps) })
   }
 
   /*
@@ -920,6 +964,10 @@ function calculatePhysicalDps(
     : ''
   const excludedNote = rotation.excluded.length > 0 ? ` ${describeUnmodelledSpecials(character, rotation.excluded)}` : ''
 
+  const holySummary = paladinHoly
+    ? ` ${paladinHoly.sealName} rides every landed swing and ${paladinHoly.judgementName} lands on its 10s cooldown; both are Holy, so armor does not reduce them. Which seal you get is decided by faction — Seal of Blood is Horde-only in Phase 2.`
+    : ''
+
   const specialSummary =
     rotation.specials.length > 0
       ? ` Layered on top: ${modelled}, using the special-attack table (no glancing blows, and no dual-wield miss penalty).${gcdNote}${excludedNote}`
@@ -932,7 +980,7 @@ function calculatePhysicalDps(
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
-    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}`,
+    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}${holySummary}`,
     breakdown,
   }
 }

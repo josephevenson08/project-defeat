@@ -50,6 +50,7 @@ _None._
 - [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 - [[domain.tierlists.tierListTypes]] — `src/domain/tierlists/tierListTypes.ts`

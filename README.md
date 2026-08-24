@@ -168,6 +168,12 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   Warrior**, which press Whirlwind alongside their signature button against a shared global-cooldown
   budget. Every other spec still models a single ability, so melee specs remain understated by
   differing amounts.
+- **Retribution's Holy damage is modelled and is faction-split.** Seal of Blood adds 35% of weapon
+  damage to every landed swing, Seal of Command 70% at 7 procs per minute, and the judgement lands on
+  a 10s cooldown. Seal of Blood is Horde-only in Phase 2, and the difference is large — Judgement of
+  Blood deals 295-325 against Judgement of Command's 68-73 — so the estimate reads the character's
+  faction. **Holy damage is not reduced by armor**, which makes it the only unmitigated damage on the
+  physical path.
 - **Windfury Weapon is modelled for Enhancement**, as a proc against the main-hand swing rate rather
   than as an ability — 20% per landed swing, capped by a 3-second internal cooldown, two extra
   attacks at +475 attack power. The main hand is *assumed* to carry the imbue, since the app has no

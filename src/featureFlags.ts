@@ -55,6 +55,15 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
  *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
  *   is the size of the hole a filter literal was hiding.
+ * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
+ *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
+ *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**
+ *   — Judgement of Blood deals 295-325 where Judgement of Command deals 68-73 — so the model reads
+ *   `character.faction`. Worth **112.5 DPS to a Horde Ret and 70.6 to an Alliance one**, which is more
+ *   than half of what the spec does.
+ * - **Holy damage is the one thing on the physical path that armor does not reduce**, and it is added
+ *   after mitigation rather than inside it. Nothing else on that path is unmitigated today; anything
+ *   added later that is not physical has to make the same distinction or it loses ~42% silently.
  * - **Windfury Weapon is modelled for Enhancement, and it is not an ability.** It is a proc against
  *   the main-hand swing rate — 20% per landed swing, capped by a 3s internal cooldown, two extra
  *   attacks at +475 attack power — folded into white damage rather than layered as a special. Worth

@@ -12,6 +12,23 @@ type SimulatorPanelProps = {
   onRun: () => void
 }
 
+/**
+ * Renders the `**bold**` the researched notes are written with.
+ *
+ * These strings are authored as prose with emphasis — "**Feral Attack Power**", "**armor does not
+ * reduce it**" — and were rendered as plain text, so a player read the asterisks. Twenty-one markers
+ * across four ability files, some of them years-old and none of them ever visible as emphasis.
+ *
+ * Deliberately **not** a markdown renderer. It handles exactly one construct, splits on a literal
+ * delimiter, and cannot emit HTML from the string — anything else in the prose stays literal, which
+ * is the right trade for text that is authored in this repo rather than supplied by anyone.
+ */
+function withEmphasis(text: string) {
+  // Odd indexes are the spans that sat between a pair of markers. An unpaired trailing `**` therefore
+  // lands on an even index and renders as plain text rather than swallowing the rest of the note.
+  return text.split('**').map((part, index) => (index % 2 === 1 ? <strong key={index}>{part}</strong> : part))
+}
+
 export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
   useEffect(() => {
     if (result) animateResultCard('.simulation-result')
@@ -48,7 +65,7 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
           */}
           {result.specNote && (
             <p className="simulation-spec-note" data-testid="simulation-spec-note">
-              <strong>What this estimate misses for your spec:</strong> {result.specNote}
+              <strong>What this estimate misses for your spec:</strong> {withEmphasis(result.specNote)}
             </p>
           )}
 
@@ -59,7 +76,7 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
           */}
           {result.unmodelledTalentNote && (
             <p className="simulation-spec-note" data-testid="simulation-talent-note">
-              <strong>Talents you have spent that this cannot model:</strong> {result.unmodelledTalentNote}
+              <strong>Talents you have spent that this cannot model:</strong> {withEmphasis(result.unmodelledTalentNote)}
             </p>
           )}
 

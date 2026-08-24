@@ -395,6 +395,10 @@ import {
 } from '../src/domain/simulation/rageModel'
 import { getRotationAbilities } from '../src/domain/abilities'
 import {
+  SEAL_OF_COMMAND_PROCS_PER_MINUTE,
+  estimatePaladinHolyDamage,
+} from '../src/domain/simulation/paladinSeals'
+import {
   WINDFURY_BONUS_ATTACK_POWER,
   WINDFURY_EXTRA_ATTACKS,
   WINDFURY_INTERNAL_COOLDOWN_SECONDS,
@@ -4687,6 +4691,154 @@ test('Windfury is bounded by the swing rate and by its internal cooldown, whiche
 
   // And the bonus attack power is the rank 5 figure, not the relic-boosted one.
   expect(WINDFURY_BONUS_ATTACK_POWER, 'Totem of the Astral Winds raises this to 555 and is not modelled').toBe(475)
+})
+
+test('a Retribution paladin is paid for the Holy damage that is most of their output', () => {
+  /*
+   * The spec's own notes said it before this existed: "Retribution's actual damage is dominated by
+   * auto attacks with Seal of Blood (Horde) or Seal of Command (Alliance) proccing on them, plus
+   * Judgement on cooldown". None of it was counted, and the same notes called Ret "the physical spec
+   * where the special-attack share of damage is smallest" without noticing that the missing share was
+   * not special-attack damage at all.
+   */
+  const forFaction = (faction: 'Alliance' | 'Horde', race: TbcRace) => {
+    const character: CharacterProfile = { faction, race, className: 'Paladin', spec: 'Retribution' }
+    const gear = normalizeGearForCharacter(defaultGear, 'Paladin', 'Retribution')
+    return calculateSimulation(character, gear, calculateStats(character, gear), 'Physical DPS')
+  }
+
+  const horde = forFaction('Horde', 'Blood Elf')
+  const alliance = forFaction('Alliance', 'Human')
+
+  // Each faction is told which seal it is actually running, rather than a generic "Holy damage" row.
+  expect(horde.breakdown.some((entry) => entry.label === 'Seal of Blood DPS')).toBe(true)
+  expect(horde.breakdown.some((entry) => entry.label === 'Judgement of Blood DPS')).toBe(true)
+  expect(alliance.breakdown.some((entry) => entry.label === 'Seal of Command DPS')).toBe(true)
+  expect(alliance.breakdown.some((entry) => entry.label === 'Judgement of Command DPS')).toBe(true)
+
+  // And never the other faction's seal, which is the whole point of splitting them.
+  expect(alliance.breakdown.some((entry) => /Blood/.test(entry.label))).toBe(false)
+  expect(horde.breakdown.some((entry) => /Command/.test(entry.label))).toBe(false)
+
+  /*
+   * The gap is enormous and it is real: Judgement of Blood deals 295-325 where Judgement of Command
+   * deals 68-73, which is why Horde Retribution led for the whole of early TBC. Modelling one seal
+   * for both factions would have been wrong by roughly a factor of four on that component.
+   */
+  const judgement = (result: typeof horde, label: string) =>
+    result.breakdown.find((entry) => entry.label === label)!.value
+
+  expect(judgement(horde, 'Judgement of Blood DPS')).toBeGreaterThan(
+    judgement(alliance, 'Judgement of Command DPS') * 3,
+  )
+  expect(horde.scoreExact, 'and it reaches the headline').toBeGreaterThan(alliance.scoreExact)
+})
+
+test('Holy damage is not reduced by armor, and the physical damage beside it still is', () => {
+  /*
+   * The invariant this whole change turns on, and the one that would have been silently wrong if the
+   * seal had been folded into `rawDps` like every other damage source on this path: **armor reduces
+   * physical damage and nothing else**. Against this app's own target that is a ~42% difference.
+   *
+   * Asserted by moving the target's armor rather than by reading the code — three armor debuffs
+   * strip 4,010 points, so the physical rows must move and the Holy rows must not.
+   */
+  const character: CharacterProfile = { faction: 'Horde', race: 'Blood Elf', className: 'Paladin', spec: 'Retribution' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Paladin', 'Retribution')
+  const stats = calculateStats(character, gear)
+
+  const bare = calculateSimulation(character, gear, stats, 'Physical DPS')
+  const sundered = calculateSimulation(character, gear, stats, 'Physical DPS', [
+    'sunder-armor',
+    'curse-of-recklessness',
+    'faerie-fire',
+  ])
+
+  const row = (result: typeof bare, label: string) => result.breakdown.find((entry) => entry.label === label)!.value
+
+  // The armor debuffs did what they say, so this is a real comparison rather than two identical runs.
+  expect(row(sundered, 'Armor mitigation')).toBeLessThan(row(bare, 'Armor mitigation'))
+
+  // Physical: Crusader Strike lands harder through thinner armor.
+  expect(row(sundered, 'Crusader Strike DPS')).toBeGreaterThan(row(bare, 'Crusader Strike DPS'))
+
+  // Holy: identical, because armor was never touching it.
+  expect(row(sundered, 'Seal of Blood DPS'), 'Holy damage ignores armor entirely').toBe(
+    row(bare, 'Seal of Blood DPS'),
+  )
+  expect(row(sundered, 'Judgement of Blood DPS')).toBe(row(bare, 'Judgement of Blood DPS'))
+
+  // And the summary says so, since a number that behaves differently needs to explain itself.
+  expect(bare.summary).toMatch(/armor does not reduce them/i)
+})
+
+test('a procs-per-minute rate is normalised for weapon speed, and is not multiplied by it again', () => {
+  /*
+   * The easy way to get PPM wrong. Chance per swing is `PPM * speed / 60`, so the rate per second is
+   * `PPM / 60` whatever is equipped — multiplying by the swing rate as well would hand a fast weapon
+   * a proc rate it does not have. Seal of Command is the only PPM effect in this simulator, so the
+   * unit is pinned here rather than left implicit.
+   */
+  const base = {
+    faction: 'Alliance' as const,
+    landedFraction: 1,
+    mainHandSwingDamage: 1000,
+    spellPower: 0,
+    critChance: 0,
+  }
+
+  const slow = estimatePaladinHolyDamage({ ...base, mainHandSwingsPerSecond: 1 / 3.6 })
+  const fast = estimatePaladinHolyDamage({ ...base, mainHandSwingsPerSecond: 1 / 1.8 })
+  expect(fast.sealDps, 'a faster weapon does not proc Seal of Command more often').toBe(slow.sealDps)
+
+  // The rate itself: 7 PPM at full landing is 7/60 procs per second, at 70% of a 1000 swing.
+  expect(slow.sealDps).toBeCloseTo((SEAL_OF_COMMAND_PROCS_PER_MINUTE / 60) * 1000 * 0.7, 6)
+
+  /*
+   * Seal of Blood is the opposite shape and must scale with the swing rate, because it fires on every
+   * landed hit rather than on a proc. Asserting both together is what keeps the two from being
+   * "simplified" into one code path later.
+   */
+  const hordeSlow = estimatePaladinHolyDamage({ ...base, faction: 'Horde', mainHandSwingsPerSecond: 1 / 3.6 })
+  const hordeFast = estimatePaladinHolyDamage({ ...base, faction: 'Horde', mainHandSwingsPerSecond: 1 / 1.8 })
+  expect(hordeFast.sealDps).toBeCloseTo(hordeSlow.sealDps * 2, 6)
+
+  // A swing that never lands carries no Holy damage with it, for either seal.
+  const whiffing = estimatePaladinHolyDamage({ ...base, mainHandSwingsPerSecond: 1, landedFraction: 0 })
+  expect(whiffing.sealDps).toBe(0)
+  // The judgement is on a cooldown rather than a swing, so it keeps going regardless.
+  expect(whiffing.judgementDps).toBeGreaterThan(0)
+})
+
+test('the emphasis in a spec note renders as emphasis, not as asterisks', async ({ page }) => {
+  /*
+   * The researched notes are authored with `**bold**` and were rendered as plain text, so a player
+   * read the asterisks. A small thing, on the one surface whose entire job is being read — and the
+   * oldest of them ("**Feral Attack Power**") had been sitting there since the Feral weapon model
+   * was written.
+   *
+   * Retribution is the note with the most of them, and the one a reader is most likely to need,
+   * because Holy damage behaving differently from everything else on the page has to explain itself.
+   */
+  await openApp(page)
+  await page.getByLabel('Class').selectOption('Paladin')
+  await page.getByLabel('Specialization').selectOption('Retribution')
+
+  await runSimulation(page)
+
+  const note = page.getByTestId('simulation-spec-note')
+  await expect(note).toBeVisible()
+  await expect(note, 'the note really is the Retribution one').toContainText(/Crusader Strike/i)
+  await expect(note, 'no raw markers reach the reader').not.toContainText('**')
+  await expect(note.locator('strong'), 'and the emphasis is real markup').not.toHaveCount(0)
+
+  /*
+   * The assertion above would pass just as happily on a note with no emphasis in it, so this pins
+   * that there was something to render. Exactly two specs carry emphasis today; the count is
+   * deliberately not asserted, because adding emphasis to a note should not fail a test.
+   */
+  const authored = getSignatureAbility('Paladin', 'Retribution')?.notes ?? ''
+  expect(authored, 'the source note is authored with emphasis').toContain('**')
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
