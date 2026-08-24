@@ -7,14 +7,17 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Start here (2026-08-23)
 
-**All four queued items were opened, three closed outright, and the fourth advanced two stages.**
-`39758d9..HEAD`, eleven commits, 192 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain
-idempotent, all on `origin/main`.
+**All four queued items are closed, and the simulation rebuild is through stage 2.** `39758d9..HEAD`,
+fourteen commits, 196 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent,
+all on `origin/main`.
 
-On `ROTATION-SCOPE.md`: **stage 1 is done** (hunters), **stage 2 was re-scoped rather than built**
-because none of its four specs survived contact, and then **the one real mechanism inside it was
-built** (Windfury, for Enhancement). What is left of stage 2 is the Retribution type change; Feral
-turns out to belong to stage 3.
+On `ROTATION-SCOPE.md`: **stage 1 done** (hunters), **stage 2 re-scoped and then closed** — none of
+its four specs was what the doc predicted, and the two in-scope ones were built as mechanisms rather
+than as ability entries. **Stage 3 is next**, and Feral's bleeds moved into it.
+
+**The physical DPS numbers moved a lot this session, deliberately.** Hunter +174 DPS, Enhancement
++25.8, Retribution +112.5 (Horde) / +70.6 (Alliance). All three were damage the model was simply not
+counting, and all three change stat weights and upgrade rankings with them.
 
 ### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
 
@@ -141,18 +144,54 @@ Windfury by 13.33% per point upstream but has no ingested talent effect here.
 appears for an Enhancement shaman too, because Stormstrike is mana-costed — correct behaviour, but
 three docs described the disclosure as a hunter thing. Corrected, and pinned by a test on both paths.
 
+### 7. Retribution's Holy damage — stage 2 closed, and the prediction was wrong again
+
+**The seal is where Ret's damage is, not the judgement.** Seal of Blood adds 35% of weapon damage to
+**every** landed white hit; Seal of Command adds 70% at 7 PPM. With the judgement that is **112.5 DPS
+Horde / 70.6 Alliance**, on a spec that was reading about 197.
+
+**It needed neither a type change nor an entry**, which is what the scope doc predicted. A seal is a
+30s self-buff riding on white hits — the repo's notes said these "do not fit this schema at all" and
+stopped there, which is true of `SignatureAbility` and not of the simulator. It lives in
+`domain/simulation/paladinSeals.ts` and `resolveRotation` was untouched.
+
+**Faction-split, and the gap is a factor of four.** Seal of Blood is Horde-only in Phase 2. Judgement
+of Blood deals 295-325; Judgement of Command deals 68-73. The model reads `character.faction`.
+
+**Holy damage is not reduced by armor** — the first unmitigated damage on the physical path, added
+after mitigation rather than inside it. Anything non-physical added later must make the same
+distinction or it loses ~42% silently. A test moves target armor and asserts the physical rows move
+while the Holy rows do not.
+
+Two of the repo's own claims corrected: the judgement **does** trigger the GCD, and Judgement of
+Command is not implemented upstream at all, so it has one source and no invented coefficient.
+
+### 8. Two defects found by driving the app rather than reading it
+
+- **The hidden hover card scrolled the page sideways at phone width.** `visibility: hidden` suppresses
+  painting, not scrollable overflow, so an absolutely positioned card at `left: 100%` extended the
+  document to 534px against a 375px viewport. `display: none` now, with `allow-discrete` keeping the
+  fade. The reflow test missed it because it never filled a seat. **And a cascade trap:** the phone
+  override first went in ~90 lines *before* the rules it overrides, so at equal specificity it
+  silently did nothing.
+- **`**bold**` in the researched notes rendered as literal asterisks** on the one surface whose job is
+  being read. Twenty-one markers across four ability files; the oldest predates this session by
+  months.
+
 ### What is left
 
-1. **Rotation stages 2-4, as rewritten.** Stage 2 is down to the **Retribution type change** —
-   Judgement of Blood is Holy damage off spell power rolling crit on the melee table, so it is
-   neither a clean `Melee Special` nor a clean `Direct Damage`. Feral's bleeds moved to stage 3, which
-   is DoT uptime for Affliction and Shadow and runs into the missing spell school. Stage 4 is combo
-   points and needs a type change. **Do not build a general engine for all 27** — the doc argues that
-   case and it still holds.
-2. **The greedy-budget rule now applies to stage 4 as well.** A shared budget is spent in priority
-   order, so a second same-resource ability moves damage rather than adding it. Rogue is entirely
+1. **Rotation stage 3, then 4.** Stage 3 is DoT uptime — Affliction and Shadow, plus **Feral's
+   bleeds**, which moved here because Rake is the prerequisite for Mangle being worth anything. It is
+   the first stage that needs a genuinely new mechanism, and it runs into the missing spell school.
+   Stage 4 is combo points and needs a type change. **Do not build a general engine for all 27** — the
+   doc argues that case and it still holds.
+2. **The greedy-budget rule applies to stage 4.** A shared budget is spent in priority order, so a
+   second same-resource ability moves damage rather than adding it. Rogue is entirely
    builder/finisher on one energy pool, so that stage has to prove the swap is a gain, not just
    source the abilities.
+3. **Spell school is now blocking three separate things** — school-scoped debuffs (Winter's Chill),
+   per-spell caster talents, and stage 3's DoTs. It has gone from a caveat to a prerequisite, and is
+   worth pricing as its own piece of work rather than discovering inside stage 3.
 2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
    sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
    per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
@@ -801,7 +840,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 192 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 196 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
