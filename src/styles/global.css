@@ -4332,19 +4332,42 @@ input[type='text']:focus {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.5);
-  /* Hidden rather than absent so it costs no layout and needs no JS state. */
+  /*
+   * Hidden rather than unmounted, so it needs no JS state — but `display: none` rather than
+   * `visibility: hidden`, and the difference is a real bug rather than a preference.
+   *
+   * The comment here used to say hiding it "costs no layout". That is true of *flow* layout and
+   * false of scrollable overflow: an absolutely positioned box at `left: 100%` still extends the
+   * document's scroll area even while invisible. At phone width every filled seat therefore pushed a
+   * 190px card past the right edge, and the page scrolled sideways with nothing visible out there —
+   * `scrollWidth` 534 against a 375 client width.
+   */
+  display: none;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity 90ms ease;
+  /*
+   * `allow-discrete` keeps the 90ms fade despite `display` being a discrete property. Where it is not
+   * supported the card simply appears instantly, which is the right way round for this to degrade.
+   */
+  transition:
+    opacity 90ms ease,
+    display 90ms allow-discrete;
 }
 
 /* `focus-within` as well as hover, so the card is reachable by keyboard —
    every seat already contains focusable buttons. */
 .raidcomp-seat:hover .raidcomp-seat-card,
 .raidcomp-seat:focus-within .raidcomp-seat-card {
+  display: block;
   opacity: 1;
-  visibility: visible;
+}
+
+/* The fade needs a start value now that the card enters from `display: none`. */
+@starting-style {
+  .raidcomp-seat:hover .raidcomp-seat-card,
+  .raidcomp-seat:focus-within .raidcomp-seat-card {
+    opacity: 0;
+  }
 }
 
 /* The last column would push its card off-screen; flip it to the left side. */
@@ -4381,6 +4404,33 @@ input[type='text']:focus {
   font-size: 12px;
   color: var(--text);
   line-height: 1.6;
+}
+
+/*
+ * Phone width: the card goes under the seat rather than beside it.
+ *
+ * Beside it there is nowhere to go — 190px of card against a 375px viewport puts most of it
+ * off-screen even when it is meant to be visible, and an open card scrolled the page sideways for
+ * the same reason the hidden one did. The `:last-child` flip that serves the rightmost column on
+ * desktop is undone here, since there are no columns to be rightmost of.
+ *
+ * **This block must stay after the base rules above.** The first version of it sat with the other
+ * raidcomp breakpoints ~90 lines earlier, which put it *before* `.raidcomp-seat-card` in the file —
+ * same specificity, so the base `left: 100%` won and the override silently did nothing.
+ */
+@media (max-width: 700px) {
+  .raidcomp-seat-card,
+  .raidcomp-group:last-child .raidcomp-seat-card {
+    left: 0;
+    right: auto;
+    top: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 6px;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 .raidcomp-seat-card img {

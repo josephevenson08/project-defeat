@@ -5774,11 +5774,33 @@ test('the layout reflows to phone width without overflowing', async ({ page }) =
   await page.setViewportSize({ width: 375, height: 812 })
   await openApp(page, 'raidcomp')
 
-  const overflow = await page.evaluate(() => ({
-    client: document.documentElement.clientWidth,
-    scroll: document.documentElement.scrollWidth,
-  }))
-  expect(overflow.scroll, 'no horizontal scroll at 375px').toBeLessThanOrEqual(overflow.client)
+  const overflow = async () =>
+    page.evaluate(() => ({
+      client: document.documentElement.clientWidth,
+      scroll: document.documentElement.scrollWidth,
+    }))
+
+  const empty = await overflow()
+  expect(empty.scroll, 'no horizontal scroll at 375px').toBeLessThanOrEqual(empty.client)
+
+  /*
+   * **With a seat filled**, which is what this test missed for as long as it existed. An empty
+   * roster has no seat cards, and the card is the thing that overflowed: absolutely positioned at
+   * `left: 100%`, it extended the document scroll area to 534px even while invisible, because
+   * `visibility: hidden` suppresses painting and not scrollable overflow.
+   */
+  await page.getByTestId('raidcomp-add-druid-dreamstate').click()
+  await expect(page.locator('.raidcomp-seat-card')).toHaveCount(1)
+
+  const filled = await overflow()
+  expect(filled.scroll, 'a hidden hover card must not widen the page').toBeLessThanOrEqual(filled.client)
+
+  // And it still must not, once the card is actually shown — on a phone it sits under the seat.
+  await page.locator('.raidcomp-seat-body').first().hover()
+  await expect(page.locator('.raidcomp-seat-card').first()).toBeVisible()
+
+  const hovered = await overflow()
+  expect(hovered.scroll, 'nor when it is open').toBeLessThanOrEqual(hovered.client)
 })
 
 test('a seat shows everything that player brings, including what the group row cannot', () => {
@@ -5822,8 +5844,12 @@ test('the seat contribution card is present and hidden until hover', async ({ pa
   await page.getByTestId('raidcomp-add-druid-dreamstate').click()
 
   /*
-   * Hidden by CSS rather than unmounted, so it costs no layout and needs no JS state — which also
-   * means the assertion is on visibility, not on presence.
+   * Hidden by CSS rather than unmounted, so it needs no JS state — which is why the assertion is on
+   * visibility rather than on presence.
+   *
+   * It used to say "costs no layout" as well, and that half was wrong: `visibility: hidden` still
+   * contributes to scrollable overflow, so the hidden card scrolled the page sideways at phone
+   * width. It is `display: none` now, and the reflow test pins the consequence.
    */
   const card = page.locator('.raidcomp-seat-card').first()
   await expect(card).toHaveCount(1)
