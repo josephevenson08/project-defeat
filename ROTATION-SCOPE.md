@@ -376,6 +376,38 @@ T5, 2,000+ for Sunwell" from memory and flagged it as unsourced. A real parse su
 owner puts a Phase 2 Enhancement shaman at **1,709.3 DPS on Hydross** — see the calibration table
 below, which replaces the guess.
 
+### Closing the shared machinery, 2026-08-23
+
+The uniform spread argued the missing damage was shared rather than per-spec, and the first item bore
+that out. **Unleashed Rage** was refused for two stated reasons and both turned out to be answerable:
+
+- *"a proc with no fixed uptime"* — true until the reference parse measured it at **94.18%**.
+- *"a percentage multiplier on attack power would be applied before attack power is derived from
+  Strength and Agility, so it would multiply only the flat portion from gear"* — also true, and a real
+  ordering bug rather than an excuse. `calculateStats` applies buff multipliers before
+  `applyAttributeConversions`, so +10% attack power would have caught only the gear half.
+
+`statMultipliersAfterConversion` is the answer: a second multiplier pass **after** the conversions.
+The rule it encodes is worth remembering because getting it wrong is silent — the total still looks
+plausible, just small. **A buff multiplying a *primary* stat belongs in `statMultipliers`** so the
+conversions downstream see the raised value; **a buff multiplying a *derived* stat belongs after
+them**, or it multiplies a number that is not finished.
+
+Applied at 10% x 94.18% uptime, every melee spec moved and no ranged or caster spec did — Unleashed
+Rage is *melee* attack power, and that the hunters held still is the check that the field routes
+rather than merely multiplies:
+
+    Warrior Fury         961 -> 1030
+    Shaman Enhancement   912 ->  966
+    Warrior Arms         885 ->  937
+    Paladin Retribution  727 ->  767
+    Hunter Beast Mastery 932 ->  932   (ranged attack power, correctly untouched)
+
+Still unmodelled and still shared: **Bloodlust** (+30% haste at 34.51% uptime in the parse),
+**Ferocious Inspiration** (+3% damage at 97.71%), and the crit gap — 38.8% modelled against the
+parse's 50.0%. Each needs a field the `Buff` type does not have yet: a percentage haste, and a flat
+damage multiplier.
+
 ### Calibrated against every spec, 2026-08-23
 
 One parse calibrates one spec. `src/domain/simulation/dpsReference.ts` now carries **archon.gg's

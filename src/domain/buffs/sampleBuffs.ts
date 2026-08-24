@@ -347,8 +347,24 @@ export const sampleBuffs: readonly Buff[] = [
     providedBySpec: 'Enhancement',
     spellId: 30806,
     roles: ['Physical DPS'],
-    notModelled:
-      "Rank 5: the Shaman's melee critical hits increase all party members' melee attack power by 10% for 10 sec. Two reasons it is not applied: it is a proc with no fixed uptime, and a percentage multiplier on attack power would be applied before attack power is derived from Strength and Agility, so it would multiply only the flat portion from gear.",
+    /*
+     * 10% attack power, at the 94.18% uptime a real parse records — 0.1 x 0.9418, rounded to 0.094.
+     *
+     * **Both of the reasons this was refused have been answered rather than argued away.** The note
+     * said it is "a proc with no fixed uptime", which was true until the repo owner supplied a
+     * Hydross log measuring that uptime directly; and that an attack-power multiplier "would be
+     * applied before attack power is derived from Strength and Agility, so it would multiply only the
+     * flat portion from gear", which was also true and is what `statMultipliersAfterConversion`
+     * exists to fix.
+     *
+     * Uptime-weighted rather than applied whole, matching how item procs are priced in this repo. The
+     * honest cost of that choice: a fight where the shaman crits early and often runs closer to the
+     * full 10%, and this understates it slightly. Understating is the right direction for a number
+     * correcting an already-understated model.
+     */
+    statMultipliersAfterConversion: { attackPower: 0.094 },
+    notes:
+      "Rank 5: the Shaman's melee critical hits increase all party members' melee attack power by 10% for 10 sec. Modelled at 94.18% uptime, measured from the reference Hydross parse rather than assumed — it is a proc, and before that log there was no defensible number to weight it by.",
   },
 
   {

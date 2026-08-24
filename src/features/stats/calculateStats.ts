@@ -142,5 +142,23 @@ export function calculateStats(
    * only while shapeshifted — the stat's own wording is "in Cat, Bear, Dire Bear and Moonkin forms
    * only" — so it arrives as part of the cat-form block, gated on the same spec check as before.
    */
-  return applyAttributeConversions(total, character.className, character.spec, talents.statConversions)
+  total = applyAttributeConversions(total, character.className, character.spec, talents.statConversions)
+
+  /*
+   * Buffs that multiply a **derived** stat, applied last because that is the only place the number
+   * they multiply is finished.
+   *
+   * Unleashed Rage is why this exists: +10% attack power, where attack power is mostly Strength and
+   * Agility converted a few lines above. Applied with the other buff multipliers it would have
+   * caught only the flat attack power from gear and missed the larger derived half — which is what
+   * its `notModelled` note said, and it was right.
+   */
+  activeBuffIds.forEach((id) => {
+    const buff = getBuffById(id)
+    if (buff?.statMultipliersAfterConversion) {
+      total = applyStatMultipliers(total, buff.statMultipliersAfterConversion)
+    }
+  })
+
+  return total
 }

@@ -37,6 +37,21 @@ export type Buff = BuffProvider & {
   /** Percentage multiplier applied to the named stat after all flat contributions are totaled (e.g. Blessing of Kings' +10% to every primary stat). */
   statMultipliers?: Partial<Record<keyof StatBlock, number>>
   /**
+   * The same, but applied **after** attributes have been converted into attack power, armor and
+   * ratings — not before, like `statMultipliers`.
+   *
+   * The distinction is the whole reason Unleashed Rage went unmodelled. Its own note said a
+   * percentage on attack power "would be applied before attack power is derived from Strength and
+   * Agility, so it would multiply only the flat portion from gear", which was true and is exactly
+   * what this field fixes. A buff that multiplies a *primary* stat belongs in `statMultipliers`, so
+   * the conversions downstream see the raised value; a buff that multiplies a *derived* stat belongs
+   * here, or it multiplies a number that is not finished yet.
+   *
+   * Getting these two the wrong way round is silent — the total still looks plausible — so the rule
+   * is: primary stat above, derived stat here.
+   */
+  statMultipliersAfterConversion?: Partial<Record<keyof StatBlock, number>>
+  /**
    * Set on buffs whose whole value is something this app cannot express as a stat change — threat,
    * maximum health, resistances, damage multipliers, weapon procs and timed raid cooldowns. Holds
    * the real effect, so the buff can be listed and read without pretending it is being applied.

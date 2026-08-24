@@ -1963,7 +1963,10 @@ test('every raid buff is sourced to a spell rank and is either applied or explic
     if (!buff.spellId) problems.push(`${buff.id}: no spellId, so its numbers cannot be traced to a rank`)
     if (buff.needsVerification) problems.push(`${buff.id}: still flagged needsVerification`)
 
-    const applies = Boolean(buff.stats || buff.statMultipliers)
+    // `statMultipliersAfterConversion` counts as applying, and forgetting it here is how a buff that
+    // does contribute gets reported as contributing nothing — which is what happened the day
+    // Unleashed Rage was modelled.
+    const applies = Boolean(buff.stats || buff.statMultipliers || buff.statMultipliersAfterConversion)
     if (applies && buff.notModelled) problems.push(`${buff.id}: both applies stats and claims to be unmodelled`)
     if (!applies && !buff.notModelled) problems.push(`${buff.id}: contributes nothing and does not say why`)
   }
@@ -2033,7 +2036,9 @@ test('every unmodelled buff carries text a panel could render', async () => {
   // panel is no longer rendered, so that premise is gone — but the data contract it was really
   // protecting is not: an unmodelled buff has to explain itself in words, or restoring the panel
   // would put 15 rows on screen with a name and nothing else.
-  expect(unmodelledBuffs.length, '15 of the 33 cannot be expressed as stats').toBe(15)
+  // 15 until Unleashed Rage was modelled on 2026-08-23: its own note said an attack-power multiplier
+  // would land before attack power was derived, and `statMultipliersAfterConversion` answered that.
+  expect(unmodelledBuffs.length, '14 of the 33 cannot be expressed as stats').toBe(14)
 
   for (const buff of unmodelledBuffs) {
     expect(buff.stats, `${buff.id} must contribute no stats`).toBeUndefined()
@@ -5074,6 +5079,49 @@ test('every DPS spec is measured against what players actually parse', () => {
   for (const row of rows) {
     expect(row.modelled, `${row.spec} produced no damage at all`).toBeGreaterThan(0)
   }
+})
+
+test('a multiplier on a derived stat is applied after the stat is derived', () => {
+  /*
+   * Unleashed Rage was refused for two reasons and both are answered rather than argued away.
+   *
+   * It is "a proc with no fixed uptime" — true until the repo owner's Hydross parse measured that
+   * uptime at **94.18%**, which is what it is now weighted by. And "a percentage multiplier on attack
+   * power would be applied before attack power is derived from Strength and Agility, so it would
+   * multiply only the flat portion from gear" — also true, and the reason
+   * `statMultipliersAfterConversion` exists.
+   *
+   * The distinction is silent when you get it wrong: the total still looks plausible, just small. So
+   * this asserts the *size* of the delta, not merely that it moved.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Draenei', className: 'Shaman', spec: 'Enhancement' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Shaman', 'Enhancement')
+
+  const without = calculateStats(character, gear)
+  const withRage = calculateStats(character, gear, ['unleashed-rage'])
+
+  // 9.4% of the *finished* attack power, which is mostly Strength and Agility converted.
+  expect(withRage.attackPower).toBeCloseTo(without.attackPower * 1.094, 4)
+
+  /*
+   * And the number that proves the ordering: most of this character's attack power comes from
+   * attributes, so a multiplier applied before the conversion would have moved the total by a small
+   * fraction of what it should. Asserted against the attribute-derived share rather than a literal.
+   */
+  const delta = withRage.attackPower - without.attackPower
+  expect(delta, 'the derived half has to be inside the multiplier').toBeGreaterThan(without.strength * 0.05)
+
+  // Melee attack power only — a hunter's ranged attack power is a different stat and must not move.
+  expect(withRage.rangedAttackPower).toBe(without.rangedAttackPower)
+
+  // Primary stats are untouched: this multiplies a derived stat, so nothing upstream of it changes.
+  expect(withRage.strength).toBe(without.strength)
+  expect(withRage.agility).toBe(without.agility)
+
+  // The buff is no longer listed as unmodelled, which is the claim a reader checks.
+  const rage = getBuffById('unleashed-rage')!
+  expect(rage.notModelled, 'it is modelled now, so it must not still say otherwise').toBeUndefined()
+  expect(rage.statMultipliersAfterConversion?.attackPower).toBe(0.094)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

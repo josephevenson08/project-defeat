@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/buffTypes.ts
-lines: 122
+lines: 137
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.buffTypes
 
-`src/domain/buffs/buffTypes.ts` · **domain** layer · 122 lines
+`src/domain/buffs/buffTypes.ts` · **domain** layer · 137 lines
 
 From the top of the file:
 
