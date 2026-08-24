@@ -17,6 +17,15 @@ declare module "*/talentEffects.json" {
       perRank?: number
       /** Present for effects that do not scale with rank (Anger Management, Endless Rage). */
       flatValue?: number
+      /**
+       * A constant added to a multiplier's bonus once any rank is spent, on top of `perRank`.
+       *
+       * Only Shaman's Flurry needs it, and it is the whole reason that talent was refused: upstream
+       * computes `1.05 + 0.05*rank` where Warrior's is `1 + 0.05*rank`. Same slope, plus a flat 5%
+       * for owning the talent at all, which is why the Shaman ranks read 10/15/20/25/30 against the
+       * Warrior's 5/10/15/20/25.
+       */
+      baseBonus?: number
       /** Which `StatBlock` key a `statFactor` multiplies. */
       stat?: string
       /** Source and destination of a `statConversion`. */

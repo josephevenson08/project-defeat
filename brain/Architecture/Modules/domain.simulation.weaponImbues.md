@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/weaponImbues.ts
-lines: 92
+lines: 154
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.weaponImbues
 
-`src/domain/simulation/weaponImbues.ts` · **domain** layer · 92 lines
+`src/domain/simulation/weaponImbues.ts` · **domain** layer · 154 lines
 
 From the top of the file:
 

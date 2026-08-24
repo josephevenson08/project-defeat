@@ -777,10 +777,27 @@ function calculatePhysicalDps(
         effectiveMultiplier *
         physicalMultiplier
 
+      /*
+       * The off hand carries Windfury too, which is what an Enhancement shaman runs and what the
+       * reference parse shows — two `Windfury Attack` rows and no Flametongue. Its extra attacks are
+       * ordinary off-hand swings, so they take the off-hand penalty and the off-hand talent
+       * multiplier exactly as the white off-hand damage above does.
+       */
+      const offHandWindfuryDamage =
+        dualWield && offHandItem
+          ? averageSwingDamage(offHandItem, attackPower + WINDFURY_BONUS_ATTACK_POWER, false) *
+            0.5 *
+            talents.offHandDamageMultiplier *
+            effectiveMultiplier *
+            physicalMultiplier
+          : 0
+
       windfury = estimateWindfury({
         mainHandSwingsPerSecond,
+        offHandSwingsPerSecond: dualWield && offHandItem?.weaponSpeed ? attackSpeedMultiplier / offHandItem.weaponSpeed : 0,
         landedFraction,
         damagePerExtraAttack,
+        damagePerOffHandExtraAttack: offHandWindfuryDamage,
       })
 
       rawDps += windfury.dps
@@ -939,6 +956,12 @@ function calculatePhysicalDps(
    */
   if (windfury && windfury.dps > 0) {
     breakdown.push({ label: 'Windfury Weapon DPS', value: round(windfury.dps * (1 - armorMitigation)) })
+    // Split by hand, because a log reports it that way and a reader comparing the two wants the
+    // same shape rather than one number they have to take on trust.
+    if (windfury.offHandDps > 0) {
+      breakdown.push({ label: 'Windfury main hand DPS', value: round(windfury.mainHandDps * (1 - armorMitigation)) })
+      breakdown.push({ label: 'Windfury off hand DPS', value: round(windfury.offHandDps * (1 - armorMitigation)) })
+    }
     breakdown.push({ label: 'Windfury procs per minute', value: round(windfury.procsPerSecond * 60) })
   }
 

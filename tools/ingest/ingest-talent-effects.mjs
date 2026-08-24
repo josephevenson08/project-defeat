@@ -421,12 +421,26 @@ const SHAMAN_EXTRACTORS = [
     re: /AddStat\(stats\.SpellHit,\s*float64\(shaman\.Talents\.NaturesGuidance\)\*([\d.]+)\*core\.SpellHitRatingPerHitChance\)/,
     value: (m) => Number(m[1]) / 100,
   },
+  {
+    talent: 'Flurry',
+    kind: 'flurryHaste',
+    unit: 'fraction per rank',
+    // Upstream: `bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)`. The regex captures both
+    // numbers because the leading one is the whole reason this talent used to be refused — Warrior's
+    // is `1 + 0.05*rank`, so reusing that shape would understate every Shaman rank by a flat 5%.
+    re: /bonus := ([\d.]+) \+ ([\d.]+)\*float64\(shaman\.Talents\.Flurry\)/,
+    value: (m) => Number(m[2]),
+    // Rounded because `1.05 - 1` is 0.050000000000000044 in IEEE 754, and an ingest that writes
+    // that into checked-in JSON makes every future diff of this file unreadable.
+    baseBonus: (m) => Number((Number(m[1]) - 1).toFixed(6)),
+    caveat:
+      'Same 3-stack aura as the Warrior version — any melee crit sets 3 stacks, a white hit removes one — and solved by the same analytic chain in talentModifiers.ts. What differs is the constant: Shaman ranks are 10/15/20/25/30% where Warrior is 5/10/15/20/25%, carried as baseBonus.',
+  },
 ]
 
 const SHAMAN_SKIPPED = [
   ['Toughness / Anticipation / Shield Specialization', 'Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only.'],
-  ['Elemental Fury / Concussion / Call of Thunder', 'Spell-side talents, and calculateCasterDps takes no talents yet.'],
-  ['Flurry', 'Shaman has its own Flurry at a different rank scale; the analytic derivation is Warrior-shaped and would need re-checking against the Shaman ranks before being reused.'],
+  ['Elemental Fury / Concussion / Call of Thunder', 'Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19.'],
   ['Shamanistic Rage / Stormstrike cooldowns', 'Activated abilities needing a usage policy.'],
 ]
 
@@ -815,6 +829,9 @@ for (const entry of CLASSES) {
       unit: extractor.unit,
       perRank: extractor.flat ? undefined : extractor.value(hit.m, second),
       flatValue: extractor.flat ? extractor.value(hit.m, second) : undefined,
+      // A constant the multiplier carries on top of the per-rank slope, for having the talent at
+      // all. Only Shaman's Flurry needs it; every other extractor leaves it undefined.
+      baseBonus: extractor.baseBonus ? extractor.baseBonus(hit.m, second) : undefined,
       // Only the three stat-routed kinds carry these; every other kind names its destination by
       // `kind` alone.
       stat: extractor.stat,

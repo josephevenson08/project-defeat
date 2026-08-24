@@ -4841,6 +4841,107 @@ test('the emphasis in a spec note renders as emphasis, not as asterisks', async 
   expect(authored, 'the source note is authored with emphasis').toContain('**')
 })
 
+test('Shaman Flurry is ingested, and carries the constant that made it Warrior-shaped', () => {
+  /*
+   * Flurry sat in `SHAMAN_SKIPPED` with a precise reason: "Shaman has its own Flurry at a different
+   * rank scale; the analytic derivation is Warrior-shaped and would need re-checking against the
+   * Shaman ranks before being reused."
+   *
+   * Checked, and the difference is a single constant. Upstream computes
+   * `bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)` against the Warrior's
+   * `bonus := 1 + 0.05*...` — the same slope plus a flat 5% for owning the talent, which is why the
+   * Shaman ranks read 10/15/20/25/30% where the Warrior reads 5/10/15/20/25%. `baseBonus` carries it,
+   * and the 3-stack aura derivation was reusable untouched.
+   *
+   * This matters out of proportion to its size: the reference parse has Flurry at **94.16% uptime**,
+   * and it scales white damage *and* the Windfury proc rate, so it sits underneath both of the two
+   * largest gaps in the model.
+   */
+  const flurry = rawTalentEffects.effects.find((effect) => effect.className === 'Shaman' && effect.talent === 'Flurry')
+  expect(flurry, 'Shaman Flurry must be ingested rather than skipped').toBeDefined()
+  expect(flurry!.kind).toBe('flurryHaste')
+  expect(flurry!.perRank).toBe(0.05)
+  expect(flurry!.baseBonus, 'the constant is what made this a different rank scale').toBe(0.05)
+
+  // 5/5 is +30%, which is the in-game value and the thing a wrong shape would have missed by 5%.
+  const maxed = deriveTalentModifiers({ [flurry!.talentId]: 5 })
+  expect(maxed.flurryBonus).toBeCloseTo(1.3, 6)
+
+  // Rank 1 is +10%, not +5% — the half of the scale a Warrior-shaped derivation would have got wrong.
+  expect(deriveTalentModifiers({ [flurry!.talentId]: 1 }).flurryBonus).toBeCloseTo(1.1, 6)
+
+  // And no points is still the identity, which is the invariant the whole talent system rests on.
+  expect(deriveTalentModifiers({}).flurryBonus).toBe(1)
+
+  // Warrior's is untouched by the new field: same slope, no constant.
+  const warrior = rawTalentEffects.effects.find((effect) => effect.className === 'Warrior' && effect.talent === 'Flurry')!
+  expect(warrior.baseBonus ?? 0, 'the Warrior version has no constant').toBe(0)
+  expect(deriveTalentModifiers({ [warrior.talentId]: 5 }).flurryBonus).toBeCloseTo(1.25, 6)
+})
+
+test('Windfury rolls on both hands, and the proc rate is the one a real log shows', () => {
+  /*
+   * Calibrated against the repo owner's Hydross parse rather than against upstream's constants, and
+   * the two disagree — which is the point of having a log.
+   *
+   * The parse: 136 melee swings in 116 seconds, 118 of them landing, and 41 `Windfury Attack` hits
+   * across two rows. At two attacks per proc that is **20.5 procs, or 10.6 per minute**, against
+   * 1.017 landed swings per second — an implied **17.4%** per landed swing.
+   *
+   * Upstream carries 0.2 for one imbued hand and **0.36 for both**. Taken literally as a per-swing
+   * chance, 0.36 predicts 18.3 procs per minute — nearly double what the log records. 0.2 on each
+   * hand predicts 10.1, inside 5% of observed. So the model rolls 20% per landed swing per hand, and
+   * `weaponImbues.ts` says why it declines the 0.36.
+   */
+  const perHandSwings = 0.5
+  const landedFraction = 0.868
+
+  const dual = estimateWindfury({
+    mainHandSwingsPerSecond: perHandSwings,
+    offHandSwingsPerSecond: perHandSwings,
+    landedFraction,
+    damagePerExtraAttack: 1000,
+    damagePerOffHandExtraAttack: 500,
+  })
+
+  // Both hands roll, so the rate is driven by the combined landed swings.
+  const expected = (perHandSwings * 2 * landedFraction) * WINDFURY_PROC_CHANCE
+  expect(dual.procsPerSecond).toBeCloseTo(expected, 6)
+  expect(dual.procsPerSecond * 60, 'within a proc a minute of the parse').toBeCloseTo(10.4, 0)
+
+  // The off hand contributes real damage, at half the main hand's, matching the 2.0k/962.2 the log
+  // reports for the two rows.
+  expect(dual.offHandDps).toBeCloseTo(dual.mainHandDps / 2, 6)
+  expect(dual.dps).toBeCloseTo(dual.mainHandDps + dual.offHandDps, 6)
+
+  /*
+   * A single imbued hand halves the proc rate, because the off hand is no longer rolling. This is the
+   * behaviour the model had for every shaman before the parse showed two Windfury rows.
+   */
+  const single = estimateWindfury({
+    mainHandSwingsPerSecond: perHandSwings,
+    landedFraction,
+    damagePerExtraAttack: 1000,
+  })
+  expect(single.procsPerSecond).toBeCloseTo(dual.procsPerSecond / 2, 6)
+  expect(single.offHandDps).toBe(0)
+
+  /*
+   * **One internal cooldown, shared between the hands.** Upstream registers a single aura holding
+   * both spells, so a dual-wielder cannot roll two independent cooldowns — capping per hand would
+   * have allowed twice the procs the aura permits.
+   */
+  const fast = estimateWindfury({
+    mainHandSwingsPerSecond: 10,
+    offHandSwingsPerSecond: 10,
+    landedFraction: 1,
+    damagePerExtraAttack: 1000,
+    damagePerOffHandExtraAttack: 500,
+  })
+  expect(fast.procsPerSecond).toBeCloseTo(1 / WINDFURY_INTERNAL_COOLDOWN_SECONDS, 6)
+  expect(fast.limitedByInternalCooldown).toBe(true)
+})
+
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
   /*
    * It used to, and that was written when the catalogue held 230 hand-written items. It now holds

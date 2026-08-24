@@ -426,6 +426,35 @@ Melee crit in the parse is **50.0%** against 38.8% in the fully buffed and talen
 Shock, Fire Nova Totem and Flamecap Fire. Note that three of the four are *spell* damage on a melee
 spec, which runs into the missing spell school the same way stage 3 does.
 
+**Two of these landed the same day, and the parse changed one of them mid-flight.**
+
+- **Flurry is ingested.** The refusal was right that the rank scale differed and wrong that this made
+  it hard: upstream is `1.05 + 0.05*rank` against the Warrior's `1 + 0.05*rank`, so the same slope
+  plus a flat 5%, carried by a new `baseBonus` field. The 3-stack analytic derivation was reused
+  untouched. **522 → 615.9 DPS**, and Windfury rose with it (86.9 → 105.7) because the proc rate
+  follows the swing rate — one talent under both of the top two gaps, exactly as predicted.
+- **Windfury now rolls on the off hand.** With both hands imbued the model went to **668.7 DPS**.
+
+**And the parse falsified upstream's constant, which is the whole reason to have a log.** wowsims
+carries 0.2 for one imbued hand and **0.36 for both**. Taken literally as a per-swing chance that
+predicts **18.3 procs per minute**; the log records 41 Windfury hits over 116 seconds, which at two
+attacks per proc is **10.6 per minute**. Rolling 0.2 per landed swing on *each* hand predicts
+**10.1** — inside 5%. So 0.36 is upstream expressing something other than a per-swing chance
+(plausibly one roll for a pair, since `1 - 0.8²` is 0.36), and the model declines it with the
+arithmetic written down. **The implied rate straight off the parse is 17.4%**, slightly under 20%,
+which is the shape the shared 3s cooldown predicts.
+
+Where that leaves the comparison: total **668.7 against 1,709.3**, so 2.6x rather than 3.3x. Windfury
+is 158.5 against 493.7 — the *rate* now matches the log and the *damage per proc* does not, which
+points at the same place white damage does.
+
+**What remains, and it is mostly one thing.** White damage is 2.2x low and Windfury inherits it,
+because both take their damage from the same swing. Candidates, none yet checked: melee crit is 38.8%
+against the parse's **50.0%**; **Unleashed Rage** is unmodelled and is +2% attack power per point;
+Bloodlust, Drums of Battle and Mongoose are all in the log's haste stack and none are modelled; and
+the BiS list hands this shaman *the same 2.7s weapon in both hands*, which is unlikely to be what the
+parsed player was holding.
+
 **Order of work this implies**, by leverage rather than by tidiness:
 
 1. **Flurry** — under both of the top two gaps.

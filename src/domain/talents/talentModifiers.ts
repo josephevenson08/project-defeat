@@ -278,7 +278,13 @@ export function deriveTalentModifiers(points: TalentPoints): TalentModifiers {
 
     const multiplicative = MULTIPLICATIVE_BY_KIND[effect.kind]
     if (multiplicative) {
-      modifiers[multiplicative] *= effect.flatValue ?? 1 + (effect.perRank ?? 0) * rank
+      /*
+       * `baseBonus` is added once for owning the talent, on top of the per-rank slope. Shaman's
+       * Flurry is the only thing that needs it and it is exactly why that talent sat refused:
+       * upstream computes `1.05 + 0.05*rank` against Warrior's `1 + 0.05*rank`, so a shared
+       * `1 + perRank*rank` would have understated every Shaman rank by a flat 5%.
+       */
+      modifiers[multiplicative] *= effect.flatValue ?? 1 + (effect.baseBonus ?? 0) + (effect.perRank ?? 0) * rank
     }
   }
 

@@ -29,7 +29,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 62,
+  "effectCount": 63,
   "effects": [
     {
       "className": "Warrior",
@@ -417,6 +417,19 @@
       "kind": "spellHitChance",
       "unit": "fraction per rank",
       "perRank": 0.01,
+      "source": "sim/shaman/talents.go"
+    },
+    {
+      "className": "Shaman",
+      "talentId": 602,
+      "talent": "Flurry",
+      "tree": "Enhancement",
+      "maxRank": 5,
+      "kind": "flurryHaste",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "baseBonus": 0.05,
+      "caveat": "Same 3-stack aura as the Warrior version — any melee crit sets 3 stacks, a white hit removes one — and solved by the same analytic chain in talentModifiers.ts. What differs is the constant: Shaman ranks are 10/15/20/25/30% where Warrior is 5/10/15/20/25%, carried as baseBonus.",
       "source": "sim/shaman/talents.go"
     },
     {
@@ -861,12 +874,7 @@
     {
       "className": "Shaman",
       "talent": "Elemental Fury / Concussion / Call of Thunder",
-      "reason": "Spell-side talents, and calculateCasterDps takes no talents yet."
-    },
-    {
-      "className": "Shaman",
-      "talent": "Flurry",
-      "reason": "Shaman has its own Flurry at a different rank scale; the analytic derivation is Warrior-shaped and would need re-checking against the Shaman ranks before being reused."
+      "reason": "Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19."
     },
     {
       "className": "Shaman",
