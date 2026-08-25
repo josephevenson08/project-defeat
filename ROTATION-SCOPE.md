@@ -383,8 +383,26 @@ rolls no crit without talents this app does not model, so the crit multiplier re
 nothing else. Applying it to the DoTs would have inflated the largest share of the spec's damage. A
 test raises spell crit and asserts every DoT row is byte-identical while Shadow Bolt moves.
 
-**Priest Shadow is the same shape and is now the worst spec at 3.1x** — Mind Flay alone, with Shadow
-Word: Pain and Vampiric Touch uncounted. The mechanism is built; that spec needs its data.
+**Priest Shadow followed the same day**, and needed two additions to the mechanism rather than none:
+
+    Priest Shadow   431 -> 639   (3.1x -> 2.1x)
+
+**A channel is a filler, not a maintained DoT.** You re-channel Mind Flay in whatever globals are
+spare; you do not keep it up the way Shadow Word: Pain is kept up. Counting it as maintained would
+double-count in *both* directions at once — crediting its full damage every 3 seconds and charging 3
+seconds of global for it. The `channeled` flag was already on the entry and is what separates them.
+
+**And a channel does not crit either**, because it is periodic. That produced a genuinely surprising
+intermediate state: with two DoTs and a channel and nothing else, **spell crit was worth exactly zero
+to a Shadow priest** — a test that asserts the spec benefits from its own spell talents failed, and
+was right to. The fix was not to weaken the test but to add **Mind Blast**, which is the spec's only
+critable spell and the thing crit rating actually buys. A direct cast on a cooldown is pressed on
+cooldown and takes its own share of the globals, ahead of the filler.
+
+**Vampiric Touch is flagged, and the reason is worth keeping.** wowsims does not implement it at the
+pinned commit, so its coefficient is the plain `duration/15` rule rather than a sourced value — and
+three of the four Affliction DoTs turned out to be overrides rather than the formula, so this one has
+a real chance of being wrong the same way.
 
 ---
 

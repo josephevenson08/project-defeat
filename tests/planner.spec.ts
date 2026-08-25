@@ -4456,12 +4456,13 @@ test('the rotation-coverage claim on the Simulation panel matches the ability da
    * Agony, Siphon Life and a Shadow Bolt filler alongside Unstable Affliction. Sorted rather than
    * listed in iteration order, so adding a class does not reorder the expectation.
    */
-  expect([...multiAbility].sort(), 'three specs have a real multi-ability rotation').toEqual([
+  expect([...multiAbility].sort(), 'four specs have a real multi-ability rotation').toEqual([
+    'Priest Shadow',
     'Warlock Affliction',
     'Warrior Arms',
     'Warrior Fury',
   ])
-  expect(singleAbility, 'and the other 24 are single-ability approximations').toBe(24)
+  expect(singleAbility, 'and the other 23 are single-ability approximations').toBe(23)
 })
 
 test('a hunter fires the button they press all fight, at a rate with two stated ceilings', () => {
@@ -5253,6 +5254,50 @@ test('a multi-DoT caster is scored as a rotation, and its DoTs do not crit', () 
 
   // And the summary says which of the two it did, since the numbers behave differently.
   expect(result.summary).toMatch(/DoTs do not crit in TBC/i)
+})
+
+test('a channel is the filler, not a DoT to be maintained', () => {
+  /*
+   * Shadow is the same multi-DoT shape as Affliction with one difference that decides the answer:
+   * its filler is a **channel**. You re-channel Mind Flay in whatever globals are spare; you do not
+   * "keep it up" the way Shadow Word: Pain is kept up.
+   *
+   * Counting it as a maintained DoT would be a double-count in both directions at once — crediting
+   * its whole damage every 3 seconds *and* charging 3 seconds of global for it. `channeled` is the
+   * field that separates the two, and it was already on the entry.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Priest', spec: 'Shadow' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Priest', 'Shadow')
+  const stats = calculateStats(character, gear)
+  const result = calculateSimulation(character, gear, stats, 'Caster DPS')
+  const row = (label: RegExp) => result.breakdown.find((entry) => label.test(entry.label))?.value
+
+  // The two maintained DoTs, and Mind Flay filling what they leave.
+  expect(row(/^Shadow Word: Pain DPS/)).toBeGreaterThan(0)
+  expect(row(/^Vampiric Touch DPS/)).toBeGreaterThan(0)
+  expect(row(/^Mind Flay DPS/), 'the channel is the filler').toBeGreaterThan(0)
+  expect(row(/^Mind Flay casts per second/)).toBeGreaterThan(0)
+
+  /*
+   * **A channel is periodic, so it cannot crit in TBC either** — Mind Flay's ticks stayed uncritable
+   * until a later expansion. That makes Shadow's filler behave differently from Affliction's Shadow
+   * Bolt, and copying either spec's rule to the other would have been wrong.
+   */
+  const critty = calculateStats(character, gear, [], [], { spellCritRating: 500 })
+  const withCrit = calculateSimulation(character, gear, critty, 'Caster DPS')
+  const critRow = (label: RegExp) => withCrit.breakdown.find((entry) => label.test(entry.label))?.value
+
+  expect(critRow(/^Spell crit chance/), 'the crit landed').toBeGreaterThan(row(/^Spell crit chance/)!)
+  expect(critRow(/^Mind Flay DPS/), 'a channel does not crit in TBC').toBe(row(/^Mind Flay DPS/))
+
+  /*
+   * And Vampiric Touch is flagged, which is the honest half: wowsims does not implement it at the
+   * pinned commit, so its coefficient is the duration/15 formula rather than a sourced value — and
+   * three of the four Affliction DoTs turned out to be overrides rather than the formula.
+   */
+  const vt = getRotationAbilities('Priest', 'Shadow').find((ability) => ability.name === 'Vampiric Touch')!
+  expect(vt.needsVerification, 'a derived coefficient must say so').toBe(true)
+  expect(vt.scaling.basis).toBe('duration/15')
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

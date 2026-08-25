@@ -1080,8 +1080,23 @@ function resolveCasterRotation(
   spellCritMultiplier: number,
   hastePercent: number,
 ): { dots: { name: string; dps: number }[]; filler?: { name: string; dps: number; castsPerSecond: number }; gcdShare: number } {
-  const dots = abilities.filter((ability) => ability.effectType === 'DoT' && ability.periodic)
-  const filler = abilities.find((ability) => ability.effectType === 'Direct Damage')
+  /*
+   * **A channel is a filler, not a maintained DoT**, and `channeled` is what separates them. You
+   * re-channel Mind Flay continuously in whatever globals are spare; you do not "keep it up" the way
+   * Shadow Word: Pain is kept up. Counting it as a maintained DoT would credit its whole damage every
+   * 3 seconds *and* charge 3 seconds of global for it, which is the same double-count in both
+   * directions.
+   */
+  const dots = abilities.filter((ability) => ability.effectType === 'DoT' && ability.periodic && !ability.channeled)
+  const channel = abilities.find((ability) => ability.channeled && ability.periodic)
+
+  /*
+   * A direct cast on a cooldown is pressed on cooldown, not used as filler — Mind Blast is the spike
+   * a Shadow priest clips a channel to catch. It takes its own share of the globals, and what is left
+   * after the DoTs and it goes to the filler.
+   */
+  const cooldowns = abilities.filter((ability) => ability.effectType === 'Direct Damage' && ability.cooldownSeconds)
+  const filler = abilities.find((ability) => ability.effectType === 'Direct Damage' && !ability.cooldownSeconds) ?? channel
 
   let gcdShare = 0
   const resolved: { name: string; dps: number }[] = []
@@ -1103,7 +1118,25 @@ function resolveCasterRotation(
     resolved.push({ name: dot.name, dps: perApplication / duration })
   }
 
-  if (!filler) return { dots: resolved, gcdShare }
+  /*
+   * Cooldowns next, before the filler, because they take priority in the real rotation and the filler
+   * is by definition what happens with the time nothing else wants.
+   */
+  const onCooldown: { name: string; dps: number }[] = []
+  for (const ability of cooldowns) {
+    const cooldown = ability.cooldownSeconds ?? 0
+    if (cooldown <= 0) continue
+
+    const occupies = Math.max(ability.gcdSeconds || 1.5, ability.castTimeSeconds) / (1 + hastePercent)
+    gcdShare += occupies / cooldown
+
+    const base = ability.baseAmount ? (ability.baseAmount.min + ability.baseAmount.max) / 2 : 0
+    // Direct damage, so this one *does* crit — it is the only critable spell a Shadow priest has.
+    const perCast = (base + spellPower * (ability.scaling.spellPowerCoefficient ?? 0)) * spellCritMultiplier
+    onCooldown.push({ name: ability.name, dps: perCast / cooldown })
+  }
+
+  if (!filler) return { dots: [...resolved, ...onCooldown], gcdShare }
 
   /*
    * The filler gets whatever is left of the second. Clamped at zero because a spec whose DoTs alone
@@ -1114,11 +1147,27 @@ function resolveCasterRotation(
   const castTime = Math.max(filler.castTimeSeconds, filler.gcdSeconds || 1.5) / (1 + hastePercent)
   const castsPerSecond = castTime > 0 ? freeShare / castTime : 0
 
-  const base = filler.baseAmount ? (filler.baseAmount.min + filler.baseAmount.max) / 2 : 0
-  const perCast = (base + spellPower * (filler.scaling.spellPowerCoefficient ?? 0)) * spellCritMultiplier
+  /*
+   * A channel delivers its `periodic` total over the channel; a hard cast delivers its `baseAmount`
+   * in one lump. Both are "damage per cast" once you know which field to read.
+   */
+  const base = filler.periodic
+    ? (filler.periodic.totalBaseAmount ?? 0)
+    : filler.baseAmount
+      ? (filler.baseAmount.min + filler.baseAmount.max) / 2
+      : 0
+
+  /*
+   * **Crit reaches direct damage and nothing else.** TBC gives no crit to periodic damage, and a
+   * channel is periodic — Mind Flay's ticks could not crit until a later expansion. So a Shadow
+   * priest's filler is uncritable where an Affliction warlock's Shadow Bolt is not, and applying one
+   * spec's rule to the other would have been wrong in whichever direction it was copied.
+   */
+  const critMultiplier = filler.effectType === 'Direct Damage' ? spellCritMultiplier : 1
+  const perCast = (base + spellPower * (filler.scaling.spellPowerCoefficient ?? 0)) * critMultiplier
 
   return {
-    dots: resolved,
+    dots: [...resolved, ...onCooldown],
     filler: { name: filler.name, dps: perCast * castsPerSecond, castsPerSecond },
     gcdShare,
   }
@@ -1178,7 +1227,8 @@ function calculateCasterDps(
    * describes a multi-spell rotation, that is what gets scored.
    */
   const rotationAbilities = getRotationAbilities(character.className, character.spec)
-  const multiSpell = rotationAbilities.filter((ability) => ability.effectType === 'DoT').length > 1
+  const multiSpell =
+    rotationAbilities.filter((ability) => ability.effectType === 'DoT' && !ability.channeled).length > 1
   const rotation = multiSpell
     ? resolveCasterRotation(
         rotationAbilities,
