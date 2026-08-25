@@ -1055,6 +1055,75 @@ function calculatePhysicalDps(
   }
 }
 
+/**
+ * A caster spec that maintains several damage-over-time effects and fills the gaps with a nuke.
+ *
+ * **This is the multi-DoT shape `ROTATION-SCOPE.md` filed under stage 3, and it turned out not to
+ * need a timeline.** DoTs do not compete for a resource the way energy abilities do — they compete
+ * for *globals*. A DoT refreshed on its own duration costs `gcd / duration` of every second and
+ * returns `damagePerApplication / duration` of damage, both of which are closed-form. Whatever
+ * fraction of the second the DoTs do not spend goes to the filler.
+ *
+ * Two mechanics decide whether the answer is right, and both are TBC-specific:
+ *
+ * **DoTs cannot crit in TBC.** Periodic damage rolls no crit at all without talents this app does
+ * not model, so the crit multiplier applies to the filler and to nothing else. Applying it to the
+ * DoTs would have inflated the largest share of an Affliction warlock's damage.
+ *
+ * **A DoT is applied once per duration, not once per cast.** `totalBaseAmount` is the whole DoT, so
+ * dividing it by anything shorter than its duration delivers it more often than the game does — the
+ * bug that made Affliction the one spec reading above what players parse.
+ */
+function resolveCasterRotation(
+  abilities: readonly SignatureAbility[],
+  spellPower: number,
+  spellCritMultiplier: number,
+  hastePercent: number,
+): { dots: { name: string; dps: number }[]; filler?: { name: string; dps: number; castsPerSecond: number }; gcdShare: number } {
+  const dots = abilities.filter((ability) => ability.effectType === 'DoT' && ability.periodic)
+  const filler = abilities.find((ability) => ability.effectType === 'Direct Damage')
+
+  let gcdShare = 0
+  const resolved: { name: string; dps: number }[] = []
+
+  for (const dot of dots) {
+    const duration = dot.periodic!.durationSeconds
+    if (duration <= 0) continue
+
+    const perApplication = (dot.periodic!.totalBaseAmount ?? 0) + spellPower * (dot.scaling.spellPowerCoefficient ?? 0)
+
+    /*
+     * The global a refresh costs, as a share of each second. An instant DoT costs its GCD; one with a
+     * cast time costs the cast, since that is the longer of the two and is what the caster is
+     * actually occupied for.
+     */
+    const occupies = Math.max(dot.gcdSeconds || 1.5, dot.castTimeSeconds) / (1 + hastePercent)
+    gcdShare += occupies / duration
+
+    resolved.push({ name: dot.name, dps: perApplication / duration })
+  }
+
+  if (!filler) return { dots: resolved, gcdShare }
+
+  /*
+   * The filler gets whatever is left of the second. Clamped at zero because a spec whose DoTs alone
+   * overrun the global budget has no room for one — that does not happen with these four, and a
+   * negative cast rate would be worse than no filler at all.
+   */
+  const freeShare = Math.max(0, 1 - gcdShare)
+  const castTime = Math.max(filler.castTimeSeconds, filler.gcdSeconds || 1.5) / (1 + hastePercent)
+  const castsPerSecond = castTime > 0 ? freeShare / castTime : 0
+
+  const base = filler.baseAmount ? (filler.baseAmount.min + filler.baseAmount.max) / 2 : 0
+  const perCast = (base + spellPower * (filler.scaling.spellPowerCoefficient ?? 0)) * spellCritMultiplier
+
+  return {
+    dots: resolved,
+    filler: { name: filler.name, dps: perCast * castsPerSecond, castsPerSecond },
+    gcdShare,
+  }
+}
+
 function calculateCasterDps(
   character: CharacterProfile,
   stats: StatBlock,
@@ -1093,7 +1162,7 @@ function calculateCasterDps(
    * Sanctity Aura is Holy only and nothing here records a spell school — so what lands is the
    * school-agnostic kind, which today is Ferocious Inspiration.
    */
-  const dps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier)
+  const singleAbilityDps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier)
 
   const breakdown: SimulationBreakdownEntry[] = [
     { label: 'Base damage per cast', value: round(cast.baseAmount) },
@@ -1103,8 +1172,46 @@ function calculateCasterDps(
     { label: 'Casts per second', value: round(castsPerSecond) },
   ]
 
+  /*
+   * A spec that maintains several DoTs is a different calculation from one that repeats a nuke, and
+   * the single-ability figure above is simply wrong for it — not imprecise. Where the ability data
+   * describes a multi-spell rotation, that is what gets scored.
+   */
+  const rotationAbilities = getRotationAbilities(character.className, character.spec)
+  const multiSpell = rotationAbilities.filter((ability) => ability.effectType === 'DoT').length > 1
+  const rotation = multiSpell
+    ? resolveCasterRotation(
+        rotationAbilities,
+        stats.spellPower,
+        1 + spellCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1),
+        hastePercent,
+      )
+    : undefined
+
+  let dps = singleAbilityDps
+
+  if (rotation) {
+    const shared = (1 + debuffs.spellDamageTakenMultiplier) * talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
+    const dotDps = rotation.dots.reduce((sum, dot) => sum + dot.dps, 0) * spellHitChance * shared
+    const fillerDps = (rotation.filler?.dps ?? 0) * spellHitChance * shared
+    dps = dotDps + fillerDps
+
+    for (const dot of rotation.dots) {
+      breakdown.push({ label: `${dot.name} DPS`, value: round(dot.dps * spellHitChance * shared) })
+    }
+    if (rotation.filler) {
+      breakdown.push({ label: `${rotation.filler.name} DPS`, value: round(fillerDps) })
+      breakdown.push({ label: `${rotation.filler.name} casts per second`, value: round(rotation.filler.castsPerSecond) })
+    }
+    breakdown.push({ label: 'Globals spent refreshing DoTs', value: toPercent(rotation.gcdShare) })
+  }
+
+  const rotationSummary = rotation
+    ? ` ${rotation.dots.length} damage-over-time effects maintained on their own durations, costing ${toPercent(rotation.gcdShare)}% of the globals, with ${rotation.filler?.name ?? 'nothing'} filling the rest. **DoTs do not crit in TBC**, so the crit multiplier reaches the filler only.`
+    : ''
+
   const summary = cast.ability
-    ? `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base damage, and ${cast.coefficient} spell-power coefficient. Single-ability approximation — cooldowns, procs, and multi-spell rotation priority aren't modeled.`
+    ? `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base damage, and ${cast.coefficient} spell-power coefficient.${rotationSummary || " Single-ability approximation — cooldowns, procs, and multi-spell rotation priority aren't modeled."}`
     : `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, assuming a ${cast.label}. Scales from spell power only — this spec has no modeled signature cast.`
 
   return {

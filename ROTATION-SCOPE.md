@@ -352,6 +352,42 @@ deliver most of the accuracy without it.
 
 ---
 
+## Stage 3, and it did not need a timeline — 2026-08-23
+
+**Stage 3 was scoped as "the first stage that adds a mechanism", needing a concurrent-DoT uptime
+model. The mechanism turned out to be arithmetic.** DoTs do not compete for a resource the way energy
+abilities do — they compete for **globals**. A DoT refreshed on its own duration costs
+`gcd / duration` of every second and returns `damagePerApplication / duration` of damage, both closed
+form, and the filler takes whatever fraction of the second is left. `resolveCasterRotation` is forty
+lines.
+
+Affliction was the spec it mattered most for, and it went from the worst in the table to mid-pack:
+
+    Warlock Affliction   183 -> 959   (8.9x -> 1.7x)
+
+Four DoTs sourced to upstream, each with a coefficient TBC **overrides rather than derives** — which
+is the detail a duration/15 assumption would have got wrong every time:
+
+| DoT | Duration | duration/15 would give | Actual |
+| --- | --- | --- | --- |
+| Unstable Affliction | 18s | 1.2 | 1.2 |
+| Corruption | 18s | 1.2 | **0.936** |
+| Curse of Agony | 24s | 1.6 | **1.2** |
+| Siphon Life | 30s | 2.0 | **1.0** |
+
+Three of the four are penalised, and Siphon Life by half — which is why it is the weakest global in
+the rotation and the first DoT dropped on a short fight.
+
+**DoTs cannot crit in TBC**, and that is the other mechanic the answer turns on. Periodic damage
+rolls no crit without talents this app does not model, so the crit multiplier reaches the filler and
+nothing else. Applying it to the DoTs would have inflated the largest share of the spec's damage. A
+test raises spell crit and asserts every DoT row is byte-identical while Shadow Bolt moves.
+
+**Priest Shadow is the same shape and is now the worst spec at 3.1x** — Mind Flay alone, with Shadow
+Word: Pain and Vampiric Touch uncounted. The mechanism is built; that spec needs its data.
+
+---
+
 ## The measured gap, 2026-08-23 — where the missing DPS actually is
 
 The doc above reasons about rotations. This section is a **measurement**, prompted by the repo owner

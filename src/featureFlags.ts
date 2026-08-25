@@ -43,10 +43,14 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * **Shown for DPS specs since 2026-08-21, hidden for Healer and Tank**, and here is what is
  * actually true about it now.
  *
- * - **Rotations cover 2 specs of 27.** Warrior Arms and Fury press three buttons each; the other 25
- *   are a single-ability approximation, which understates any spec whose damage is spread across
- *   several buttons. This is the largest remaining gap and the main reason the estimate reads as
- *   indicative. See ROTATION-SCOPE.md.
+ * - **Rotations cover 3 specs of 27.** Warrior Arms and Fury press three buttons each, and Affliction
+ *   maintains four damage-over-time effects with a Shadow Bolt filler. The other 24 are a
+ *   single-ability approximation, which understates any spec whose damage is spread across several
+ *   buttons. Still the largest remaining gap. See ROTATION-SCOPE.md.
+ * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
+ *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
+ *   best case against them. The model reads **1.4x to 3.1x low**, and no spec may read *above* its
+ *   reference — a spec that does is double-counting something, which has been caught twice.
  * - **And "single-ability approximation" was itself too generous until 2026-08-23**, which is worth
  *   keeping here rather than quietly fixing: the three hunter specs had *no* ability modelled at all.
  *   `resolveRotation` filtered on the literal `'Melee Special'`, so Steady Shot — catalogued,

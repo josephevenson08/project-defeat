@@ -4451,8 +4451,17 @@ test('the rotation-coverage claim on the Simulation panel matches the ability da
     }
   }
 
-  expect(multiAbility, 'exactly two specs have a real multi-ability rotation').toEqual(['Warrior Arms', 'Warrior Fury'])
-  expect(singleAbility, 'and the other 25 are single-ability approximations').toBe(25)
+  /*
+   * Three since 2026-08-23, when Affliction got the rest of its rotation — Corruption, Curse of
+   * Agony, Siphon Life and a Shadow Bolt filler alongside Unstable Affliction. Sorted rather than
+   * listed in iteration order, so adding a class does not reorder the expectation.
+   */
+  expect([...multiAbility].sort(), 'three specs have a real multi-ability rotation').toEqual([
+    'Warlock Affliction',
+    'Warrior Arms',
+    'Warrior Fury',
+  ])
+  expect(singleAbility, 'and the other 24 are single-ability approximations').toBe(24)
 })
 
 test('a hunter fires the button they press all fight, at a rate with two stated ceilings', () => {
@@ -5194,6 +5203,56 @@ test('buff effects that are not stats reach the simulator, and only through the 
   expect(getBuffById('bloodlust')?.hastePercent).toBe(0.104)
   expect(getBuffById('ferocious-inspiration')?.damageMultiplier).toBe(0.029)
   expect(getBuffById('bloodlust')?.notModelled, 'it is modelled now').toBeUndefined()
+})
+
+test('a multi-DoT caster is scored as a rotation, and its DoTs do not crit', () => {
+  /*
+   * `ROTATION-SCOPE.md` filed this under stage 3 and expected it to need a timeline. It does not.
+   * **DoTs compete for globals, not for a resource** — a DoT refreshed on its own duration costs
+   * `gcd / duration` of every second and returns `damagePerApplication / duration` of damage, both
+   * closed form, and the filler takes whatever fraction of the second is left.
+   *
+   * Affliction was the spec this mattered most for: modelled on Unstable Affliction alone it read
+   * 183 against a 1,629 target, the worst in the game by a factor of three.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Gnome', className: 'Warlock', spec: 'Affliction' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Warlock', 'Affliction')
+  const stats = calculateStats(character, gear)
+  const result = calculateSimulation(character, gear, stats, 'Caster DPS')
+
+  const row = (label: RegExp) => result.breakdown.find((entry) => label.test(entry.label))?.value
+
+  // Every DoT the rotation maintains, and the filler that fills the gaps between them.
+  for (const name of ['Unstable Affliction', 'Corruption', 'Curse of Agony', 'Siphon Life']) {
+    expect(row(new RegExp(`^${name} DPS`)), `${name} must contribute`).toBeGreaterThan(0)
+  }
+  expect(row(/^Shadow Bolt DPS/), 'the filler is what makes this a rotation rather than a sum').toBeGreaterThan(0)
+
+  /*
+   * The globals the DoTs spend has to be a real fraction. Above 100% would mean the spec cannot
+   * maintain what it is being credited with, which is the failure a sum-of-DoTs model cannot see.
+   */
+  const gcdShare = row(/Globals spent refreshing/)!
+  expect(gcdShare).toBeGreaterThan(0)
+  expect(gcdShare, 'a rotation that overruns the global budget is not a rotation').toBeLessThan(100)
+
+  /*
+   * **DoTs cannot crit in TBC.** Periodic damage rolls no crit without talents this app does not
+   * model, so spell crit must move the filler and leave every DoT row untouched. This is the
+   * assertion that would catch the crit multiplier being applied to the largest share of the spec's
+   * damage — which is where an Affliction warlock's damage actually is.
+   */
+  const critty = calculateStats(character, gear, [], [], { spellCritRating: 500 })
+  const withCrit = calculateSimulation(character, gear, critty, 'Caster DPS')
+  const critRow = (label: RegExp) => withCrit.breakdown.find((entry) => label.test(entry.label))?.value
+
+  expect(critRow(/^Spell crit chance/), 'the crit actually landed').toBeGreaterThan(row(/^Spell crit chance/)!)
+  expect(critRow(/^Corruption DPS/), 'a DoT must not crit').toBe(row(/^Corruption DPS/))
+  expect(critRow(/^Curse of Agony DPS/)).toBe(row(/^Curse of Agony DPS/))
+  expect(critRow(/^Shadow Bolt DPS/), 'but the filler must').toBeGreaterThan(row(/^Shadow Bolt DPS/)!)
+
+  // And the summary says which of the two it did, since the numbers behave differently.
+  expect(result.summary).toMatch(/DoTs do not crit in TBC/i)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

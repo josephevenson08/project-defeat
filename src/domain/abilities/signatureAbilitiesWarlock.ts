@@ -28,7 +28,117 @@ export const warlockSignatureAbilities: readonly SignatureAbility[] = [
     },
     notes:
       'Unstable Affliction is the 41-point Affliction talent and the spell that defines the spec, but Affliction is a multi-DoT spec rather than a single-ability one: the real Phase 1/2 rotation maintains Unstable Affliction, Corruption, Curse of Agony (or Curse of Doom), Siphon Life and Immolate, and fills the gaps with Shadow Bolt (rank 11, spell 27209, 420 mana, 3.0s cast, 544-607, coefficient 0.8571). If the simulator needs a plain cast-time nuke anchor rather than a DoT, Shadow Bolt is the correct substitute — a DoT-only model will understate Affliction, and a Shadow-Bolt-only model will understate it differently.',
+  },  {
+    className: 'Warlock',
+    spec: 'Affliction',
+    name: 'Corruption',
+    spellId: 27216,
+    rank: 8,
+    requiredLevel: 65,
+    effectType: 'DoT',
+    /*
+     * Instant, not the 2s the tooltip shows. Improved Corruption 5/5 removes the whole cast time
+     * (400ms per rank upstream) and no Affliction build skips it, so 2s would model a warlock nobody
+     * plays. Stated here rather than left to look like an error.
+     */
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    resource: { type: 'Mana', cost: 370 },
+    periodic: {
+      durationSeconds: 18,
+      tickIntervalSeconds: 3,
+      ticks: 6,
+      totalBaseAmount: 900,
+      perTickBaseAmount: 150,
+    },
+    scaling: {
+      basis: 'hardcoded exception',
+      spellPowerCoefficient: 0.936,
+      spellPowerCoefficientPerTick: 0.156,
+      coefficientNotes:
+        'Upstream: `core.BaseDamageConfigMagicNoRoll(900/6, 0.156)`. 0.156 per tick over 6 ticks is 0.936 total, which is short of the 1.2 the plain duration/15 rule would give an 18s DoT — Corruption is one of the coefficients TBC overrides rather than derives, which is why the basis is the exception rather than the formula.',
+    },
+    notes:
+      'The second DoT of the Affliction rotation and the one with the highest damage per global. Empowered Corruption adds a further (0.12 x rank)/6 per tick upstream; that talent is not ingested, so this is the untalented coefficient.',
   },
+  {
+    className: 'Warlock',
+    spec: 'Affliction',
+    name: 'Curse of Agony',
+    spellId: 27218,
+    rank: 7,
+    requiredLevel: 67,
+    effectType: 'DoT',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    resource: { type: 'Mana', cost: 265 },
+    periodic: {
+      durationSeconds: 24,
+      tickIntervalSeconds: 2,
+      ticks: 12,
+      totalBaseAmount: 1356,
+      perTickBaseAmount: 113,
+    },
+    scaling: {
+      basis: 'hardcoded exception',
+      spellPowerCoefficient: 1.2,
+      spellPowerCoefficientPerTick: 0.1,
+      coefficientNotes:
+        'Upstream: `core.BaseDamageConfigMagicNoRoll(baseDmg, 0.1)`. 0.1 per tick over 12 ticks is 1.2 total, well short of the 1.6 a 24s duration would earn under duration/15 — the long-DoT penalty TBC applies to Curse of Agony specifically.',
+    },
+    notes:
+      "The tooltip's \"dealt slowly at first, and builds up\" ramp is real but not modelled: the total over the full duration is what matters to a sustained estimate, and this app has no timeline to spend the ramp on. Only one Curse per Warlock can be active, so this competes with Curse of the Elements — a raid running that debuff gives it to a different Warlock.",
+  },
+  {
+    className: 'Warlock',
+    spec: 'Affliction',
+    name: 'Siphon Life',
+    spellId: 30911,
+    rank: 6,
+    requiredLevel: 70,
+    effectType: 'DoT',
+    castTimeSeconds: 0,
+    gcdSeconds: 1.5,
+    resource: { type: 'Mana', cost: 410 },
+    periodic: {
+      durationSeconds: 30,
+      tickIntervalSeconds: 3,
+      ticks: 10,
+      totalBaseAmount: 630,
+      perTickBaseAmount: 63,
+    },
+    scaling: {
+      basis: 'hardcoded exception',
+      spellPowerCoefficient: 1.0,
+      spellPowerCoefficientPerTick: 0.1,
+      coefficientNotes:
+        'Upstream: `core.BaseDamageConfigMagicNoRoll(63, 0.1)`. 0.1 per tick over 10 ticks is 1.0, against the 2.0 duration/15 would give a 30s DoT — the steepest of the three penalties here, and the reason Siphon Life is the weakest global of the rotation.',
+    },
+    notes:
+      'The healing half is not modelled and is not a DPS matter: the tooltip transfers the damage as health to the Warlock, which keeps them alive rather than raising output. Cheapest DoT per global by damage, and the first one dropped on a short fight.',
+  },
+  {
+    className: 'Warlock',
+    spec: 'Affliction',
+    name: 'Shadow Bolt',
+    spellId: 27209,
+    rank: 11,
+    requiredLevel: 69,
+    effectType: 'Direct Damage',
+    castTimeSeconds: 3.0,
+    gcdSeconds: 1.5,
+    resource: { type: 'Mana', cost: 420 },
+    baseAmount: { min: 544, max: 607 },
+    scaling: {
+      basis: 'castTime/3.5',
+      spellPowerCoefficient: 0.8571,
+      coefficientNotes:
+        '3.0s cast / 3.5 = 0.8571, the plain direct-damage rule with no exception. These numbers were already recorded in the Unstable Affliction note as the correct filler; this entry is that note becoming data.',
+    },
+    notes:
+      'The filler, and the only ability here that is not a DoT. It fills whatever globals the DoTs leave, which is what makes an Affliction estimate a rotation rather than a sum — without it the spec idles between refreshes and reads far too low.',
+  },
+
   {
     className: 'Warlock',
     spec: 'Demonology',
