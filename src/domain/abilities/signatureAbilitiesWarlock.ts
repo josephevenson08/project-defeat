@@ -181,5 +181,39 @@ export const warlockSignatureAbilities: readonly SignatureAbility[] = [
     needsVerification: true,
     notes:
       'Incinerate is new in TBC and is the fire-themed Destruction filler, dealing an extra 111-128 when the target has Immolate on it — so the real rotation is Immolate maintained, Incinerate as filler, Conflagrate optional. The choice between Incinerate and Shadow Bolt as the Destruction signature is genuinely contested: many Phase 1/2 Destruction warlocks ran a shadow-damage build and spammed Shadow Bolt instead, because gear itemization and raid debuffs (Improved Shadow Bolt, Curse of Shadow) favoured shadow over fire in early TBC. Flagged for that reason — the numbers are solid, the choice of spell is the uncertain part. Shadow Bolt (rank 11, spell 27209, 3.0s, 544-607, coefficient 0.8571) is the alternative if a shadow-build Destruction model is wanted.',
+  },  {
+    className: 'Warlock',
+    spec: 'Destruction',
+    name: 'Immolate',
+    spellId: 27215,
+    rank: 9,
+    requiredLevel: 69,
+    effectType: 'DoT',
+    castTimeSeconds: 2.0,
+    gcdSeconds: 1.5,
+    resource: { type: 'Mana', cost: 445 },
+    /*
+     * A hybrid, and the only one modelled: 332 Fire on impact and 615 more over 15 seconds. The
+     * `baseAmount` is the direct half and `periodic` the rest, which is the split the type documents
+     * for Fireball and Regrowth — this is the first entry that actually uses it on both sides.
+     */
+    baseAmount: { min: 332, max: 332 },
+    periodic: {
+      durationSeconds: 15,
+      tickIntervalSeconds: 3,
+      ticks: 5,
+      totalBaseAmount: 615,
+      perTickBaseAmount: 123,
+    },
+    scaling: {
+      basis: 'hardcoded exception',
+      spellPowerCoefficient: 0.85,
+      spellPowerCoefficientPerTick: 0.13,
+      coefficientNotes:
+        'Two coefficients summed, because the spell has two halves: upstream is `BaseDamageConfigMagic(332, 332, 0.2)` for the impact and `BaseDamageConfigMagicNoRoll(615/5, 0.13)` for the DoT. 0.13 across five ticks is 0.65, plus 0.2 direct, so 0.85 for the whole cast. Shadow and Flame adds up to a further 0.04 per rank to the direct half only; it is not ingested, so this is the untalented figure.',
+    },
+    notes:
+      'The DoT Destruction maintains, and the reason Incinerate is the filler rather than Shadow Bolt: Incinerate deals an extra 111-128 against a target that has Immolate on it. **That bonus is not modelled**, which understates Incinerate by roughly a tenth of a cast — worth stating because in this rotation the condition is always true, so it is a known one-directional gap rather than a conditional the model correctly skips. Voidheart 4-piece adds a sixth tick and is not modelled either.',
   },
+
 ]

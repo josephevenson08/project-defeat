@@ -1105,7 +1105,14 @@ function resolveCasterRotation(
     const duration = dot.periodic!.durationSeconds
     if (duration <= 0) continue
 
-    const perApplication = (dot.periodic!.totalBaseAmount ?? 0) + spellPower * (dot.scaling.spellPowerCoefficient ?? 0)
+    /*
+     * A hybrid DoT lands part of its damage on impact — Immolate is 332 Fire immediately and 615 more
+     * over 15 seconds — so `baseAmount` counts alongside the periodic total. Reading only the
+     * periodic half would drop a third of that spell on the floor.
+     */
+    const direct = dot.baseAmount ? (dot.baseAmount.min + dot.baseAmount.max) / 2 : 0
+    const perApplication =
+      direct + (dot.periodic!.totalBaseAmount ?? 0) + spellPower * (dot.scaling.spellPowerCoefficient ?? 0)
 
     /*
      * The global a refresh costs, as a share of each second. An instant DoT costs its GCD; one with a
@@ -1227,8 +1234,13 @@ function calculateCasterDps(
    * describes a multi-spell rotation, that is what gets scored.
    */
   const rotationAbilities = getRotationAbilities(character.className, character.spec)
-  const multiSpell =
-    rotationAbilities.filter((ability) => ability.effectType === 'DoT' && !ability.channeled).length > 1
+  /*
+   * A rotation is "one or more maintained DoTs plus something else", not "two or more DoTs" — the
+   * first version required two and quietly left Destruction on the single-ability path, where its one
+   * maintained Immolate could not reach the estimate at all.
+   */
+  const maintainedDots = rotationAbilities.filter((ability) => ability.effectType === 'DoT' && !ability.channeled)
+  const multiSpell = maintainedDots.length >= 1 && rotationAbilities.length > 1
   const rotation = multiSpell
     ? resolveCasterRotation(
         rotationAbilities,

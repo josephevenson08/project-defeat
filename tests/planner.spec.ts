@@ -4456,13 +4456,14 @@ test('the rotation-coverage claim on the Simulation panel matches the ability da
    * Agony, Siphon Life and a Shadow Bolt filler alongside Unstable Affliction. Sorted rather than
    * listed in iteration order, so adding a class does not reorder the expectation.
    */
-  expect([...multiAbility].sort(), 'four specs have a real multi-ability rotation').toEqual([
+  expect([...multiAbility].sort(), 'five specs have a real multi-ability rotation').toEqual([
     'Priest Shadow',
     'Warlock Affliction',
+    'Warlock Destruction',
     'Warrior Arms',
     'Warrior Fury',
   ])
-  expect(singleAbility, 'and the other 23 are single-ability approximations').toBe(23)
+  expect(singleAbility, 'and the other 22 are single-ability approximations').toBe(22)
 })
 
 test('a hunter fires the button they press all fight, at a rate with two stated ceilings', () => {

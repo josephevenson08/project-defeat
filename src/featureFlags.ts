@@ -43,11 +43,12 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * **Shown for DPS specs since 2026-08-21, hidden for Healer and Tank**, and here is what is
  * actually true about it now.
  *
- * - **Rotations cover 4 specs of 27.** Warrior Arms and Fury press three buttons each; Affliction
+ * - **Rotations cover 5 specs of 27.** Warrior Arms and Fury press three buttons each; Affliction
  *   maintains four damage-over-time effects with a Shadow Bolt filler; Shadow keeps two DoTs up,
- *   presses Mind Blast on cooldown and channels Mind Flay in the gaps. The other 23 are a
- *   single-ability approximation, which understates any spec whose damage is spread across several
- *   buttons. Still the largest remaining gap. See ROTATION-SCOPE.md.
+ *   presses Mind Blast on cooldown and channels Mind Flay in the gaps; Destruction maintains Immolate
+ *   and fills with Incinerate. The other 22 are a single-ability approximation, which understates any
+ *   spec whose damage is spread across several buttons. Still the largest remaining gap. See
+ *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
  *   best case against them. The model reads **1.4x to 3.1x low**, and no spec may read *above* its
