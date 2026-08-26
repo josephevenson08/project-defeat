@@ -5111,6 +5111,20 @@ test('every DPS spec is measured against what players actually parse', () => {
   for (const row of rows) {
     expect(row.modelled, `${row.spec} produced no damage at all`).toBeGreaterThan(0)
   }
+
+  /*
+   * **The range `featureFlags.ts` quotes, asserted rather than written down.** That file says the
+   * model reads "1.4x to 2.6x low", and it has already carried a stale version of this exact
+   * sentence — it said 3.1x for a while after Shadow and Destruction improved, which is the fourth
+   * stale disclosure this project has found in a file whose whole job is describing its own limits.
+   *
+   * Pinned loosely on purpose: the bound is what the prose claims, so improving the model fails this
+   * and forces the sentence to be rewritten, which is the point.
+   */
+  const best = Math.min(...rows.map((row) => row.ratio))
+  const worst = Math.max(...rows.map((row) => row.ratio))
+  expect(best, 'featureFlags.ts claims the best spec is around 1.4x').toBeLessThan(1.5)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 2.6x').toBeLessThan(2.7)
 })
 
 test('a multiplier on a derived stat is applied after the stat is derived', () => {
@@ -5299,6 +5313,41 @@ test('a channel is the filler, not a DoT to be maintained', () => {
   const vt = getRotationAbilities('Priest', 'Shadow').find((ability) => ability.name === 'Vampiric Touch')!
   expect(vt.needsVerification, 'a derived coefficient must say so').toBe(true)
   expect(vt.scaling.basis).toBe('duration/15')
+})
+
+test('only a spec with a rage bar is told its rage income', () => {
+  /*
+   * Rage is derived from swings for every melee spec, because the arithmetic is identical whatever
+   * the class. The breakdown row was gated on the number being above zero and nothing else, so a
+   * **Combat Rogue read "Rage per second 4.1"** and an Enhancement Shaman 3.9 — classes with no rage
+   * bar at all.
+   *
+   * The figure was inert either way, since nothing in those rotations spends rage, which is what
+   * makes it worse rather than better: a reader has no way to tell an inert row from a meaningful
+   * one, and this panel's whole claim is that its numbers mean something.
+   */
+  const rageRow = (className: TbcClass, spec: TbcSpec) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const result = calculateSimulation(character, gear, calculateStats(character, gear), 'Physical DPS')
+    return result.breakdown.find((entry) => entry.label === 'Rage per second')
+  }
+
+  // A Warrior spends rage, and Heroic Strike's affordability is exactly what the row exists to explain.
+  expect(rageRow('Warrior', 'Fury'), 'a Fury warrior spends rage').toBeDefined()
+
+  // Nobody else does.
+  expect(rageRow('Rogue', 'Combat'), 'a rogue has energy, not rage').toBeUndefined()
+  expect(rageRow('Shaman', 'Enhancement'), 'a shaman has mana, not rage').toBeUndefined()
+  expect(rageRow('Paladin', 'Retribution'), 'a paladin has mana, not rage').toBeUndefined()
+  expect(rageRow('Druid', 'Feral'), 'cat form runs on energy').toBeUndefined()
+
+  /*
+   * Gated on the data rather than on a class list, so a spec that gains a rage-costed ability starts
+   * reporting income without anyone remembering to add it here.
+   */
+  const warriorSpends = getRotationAbilities('Warrior', 'Fury').some((ability) => ability.resource?.type === 'Rage')
+  expect(warriorSpends, 'the gate reads the ability data').toBe(true)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

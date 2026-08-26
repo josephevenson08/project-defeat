@@ -982,9 +982,21 @@ function calculatePhysicalDps(
     breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
   }
 
-  // Shown rather than kept internal: rage income is what decides whether the dump at the bottom of
-  // the priority is worth anything, so a reader can see why it contributes what it does.
-  if (rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
+  /*
+   * Shown rather than kept internal: rage income is what decides whether the dump at the bottom of
+   * the priority is worth anything, so a reader can see why it contributes what it does.
+   *
+   * **Gated on the spec actually having a rage-costed ability**, which it was not. Rage is derived
+   * from swings for every melee spec because the arithmetic is the same, so the row appeared for a
+   * Combat Rogue (4.1) and an Enhancement Shaman (3.9) — classes with no rage bar at all. The figure
+   * was inert either way, since nothing in those rotations spends it, so this was a display bug
+   * rather than a wrong number, and reads worse than one: a reader has no way to tell an inert row
+   * from a meaningful one.
+   */
+  const spendsRage = getRotationAbilities(character.className, character.spec).some(
+    (ability) => ability.resource?.type === 'Rage',
+  )
+  if (spendsRage && rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
   }
 
