@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/featureFlags.ts
-lines: 130
+lines: 131
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # featureFlags
 
-`src/featureFlags.ts` · **app** layer · 130 lines
+`src/featureFlags.ts` · **app** layer · 131 lines
 
 From the top of the file:
 

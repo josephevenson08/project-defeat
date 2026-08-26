@@ -51,9 +51,10 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.4x to 2.6x low** — a range this file got wrong once
- *   already by not moving when the model improved, which is why the test now asserts it. No spec may
- *   read *above* its
+ *   best case against them. The model reads **1.2x to 2.3x low** — a range this file has now got
+ *   wrong twice by not moving when the model improved, so the test brackets it on both sides and
+ *   fails on an improvement, which is the only thing that has reliably forced this prose to keep up.
+ *   No spec may read *above* its
  *   reference — a spec that does is double-counting something, which has been caught twice.
  * - **And "single-ability approximation" was itself too generous until 2026-08-23**, which is worth
  *   keeping here rather than quietly fixing: the three hunter specs had *no* ability modelled at all.

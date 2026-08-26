@@ -4985,12 +4985,50 @@ function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterR
   let gear = normalizeGearForCharacter(defaultGear, className, spec)
   const list = getBisListForSpec(className, spec)
   const filled = new Set<string>()
+
+  /*
+   * **Gems and enchants come with the item, and leaving them off was worth about a quarter of the
+   * gap this table exists to measure.** `defaultGear` sets `gemIds: []` and no `enchantId`, and the
+   * first version of this harness never read the entries' own `recommendedGemIds` /
+   * `recommendedEnchantId` — so it scored a "best case" character wearing raid gear with empty
+   * sockets and bare weapons, which is not a character anyone plays.
+   *
+   * Coverage is partial and that is fine: 7 of a spec's 15 rank-1 entries carry gems and 11 carry an
+   * enchant, so this raises the floor rather than reaching the true ceiling.
+   */
+  const equip = (slot: string, entry: { itemId: string; recommendedEnchantId?: string; recommendedGemIds?: string[] }) => {
+    const item = getItemById(entry.itemId)
+    if (!item) return false
+    gear = {
+      ...gear,
+      [slot]: {
+        ...(gear as Record<string, unknown>)[slot],
+        item,
+        gemIds: entry.recommendedGemIds ?? [],
+        ...(entry.recommendedEnchantId ? { enchantId: entry.recommendedEnchantId } : {}),
+      },
+    } as typeof gear
+    return true
+  }
+
   for (const entry of list?.entries ?? []) {
     if (entry.rank !== 1 || filled.has(entry.slot)) continue
-    const item = getItemById(entry.itemId)
-    if (!item) continue
-    filled.add(entry.slot)
-    gear = { ...gear, [entry.slot]: { ...(gear as Record<string, unknown>)[entry.slot], item } } as typeof gear
+    if (equip(entry.slot, entry)) filled.add(entry.slot)
+  }
+
+  /*
+   * **The paired slots, which the ranked list does not name.** It ranks `Finger 1` and `Trinket 1`
+   * and stops — there is no `Finger 2` row anywhere in the data — so a best-case character was
+   * walking around with one ring and one trinket. The second-ranked pick for the same slot is what a
+   * real player puts in the other one.
+   */
+  for (const [ranked, paired] of [
+    ['Finger 1', 'Finger 2'],
+    ['Trinket 1', 'Trinket 2'],
+  ] as const) {
+    if (filled.has(paired)) continue
+    const second = list?.entries.find((entry) => entry.slot === ranked && entry.rank === 2)
+    if (second && equip(paired, second)) filled.add(paired)
   }
 
   /*
@@ -5123,8 +5161,20 @@ test('every DPS spec is measured against what players actually parse', () => {
    */
   const best = Math.min(...rows.map((row) => row.ratio))
   const worst = Math.max(...rows.map((row) => row.ratio))
-  expect(best, 'featureFlags.ts claims the best spec is around 1.4x').toBeLessThan(1.5)
-  expect(worst, 'featureFlags.ts claims the worst spec is around 2.6x').toBeLessThan(2.7)
+
+  /*
+   * Bracketed on both sides rather than bounded on one, and that is deliberate. A one-sided bound
+   * passes silently while the model improves underneath it — which is exactly what happened the
+   * first time this was added: the harness gained gems and enchants, every spec moved, and the
+   * "1.4x to 2.6x" sentence went stale again without failing anything.
+   *
+   * Failing on an improvement is the feature. It is the only thing that has reliably forced this
+   * project's prose to keep up with its code.
+   */
+  expect(best, 'featureFlags.ts claims the best spec is around 1.2x').toBeGreaterThan(1.1)
+  expect(best).toBeLessThan(1.3)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 2.3x').toBeGreaterThan(2.2)
+  expect(worst).toBeLessThan(2.4)
 })
 
 test('a multiplier on a derived stat is applied after the stat is derived', () => {

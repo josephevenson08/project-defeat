@@ -497,8 +497,21 @@ reasons below), with Priest Shadow worst and Marksmanship Hunter closest. That i
 uniform spread than expected, and it argues that the missing damage is mostly *shared* machinery —
 haste, crit, proc handling — rather than twenty separate per-spec holes.
 
-**The first version of this harness was itself wrong by about 28%, and it is worth recording which
-way.** It ran with **no target debuffs**, where every real parse has Sunder Armor, Faerie Fire and
+**The harness has now been wrong twice, both times in the direction that flatters the next person to
+"improve" the model.** The second: it dressed every spec in raid gear with **empty sockets and bare
+weapons**, never reading the ranked entries' own `recommendedGemIds` and `recommendedEnchantId`, and
+left `Finger 2` and `Trinket 2` empty because the ranked list names only `Finger 1` and `Trinket 1`.
+Applying them took the slot count from 15 to 17 and moved every spec at once:
+
+    Shaman Enhancement   1076 -> 1305   (1.6x -> 1.3x)
+    Hunter Marksmanship   954 -> 1131   (1.4x -> 1.2x)
+    Warrior Fury         1131 -> 1305   (1.8x -> 1.6x)
+    Druid Feral           636 ->  728   (2.6x -> 2.3x)
+
+The range across the twenty is **1.2x to 2.3x** now. Found by a research agent auditing the
+simulator, and verified here before being acted on.
+
+**The first version of this harness was wrong by about 28%, in the same direction.** It ran with **no target debuffs**, where every real parse has Sunder Armor, Faerie Fire and
 Curse of Recklessness. Those strip 4,010 armour between them, and against this app's 7,700-armour
 target that is the difference between **42.2%** mitigation and **25.9%** — so the harness was
 measuring the model against a boss no raid ever fights. Correcting it moved Enhancement from 669 to
