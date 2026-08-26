@@ -352,6 +352,39 @@ deliver most of the accuracy without it.
 
 ---
 
+## Stage 3 begins — the pet, and an honest shortfall, 2026-08-23
+
+The first item on the not-built list, and the one the report sized as largest.
+
+    Hunter Marksmanship   1131 -> 1209   (1.2x -> 1.1x)
+    Hunter Beast Mastery  1247 -> 1325   (1.7x -> 1.6x)
+    Hunter Survival       1056 -> 1133   (1.6x -> 1.5x)
+
+**A pet is a second attacker, not an ability**, which is why it had nowhere to live: its own attack
+power, its own crit, its own weapon, none expressible in `SignatureAbility`. Every hunter estimate
+before this described a hunter standing alone.
+
+The mechanic the answer turns on: **a pet inherits no crit at all.** Upstream inherits attack power
+(22% of ranged), spell power, stamina and armour, and nothing else — so the pet rolls on its own base
+crit of about 6.8%, and putting it on the hunter's would have overstated it badly. Its attack power
+is `-20 + 162 Strength x 2 + 0.22 x owner ranged attack power`, and it is always happy, which is a
+flat 1.25x that upstream also applies unconditionally.
+
+**It closed less than expected and that is the finding, not a disappointment.** The pet adds roughly
+**6%** of a hunter's total where archon's own rotation data puts a real pet nearer a third. The
+missing part is named rather than absorbed: the focus-costed abilities (Bite, Claw, Gore, Screech)
+are not modelled, because the base focus regeneration is passed to `EnableFocusBar` as a *multiplier*
+rather than a rate and a number that cannot be read off the source is not one this repo invents; and
+none of the Beast Mastery talents that scale a pet are ingested — Unleashed Fury (+4% damage/rank),
+Serpent's Swiftness (+4% attack speed/rank), Ferocity (+2% crit/rank), Animal Handler, Frenzy. Kill
+Command is not implemented upstream either.
+
+So the next pet increment is **two sourcing jobs, not a modelling one**: the focus economy, and a
+pet-scaling kind in the talent ingest. Both are bounded, and the damage table added in stage 2 is what
+will show whether either lands.
+
+---
+
 ## Stage 2 of the migration path — a damage table that adds up, 2026-08-23
 
 `SimulationResult.damageSources` is every source, its DPS and its share, and **it sums to

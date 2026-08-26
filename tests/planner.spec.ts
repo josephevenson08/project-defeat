@@ -101,6 +101,12 @@ import {
 import { excludedByPhase } from '../src/domain/bis'
 import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
 import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
+import {
+  HUNTER_PET_ATTACK_POWER_INHERITANCE,
+  HUNTER_PET_BASE_STRENGTH,
+  HUNTER_PET_FLAT_ATTACK_POWER,
+  HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
+} from '../src/domain/simulation/hunterPet'
 import { validateBuild } from '../src/domain/builds/buildSerialization'
 import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
 import { sampleItemSets } from '../src/domain/gear/itemSets'
@@ -5171,8 +5177,8 @@ test('every DPS spec is measured against what players actually parse', () => {
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.2x').toBeGreaterThan(1.1)
-  expect(best).toBeLessThan(1.3)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.1x').toBeGreaterThan(1.05)
+  expect(best).toBeLessThan(1.2)
   expect(worst, 'featureFlags.ts claims the worst spec is around 2.3x').toBeGreaterThan(2.2)
   expect(worst).toBeLessThan(2.4)
 })
@@ -5504,6 +5510,63 @@ test('the damage table reaches the panel, not just the result object', async ({ 
   expect(shares.length).toBeGreaterThan(1)
   expect([...shares].sort((a, b) => b - a)).toEqual(shares)
   expect(shares.reduce((sum, share) => sum + share, 0), 'the shares are a distribution').toBeCloseTo(100, 0)
+})
+
+test('a hunter fights with a pet, and the pet rolls its own crit rather than the hunter’s', () => {
+  /*
+   * A pet is a **second attacker**, not an ability — its own attack power, its own crit, its own
+   * weapon, none of which `SignatureAbility` can express. Every hunter estimate before this described
+   * a hunter standing alone.
+   *
+   * The mechanic that decides whether the number is right: **a pet inherits no crit at all.**
+   * Upstream inherits attack power, spell power, stamina and armour and nothing else, so a pet rolls
+   * on its own base crit — 1.1515 + 1.8 flat, plus 127 Agility at one percent per 33 — and putting it
+   * on the hunter's crit would have overstated it badly.
+   */
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const result = calculateSimulation(hunter, gear, stats, 'Physical DPS')
+
+  const petDps = result.breakdown.find((entry) => entry.label === 'Pet DPS')
+  expect(petDps, 'a hunter brings a pet').toBeDefined()
+  expect(petDps!.value).toBeGreaterThan(0)
+
+  // It appears in the damage table as its own source, which is the point of having that table.
+  expect(result.damageSources?.some((source) => source.name === 'Pet')).toBe(true)
+
+  /*
+   * **Attack power is 22% of the hunter's ranged attack power, plus the pet's own.** Asserted against
+   * the arithmetic rather than a literal, so a change to either constant fails here.
+   */
+  const reported = result.breakdown.find((entry) => entry.label === 'Pet attack power')!.value
+  const expected =
+    HUNTER_PET_FLAT_ATTACK_POWER +
+    HUNTER_PET_BASE_STRENGTH * HUNTER_PET_STRENGTH_TO_ATTACK_POWER +
+    stats.rangedAttackPower * HUNTER_PET_ATTACK_POWER_INHERITANCE
+  expect(reported).toBeCloseTo(Math.round(expected * 10) / 10, 1)
+
+  /*
+   * The pet scales with the hunter's *ranged* attack power and nothing else — not melee, and not
+   * crit. Handing it 500 crit rating must move the hunter and leave the pet alone.
+   */
+  const critty = calculateStats(hunter, gear, [], [], { critRating: 500 })
+  const withCrit = calculateSimulation(hunter, gear, critty, 'Physical DPS')
+  expect(withCrit.scoreExact, 'the hunter benefits from crit').toBeGreaterThan(result.scoreExact)
+  expect(
+    withCrit.breakdown.find((entry) => entry.label === 'Pet DPS')!.value,
+    'the pet inherits no crit',
+  ).toBe(petDps!.value)
+
+  // And the estimate says what it left out, because white damage is not all a pet does.
+  expect(result.summary).toMatch(/white damage only/i)
+  expect(result.summary, 'the focus abilities are named').toMatch(/Bite, Claw, Gore, Screech/)
+
+  // Nobody else gets one.
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.breakdown.some((entry) => entry.label === 'Pet DPS')).toBe(false)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

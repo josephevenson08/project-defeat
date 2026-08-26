@@ -23,6 +23,7 @@ import {
 import type { WeaponDamageProfile } from '../../domain/simulation/specialAttacks'
 import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simulation/weaponImbues'
 import { estimatePaladinHolyDamage } from '../../domain/simulation/paladinSeals'
+import { HUNTER_PET_UNMODELLED, estimateHunterPet, hunterPetCritChance } from '../../domain/simulation/hunterPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -694,6 +695,11 @@ function calculatePhysicalDps(
    * would mean recomputing terms and risking a decomposition that does not add up to the answer.
    */
   const whiteSources: { name: string; raw: number }[] = []
+  /*
+   * Kept apart from `whiteSources` because a pet's damage is already post-armour when it arrives —
+   * it is a separate actor with its own table, so it cannot ride the player's mitigation step.
+   */
+  let hunterPet: ReturnType<typeof estimateHunterPet> | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -719,6 +725,36 @@ function calculatePhysicalDps(
       : undefined
 
     whiteSources.push({ name: 'Auto Shot', raw: rawDps })
+
+    /*
+     * The pet, which is a **second attacker** rather than an ability — its own attack power, its own
+     * crit, its own weapon, none of which `SignatureAbility` can express. Every hunter estimate
+     * before this described a hunter standing alone.
+     *
+     * Its table is built here rather than reused: a pet inherits **no crit at all** from its owner
+     * (upstream inherits attack power, spell power, stamina and armour, and nothing else), so it
+     * rolls on its own crit chance and would be badly overstated on the hunter's.
+     */
+    const petTable = buildWhiteAttackTable({
+      skillDiff,
+      dualWield: false,
+      expertiseSkillPoints: 0,
+      missReduction: 0,
+      rawCritChance: hunterPetCritChance(),
+      attacksFromBehind: true,
+    })
+    const petGlance = computeGlanceDamageRange(skillDiff)
+    const petMultiplier =
+      petTable.hit +
+      petTable.block +
+      petTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER +
+      petTable.glance * ((petGlance.low + petGlance.high) / 2)
+
+    hunterPet = estimateHunterPet({
+      ownerRangedAttackPower: stats.rangedAttackPower,
+      attackTableMultiplier: petMultiplier,
+      armorMitigation,
+    })
 
     rangedContext = {
       swingSeconds: rangedSwingSeconds,
@@ -1010,7 +1046,9 @@ function calculatePhysicalDps(
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
    */
   const damageMultiplier = 1 + buffs.damageMultiplier
-  const mitigatedDps = ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier
+  const mitigatedDps =
+    ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier +
+    (hunterPet?.dps ?? 0) * damageMultiplier
 
   /*
    * The same total, itemised. Every physical source takes armour and the damage multiplier; the Holy
@@ -1022,10 +1060,13 @@ function calculatePhysicalDps(
    * a sum that no longer matches the answer, instead of as a plausible row nobody checks.
    */
   const physical = (raw: number) => raw * (1 - armorMitigation) * damageMultiplier
+  // Already mitigated by its own model, so it takes the damage multiplier and nothing else.
+  const petDps = (hunterPet?.dps ?? 0) * damageMultiplier
   const sources: { name: string; dps: number }[] = [
     ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
     ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
   ]
+  if (petDps > 0) sources.push({ name: 'Pet', dps: petDps })
   if (paladinHoly) {
     sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
     sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * damageMultiplier })
@@ -1057,6 +1098,11 @@ function calculatePhysicalDps(
    * Named individually rather than as one "Holy damage" line, because which seal a paladin is running
    * is a faction fact a reader will want to see stated rather than inferred from a number.
    */
+  if (hunterPet) {
+    breakdown.push({ label: 'Pet DPS', value: round(petDps) })
+    breakdown.push({ label: 'Pet attack power', value: round(hunterPet.attackPower) })
+  }
+
   if (paladinHoly && paladinHoly.totalDps > 0) {
     breakdown.push({ label: `${paladinHoly.sealName} DPS`, value: round(paladinHoly.sealDps) })
     breakdown.push({ label: `${paladinHoly.judgementName} DPS`, value: round(paladinHoly.judgementDps) })
@@ -1099,6 +1145,8 @@ function calculatePhysicalDps(
     : ''
   const excludedNote = rotation.excluded.length > 0 ? ` ${describeUnmodelledSpecials(character, rotation.excluded)}` : ''
 
+  const petSummary = hunterPet ? ` The pet is counted as a second attacker, and ${HUNTER_PET_UNMODELLED}` : ''
+
   const holySummary = paladinHoly
     ? ` ${paladinHoly.sealName} rides every landed swing and ${paladinHoly.judgementName} lands on its 10s cooldown; both are Holy, so armor does not reduce them. Which seal you get is decided by faction — Seal of Blood is Horde-only in Phase 2.`
     : ''
@@ -1116,7 +1164,7 @@ function calculatePhysicalDps(
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
     damageSources: toDamageSources(sources),
-    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}${holySummary}`,
+    summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}${holySummary}${petSummary}`,
     breakdown,
   }
 }

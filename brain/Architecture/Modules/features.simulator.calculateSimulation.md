@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateSimulation.ts
-lines: 1665
+lines: 1713
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateSimulation
 
-`src/features/simulator/calculateSimulation.ts` · **features** layer · 1665 lines
+`src/features/simulator/calculateSimulation.ts` · **features** layer · 1713 lines
 
 _No doc comment at the top of this file._
 
@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
+- [[domain.simulation.hunterPet]] — `src/domain/simulation/hunterPet.ts`
 - [[domain.simulation.manaModel]] — `src/domain/simulation/manaModel.ts`
 - [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`
 - [[domain.simulation.rageModel]] — `src/domain/simulation/rageModel.ts`
