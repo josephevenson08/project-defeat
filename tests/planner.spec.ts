@@ -5400,6 +5400,112 @@ test('only a spec with a rage bar is told its rage income', () => {
   expect(warriorSpends, 'the gate reads the ability data').toBe(true)
 })
 
+test('the damage breakdown is complete, and adds up to the answer', () => {
+  /*
+   * `breakdown` mixes inputs with outputs — attack power and crit chance sit beside
+   * `Windfury Weapon DPS` — so it cannot be summed and cannot be compared against a log.
+   * `damageSources` is the other half: every source, its DPS, its share, and **it sums to
+   * `scoreExact`**.
+   *
+   * That invariant is the whole value. "The total is 3.3x low" and "white damage is 3.2x low while
+   * Windfury is 5.7x low" are different pieces of information and only the second says what to fix —
+   * the reference parse in `ROTATION-SCOPE.md` is exactly that comparison, worked out by hand. A
+   * source dropped, double-counted, or mitigated on the wrong side of the armour term shows up here
+   * as a sum that stops matching, rather than as a plausible row nobody checks.
+   */
+  for (const entry of tbcClasses) {
+    for (const spec of entry.specs) {
+      const role = getRoleForSpec(entry.className, spec)
+      if (role !== 'Physical DPS' && role !== 'Caster DPS') continue
+
+      const character: CharacterProfile = {
+        faction: 'Alliance',
+        race: legalRaceFor(entry.className),
+        className: entry.className,
+        spec,
+      }
+      const gear = normalizeGearForCharacter(defaultGear, entry.className, spec)
+      const result = calculateSimulation(character, gear, calculateStats(character, gear), role)
+
+      const sources = result.damageSources ?? []
+      expect(sources.length, `${entry.className} ${spec} must decompose its damage`).toBeGreaterThan(0)
+
+      const summed = sources.reduce((total, source) => total + source.dps, 0)
+      expect(summed, `${entry.className} ${spec}: sources must sum to the score`).toBeCloseTo(result.scoreExact, 6)
+
+      // Shares are a real distribution, not decoration.
+      const shares = sources.reduce((total, source) => total + source.share, 0)
+      expect(shares, `${entry.className} ${spec}: shares must sum to 1`).toBeCloseTo(1, 6)
+
+      // Sorted biggest first, which is the order a log reports and the order a reader scans.
+      const dpsValues = sources.map((source) => source.dps)
+      expect([...dpsValues].sort((a, b) => b - a)).toEqual(dpsValues)
+
+      // Nothing contributes zero: an ability that does is reported through `excluded` with a reason,
+      // and a silent 0% row would say the same thing while explaining nothing.
+      for (const source of sources) expect(source.dps, `${source.name} is a 0% row`).toBeGreaterThan(0)
+    }
+  }
+})
+
+test('the healer and tank paths report no damage sources at all', () => {
+  /*
+   * They score healing and effective health, so a damage decomposition would be a category error
+   * rather than an empty list. Asserted because "absent" and "empty" read the same in the UI and
+   * mean different things.
+   */
+  const healer: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Priest', spec: 'Holy' }
+  const healerGear = normalizeGearForCharacter(defaultGear, 'Priest', 'Holy')
+  expect(
+    calculateSimulation(healer, healerGear, calculateStats(healer, healerGear), 'Healer').damageSources,
+  ).toBeUndefined()
+
+  const tank: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Protection' }
+  const tankGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Protection')
+  expect(calculateSimulation(tank, tankGear, calculateStats(tank, tankGear), 'Tank').damageSources).toBeUndefined()
+})
+
+test('the damage table reaches the panel, not just the result object', async ({ page }) => {
+  /*
+   * This project's signature failure is researched, correct data that reaches no surface — the
+   * decision log has a note about it and it has happened at least three times. A complete damage
+   * decomposition that only a test can see would be the fourth.
+   */
+  await openApp(page)
+  /*
+   * Dressed first. A bare character's Whirlwind contributes nothing — it scales off a weapon there is
+   * none of — and is correctly filtered out, so an undressed run is a thinner table than the one this
+   * is checking the shape of.
+   */
+  await equipDefaultGear(page)
+  await runSimulation(page)
+
+  const table = page.getByTestId('simulation-damage-sources')
+  await expect(table).toBeVisible()
+
+  // The default character is a Fury Warrior, so white damage and both cooldowns should be listed.
+  await expect(table).toContainText('Melee main hand')
+  await expect(table).toContainText('Bloodthirst')
+  await expect(table).toContainText('Whirlwind')
+
+  // Shares are rendered as percentages, which is the column a reader compares against a log.
+  await expect(table).toContainText('%')
+
+  const rows = table.locator('.damage-source')
+  await expect(rows.first()).toBeVisible()
+
+  /*
+   * Biggest first. A log sorts its damage table and so does this, because the first question anyone
+   * asks it is "what is the largest thing here".
+   */
+  const shares = await rows.evaluateAll((nodes) =>
+    nodes.map((node) => Number((node.querySelector('.damage-source-share')?.textContent ?? '0').replace('%', ''))),
+  )
+  expect(shares.length).toBeGreaterThan(1)
+  expect([...shares].sort((a, b) => b - a)).toEqual(shares)
+  expect(shares.reduce((sum, share) => sum + share, 0), 'the shares are a distribution').toBeCloseTo(100, 0)
+})
+
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
   /*
    * It used to, and that was written when the catalogue held 230 hand-written items. It now holds

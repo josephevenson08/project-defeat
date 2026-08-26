@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/SimulatorPanel.tsx
-lines: 105
+lines: 132
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.SimulatorPanel
 
-`src/features/simulator/SimulatorPanel.tsx` · **features** layer · 105 lines
+`src/features/simulator/SimulatorPanel.tsx` · **features** layer · 132 lines
 
 _No doc comment at the top of this file._
 

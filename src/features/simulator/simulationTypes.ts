@@ -5,6 +5,14 @@ export type SimulationBreakdownEntry = {
   value: number
 }
 
+export type DamageSource = {
+  name: string
+  /** Post-mitigation DPS, so these are directly comparable with each other and with a log. */
+  dps: number
+  /** Fraction of the total, which is the column a log reports and the one a reader scans first. */
+  share: number
+}
+
 export type SimulationResult = {
   role: CharacterRole
   metricLabel: 'Estimated DPS' | 'Estimated Healing' | 'Effective Health'
@@ -41,4 +49,20 @@ export type SimulationResult = {
    */
   unmodelledTalentNote?: string
   breakdown: SimulationBreakdownEntry[]
+  /**
+   * Every source of damage, its DPS, and its share of the total — the shape a Warcraft Logs damage
+   * table has.
+   *
+   * **Distinct from `breakdown`, which mixes inputs with outputs.** That list carries attack power
+   * and crit chance beside `Windfury Weapon DPS`, so it cannot be summed and cannot be compared to a
+   * log. This one is a complete decomposition and **sums to `scoreExact`**, which is asserted.
+   *
+   * That invariant is the point of it. "The total is 3.3x low" and "white damage is 3.2x low while
+   * Windfury is 5.7x low" are completely different pieces of information, and only the second tells
+   * anyone what to fix — the reference parse in `ROTATION-SCOPE.md` is exactly that comparison, done
+   * by hand. This makes it something the app produces rather than something a person reconstructs.
+   *
+   * Absent on the healer and tank paths, which score healing and effective health rather than damage.
+   */
+  damageSources?: readonly DamageSource[]
 }

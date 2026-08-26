@@ -352,6 +352,31 @@ deliver most of the accuracy without it.
 
 ---
 
+## Stage 2 of the migration path — a damage table that adds up, 2026-08-23
+
+`SimulationResult.damageSources` is every source, its DPS and its share, and **it sums to
+`scoreExact`**, which a test asserts for all twenty DPS specs.
+
+`breakdown` could not do this job: it mixes inputs with outputs — attack power and crit chance sit
+beside `Windfury Weapon DPS` — so it cannot be summed and cannot be laid next to a log.
+
+**The invariant is the point.** "The total is 3.3x low" and "white damage is 3.2x low while Windfury
+is 5.7x low" are different pieces of information, and only the second says what to fix. The reference
+Hydross comparison earlier in this file is exactly that, worked out by hand from a Warcraft Logs
+table; this makes it something the app produces. A source dropped, double-counted, or mitigated on
+the wrong side of the armour term now shows up as a sum that stops matching, rather than as a
+plausible row nobody checks.
+
+It renders in the panel, sorted biggest first with a share bar, in the shape a log uses — because a
+complete decomposition only a test can see would be this project's signature failure for the fourth
+time.
+
+One asymmetry worth knowing if you extend it: **physical sources take armour and the damage
+multiplier, Holy sources take only the multiplier.** That is why the list is built where the total is
+rather than by scaling a flat list uniformly afterwards.
+
+---
+
 ## Stage 3, and it did not need a timeline — 2026-08-23
 
 **Stage 3 was scoped as "the first stage that adds a mechanism", needing a concurrent-DoT uptime

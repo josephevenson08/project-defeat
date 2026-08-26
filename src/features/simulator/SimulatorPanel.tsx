@@ -80,6 +80,33 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
             </p>
           )}
 
+          {/*
+            Where the damage actually comes from, in the shape a Warcraft Logs damage table has.
+
+            Above the breakdown rather than below, because it answers the question a reader has first
+            — "what is this number made of" — where `breakdown` answers "how was it computed". The two
+            were one list until now, and mixing an input like crit chance in with an output like
+            Windfury DPS is what stopped either question being answerable.
+
+            The bar is the share, drawn the way a log draws it, so a spec can be scanned rather than
+            read.
+          */}
+          {result.damageSources && result.damageSources.length > 0 && (
+            <div className="damage-sources" data-testid="simulation-damage-sources">
+              <h4 className="damage-sources-heading">Damage sources</h4>
+              {result.damageSources.map((source) => (
+                <div className="damage-source" key={source.name}>
+                  <span className="damage-source-name">{source.name}</span>
+                  <span className="damage-source-bar" aria-hidden="true">
+                    <span style={{ width: `${Math.max(1, source.share * 100)}%` }} />
+                  </span>
+                  <span className="damage-source-share">{(source.share * 100).toFixed(1)}%</span>
+                  <strong className="damage-source-dps">{Math.round(source.dps * 10) / 10}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="breakdown-list" aria-label="Result breakdown">
             {result.breakdown.map((entry) => (
               <div key={entry.label}>

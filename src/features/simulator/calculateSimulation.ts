@@ -57,7 +57,7 @@ import type { CharacterProfile, CharacterRole } from '../character/characterType
 import { twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import type { EquippedGear } from '../gear/gearTypes'
 import type { StatBlock } from '../stats/statsTypes'
-import type { SimulationBreakdownEntry, SimulationResult } from './simulationTypes'
+import type { DamageSource, SimulationBreakdownEntry, SimulationResult } from './simulationTypes'
 
 const PLAYER_LEVEL = 70
 const DUAL_WIELD_WEAPON_TYPES = new Set(['Axe', 'Dagger', 'Fist Weapon', 'Mace', 'Sword'])
@@ -591,6 +591,24 @@ function describeUnmodelledSpecials(character: CharacterProfile, excluded: Resol
   return `Not included: ${named}. That damage is missing from this estimate.`
 }
 
+/**
+ * Turns a list of named DPS figures into shares, dropping anything that contributes nothing.
+ *
+ * Sorted by size, because the first question anyone asks a damage table is "what is the biggest
+ * thing here" and a log answers it by sorting. Zero-DPS rows are dropped rather than shown at 0%:
+ * an ability that contributes nothing is reported through `excluded` with a *reason*, and a silent
+ * 0% row would say the same thing while explaining nothing.
+ */
+function toDamageSources(sources: readonly { name: string; dps: number }[]): DamageSource[] {
+  const total = sources.reduce((sum, source) => sum + source.dps, 0)
+  if (total <= 0) return []
+
+  return sources
+    .filter((source) => source.dps > 0)
+    .map((source) => ({ name: source.name, dps: source.dps, share: source.dps / total }))
+    .sort((a, b) => b.dps - a.dps)
+}
+
 function calculatePhysicalDps(
   character: CharacterProfile,
   gear: EquippedGear,
@@ -668,6 +686,14 @@ function calculatePhysicalDps(
    * this must not be.
    */
   let paladinHoly: ReturnType<typeof estimatePaladinHolyDamage> | undefined
+  /*
+   * White damage, itemised as it is built rather than reconstructed afterwards.
+   *
+   * `rawDps` stays exactly as it was and is still what the total is computed from — this records the
+   * same numbers a second time so they can be reported per source. Deriving the split afterwards
+   * would mean recomputing terms and risking a decomposition that does not add up to the answer.
+   */
+  const whiteSources: { name: string; raw: number }[] = []
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -691,6 +717,8 @@ function calculatePhysicalDps(
     const rangedSwingSeconds = rangedItem?.weaponSpeed
       ? rangedItem.weaponSpeed / (gearAttackSpeedMultiplier * talents.rangedAttackSpeedMultiplier)
       : undefined
+
+    whiteSources.push({ name: 'Auto Shot', raw: rawDps })
 
     rangedContext = {
       swingSeconds: rangedSwingSeconds,
@@ -754,6 +782,8 @@ function calculatePhysicalDps(
       ? (offHandWeaponDps + apDps) * 0.5 * effectiveMultiplier * attackSpeedMultiplier * talents.offHandDamageMultiplier * physicalMultiplier
       : 0
     rawDps = mainHandDps + offHandDps
+    whiteSources.push({ name: 'Melee main hand', raw: mainHandDps })
+    if (offHandDps > 0) whiteSources.push({ name: 'Melee off hand', raw: offHandDps })
 
     /*
      * Rage income, from the same swings the white damage above is built on.
@@ -843,6 +873,10 @@ function calculatePhysicalDps(
       })
 
       rawDps += windfury.dps
+      // Split by hand, because a log reports two Windfury rows and a reader comparing them wants the
+      // same two here rather than one number they have to take apart.
+      if (windfury.mainHandDps > 0) whiteSources.push({ name: 'Windfury main hand', raw: windfury.mainHandDps })
+      if (windfury.offHandDps > 0) whiteSources.push({ name: 'Windfury off hand', raw: windfury.offHandDps })
     }
 
     /*
@@ -978,6 +1012,25 @@ function calculatePhysicalDps(
   const damageMultiplier = 1 + buffs.damageMultiplier
   const mitigatedDps = ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier
 
+  /*
+   * The same total, itemised. Every physical source takes armour and the damage multiplier; the Holy
+   * sources take only the multiplier, which is the one asymmetry in this list and the reason it is
+   * built here rather than by scaling a flat list uniformly.
+   *
+   * A test asserts these sum to `mitigatedDps`. That is what makes the decomposition worth having:
+   * a source dropped, double-counted, or mitigated on the wrong side of the armour term shows up as
+   * a sum that no longer matches the answer, instead of as a plausible row nobody checks.
+   */
+  const physical = (raw: number) => raw * (1 - armorMitigation) * damageMultiplier
+  const sources: { name: string; dps: number }[] = [
+    ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
+    ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
+  ]
+  if (paladinHoly) {
+    sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
+    sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * damageMultiplier })
+  }
+
   for (const entry of rotation.specials) {
     breakdown.push({ label: `${entry.name} DPS`, value: round(entry.dps * (1 - armorMitigation)) })
   }
@@ -1062,6 +1115,7 @@ function calculatePhysicalDps(
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,
+    damageSources: toDamageSources(sources),
     summary: `White-damage attack-table estimate vs. a level ${target.level} target: weapon damage (where known) plus attack power, scaled by miss/dodge/glance/crit outcomes, then reduced by armor mitigation. Attacks are taken from behind the target, so parry and block cannot occur.${specialSummary}${holySummary}`,
     breakdown,
   }
@@ -1263,12 +1317,23 @@ function calculateCasterDps(
     : undefined
 
   let dps = singleAbilityDps
+  let casterSources: { name: string; dps: number }[] = [{ name: cast.label, dps: singleAbilityDps }]
 
   if (rotation) {
     const shared = (1 + debuffs.spellDamageTakenMultiplier) * talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
     const dotDps = rotation.dots.reduce((sum, dot) => sum + dot.dps, 0) * spellHitChance * shared
     const fillerDps = (rotation.filler?.dps ?? 0) * spellHitChance * shared
     dps = dotDps + fillerDps
+
+    /*
+     * Every spell in the rotation, itemised. The caster path is the easy half of this: the resolver
+     * already returns each DoT and the filler separately, so the decomposition is the same numbers
+     * the total is built from rather than a second derivation.
+     */
+    casterSources = [
+      ...rotation.dots.map((dot) => ({ name: dot.name, dps: dot.dps * spellHitChance * shared })),
+      ...(rotation.filler ? [{ name: rotation.filler.name, dps: fillerDps }] : []),
+    ]
 
     for (const dot of rotation.dots) {
       breakdown.push({ label: `${dot.name} DPS`, value: round(dot.dps * spellHitChance * shared) })
@@ -1295,6 +1360,7 @@ function calculateCasterDps(
     metricLabel: 'Estimated DPS',
     score: round(dps),
     scoreExact: dps,
+    damageSources: toDamageSources(casterSources),
     summary,
     breakdown,
   }
