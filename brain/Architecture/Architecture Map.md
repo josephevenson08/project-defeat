@@ -100,7 +100,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
 - [[domain.abilities.abilityTypes]] · 11 importers
-- [[domain.abilities.index]] · 2 importers
+- [[domain.abilities.index]] · 3 importers
 - [[domain.abilities.sampleSignatureAbilities]] · 1 importers
 - [[domain.abilities.signatureAbilitiesDruid]] · 1 importers
 - [[domain.abilities.signatureAbilitiesHunter]] · 1 importers
@@ -133,7 +133,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 9 importers
 - [[domain.character.sampleRacialTraits]] · 1 importers
-- [[domain.character.tbcClasses]] · 7 importers
+- [[domain.character.tbcClasses]] · 8 importers
 - [[domain.consumables.consumableCatalogueJson.d]] · 0 importers
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers

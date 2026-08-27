@@ -539,8 +539,13 @@ In leverage order, each one a closed-form addition to the existing engine, each 
 falsification test `ROTATION-SCOPE.md` already established (removing the addition must reproduce the
 previous number exactly):
 
-1. **Pets** — a second actor with its own attack table and attack power. Largest single item, and it
-   is not a timeline problem. Unblocks six refused Beast Mastery talents.
+1. ~~**Pets** — a second actor with its own attack table and attack power. Largest single item, and it
+   is not a timeline problem. Unblocks six refused Beast Mastery talents.~~ **White damage and the
+   four scaling talents landed 2026-08-23 and 2026-08-27; the focus-costed abilities have not.** Four
+   of the six refused talents are ingested. The pet is 11.2% of a best-case Beast Mastery hunter
+   against the ~28% this report attributed to it, and the remainder is Bite, Claw, Gore and Screech —
+   a rate model on a focus economy that is now fully sourced (`sim/hunter/focus.go`, 5 focus/sec).
+   The rest of this list is untouched. See `ROTATION-SCOPE.md`.
 2. **Slice and Dice, poisons, Combat Potency** — the three that make a Rogue a Rogue. All rate
    arithmetic; the fixed point (haste → off-hand swings → energy → finishers → haste) converges in
    three or four passes.

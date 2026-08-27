@@ -64,6 +64,14 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
  *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
  *   is the size of the hole a filter literal was hiding.
+ * - **A hunter's pet is a second attacker, and it swings but does not use its abilities.** Its white
+ *   damage is modelled — its own weapon, its own attack table, 22% of the owner's ranged attack power
+ *   and no inherited crit — along with the four Beast Mastery talents that scale it. What is missing
+ *   is the focus-costed half: Bite, Claw, Gore and Screech. The focus that pays for them is sourced
+ *   (25 every 5 seconds, from `sim/hunter/focus.go` rather than `sim/core`, which is why it stayed
+ *   unsourced so long); the rate a pet spends it at is not. The estimate names the gap, and names the
+ *   pet family it assumes, because the eight families span 0.91 to 1.1 on damage and this app has no
+ *   picker for them.
  * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
  *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
  *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**

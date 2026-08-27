@@ -198,14 +198,16 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   rail, the gear rankings and the upgrade finder as well as the estimate. **A named list of talent
   groups is still refused**, each with a reason — the count is asserted from the data rather than
   written here, because the figure that used to sit in this sentence went stale the moment the ingest
-  changed. Two kinds dominate: per-spell effects (Ignite, Shadow
-  Weaving, Ruin, every "Improved &lt;nuke&gt;") need a spell school this simulator does not record,
-  and stat-pipeline effects (Toughness, Vitality) would have to route through `calculateStats`, which
-  is a deliberate open decision. **Expect a talented estimate to read low**, especially for casters.
-- **Talents do not reach the always-visible stat rail.** They are applied inside the simulation only,
-  so spending points changes the estimate but not the paperdoll totals, the gear rankings, or the
-  upgrade finder. That is deliberate — widening it is the open product decision above — but it means
-  the two surfaces disagree by design.
+  changed. **One kind dominates now**: per-spell effects (Ignite, Shadow Weaving, Ruin, every
+  "Improved &lt;nuke&gt;") need a spell school this simulator does not record. The stat-pipeline
+  effects this sentence used to name alongside them — Toughness, Vitality, Divine Strength — stopped
+  being refused on 2026-08-21 when talents reached `calculateStats`, and a test now fails if any
+  refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
+- **A hunter's pet swings but does not use its abilities.** Its white damage is modelled — its own
+  weapon and attack table, 22% of the owner's ranged attack power, no inherited crit — along with the
+  four Beast Mastery talents that scale it. Bite, Claw, Gore and Screech are not: the focus that pays
+  for them is sourced, the rate a pet spends it at is not. The estimate names the gap, and names the
+  pet family it assumes, because the eight families span 0.91 to 1.1 on damage and there is no picker.
 - The layout is fluid and reflows to phone width. It previously had a ~806px floor from fixed
   containers, a hard two-column content grid and a non-wrapping tab bar; all three are responsive now.
 - Feral Druid is treated as physical DPS until bear/cat mode support is split.

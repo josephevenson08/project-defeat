@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
+- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

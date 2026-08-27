@@ -1,10 +1,31 @@
 import { useEffect } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
+import { getRotationAbilities } from '../../domain/abilities'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
+import { tbcClasses } from '../../domain/character/tbcClasses'
 import { animateResultCard } from '../../lib/animations'
 import type { SimulationResult } from './simulationTypes'
+
+/**
+ * How many specs have a real multi-ability rotation, **computed rather than written down**.
+ *
+ * This sentence said "two specs" while the answer was five, and it had been wrong since the day
+ * Affliction, Shadow and Destruction gained their rotations. A test in `planner.spec.ts` already
+ * asserted the real figure and its own comment even quoted the panel's stale number — so the count
+ * was known to be wrong and nothing connected the two, which is this repo's recurring failure in its
+ * purest form: prose describing code, updated by hand, on a surface a player reads.
+ *
+ * Derived at module scope because the ability catalogue is static data. Nothing here can drift now:
+ * adding a rotation moves the number on screen in the same commit.
+ */
+const rotationCoverage = tbcClasses
+  .flatMap((entry) => entry.specs.map((spec) => getRotationAbilities(entry.className, spec).length))
+  .reduce(
+    (totals, count) => (count > 1 ? { ...totals, multi: totals.multi + 1 } : { ...totals, single: totals.single + 1 }),
+    { multi: 0, single: 0 },
+  )
 
 type SimulatorPanelProps = {
   result: SimulationResult | undefined
@@ -39,10 +60,10 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
       <p className="panel-copy">
         Runs a TBC attack-table/spell-table simulation against the target configured above, using the current
         character&apos;s stat totals, talents, active buffs and consumables, and any target debuffs toggled below.
-        <strong> Rotation coverage is the standing gap:</strong> two specs layer their real special attacks on top of
-        auto attacks, and the rest are modeled from a single signature ability, which understates any spec whose damage
-        is spread across several buttons. Every estimate&apos;s summary names what it left out and why — read it, because
-        the caveats differ by spec rather than being boilerplate.
+        <strong> Rotation coverage is the standing gap:</strong> {rotationCoverage.multi} specs layer their real special
+        attacks on top of auto attacks, and the other {rotationCoverage.single} are modeled from a single signature
+        ability, which understates any spec whose damage is spread across several buttons. Every estimate&apos;s summary
+        names what it left out and why — read it, because the caveats differ by spec rather than being boilerplate.
       </p>
       <Button onClick={onRun}>Run Simulation</Button>
       {result ? (

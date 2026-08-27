@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/hunterPet.ts
-lines: 110
+lines: 195
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.hunterPet
 
-`src/domain/simulation/hunterPet.ts` · **domain** layer · 110 lines
+`src/domain/simulation/hunterPet.ts` · **domain** layer · 195 lines
 
 From the top of the file:
 
@@ -20,23 +20,21 @@ From the top of the file:
 > `SignatureAbility` — so a spec whose damage is meaningfully a pet's had no way to say so, and every
 > hunter estimate silently described a hunter standing alone.
 > 
-> Every constant is read from wowsims/tbc `sim/hunter/pet.go` and `sim/hunter/talents.go` at the
-> pinned commit 3301fca5.
+> Every constant is read from wowsims/tbc `sim/hunter/pet.go`, `sim/hunter/focus.go` and
+> `sim/hunter/talents.go` at the pinned commit 3301fca5.
 > 
 > **What this models is the pet's white damage only, and the shortfall is stated rather than
 > discovered.** Its focus-costed abilities — Bite, Claw, Gore, Screech — are real damage and are not
-> here: they are limited by a focus economy whose base regeneration rate is passed to
-> `EnableFocusBar` as a *multiplier* rather than a rate, and a number that cannot be read off the
-> source is not one this repo invents. Kill Command is not implemented upstream either. The
-> Beast Mastery talents that scale a pet are likewise absent — see `HUNTER_PET_UNMODELLED`.
+> here. The focus economy they spend from *is* now sourced (see `HUNTER_PET_FOCUS_PER_SECOND`), so
+> what remains is the rate model rather than the constants.
 
 ## Exports
 
 **function** — `estimateHunterPet`, `hunterPetCritChance`
 
-**const** — `HUNTER_PET_AGILITY_PER_CRIT_PERCENT`, `HUNTER_PET_ATTACK_POWER_INHERITANCE`, `HUNTER_PET_BASE_AGILITY`, `HUNTER_PET_BASE_STRENGTH`, `HUNTER_PET_FLAT_ATTACK_POWER`, `HUNTER_PET_FLAT_CRIT_PERCENT`, `HUNTER_PET_HAPPINESS_MULTIPLIER`, `HUNTER_PET_STRENGTH_TO_ATTACK_POWER`, `HUNTER_PET_SWING_SECONDS`, `HUNTER_PET_UNMODELLED`, `HUNTER_PET_WEAPON_DAMAGE`
+**const** — `HUNTER_PET_AGILITY_PER_CRIT_PERCENT`, `HUNTER_PET_ATTACK_POWER_INHERITANCE`, `HUNTER_PET_AUTO_ATTACK_MULTIPLIER`, `HUNTER_PET_BASE_AGILITY`, `HUNTER_PET_BASE_STRENGTH`, `HUNTER_PET_DEFAULT_FAMILY`, `HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER`, `HUNTER_PET_FLAT_ATTACK_POWER`, `HUNTER_PET_FLAT_CRIT_PERCENT`, `HUNTER_PET_FOCUS_PER_SECOND`, `HUNTER_PET_FOCUS_PER_TICK`, `HUNTER_PET_FOCUS_TICK_SECONDS`, `HUNTER_PET_HAPPINESS_MULTIPLIER`, `HUNTER_PET_MAX_FOCUS`, `HUNTER_PET_MELEE_SPEED_MULTIPLIER`, `HUNTER_PET_STRENGTH_TO_ATTACK_POWER`, `HUNTER_PET_SWING_SECONDS`, `HUNTER_PET_UNMODELLED`, `HUNTER_PET_WEAPON_DAMAGE`, `noHunterPetTalents`
 
-**type** — `HunterPetEstimate`, `HunterPetInput`
+**type** — `HunterPetEstimate`, `HunterPetInput`, `HunterPetTalents`
 
 ## Imports
 

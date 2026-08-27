@@ -75,6 +75,27 @@ export type TalentModifiers = {
   rangedDamageMultiplier: number
   /** Multiplies ranged attack speed. Hunter's Serpent's Swiftness. 1 when untalented. */
   rangedAttackSpeedMultiplier: number
+  /*
+   * The four fields that reach the hunter's **pet** rather than the hunter.
+   *
+   * They are separate fields rather than reuses of the melee ones for the reason the pet exists as
+   * its own model at all: a pet is a second actor with its own attack table. It inherits attack
+   * power, spell power, stamina and armour from its owner and **nothing else** — no crit, no hit, no
+   * haste — so folding Ferocity into `meleeCritChance` would hand the *hunter* crit they do not
+   * have, and reading the hunter's crit onto the pet would overstate it badly.
+   *
+   * Serpent's Swiftness is the one talent that lands in both halves: upstream writes
+   * `RangedSpeedMultiplier` for the hunter and `pet.PseudoStats.MeleeSpeedMultiplier` for the pet, on
+   * the same line count and the same coefficient. Two extractors, two fields, one talent id.
+   */
+  /** Added to the pet's own crit chance, as a fraction. Ferocity, +2% a rank. */
+  petCritChance: number
+  /** Added to the pet's own hit chance, as a fraction. Animal Handler, +2% a rank. */
+  petHitChance: number
+  /** Multiplies the pet's damage dealt. Unleashed Fury, +4% a rank. 1 when untalented. */
+  petDamageMultiplier: number
+  /** Multiplies the pet's melee speed. Serpent's Swiftness, +4% a rank. 1 when untalented. */
+  petMeleeSpeedMultiplier: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -151,6 +172,10 @@ export const noTalentModifiers: TalentModifiers = {
   flatAttackPower: 0,
   rangedDamageMultiplier: 1,
   rangedAttackSpeedMultiplier: 1,
+  petCritChance: 0,
+  petHitChance: 0,
+  petDamageMultiplier: 1,
+  petMeleeSpeedMultiplier: 1,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -188,6 +213,8 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   defenseSkill: 'defenseSkillPoints',
   parryChance: 'parryChance',
   blockChance: 'blockChance',
+  petCritChance: 'petCritChance',
+  petHitChance: 'petHitChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
@@ -200,6 +227,8 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   flurryHaste: 'flurryBonus',
   rageGeneratedMultiplier: 'rageGeneratedMultiplier',
   spellDamageMultiplier: 'spellDamageMultiplier',
+  petDamageMultiplier: 'petDamageMultiplier',
+  petMeleeSpeedMultiplier: 'petMeleeSpeedMultiplier',
 }
 
 /*

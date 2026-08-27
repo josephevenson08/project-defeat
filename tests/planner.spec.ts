@@ -103,9 +103,18 @@ import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
 import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
 import {
   HUNTER_PET_ATTACK_POWER_INHERITANCE,
+  HUNTER_PET_AUTO_ATTACK_MULTIPLIER,
   HUNTER_PET_BASE_STRENGTH,
+  HUNTER_PET_DEFAULT_FAMILY,
+  HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER,
   HUNTER_PET_FLAT_ATTACK_POWER,
+  HUNTER_PET_FOCUS_PER_SECOND,
+  HUNTER_PET_FOCUS_PER_TICK,
+  HUNTER_PET_FOCUS_TICK_SECONDS,
+  HUNTER_PET_HAPPINESS_MULTIPLIER,
+  HUNTER_PET_MELEE_SPEED_MULTIPLIER,
   HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
+  estimateHunterPet,
 } from '../src/domain/simulation/hunterPet'
 import { validateBuild } from '../src/domain/builds/buildSerialization'
 import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
@@ -4441,9 +4450,14 @@ test('a stat called unmodelled must actually score zero', () => {
 
 test('the rotation-coverage claim on the Simulation panel matches the ability data', () => {
   /*
-   * The panel says two specs layer real special attacks and the rest run from a single signature
-   * ability. That is a number in prose, which is the shape of claim this project keeps letting rot —
-   * so it gets an assertion.
+   * The panel says how many specs layer real special attacks and how many run from a single
+   * signature ability. That used to be a number **typed into the JSX** — and this comment used to
+   * say "the panel says two specs" while the assertion below said five, which is the whole failure
+   * in one place: the count was known to be wrong, written down twice, and connected to nothing.
+   *
+   * `SimulatorPanel` derives both figures from `getRotationAbilities` now, so the sentence a player
+   * reads cannot drift from this list. The assertion stays because it names *which* specs, which a
+   * count cannot.
    */
   const multiAbility: string[] = []
   let singleAbility = 0
@@ -5562,11 +5576,153 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
   expect(result.summary).toMatch(/white damage only/i)
   expect(result.summary, 'the focus abilities are named').toMatch(/Bite, Claw, Gore, Screech/)
 
+  /*
+   * **The family is named in the estimate, and the name has to match the constant it is priced at.**
+   *
+   * Upstream reads the family from a picker this app does not have, and the eight families span 0.91
+   * to 1.1 on damage dealt. So one is assumed — and an assumed 1.1 that the reader is never told
+   * about is the exact shape of caveat this repo keeps finding wrong after the fact. Asserted
+   * against the constant rather than the literal string, so renaming the default pet without
+   * repricing it fails here.
+   */
+  expect(result.summary, 'the assumed pet family is stated').toContain(HUNTER_PET_DEFAULT_FAMILY)
+  expect(HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER, 'the Cat sits in the 1.1 damage tier').toBeCloseTo(1.1, 10)
+
+  /*
+   * **Three multipliers this model used to be missing**, all in `pet.go` within ten lines of the
+   * happiness bonus it did model: `MeleeSpeedMultiplier *= 1.3` ("Cobra reflexes", ungated),
+   * `AutoAttacks.MHEffect.DamageMultiplier *= 0.85` (uncommented upstream), and the family
+   * multiplier. Net about +21%, in the understating direction.
+   *
+   * Asserted as a **ratio against a deliberately un-multiplied recomputation**, not as a literal:
+   * the point is that all three are applied exactly once each, which a literal would confirm today
+   * and stop confirming the moment the pet's attack power changes for any other reason.
+   */
+  const petSample = estimateHunterPet({
+    ownerRangedAttackPower: stats.rangedAttackPower,
+    attackTableMultiplier: 1,
+    armorMitigation: 0,
+  })
+  const petWeaponDps = (42 + 68) / 2 / 2.0
+  const unmultiplied = petWeaponDps + petSample.attackPower / 14
+  expect(petSample.dps / unmultiplied, 'speed and damage multipliers are each applied once').toBeCloseTo(
+    HUNTER_PET_MELEE_SPEED_MULTIPLIER *
+      HUNTER_PET_HAPPINESS_MULTIPLIER *
+      HUNTER_PET_AUTO_ATTACK_MULTIPLIER *
+      HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER,
+    10,
+  )
+
+  /*
+   * The focus economy, which is sourced now even though nothing spends it. It lives in
+   * `sim/hunter/focus.go` rather than `sim/core` — the reason it stayed unsourced is that a search of
+   * core comes back empty and reads as an absence. 25 focus every 5 seconds is 5 a second, and
+   * Bestial Discipline multiplies *that* rather than replacing it.
+   */
+  expect(HUNTER_PET_FOCUS_PER_TICK / HUNTER_PET_FOCUS_TICK_SECONDS).toBe(HUNTER_PET_FOCUS_PER_SECOND)
+  expect(HUNTER_PET_FOCUS_PER_SECOND, 'BaseFocusPerTick 25 on a 5s tick').toBe(5)
+
+  /*
+   * **Kill Command is implemented upstream**, and this file claimed the opposite for as long as the
+   * pet existed. `sim/hunter/kill_command.go` registers spell 34026 on the hunter and 34027 on the
+   * pet. It is still not modelled here — it fires off the owner's crits, which needs a timeline —
+   * but the estimate must not say it is missing from wowsims.
+   */
+  expect(result.summary, 'the wrong reason for skipping Kill Command is gone').not.toMatch(
+    /Kill Command is not implemented upstream/i,
+  )
+
   // Nobody else gets one.
   const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
   const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
   const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
   expect(furyResult.breakdown.some((entry) => entry.label === 'Pet DPS')).toBe(false)
+})
+
+test('a pet talent moves the pet and not the hunter, and Serpent’s Swiftness moves both', () => {
+  /*
+   * The four Beast Mastery talents that scale a pet reach it now. They sat refused for as long as
+   * the ingest existed under the reason "there is no pet in this model" — true when written, false
+   * from the moment `hunterPet.ts` shipped, and exactly the kind of stale refusal this repo keeps
+   * finding after the fact.
+   *
+   * **What decides whether they are wired correctly is which actor moves.** A pet inherits attack
+   * power, spell power, stamina and armour from its owner and *nothing else* — no crit, no hit, no
+   * haste. So Ferocity is crit the pet has and the hunter does not, and putting it on the shared
+   * melee field would silently hand the hunter crit they have not earned. Separate fields are the
+   * whole mechanism, and this is the test that proves they stayed separate.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const ferocity = idOf('Hunter', 'Ferocity')
+  const animalHandler = idOf('Hunter', 'Animal Handler')
+  const unleashedFury = idOf('Hunter', 'Unleashed Fury')
+  const serpentsSwiftness = idOf('Hunter', "Serpent's Swiftness")
+
+  // Each lands on its own pet field, at the coefficient upstream writes, and on no other field.
+  const fero = deriveTalentModifiers({ [ferocity]: 5 })
+  expect(fero.petCritChance, 'Ferocity is +2% pet crit a rank').toBeCloseTo(0.1, 10)
+  expect(fero.meleeCritChance, 'and none of it reaches the hunter').toBe(0)
+  expect(fero.rangedCritChance).toBe(0)
+
+  const handler = deriveTalentModifiers({ [animalHandler]: 2 })
+  expect(handler.petHitChance, 'Animal Handler is +2% pet hit a rank, max 2').toBeCloseTo(0.04, 10)
+  expect(handler.meleeHitChance).toBe(0)
+
+  const fury = deriveTalentModifiers({ [unleashedFury]: 5 })
+  expect(fury.petDamageMultiplier, 'Unleashed Fury is +4% pet damage a rank').toBeCloseTo(1.2, 10)
+  expect(fury.rangedDamageMultiplier, 'the hunter’s own damage is untouched').toBe(1)
+
+  /*
+   * **Serpent's Swiftness is one talent id with two effects**, and that is the case worth pinning.
+   * Upstream writes two separate lines — `RangedSpeedMultiplier` for the hunter and
+   * `pet.PseudoStats.MeleeSpeedMultiplier` for the pet — at the same coefficient. A single extractor
+   * would have silently dropped whichever half it did not match.
+   */
+  const swift = deriveTalentModifiers({ [serpentsSwiftness]: 5 })
+  expect(swift.rangedAttackSpeedMultiplier, 'the hunter half').toBeCloseTo(1.2, 10)
+  expect(swift.petMeleeSpeedMultiplier, 'the pet half, same coefficient').toBeCloseTo(1.2, 10)
+
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const petDpsWith = (points: Record<number, number>) => {
+    const sim = calculateSimulation(hunter, gear, stats, 'Physical DPS', [], undefined, points)
+    return {
+      pet: sim.damageSources!.find((source) => source.name === 'Pet')!.dps,
+      autoShot: sim.damageSources!.find((source) => source.name === 'Auto Shot')!.dps,
+    }
+  }
+
+  const bare = petDpsWith({})
+
+  /*
+   * Ferocity, Animal Handler and Unleashed Fury each raise the pet's damage and leave Auto Shot
+   * **byte-identical**. That second half is the assertion that would catch a pet field being wired
+   * into a hunter term — a mistake that raises the total and so looks like progress.
+   */
+  for (const [name, points] of [
+    ['Ferocity', { [ferocity]: 5 }],
+    ['Animal Handler', { [animalHandler]: 2 }],
+    ['Unleashed Fury', { [unleashedFury]: 5 }],
+  ] as const) {
+    const talented = petDpsWith(points)
+    expect(talented.pet, `${name} raises the pet`).toBeGreaterThan(bare.pet)
+    expect(talented.autoShot, `${name} must not touch the hunter's own shot`).toBeCloseTo(bare.autoShot, 10)
+  }
+
+  // And the one that is meant to move both, moves both.
+  const swiftened = petDpsWith({ [serpentsSwiftness]: 5 })
+  expect(swiftened.pet, 'the pet swings faster').toBeGreaterThan(bare.pet)
+  expect(swiftened.autoShot, 'and so does the hunter').toBeGreaterThan(bare.autoShot)
+
+  /*
+   * Unleashed Fury at 5 ranks is exactly +20% on the pet, and asserting the *size* rather than the
+   * direction is what caught Endless Rage contributing nothing: a modifier with no destination still
+   * passes "DPS went up" if anything else in the build moved.
+   */
+  expect(petDpsWith({ [unleashedFury]: 5 }).pet / bare.pet).toBeCloseTo(1.2, 6)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
@@ -7237,6 +7393,32 @@ test('no talent is refused for a reason the code no longer has', async () => {
   // Health and Mana are the honest remaining stat-shaped gap: `StatBlock` has no field for either.
   const remaining = rawTalentEffects.skipped.filter((entry) => /Health|Mana/i.test(entry.reason))
   expect(remaining.length, 'the stat-shaped refusals that are left are the Health and Mana ones').toBeGreaterThan(0)
+
+  /*
+   * **The same rot, one class over.** Six Hunter talents were refused as "Pet talents. There is no
+   * pet in this model" — true when written, and false from the moment `hunterPet.ts` shipped a pet.
+   * Nothing failed, because closing a gap never forces the sentence describing it to change.
+   *
+   * Four of the six are ingested now. The two that are not — Frenzy and Bestial Discipline — are
+   * refused for reasons about the *ability rate*, which genuinely does not exist yet. So no Hunter
+   * refusal may still claim the model has no pet.
+   *
+   * **Scoped to Hunter deliberately.** Warlock's Master Demonologist is refused with "No pet model
+   * here" and that is still true — there is no demon in this model — so a blanket search on the
+   * phrase would fail on an honest sentence.
+   */
+  const noPet = rawTalentEffects.skipped.filter(
+    (entry) => entry.className === 'Hunter' && /no pet/i.test(entry.reason),
+  )
+  expect(
+    noPet.map((entry) => `${entry.className}/${entry.talent}: ${entry.reason}`),
+    'a hunter has a pet now, so no Hunter talent may be refused for the model not having one',
+  ).toEqual([])
+
+  const ingestedNames = new Set(rawTalentEffects.effects.map((effect) => `${effect.className}/${effect.talent}`))
+  for (const talent of ['Ferocity', 'Animal Handler', 'Unleashed Fury', "Serpent's Swiftness"]) {
+    expect(ingestedNames.has(`Hunter/${talent}`), `${talent} reaches the pet now`).toBe(true)
+  }
 })
 
 import { isSimulationEnabled } from '../src/featureFlags'

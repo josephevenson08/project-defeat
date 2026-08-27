@@ -23,7 +23,12 @@ import {
 import type { WeaponDamageProfile } from '../../domain/simulation/specialAttacks'
 import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simulation/weaponImbues'
 import { estimatePaladinHolyDamage } from '../../domain/simulation/paladinSeals'
-import { HUNTER_PET_UNMODELLED, estimateHunterPet, hunterPetCritChance } from '../../domain/simulation/hunterPet'
+import {
+  HUNTER_PET_DEFAULT_FAMILY,
+  HUNTER_PET_UNMODELLED,
+  estimateHunterPet,
+  hunterPetCritChance,
+} from '../../domain/simulation/hunterPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -734,13 +739,18 @@ function calculatePhysicalDps(
      * Its table is built here rather than reused: a pet inherits **no crit at all** from its owner
      * (upstream inherits attack power, spell power, stamina and armour, and nothing else), so it
      * rolls on its own crit chance and would be badly overstated on the hunter's.
+     *
+     * The two figures that are *not* zero are the pet's own talents. Ferocity is crit the pet has
+     * and the hunter does not; Animal Handler is the same for hit. They enter the pet's table and
+     * only the pet's table, which is the whole reason they are separate `TalentModifiers` fields
+     * rather than the melee ones.
      */
     const petTable = buildWhiteAttackTable({
       skillDiff,
       dualWield: false,
       expertiseSkillPoints: 0,
-      missReduction: 0,
-      rawCritChance: hunterPetCritChance(),
+      missReduction: talents.petHitChance,
+      rawCritChance: hunterPetCritChance() + talents.petCritChance,
       attacksFromBehind: true,
     })
     const petGlance = computeGlanceDamageRange(skillDiff)
@@ -754,6 +764,10 @@ function calculatePhysicalDps(
       ownerRangedAttackPower: stats.rangedAttackPower,
       attackTableMultiplier: petMultiplier,
       armorMitigation,
+      talents: {
+        damageMultiplier: talents.petDamageMultiplier,
+        meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
+      },
     })
 
     rangedContext = {
@@ -1145,7 +1159,14 @@ function calculatePhysicalDps(
     : ''
   const excludedNote = rotation.excluded.length > 0 ? ` ${describeUnmodelledSpecials(character, rotation.excluded)}` : ''
 
-  const petSummary = hunterPet ? ` The pet is counted as a second attacker, and ${HUNTER_PET_UNMODELLED}` : ''
+  /*
+   * The family is named rather than left implicit. Upstream reads it from a picker this app does not
+   * have, and the eight families span 0.91 to 1.1 on damage dealt — so a reader running a Bear needs
+   * to be told this number is not about their pet, rather than discovering it by disagreeing with it.
+   */
+  const petSummary = hunterPet
+    ? ` The pet is counted as a second attacker, modelled as a ${HUNTER_PET_DEFAULT_FAMILY} — the damage families span 0.91 to 1.1 upstream and this app has no pet picker — and ${HUNTER_PET_UNMODELLED}`
+    : ''
 
   const holySummary = paladinHoly
     ? ` ${paladinHoly.sealName} rides every landed swing and ${paladinHoly.judgementName} lands on its 10s cooldown; both are Holy, so armor does not reduce them. Which seal you get is decided by faction — Seal of Blood is Horde-only in Phase 2.`

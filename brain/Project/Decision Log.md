@@ -58,7 +58,7 @@ It has happened three times: 33 sourced raid buffs reaching no number because no
 
 ## Coverage is not completeness, and the refusal count goes next to it
 
-Talents reach 27 of 27 specs *and* 43 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
+Talents reach 27 of 27 specs *and* 46 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
 
 ## Verify before correcting, even when the data looks obviously wrong
 
@@ -99,6 +99,24 @@ Assignments are now keyed by `ExclusiveGroup.id`. The tell that the original sha
 ## Falsify an invariant before trusting it
 
 A test that has never been seen to fail is a hypothesis. This repo has already shipped a green suite that asserted nothing: `expect(locator).toHaveCount(0)` is vacuously true wherever the panel is not rendered, which only became possible once the planner grew sub-tabs. Every invariant added since is checked by breaking the thing it guards and confirming the failure names the real defect.
+
+## A constant nobody can explain is still a constant the reference uses
+
+The hunter pet carries an ungated `DamageMultiplier *= 0.85` that wowsims applies with **no comment at all**, alongside a `MeleeSpeedMultiplier *= 1.3` commented only as "Cobra reflexes". Neither is a talent, a family gate or a conditional. Both were absent from this model, and dropping the unexplained one for lacking a justification would have overstated every pet by 18%.
+
+So an unexplained constant is carried across as read, and the fact that it is unexplained is written down next to it. The alternative — modelling only the constants that come with a rationale — silently substitutes this project’s reasoning for the reference implementation’s behaviour, in whichever direction the missing rationale happens to point.
+
+## A second actor gets its own fields, never the shared ones
+
+A hunter pet inherits attack power, spell power, stamina and armour from its owner and **nothing else** — no crit, no hit, no haste. So the four Beast Mastery talents that scale it land on `petCritChance`, `petHitChance`, `petDamageMultiplier` and `petMeleeSpeedMultiplier` rather than on the melee fields they resemble.
+
+Sharing a field would have handed the *hunter* crit they had not earned, and it would have raised the total — which reads as progress. The test that catches it asserts the owner’s Auto Shot is byte-identical across each pet talent, because a separation bug looks exactly like an improvement from the total alone.
+
+## Look in the right package before concluding a constant does not exist
+
+The pet focus economy sat unmodelled for a pass because a search of `sim/core/energy.go` found the rogue and druid energy constants and no focus ones, and that absence was read as the numbers being unreadable. They are all in `sim/hunter/focus.go` — 25 focus every 5 seconds, a 100 cap — one package over.
+
+A search of the wrong place returns the same empty result as a search for something that is not there. When the conclusion is going to be "this cannot be sourced", the search itself is the thing to check first.
 
 ## Related
 

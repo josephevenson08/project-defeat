@@ -1,7 +1,156 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-23.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-27.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-08-27)
+
+**The pet is finished as far as white damage goes, and the two sourcing jobs were three.** The queue
+item said "finish the pet, which is two sourcing jobs rather than modelling" — the focus economy and
+the pet-scaling talents. Both were done and both were smaller than billed. The third job was not on
+the list at all, and it was the biggest: **the pet's white damage was missing three multipliers**,
+worth about +21%, none of them a talent.
+
+    Hunter Marksmanship   1209 -> 1225   (1.1x)
+    Hunter Beast Mastery  1325 -> 1405   (1.6x -> 1.5x)
+    Hunter Survival       1133 -> 1150   (1.5x)
+
+The pet's share of a best-case hunter went from about **6% to 11.2%** for Beast Mastery (7.7% for
+Marksmanship, 8.2% for Survival), against archon's rotation data putting a real one nearer a third.
+So the abilities are most of what is still missing, which the previous pass guessed and this one can
+measure.
+
+### 1. The focus economy was never unreadable — it was in the wrong package
+
+The handoff said the base regeneration "is passed to `EnableFocusBar` as a *multiplier* rather than a
+rate", and told the next person to find where `EnableFocusBar` is defined before modelling anything.
+That instruction was exactly right and the conclusion drawn from it was not.
+
+`EnableFocusBar` is defined in **`sim/hunter/focus.go`**, not in `sim/core`, and that file carries
+every constant: `MaxFocus = 100`, `tickDuration = 5s`, `BaseFocusPerTick = 25`. So the base is **5
+focus per second**, and `1.0 + 0.5*BestialDiscipline` scales it.
+
+**The reason it went unsourced is the part worth keeping.** The previous pass looked in
+`sim/core/energy.go`, found the rogue and druid energy constants and no focus ones, and read that as
+the constants not existing anywhere. A search of the wrong package returns the same empty result as a
+search for something that is not there.
+
+Every pet ability is sourced now too, from `sim/hunter/pet_abilities.go` — Bite 35 focus / 10s
+cooldown / 108-132, Claw 25 / 54-76, Gore 25 / 37-61 with a 50% chance to double, Screech 20 / 33-61,
+all on a GCD locked at 1.5s by `IgnoreHaste: true`. **None is modelled**, and that gap is now a rate
+model rather than a missing number.
+
+### 2. Three multipliers were missing, and this is the finding
+
+`pet.go` applies four multipliers within ten lines of each other. This model had one.
+
+| | Upstream | Was modelled |
+|---|---|---|
+| Happiness | `PseudoStats.DamageDealtMultiplier *= 1.25` | yes |
+| "Cobra reflexes" | `PseudoStats.MeleeSpeedMultiplier *= 1.3` | **no** |
+| Family damage | `MHEffect.DamageMultiplier *= petConfig.DamageMultiplier` | **no** |
+| Uncommented | `MHEffect.DamageMultiplier *= 0.85` | **no** |
+
+All three are unconditional — not gated on a talent, a family or anything. The one worth naming is
+the **`0.85`, which upstream applies with no comment at all**. It is carried across as read: a
+constant nobody can explain is still a constant the reference implementation uses, and dropping it
+for lacking a justification would have overstated every pet by 18%.
+
+**The family multiplier needed a decision rather than a lookup.** `PetConfigs` spans 0.91 (Bear) to
+1.1 (Cat, Raptor, Ravager) and this app has no pet picker, so the **Cat is assumed and the estimate
+says so out loud**. A test pins that the family named in the prose and the multiplier it is priced at
+cannot drift apart — the same shape as every other caveat assertion here.
+
+### 3. The talents were the easy half, and one of them is two talents
+
+Four reach the pet now, on their own `pet*` fields: Ferocity (+2% pet crit a rank), Animal Handler
+(+2% pet hit), Unleashed Fury (+4% pet damage), Serpent's Swiftness (+4% pet melee speed). Effects
+went **63 → 67**.
+
+**Separate fields are the mechanism, not tidiness.** A pet inherits attack power, spell power,
+stamina and armour and *nothing else* — no crit, hit or haste. Folding Ferocity into the shared
+`meleeCritChance` would have handed the hunter crit they have not earned, and it would have raised
+the total, which reads as progress. The test asserts Auto Shot is **byte-identical** across each pet
+talent; that is the half that catches it.
+
+**Serpent's Swiftness is one talent id with two extractors.** Upstream writes two separate lines —
+`RangedSpeedMultiplier` on the hunter, `pet.PseudoStats.MeleeSpeedMultiplier` on the pet — at the
+same coefficient. One extractor would have silently dropped whichever half it did not match, and the
+ingest reports success either way.
+
+### 4. Two of this repo's own claims were wrong
+
+- **Kill Command is implemented upstream.** `sim/hunter/kill_command.go`, spell 34026 on the hunter
+  and 34027 on the pet. This repo said it was not — in `hunterPet.ts`'s module doc, in the
+  user-facing estimate, and in `ROTATION-SCOPE.md`. It is still not modelled here, because it fires
+  off the owner's crits and needs a timeline, but the reason is now the true one.
+- **The ingest refused six Hunter talents as "there is no pet in this model".** True when written,
+  false from the moment `hunterPet.ts` shipped on 2026-08-23 — the same rot `featureFlags.ts` has
+  demonstrated twice. Four are ingested now; Frenzy and Bestial Discipline stay refused and **both
+  new reasons are about the ability rate**, not about the pet. A test fails if any Hunter refusal
+  claims it again, scoped to Hunter because Warlock's "No pet model here" is still true.
+
+### 5. Doc rot found in the sweep, none of it caused by this work
+
+**The worst one was on screen, and only driving the app found it.** The Simulation panel's own intro
+told every player "**two specs** layer their real special attacks on top of auto attacks, and the
+rest are modeled from a single signature ability". The real figure is **5 and 22**.
+
+What makes it worth retelling is that the number was already known to be wrong. `planner.spec.ts`
+asserts the list of five specs, and **its own comment said "the panel says two specs"** — so the
+stale figure was written down, twice, next to the assertion that contradicted it, and nothing
+connected them. That is this repo's recurring failure in its purest form.
+
+`SimulatorPanel` now **derives both figures from `getRotationAbilities`** at module scope rather than
+carrying them in the JSX, so adding a rotation moves the sentence on screen in the same commit. The
+test keeps its assertion because it names *which* specs, which a count cannot.
+
+The lesson is the one already in the rules and it earned another instance: **a caveat needs something
+that fails when it stops being true**, and "we wrote an assertion nearby" is not that.
+
+- **README carried two contradictory bullets about talents, side by side.** One said talents have
+  reached the always-visible stat rail since 2026-08-21; the next said "**Talents do not reach the
+  always-visible stat rail**". The second is a leftover the 2026-08-21 pass did not delete, and it
+  also named Toughness and Vitality as refused when both have been ingested since. Corrected.
+- **ROADMAP said "Rotations cover 2 specs of 27"** where the real figure is 5 and is asserted in a
+  test. Three specs gained rotations underneath that sentence without it moving.
+- **ROADMAP said "62 machine-readable effects"** where the file held 63, and now 67. Both counts are
+  replaced by pointers to the assertions, which is the rule this repo already states and these two
+  sentences were quietly breaking.
+
+### What is left
+
+**1. The pet's abilities, which is now a rate model rather than sourcing.** Every constant is in
+hand. The shape of the problem: the pet acts on a 1.5s GCD it cannot haste, spending from 5 focus/sec
+against costs of 20-35, so focus rather than the GCD is the binding constraint at a base rate — which
+is what makes Bestial Discipline worth having and why it is refused until the abilities exist. Bite's
+10s cooldown is a second ceiling on the only ability with one. Note the same trap the resolver
+already taught: **a second ability spending the same focus moves damage rather than adding it**
+unless it returns more per point.
+
+**2. Frenzy, once the ability rate exists.** 20% a rank on a pet crit, +30% melee speed for 8s. It is
+`flurrySpeedMultiplier`-shaped but not the same shape — a fixed-duration refreshing aura rather than
+a consumed stack, so it wants `1 - exp(-λ·8)` rather than a Markov chain over stacks. Pricing it off
+white swings alone would understate it once most of a pet's attacks are abilities.
+
+**3. The rest of the stage 3 list is untouched** and still in the architecture report's leverage
+order: Slice and Dice / poisons / Combat Potency, weapon-enchant and damage procs, Windfury Totem,
+Expose Weakness, Deep Wounds, Elemental Weapons, Flurry with specials, and **spell school**.
+
+**4. Feral is still the worst spec at 2.3x and still needs bleeds first.**
+
+**5. Not simulator work, still open:** the website walkthrough the owner asked for and has not had.
+
+### One trap this session hit
+
+**The repo's documented heredoc trap is real and it fires on `<<'EOF'` too.** Writing a TypeScript
+file through a quoted bash heredoc died with `unexpected EOF while looking for matching '` before
+writing a byte. The file was untouched, which is the good outcome, but the failure looks like a
+syntax error in the command rather than in the content. The rule already in this file — write the
+patch to a file and run it, or use an editor tool — is the answer, and quoting the delimiter does not
+buy an exemption.
 
 ---
 
@@ -943,7 +1092,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 208 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 209 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```

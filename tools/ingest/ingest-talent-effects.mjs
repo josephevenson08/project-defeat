@@ -320,8 +320,17 @@ const HUNTER_SOURCES = [{ path: 'sim/hunter/talents.go', cache: 'sim_hunter_tale
  * Hunter. The only class whose specs all run the RANGED branch, so its effects land on ranged fields
  * rather than the melee ones — Serpent's Swiftness is the big one at +4% ranged attack speed a rank.
  *
- * Every pet talent is refused: there is no pet in this model at all, and Beast Mastery's real edge
- * lives there, which the spec's own note already says.
+ * **The pet talents are ingested now**, and the note that used to sit here — "there is no pet in
+ * this model at all" — was true when written and false from the moment `hunterPet.ts` shipped. Four
+ * of them reach the pet's own attack table and damage, on their own `pet*` fields rather than the
+ * melee ones: a pet inherits attack power, spell power, stamina and armour from its owner and no
+ * crit, hit or haste, so sharing a field with the hunter would move the wrong actor.
+ *
+ * Serpent's Swiftness is deliberately extracted **twice**. Upstream writes two separate lines, one
+ * for the hunter's `RangedSpeedMultiplier` and one for the pet's `MeleeSpeedMultiplier`, and both
+ * are real. Two extractors keyed to the same talent name produce two effects with the same talent
+ * id and different kinds, which `deriveTalentModifiers` already handles by iterating effects rather
+ * than talents.
  */
 const HUNTER_EXTRACTORS = [
   {
@@ -360,12 +369,46 @@ const HUNTER_EXTRACTORS = [
     unit: 'fraction per rank',
     re: /PseudoStats\.RangedSpeedMultiplier \*= 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.SerpentsSwiftness\)/,
     value: (m) => Number(m[1]),
-    caveat: 'Also speeds the pet in upstream; there is no pet here, so only the hunter half applies.',
+    caveat: 'The hunter half. The pet half is a second extractor on the same talent id, because upstream writes it as a separate line against the pet.',
+  },
+  {
+    talent: "Serpent's Swiftness",
+    kind: 'petMeleeSpeedMultiplier',
+    unit: 'fraction per rank',
+    re: /pet\.PseudoStats\.MeleeSpeedMultiplier \*= 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.SerpentsSwiftness\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'The pet half, at the same coefficient as the hunter half but on the pet’s melee swing rather than the owner’s ranged one.',
+  },
+  {
+    talent: 'Unleashed Fury',
+    kind: 'petDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /pet\.PseudoStats\.DamageDealtMultiplier \*= 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.UnleashedFury\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Ferocity',
+    kind: 'petCritChance',
+    unit: 'fraction per rank',
+    re: /pet\.AddStat\(stats\.MeleeCrit,\s*core\.MeleeCritRatingPerCritChance\*([\d.]+)\*float64\(hunter\.Talents\.Ferocity\)\)/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Upstream grants the same figure to the pet’s SpellCrit on the next line. Only the melee half is read, because the pet’s spell abilities are not modelled — see HUNTER_PET_UNMODELLED.',
+  },
+  {
+    talent: 'Animal Handler',
+    kind: 'petHitChance',
+    unit: 'fraction per rank',
+    re: /pet\.AddStat\(stats\.MeleeHit,\s*core\.MeleeHitRatingPerHitChance\*([\d.]+)\*float64\(hunter\.Talents\.AnimalHandler\)\)/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Melee half only, for the same reason as Ferocity: the pet’s SpellHit line feeds abilities this model does not have.',
   },
 ]
 
 const HUNTER_SKIPPED = [
-  ['Ferocity / Animal Handler / Unleashed Fury / Frenzy / Focused Fire / The Beast Within', 'Pet talents. There is no pet in this model, which is also why Beast Mastery is the spec its own note flags as most understated.'],
+  ['Frenzy', 'A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. The constants are all sourced; the uptime is not, because it depends on how often the pet lands an attack — and the pet’s focus abilities, which are most of its attacks, are not modelled yet. Pricing it off white swings alone would understate it.'],
+  ['Focused Fire', 'Multiplies the hunter’s own DamageDealtMultiplier by 1% a rank, gated on owning a pet, and separately grants the pet’s Kill Command +10% crit a rank. The first half is expressible; the second needs Kill Command, which fires off the owner’s crits and so needs a timeline.'],
+  ['The Beast Within / Bestial Wrath', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+  ['Bestial Discipline', 'Multiplies the pet’s focus regeneration by 50% a rank. The base rate it scales is sourced now (25 focus per 5s, sim/hunter/focus.go), but nothing spends focus yet, so the modifier would multiply an income no ability draws on.'],
   ['Survivalist', 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
   ['Combat Experience', 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
   ['Mortal Shots', 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],

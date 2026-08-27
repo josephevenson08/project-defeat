@@ -177,12 +177,22 @@ each pinned by an assertion these days.
 - **The healer mana constraint** — MP5, Spirit regen and the Intellect-to-mana conversion, from
   wowsims' `mana.go`. Reported as a deficit rather than used to throttle the headline, because a
   healer who casts flat out and one who paces are both real.
-- **Talent scaling, on all 27 specs** — 579 talents ingested across nine classes, 62 machine-readable
-  effects reaching every one of the four role paths, and since 2026-08-21 the stat pipeline as well.
+- **Talent scaling, on all 27 specs** — 579 talents ingested across nine classes, their
+  machine-readable effects reaching every one of the four role paths, and since 2026-08-21 the stat
+  pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
+  the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
+  itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **A hunter's pet, as a second attacker** — its own weapon, attack table and attack power, inheriting
+  22% of the owner's ranged attack power and none of their crit, plus the four Beast Mastery talents
+  that scale it. Its focus-costed abilities are still missing; the focus economy they spend from is
+  sourced.
 
 **Still open, and these are the honest ones:**
 
-- **Rotations cover 2 specs of 27.** The largest remaining gap by a distance. Scoped in
+- **Rotations cover 5 specs of 27.** Warrior Arms and Fury, Warlock Affliction and Destruction, and
+  Priest Shadow — the list is asserted in `tests/planner.spec.ts` rather than counted here, because
+  this sentence said 2 for long enough that three specs gained rotations underneath it. The largest
+  remaining gap by a distance. Scoped in
   `ROTATION-SCOPE.md`, which corrects this file's earlier assumption that it would be an ingest like
   talents: wowsims implements rotations as *imperative state machines over an event timeline*, and
   this engine is closed-form. It is no longer "the reason the Simulation tab stays hidden" — that tab

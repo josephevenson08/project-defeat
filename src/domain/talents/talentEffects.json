@@ -29,7 +29,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 63,
+  "effectCount": 67,
   "effects": [
     {
       "className": "Warrior",
@@ -361,7 +361,54 @@
       "kind": "rangedAttackSpeedMultiplier",
       "unit": "fraction per rank",
       "perRank": 0.04,
-      "caveat": "Also speeds the pet in upstream; there is no pet here, so only the hunter half applies.",
+      "caveat": "The hunter half. The pet half is a second extractor on the same talent id, because upstream writes it as a separate line against the pet.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1802,
+      "talent": "Serpent's Swiftness",
+      "tree": "Beast Mastery",
+      "maxRank": 5,
+      "kind": "petMeleeSpeedMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "caveat": "The pet half, at the same coefficient as the hunter half but on the pet’s melee swing rather than the owner’s ranged one.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1396,
+      "talent": "Unleashed Fury",
+      "tree": "Beast Mastery",
+      "maxRank": 5,
+      "kind": "petDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1393,
+      "talent": "Ferocity",
+      "tree": "Beast Mastery",
+      "maxRank": 5,
+      "kind": "petCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "caveat": "Upstream grants the same figure to the pet’s SpellCrit on the next line. Only the melee half is read, because the pet’s spell abilities are not modelled — see HUNTER_PET_UNMODELLED.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1799,
+      "talent": "Animal Handler",
+      "tree": "Beast Mastery",
+      "maxRank": 2,
+      "kind": "petHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "caveat": "Melee half only, for the same reason as Ferocity: the pet’s SpellHit line feeds abilities this model does not have.",
       "source": "sim/hunter/talents.go"
     },
     {
@@ -838,8 +885,23 @@
     },
     {
       "className": "Hunter",
-      "talent": "Ferocity / Animal Handler / Unleashed Fury / Frenzy / Focused Fire / The Beast Within",
-      "reason": "Pet talents. There is no pet in this model, which is also why Beast Mastery is the spec its own note flags as most understated."
+      "talent": "Frenzy",
+      "reason": "A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. The constants are all sourced; the uptime is not, because it depends on how often the pet lands an attack — and the pet’s focus abilities, which are most of its attacks, are not modelled yet. Pricing it off white swings alone would understate it."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Focused Fire",
+      "reason": "Multiplies the hunter’s own DamageDealtMultiplier by 1% a rank, gated on owning a pet, and separately grants the pet’s Kill Command +10% crit a rank. The first half is expressible; the second needs Kill Command, which fires off the owner’s crits and so needs a timeline."
+    },
+    {
+      "className": "Hunter",
+      "talent": "The Beast Within / Bestial Wrath",
+      "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Bestial Discipline",
+      "reason": "Multiplies the pet’s focus regeneration by 50% a rank. The base rate it scales is sourced now (25 focus per 5s, sim/hunter/focus.go), but nothing spends focus yet, so the modifier would multiply an income no ability draws on."
     },
     {
       "className": "Hunter",

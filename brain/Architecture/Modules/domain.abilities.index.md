@@ -26,6 +26,7 @@ _No doc comment at the top of this file._
 
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 
 ## Concepts & phases
 

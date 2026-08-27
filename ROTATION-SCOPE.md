@@ -352,6 +352,101 @@ deliver most of the accuracy without it.
 
 ---
 
+## The pet, continued — and the two sourcing jobs were three, 2026-08-27
+
+    Hunter Marksmanship   1209 -> 1225   (1.1x)
+    Hunter Beast Mastery  1325 -> 1405   (1.6x -> 1.5x)
+    Hunter Survival       1133 -> 1150   (1.5x)
+
+The section below sized this as **two sourcing jobs, not a modelling one**. Both were done and both
+were smaller than billed. **The third job was not on the list at all**, and it was the largest of the
+three: the white damage this model already had was missing three multipliers.
+
+### The focus economy was never unreadable — it was in the wrong package
+
+The blocked half was stated as "the base focus regeneration is passed to `EnableFocusBar` as a
+*multiplier* rather than a rate". True, and the conclusion drawn from it — that the rate cannot be
+read off the source — was wrong. `EnableFocusBar` is defined in **`sim/hunter/focus.go`**, not in
+`sim/core`, and it carries every constant:
+
+    const MaxFocus = 100.0
+    const tickDuration = time.Second * 5
+    const BaseFocusPerTick = 25.0
+
+    focusPerTick: BaseFocusPerTick * regenMultiplier
+
+So the base is **5 focus per second**, the multiplier is `1.0 + 0.5*BestialDiscipline`, and Bestial
+Discipline is +50% regen a rank on top of it. The reason this went unsourced is worth keeping: the
+previous pass looked in `sim/core/energy.go`, found the rogue and druid energy constants and no focus
+ones, and read that absence as the constants not existing. **A search of the wrong package returns
+the same empty result as a search for something that is not there.**
+
+Every pet ability is sourced too, from `sim/hunter/pet_abilities.go` — Bite 35 focus on a 10s
+cooldown for 108-132, Claw 25 for 54-76, Gore 25 for 37-61 with a 50% chance to double, Screech 20
+for 33-61, all on a GCD locked at 1.5s by `IgnoreHaste: true`. **They are still not modelled**, and
+the remaining gap is now honestly a rate model rather than a missing number.
+
+### Three multipliers were missing from white damage, and they were never talents
+
+This is the part nothing predicted. `pet.go` applies four multipliers within ten lines of each other
+and this model had **one** of them:
+
+| | Upstream | Was modelled |
+|---|---|---|
+| Happiness | `PseudoStats.DamageDealtMultiplier *= 1.25` | yes |
+| "Cobra reflexes" | `PseudoStats.MeleeSpeedMultiplier *= 1.3` | **no** |
+| Family damage | `MHEffect.DamageMultiplier *= petConfig.DamageMultiplier` | **no** |
+| Uncommented | `MHEffect.DamageMultiplier *= 0.85` | **no** |
+
+Net about **+21%** on the pet's white damage. None of the three is a talent, a family gate or a
+conditional — all three are applied unconditionally, and the one worth naming is the `0.85`, which
+upstream applies with **no comment at all**. It is carried across as read: a constant nobody can
+explain is still a constant the reference implementation uses, and dropping it because it lacks a
+justification would have overstated every pet by 18%.
+
+The family multiplier needed a decision rather than a lookup. `PetConfigs` spans **0.91 (Bear) to
+1.1 (Cat, Raptor, Ravager)** and this app has no pet picker, so the **Cat is assumed and the estimate
+says so** — the same assumption every other default here makes, stated rather than buried, with a
+test pinning that the named family and the priced multiplier cannot drift apart.
+
+### The talents were the easy half, and one of them is two talents
+
+Four now reach the pet, on their own `pet*` fields in `TalentModifiers`: Ferocity (+2% pet crit a
+rank), Animal Handler (+2% pet hit), Unleashed Fury (+4% pet damage), Serpent's Swiftness (+4% pet
+melee speed).
+
+**Separate fields are the mechanism, not tidiness.** A pet inherits attack power, spell power,
+stamina and armour from its owner and *nothing else* — no crit, no hit, no haste. Folding Ferocity
+into the shared `meleeCritChance` would have handed the hunter crit they have not earned, and it
+would have raised the total, which reads as progress. The test asserts Auto Shot is **byte-identical**
+across each pet talent, which is the half that catches it.
+
+**Serpent's Swiftness is one talent id with two extractors.** Upstream writes two separate lines —
+`RangedSpeedMultiplier` on the hunter and `pet.PseudoStats.MeleeSpeedMultiplier` on the pet — at the
+same coefficient. One extractor would have silently dropped whichever half it did not match, and the
+ingest would have reported success either way.
+
+### What is left, and the share it is worth
+
+The pet was ~6% of a hunter's total. At best-case BiS it is now **11.2% for Beast Mastery**, 7.7% for
+Marksmanship and 8.2% for Survival — against archon's rotation data putting a real one nearer a
+third. So the abilities really are most of the remaining gap, which the previous section guessed and
+this one can now measure.
+
+Two talents stay refused and **both reasons are about the ability rate rather than about the pet**,
+which is the point of the rewrite: Frenzy is a 30% haste aura procced by pet crits, and pricing its
+uptime off white swings alone would understate it when most of a pet's attacks are abilities; Bestial
+Discipline multiplies a focus income nothing spends yet.
+
+**Two claims in the section below were wrong and are corrected rather than edited away.** Kill
+Command **is** implemented upstream — `sim/hunter/kill_command.go`, spell 34026 on the hunter and
+34027 on the pet — and this repo said it was not, in the module doc, in the user-facing estimate and
+here. And the ingest refused six Hunter talents as "there is no pet in this model", which was true
+when written and false from the moment the pet shipped. A test now fails if any Hunter refusal says
+it again.
+
+---
+
 ## Stage 3 begins — the pet, and an honest shortfall, 2026-08-23
 
 The first item on the not-built list, and the one the report sized as largest.
