@@ -7,17 +7,73 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Start here (2026-08-23)
 
-**All four queued items are closed, and the simulation rebuild is through stage 2.** `39758d9..HEAD`,
-fourteen commits, 196 tests passing, `tsc`/`lint`/`build` clean, ingests and the brain idempotent,
-all on `origin/main`.
+**The simulator stopped being unfalsifiable.** `39758d9..HEAD`, thirty commits, 208 tests passing,
+`tsc`/`lint`/`build` clean on real exit codes, ingests and the brain idempotent, all on `origin/main`.
 
-On `ROTATION-SCOPE.md`: **stage 1 done** (hunters), **stage 2 re-scoped and then closed** — none of
-its four specs was what the doc predicted, and the two in-scope ones were built as mechanisms rather
-than as ability entries. **Stage 3 is next**, and Feral's bleeds moved into it.
+The headline: this project used to claim it was "roughly 4x low" on one person's judgement, with
+nothing able to check it. It now measures itself against **observed parses for all 20 DPS specs** and
+reads **1.1x to 2.3x low**, with a regression guard that has already caught three real defects.
 
-**The physical DPS numbers moved a lot this session, deliberately.** Hunter +174 DPS, Enhancement
-+25.8, Retribution +112.5 (Horde) / +70.6 (Alliance). All three were damage the model was simply not
-counting, and all three change stat weights and upgrade rankings with them.
+### The calibration table, which is the thing to look at first
+
+`src/domain/simulation/dpsReference.ts` holds archon.gg's observed averages for the SSC/TK phase. A
+test dresses each spec in rank-1 BiS with its recommended gems and enchants, every buff and
+consumable, its primary tree to the 61-point cap and every modelled target debuff, then prints:
+
+| Spec | Model | Target | Ratio | Spec | Model | Target | Ratio |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hunter Marksmanship | 1209 | 1341 | **1.1x** | Warrior Fury | 1305 | 2053 | 1.6x |
+| Shaman Enhancement | 1305 | 1693 | **1.3x** | Hunter Beast Mastery | 1325 | 2068 | 1.6x |
+| Rogue Subtlety | 960 | 1292 | 1.3x | Rogue Assassination | 867 | 1362 | 1.6x |
+| Mage Frost | 831 | 1120 | 1.3x | Priest Shadow | 742 | 1330 | 1.8x |
+| Warrior Arms | 1166 | 1706 | 1.5x | Paladin Retribution | 966 | 1785 | 1.8x |
+| Hunter Survival | 1133 | 1696 | 1.5x | Rogue Combat | 846 | 1731 | 2.0x |
+| Warlock Affliction | 1086 | 1629 | 1.5x | Mage Arcane | 995 | 2084 | 2.1x |
+| Shaman Elemental | 866 | 1422 | 1.6x | Warlock Destruction | 864 | 1838 | 2.1x |
+| Druid Balance | 870 | 1401 | 1.6x | Warlock Demonology | 752 | 1619 | 2.2x |
+| Mage Fire | 897 | 1413 | 1.6x | **Druid Feral** | 728 | 1655 | **2.3x** |
+
+**The one assertion with teeth is one-directional: no spec may read *above* its reference.** The
+model understates everywhere, so a spec reading high is a double-count — and that has now happened
+twice, catching Affliction delivering an 18-second DoT every 1.5 seconds, and upstream's Windfury
+proc constant predicting nearly double the procs a real log shows.
+
+### Read `SIMULATION-ARCHITECTURE.md` before doing more simulator work
+
+A research agent audited the engine against wowsims and wrote it. The recommendation is a **two-tier
+engine**: keep `calculateSimulation` as the fast analytic scorer that ranks gear and derives stat
+weights, add an event loop behind the Run button as the accurate headline, and calibrate the first
+against the second.
+
+The load-bearing argument: an event loop is cheap for **one** number (3,000 iterations in 275 ms) and
+impossible for **2,700** — `findUpgrades` scores ~2,500 candidates live in a `useMemo` on every gear
+change. wowsims never faces this because its UI has no upgrade finder. Its six-stage migration path
+puts the loop at **stage 4**, and argues the work before it is the same work either way.
+
+### What actually closed the gap, and it was mostly not rotations
+
+Ranked by what each was worth, because the order is not what anyone predicted:
+
+- **The calibration harness was wrong twice, both times flattering the model.** First it fought a boss
+  with **no armour debuffs** (42.2% mitigation against the 25.9% every real raid has). Then it dressed
+  every spec in raid gear with **empty sockets, bare weapons and no second ring**. Between them, about
+  half the apparent gap. A rig that understates makes every later change look like progress.
+- **Shared buff machinery**: Flurry for Shaman (refused for a rank-scale reason that turned out to be
+  a single `+5%` constant), Unleashed Rage, Bloodlust, Ferocious Inspiration.
+- **Whole damage sources nobody had modelled**: Windfury on both hands, Retribution's seals and
+  judgement (more than half that spec's output, faction-split by a factor of four), hunter pets.
+- **Multi-spell rotations** for Affliction, Shadow and Destruction — which `ROTATION-SCOPE.md` had
+  scoped as needing an event timeline and which turned out to be arithmetic: DoTs compete for
+  **globals**, not for a resource.
+
+### Two pieces of infrastructure worth knowing about
+
+- **`SimulationResult.damageSources`** — every source, its DPS, its share, **summing to `scoreExact`**,
+  asserted for all 20 specs and rendered in the panel like a log's damage table. This is what makes
+  every later change falsifiable *per source* rather than per total.
+- **The bracketed range assertion.** `featureFlags.ts` quotes the calibration range, and the test
+  brackets it on **both** sides so improving the model *fails* and forces the prose to be rewritten.
+  That sentence has gone stale three times; the bracket caught the third before a human did.
 
 ### 1. Faerie Fire — the decision was taken, and the requested restriction was inverted
 
@@ -212,22 +268,37 @@ code no longer has"* does not catch it, which is the more interesting half.
 
 ### What is left
 
-1. **Rotation stage 3, then 4.** Stage 3 is DoT uptime — Affliction and Shadow, plus **Feral's
-   bleeds**, which moved here because Rake is the prerequisite for Mangle being worth anything. It is
-   the first stage that needs a genuinely new mechanism, and it runs into the missing spell school.
-   Stage 4 is combo points and needs a type change. **Do not build a general engine for all 27** — the
-   doc argues that case and it still holds.
-2. **The greedy-budget rule applies to stage 4.** A shared budget is spent in priority order, so a
-   second same-resource ability moves damage rather than adding it. Rogue is entirely
-   builder/finisher on one energy pool, so that stage has to prove the swap is a gain, not just
-   source the abilities.
-3. **Spell school is now blocking three separate things** — school-scoped debuffs (Winter's Chill),
-   per-spell caster talents, and stage 3's DoTs. It has gone from a caveat to a prerequisite, and is
-   worth pricing as its own piece of work rather than discovering inside stage 3.
-2. **Open, pre-existing, and flagged as a separate task:** at 375px the Raid Comp page scrolls
-   sideways — `document.documentElement.scrollWidth` is 534 against a 375 client width — because the
-   per-seat hover card is hidden with CSS rather than unmounted and still takes layout off-screen.
-   Found while measuring the picker's layout. The "reflows to phone width" test misses it.
+**1. Finish the pet, which is two sourcing jobs rather than modelling.** The pet is in and adds about
+**6%** of a hunter's total where archon's rotation data puts a real one nearer a third. Both gaps are
+named in the estimate itself:
+
+- **The focus economy.** Bite, Claw, Gore and Screech are focus-costed, and upstream passes the base
+  regeneration to `EnableFocusBar` as a *multiplier* rather than a rate. `sim/core/energy.go` has the
+  energy constants (20.2 per 2.02s, confirming this repo's 10/sec) but no focus ones. Find where
+  `EnableFocusBar` is defined before modelling any pet ability.
+- **Pet-scaling talents, none of which are ingested.** All four are already sourced in
+  `sim/hunter/talents.go`: Unleashed Fury `+0.04` damage/rank, Serpent's Swiftness `+0.04` attack
+  speed/rank, Ferocity `+0.02` crit/rank, Animal Handler `+0.02` hit/rank. This needs **pet fields on
+  `TalentModifiers`** and matching ingest extractors — the same shape `baseBonus` took for Flurry.
+  Note `HUNTER_SKIPPED` still says "There is no pet in this model", which is now false.
+
+**2. The rest of the stage 3 list**, in the architecture report's leverage order: Slice and Dice /
+poisons / Combat Potency (the three that make a Rogue a Rogue — Combat is 2.0x, and all of it is rate
+arithmetic); weapon-enchant and damage procs (**0 of 91 enchants carry a proc effect**, and Mongoose
+is the recommended main-hand for three specs at 53.48% measured uptime); Windfury Totem, Expose
+Weakness, Deep Wounds, Elemental Weapons; Flurry with specials in the Markov chain; and **spell
+school**, which now blocks four separate things.
+
+**3. Feral is the worst spec at 2.3x and needs bleeds first.** Rake and Rip, and note the measured
+finding that **adding Mangle before bleeds exist is a DPS loss** — Shred returns more per energy, and
+Mangle's debuff multiplies periodic physical damage the spec currently has none of. A test pins that.
+
+**4. Stage 4 onward is the event loop**, and `SIMULATION-ARCHITECTURE.md` has the port list, the
+skip list, and the Web Worker requirement. Do not start it before stage 3: the report's case is that
+the loop needs every one of those mechanics implemented anyway, just as callbacks instead of terms.
+
+**5. Not simulator work, still open:** the website walkthrough the owner asked for and has not had
+yet, and a stray empty `Untitled.canvas` in the repo root that nobody has claimed.
 
 ### One trap this session hit
 
@@ -872,7 +943,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 196 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 208 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
