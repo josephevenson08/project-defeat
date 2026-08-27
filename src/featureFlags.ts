@@ -64,14 +64,24 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
  *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
  *   is the size of the hole a filter literal was hiding.
- * - **A hunter's pet is a second attacker, and it swings but does not use its abilities.** Its white
- *   damage is modelled — its own weapon, its own attack table, 22% of the owner's ranged attack power
- *   and no inherited crit — along with the four Beast Mastery talents that scale it. What is missing
- *   is the focus-costed half: Bite, Claw, Gore and Screech. The focus that pays for them is sourced
- *   (25 every 5 seconds, from `sim/hunter/focus.go` rather than `sim/core`, which is why it stayed
- *   unsourced so long); the rate a pet spends it at is not. The estimate names the gap, and names the
- *   pet family it assumes, because the eight families span 0.91 to 1.1 on damage and this app has no
- *   picker for them.
+ * - **A hunter's pet is a second attacker, and it presses two buttons.** Its auto attack is modelled
+ *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
+ *   crit — along with every Beast Mastery talent this model can express, and it spends a focus bar
+ *   on Bite and Claw in priority order.
+ *
+ *   **The abilities are worth much less than the pet's remaining gap**, and that is the useful thing
+ *   to know rather than a disappointment: they are flat rolls with **no attack power scaling at all**,
+ *   so they add about 2.4% to a Beast Mastery hunter, where the pet as a whole is 13.3% of the total
+ *   against an attributed share nearer a third. What is still missing is Frenzy, Kill Command and
+ *   Bestial Wrath — see `ROTATION-SCOPE.md`.
+ *
+ *   **What moves them is Bestial Discipline, not gear**, and getting that backwards is a mistake this
+ *   repo made and a test caught. Gear alone takes the abilities from 17.5% of the pet to 15.1%,
+ *   because they cannot follow attack power; Bestial Discipline takes them to 27.8% by doubling
+ *   focus income, which is much the larger effect and pulls the other way.
+ *
+ *   The estimate names the pet family it assumes, because the eight families span 0.91 to 1.1 on
+ *   damage and this app has no picker for them.
  * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
  *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
  *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**
@@ -93,8 +103,10 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   hunter shot that prompted it — an Enhancement shaman sees it for Stormstrike, which is the spec
  *   where TBC mana pressure actually bites. Aspect of the Viper, Judgement of Wisdom, Shamanistic
  *   Rage and potions are all unmodelled.
- * - **Talents reach all 27 specs.** All nine classes are ingested — 49 effects — and every one of the
- *   four role paths takes them as of 2026-08-19. Each reads only its own fields, which is asserted in
+ * - **Talents reach all 27 specs.** All nine classes are ingested and every one of the four role paths
+ *   takes them as of 2026-08-19. The effect count is deliberately not written here: this sentence
+ *   said "49" while the file held 63, and then 68, which is this file's own recurring failure in
+ *   miniature. `talentEffects.json` carries the figure and a test asserts it matches the list. Each reads only its own fields, which is asserted in
  *   both directions: a Shaman's melee talent must move an Elemental score by exactly nothing, and a
  *   Warrior's Cruelty must not move Effective Health.
  * - **What that does *not* mean is that talents are fully modelled**, and the difference matters more

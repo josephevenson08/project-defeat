@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/talents/talentModifiers.ts
-lines: 411
+lines: 422
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentModifiers
 
-`src/domain/talents/talentModifiers.ts` · **domain** layer · 411 lines
+`src/domain/talents/talentModifiers.ts` · **domain** layer · 422 lines
 
 _No doc comment at the top of this file._
 

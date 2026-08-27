@@ -314,7 +314,12 @@ const ROGUE_SKIPPED = [
   ['Adrenaline Rush / Blade Flurry / Cold Blood', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
 ]
 
-const HUNTER_SOURCES = [{ path: 'sim/hunter/talents.go', cache: 'sim_hunter_talents.go' }]
+const HUNTER_SOURCES = [
+  { path: 'sim/hunter/talents.go', cache: 'sim_hunter_talents.go' },
+  // Bestial Discipline is applied at pet construction rather than in ApplyTalents, so its
+  // coefficient lives here and nowhere in talents.go.
+  { path: 'sim/hunter/pet.go', cache: 'sim_hunter_pet.go' },
+]
 
 /*
  * Hunter. The only class whose specs all run the RANGED branch, so its effects land on ranged fields
@@ -402,13 +407,25 @@ const HUNTER_EXTRACTORS = [
     value: (m) => Number(m[1]) / 100,
     caveat: 'Melee half only, for the same reason as Ferocity: the pet’s SpellHit line feeds abilities this model does not have.',
   },
+  {
+    /*
+     * Read out of `pet.go` rather than `talents.go`, because this is the one pet talent upstream
+     * applies at construction rather than in `ApplyTalents` — it is an argument to `EnableFocusBar`,
+     * not a stat. The pattern anchors on that call so it cannot drift onto anything else.
+     */
+    talent: 'Bestial Discipline',
+    kind: 'petFocusRegenMultiplier',
+    unit: 'fraction per rank',
+    re: /EnableFocusBar\(1\.0\+([\d.]+)\*float64\(hunter\.Talents\.BestialDiscipline\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Multiplies focus income, not damage. Upstream scales BaseFocusPerTick (25 per 5s) by this, so it buys ability rate rather than ability size.',
+  },
 ]
 
 const HUNTER_SKIPPED = [
-  ['Frenzy', 'A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. The constants are all sourced; the uptime is not, because it depends on how often the pet lands an attack — and the pet’s focus abilities, which are most of its attacks, are not modelled yet. Pricing it off white swings alone would understate it.'],
+  ['Frenzy', 'A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. Every constant is sourced and the ability rate exists now, so what is left is the uptime: it is a fixed-duration refreshing aura rather than a consumed stack, which is a different closed form from flurrySpeedMultiplier and has not been written yet.'],
   ['Focused Fire', 'Multiplies the hunter’s own DamageDealtMultiplier by 1% a rank, gated on owning a pet, and separately grants the pet’s Kill Command +10% crit a rank. The first half is expressible; the second needs Kill Command, which fires off the owner’s crits and so needs a timeline.'],
   ['The Beast Within / Bestial Wrath', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
-  ['Bestial Discipline', 'Multiplies the pet’s focus regeneration by 50% a rank. The base rate it scales is sourced now (25 focus per 5s, sim/hunter/focus.go), but nothing spends focus yet, so the modifier would multiply an income no ability draws on.'],
   ['Survivalist', 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
   ['Combat Experience', 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
   ['Mortal Shots', 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],

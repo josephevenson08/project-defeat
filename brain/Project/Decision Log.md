@@ -58,7 +58,7 @@ It has happened three times: 33 sourced raid buffs reaching no number because no
 
 ## Coverage is not completeness, and the refusal count goes next to it
 
-Talents reach 27 of 27 specs *and* 46 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
+Talents reach 27 of 27 specs *and* 45 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
 
 ## Verify before correcting, even when the data looks obviously wrong
 
@@ -111,6 +111,18 @@ So an unexplained constant is carried across as read, and the fact that it is un
 A hunter pet inherits attack power, spell power, stamina and armour from its owner and **nothing else** — no crit, no hit, no haste. So the four Beast Mastery talents that scale it land on `petCritChance`, `petHitChance`, `petDamageMultiplier` and `petMeleeSpeedMultiplier` rather than on the melee fields they resemble.
 
 Sharing a field would have handed the *hunter* crit they had not earned, and it would have raised the total — which reads as progress. The test that catches it asserts the owner’s Auto Shot is byte-identical across each pet talent, because a separation bug looks exactly like an improvement from the total alone.
+
+## Split a damage source when its halves scale differently
+
+The hunter pet reports as `Pet melee`, `Pet Bite` and `Pet Claw` rather than one `Pet` row. The auto attack grows with 22% of the owner’s ranged attack power; Bite and Claw are flat rolls with no attack power scaling at all, so they shrink as a share with every upgrade the hunter equips.
+
+One row would have hidden a shrinking source behind a growing one, and the whole point of `damageSources` summing to `scoreExact` is that a change shows up **per source** rather than as a plausible total nobody can check. The test for the split asserts that 2,000 extra attack power moves the melee row and leaves the two abilities exactly where they were.
+
+## Apply a ceiling before it binds, not after
+
+The pet ability rate is capped by focus, by each ability’s own cooldown, and by the pet’s 1.5s global cooldown. At every realistic focus income the GCD ceiling is nowhere near binding — the abilities come to roughly 0.16 uses a second where it would allow 0.67 — so a model that simply omitted it would agree with this one everywhere it is currently used.
+
+It is applied anyway, and a test proves it by handing the model an absurd focus income. A ceiling left out because nothing reaches it is indistinguishable from one that was forgotten, and it stops being harmless the moment the inputs move.
 
 ## Look in the right package before concluding a constant does not exist
 

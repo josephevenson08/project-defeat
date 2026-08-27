@@ -9,10 +9,9 @@
  * Every constant is read from wowsims/tbc `sim/hunter/pet.go`, `sim/hunter/focus.go` and
  * `sim/hunter/talents.go` at the pinned commit 3301fca5.
  *
- * **What this models is the pet's white damage only, and the shortfall is stated rather than
- * discovered.** Its focus-costed abilities — Bite, Claw, Gore, Screech — are real damage and are not
- * here. The focus economy they spend from *is* now sourced (see `HUNTER_PET_FOCUS_PER_SECOND`), so
- * what remains is the rate model rather than the constants.
+ * **It swings and it presses two buttons.** The auto attack is here, and so are Bite and Claw, paid
+ * for out of a focus bar at 5 focus a second. What is not here is stated rather than discovered:
+ * Frenzy, Kill Command and Bestial Wrath, each named in `HUNTER_PET_UNMODELLED` with the reason.
  */
 
 /** Base melee weapon: 42-68 damage on a 2.0s swing. */
@@ -108,19 +107,82 @@ export const HUNTER_PET_FOCUS_PER_TICK = 25
 export const HUNTER_PET_FOCUS_TICK_SECONDS = 5
 export const HUNTER_PET_FOCUS_PER_SECOND = HUNTER_PET_FOCUS_PER_TICK / HUNTER_PET_FOCUS_TICK_SECONDS
 
+/**
+ * The pet's global cooldown, which **ranged haste does not reduce** — the same finding Steady Shot
+ * turned on, one actor over. Every pet ability sets `IgnoreHaste: true` on a `GCDDefault` cast, so
+ * the pet acts at most once every 1.5 seconds no matter how fast it swings.
+ */
+export const HUNTER_PET_GCD_SECONDS = 1.5
+
+/**
+ * The two abilities a Cat presses, from `sim/hunter/pet_abilities.go`.
+ *
+ * **They are flat rolls with no attack power scaling at all** — `BaseDamageConfigRoll(108, 132)`,
+ * not the `BaseDamageConfigMeleeWeapon` that Kill Command uses. That is the fact that decides what
+ * this is worth: the pet's *white* damage grows with the owner's ranged attack power and these do not,
+ * so gear moves one half of the pet and leaves the other exactly where it was.
+ *
+ * **What does move them is Bestial Discipline, and it is much the larger effect** — a mistake worth
+ * recording, because the obvious reading is backwards. Gear alone takes the abilities from 17.5% of
+ * the pet to 15.1%; doubling focus income takes them to 27.8%. A test compared a naked untalented
+ * hunter against a best-case one, expected the share to fall, and caught the conflation.
+ *
+ * `PetConfigs` gives the Cat `Bite` as primary and `Claw` as secondary, and upstream's `OnGCDReady`
+ * tries the primary first and falls through to the secondary — which is a priority order, so it is
+ * modelled as one.
+ *
+ * **Only the Cat's two are here.** Gore (35298, 25 focus, 37-61 with a 50% chance to double) and
+ * Screech (27051, 20 focus, 33-61) belong to families this app does not model, and Lightning Breath
+ * (25011, 50 focus, 80-93 plus a 0.05 spell power coefficient) is Nature damage on the spell table.
+ * Shipping all five would be four rows nothing reads, which this repo has done three times; their
+ * constants are recorded here instead so the next family is a lookup rather than another fetch.
+ */
+export type HunterPetAbility = {
+  name: string
+  spellId: number
+  focusCost: number
+  damage: { min: number; max: number }
+  /** Seconds between uses, when the ability has a cooldown at all. Claw has none. */
+  cooldownSeconds?: number
+}
+
+export const HUNTER_PET_BITE: HunterPetAbility = {
+  name: 'Bite',
+  spellId: 27050,
+  focusCost: 35,
+  damage: { min: 108, max: 132 },
+  cooldownSeconds: 10,
+}
+
+export const HUNTER_PET_CLAW: HunterPetAbility = {
+  name: 'Claw',
+  spellId: 27049,
+  focusCost: 25,
+  damage: { min: 54, max: 76 },
+}
+
+/** In `PetConfigs` order: primary first, secondary second, which is the order `OnGCDReady` tries them. */
+export const HUNTER_PET_ABILITIES: readonly HunterPetAbility[] = [HUNTER_PET_BITE, HUNTER_PET_CLAW]
+
 /** Named so the estimate can say what it left out, rather than reporting a pet that is quietly too small. */
 export const HUNTER_PET_UNMODELLED =
-  'the pet contributes white damage only. Its focus-costed abilities (Bite, Claw, Gore, Screech) are not modelled — the focus that pays for them is sourced at 5 per second, but the rate a pet spends it at is not — and neither is Frenzy, whose 8-second haste proc needs that same ability rate before it can be priced, nor Kill Command, which fires off the owner’s own crits.'
+  'the pet presses Bite and Claw out of its focus bar but nothing else. Those two are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are. Not modelled: Frenzy, a 30% haste aura procced by the pet’s own crits; Kill Command, which fires off the owner’s crits; and Bestial Wrath, which needs a cooldown usage policy.'
 
 export type HunterPetTalents = {
   /** Multiplies the pet's damage. Unleashed Fury, +4% a rank. 1 when untalented. */
   damageMultiplier: number
   /** Multiplies the pet's melee speed. Serpent's Swiftness, +4% a rank. 1 when untalented. */
   meleeSpeedMultiplier: number
+  /** Multiplies focus regeneration. Bestial Discipline, +50% a rank. 1 when untalented. */
+  focusRegenMultiplier: number
 }
 
 /** The untalented identity, which an empty tree has to reproduce exactly. */
-export const noHunterPetTalents: HunterPetTalents = { damageMultiplier: 1, meleeSpeedMultiplier: 1 }
+export const noHunterPetTalents: HunterPetTalents = {
+  damageMultiplier: 1,
+  meleeSpeedMultiplier: 1,
+  focusRegenMultiplier: 1,
+}
 
 export type HunterPetInput = {
   /** The hunter's ranged attack power, which is the only stat a pet inherits for damage. */
@@ -133,15 +195,39 @@ export type HunterPetInput = {
   /** Armor mitigation as a fraction. The pet swings a physical weapon and is reduced like any other. */
   armorMitigation: number
   /**
-   * The two pet-scaling talents that reach white damage. Optional so a caller with no talents to
-   * hand keeps its numbers unchanged — absent is the untalented identity.
+   * Expected damage multiplier from the pet's **special**-attack table, which is a different table:
+   * an ability cannot glance, so the caller builds it separately rather than reusing the white one.
+   * Optional, because a caller that does not supply it gets white damage and no abilities — which is
+   * what every caller got before the abilities existed.
+   */
+  specialAttackTableMultiplier?: number
+  /**
+   * The pet-scaling talents. Optional so a caller with no talents to hand keeps its numbers
+   * unchanged — absent is the untalented identity.
    */
   talents?: HunterPetTalents
+}
+
+export type HunterPetAbilityEstimate = {
+  name: string
+  /** Uses per second, after the focus budget, the shared GCD and the ability's own cooldown. */
+  usesPerSecond: number
+  /** Focus spent per second on this ability alone. */
+  focusPerSecond: number
+  dps: number
 }
 
 export type HunterPetEstimate = {
   attackPower: number
   critChance: number
+  /** Auto-attack damage alone, which is the only part that scales with the owner's gear. */
+  whiteDps: number
+  /** Every focus-costed ability, itemised, so the damage table can show them individually. */
+  abilities: readonly HunterPetAbilityEstimate[]
+  abilityDps: number
+  /** Focus income after Bestial Discipline, reported because the ability rate is derived from it. */
+  focusPerSecond: number
+  /** White plus abilities. What the caller adds to the hunter's total. */
   dps: number
 }
 
@@ -151,17 +237,67 @@ export function hunterPetCritChance(): number {
 }
 
 /**
- * The pet's sustained white damage.
+ * How often the pet uses each ability, spending a shared focus budget in priority order.
  *
- * Shaped exactly like the player's white-damage model — weapon DPS plus attack power over 14, rolled
+ * **Three ceilings, and which one binds is the interesting part.** An ability is limited by its own
+ * cooldown, by the pet's 1.5s global cooldown, and by focus. At the base 5 focus a second, against
+ * costs of 25 and 35, **focus binds by a wide margin** — the two abilities together come to about
+ * 0.16 uses a second where the GCD would allow 0.67. That is why Bestial Discipline is worth having
+ * and why the GCD ceiling almost never shows up in the answer; it is still applied, because a future
+ * family with cheaper abilities would run into it.
+ *
+ * **The budget is spent greedily, in `PetConfigs` order**, matching upstream's `OnGCDReady`: it
+ * tries the primary and falls through to the secondary only when the primary is unaffordable or on
+ * cooldown. So Bite takes what its 10s cooldown allows and Claw divides the remainder. This is the
+ * same greedy shape `resolveRotation` uses for the player, and it carries the same warning: a
+ * second ability spending the same resource **moves** damage rather than adding it, and only pays
+ * off if it returns more per point. Here it does not — Bite returns 3.4 damage per focus against
+ * Claw's 2.6 — which is exactly why upstream lists Bite first.
+ *
+ * **What this does not model is the starvation.** On a real timeline Claw can spend the pet below
+ * 35 focus just as Bite comes off cooldown, delaying it; the closed form lets Bite take its full
+ * cooldown rate first. That overstates Bite slightly and understates Claw by the same focus, and
+ * since Bite is the better use of a focus point the net is a small overstatement. It is named here
+ * rather than discovered later.
+ */
+export function hunterPetAbilityRates(
+  focusPerSecond: number,
+  abilities: readonly HunterPetAbility[] = HUNTER_PET_ABILITIES,
+): { ability: HunterPetAbility; usesPerSecond: number }[] {
+  let remainingFocus = Math.max(0, focusPerSecond)
+  let remainingGcd = 1 / HUNTER_PET_GCD_SECONDS
+
+  return abilities.map((ability) => {
+    const fromCooldown = ability.cooldownSeconds ? 1 / ability.cooldownSeconds : Number.POSITIVE_INFINITY
+    const fromFocus = ability.focusCost > 0 ? remainingFocus / ability.focusCost : Number.POSITIVE_INFINITY
+    const usesPerSecond = Math.max(0, Math.min(fromCooldown, fromFocus, remainingGcd))
+
+    remainingFocus -= usesPerSecond * ability.focusCost
+    remainingGcd -= usesPerSecond
+
+    return { ability, usesPerSecond }
+  })
+}
+
+/**
+ * The pet's sustained damage: auto attacks, plus whatever its focus pays for.
+ *
+ * The white half is shaped exactly like the player's — weapon DPS plus attack power over 14, rolled
  * through an attack table and reduced by armour — because a pet swings a weapon like anything else.
  * The two differences are that its attack power is mostly *not* its own, and that it is always happy.
  *
  * **Speed and damage are kept as separate multipliers**, which matters because they enter at
  * different points upstream: `MeleeSpeedMultiplier` changes how often the pet swings, so it scales
  * the weapon term and the attack-power term alike, while the `DamageMultiplier` chain scales what
- * each swing lands for. Collapsing them into one factor gives the same answer today and stops doing
- * so the moment anything reads the swing interval — which the focus abilities will.
+ * each swing lands for.
+ *
+ * **And two of those damage multipliers are auto-attack-only, which is the trap in this function.**
+ * Upstream writes happiness as `PseudoStats.DamageDealtMultiplier` — unit-wide, so it reaches
+ * everything — but the family multiplier and the unexplained `0.85` as
+ * `AutoAttacks.MHEffect.DamageMultiplier`, which is the auto attack alone. Every pet ability carries
+ * `DamageMultiplier: 1`, and Kill Command re-applies the family multiplier **explicitly**, which is
+ * the proof that it is not inherited. Handing the abilities the white chain would overstate them by
+ * about 6% at the modelled family and silently more at another.
  */
 export function estimateHunterPet(input: HunterPetInput): HunterPetEstimate {
   const { ownerRangedAttackPower, attackTableMultiplier, armorMitigation } = input
@@ -178,17 +314,44 @@ export function estimateHunterPet(input: HunterPetInput): HunterPetEstimate {
   const fromAttackPower = attackPower / 14
 
   const speed = HUNTER_PET_MELEE_SPEED_MULTIPLIER * talents.meleeSpeedMultiplier
-  const damage =
-    HUNTER_PET_HAPPINESS_MULTIPLIER *
-    HUNTER_PET_AUTO_ATTACK_MULTIPLIER *
-    HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER *
-    talents.damageMultiplier
+  // Reaches everything the pet does: happiness is unit-wide upstream, and so is Unleashed Fury.
+  const unitDamage = HUNTER_PET_HAPPINESS_MULTIPLIER * talents.damageMultiplier
+  // The auto attack alone. See the note above for why these two do not reach the abilities.
+  const whiteOnlyDamage = HUNTER_PET_AUTO_ATTACK_MULTIPLIER * HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER
 
-  const raw = (weaponDps + fromAttackPower) * attackTableMultiplier * speed * damage
+  const whiteRaw = (weaponDps + fromAttackPower) * attackTableMultiplier * speed * unitDamage * whiteOnlyDamage
+  const whiteDps = Math.max(0, whiteRaw) * (1 - armorMitigation)
+
+  const focusPerSecond = HUNTER_PET_FOCUS_PER_SECOND * talents.focusRegenMultiplier
+
+  /*
+   * No special table means no abilities, and that is a deliberate default rather than a zero: every
+   * caller that predates the abilities keeps the number it had, so adding this cannot silently move
+   * a surface nobody has looked at.
+   */
+  const abilities: HunterPetAbilityEstimate[] =
+    input.specialAttackTableMultiplier === undefined
+      ? []
+      : hunterPetAbilityRates(focusPerSecond).map(({ ability, usesPerSecond }) => {
+          const averageDamage = (ability.damage.min + ability.damage.max) / 2
+          const raw = usesPerSecond * averageDamage * input.specialAttackTableMultiplier! * unitDamage
+          return {
+            name: ability.name,
+            usesPerSecond,
+            focusPerSecond: usesPerSecond * ability.focusCost,
+            dps: Math.max(0, raw) * (1 - armorMitigation),
+          }
+        })
+
+  const abilityDps = abilities.reduce((sum, entry) => sum + entry.dps, 0)
 
   return {
     attackPower,
     critChance: hunterPetCritChance(),
-    dps: Math.max(0, raw) * (1 - armorMitigation),
+    whiteDps,
+    abilities,
+    abilityDps,
+    focusPerSecond,
+    dps: whiteDps + abilityDps,
   }
 }

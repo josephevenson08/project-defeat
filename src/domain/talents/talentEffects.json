@@ -9,6 +9,7 @@
       "sim/warrior/berserker_rage.go",
       "sim/rogue/talents.go",
       "sim/hunter/talents.go",
+      "sim/hunter/pet.go",
       "sim/shaman/talents.go",
       "sim/druid/talents.go",
       "sim/paladin/talents.go",
@@ -29,7 +30,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 67,
+  "effectCount": 68,
   "effects": [
     {
       "className": "Warrior",
@@ -410,6 +411,18 @@
       "perRank": 0.02,
       "caveat": "Melee half only, for the same reason as Ferocity: the pet’s SpellHit line feeds abilities this model does not have.",
       "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1390,
+      "talent": "Bestial Discipline",
+      "tree": "Beast Mastery",
+      "maxRank": 2,
+      "kind": "petFocusRegenMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.5,
+      "caveat": "Multiplies focus income, not damage. Upstream scales BaseFocusPerTick (25 per 5s) by this, so it buys ability rate rather than ability size.",
+      "source": "sim/hunter/pet.go"
     },
     {
       "className": "Shaman",
@@ -886,7 +899,7 @@
     {
       "className": "Hunter",
       "talent": "Frenzy",
-      "reason": "A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. The constants are all sourced; the uptime is not, because it depends on how often the pet lands an attack — and the pet’s focus abilities, which are most of its attacks, are not modelled yet. Pricing it off white swings alone would understate it."
+      "reason": "A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. Every constant is sourced and the ability rate exists now, so what is left is the uptime: it is a fixed-duration refreshing aura rather than a consumed stack, which is a different closed form from flurrySpeedMultiplier and has not been written yet."
     },
     {
       "className": "Hunter",
@@ -897,11 +910,6 @@
       "className": "Hunter",
       "talent": "The Beast Within / Bestial Wrath",
       "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
-    },
-    {
-      "className": "Hunter",
-      "talent": "Bestial Discipline",
-      "reason": "Multiplies the pet’s focus regeneration by 50% a rank. The base rate it scales is sourced now (25 focus per 5s, sim/hunter/focus.go), but nothing spends focus yet, so the modifier would multiply an income no ability draws on."
     },
     {
       "className": "Hunter",

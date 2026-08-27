@@ -113,8 +113,12 @@ import {
   HUNTER_PET_FOCUS_TICK_SECONDS,
   HUNTER_PET_HAPPINESS_MULTIPLIER,
   HUNTER_PET_MELEE_SPEED_MULTIPLIER,
+  HUNTER_PET_BITE,
+  HUNTER_PET_CLAW,
+  HUNTER_PET_GCD_SECONDS,
   HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
   estimateHunterPet,
+  hunterPetAbilityRates,
 } from '../src/domain/simulation/hunterPet'
 import { validateBuild } from '../src/domain/builds/buildSerialization'
 import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
@@ -5546,8 +5550,12 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
   expect(petDps, 'a hunter brings a pet').toBeDefined()
   expect(petDps!.value).toBeGreaterThan(0)
 
-  // It appears in the damage table as its own source, which is the point of having that table.
-  expect(result.damageSources?.some((source) => source.name === 'Pet')).toBe(true)
+  /*
+   * It appears in the damage table as its own sources — the auto attack and each focus ability
+   * separately, because the two halves behave differently: white damage scales with the owner's
+   * ranged attack power and Bite and Claw are flat rolls that do not scale at all.
+   */
+  expect(result.damageSources?.some((source) => source.name === 'Pet melee')).toBe(true)
 
   /*
    * **Attack power is 22% of the hunter's ranged attack power, plus the pet's own.** Asserted against
@@ -5572,9 +5580,17 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
     'the pet inherits no crit',
   ).toBe(petDps!.value)
 
-  // And the estimate says what it left out, because white damage is not all a pet does.
-  expect(result.summary).toMatch(/white damage only/i)
-  expect(result.summary, 'the focus abilities are named').toMatch(/Bite, Claw, Gore, Screech/)
+  /*
+   * And the estimate says what it models and what it left out. It used to say "white damage only"
+   * and name all four focus abilities as missing; Bite and Claw are modelled now, so the sentence
+   * names those two and the three real remaining gaps instead.
+   */
+  expect(result.summary, 'the modelled abilities are named').toMatch(/Bite and Claw/)
+  expect(result.summary, 'and so are the ones that are not').toMatch(/Frenzy/)
+  expect(result.summary, 'Kill Command is named as unmodelled, not as unimplemented').toMatch(/Kill Command/)
+  expect(result.summary, 'the flat-roll caveat is the one that decides what they are worth').toMatch(
+    /do not scale with attack power/i,
+  )
 
   /*
    * **The family is named in the estimate, and the name has to match the constant it is priced at.**
@@ -5605,7 +5621,7 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
   })
   const petWeaponDps = (42 + 68) / 2 / 2.0
   const unmultiplied = petWeaponDps + petSample.attackPower / 14
-  expect(petSample.dps / unmultiplied, 'speed and damage multipliers are each applied once').toBeCloseTo(
+  expect(petSample.whiteDps / unmultiplied, 'speed and damage multipliers are each applied once').toBeCloseTo(
     HUNTER_PET_MELEE_SPEED_MULTIPLIER *
       HUNTER_PET_HAPPINESS_MULTIPLIER *
       HUNTER_PET_AUTO_ATTACK_MULTIPLIER *
@@ -5690,7 +5706,10 @@ test('a pet talent moves the pet and not the hunter, and Serpent’s Swiftness m
   const petDpsWith = (points: Record<number, number>) => {
     const sim = calculateSimulation(hunter, gear, stats, 'Physical DPS', [], undefined, points)
     return {
-      pet: sim.damageSources!.find((source) => source.name === 'Pet')!.dps,
+      // Summed across every pet row, because the pet is itemised into melee plus each focus ability.
+      pet: sim
+        .damageSources!.filter((source) => source.name.startsWith('Pet'))
+        .reduce((sum, source) => sum + source.dps, 0),
       autoShot: sim.damageSources!.find((source) => source.name === 'Auto Shot')!.dps,
     }
   }
@@ -5723,6 +5742,214 @@ test('a pet talent moves the pet and not the hunter, and Serpent’s Swiftness m
    * passes "DPS went up" if anything else in the build moved.
    */
   expect(petDpsWith({ [unleashedFury]: 5 }).pet / bare.pet).toBeCloseTo(1.2, 6)
+})
+
+test('the pet spends a focus budget in priority order, and the abilities do not take the white multipliers', () => {
+  /*
+   * Bite and Claw, out of a focus bar. **Three ceilings, and which one binds is the finding**: an
+   * ability is limited by its own cooldown, by the pet's 1.5s global cooldown, and by focus — and at
+   * the base 5 focus a second, against costs of 35 and 25, focus binds by a wide margin. The two
+   * together come to about 0.16 uses a second where the GCD would allow 0.67.
+   */
+  expect(HUNTER_PET_BITE.focusCost).toBe(35)
+  expect(HUNTER_PET_BITE.cooldownSeconds).toBe(10)
+  expect(HUNTER_PET_CLAW.focusCost).toBe(25)
+  expect(HUNTER_PET_CLAW.cooldownSeconds, 'Claw has no cooldown; focus is its only limit').toBeUndefined()
+
+  /*
+   * At base focus the budget is fully spent and Bite takes its cooldown rate first, which is the
+   * greedy priority order upstream's `OnGCDReady` produces by trying the primary and falling through.
+   */
+  const base = hunterPetAbilityRates(HUNTER_PET_FOCUS_PER_SECOND)
+  const spent = base.reduce((sum, entry) => sum + entry.usesPerSecond * entry.ability.focusCost, 0)
+  expect(spent, 'every point of focus is spent').toBeCloseTo(HUNTER_PET_FOCUS_PER_SECOND, 10)
+  expect(base[0].usesPerSecond, 'Bite is capped by its own 10s cooldown, not by focus').toBeCloseTo(0.1, 10)
+  expect(base[1].usesPerSecond, 'Claw divides what Bite leaves: 1.5 focus a second over a 25 cost').toBeCloseTo(0.06, 10)
+
+  // And the GCD ceiling is nowhere near binding, which is why Bestial Discipline is worth having.
+  const totalUses = base.reduce((sum, entry) => sum + entry.usesPerSecond, 0)
+  expect(totalUses).toBeLessThan(1 / HUNTER_PET_GCD_SECONDS)
+
+  /*
+   * **The GCD ceiling is still applied, and this is what proves it.** No family in TBC has abilities
+   * cheap enough to reach it at a realistic focus income, so an unbounded model would agree with this
+   * one everywhere it is currently used — and quietly stop agreeing the moment anything changed.
+   */
+  const absurd = hunterPetAbilityRates(1000, [HUNTER_PET_CLAW])
+  expect(absurd[0].usesPerSecond, 'the global cooldown caps it once focus stops being the constraint').toBeCloseTo(
+    1 / HUNTER_PET_GCD_SECONDS,
+    10,
+  )
+
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const result = calculateSimulation(hunter, gear, stats, 'Physical DPS')
+
+  // Each ability is its own row, so a change shows up per source rather than inside one "Pet" total.
+  for (const name of ['Pet melee', 'Pet Bite', 'Pet Claw']) {
+    expect(
+      result.damageSources?.some((source) => source.name === name),
+      `${name} is itemised`,
+    ).toBe(true)
+  }
+
+  /*
+   * **The abilities must not take the auto-attack multipliers**, and this is the assertion that
+   * earns its keep. Upstream writes happiness as `PseudoStats.DamageDealtMultiplier`, which is
+   * unit-wide, but the family multiplier and the unexplained `0.85` as
+   * `AutoAttacks.MHEffect.DamageMultiplier`, which is the auto attack alone — and Kill Command
+   * re-applies the family multiplier **explicitly**, which is the proof it is not inherited.
+   *
+   * Checked against the arithmetic rather than a literal: Bite's expected damage is its average roll
+   * times its rate times the special table times happiness, and nothing else.
+   */
+  const petOnly = estimateHunterPet({
+    ownerRangedAttackPower: 0,
+    attackTableMultiplier: 0,
+    specialAttackTableMultiplier: 1,
+    armorMitigation: 0,
+  })
+  const bite = petOnly.abilities.find((entry) => entry.name === 'Bite')!
+  expect(bite.dps).toBeCloseTo(
+    bite.usesPerSecond * ((HUNTER_PET_BITE.damage.min + HUNTER_PET_BITE.damage.max) / 2) * HUNTER_PET_HAPPINESS_MULTIPLIER,
+    10,
+  )
+  // Stated the other way round too, because the failure mode is a factor quietly appearing.
+  expect(bite.dps, 'the family multiplier must not reach an ability').not.toBeCloseTo(
+    bite.usesPerSecond *
+      ((HUNTER_PET_BITE.damage.min + HUNTER_PET_BITE.damage.max) / 2) *
+      HUNTER_PET_HAPPINESS_MULTIPLIER *
+      HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER *
+      HUNTER_PET_AUTO_ATTACK_MULTIPLIER,
+    4,
+  )
+
+  /*
+   * **The abilities are flat rolls with no attack power scaling**, which is what decides their whole
+   * worth: the pet's white damage grows with the owner's ranged attack power and these do not, so
+   * they shrink as a share with every upgrade. Handing the pet 2,000 more attack power must move the
+   * melee row and leave Bite and Claw exactly where they were.
+   */
+  const geared = estimateHunterPet({
+    ownerRangedAttackPower: 2000,
+    attackTableMultiplier: 1,
+    specialAttackTableMultiplier: 1,
+    armorMitigation: 0,
+  })
+  const bare = estimateHunterPet({
+    ownerRangedAttackPower: 0,
+    attackTableMultiplier: 1,
+    specialAttackTableMultiplier: 1,
+    armorMitigation: 0,
+  })
+  expect(geared.whiteDps, 'white damage scales with the owner').toBeGreaterThan(bare.whiteDps)
+  expect(geared.abilityDps, 'the abilities do not').toBeCloseTo(bare.abilityDps, 10)
+})
+
+test('Bestial Discipline buys ability rate rather than ability size', () => {
+  /*
+   * The one pet talent that multiplies an **income**. Upstream passes it straight into
+   * `EnableFocusBar(1.0 + 0.5*rank)`, which scales `BaseFocusPerTick` — so it cannot make Bite hit
+   * harder, only more often, and only until the global cooldown starts binding instead.
+   *
+   * It is also the one pet talent read out of `pet.go` rather than `talents.go`, because upstream
+   * applies it at construction rather than in `ApplyTalents`.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const bestialDiscipline = idOf('Hunter', 'Bestial Discipline')
+
+  const maxed = deriveTalentModifiers({ [bestialDiscipline]: 2 })
+  expect(maxed.petFocusRegenMultiplier, '+50% a rank, max 2').toBeCloseTo(2, 10)
+  expect(deriveTalentModifiers({}).petFocusRegenMultiplier, 'identity when untalented').toBe(1)
+  // It must not leak into anything that scales damage, which is the whole point of a separate field.
+  expect(maxed.petDamageMultiplier).toBe(1)
+  expect(maxed.petMeleeSpeedMultiplier).toBe(1)
+
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const read = (points: Record<number, number>) => {
+    const sim = calculateSimulation(hunter, gear, stats, 'Physical DPS', [], undefined, points)
+    const source = (name: string) => sim.damageSources!.find((entry) => entry.name === name)?.dps ?? 0
+    return { melee: source('Pet melee'), bite: source('Pet Bite'), claw: source('Pet Claw') }
+  }
+
+  const bare = read({})
+  const talented = read({ [bestialDiscipline]: 2 })
+
+  /*
+   * **Bite does not move and Claw does**, and that asymmetry is the mechanism rather than a detail.
+   * Bite is already capped by its own 10s cooldown at base focus, so a larger income cannot buy more
+   * of it — every extra point goes to Claw, which has no cooldown at all. A model that simply scaled
+   * the whole ability budget by the talent would raise both and look just as plausible.
+   */
+  expect(talented.bite, 'Bite is cooldown-capped, so more focus buys none of it').toBeCloseTo(bare.bite, 10)
+  expect(talented.claw, 'Claw has no cooldown, so it takes the whole surplus').toBeGreaterThan(bare.claw)
+  expect(talented.melee, 'and focus does not touch the auto attack').toBeCloseTo(bare.melee, 10)
+})
+
+test('the pet shares featureFlags quotes are the shares the model produces', () => {
+  /*
+   * `featureFlags.ts` says the pet's abilities are worth "about 2.4%" of a Beast Mastery hunter and
+   * the pet as a whole "13.3% of the total". Its own header forbids adding a numeric bullet there
+   * without an assertion behind it — the file has been wrong twice by not moving when the model
+   * improved, and both times the sentence carried a number nothing checked.
+   *
+   * Bracketed on **both** sides rather than bounded below, for the same reason the calibration range
+   * is: a one-sided bound passes silently while the model changes underneath it. Improving the pet is
+   * supposed to fail this and force the sentence to be rewritten.
+   *
+   * Measured at best case — rank-1 BiS, every buff and consumable, the tree filled to 61 — because
+   * that is the character `featureFlags.ts` is describing and the one the calibration table uses.
+   */
+  const { result } = bestCaseSimulation('Hunter', 'Beast Mastery', 'Physical DPS')
+  const sources = result.damageSources ?? []
+  const petRows = sources.filter((source) => source.name.startsWith('Pet'))
+  const abilityRows = petRows.filter((source) => source.name !== 'Pet melee')
+
+  expect(petRows.length, 'the pet is itemised into melee plus each ability').toBeGreaterThan(1)
+  expect(abilityRows.map((source) => source.name).sort()).toEqual(['Pet Bite', 'Pet Claw'])
+
+  const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
+
+  expect(share(abilityRows), 'featureFlags says the abilities are about 2.4%').toBeGreaterThan(0.02)
+  expect(share(abilityRows)).toBeLessThan(0.03)
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 13.3%').toBeGreaterThan(0.125)
+  expect(share(petRows)).toBeLessThan(0.14)
+
+  /*
+   * **And the one that decides whether the abilities matter at all is Bestial Discipline, not gear.**
+   *
+   * The first version of this assertion compared a naked untalented hunter against a best-case one
+   * and expected the ability share of the pet to *fall*, on the reasoning that flat rolls cannot
+   * follow attack power. It failed, and it was right to: 17.45% against 18.14%. The comparison
+   * conflated two effects pulling opposite ways.
+   *
+   * Held apart, both are real. Gear alone takes the share **17.45% → 15.12%**, which is the flat-roll
+   * mechanism. Bestial Discipline alone takes it **17.45% → 27.75%**, because doubling focus income
+   * doubles the ability rate, and that is much the larger of the two. So the controlled comparison is
+   * same gear, different talents — and the claim about gear is asserted where it can be exact, in the
+   * unit test above, as the ability DPS not moving at all when the owner gains 2,000 attack power.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(character, gear)
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const abilityShareOfPet = (points: Record<number, number>) => {
+    const sim = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
+    const rows = (sim.damageSources ?? []).filter((source) => source.name.startsWith('Pet'))
+    const abilities = rows.filter((source) => source.name !== 'Pet melee')
+    return abilities.reduce((sum, s) => sum + s.dps, 0) / rows.reduce((sum, s) => sum + s.dps, 0)
+  }
+
+  expect(
+    abilityShareOfPet({ [idOf('Hunter', 'Bestial Discipline')]: 2 }),
+    'Bestial Discipline is what makes the pet abilities worth counting',
+  ).toBeGreaterThan(abilityShareOfPet({}) * 1.5)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

@@ -760,13 +760,29 @@ function calculatePhysicalDps(
       petTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER +
       petTable.glance * ((petGlance.low + petGlance.high) / 2)
 
+    /*
+     * **A second table for the pet, because Bite and Claw are specials and cannot glance.** Reusing
+     * the white one would price them at a glancing blow's reduced damage on a share of every use —
+     * the same distinction the player's own yellow damage already makes, applied to the other actor.
+     */
+    const petSpecialTable = buildSpecialAttackTable({
+      skillDiff,
+      expertiseSkillPoints: 0,
+      missReduction: talents.petHitChance,
+      rawCritChance: hunterPetCritChance() + talents.petCritChance,
+      attacksFromBehind: true,
+    })
+
     hunterPet = estimateHunterPet({
       ownerRangedAttackPower: stats.rangedAttackPower,
       attackTableMultiplier: petMultiplier,
+      specialAttackTableMultiplier:
+        petSpecialTable.hit + petSpecialTable.block + petSpecialTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER,
       armorMitigation,
       talents: {
         damageMultiplier: talents.petDamageMultiplier,
         meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
+        focusRegenMultiplier: talents.petFocusRegenMultiplier,
       },
     })
 
@@ -1080,7 +1096,18 @@ function calculatePhysicalDps(
     ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
     ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
   ]
-  if (petDps > 0) sources.push({ name: 'Pet', dps: petDps })
+  /*
+   * The pet is split into its auto attack and each focus ability rather than reported as one row.
+   *
+   * That split is worth the extra rows because the two halves behave completely differently: the
+   * white damage scales with the owner's ranged attack power, while Bite and Claw are flat rolls that
+   * do not scale at all. One "Pet" line would hide a source that shrinks as a share of every upgrade
+   * behind one that grows, and the whole point of this table is that a change shows up per source.
+   */
+  if (hunterPet && hunterPet.whiteDps > 0) sources.push({ name: 'Pet melee', dps: hunterPet.whiteDps * damageMultiplier })
+  for (const ability of hunterPet?.abilities ?? []) {
+    if (ability.dps > 0) sources.push({ name: `Pet ${ability.name}`, dps: ability.dps * damageMultiplier })
+  }
   if (paladinHoly) {
     sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
     sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * damageMultiplier })
@@ -1115,6 +1142,17 @@ function calculatePhysicalDps(
   if (hunterPet) {
     breakdown.push({ label: 'Pet DPS', value: round(petDps) })
     breakdown.push({ label: 'Pet attack power', value: round(hunterPet.attackPower) })
+    /*
+     * Shown for the same reason the hunter's own mana drain is: the ability rate is derived from
+     * this number and is bounded by it rather than by the global cooldown, so a reader who wants to
+     * know why Bite lands as rarely as it does needs the income in front of them.
+     */
+    if (hunterPet.abilityDps > 0) {
+      breakdown.push({ label: 'Pet focus per second', value: round(hunterPet.focusPerSecond) })
+      for (const ability of hunterPet.abilities) {
+        breakdown.push({ label: `Pet ${ability.name} per minute`, value: round(ability.usesPerSecond * 60) })
+      }
+    }
   }
 
   if (paladinHoly && paladinHoly.totalDps > 0) {

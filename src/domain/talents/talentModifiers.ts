@@ -76,7 +76,7 @@ export type TalentModifiers = {
   /** Multiplies ranged attack speed. Hunter's Serpent's Swiftness. 1 when untalented. */
   rangedAttackSpeedMultiplier: number
   /*
-   * The four fields that reach the hunter's **pet** rather than the hunter.
+   * The `pet*` fields, which reach the hunter's **pet** rather than the hunter.
    *
    * They are separate fields rather than reuses of the melee ones for the reason the pet exists as
    * its own model at all: a pet is a second actor with its own attack table. It inherits attack
@@ -96,6 +96,15 @@ export type TalentModifiers = {
   petDamageMultiplier: number
   /** Multiplies the pet's melee speed. Serpent's Swiftness, +4% a rank. 1 when untalented. */
   petMeleeSpeedMultiplier: number
+  /**
+   * Multiplies the pet's focus regeneration. Bestial Discipline, +50% a rank. 1 when untalented.
+   *
+   * The one modifier here that buys **rate rather than size**. Upstream passes it straight into
+   * `EnableFocusBar(1.0 + 0.5*rank)`, which multiplies `BaseFocusPerTick` — so it is a multiplier on
+   * an income, and the pet's ability rate is focus-bound, which makes it close to linear in this
+   * number until the 1.5s global cooldown starts binding instead.
+   */
+  petFocusRegenMultiplier: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -176,6 +185,7 @@ export const noTalentModifiers: TalentModifiers = {
   petHitChance: 0,
   petDamageMultiplier: 1,
   petMeleeSpeedMultiplier: 1,
+  petFocusRegenMultiplier: 1,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -229,6 +239,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   spellDamageMultiplier: 'spellDamageMultiplier',
   petDamageMultiplier: 'petDamageMultiplier',
   petMeleeSpeedMultiplier: 'petMeleeSpeedMultiplier',
+  petFocusRegenMultiplier: 'petFocusRegenMultiplier',
 }
 
 /*

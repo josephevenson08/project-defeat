@@ -352,6 +352,82 @@ deliver most of the accuracy without it.
 
 ---
 
+## The pet presses its buttons, and they are worth less than anyone expected, 2026-08-27
+
+    Hunter Marksmanship   1225 -> 1239   (1.1x)
+    Hunter Beast Mastery  1405 -> 1440   (1.5x -> 1.4x)
+    Hunter Survival       1150 -> 1164   (1.5x)
+
+Bite and Claw are modelled, along with Bestial Discipline. **The headline is the size**: they add
+about **2.4%** to a Beast Mastery hunter and about **1.1%** to the other two, which is far less than
+the section below implied when it said "the abilities really are most of the remaining gap".
+
+### Why they are small, and it is one fact
+
+`BaseDamageConfigRoll(108, 132)`. **The pet's abilities are flat rolls with no attack power scaling
+at all** — unlike Kill Command, which uses `BaseDamageConfigMeleeWeapon`. So gear moves one half of
+the pet and leaves the other exactly where it was.
+
+**What moves them is Bestial Discipline, and getting that backwards is a mistake a test caught.** The
+first version of the share assertion compared a naked untalented hunter against a best-case one and
+expected the ability share of the pet to fall; it rose, 17.45% to 18.14%, because the comparison
+conflated two effects pulling opposite ways. Held apart: gear alone takes the share **17.5% to
+15.1%**, which is the flat-roll mechanism, and Bestial Discipline alone takes it **17.5% to 27.8%**
+by doubling focus income. The talent is much the larger of the two.
+
+That is worth stating plainly because it reverses the previous section's conclusion. The pet is
+**13.3%** of a best-case Beast Mastery hunter now, up from 11.2%, against the ~28% the architecture
+report attributed to it. The abilities were never going to close that. What is left is Frenzy, Kill
+Command and Bestial Wrath — or the attribution itself is high, which is a possibility the report
+already flagged about its own number.
+
+### Three ceilings, and focus binds by a wide margin
+
+An ability is limited by its own cooldown, by the pet's **1.5s global cooldown** (every ability sets
+`IgnoreHaste: true` on a `GCDDefault` cast — the same finding Steady Shot turned on, one actor over),
+and by focus. At the base 5 focus a second against costs of 35 and 25, the two together come to about
+**0.16 uses a second where the GCD would allow 0.67**.
+
+The budget is spent **greedily in `PetConfigs` order**, matching upstream's `OnGCDReady`, which tries
+the primary and falls through to the secondary. So Bite takes what its 10s cooldown allows and Claw
+divides the remainder. The same warning the resolver already carries applies: a second ability
+spending the same resource *moves* damage rather than adding it. Here Bite returns 3.4 damage per
+focus against Claw's 2.6, which is exactly why upstream lists Bite first.
+
+**The GCD ceiling is still applied even though nothing reaches it**, and a test proves it by handing
+the model an absurd focus income. An unbounded version would agree everywhere it is currently used
+and quietly stop agreeing the moment a cheaper family was added.
+
+**What is not modelled is the starvation.** On a real timeline Claw can spend the pet below 35 focus
+just as Bite comes off cooldown, delaying it; the closed form lets Bite take its full cooldown rate
+first. That overstates Bite slightly and understates Claw by the same focus, netting a small
+overstatement since Bite is the better use of a point. Named here rather than discovered later.
+
+### Bestial Discipline buys rate, and the asymmetry is the tell
+
++50% focus regen a rank, max 2, so a Beast Mastery hunter runs at **10 focus a second**. Read out of
+`pet.go` rather than `talents.go`, because it is an argument to `EnableFocusBar` rather than a stat —
+upstream applies it at construction, not in `ApplyTalents`.
+
+**Bite does not move and Claw does.** Bite is already cooldown-capped at base focus, so a larger
+income buys none of it; every extra point goes to Claw, which has no cooldown. Claw goes 3.6 to 15.6
+uses a minute and overtakes Bite as the larger of the two. A model that scaled the whole ability
+budget by the talent would raise both and look just as plausible, which is why the test asserts the
+asymmetry rather than the total.
+
+### One multiplier trap, caught by reading rather than by a failure
+
+Upstream writes happiness as `PseudoStats.DamageDealtMultiplier` — unit-wide, reaching everything —
+but the family multiplier and the unexplained `0.85` as `AutoAttacks.MHEffect.DamageMultiplier`,
+which is **the auto attack alone**. Every pet ability carries `DamageMultiplier: 1`, and Kill Command
+re-applies the family multiplier *explicitly*, which is the proof it is not inherited.
+
+Handing the abilities the white chain would have overstated them by about 6% at the modelled family
+and silently more at another. The damage sources are split into `Pet melee`, `Pet Bite` and `Pet
+Claw` partly so this stays visible per source rather than inside one total.
+
+---
+
 ## The pet, continued — and the two sourcing jobs were three, 2026-08-27
 
     Hunter Marksmanship   1209 -> 1225   (1.1x)

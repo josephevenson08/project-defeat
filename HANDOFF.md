@@ -5,6 +5,74 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, later)
+
+**The pet presses its buttons now, and they are worth much less than this file predicted.** Bite and
+Claw are modelled, along with Bestial Discipline. The section below said "the abilities are most of
+what is still missing"; that was wrong, and the reason is one fact.
+
+    Hunter Marksmanship   1225 -> 1239   (1.1x)
+    Hunter Beast Mastery  1405 -> 1440   (1.5x -> 1.4x)
+    Hunter Survival       1150 -> 1164   (1.5x)
+
+**`BaseDamageConfigRoll(108, 132)`. The pet's abilities are flat rolls with no attack power scaling
+at all** — unlike Kill Command, which uses `BaseDamageConfigMeleeWeapon`. So gear moves one half of
+the pet and leaves the other where it was: they add **2.4%** to a Beast Mastery hunter and about 1.1%
+to the other two. The pet is **13.3%** of a best-case BM hunter now, against the ~28% the
+architecture report attributed to it.
+
+**What moves the abilities is Bestial Discipline, not gear, and a test caught me getting that
+backwards.** The first share assertion compared a naked untalented hunter against a best-case one and
+expected the ability share of the pet to *fall*; it rose, 17.45% to 18.14%. Held apart: gear alone
+takes it **17.5% → 15.1%**, Bestial Discipline alone **17.5% → 27.8%**. The talent dominates, and the
+flat-roll claim is now asserted where it can be exact — ability DPS not moving at all when the owner
+gains 2,000 attack power.
+
+So the remaining pet gap is **Frenzy, Kill Command and Bestial Wrath** — or the ~28% attribution is
+high, which that report already flagged about its own number. Either way the abilities were never
+going to close it, and the damage table now shows that per source rather than inside one total.
+
+### The parts worth knowing
+
+- **Three ceilings; focus binds by a wide margin.** Own cooldown, the pet's 1.5s GCD (`IgnoreHaste:
+  true` — the Steady Shot finding, one actor over), and focus. At 5 focus/sec against costs of 35 and
+  25, the two abilities come to ~0.16 uses/sec where the GCD would allow 0.67. **The GCD ceiling is
+  applied anyway and a test proves it** by handing the model an absurd focus income — an unbounded
+  version would agree everywhere it is used today and stop agreeing the moment a cheaper family
+  existed.
+- **The budget is spent greedily in `PetConfigs` order**, matching upstream's `OnGCDReady`. Bite
+  takes what its 10s cooldown allows, Claw divides the rest. Bite returns 3.4 damage per focus
+  against Claw's 2.6, which is why upstream lists it first.
+- **Bestial Discipline moves Claw and not Bite**, and that asymmetry is the mechanism: Bite is
+  already cooldown-capped at base focus, so every extra point goes to the ability with no cooldown.
+  Claw goes 3.6 → 15.6 uses a minute and overtakes Bite. A model that scaled the whole budget would
+  raise both and look just as plausible, so the test asserts the asymmetry rather than the total.
+  It is also the one pet talent read out of `pet.go` rather than `talents.go`, because upstream
+  applies it at construction rather than in `ApplyTalents`.
+- **A multiplier trap, caught by reading rather than by a failure.** Happiness is
+  `PseudoStats.DamageDealtMultiplier` (unit-wide) but the family multiplier and the `0.85` are
+  `AutoAttacks.MHEffect.DamageMultiplier` — **the auto attack alone**. Every ability carries
+  `DamageMultiplier: 1`, and Kill Command re-applies the family multiplier *explicitly*, which is the
+  proof. Handing the abilities the white chain would have overstated them ~6%.
+- **What is not modelled is the starvation.** On a real timeline Claw can spend the pet below 35
+  focus just as Bite comes off cooldown; the closed form lets Bite take its cooldown rate first. A
+  small overstatement, named rather than discovered.
+
+### What is left on the pet
+
+1. **Frenzy** — 20% a rank on a pet crit, +30% melee speed for 8s. The ability rate exists now, so
+   the block is gone. It wants `1 - exp(-λ·8)` rather than a Markov chain over stacks, because it is
+   a fixed-duration refreshing aura rather than a consumed one.
+2. **Kill Command** — `BaseDamageConfigMeleeWeapon(MainHand, false, 127, 1, true)`, so it **does**
+   scale, which makes it the more promising of the two. 5s cooldown, 75 mana, gated on the owner
+   critting within the last 5 seconds. At raid crit rates that window is essentially always open, so
+   the honest closed form is "on cooldown", which is stateable.
+3. **Bestial Wrath / The Beast Within** — needs a cooldown usage policy this model has none of.
+
+Everything under **What is left** in the section below still stands, minus the pet items.
+
+---
+
 ## Start here (2026-08-27)
 
 **The pet is finished as far as white damage goes, and the two sourcing jobs were three.** The queue
@@ -2001,7 +2069,8 @@ no `StatBlock` field.
 
 ~~**Caster and healer talents are blocked on plumbing, not data.**~~ **Done 2026-08-19.**
 `calculateCasterDps` and `calculateHealing` now take `TalentModifiers`, and all nine classes are
-ingested — **49 effects**, up from 30. Talents reach **all 27 specs**: the tank path followed the
+ingested — **49 effects** at the time, up from 30, and more since; the live figure is asserted from
+`talentEffects.json` rather than written here. Talents reach **all 27 specs**: the tank path followed the
 caster and healer ones the same day, so every one of the four role paths now takes `TalentModifiers`.
 
 The plumbing came first deliberately, and the ingest second, because this repo's recurring failure is

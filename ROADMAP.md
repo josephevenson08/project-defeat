@@ -183,9 +183,10 @@ each pinned by an assertion these days.
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
 - **A hunter's pet, as a second attacker** — its own weapon, attack table and attack power, inheriting
-  22% of the owner's ranged attack power and none of their crit, plus the four Beast Mastery talents
-  that scale it. Its focus-costed abilities are still missing; the focus economy they spend from is
-  sourced.
+  22% of the owner's ranged attack power and none of their crit, plus every Beast Mastery talent this model can express
+  that scale it, plus Bite and Claw out of a focus bar spent in priority order. Those two are flat
+  rolls that do not scale with attack power, so they are worth about 2.4% to a Beast Mastery hunter
+  and it is Bestial Discipline rather than gear that makes them matter. Frenzy, Kill Command and Bestial Wrath are still missing.
 
 **Still open, and these are the honest ones:**
 
