@@ -203,11 +203,12 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   effects this sentence used to name alongside them — Toughness, Vitality, Divine Strength — stopped
   being refused on 2026-08-21 when talents reached `calculateStats`, and a test now fails if any
   refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
-- **A hunter's pet swings, and presses two buttons out of a focus bar.** Its auto attack is modelled —
-  its own weapon and attack table, 22% of the owner's ranged attack power, no inherited crit — along
-  with every Beast Mastery talent this model can express, and it spends focus on Bite and Claw in priority
-  order. Those two are flat rolls that do not scale with attack power, so gear moves the pet's auto
-  attack and leaves them where they were; Frenzy, Kill Command and Bestial Wrath are the real gap. The estimate
+- **A hunter's pet swings, and presses three buttons.** Its auto attack is modelled — its own weapon
+  and attack table, 22% of the owner's ranged attack power, no inherited crit — along with every Beast
+  Mastery talent this model can express, a focus bar spent on Bite and Claw, and Kill Command. Whether
+  an ability scales decides its worth: Bite and Claw are flat rolls that gear cannot move, while Kill
+  Command is a real weapon swing and is worth more than both together. Its rate is gated on the
+  owner's crit rate rather than its own cooldown. Frenzy, Bestial Wrath and Focused Fire are the gap. The estimate
   names the pet family it assumes, because the eight families span 0.91 to 1.1 and there is no picker.
 - The layout is fluid and reflows to phone width. It previously had a ~806px floor from fixed
   containers, a hard two-column content grid and a non-wrapping tab bar; all three are responsive now.

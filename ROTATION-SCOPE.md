@@ -352,6 +352,85 @@ deliver most of the accuracy without it.
 
 ---
 
+## Kill Command, and the one that scales beats the two that do not, 2026-08-27
+
+    Hunter Marksmanship   1239 -> 1277   (1.1x -> 1.0x)
+    Hunter Beast Mastery  1440 -> 1494   (1.4x)
+    Hunter Survival       1164 -> 1201   (1.4x)
+
+**Kill Command alone is worth more than Bite and Claw together** — 54.1 DPS against their 34.9 on a
+best-case Beast Mastery hunter — despite landing 7.7 times a minute against their 21.6. The section
+below predicted this from one line, and the prediction held: it uses
+`BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true)` where the focus abilities use
+`BaseDamageConfigRoll`, so it is the only pet ability that follows the owner's attack power.
+
+The pet is now **16.5%** of a best-case BM hunter, up from 13.3%.
+
+### Two spells, one attack, and it competes with nothing
+
+`sim/hunter/kill_command.go` registers **34026 on the owner** — 75 mana, a 5s cooldown — whose only
+effect is to fire the pet's **34027**. So it costs the pet no focus, takes none of the pet's 1.5s
+global cooldown, and does not contend with Bite and Claw for anything. It is a free extra pet attack
+bought with the owner's mana.
+
+Its 75 mana joins the drain the readout already reports, on the same grounds as Steady Shot's:
+`StatBlock` has no mana field, so a cap would mean inventing the income.
+
+### The gate is the owner's crit rate, not the cooldown
+
+`applyKillCommand` opens a 5-second window on **any owner crit** and calls `TryKillCommand` in the
+same breath, so the spell fires on the first crit *after* the cooldown comes up rather than the
+instant it does. Treating owner crits as a Poisson process at rate `λ`, the cycle is the cooldown
+plus the expected wait:
+
+    usesPerSecond = 1 / (5 + 1/λ)
+
+That degrades correctly at both ends — a hunter critting constantly approaches one per cooldown and
+never exceeds it, and a hunter who never crits gets none at all, which is exactly the upstream gate.
+In practice it costs about half the cooldown rate: 7.7 uses a minute against the 12 the cooldown
+alone would allow.
+
+**This is where the closed form is weakest, and it is named rather than discovered.** Real crits are
+not Poisson — auto shots land on a timer — so the wait after the cooldown is less variable than this
+assumes, and the model therefore understates. That is the honest direction here.
+
+The crits come from **both** ranged sources, so `ResolvedSpecial` gained a `usesPerSecond` field to
+let Steady Shot's rate out of `resolveRotation`. Recovering it by dividing DPS by damage-per-use
+would reconstruct a number the function already knows, which is how two call sites end up disagreeing
+about haste.
+
+### The multiplier asymmetry, proven rather than assumed
+
+Kill Command sets `DamageMultiplier: hp.config.DamageMultiplier` **explicitly**, where every entry in
+`pet_abilities.go` sets `DamageMultiplier: 1`. That is the line that proves the family multiplier is
+not inherited by an ability that does not ask for it — the reasoning the previous section had to
+argue for, now sitting in the source. It does not take the auto-attack `0.85`.
+
+**Focused Fire is not applied**, and it is a real understatement rather than an absence: upstream
+gives this spell `BonusCritRating` of 10% a rank, and the talent has no ingested effect here.
+
+### Two assertions broke, and both were right to
+
+- **"The pet inherits no crit"** compared the aggregate `Pet DPS` row against a hunter given 500 crit
+  rating. Kill Command's *rate* is gated on the owner critting, so that row now moves. The pet's own
+  attacks still inherit nothing — the assertion is per source now, which is two opposite truths the
+  one aggregate row could not express, and the argument for itemising the pet in the first place.
+- **The Bestial Discipline ratio** counted every non-melee pet row as a focus ability. Kill Command
+  spends no focus, so including it diluted a ratio that is about focus income.
+
+### Marksmanship crossed the calibration bracket
+
+**1.05x low**, from 1.1x, so `featureFlags.ts` had to be rewritten again — the third time the bracket
+has forced that, and the reason it is bracketed on both sides.
+
+Worth reading carefully rather than celebrating: **no spec reads above its reference** (1277 against
+1341), so this is an improvement and not a double-count. But Marksmanship is the spec with the least
+left to model — auto shot, Steady Shot and a pet, all three in — so the next pet improvement may push
+it *above* and trip the one assertion here with real teeth. **If that happens, find the double-count
+rather than loosening the bound**: every previous crossing was something genuinely counted twice.
+
+---
+
 ## The pet presses its buttons, and they are worth less than anyone expected, 2026-08-27
 
     Hunter Marksmanship   1225 -> 1239   (1.1x)

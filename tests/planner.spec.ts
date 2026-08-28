@@ -116,9 +116,12 @@ import {
   HUNTER_PET_BITE,
   HUNTER_PET_CLAW,
   HUNTER_PET_GCD_SECONDS,
+  HUNTER_PET_KILL_COMMAND,
   HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
   estimateHunterPet,
+  estimateHunterPetKillCommand,
   hunterPetAbilityRates,
+  killCommandUsesPerSecond,
 } from '../src/domain/simulation/hunterPet'
 import { validateBuild } from '../src/domain/builds/buildSerialization'
 import { BUILD_FORMAT_VERSION } from '../src/domain/builds/buildTypes'
@@ -5195,8 +5198,8 @@ test('every DPS spec is measured against what players actually parse', () => {
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.1x').toBeGreaterThan(1.05)
-  expect(best).toBeLessThan(1.2)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.05x').toBeGreaterThan(1.02)
+  expect(best).toBeLessThan(1.1)
   expect(worst, 'featureFlags.ts claims the worst spec is around 2.3x').toBeGreaterThan(2.2)
   expect(worst).toBeLessThan(2.4)
 })
@@ -5575,10 +5578,28 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
   const critty = calculateStats(hunter, gear, [], [], { critRating: 500 })
   const withCrit = calculateSimulation(hunter, gear, critty, 'Physical DPS')
   expect(withCrit.scoreExact, 'the hunter benefits from crit').toBeGreaterThan(result.scoreExact)
+
+  /*
+   * **Asserted per source rather than on the pet total, and Kill Command is why.**
+   *
+   * This used to compare the aggregate `Pet DPS` row and it broke the moment Kill Command landed —
+   * correctly. The pet's own attacks still inherit no crit, but Kill Command's *rate* is gated on the
+   * **owner** critting, so more owner crit really does buy more of it. Two opposite truths that the
+   * one aggregate row cannot express, which is the argument for itemising the pet in the first place.
+   */
+  const petSource = (sim: typeof result, name: string) =>
+    sim.damageSources?.find((source) => source.name === name)?.dps ?? 0
+
+  for (const name of ['Pet melee', 'Pet Bite', 'Pet Claw']) {
+    expect(petSource(withCrit, name), `${name} inherits none of the owner's crit`).toBeCloseTo(
+      petSource(result, name),
+      10,
+    )
+  }
   expect(
-    withCrit.breakdown.find((entry) => entry.label === 'Pet DPS')!.value,
-    'the pet inherits no crit',
-  ).toBe(petDps!.value)
+    petSource(withCrit, 'Pet Kill Command'),
+    'but Kill Command is gated on owner crits, so it moves the other way',
+  ).toBeGreaterThan(petSource(result, 'Pet Kill Command'))
 
   /*
    * And the estimate says what it models and what it left out. It used to say "white damage only"
@@ -5890,6 +5911,97 @@ test('Bestial Discipline buys ability rate rather than ability size', () => {
   expect(talented.melee, 'and focus does not touch the auto attack').toBeCloseTo(bare.melee, 10)
 })
 
+test('Kill Command is gated on the owner’s crits, not on its own cooldown', () => {
+  /*
+   * **Two spells and one attack.** The hunter casts 34026 — 75 mana, a 5s cooldown — and its only
+   * effect is to fire the pet's 34027. So it costs the pet no focus, takes none of the pet's global
+   * cooldown, and does not compete with Bite and Claw for anything.
+   *
+   * **The gate is the owner's crit rate.** `applyKillCommand` opens a 5-second window on any owner
+   * crit and calls `TryKillCommand` in the same breath, so the spell fires on the first crit after
+   * the cooldown comes up rather than the instant it does. Treating crits as a Poisson process, the
+   * cycle is `cooldown + 1/λ`.
+   */
+  expect(HUNTER_PET_KILL_COMMAND.cooldownSeconds).toBe(5)
+  expect(HUNTER_PET_KILL_COMMAND.ownerManaCost).toBe(75)
+
+  // A hunter who never crits never fires it, which is the upstream gate rather than a guard clause.
+  expect(killCommandUsesPerSecond(0), 'no crits, no Kill Command').toBe(0)
+
+  /*
+   * The two ends of the curve, which is what makes this a rate model rather than a cooldown. At an
+   * absurd crit rate it approaches one per cooldown and never exceeds it; at a realistic one it is
+   * roughly half that, because the expected wait for a crit is comparable to the cooldown itself.
+   */
+  expect(killCommandUsesPerSecond(1000)).toBeCloseTo(1 / HUNTER_PET_KILL_COMMAND.cooldownSeconds, 3)
+  expect(killCommandUsesPerSecond(1000)).toBeLessThan(1 / HUNTER_PET_KILL_COMMAND.cooldownSeconds)
+  // 0.25 crits a second is a 4s expected wait on top of the 5s cooldown: one per 9s.
+  expect(killCommandUsesPerSecond(0.25)).toBeCloseTo(1 / 9, 10)
+
+  /*
+   * **It takes the family multiplier and not the auto-attack 0.85**, which is the asymmetry that
+   * makes this worth its own assertion: upstream writes `DamageMultiplier: hp.config.DamageMultiplier`
+   * on this spell explicitly and `DamageMultiplier: 1` on every focus ability, which is the proof the
+   * family multiplier is not inherited by an ability that does not ask for it.
+   */
+  const estimate = estimateHunterPetKillCommand({
+    petAttackPower: 700,
+    specialAttackTableMultiplier: 1,
+    ownerCritsPerSecond: 0.25,
+    armorMitigation: 0,
+  })
+  const expectedPerUse = (42 + 68) / 2 + (700 / 14) * 2 + HUNTER_PET_KILL_COMMAND.flatBonusDamage
+  expect(estimate.damagePerUse, 'a non-normalised weapon swing plus 127').toBeCloseTo(expectedPerUse, 10)
+  expect(estimate.dps).toBeCloseTo(
+    (1 / 9) * expectedPerUse * HUNTER_PET_HAPPINESS_MULTIPLIER * HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER,
+    10,
+  )
+  expect(estimate.dps, 'the auto-attack 0.85 must not reach it').not.toBeCloseTo(
+    (1 / 9) *
+      expectedPerUse *
+      HUNTER_PET_HAPPINESS_MULTIPLIER *
+      HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER *
+      HUNTER_PET_AUTO_ATTACK_MULTIPLIER,
+    4,
+  )
+
+  /*
+   * **And unlike Bite and Claw, it scales**, which is the whole reason it is worth more than both of
+   * them combined. `BaseDamageConfigMeleeWeapon` against their `BaseDamageConfigRoll`.
+   */
+  const geared = estimateHunterPetKillCommand({
+    petAttackPower: 1400,
+    specialAttackTableMultiplier: 1,
+    ownerCritsPerSecond: 0.25,
+    armorMitigation: 0,
+  })
+  expect(geared.damagePerUse, 'attack power reaches it').toBeGreaterThan(estimate.damagePerUse)
+
+  // The owner's mana, reported rather than enforced, on the same grounds as Steady Shot's.
+  expect(estimate.ownerManaPerSecond).toBeCloseTo((1 / 9) * 75, 10)
+
+  /*
+   * End to end: it appears as its own damage row, and a hunter with nothing in the ranged slot has
+   * no auto shot, therefore no crits, therefore no Kill Command — which is the gate working rather
+   * than a special case, since the same arithmetic produces both.
+   */
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const result = calculateSimulation(hunter, gear, calculateStats(hunter, gear), 'Physical DPS')
+  const row = result.damageSources?.find((source) => source.name === 'Pet Kill Command')
+  expect(row, 'a hunter with a ranged weapon fires it').toBeDefined()
+  expect(row!.dps).toBeGreaterThan(0)
+
+  const bare = Object.fromEntries(
+    Object.entries(gear as Record<string, unknown>).filter(([slot]) => slot !== 'Ranged'),
+  ) as typeof gear
+  const noShot = calculateSimulation(hunter, bare, calculateStats(hunter, bare), 'Physical DPS')
+  expect(
+    noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
+    'no ranged weapon means no crits to open the window',
+  ).toBe(false)
+})
+
 test('the pet shares featureFlags quotes are the shares the model produces', () => {
   /*
    * `featureFlags.ts` says the pet's abilities are worth "about 2.4%" of a Beast Mastery hunter and
@@ -5907,17 +6019,34 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
   const { result } = bestCaseSimulation('Hunter', 'Beast Mastery', 'Physical DPS')
   const sources = result.damageSources ?? []
   const petRows = sources.filter((source) => source.name.startsWith('Pet'))
-  const abilityRows = petRows.filter((source) => source.name !== 'Pet melee')
+  const focusRows = petRows.filter((source) => source.name === 'Pet Bite' || source.name === 'Pet Claw')
+  const killCommandRow = petRows.find((source) => source.name === 'Pet Kill Command')
 
-  expect(petRows.length, 'the pet is itemised into melee plus each ability').toBeGreaterThan(1)
-  expect(abilityRows.map((source) => source.name).sort()).toEqual(['Pet Bite', 'Pet Claw'])
+  expect(petRows.map((source) => source.name).sort(), 'every pet source is itemised').toEqual([
+    'Pet Bite',
+    'Pet Claw',
+    'Pet Kill Command',
+    'Pet melee',
+  ])
 
   const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
 
-  expect(share(abilityRows), 'featureFlags says the abilities are about 2.4%').toBeGreaterThan(0.02)
-  expect(share(abilityRows)).toBeLessThan(0.03)
-  expect(share(petRows), 'featureFlags says the pet as a whole is about 13.3%').toBeGreaterThan(0.125)
-  expect(share(petRows)).toBeLessThan(0.14)
+  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.3%').toBeGreaterThan(0.019)
+  expect(share(focusRows)).toBeLessThan(0.028)
+  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.6%').toBeGreaterThan(0.031)
+  expect(share([killCommandRow!])).toBeLessThan(0.041)
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 16.5%').toBeGreaterThan(0.155)
+  expect(share(petRows)).toBeLessThan(0.175)
+
+  /*
+   * **The comparison featureFlags leans on: Kill Command beats Bite and Claw together.** It lands
+   * about 7.7 times a minute against their 21.6, and still wins, because it is the only pet ability
+   * that scales with the owner's attack power. That single fact is why the previous pass's
+   * conclusion — that the focus abilities were the pet's remaining gap — was wrong.
+   */
+  expect(killCommandRow!.dps, 'the one that scales beats the two that do not').toBeGreaterThan(
+    focusRows.reduce((sum, source) => sum + source.dps, 0),
+  )
 
   /*
    * **And the one that decides whether the abilities matter at all is Bestial Discipline, not gear.**
@@ -5939,17 +6068,23 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
   const idOf = (className: string, name: string) =>
     getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
 
-  const abilityShareOfPet = (points: Record<number, number>) => {
+  /*
+   * **Scoped to the focus abilities**, not to every pet row. Kill Command is a pet source too and it
+   * spends no focus at all — it is the owner's mana and the owner's crits — so counting it here
+   * would dilute a ratio that is supposed to be about focus income, and it did: this assertion broke
+   * the moment Kill Command landed, which is the filter earning its comment.
+   */
+  const focusAbilityShareOfPet = (points: Record<number, number>) => {
     const sim = calculateSimulation(character, gear, stats, 'Physical DPS', [], undefined, points)
     const rows = (sim.damageSources ?? []).filter((source) => source.name.startsWith('Pet'))
-    const abilities = rows.filter((source) => source.name !== 'Pet melee')
-    return abilities.reduce((sum, s) => sum + s.dps, 0) / rows.reduce((sum, s) => sum + s.dps, 0)
+    const focus = rows.filter((source) => source.name === 'Pet Bite' || source.name === 'Pet Claw')
+    return focus.reduce((sum, s) => sum + s.dps, 0) / rows.reduce((sum, s) => sum + s.dps, 0)
   }
 
   expect(
-    abilityShareOfPet({ [idOf('Hunter', 'Bestial Discipline')]: 2 }),
-    'Bestial Discipline is what makes the pet abilities worth counting',
-  ).toBeGreaterThan(abilityShareOfPet({}) * 1.5)
+    focusAbilityShareOfPet({ [idOf('Hunter', 'Bestial Discipline')]: 2 }),
+    'Bestial Discipline is what makes the focus abilities worth counting',
+  ).toBeGreaterThan(focusAbilityShareOfPet({}) * 1.5)
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

@@ -9,9 +9,10 @@
  * Every constant is read from wowsims/tbc `sim/hunter/pet.go`, `sim/hunter/focus.go` and
  * `sim/hunter/talents.go` at the pinned commit 3301fca5.
  *
- * **It swings and it presses two buttons.** The auto attack is here, and so are Bite and Claw, paid
- * for out of a focus bar at 5 focus a second. What is not here is stated rather than discovered:
- * Frenzy, Kill Command and Bestial Wrath, each named in `HUNTER_PET_UNMODELLED` with the reason.
+ * **It swings and it presses three buttons.** The auto attack is here; so are Bite and Claw, paid for
+ * out of a focus bar at 5 focus a second; and so is Kill Command, which the owner casts and the pet
+ * lands. What is not here is stated rather than discovered: Frenzy, Bestial Wrath and Focused Fire,
+ * each named in `HUNTER_PET_UNMODELLED` with the reason.
  */
 
 /** Base melee weapon: 42-68 damage on a 2.0s swing. */
@@ -166,7 +167,111 @@ export const HUNTER_PET_ABILITIES: readonly HunterPetAbility[] = [HUNTER_PET_BIT
 
 /** Named so the estimate can say what it left out, rather than reporting a pet that is quietly too small. */
 export const HUNTER_PET_UNMODELLED =
-  'the pet presses Bite and Claw out of its focus bar but nothing else. Those two are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are. Not modelled: Frenzy, a 30% haste aura procced by the pet’s own crits; Kill Command, which fires off the owner’s crits; and Bestial Wrath, which needs a cooldown usage policy.'
+  'the pet presses Bite and Claw out of its focus bar, and Kill Command off the owner’s crits. Bite and Claw are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are; Kill Command is a real weapon swing and does scale. Not modelled: Frenzy, a 30% haste aura procced by the pet’s own crits; Bestial Wrath, which needs a cooldown usage policy; and Focused Fire, which would add 10% crit a rank to Kill Command specifically.'
+
+/**
+ * Kill Command, which is two spells and one attack.
+ *
+ * **The hunter casts it and the pet lands it.** `sim/hunter/kill_command.go` registers 34026 on the
+ * owner — 75 mana, a 5s cooldown — whose only effect is to fire the pet's 34027. So it costs the pet
+ * no focus, takes none of the pet's global cooldown, and does not compete with Bite and Claw for
+ * anything. It is a free extra pet attack bought with the owner's mana.
+ *
+ * **It scales, and that is what makes it worth more than the focus abilities.**
+ * `BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true)` is a real weapon swing plus a flat
+ * 127 — not the `BaseDamageConfigRoll` that leaves Bite and Claw fixed — so it follows the owner's
+ * ranged attack power through the pet's 22% inheritance.
+ *
+ * **It also takes the family multiplier**, explicitly, which is the line that proves the multiplier
+ * is not inherited by abilities that do not ask for it: `DamageMultiplier: hp.config.DamageMultiplier`
+ * appears here and nowhere in `pet_abilities.go`. It does not take the auto-attack `0.85`.
+ *
+ * **Focused Fire is not applied.** Upstream gives this spell `BonusCritRating` of 10% a rank, and the
+ * talent has no ingested effect here, so the crit figure is the pet's own. Named because it is a real
+ * understatement rather than an absence.
+ */
+export const HUNTER_PET_KILL_COMMAND = {
+  name: 'Kill Command',
+  ownerSpellId: 34026,
+  petSpellId: 34027,
+  ownerManaCost: 75,
+  cooldownSeconds: 5,
+  /** Added to the pet's weapon swing, before any multiplier. */
+  flatBonusDamage: 127,
+} as const
+
+/**
+ * How often Kill Command actually lands, which is **not** once per cooldown.
+ *
+ * Upstream gates it twice: a 5s cooldown, and an enable window that only an **owner crit** opens and
+ * that lasts 5 seconds. `applyKillCommand` sets `killCommandEnabledUntil` on any owner crit and calls
+ * `TryKillCommand` in the same breath, so the spell fires on the first crit after the cooldown comes
+ * up rather than the instant it does.
+ *
+ * Treating owner crits as a Poisson process at rate `λ`, the cycle is the cooldown plus the expected
+ * wait for the next crit — `5 + 1/λ` — so the rate is `1 / (5 + 1/λ)`. That degrades correctly at
+ * both ends: a hunter critting constantly approaches one per cooldown, and a hunter who never crits
+ * gets none at all, which is exactly the upstream gate.
+ *
+ * **This is where the closed form is weakest and it is worth saying so.** Real crits are not Poisson
+ * — auto shots land on a timer — so the wait after the cooldown is less variable than this assumes.
+ * The direction is understating, since a regular arrival process waits less on average than an
+ * exponential one with the same rate, which is the honest direction for this model.
+ *
+ * **Mana is deliberately not a third gate**, matching Steady Shot: `StatBlock` has no mana field, so
+ * a cap would mean inventing the income. The drain is reported instead.
+ */
+export function killCommandUsesPerSecond(ownerCritsPerSecond: number): number {
+  if (ownerCritsPerSecond <= 0) return 0
+  return 1 / (HUNTER_PET_KILL_COMMAND.cooldownSeconds + 1 / ownerCritsPerSecond)
+}
+
+export type HunterPetKillCommandInput = {
+  /** The pet's finished attack power, which is what its weapon swing scales on. */
+  petAttackPower: number
+  /** Expected multiplier from the pet's special-attack table. Kill Command rolls as a melee special. */
+  specialAttackTableMultiplier: number
+  /** Owner crits per second, which is the gate rather than the cooldown. */
+  ownerCritsPerSecond: number
+  armorMitigation: number
+  talents?: HunterPetTalents
+}
+
+export type HunterPetKillCommandEstimate = {
+  usesPerSecond: number
+  damagePerUse: number
+  ownerManaPerSecond: number
+  dps: number
+}
+
+/** The pet's Kill Command hit, priced per use and per second. */
+export function estimateHunterPetKillCommand(input: HunterPetKillCommandInput): HunterPetKillCommandEstimate {
+  const talents = input.talents ?? noHunterPetTalents
+  const usesPerSecond = killCommandUsesPerSecond(input.ownerCritsPerSecond)
+
+  /*
+   * A non-normalised weapon swing: the damage roll plus attack power over 14 scaled by the weapon's
+   * own speed, which is the same formula the pet's white damage uses per swing rather than per
+   * second. Written out rather than reusing the DPS figure, because this is one hit and not a rate.
+   */
+  const averageRoll = (HUNTER_PET_WEAPON_DAMAGE.min + HUNTER_PET_WEAPON_DAMAGE.max) / 2
+  const fromAttackPower = (Math.max(0, input.petAttackPower) / 14) * HUNTER_PET_SWING_SECONDS
+  const damagePerUse = averageRoll + fromAttackPower + HUNTER_PET_KILL_COMMAND.flatBonusDamage
+
+  // Happiness and Unleashed Fury are unit-wide; the family multiplier is applied here because
+  // upstream applies it here. The auto-attack 0.85 is not, because this is not an auto attack.
+  const multiplier =
+    HUNTER_PET_HAPPINESS_MULTIPLIER * talents.damageMultiplier * HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER
+
+  const raw = usesPerSecond * damagePerUse * input.specialAttackTableMultiplier * multiplier
+
+  return {
+    usesPerSecond,
+    damagePerUse,
+    ownerManaPerSecond: usesPerSecond * HUNTER_PET_KILL_COMMAND.ownerManaCost,
+    dps: Math.max(0, raw) * (1 - input.armorMitigation),
+  }
+}
 
 export type HunterPetTalents = {
   /** Multiplies the pet's damage. Unleashed Fury, +4% a rank. 1 when untalented. */

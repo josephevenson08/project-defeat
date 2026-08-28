@@ -118,6 +118,12 @@ The hunter pet reports as `Pet melee`, `Pet Bite` and `Pet Claw` rather than one
 
 One row would have hidden a shrinking source behind a growing one, and the whole point of `damageSources` summing to `scoreExact` is that a change shows up **per source** rather than as a plausible total nobody can check. The test for the split asserts that 2,000 extra attack power moves the melee row and leaves the two abilities exactly where they were.
 
+## A cooldown is not a rate when something else gates the ability
+
+Kill Command has a 5-second cooldown, and it fires about **7.7 times a minute** rather than 12. Upstream opens a 5-second window on any **owner crit** and casts inside it, so the spell goes off on the first crit *after* the cooldown comes up rather than the instant it does. The rate is `1 / (cooldown + 1/λ)`, where λ is the rate of the gating event.
+
+The closed form is worth preferring over "on cooldown" because it degrades correctly at both ends: a character critting constantly approaches one per cooldown and never exceeds it, and one who never crits gets none at all, which is exactly the upstream gate. Where it is weak is named rather than left to be discovered — real crits are not Poisson, so the wait is less variable than this assumes and the model therefore understates.
+
 ## Apply a ceiling before it binds, not after
 
 The pet ability rate is capped by focus, by each ability’s own cooldown, and by the pet’s 1.5s global cooldown. At every realistic focus income the GCD ceiling is nowhere near binding — the abilities come to roughly 0.16 uses a second where it would allow 0.67 — so a model that simply omitted it would agree with this one everywhere it is currently used.

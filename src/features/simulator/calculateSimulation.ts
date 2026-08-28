@@ -25,8 +25,10 @@ import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simu
 import { estimatePaladinHolyDamage } from '../../domain/simulation/paladinSeals'
 import {
   HUNTER_PET_DEFAULT_FAMILY,
+  HUNTER_PET_KILL_COMMAND,
   HUNTER_PET_UNMODELLED,
   estimateHunterPet,
+  estimateHunterPetKillCommand,
   hunterPetCritChance,
 } from '../../domain/simulation/hunterPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
@@ -313,6 +315,15 @@ type ResolvedSpecial = {
   name: string
   dps: number
   explanation: string
+  /**
+   * The rate the DPS above was derived from, carried rather than recovered.
+   *
+   * Added for Kill Command, whose gate is **owner crits per second** rather than its own cooldown —
+   * and a hunter's crits come from the auto shot and from Steady Shot together, so the shot's rate
+   * has to leave this function. Dividing DPS by damage-per-use to get it back would reconstruct a
+   * number this already knows, which is exactly how two call sites end up disagreeing about haste.
+   */
+  usesPerSecond: number
 }
 
 type ResolvedRotation = {
@@ -518,6 +529,7 @@ function resolveRotation(
       specials.push({
         name: ability.name,
         dps: Math.max(0, perUse) * uses,
+        usesPerSecond: uses,
         explanation: ability.replacesMainHandSwing
           ? `funded by surplus rage at roughly one per ${(1 / uses).toFixed(1)}s, counted as the gain over the main-hand swing it replaces`
           : `funded by surplus rage at roughly one per ${(1 / uses).toFixed(1)}s`,
@@ -569,6 +581,7 @@ function resolveRotation(
       specials.push({
         name: ability.name,
         dps: estimate.damagePerUse * effectiveMultiplier * damageMultiplier * usesPerSecond,
+        usesPerSecond,
         explanation: estimate.explanation,
       })
     } else {
@@ -705,6 +718,16 @@ function calculatePhysicalDps(
    * it is a separate actor with its own table, so it cannot ride the player's mitigation step.
    */
   let hunterPet: ReturnType<typeof estimateHunterPet> | undefined
+  /*
+   * Kill Command needs three things the hunter branch derives and the rotation does not: the pet's
+   * special-attack multiplier, the pet's finished attack power, and the owner's *post-suppression*
+   * ranged crit chance. It is computed after `resolveRotation` rather than inside the branch,
+   * because its gate is owner crits per second and Steady Shot's rate is half of that figure — so
+   * these are carried forward rather than derived a second time.
+   */
+  let killCommandContext:
+    | { specialAttackTableMultiplier: number; autoShotsPerSecond: number; rangedCritChance: number }
+    | undefined
 
   if (character.className === 'Hunter') {
     const rangedItem = gear['Ranged']?.item
@@ -773,11 +796,20 @@ function calculatePhysicalDps(
       attacksFromBehind: true,
     })
 
+    const petSpecialMultiplier =
+      petSpecialTable.hit + petSpecialTable.block + petSpecialTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
+
+    killCommandContext = {
+      specialAttackTableMultiplier: petSpecialMultiplier,
+      autoShotsPerSecond: rangedSwingSeconds ? 1 / rangedSwingSeconds : 0,
+      // The table's own figure, after crit suppression, because that is what actually crits.
+      rangedCritChance: table.crit,
+    }
+
     hunterPet = estimateHunterPet({
       ownerRangedAttackPower: stats.rangedAttackPower,
       attackTableMultiplier: petMultiplier,
-      specialAttackTableMultiplier:
-        petSpecialTable.hit + petSpecialTable.block + petSpecialTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER,
+      specialAttackTableMultiplier: petSpecialMultiplier,
       armorMitigation,
       talents: {
         damageMultiplier: talents.petDamageMultiplier,
@@ -1065,6 +1097,33 @@ function calculatePhysicalDps(
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   /*
+   * **Kill Command, whose gate is the owner's crit rate rather than its own cooldown.** Upstream
+   * opens a 5-second window on any owner crit and fires the spell inside it, so the rate is the
+   * cooldown plus the expected wait for the next crit rather than one per cooldown.
+   *
+   * The crits come from both ranged sources — the auto shot and Steady Shot — which is why this sits
+   * after `resolveRotation` and reads the shot's own rate rather than guessing at it. A hunter with
+   * nothing in the ranged slot fires neither, gets no crits, and correctly gets no Kill Command.
+   */
+  const killCommand =
+    hunterPet && killCommandContext
+      ? estimateHunterPetKillCommand({
+          petAttackPower: hunterPet.attackPower,
+          specialAttackTableMultiplier: killCommandContext.specialAttackTableMultiplier,
+          ownerCritsPerSecond:
+            (killCommandContext.autoShotsPerSecond +
+              rotation.specials.reduce((sum, entry) => sum + entry.usesPerSecond, 0)) *
+            killCommandContext.rangedCritChance,
+          armorMitigation,
+          talents: {
+            damageMultiplier: talents.petDamageMultiplier,
+            meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
+            focusRegenMultiplier: talents.petFocusRegenMultiplier,
+          },
+        })
+      : undefined
+
+  /*
    * Armor reduces physical damage and nothing else, so the Holy total is added **after** mitigation
    * rather than inside it. Before Retribution's seals existed every damage source on this path was
    * physical and the distinction could not arise; folding Holy damage into `rawDps` would have
@@ -1078,7 +1137,7 @@ function calculatePhysicalDps(
   const damageMultiplier = 1 + buffs.damageMultiplier
   const mitigatedDps =
     ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier +
-    (hunterPet?.dps ?? 0) * damageMultiplier
+    ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * damageMultiplier
 
   /*
    * The same total, itemised. Every physical source takes armour and the damage multiplier; the Holy
@@ -1091,7 +1150,7 @@ function calculatePhysicalDps(
    */
   const physical = (raw: number) => raw * (1 - armorMitigation) * damageMultiplier
   // Already mitigated by its own model, so it takes the damage multiplier and nothing else.
-  const petDps = (hunterPet?.dps ?? 0) * damageMultiplier
+  const petDps = ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * damageMultiplier
   const sources: { name: string; dps: number }[] = [
     ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
     ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
@@ -1107,6 +1166,9 @@ function calculatePhysicalDps(
   if (hunterPet && hunterPet.whiteDps > 0) sources.push({ name: 'Pet melee', dps: hunterPet.whiteDps * damageMultiplier })
   for (const ability of hunterPet?.abilities ?? []) {
     if (ability.dps > 0) sources.push({ name: `Pet ${ability.name}`, dps: ability.dps * damageMultiplier })
+  }
+  if (killCommand && killCommand.dps > 0) {
+    sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * damageMultiplier })
   }
   if (paladinHoly) {
     sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
@@ -1153,6 +1215,17 @@ function calculatePhysicalDps(
         breakdown.push({ label: `Pet ${ability.name} per minute`, value: round(ability.usesPerSecond * 60) })
       }
     }
+    /*
+     * Kill Command is reported by rate rather than folded into the focus rows, because it spends
+     * neither focus nor the pet's global cooldown — it is the owner's mana and the owner's crits.
+     * Showing it beside them without saying so would imply it competes with Bite and Claw.
+     */
+    if (killCommand && killCommand.dps > 0) {
+      breakdown.push({
+        label: `Pet ${HUNTER_PET_KILL_COMMAND.name} per minute`,
+        value: round(killCommand.usesPerSecond * 60),
+      })
+    }
   }
 
   if (paladinHoly && paladinHoly.totalDps > 0) {
@@ -1181,8 +1254,9 @@ function calculatePhysicalDps(
    * or the estimate would quietly assume infinite mana and say nothing about it. A hunter sustains
    * this with Aspect of the Viper, Judgement of Wisdom and potions, none of which are modelled here.
    */
-  if (rotation.manaPerSecond !== undefined && rotation.manaPerSecond > 0) {
-    breakdown.push({ label: 'Mana per second spent', value: round(rotation.manaPerSecond) })
+  const manaPerSecond = (rotation.manaPerSecond ?? 0) + (killCommand?.ownerManaPerSecond ?? 0)
+  if (manaPerSecond > 0) {
+    breakdown.push({ label: 'Mana per second spent', value: round(manaPerSecond) })
   }
 
   // Only shown when there is any, so it does not add a permanent 0 row to every melee readout —

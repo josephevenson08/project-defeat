@@ -5,6 +5,72 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, latest)
+
+**Kill Command lands, and the one pet ability that scales beats the two that do not.** 54.1 DPS
+against Bite and Claw's 34.9 combined, on a best-case Beast Mastery hunter, despite firing 7.7 times
+a minute against their 21.6. The section below predicted that from one line of upstream and the
+prediction held.
+
+    Hunter Marksmanship   1239 -> 1277   (1.1x -> 1.0x)
+    Hunter Beast Mastery  1440 -> 1494   (1.4x)
+    Hunter Survival       1164 -> 1201   (1.4x)
+
+The pet is **16.5%** of a best-case BM hunter now, up from 13.3%, against an attributed share nearer
+a third.
+
+### The parts worth knowing
+
+- **Two spells, one attack, competing with nothing.** `kill_command.go` registers 34026 on the owner
+  (75 mana, 5s cooldown) whose only effect is to fire the pet's 34027. It costs the pet no focus and
+  takes none of its 1.5s global cooldown, so it does not contend with Bite and Claw. Its mana joins
+  the reported drain rather than capping anything, on Steady Shot's grounds.
+- **The gate is the owner's crit rate, not the cooldown.** Upstream opens a 5-second window on any
+  owner crit and fires inside it, so the rate is `1 / (5 + 1/λ)` — about **half** what the cooldown
+  alone allows. It degrades correctly at both ends, and the weak point is named: real crits are not
+  Poisson, so the wait is less variable than assumed and this **understates**.
+- **`ResolvedSpecial` gained `usesPerSecond`**, because the owner's crits come from the auto shot
+  *and* Steady Shot, and the shot's rate had to leave `resolveRotation`. Dividing DPS by
+  damage-per-use to recover it would reconstruct a number that function already knows.
+- **The multiplier asymmetry is now proven rather than argued.** Kill Command sets
+  `DamageMultiplier: hp.config.DamageMultiplier` explicitly where every focus ability sets `1`. That
+  is the source line showing the family multiplier is not inherited. It does not take the `0.85`.
+- **Focused Fire is a real understatement**, not an absence: upstream gives this spell 10% crit a
+  rank and the talent has no ingested effect here.
+
+### Two assertions broke and both were right to
+
+- **"The pet inherits no crit"** compared the aggregate `Pet DPS` row. Kill Command's *rate* is gated
+  on the **owner** critting, so that row now moves with owner crit while the pet's own attacks do
+  not. Two opposite truths one aggregate row cannot express — it is asserted per source now, which is
+  the argument for itemising the pet at all.
+- **The Bestial Discipline ratio** counted every non-melee pet row as a focus ability; Kill Command
+  spends no focus.
+
+### Marksmanship crossed the calibration bracket — read this before touching the pet again
+
+**1.05x low**, from 1.1x, so `featureFlags.ts` was rewritten for the third time the bracket has
+forced. **No spec reads above its reference** (1277 against 1341), so this is an improvement, not a
+double-count.
+
+But Marksmanship has the least left to model — auto shot, Steady Shot and a pet, all three in — so
+**the next pet improvement may push it above 1341 and trip the one assertion with real teeth.** If
+that happens, find the double-count rather than loosening the bound: every previous crossing was
+something genuinely counted twice.
+
+### What is left on the pet
+
+1. **Frenzy** — 20% a rank on a pet crit, +30% melee speed for 8s. Wants `1 - exp(-λ·8)` rather than
+   a Markov chain over stacks, since it is a fixed-duration refreshing aura rather than a consumed
+   one. λ is the pet's own crit rate across melee, Bite, Claw and Kill Command, all of which exist
+   now.
+2. **Focused Fire** — 10% crit a rank on Kill Command specifically, plus 1% a rank to the hunter's
+   own damage. Both halves are expressible now that Kill Command is modelled; it is the last Beast
+   Mastery talent refused for a reason that is about to stop being true.
+3. **Bestial Wrath / The Beast Within** — still needs a cooldown usage policy this model has none of.
+
+---
+
 ## Start here (2026-08-27, later)
 
 **The pet presses its buttons now, and they are worth much less than this file predicted.** Bite and

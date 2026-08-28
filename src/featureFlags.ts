@@ -51,11 +51,18 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.1x to 2.3x low** — a range this file has now got
- *   wrong twice by not moving when the model improved, so the test brackets it on both sides and
- *   fails on an improvement, which is the only thing that has reliably forced this prose to keep up.
- *   No spec may read *above* its
+ *   best case against them. The model reads **1.05x to 2.3x low** — a range this file has now got
+ *   wrong three times by not moving when the model improved, so the test brackets it on both sides
+ *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
+ *   up. The third time was Kill Command landing on 2026-08-27. No spec may read *above* its
  *   reference — a spec that does is double-counting something, which has been caught twice.
+ *
+ *   **Marksmanship is now within 5% of its reference, and that is worth reading carefully.** It is
+ *   the spec with the least left to model — auto shot, Steady Shot and a pet, all three of which are
+ *   in — so being close is plausible rather than suspicious. But it also means the next pet
+ *   improvement may push it *above* 1341 and trip the one assertion here with real teeth. If that
+ *   happens the answer is to find the double-count, not to loosen the bound: every previous time a
+ *   spec crossed it, something was genuinely counted twice.
  * - **And "single-ability approximation" was itself too generous until 2026-08-23**, which is worth
  *   keeping here rather than quietly fixing: the three hunter specs had *no* ability modelled at all.
  *   `resolveRotation` filtered on the literal `'Melee Special'`, so Steady Shot — catalogued,
@@ -64,24 +71,29 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   by the 1.5s hunter GCD (which ranged haste does not reduce) and by one shot per auto-shot cycle,
  *   both read off wowsims. It is worth **174 DPS to a Marksmanship hunter on the default set**, which
  *   is the size of the hole a filter literal was hiding.
- * - **A hunter's pet is a second attacker, and it presses two buttons.** Its auto attack is modelled
+ * - **A hunter's pet is a second attacker, and it presses three buttons.** Its auto attack is modelled
  *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
- *   crit — along with every Beast Mastery talent this model can express, and it spends a focus bar
- *   on Bite and Claw in priority order.
+ *   crit — along with every Beast Mastery talent this model can express, a focus bar spent on Bite
+ *   and Claw in priority order, and Kill Command. The pet is **16.5% of a best-case Beast Mastery
+ *   hunter**, against an attributed share nearer a third.
  *
- *   **The abilities are worth much less than the pet's remaining gap**, and that is the useful thing
- *   to know rather than a disappointment: they are flat rolls with **no attack power scaling at all**,
- *   so they add about 2.4% to a Beast Mastery hunter, where the pet as a whole is 13.3% of the total
- *   against an attributed share nearer a third. What is still missing is Frenzy, Kill Command and
- *   Bestial Wrath — see `ROTATION-SCOPE.md`.
+ *   **Whether a pet ability scales is what decides its worth, and the two kinds behave oppositely.**
+ *   Bite and Claw are `BaseDamageConfigRoll` — flat, with **no attack power scaling at all** — so
+ *   they add about 2.3% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
+ *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.6%**:
+ *   more than Bite and Claw together despite landing only 7.7 times a minute.
  *
- *   **What moves them is Bestial Discipline, not gear**, and getting that backwards is a mistake this
- *   repo made and a test caught. Gear alone takes the abilities from 17.5% of the pet to 15.1%,
- *   because they cannot follow attack power; Bestial Discipline takes them to 27.8% by doubling
- *   focus income, which is much the larger effect and pulls the other way.
+ *   **Kill Command's gate is the owner's crit rate, not its own cooldown.** Upstream opens a
+ *   5-second window on any owner crit, so the rate is `1 / (5 + 1/crits per second)` — about half
+ *   what the cooldown alone would allow. Its 75 mana joins the reported drain rather than capping it.
  *
- *   The estimate names the pet family it assumes, because the eight families span 0.91 to 1.1 on
- *   damage and this app has no picker for them.
+ *   **What moves Bite and Claw is Bestial Discipline, not gear**, and getting that backwards is a
+ *   mistake this repo made and a test caught. Gear alone takes them from 17.5% of the pet to 15.1%;
+ *   Bestial Discipline takes them to 27.8% by doubling focus income.
+ *
+ *   Still missing: Frenzy, Bestial Wrath, and Focused Fire — which upstream gives Kill Command
+ *   specifically, at 10% crit a rank. The estimate names the pet family it assumes, because the eight
+ *   families span 0.91 to 1.1 on damage and this app has no picker for them.
  * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
  *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
  *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**
