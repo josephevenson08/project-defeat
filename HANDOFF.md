@@ -5,6 +5,62 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, poisons close the rogue)
+
+**The three that make a rogue a rogue are all in.** Poisons are the second unmitigated damage source
+this model has, after Retribution's seals, and the first that is not physical *and* not a swing.
+
+    Rogue Combat          1033 -> 1098   (1.7x -> 1.6x)
+    Rogue Assassination   1050 -> 1161   (1.3x -> 1.2x)
+    Rogue Subtlety        1160 -> 1220   (1.1x)
+
+Assassination gains most, and that is the model working rather than a coincidence: **all three poison
+talents live in its tree** — Improved Poisons, Vile Poisons and Master Poisoner.
+
+### Nature damage, on the spell table, and both halves matter
+
+**They do not take armour.** Upstream gives them `SpellSchoolNature`, so they join `unmitigatedDps`
+beside the Paladin seals rather than the physical path. Against this app's 7,700-armour target that
+is about a quarter of them, and a test moves the target's armour and asserts the physical rows move
+while the two poison rows do not.
+
+**They roll on the spell table**, `OutcomeFuncMagicHitAndCrit` rather than the melee one — so they use
+**spell hit**, which a rogue has essentially none of. That is exactly why Master Poisoner exists, and
+why its +5% a rank is its own `poisonSpellHitChance` field rather than the shared one: it is scoped to
+two spells rather than to the actor.
+
+**The dot cannot crit and Instant Poison can.** The ticks get `OutcomeFuncTick()`, a plain hit. Handing
+the dot a crit multiplier would be exactly the quiet overstatement the damage table exists to expose,
+so a test pins the asymmetry.
+
+### The imbue-slot gap, named rather than guessed
+
+Upstream reads which poison sits on which hand from `Consumes.MainHandImbue` — a player choice, and
+this app has no weapon-imbue slot, the same gap Windfury Weapon already names. Rather than reason
+about which pairing is better, this takes the one `presets.go` ships as `FullConsumes`: **Instant
+Poison main hand, Deadly Poison off hand**.
+
+The hand is not cosmetic. `GetMeleeProcMaskForHands` builds each poison's proc mask from the hands
+carrying it, and the two weapons swing at different speeds, so swapping them changes both rates.
+
+### Deadly Poison's steady state is sustained, not assumed
+
+Five stacks is the cap, and the model returns **the stacks the proc rate can sustain** capped there
+rather than asserting the cap. A slow off-hand or a heavily missing rogue genuinely holds fewer, and
+asserting five would hide that. What is not modelled is the ramp — roughly the first seventeen seconds
+of a several-minute fight, in the understating direction.
+
+### What is left in stage 3
+
+1. **Weapon-enchant and damage procs** — 0 of 91 enchants carry a proc effect, and Mongoose is the
+   recommended main-hand for three specs at 53.48% measured uptime.
+2. **Windfury Totem, Expose Weakness, Deep Wounds, Elemental Weapons.**
+3. **Spell school**, which blocks four separate things.
+4. **Feral is now the clear outlier at 2.3x** and still needs bleeds — Rake and Rip, with the measured
+   warning that adding Mangle before them is a DPS loss.
+
+---
+
 ## Start here (2026-08-27, stage 3 begins with the rogue)
 
 **Slice and Dice and Combat Potency, and every rogue spec gained about a fifth.** This is the top of

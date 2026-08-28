@@ -141,6 +141,13 @@ import {
   combatPotencyEnergyPerSecond,
   estimateSliceAndDice,
 } from '../src/domain/simulation/sliceAndDice'
+import {
+  DEADLY_POISON,
+  DEADLY_POISON_HAND,
+  INSTANT_POISON,
+  INSTANT_POISON_HAND,
+  estimateRoguePoisons,
+} from '../src/domain/simulation/roguePoisons'
 
 /*
  * Gear editing moved into a popup, so a slot's controls only exist while its overlay is open. These
@@ -6012,6 +6019,98 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
     noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
     'no ranged weapon means no crits to open the window',
   ).toBe(false)
+})
+
+test('rogue poisons are Nature damage on the spell table, so armor does not touch them', () => {
+  /*
+   * **The second unmitigated source this model has**, after Retribution's seals — and the reason that
+   * distinction was built. Poisons roll `OutcomeFuncMagicHitAndCrit` upstream, not the melee table,
+   * and they are Nature school. A poison taking armour mitigation would lose about a quarter of
+   * itself against this app's 7,700-armour target, silently.
+   */
+  const rogue: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Rogue', spec: 'Assassination' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Rogue', 'Assassination')
+  const stats = calculateStats(rogue, gear)
+
+  const at = (armor: number) => {
+    const result = calculateSimulation(rogue, gear, stats, 'Physical DPS', [], { ...defaultSimulationTarget, armor })
+    const source = (name: string) => result.damageSources?.find((entry) => entry.name === name)?.dps ?? 0
+    return { mainHand: source('Melee main hand'), instant: source('Instant Poison'), deadly: source('Deadly Poison') }
+  }
+
+  const soft = at(3000)
+  const hard = at(12000)
+
+  expect(hard.mainHand, 'armor reduces the physical rows').toBeLessThan(soft.mainHand)
+  expect(hard.instant, 'and does not touch Instant Poison').toBeCloseTo(soft.instant, 10)
+  expect(hard.deadly, 'or Deadly Poison').toBeCloseTo(soft.deadly, 10)
+  expect(soft.instant).toBeGreaterThan(0)
+  expect(soft.deadly).toBeGreaterThan(0)
+
+  /*
+   * **Instant on the main hand, Deadly on the off hand**, taken from upstream's own `FullConsumes`
+   * preset rather than reasoned about — this app has no weapon-imbue slot, the same gap Windfury
+   * Weapon already names, so a pairing has to be assumed and the sourced one is the honest choice.
+   * The hand matters because the two weapons swing at different speeds.
+   */
+  expect(INSTANT_POISON_HAND).toBe('Main Hand')
+  expect(DEADLY_POISON_HAND).toBe('Off Hand')
+  expect(INSTANT_POISON.baseProcChance).toBe(0.2)
+  expect(DEADLY_POISON.baseProcChance).toBe(0.3)
+
+  const base = {
+    mainHandSwingsPerSecond: 1,
+    offHandSwingsPerSecond: 1,
+    spellHitChance: 1,
+    spellCritChance: 0,
+    spellCritMultiplier: 1.5,
+    bonusProcChance: 0,
+    damageMultiplier: 1,
+  }
+
+  /*
+   * **The dot cannot crit and Instant can**, which is the asymmetry worth pinning: upstream gives the
+   * ticks `OutcomeFuncTick()`, a plain hit, and only Instant Poison rolls for a crit. Handing the dot
+   * a crit multiplier would be exactly the quiet overstatement the damage table exists to expose.
+   */
+  const noCrit = estimateRoguePoisons(base)
+  const withCrit = estimateRoguePoisons({ ...base, spellCritChance: 0.5 })
+  expect(withCrit.instantDps, 'Instant Poison crits').toBeGreaterThan(noCrit.instantDps)
+  expect(withCrit.deadlyDps, 'the dot does not').toBeCloseTo(noCrit.deadlyDps, 10)
+
+  /*
+   * **Spell hit, not melee hit.** A rogue carries almost no spell hit, which is why Master Poisoner
+   * exists at all — and why this is a separate field from the shared `spellHitChance`.
+   */
+  expect(estimateRoguePoisons({ ...base, spellHitChance: 0.5 }).totalDps).toBeCloseTo(noCrit.totalDps / 2, 6)
+
+  /*
+   * Deadly Poison's steady state is the stacks the proc rate sustains, capped at five rather than
+   * assumed to be five: a slow off-hand or a heavily missing rogue genuinely holds fewer.
+   */
+  expect(estimateRoguePoisons({ ...base, offHandSwingsPerSecond: 5 }).deadlyStacks, 'capped at five').toBe(5)
+  const slow = estimateRoguePoisons({ ...base, offHandSwingsPerSecond: 0.1 })
+  expect(slow.deadlyStacks, '0.1 swings a second at 30% over a 12s dot').toBeCloseTo(0.1 * 0.3 * 12, 10)
+  expect(slow.deadlyStacks).toBeLessThan(DEADLY_POISON.maxStacks)
+
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const talented = deriveTalentModifiers({
+    [idOf('Rogue', 'Improved Poisons')]: 5,
+    [idOf('Rogue', 'Vile Poisons')]: 5,
+    [idOf('Rogue', 'Master Poisoner')]: 2,
+  })
+  expect(talented.poisonProcChance, '+2% a rank, both poisons').toBeCloseTo(0.1, 10)
+  expect(talented.poisonDamageMultiplier, '+4% a rank').toBeCloseTo(1.2, 10)
+  expect(talented.poisonSpellHitChance, '+5% a rank, poisons only').toBeCloseTo(0.1, 10)
+  // Scoped to the poisons rather than the actor, so a shared spell-hit field must stay untouched.
+  expect(talented.spellHitChance, 'Master Poisoner is not general spell hit').toBe(0)
+
+  // Nobody but a rogue is poisoned: a Fury warrior has no imbue and no poison rows.
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.damageSources?.some((entry) => /Poison/.test(entry.name))).toBe(false)
 })
 
 test('Slice and Dice is a finisher that deals no damage, and three ceilings decide whether it stays up', () => {

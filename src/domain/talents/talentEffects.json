@@ -9,6 +9,7 @@
       "sim/warrior/berserker_rage.go",
       "sim/rogue/talents.go",
       "sim/rogue/slice_and_dice.go",
+      "sim/rogue/poisons.go",
       "sim/hunter/talents.go",
       "sim/hunter/pet.go",
       "sim/shaman/talents.go",
@@ -31,7 +32,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 73,
+  "effectCount": 76,
   "effects": [
     {
       "className": "Warrior",
@@ -342,6 +343,41 @@
       "unit": "fraction per rank",
       "perRank": 0.15,
       "source": "sim/rogue/slice_and_dice.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 268,
+      "talent": "Improved Poisons",
+      "tree": "Assassination",
+      "maxRank": 5,
+      "kind": "poisonProcChance",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "caveat": "Applies to both poisons at the same rate: Deadly is 0.30 base and Instant 0.20, each plus this.",
+      "source": "sim/rogue/poisons.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 682,
+      "talent": "Vile Poisons",
+      "tree": "Assassination",
+      "maxRank": 5,
+      "kind": "poisonDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "source": "sim/rogue/poisons.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1715,
+      "talent": "Master Poisoner",
+      "tree": "Assassination",
+      "maxRank": 2,
+      "kind": "poisonSpellHitChance",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "caveat": "Scoped to the two poison spells rather than to the rogue, which is why it is its own field.",
+      "source": "sim/rogue/poisons.go"
     },
     {
       "className": "Hunter",

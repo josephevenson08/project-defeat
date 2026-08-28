@@ -134,6 +134,18 @@ export type TalentModifiers = {
   finisherEnergyRefund: number
   /** Multiplies Slice and Dice's duration. Improved Slice and Dice, +15% a rank. 1 when untalented. */
   sliceAndDiceDurationMultiplier: number
+  /** Added to both poisons' proc chance, as a fraction. Improved Poisons, +2% a rank. */
+  poisonProcChance: number
+  /** Multiplies poison damage. Vile Poisons, +4% a rank. 1 when untalented. */
+  poisonDamageMultiplier: number
+  /**
+   * Added to spell hit **for poisons only**. Master Poisoner, +5% a rank.
+   *
+   * Separate from `spellHitChance` because it is scoped to two spells rather than to the actor: a
+   * rogue has no other spell to land, but sharing the field would mean a future rogue nuke silently
+   * inheriting a poison talent.
+   */
+  poisonSpellHitChance: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -219,6 +231,9 @@ export const noTalentModifiers: TalentModifiers = {
   offHandEnergyPerProc: 0,
   finisherEnergyRefund: 0,
   sliceAndDiceDurationMultiplier: 1,
+  poisonProcChance: 0,
+  poisonDamageMultiplier: 1,
+  poisonSpellHitChance: 0,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -261,6 +276,8 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   petFrenzyProcChance: 'petFrenzyProcChance',
   offHandEnergyPerProc: 'offHandEnergyPerProc',
   finisherEnergyRefund: 'finisherEnergyRefund',
+  poisonProcChance: 'poisonProcChance',
+  poisonSpellHitChance: 'poisonSpellHitChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
@@ -277,6 +294,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   petMeleeSpeedMultiplier: 'petMeleeSpeedMultiplier',
   petFocusRegenMultiplier: 'petFocusRegenMultiplier',
   sliceAndDiceDurationMultiplier: 'sliceAndDiceDurationMultiplier',
+  poisonDamageMultiplier: 'poisonDamageMultiplier',
 }
 
 /*

@@ -242,6 +242,8 @@ const ROGUE_SOURCES = [
   { path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' },
   // Improved Slice and Dice is applied where the buff is registered, not with the other talents.
   { path: 'sim/rogue/slice_and_dice.go', cache: 'sim_rogue_slice_and_dice.go' },
+  // The poison talents live with the poisons, not in talents.go.
+  { path: 'sim/rogue/poisons.go', cache: 'sim_rogue_poisons.go' },
 ]
 
 /*
@@ -344,6 +346,36 @@ const ROGUE_ENERGY_EXTRACTORS = [
     unit: 'fraction per rank',
     re: /durationMultiplier := 1\.0 \+ ([\d.]+)\*float64\(rogue\.Talents\.ImprovedSliceAndDice\)/,
     value: (m) => Number(m[1]),
+  },
+]
+
+const ROGUE_POISON_EXTRACTORS = [
+  {
+    /*
+     * One coefficient, two poisons. Upstream writes the same `0.3 + 0.02*rank` / `0.2 + 0.02*rank`
+     * shape twice, so this anchors on the Deadly line and the value is asserted to match Instant's.
+     */
+    talent: 'Improved Poisons',
+    kind: 'poisonProcChance',
+    unit: 'fraction per rank',
+    re: /procChance := 0\.3 \+ ([\d.]+)\*float64\(rogue\.Talents\.ImprovedPoisons\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Applies to both poisons at the same rate: Deadly is 0.30 base and Instant 0.20, each plus this.',
+  },
+  {
+    talent: 'Vile Poisons',
+    kind: 'poisonDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /DamageMultiplier:\s*1 \+ ([\d.]+)\*float64\(rogue\.Talents\.VilePoisons\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Master Poisoner',
+    kind: 'poisonSpellHitChance',
+    unit: 'fraction per rank',
+    re: /BonusSpellHitRating:\s*([\d.]+) \* core\.SpellHitRatingPerHitChance \* float64\(rogue\.Talents\.MasterPoisoner\)/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Scoped to the two poison spells rather than to the rogue, which is why it is its own field.',
   },
 ]
 
@@ -898,7 +930,7 @@ const WARLOCK_SKIPPED = [
 
 const CLASSES = [
   { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: [...WARRIOR_EXTRACTORS, ...WARRIOR_STAT_EXTRACTORS], skipped: WARRIOR_SKIPPED },
-  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS], skipped: ROGUE_SKIPPED },
+  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS, ...ROGUE_POISON_EXTRACTORS], skipped: ROGUE_SKIPPED },
   { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
   { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS], skipped: DRUID_SKIPPED },

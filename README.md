@@ -205,8 +205,10 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
 - **Slice and Dice is modelled for every rogue.** It deals no damage — it spends energy and combo
   points to buy 30% melee speed, which lands in the white-damage swing rate. Combat Potency feeds the
-  energy that pays for it, off landed off-hand hits only. Rogue poisons are still missing, and they
-  are Nature damage rather than physical.
+  energy that pays for it, off landed off-hand hits only. **Poisons are modelled too** — Instant on
+  the main hand and Deadly on the off hand, taken from wowsims' own preset since this app has no
+  weapon-imbue slot. Both are Nature damage on the spell table, so armor does not reduce them and they
+  use spell hit rather than melee hit.
 - **A hunter's pet swings, and presses three buttons.** Its auto attack is modelled — its own weapon
   and attack table, 22% of the owner's ranged attack power, no inherited crit — along with every Beast
   Mastery talent this model can express, a focus bar spent on Bite and Claw, and Kill Command. Whether

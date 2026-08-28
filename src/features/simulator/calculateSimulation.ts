@@ -37,6 +37,7 @@ import {
   combatPotencyEnergyPerSecond,
   estimateSliceAndDice,
 } from '../../domain/simulation/sliceAndDice'
+import { estimateRoguePoisons } from '../../domain/simulation/roguePoisons'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -747,6 +748,8 @@ function calculatePhysicalDps(
    */
   /* Reported after the branch, so the readout can say where a rogue's 30% melee speed came from. */
   let sliceAndDiceReport: { uptime: number; durationSeconds: number; combatPotencyEnergy: number } | undefined
+  /* Nature damage, so it rides the unmitigated path beside Retribution's seals rather than the armour one. */
+  let roguePoisons: ReturnType<typeof estimateRoguePoisons> | undefined
 
   let petContext:
     | {
@@ -936,6 +939,31 @@ function calculatePhysicalDps(
           combatPotencyEnergy,
         }
       }
+
+      /*
+       * **Poisons, which are the first thing on this path that is neither physical nor a swing.**
+       *
+       * They roll on the spell table — `OutcomeFuncMagicHitAndCrit` upstream, not the melee one — so
+       * they use spell hit, which a rogue has almost none of, and Master Poisoner exists precisely to
+       * close that. And they are **Nature damage**, so they join `unmitigatedDps` rather than taking
+       * armour, the same route Retribution's seals established.
+       */
+      const poisonSpeed =
+        gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit) * sliceAndDiceSpeed
+      roguePoisons = estimateRoguePoisons({
+        mainHandSwingsPerSecond:
+          mainHandItem?.weaponSpeed ? (poisonSpeed / mainHandItem.weaponSpeed) * landedShare : 0,
+        offHandSwingsPerSecond:
+          dualWield && offHandItem?.weaponSpeed ? (poisonSpeed / offHandItem.weaponSpeed) * landedShare : 0,
+        spellHitChance: computeSpellHitChance(
+          target.level - PLAYER_LEVEL,
+          ratingToFraction(stats.spellHitRating, RATING_PER_PERCENT.spellHit) + talents.poisonSpellHitChance,
+        ),
+        spellCritChance: computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit)),
+        spellCritMultiplier: SPELL_CRIT_DAMAGE_MULTIPLIER,
+        bonusProcChance: talents.poisonProcChance,
+        damageMultiplier: talents.poisonDamageMultiplier,
+      })
     }
 
     const attackSpeedMultiplier =
@@ -1223,7 +1251,7 @@ function calculatePhysicalDps(
    * physical and the distinction could not arise; folding Holy damage into `rawDps` would have
    * quietly shaved a third off it against a raid boss.
    */
-  const unmitigatedDps = paladinHoly?.totalDps ?? 0
+  const unmitigatedDps = (paladinHoly?.totalDps ?? 0) + (roguePoisons?.totalDps ?? 0)
   /*
    * A buff damage multiplier scales everything, physical and Holy alike — Ferocious Inspiration is
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
@@ -1264,6 +1292,14 @@ function calculatePhysicalDps(
   if (killCommand && killCommand.dps > 0) {
     sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * damageMultiplier })
   }
+  if (roguePoisons) {
+    if (roguePoisons.instantDps > 0) {
+      sources.push({ name: 'Instant Poison', dps: roguePoisons.instantDps * damageMultiplier })
+    }
+    if (roguePoisons.deadlyDps > 0) {
+      sources.push({ name: 'Deadly Poison', dps: roguePoisons.deadlyDps * damageMultiplier })
+    }
+  }
   if (paladinHoly) {
     sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
     sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * damageMultiplier })
@@ -1297,6 +1333,10 @@ function calculatePhysicalDps(
    * came from. The Combat Potency row is separate because it explains why the filler rate is what it
    * is — and because a rogue who has one talent and not the other should be able to see which.
    */
+  if (roguePoisons && roguePoisons.totalDps > 0) {
+    breakdown.push({ label: 'Deadly Poison stacks', value: round(roguePoisons.deadlyStacks) })
+    breakdown.push({ label: 'Instant Poison procs per minute', value: round(roguePoisons.instantProcsPerSecond * 60) })
+  }
   if (sliceAndDiceReport) {
     breakdown.push({ label: 'Slice and Dice uptime', value: toPercent(sliceAndDiceReport.uptime) })
     breakdown.push({ label: 'Slice and Dice duration', value: round(sliceAndDiceReport.durationSeconds) })
