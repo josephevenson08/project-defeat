@@ -25,10 +25,12 @@ import { WINDFURY_BONUS_ATTACK_POWER, estimateWindfury } from '../../domain/simu
 import { estimatePaladinHolyDamage } from '../../domain/simulation/paladinSeals'
 import {
   HUNTER_PET_DEFAULT_FAMILY,
+  HUNTER_PET_FRENZY_HASTE,
   HUNTER_PET_KILL_COMMAND,
   HUNTER_PET_UNMODELLED,
   estimateHunterPet,
   estimateHunterPetKillCommand,
+  hunterPetAttackPower,
   hunterPetCritChance,
 } from '../../domain/simulation/hunterPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
@@ -719,14 +721,26 @@ function calculatePhysicalDps(
    */
   let hunterPet: ReturnType<typeof estimateHunterPet> | undefined
   /*
-   * Kill Command needs three things the hunter branch derives and the rotation does not: the pet's
-   * special-attack multiplier, the pet's finished attack power, and the owner's *post-suppression*
-   * ranged crit chance. It is computed after `resolveRotation` rather than inside the branch,
-   * because its gate is owner crits per second and Steady Shot's rate is half of that figure — so
-   * these are carried forward rather than derived a second time.
+   * **The whole pet is priced after `resolveRotation`, and the ordering is forced by two gates that
+   * point in opposite directions.**
+   *
+   * Kill Command is gated on the *owner's* crit rate, and a hunter's crits come from the auto shot
+   * and from Steady Shot — so it cannot be priced until the shot's rate is known. Frenzy is gated on
+   * the *pet's* crit rate, and Kill Command is one of the pet's attacks — so the pet's auto attack
+   * cannot be priced until Kill Command's rate is known.
+   *
+   * That gives one order and no cycle: rotation, then Kill Command, then the pet. The hunter branch
+   * carries the tables forward rather than deriving them twice, which is the same reason
+   * `MeleeSwingContext` exists.
    */
-  let killCommandContext:
-    | { specialAttackTableMultiplier: number; autoShotsPerSecond: number; rangedCritChance: number }
+  let petContext:
+    | {
+        attackTableMultiplier: number
+        specialAttackTableMultiplier: number
+        petCritChance: number
+        autoShotsPerSecond: number
+        rangedCritChance: number
+      }
     | undefined
 
   if (character.className === 'Hunter') {
@@ -799,24 +813,15 @@ function calculatePhysicalDps(
     const petSpecialMultiplier =
       petSpecialTable.hit + petSpecialTable.block + petSpecialTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER
 
-    killCommandContext = {
-      specialAttackTableMultiplier: petSpecialMultiplier,
-      autoShotsPerSecond: rangedSwingSeconds ? 1 / rangedSwingSeconds : 0,
-      // The table's own figure, after crit suppression, because that is what actually crits.
-      rangedCritChance: table.crit,
-    }
-
-    hunterPet = estimateHunterPet({
-      ownerRangedAttackPower: stats.rangedAttackPower,
+    petContext = {
       attackTableMultiplier: petMultiplier,
       specialAttackTableMultiplier: petSpecialMultiplier,
-      armorMitigation,
-      talents: {
-        damageMultiplier: talents.petDamageMultiplier,
-        meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
-        focusRegenMultiplier: talents.petFocusRegenMultiplier,
-      },
-    })
+      // The pet's own crit after suppression, which is what Frenzy's proc rate counts.
+      petCritChance: petSpecialTable.crit,
+      autoShotsPerSecond: rangedSwingSeconds ? 1 / rangedSwingSeconds : 0,
+      // The owner's table figure, after crit suppression, because that is what opens Kill Command.
+      rangedCritChance: table.crit,
+    }
 
     rangedContext = {
       swingSeconds: rangedSwingSeconds,
@@ -1105,23 +1110,37 @@ function calculatePhysicalDps(
    * after `resolveRotation` and reads the shot's own rate rather than guessing at it. A hunter with
    * nothing in the ranged slot fires neither, gets no crits, and correctly gets no Kill Command.
    */
-  const killCommand =
-    hunterPet && killCommandContext
-      ? estimateHunterPetKillCommand({
-          petAttackPower: hunterPet.attackPower,
-          specialAttackTableMultiplier: killCommandContext.specialAttackTableMultiplier,
-          ownerCritsPerSecond:
-            (killCommandContext.autoShotsPerSecond +
-              rotation.specials.reduce((sum, entry) => sum + entry.usesPerSecond, 0)) *
-            killCommandContext.rangedCritChance,
-          armorMitigation,
-          talents: {
-            damageMultiplier: talents.petDamageMultiplier,
-            meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
-            focusRegenMultiplier: talents.petFocusRegenMultiplier,
-          },
-        })
-      : undefined
+  const petTalents = {
+    damageMultiplier: talents.petDamageMultiplier,
+    meleeSpeedMultiplier: talents.petMeleeSpeedMultiplier,
+    focusRegenMultiplier: talents.petFocusRegenMultiplier,
+    frenzyProcChance: talents.petFrenzyProcChance,
+  }
+
+  const killCommand = petContext
+    ? estimateHunterPetKillCommand({
+        petAttackPower: hunterPetAttackPower(stats.rangedAttackPower),
+        specialAttackTableMultiplier: petContext.specialAttackTableMultiplier,
+        ownerCritsPerSecond:
+          (petContext.autoShotsPerSecond + rotation.specials.reduce((sum, entry) => sum + entry.usesPerSecond, 0)) *
+          petContext.rangedCritChance,
+        armorMitigation,
+        talents: petTalents,
+      })
+    : undefined
+
+  // And now the pet itself, which needs Kill Command's rate for Frenzy's proc chance.
+  if (petContext) {
+    hunterPet = estimateHunterPet({
+      ownerRangedAttackPower: stats.rangedAttackPower,
+      attackTableMultiplier: petContext.attackTableMultiplier,
+      specialAttackTableMultiplier: petContext.specialAttackTableMultiplier,
+      petCritChance: petContext.petCritChance,
+      killCommandUsesPerSecond: killCommand?.usesPerSecond ?? 0,
+      armorMitigation,
+      talents: petTalents,
+    })
+  }
 
   /*
    * Armor reduces physical damage and nothing else, so the Holy total is added **after** mitigation
@@ -1225,6 +1244,15 @@ function calculatePhysicalDps(
         label: `Pet ${HUNTER_PET_KILL_COMMAND.name} per minute`,
         value: round(killCommand.usesPerSecond * 60),
       })
+    }
+    /*
+     * Frenzy as an uptime rather than a multiplier, because that is the number a reader can check
+     * against a log. It reaches the auto attack alone — the abilities are focus-bound, not
+     * speed-bound — so it is reported beside the pet rather than beside the shot rates.
+     */
+    if (hunterPet.frenzyMultiplier > 1) {
+      const uptime = (hunterPet.frenzyMultiplier - 1) / (HUNTER_PET_FRENZY_HASTE - 1)
+      breakdown.push({ label: 'Pet Frenzy uptime', value: toPercent(uptime) })
     }
   }
 

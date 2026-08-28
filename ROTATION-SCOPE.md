@@ -352,6 +352,65 @@ deliver most of the accuracy without it.
 
 ---
 
+## Frenzy and Focused Fire close the pet, 2026-08-27
+
+    Hunter Beast Mastery  1500 -> 1565   (1.4x -> 1.3x)
+    Hunter Marksmanship   1277           (unchanged; both talents are Beast Mastery)
+    Hunter Survival       1201           (unchanged)
+
+The pet is **18.4%** of a best-case Beast Mastery hunter, from about 6% when this work started.
+
+### Frenzy is not Flurry, and that difference is the whole content
+
+Flurry is three stacks a white hit **consumes**, so its uptime is a Markov chain over the stack count.
+Frenzy is a fixed 8-second duration any proc **refreshes** and nothing consumes, so the question is
+"was there a proc in the last 8 seconds":
+
+    uptime     = 1 - exp(-8 * lambda)
+    multiplier = 1 + 0.3 * uptime
+
+A duration aura needs none of Flurry's swing-weighting, because the clock runs the same whether the
+aura is up or not.
+
+**The fixed point is iterated rather than solved.** Lambda counts the pet's crits, and those come
+partly from auto attacks whose rate Frenzy itself raises. Substituting gives a transcendental
+equation, so three passes are taken — the third moves the answer by under 1e-4 at every rate this
+model produces, which is the same treatment `SIMULATION-ARCHITECTURE.md` recommends for the Rogue
+energy loop. Ability crits enter as a constant, since none of their rates depend on melee speed.
+
+**It reaches the auto attack alone**, worth +25.5% on pet melee. The aura is `MeleeSpeedMultiplier`;
+every pet ability is `IgnoreHaste: true` and Kill Command has no cast at all, so a frenzied pet swings
+more and presses its buttons exactly as often. A test asserts the three ability rows are
+byte-identical across it.
+
+### Three gates, three different actors
+
+Worth stating plainly because it is what forces the evaluation order: **Bite and Claw are gated on the
+pet's focus, Kill Command on the owner's crits, Frenzy on the pet's crits.** Kill Command and Frenzy
+sit five lines apart in `sim/hunter/talents.go` and point at different units.
+
+So: rotation, then Kill Command, then the pet's auto attack. Frenzy counts Kill Command's crits, and
+Kill Command counts Steady Shot's. One order, no cycle. The hunter branch carries a `petContext`
+forward rather than deriving the tables twice.
+
+### Focused Fire is half expressible, and the other half is named
+
+The hunter half is `DamageDealtMultiplier *= 1 + 0.01*rank`, gated on owning a pet, taken as
+`rangedDamageMultiplier`. **That is a judgement rather than a reading** and it is recorded as one:
+every hunter here has a pet and every point of *hunter* damage this model computes is ranged, so the
+blanket multiplier and the ranged one coincide today. It needs splitting if hunter melee is modelled.
+
+The other half is `BonusCritRating` on the pet's Kill Command **specifically**. `TalentModifiers` has
+fields shaped like an *actor* and none shaped like a *spell*, so it stays refused with that reason —
+and the test checks the reason rather than only the absence.
+
+### What is left
+
+**Bestial Wrath / The Beast Within**, which needs a cooldown usage policy this model has none of.
+That is the whole remaining pet list.
+
+---
+
 ## Kill Command, and the one that scales beats the two that do not, 2026-08-27
 
     Hunter Marksmanship   1239 -> 1277   (1.1x -> 1.0x)

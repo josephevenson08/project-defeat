@@ -9,10 +9,16 @@
  * Every constant is read from wowsims/tbc `sim/hunter/pet.go`, `sim/hunter/focus.go` and
  * `sim/hunter/talents.go` at the pinned commit 3301fca5.
  *
- * **It swings and it presses three buttons.** The auto attack is here; so are Bite and Claw, paid for
- * out of a focus bar at 5 focus a second; and so is Kill Command, which the owner casts and the pet
- * lands. What is not here is stated rather than discovered: Frenzy, Bestial Wrath and Focused Fire,
- * each named in `HUNTER_PET_UNMODELLED` with the reason.
+ * **It swings and it presses three buttons.** The auto attack is here, sped by Frenzy; so are Bite
+ * and Claw, paid for out of a focus bar at 5 focus a second; and so is Kill Command, which the owner
+ * casts and the pet lands. What is not here is stated rather than discovered: Bestial Wrath and the
+ * per-spell half of Focused Fire, both named in `HUNTER_PET_UNMODELLED` with the reason.
+ *
+ * **Three gates, and they point at different actors** — which is the thing to hold on to when
+ * reading this file. Bite and Claw are gated on the pet's **focus**; Kill Command on the **owner's**
+ * crits; Frenzy on the **pet's** crits. Kill Command is therefore priced before the pet's auto
+ * attack, because Frenzy counts its crits, and it in turn is priced after the rotation, because a
+ * hunter's crits come from Steady Shot as well as the auto shot. One order, no cycle.
  */
 
 /** Base melee weapon: 42-68 damage on a 2.0s swing. */
@@ -167,7 +173,7 @@ export const HUNTER_PET_ABILITIES: readonly HunterPetAbility[] = [HUNTER_PET_BIT
 
 /** Named so the estimate can say what it left out, rather than reporting a pet that is quietly too small. */
 export const HUNTER_PET_UNMODELLED =
-  'the pet presses Bite and Claw out of its focus bar, and Kill Command off the owner’s crits. Bite and Claw are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are; Kill Command is a real weapon swing and does scale. Not modelled: Frenzy, a 30% haste aura procced by the pet’s own crits; Bestial Wrath, which needs a cooldown usage policy; and Focused Fire, which would add 10% crit a rank to Kill Command specifically.'
+  'the pet presses Bite and Claw out of its focus bar, and Kill Command off the owner’s crits, with Frenzy speeding its swings. Bite and Claw are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are; Kill Command is a real weapon swing and does scale. Not modelled: Bestial Wrath, which needs a cooldown usage policy, and the half of Focused Fire that adds 10% crit a rank to Kill Command specifically, which would need a per-spell crit field.'
 
 /**
  * Kill Command, which is two spells and one attack.
@@ -273,6 +279,84 @@ export function estimateHunterPetKillCommand(input: HunterPetKillCommandInput): 
   }
 }
 
+/**
+ * Frenzy, which is a refreshing aura rather than a consumed stack — and that is why it is not Flurry.
+ *
+ * On any **pet** crit, at 20% a rank, the pet gains 30% melee speed for 8 seconds. Upstream registers
+ * both auras on `hunter.pet`, so the owner's crits do nothing here; that is the opposite gate from
+ * Kill Command, which is triggered by the *owner's* crits, and the two sit five lines apart in the
+ * source.
+ *
+ * **It reaches the auto attack and nothing else.** The aura is `MeleeSpeedMultiplier`, and every pet
+ * ability is `IgnoreHaste: true` on its cast while Kill Command has no cast at all — so a faster pet
+ * swings more and presses its buttons exactly as often. Bite and Claw are focus-bound, not
+ * speed-bound.
+ *
+ * ### Why the closed form differs from `flurrySpeedMultiplier`
+ *
+ * Flurry is three stacks that a white hit *consumes*, so its uptime is a Markov chain over the stack
+ * count. Frenzy is a fixed 8-second duration that any proc *refreshes*, and nothing consumes it. So
+ * the question is not "how many stacks remain" but "was there a proc in the last 8 seconds", and for
+ * a Poisson process of rate `λ` that is
+ *
+ *     uptime = 1 - exp(-λ · 8)
+ *
+ * The multiplier is time-weighted, which for a duration aura is simply `1 + 0.3 · uptime`: the pet
+ * spends `uptime` of the fight swinging 30% faster. Flurry needs the extra step of weighting by how
+ * long each swing occupies; a duration aura does not, because the clock runs the same either way.
+ *
+ * ### The fixed point, and why it is iterated rather than solved
+ *
+ * `λ` counts the pet's crits, and the pet's crits come partly from auto attacks, whose rate Frenzy
+ * itself raises. Faster swings mean more crits mean more uptime mean faster swings. Substituting
+ * gives a transcendental equation, so it is iterated instead — it converges to four decimal places in
+ * three passes, which is the same treatment `SIMULATION-ARCHITECTURE.md` recommends for the Rogue
+ * energy loop.
+ *
+ * **Ability crits are counted and do not compound.** Bite, Claw and Kill Command all crit and all
+ * proc Frenzy, but none of their rates depend on melee speed, so they enter `λ` as a constant.
+ */
+export const HUNTER_PET_FRENZY_HASTE = 1.3
+export const HUNTER_PET_FRENZY_DURATION_SECONDS = 8
+export const HUNTER_PET_FRENZY_PROC_CHANCE_PER_RANK = 0.2
+
+export type FrenzyInput = {
+  /** Proc chance per pet crit, as a fraction. 0.2 a rank, so rank 5 is certain. */
+  procChance: number
+  /** The pet's crit chance after suppression — its own, since a pet inherits none of the owner's. */
+  petCritChance: number
+  /** Auto attacks per second **before** Frenzy. The term the fixed point iterates on. */
+  baseSwingsPerSecond: number
+  /** Bite, Claw and Kill Command together. They crit and proc Frenzy, and their rates are fixed. */
+  abilityUsesPerSecond: number
+}
+
+/**
+ * Frenzy's expected melee-speed multiplier, in closed form. 1 when untalented.
+ *
+ * Deliberately a **lower bound**, like `flurrySpeedMultiplier` before it: a real proc stream from
+ * regular auto attacks is less variable than a Poisson one, and a less variable arrival process
+ * spends less time with a stale aura. Understating is the honest direction for a number that exists
+ * to correct an already-understated figure.
+ */
+export function frenzySpeedMultiplier(input: FrenzyInput): number {
+  const { procChance, petCritChance, baseSwingsPerSecond, abilityUsesPerSecond } = input
+  if (procChance <= 0 || petCritChance <= 0) return 1
+
+  const bonus = HUNTER_PET_FRENZY_HASTE - 1
+  let multiplier = 1
+
+  // Three passes: the third moves the answer by less than 1e-4 at every rate this model produces.
+  for (let pass = 0; pass < 3; pass += 1) {
+    const attacksPerSecond = Math.max(0, baseSwingsPerSecond) * multiplier + Math.max(0, abilityUsesPerSecond)
+    const procsPerSecond = attacksPerSecond * Math.min(1, petCritChance) * Math.min(1, procChance)
+    const uptime = 1 - Math.exp(-procsPerSecond * HUNTER_PET_FRENZY_DURATION_SECONDS)
+    multiplier = 1 + bonus * uptime
+  }
+
+  return multiplier
+}
+
 export type HunterPetTalents = {
   /** Multiplies the pet's damage. Unleashed Fury, +4% a rank. 1 when untalented. */
   damageMultiplier: number
@@ -280,6 +364,8 @@ export type HunterPetTalents = {
   meleeSpeedMultiplier: number
   /** Multiplies focus regeneration. Bestial Discipline, +50% a rank. 1 when untalented. */
   focusRegenMultiplier: number
+  /** Chance a pet crit procs Frenzy, as a fraction. 0.2 a rank. 0 when untalented. */
+  frenzyProcChance: number
 }
 
 /** The untalented identity, which an empty tree has to reproduce exactly. */
@@ -287,6 +373,7 @@ export const noHunterPetTalents: HunterPetTalents = {
   damageMultiplier: 1,
   meleeSpeedMultiplier: 1,
   focusRegenMultiplier: 1,
+  frenzyProcChance: 0,
 }
 
 export type HunterPetInput = {
@@ -306,6 +393,17 @@ export type HunterPetInput = {
    * what every caller got before the abilities existed.
    */
   specialAttackTableMultiplier?: number
+  /**
+   * The pet's crit chance after suppression, which Frenzy's proc rate is derived from. Optional for
+   * the same reason as the special table: a caller that does not supply it gets no Frenzy.
+   */
+  petCritChance?: number
+  /**
+   * Kill Command's uses per second, if it is modelled. It crits and procs Frenzy like anything else
+   * the pet does, but it is priced **before** this call — its own rate depends on the *owner's* crit
+   * rate, which comes from the rotation — so it arrives as a number rather than being derived here.
+   */
+  killCommandUsesPerSecond?: number
   /**
    * The pet-scaling talents. Optional so a caller with no talents to hand keeps its numbers
    * unchanged — absent is the untalented identity.
@@ -332,8 +430,25 @@ export type HunterPetEstimate = {
   abilityDps: number
   /** Focus income after Bestial Discipline, reported because the ability rate is derived from it. */
   focusPerSecond: number
+  /** Frenzy's expected melee-speed multiplier. 1 when untalented, and it reaches the auto attack only. */
+  frenzyMultiplier: number
   /** White plus abilities. What the caller adds to the hunter's total. */
   dps: number
+}
+
+/**
+ * The pet's finished attack power, which both the auto attack and Kill Command scale on.
+ *
+ * Extracted so the two cannot disagree. Kill Command is priced before the pet estimate — Frenzy's
+ * proc rate counts Kill Command's crits, so it has to know that rate first — and deriving attack
+ * power twice across that ordering is exactly how two call sites end up out of step.
+ */
+export function hunterPetAttackPower(ownerRangedAttackPower: number): number {
+  return (
+    HUNTER_PET_FLAT_ATTACK_POWER +
+    HUNTER_PET_BASE_STRENGTH * HUNTER_PET_STRENGTH_TO_ATTACK_POWER +
+    Math.max(0, ownerRangedAttackPower) * HUNTER_PET_ATTACK_POWER_INHERITANCE
+  )
 }
 
 /** Base crit as a fraction, before any of the hunter's own crit — a pet inherits none of it. */
@@ -408,24 +523,18 @@ export function estimateHunterPet(input: HunterPetInput): HunterPetEstimate {
   const { ownerRangedAttackPower, attackTableMultiplier, armorMitigation } = input
   const talents = input.talents ?? noHunterPetTalents
 
-  const attackPower =
-    HUNTER_PET_FLAT_ATTACK_POWER +
-    HUNTER_PET_BASE_STRENGTH * HUNTER_PET_STRENGTH_TO_ATTACK_POWER +
-    Math.max(0, ownerRangedAttackPower) * HUNTER_PET_ATTACK_POWER_INHERITANCE
+  const attackPower = hunterPetAttackPower(ownerRangedAttackPower)
 
   const weaponDps =
     (HUNTER_PET_WEAPON_DAMAGE.min + HUNTER_PET_WEAPON_DAMAGE.max) / 2 / HUNTER_PET_SWING_SECONDS
   // The same attack-power-to-DPS constant the player's white damage uses: 14 attack power is 1 DPS.
   const fromAttackPower = attackPower / 14
 
-  const speed = HUNTER_PET_MELEE_SPEED_MULTIPLIER * talents.meleeSpeedMultiplier
+  const baseSpeed = HUNTER_PET_MELEE_SPEED_MULTIPLIER * talents.meleeSpeedMultiplier
   // Reaches everything the pet does: happiness is unit-wide upstream, and so is Unleashed Fury.
   const unitDamage = HUNTER_PET_HAPPINESS_MULTIPLIER * talents.damageMultiplier
   // The auto attack alone. See the note above for why these two do not reach the abilities.
   const whiteOnlyDamage = HUNTER_PET_AUTO_ATTACK_MULTIPLIER * HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER
-
-  const whiteRaw = (weaponDps + fromAttackPower) * attackTableMultiplier * speed * unitDamage * whiteOnlyDamage
-  const whiteDps = Math.max(0, whiteRaw) * (1 - armorMitigation)
 
   const focusPerSecond = HUNTER_PET_FOCUS_PER_SECOND * talents.focusRegenMultiplier
 
@@ -450,6 +559,30 @@ export function estimateHunterPet(input: HunterPetInput): HunterPetEstimate {
 
   const abilityDps = abilities.reduce((sum, entry) => sum + entry.dps, 0)
 
+  /*
+   * **Frenzy, which reaches the auto attack and nothing else.** The aura is `MeleeSpeedMultiplier`,
+   * every pet ability is `IgnoreHaste: true`, and Kill Command has no cast at all — so a frenzied pet
+   * swings more often and presses its buttons exactly as often. Bite and Claw are focus-bound.
+   *
+   * Its own proc rate counts every pet attack, abilities included, which is why this sits after the
+   * ability rates are known rather than beside the swing speed it modifies.
+   */
+  const baseSwingsPerSecond = baseSpeed / HUNTER_PET_SWING_SECONDS
+  const frenzyMultiplier =
+    input.petCritChance === undefined
+      ? 1
+      : frenzySpeedMultiplier({
+          procChance: talents.frenzyProcChance,
+          petCritChance: input.petCritChance,
+          baseSwingsPerSecond,
+          abilityUsesPerSecond:
+            abilities.reduce((sum, entry) => sum + entry.usesPerSecond, 0) + (input.killCommandUsesPerSecond ?? 0),
+        })
+
+  const whiteRaw =
+    (weaponDps + fromAttackPower) * attackTableMultiplier * baseSpeed * frenzyMultiplier * unitDamage * whiteOnlyDamage
+  const whiteDps = Math.max(0, whiteRaw) * (1 - armorMitigation)
+
   return {
     attackPower,
     critChance: hunterPetCritChance(),
@@ -457,6 +590,7 @@ export function estimateHunterPet(input: HunterPetInput): HunterPetEstimate {
     abilities,
     abilityDps,
     focusPerSecond,
+    frenzyMultiplier,
     dps: whiteDps + abilityDps,
   }
 }

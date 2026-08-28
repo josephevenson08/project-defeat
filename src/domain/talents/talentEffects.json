@@ -30,7 +30,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 68,
+  "effectCount": 70,
   "effects": [
     {
       "className": "Warrior",
@@ -410,6 +410,30 @@
       "unit": "fraction per rank",
       "perRank": 0.02,
       "caveat": "Melee half only, for the same reason as Ferocity: the pet’s SpellHit line feeds abilities this model does not have.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1397,
+      "talent": "Frenzy",
+      "tree": "Beast Mastery",
+      "maxRank": 5,
+      "kind": "petFrenzyProcChance",
+      "unit": "fraction per rank",
+      "perRank": 0.2,
+      "caveat": "A pet crit procs a 30% melee speed aura for 8s. The aura refreshes rather than stacking, so its uptime is 1 - exp(-lambda*8) rather than a Markov chain; see frenzySpeedMultiplier.",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1624,
+      "talent": "Focused Fire",
+      "tree": "Beast Mastery",
+      "maxRank": 2,
+      "kind": "rangedDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Upstream writes a blanket DamageDealtMultiplier gated on owning a pet. Taken as ranged damage because every hunter here has a pet and every point of hunter damage this model computes is ranged; it would need splitting if hunter melee were ever modelled. The pet half is a per-spell crit bonus with no field.",
       "source": "sim/hunter/talents.go"
     },
     {
@@ -898,13 +922,8 @@
     },
     {
       "className": "Hunter",
-      "talent": "Frenzy",
-      "reason": "A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. Every constant is sourced and the ability rate exists now, so what is left is the uptime: it is a fixed-duration refreshing aura rather than a consumed stack, which is a different closed form from flurrySpeedMultiplier and has not been written yet."
-    },
-    {
-      "className": "Hunter",
-      "talent": "Focused Fire",
-      "reason": "Multiplies the hunter’s own DamageDealtMultiplier by 1% a rank, gated on owning a pet, and separately grants the pet’s Kill Command +10% crit a rank. The first half is expressible; the second needs Kill Command, which fires off the owner’s crits and so needs a timeline."
+      "talent": "Focused Fire (Kill Command half)",
+      "reason": "The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor."
     },
     {
       "className": "Hunter",

@@ -207,8 +207,9 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   and attack table, 22% of the owner's ranged attack power, no inherited crit — along with every Beast
   Mastery talent this model can express, a focus bar spent on Bite and Claw, and Kill Command. Whether
   an ability scales decides its worth: Bite and Claw are flat rolls that gear cannot move, while Kill
-  Command is a real weapon swing and is worth more than both together. Its rate is gated on the
-  owner's crit rate rather than its own cooldown. Frenzy, Bestial Wrath and Focused Fire are the gap. The estimate
+  Command is a real weapon swing and is worth more than both together. Three gates point three
+  different ways: Bite and Claw at the pet's focus, Kill Command at the owner's crits, Frenzy at the
+  pet's own. Only Bestial Wrath is still missing. The estimate
   names the pet family it assumes, because the eight families span 0.91 to 1.1 and there is no picker.
 - The layout is fluid and reflows to phone width. It previously had a ~806px floor from fixed
   containers, a hard two-column content grid and a non-wrapping tab bar; all three are responsive now.

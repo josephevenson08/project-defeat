@@ -115,11 +115,14 @@ import {
   HUNTER_PET_MELEE_SPEED_MULTIPLIER,
   HUNTER_PET_BITE,
   HUNTER_PET_CLAW,
+  HUNTER_PET_FRENZY_DURATION_SECONDS,
+  HUNTER_PET_FRENZY_HASTE,
   HUNTER_PET_GCD_SECONDS,
   HUNTER_PET_KILL_COMMAND,
   HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
   estimateHunterPet,
   estimateHunterPetKillCommand,
+  frenzySpeedMultiplier,
   hunterPetAbilityRates,
   killCommandUsesPerSecond,
 } from '../src/domain/simulation/hunterPet'
@@ -6002,6 +6005,147 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
   ).toBe(false)
 })
 
+test('Frenzy is a refreshing aura, not a consumed stack, and it reaches the auto attack alone', () => {
+  /*
+   * **Why this is not Flurry**, which is the whole reason it needed its own closed form.
+   *
+   * Flurry is three stacks that a white hit *consumes*, so its uptime is a Markov chain over the
+   * stack count. Frenzy is a fixed 8-second duration that any proc *refreshes* and nothing consumes,
+   * so the question is "was there a proc in the last 8 seconds" — for a Poisson process of rate λ,
+   * `1 - exp(-8λ)`, and the multiplier is `1 + 0.3 · uptime`.
+   */
+  expect(HUNTER_PET_FRENZY_HASTE).toBe(1.3)
+  expect(HUNTER_PET_FRENZY_DURATION_SECONDS).toBe(8)
+
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  // 0.2 a rank, so rank 5 is certainty — and 0, not 1, is the untalented identity, because it is a
+  // probability rather than a factor.
+  expect(deriveTalentModifiers({ [idOf('Hunter', 'Frenzy')]: 5 }).petFrenzyProcChance).toBeCloseTo(1, 10)
+  expect(deriveTalentModifiers({}).petFrenzyProcChance).toBe(0)
+
+  // Untalented is exactly 1, which is what an empty tree has to reproduce.
+  expect(
+    frenzySpeedMultiplier({ procChance: 0, petCritChance: 0.2, baseSwingsPerSecond: 1, abilityUsesPerSecond: 0.5 }),
+  ).toBe(1)
+
+  /*
+   * The closed form, checked against the arithmetic at a rate where the fixed point does not bite:
+   * with no auto attacks at all, λ is just the ability rate and the answer is exact rather than
+   * iterated. That isolates the formula from the iteration.
+   */
+  const abilitiesOnly = frenzySpeedMultiplier({
+    procChance: 1,
+    petCritChance: 0.2,
+    baseSwingsPerSecond: 0,
+    abilityUsesPerSecond: 0.5,
+  })
+  const expectedUptime = 1 - Math.exp(-0.5 * 0.2 * HUNTER_PET_FRENZY_DURATION_SECONDS)
+  expect(abilitiesOnly).toBeCloseTo(1 + (HUNTER_PET_FRENZY_HASTE - 1) * expectedUptime, 10)
+
+  /*
+   * **The fixed point, which is the part that could not be solved in closed form.** λ counts the
+   * pet's crits, and the pet's crits come partly from auto attacks whose rate Frenzy itself raises.
+   * More swings must mean more uptime, and the result must stay bounded by the 1.3 the aura grants —
+   * an iteration that diverged would sail past it.
+   */
+  const slow = frenzySpeedMultiplier({ procChance: 1, petCritChance: 0.15, baseSwingsPerSecond: 0.4, abilityUsesPerSecond: 0 })
+  const fast = frenzySpeedMultiplier({ procChance: 1, petCritChance: 0.15, baseSwingsPerSecond: 1.2, abilityUsesPerSecond: 0 })
+  expect(fast, 'a faster pet procs it more often').toBeGreaterThan(slow)
+  expect(fast, 'and it can never exceed the haste the aura grants').toBeLessThan(HUNTER_PET_FRENZY_HASTE)
+  expect(
+    frenzySpeedMultiplier({ procChance: 1, petCritChance: 1, baseSwingsPerSecond: 100, abilityUsesPerSecond: 0 }),
+    'at certainty it approaches the full 30% and stops',
+  ).toBeCloseTo(HUNTER_PET_FRENZY_HASTE, 6)
+
+  /*
+   * **It reaches the auto attack and nothing else**, which is the assertion that would catch it being
+   * wired into the wrong term. The aura is `MeleeSpeedMultiplier`; every pet ability is
+   * `IgnoreHaste: true` on its cast and Kill Command has no cast at all, so a frenzied pet swings
+   * more and presses its buttons exactly as often.
+   */
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const read = (points: Record<number, number>) => {
+    const sim = calculateSimulation(hunter, gear, stats, 'Physical DPS', [], undefined, points)
+    const source = (name: string) => sim.damageSources!.find((entry) => entry.name === name)?.dps ?? 0
+    return {
+      melee: source('Pet melee'),
+      bite: source('Pet Bite'),
+      claw: source('Pet Claw'),
+      killCommand: source('Pet Kill Command'),
+      uptime: sim.breakdown.find((entry) => entry.label === 'Pet Frenzy uptime')?.value,
+    }
+  }
+
+  const bare = read({})
+  const frenzied = read({ [idOf('Hunter', 'Frenzy')]: 5 })
+
+  expect(frenzied.melee, 'the auto attack speeds up').toBeGreaterThan(bare.melee)
+  for (const key of ['bite', 'claw', 'killCommand'] as const) {
+    expect(frenzied[key], `${key} is focus- or cooldown-bound, not speed-bound`).toBeCloseTo(bare[key], 10)
+  }
+
+  // The uptime is reported rather than only the multiplier, because that is the figure a log shows.
+  expect(bare.uptime, 'no row at all when untalented').toBeUndefined()
+  expect(frenzied.uptime).toBeDefined()
+  expect(frenzied.uptime!).toBeGreaterThan(0)
+  expect(frenzied.uptime!).toBeLessThan(100)
+})
+
+test('Focused Fire reaches the hunter, and only the half this model has a field for', () => {
+  /*
+   * Two halves, and only one is expressible. Upstream writes
+   * `PseudoStats.DamageDealtMultiplier *= 1.0 + 0.01*rank` on the **hunter**, gated on owning a pet,
+   * and separately a `BonusCritRating` of 10% a rank on the **pet's Kill Command specifically**.
+   *
+   * The first is taken as `rangedDamageMultiplier`, which is a judgement rather than a reading: every
+   * hunter here has a pet and every point of hunter damage this model computes is ranged, so a
+   * blanket multiplier and a ranged one coincide. The second is a per-spell crit bonus and this
+   * record has no field shaped like a spell, so it stays refused with that reason.
+   */
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  const focusedFire = idOf('Hunter', 'Focused Fire')
+  const maxed = deriveTalentModifiers({ [focusedFire]: 2 })
+  expect(maxed.rangedDamageMultiplier, '+1% a rank, max 2').toBeCloseTo(1.02, 10)
+  // It must not leak onto the pet, which is the actor it is *named* after but does not scale.
+  expect(maxed.petDamageMultiplier).toBe(1)
+  expect(maxed.petCritChance).toBe(0)
+
+  const hunter: CharacterProfile = { faction: 'Alliance', race: 'Night Elf', className: 'Hunter', spec: 'Beast Mastery' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Hunter', 'Beast Mastery')
+  const stats = calculateStats(hunter, gear)
+  const read = (points: Record<number, number>) => {
+    const sim = calculateSimulation(hunter, gear, stats, 'Physical DPS', [], undefined, points)
+    const source = (name: string) => sim.damageSources!.find((entry) => entry.name === name)?.dps ?? 0
+    return { autoShot: source('Auto Shot'), petMelee: source('Pet melee'), killCommand: source('Pet Kill Command') }
+  }
+
+  const bare = read({})
+  const talented = read({ [focusedFire]: 2 })
+
+  expect(talented.autoShot, "the hunter's own shot gains 2%").toBeCloseTo(bare.autoShot * 1.02, 6)
+  expect(talented.petMelee, 'and the pet gains nothing, because the multiplier is the owner’s').toBeCloseTo(
+    bare.petMelee,
+    10,
+  )
+
+  /*
+   * **The refused half is still refused, and for the right reason.** A test asserting a talent is
+   * ingested proves nothing about the part that was left out, and this repo's recurring failure is
+   * prose that stops matching the code — so the reason is checked, not just the absence.
+   */
+  const refusal = rawTalentEffects.skipped.find(
+    (entry) => entry.className === 'Hunter' && /Focused Fire/.test(entry.talent),
+  )
+  expect(refusal, 'the per-spell half is named rather than silently dropped').toBeDefined()
+  expect(refusal!.reason).toMatch(/per-spell|Kill Command/i)
+})
+
 test('the pet shares featureFlags quotes are the shares the model produces', () => {
   /*
    * `featureFlags.ts` says the pet's abilities are worth "about 2.4%" of a Beast Mastery hunter and
@@ -6031,12 +6175,12 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
 
   const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
 
-  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.3%').toBeGreaterThan(0.019)
-  expect(share(focusRows)).toBeLessThan(0.028)
-  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.6%').toBeGreaterThan(0.031)
-  expect(share([killCommandRow!])).toBeLessThan(0.041)
-  expect(share(petRows), 'featureFlags says the pet as a whole is about 16.5%').toBeGreaterThan(0.155)
-  expect(share(petRows)).toBeLessThan(0.175)
+  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.2%').toBeGreaterThan(0.018)
+  expect(share(focusRows)).toBeLessThan(0.027)
+  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.5%').toBeGreaterThan(0.030)
+  expect(share([killCommandRow!])).toBeLessThan(0.040)
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 18.4%').toBeGreaterThan(0.175)
+  expect(share(petRows)).toBeLessThan(0.195)
 
   /*
    * **The comparison featureFlags leans on: Kill Command beats Bite and Claw together.** It lands

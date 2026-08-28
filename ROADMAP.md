@@ -187,8 +187,8 @@ each pinned by an assertion these days.
   that scale it, plus Bite and Claw out of a focus bar spent in priority order, plus Kill Command.
   Bite and Claw are flat rolls that gear cannot move, worth about 2.3%, and it is Bestial Discipline
   rather than gear that makes them matter. Kill Command is a real weapon swing gated on the owner's
-  crit rate, and is worth more than both together. Frenzy, Bestial Wrath and Focused Fire are still
-  missing.
+  crit rate, and is worth more than both together, plus Frenzy speeding the pet's swings. Only Bestial
+  Wrath is still missing.
 
 **Still open, and these are the honest ones:**
 

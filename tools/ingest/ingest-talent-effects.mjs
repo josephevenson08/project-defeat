@@ -409,6 +409,33 @@ const HUNTER_EXTRACTORS = [
   },
   {
     /*
+     * The proc CHANCE, not the haste. Upstream's 1.3 speed multiplier lives inside an aura callback
+     * that no pattern here should try to read, and the uptime it produces is derived analytically in
+     * `hunterPet.ts` — the same split `flurryHaste` already makes, and for the same reason: the value
+     * transfers and the mechanism does not.
+     */
+    talent: 'Frenzy',
+    kind: 'petFrenzyProcChance',
+    unit: 'fraction per rank',
+    re: /procChance := ([\d.]+) \* float64\(hunter\.Talents\.Frenzy\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'A pet crit procs a 30% melee speed aura for 8s. The aura refreshes rather than stacking, so its uptime is 1 - exp(-lambda*8) rather than a Markov chain; see frenzySpeedMultiplier.',
+  },
+  {
+    /*
+     * The hunter half only. Upstream also gives the pet's Kill Command +10% crit a rank, in
+     * `kill_command.go` as a `BonusCritRating` on that one spell — a per-spell crit bonus, which this
+     * record has no field for and which would need one shaped like the spell rather than the actor.
+     */
+    talent: 'Focused Fire',
+    kind: 'rangedDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /PseudoStats\.DamageDealtMultiplier \*= 1\.0 \+ ([\d.]+)\*float64\(hunter\.Talents\.FocusedFire\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Upstream writes a blanket DamageDealtMultiplier gated on owning a pet. Taken as ranged damage because every hunter here has a pet and every point of hunter damage this model computes is ranged; it would need splitting if hunter melee were ever modelled. The pet half is a per-spell crit bonus with no field.',
+  },
+  {
+    /*
      * Read out of `pet.go` rather than `talents.go`, because this is the one pet talent upstream
      * applies at construction rather than in `ApplyTalents` — it is an argument to `EnableFocusBar`,
      * not a stat. The pattern anchors on that call so it cannot drift onto anything else.
@@ -423,8 +450,7 @@ const HUNTER_EXTRACTORS = [
 ]
 
 const HUNTER_SKIPPED = [
-  ['Frenzy', 'A 30% melee speed aura for 8 seconds, procced by a pet crit at 20% a rank. Every constant is sourced and the ability rate exists now, so what is left is the uptime: it is a fixed-duration refreshing aura rather than a consumed stack, which is a different closed form from flurrySpeedMultiplier and has not been written yet.'],
-  ['Focused Fire', 'Multiplies the hunter’s own DamageDealtMultiplier by 1% a rank, gated on owning a pet, and separately grants the pet’s Kill Command +10% crit a rank. The first half is expressible; the second needs Kill Command, which fires off the owner’s crits and so needs a timeline.'],
+  ['Focused Fire (Kill Command half)', 'The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor.'],
   ['The Beast Within / Bestial Wrath', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
   ['Survivalist', 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
   ['Combat Experience', 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],

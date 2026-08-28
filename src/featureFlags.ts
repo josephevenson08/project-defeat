@@ -74,26 +74,31 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **A hunter's pet is a second attacker, and it presses three buttons.** Its auto attack is modelled
  *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
  *   crit — along with every Beast Mastery talent this model can express, a focus bar spent on Bite
- *   and Claw in priority order, and Kill Command. The pet is **16.5% of a best-case Beast Mastery
- *   hunter**, against an attributed share nearer a third.
+ *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **18.4% of a
+ *   best-case Beast Mastery hunter**, against an attributed share nearer a third.
  *
  *   **Whether a pet ability scales is what decides its worth, and the two kinds behave oppositely.**
  *   Bite and Claw are `BaseDamageConfigRoll` — flat, with **no attack power scaling at all** — so
- *   they add about 2.3% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
- *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.6%**:
+ *   they add about 2.2% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
+ *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.5%**:
  *   more than Bite and Claw together despite landing only 7.7 times a minute.
  *
- *   **Kill Command's gate is the owner's crit rate, not its own cooldown.** Upstream opens a
- *   5-second window on any owner crit, so the rate is `1 / (5 + 1/crits per second)` — about half
- *   what the cooldown alone would allow. Its 75 mana joins the reported drain rather than capping it.
+ *   **Three gates, pointing at three different things**, which is the part worth holding on to. Bite
+ *   and Claw are gated on the pet's **focus**. Kill Command on the **owner's** crits — upstream opens
+ *   a 5-second window on any owner crit, so its rate is `1 / (5 + 1/crits per second)`, about half
+ *   what the cooldown alone would allow, and its 75 mana joins the reported drain. Frenzy on the
+ *   **pet's** crits, as a refreshing 8-second aura whose uptime is `1 - exp(-8λ)` rather than the
+ *   Markov chain Flurry needs, and it reaches the auto attack alone because the abilities are
+ *   focus-bound rather than speed-bound.
  *
  *   **What moves Bite and Claw is Bestial Discipline, not gear**, and getting that backwards is a
  *   mistake this repo made and a test caught. Gear alone takes them from 17.5% of the pet to 15.1%;
  *   Bestial Discipline takes them to 27.8% by doubling focus income.
  *
- *   Still missing: Frenzy, Bestial Wrath, and Focused Fire — which upstream gives Kill Command
- *   specifically, at 10% crit a rank. The estimate names the pet family it assumes, because the eight
- *   families span 0.91 to 1.1 on damage and this app has no picker for them.
+ *   Still missing: Bestial Wrath, which needs a cooldown usage policy, and the half of Focused Fire
+ *   that grants Kill Command 10% crit a rank — a per-spell bonus, where every field here is shaped
+ *   like an actor. The estimate names the pet family it assumes, because the eight families span 0.91
+ *   to 1.1 on damage and this app has no picker for them.
  * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
  *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
  *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**

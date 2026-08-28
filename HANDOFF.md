@@ -5,6 +5,66 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, and the pet is finished)
+
+**Frenzy and Focused Fire land, and that closes the hunter pet.** Beast Mastery **1500 → 1565**, a
+1.4x → **1.3x** ratio; the pet is **18.4%** of a best-case BM hunter, up from ~6% when this queue item
+opened. Marksmanship and Survival are unchanged, because both talents are Beast Mastery.
+
+### Frenzy is not Flurry, and that is the whole modelling content
+
+Flurry is three stacks a white hit *consumes*, so its uptime is a Markov chain over the stack count.
+Frenzy is a fixed 8-second duration any proc *refreshes* and nothing consumes — so the question is
+"was there a proc in the last 8 seconds", which for a Poisson process is `1 - exp(-8λ)`, and the
+multiplier is simply `1 + 0.3 · uptime`. A duration aura needs no swing-weighting, because the clock
+runs the same either way.
+
+**It has a fixed point, and it is iterated rather than solved.** λ counts the pet's crits, and those
+come partly from auto attacks whose rate Frenzy itself raises — faster swings, more crits, more
+uptime, faster swings. Substituting gives a transcendental equation, so three passes are taken; the
+third moves the answer by under 1e-4 at every rate this model produces. Ability crits enter λ as a
+constant, since none of their rates depend on melee speed.
+
+**It reaches the auto attack alone** — worth +25.5% on pet melee. The aura is `MeleeSpeedMultiplier`,
+every pet ability is `IgnoreHaste: true`, and Kill Command has no cast at all, so a frenzied pet
+swings more and presses its buttons exactly as often. A test asserts Bite, Claw and Kill Command are
+byte-identical across it.
+
+### Three gates, pointing at three different things
+
+This is the sentence to keep: **Bite and Claw are gated on the pet's focus, Kill Command on the
+owner's crits, Frenzy on the pet's crits.** Kill Command and Frenzy sit five lines apart in
+`sim/hunter/talents.go` and point at different actors.
+
+That forces one evaluation order with no cycle — rotation, then Kill Command, then the pet's auto
+attack — because Frenzy counts Kill Command's crits and Kill Command counts Steady Shot's. The hunter
+branch now carries a `petContext` forward rather than deriving the tables twice.
+
+### Focused Fire is half expressible, and the half that is not is named
+
+The hunter half — `DamageDealtMultiplier *= 1 + 0.01·rank`, gated on owning a pet — is taken as
+`rangedDamageMultiplier`. **That is a judgement rather than a reading**, and it is written down as
+one: every hunter here has a pet and every point of *hunter* damage this model computes is ranged, so
+a blanket multiplier and a ranged one coincide today. It would need splitting if hunter melee were
+ever modelled.
+
+The other half is `BonusCritRating` on the pet's Kill Command **specifically** — a per-spell crit
+bonus, where every field in `TalentModifiers` is shaped like an *actor*. It stays refused with that
+reason, and a test checks the reason rather than just the absence.
+
+### What is left on the pet
+
+**Bestial Wrath / The Beast Within only**, and it needs a cooldown usage policy this model has none
+of — the same reason Rapid Fire and Readiness are refused. Everything else the pet does is in.
+
+### Still true, and still the thing to read first
+
+Marksmanship sits at **1.05x** and neither talent here touched it. The warning in the section below
+stands: the next pet improvement may push it above its reference, and the answer is to find the
+double-count rather than loosen the bound.
+
+---
+
 ## Start here (2026-08-27, latest)
 
 **Kill Command lands, and the one pet ability that scales beats the two that do not.** 54.1 DPS

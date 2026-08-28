@@ -71,6 +71,11 @@ export type TalentModifiers = {
    * this comment used to say. Upstream applies Hunter's Ranged Weapon Specialization as a blanket
    * `RangedDamageDealtMultiplier` with no proc mask, and the talent's own wording is ambiguous
    * enough that the narrower reading looked right until it was checked. 1 when untalented.
+   *
+   * **Focused Fire lands here too**, and that is a judgement rather than a reading: upstream writes
+   * it as a blanket `DamageDealtMultiplier` gated on owning a pet. Every hunter in this model has a
+   * pet and every point of *hunter* damage this model computes is ranged, so the two coincide today.
+   * It would need splitting if hunter melee were ever modelled.
    */
   rangedDamageMultiplier: number
   /** Multiplies ranged attack speed. Hunter's Serpent's Swiftness. 1 when untalented. */
@@ -105,6 +110,17 @@ export type TalentModifiers = {
    * number until the 1.5s global cooldown starts binding instead.
    */
   petFocusRegenMultiplier: number
+  /**
+   * Chance a **pet** crit procs Frenzy, as a fraction. 0.2 a rank, so rank 5 is certain.
+   *
+   * Additive rather than multiplicative because it is a probability, not a factor — and 0 rather
+   * than 1 is the identity, which is why it cannot share a field with the multipliers above.
+   *
+   * Note the gate is the *pet's* crit, where Kill Command's is the *owner's*. The two sit five lines
+   * apart in `sim/hunter/talents.go` and point at different actors, which is the kind of thing a
+   * shared field would quietly erase.
+   */
+  petFrenzyProcChance: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -186,6 +202,7 @@ export const noTalentModifiers: TalentModifiers = {
   petDamageMultiplier: 1,
   petMeleeSpeedMultiplier: 1,
   petFocusRegenMultiplier: 1,
+  petFrenzyProcChance: 0,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -225,6 +242,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   blockChance: 'blockChance',
   petCritChance: 'petCritChance',
   petHitChance: 'petHitChance',
+  petFrenzyProcChance: 'petFrenzyProcChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
