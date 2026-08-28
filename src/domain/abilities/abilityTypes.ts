@@ -164,6 +164,19 @@ export type SignatureAbility = {
   replacesMainHandSwing?: boolean
   cooldownSeconds?: number
   resource?: AbilityResourceCost
+  /**
+   * Combo points the ability grants per use, for the three rogue fillers that build them.
+   *
+   * Added because Slice and Dice is refreshed at five points and the generation rate is a real
+   * ceiling on how often it can be: an Assassination rogue reads 70% uptime rather than 100% if
+   * this is assumed to be 1, because **Mutilate grants two** where Sinister Strike and Hemorrhage
+   * grant one. Read from `AddComboPoints` in each ability file upstream rather than inferred from
+   * the energy cost.
+   *
+   * Absent for everything that is not a rogue builder, which is the honest default: no other spec
+   * in this model has a combo-point economy at all.
+   */
+  comboPointsPerUse?: number
   /** Base damage/healing at max rank before scaling. Omitted when the ability has no flat base. */
   baseAmount?: AmountRange
   /** Present for DoT/HoT effects, and for direct abilities that leave a periodic component behind. */

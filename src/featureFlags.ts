@@ -99,6 +99,19 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   that grants Kill Command 10% crit a rank — a per-spell bonus, where every field here is shaped
  *   like an actor. The estimate names the pet family it assumes, because the eight families span 0.91
  *   to 1.1 on damage and this app has no picker for them.
+ * - **Slice and Dice is modelled for every rogue, and it deals no damage.** It spends 25 energy and
+ *   five combo points to buy **30% melee speed**, so the multiplier lands in the white-damage swing
+ *   rate beside gear haste and Flurry rather than in the damage table. It was worth about a fifth to
+ *   every rogue spec when it landed on 2026-08-27 — a historical delta rather than a live claim, so it
+ *   carries no assertion; the constants below all do. Three ceilings decide whether it stays up — energy, a 1-second global cooldown,
+ *   and five combo points — and the points are what can actually bind, because five points is five
+ *   fillers and the filler is itself energy-bound. Relentless Strikes hands back exactly the 25 it
+ *   costs, so a talented rogue holds it at 100% without visibly paying.
+ *
+ *   **Combat Potency feeds it, and reads landed off-hand hits only** (`ProcMaskMeleeOH`), so the two
+ *   talents form a loop: faster swings, more procs, more energy, more combo points, more Slice and
+ *   Dice. It is iterated in three passes. What the haste does **not** do is speed the specials —
+ *   those are bounded by energy and the global cooldown, neither of which melee haste touches.
  * - **Retribution's Holy damage is modelled, and it is faction-split.** Seal of Blood adds 35% of
  *   weapon damage to every landed white hit; Seal of Command adds 70% at 7 procs per minute; the
  *   judgement lands on the Judgement button's 10s cooldown. **Seal of Blood is Horde-only in Phase 2**

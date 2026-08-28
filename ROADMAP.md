@@ -182,6 +182,9 @@ each pinned by an assertion these days.
   pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **Slice and Dice and Combat Potency, for all three rogue specs** — a finisher that deals no damage
+  and buys 30% melee speed instead, bounded by energy, a 1-second global cooldown and the combo points
+  five fillers generate. Worth about a fifth to every rogue. Poisons are the remaining rogue gap.
 - **A hunter's pet, as a second attacker** — its own weapon, attack table and attack power, inheriting
   22% of the owner's ranged attack power and none of their crit, plus every Beast Mastery talent this model can express
   that scale it, plus Bite and Claw out of a focus bar spent in priority order, plus Kill Command.

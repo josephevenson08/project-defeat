@@ -132,6 +132,15 @@ import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
+import {
+  SLICE_AND_DICE_BASE_DURATIONS,
+  SLICE_AND_DICE_COMBO_POINTS,
+  SLICE_AND_DICE_ENERGY_COST,
+  SLICE_AND_DICE_GCD_SECONDS,
+  SLICE_AND_DICE_HASTE,
+  combatPotencyEnergyPerSecond,
+  estimateSliceAndDice,
+} from '../src/domain/simulation/sliceAndDice'
 
 /*
  * Gear editing moved into a popup, so a slot's controls only exist while its overlay is open. These
@@ -6003,6 +6012,108 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
     noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
     'no ranged weapon means no crits to open the window',
   ).toBe(false)
+})
+
+test('Slice and Dice is a finisher that deals no damage, and three ceilings decide whether it stays up', () => {
+  /*
+   * **A finisher that deals no damage at all**, which is why it fits nowhere in `SignatureAbility`:
+   * it spends 25 energy and five combo points to make the rogue swing 30% faster. The multiplier
+   * belongs in the white-damage swing rate beside gear haste and Flurry, not in the damage table.
+   */
+  expect(SLICE_AND_DICE_HASTE).toBe(1.3)
+  expect(SLICE_AND_DICE_ENERGY_COST).toBe(25)
+  // A one-second global cooldown, not the usual 1.5 — read off the cast config rather than assumed.
+  expect(SLICE_AND_DICE_GCD_SECONDS).toBe(1)
+  expect(SLICE_AND_DICE_BASE_DURATIONS[SLICE_AND_DICE_COMBO_POINTS]).toBe(21)
+
+  const plenty = {
+    durationMultiplier: 1,
+    energyRefundPerFinisher: 0,
+    energyPerSecond: 10,
+    gcdBudgetPerSecond: 1,
+    comboPointsPerSecond: 5,
+  }
+  expect(estimateSliceAndDice(plenty).uptime, 'affordable in every currency').toBeCloseTo(1, 10)
+  expect(estimateSliceAndDice(plenty).speedMultiplier).toBeCloseTo(SLICE_AND_DICE_HASTE, 10)
+
+  /*
+   * **Relentless Strikes makes it exactly free, and that is two constants cancelling rather than an
+   * approximation**: 25 energy handed back against a 25 energy cost. A rogue who has it pays only
+   * the global cooldown and the combo points.
+   */
+  expect(estimateSliceAndDice({ ...plenty, energyRefundPerFinisher: 25 }).netEnergyPerSecond).toBe(0)
+
+  /*
+   * **The combo-point ceiling is the one that actually binds**, which is why the model takes a
+   * generation rate at all. Starve the points and the uptime falls in proportion; starve the energy
+   * and it does the same. Asserted as sizes rather than directions, because a ceiling wired to the
+   * wrong term still moves the answer downward.
+   */
+  // A five-point refresh every 21s needs 5/21 combo points a second. Half that is half the uptime.
+  const pointsNeeded = SLICE_AND_DICE_COMBO_POINTS / SLICE_AND_DICE_BASE_DURATIONS[SLICE_AND_DICE_COMBO_POINTS]
+  const starvedPoints = estimateSliceAndDice({ ...plenty, comboPointsPerSecond: pointsNeeded / 2 })
+  expect(starvedPoints.uptime, 'half the points needed is half the uptime').toBeCloseTo(0.5, 10)
+  expect(
+    estimateSliceAndDice({ ...plenty, comboPointsPerSecond: pointsNeeded }).uptime,
+    'and exactly enough is exactly full',
+  ).toBeCloseTo(1, 10)
+  const starvedEnergy = estimateSliceAndDice({ ...plenty, energyPerSecond: 0.5 })
+  expect(starvedEnergy.uptime).toBeLessThan(1)
+  expect(starvedEnergy.uptime).toBeCloseTo(0.5 / SLICE_AND_DICE_ENERGY_COST / (1 / 21), 6)
+
+  // Improved Slice and Dice buys duration, so it buys uptime for a points-starved rogue.
+  expect(
+    estimateSliceAndDice({ ...plenty, comboPointsPerSecond: 0.5, durationMultiplier: 1.45 }).uptime,
+  ).toBeGreaterThan(starvedPoints.uptime)
+
+  /*
+   * **Combat Potency reads landed OFF-HAND hits and nothing else.** Upstream checks `Landed()` and
+   * then `ProcMaskMeleeOH`, citing the spell's own mask — so main-hand swings and specials return
+   * zero, and that is what makes the talent worth exactly what the off-hand swing rate is worth.
+   */
+  expect(combatPotencyEnergyPerSecond(2, 15)).toBeCloseTo(2 * 0.2 * 15, 10)
+  expect(combatPotencyEnergyPerSecond(2, 0), 'untalented returns nothing').toBe(0)
+
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const modifiers = deriveTalentModifiers({
+    [idOf('Rogue', 'Combat Potency')]: 5,
+    [idOf('Rogue', 'Improved Slice and Dice')]: 3,
+    [idOf('Rogue', 'Relentless Strikes')]: 1,
+  })
+  expect(modifiers.offHandEnergyPerProc, '3 energy a rank').toBe(15)
+  expect(modifiers.sliceAndDiceDurationMultiplier, '+15% duration a rank').toBeCloseTo(1.45, 10)
+  expect(modifiers.finisherEnergyRefund, 'flat 25, because it is a one-point talent').toBe(25)
+
+  /*
+   * **Mutilate grants two combo points where the other two fillers grant one**, and that one field
+   * is the difference between an Assassination rogue reading 70% Slice and Dice uptime and reading
+   * 100%. Read from `AddComboPoints` in each ability's own file upstream.
+   */
+  const cpOf = (spec: TbcSpec) =>
+    getRotationAbilities('Rogue', spec).find((ability) => ability.resource?.type === 'Energy')?.comboPointsPerUse
+  expect(cpOf('Assassination'), 'Mutilate').toBe(2)
+  expect(cpOf('Combat'), 'Sinister Strike').toBe(1)
+  expect(cpOf('Subtlety'), 'Hemorrhage').toBe(1)
+
+  /*
+   * End to end: every rogue holds it at 100%, which is what real rogues do, and it moves **white
+   * damage only**. The specials are bounded by energy and the global cooldown, neither of which
+   * melee haste touches — so a rogue swinging 30% faster presses exactly as many buttons. That is
+   * the assertion which would catch the multiplier being wired into the wrong term.
+   */
+  for (const spec of ['Combat', 'Assassination', 'Subtlety'] as const) {
+    const { result } = bestCaseSimulation('Rogue', spec, 'Physical DPS')
+    const uptime = result.breakdown.find((entry) => entry.label === 'Slice and Dice uptime')
+    expect(uptime, `${spec} reports its uptime`).toBeDefined()
+    expect(uptime!.value, `${spec} holds Slice and Dice up`).toBe(100)
+  }
+
+  // Nobody else gets it: a Fury warrior has no energy bar and no finishers.
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.breakdown.some((entry) => entry.label === 'Slice and Dice uptime')).toBe(false)
 })
 
 test('Frenzy is a refreshing aura, not a consumed stack, and it reaches the auto attack alone', () => {

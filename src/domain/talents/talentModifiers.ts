@@ -121,6 +121,19 @@ export type TalentModifiers = {
    * shared field would quietly erase.
    */
   petFrenzyProcChance: number
+  /*
+   * The three that make a rogue's energy economy, and none of them is a damage number.
+   *
+   * They are grouped because they only make sense together: Combat Potency buys energy, Relentless
+   * Strikes hands energy back on a finisher, and Improved Slice and Dice decides how often that
+   * finisher has to be pressed. See `sliceAndDice.ts` for how they combine.
+   */
+  /** Energy returned per Combat Potency proc — 3 a rank, at a 20% chance on landed off-hand hits. */
+  offHandEnergyPerProc: number
+  /** Energy handed back per finisher. Relentless Strikes, guaranteed at five combo points. */
+  finisherEnergyRefund: number
+  /** Multiplies Slice and Dice's duration. Improved Slice and Dice, +15% a rank. 1 when untalented. */
+  sliceAndDiceDurationMultiplier: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -203,6 +216,9 @@ export const noTalentModifiers: TalentModifiers = {
   petMeleeSpeedMultiplier: 1,
   petFocusRegenMultiplier: 1,
   petFrenzyProcChance: 0,
+  offHandEnergyPerProc: 0,
+  finisherEnergyRefund: 0,
+  sliceAndDiceDurationMultiplier: 1,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -243,6 +259,8 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   petCritChance: 'petCritChance',
   petHitChance: 'petHitChance',
   petFrenzyProcChance: 'petFrenzyProcChance',
+  offHandEnergyPerProc: 'offHandEnergyPerProc',
+  finisherEnergyRefund: 'finisherEnergyRefund',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
@@ -258,6 +276,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   petDamageMultiplier: 'petDamageMultiplier',
   petMeleeSpeedMultiplier: 'petMeleeSpeedMultiplier',
   petFocusRegenMultiplier: 'petFocusRegenMultiplier',
+  sliceAndDiceDurationMultiplier: 'sliceAndDiceDurationMultiplier',
 }
 
 /*

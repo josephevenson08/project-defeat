@@ -8,6 +8,7 @@
       "sim/warrior/dps/dps_warrior.go",
       "sim/warrior/berserker_rage.go",
       "sim/rogue/talents.go",
+      "sim/rogue/slice_and_dice.go",
       "sim/hunter/talents.go",
       "sim/hunter/pet.go",
       "sim/shaman/talents.go",
@@ -30,7 +31,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 70,
+  "effectCount": 73,
   "effects": [
     {
       "className": "Warrior",
@@ -306,6 +307,41 @@
       "perRank": 0.03,
       "stat": "agility",
       "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1825,
+      "talent": "Combat Potency",
+      "tree": "Combat",
+      "maxRank": 5,
+      "kind": "offHandEnergyPerProc",
+      "unit": "energy per proc per rank",
+      "perRank": 3,
+      "caveat": "A 20% chance on LANDED off-hand hits only. A miss or a dodge returns nothing, which matters before hit cap.",
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 281,
+      "talent": "Relentless Strikes",
+      "tree": "Assassination",
+      "maxRank": 1,
+      "kind": "finisherEnergyRefund",
+      "unit": "energy per finisher (flat, not per rank)",
+      "flatValue": 25,
+      "caveat": "Guaranteed at five combo points (upstream short-circuits on numPoints == 5), random below that. Modelled at five, which is the only refresh a raiding rogue uses.",
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 1827,
+      "talent": "Improved Slice and Dice",
+      "tree": "Combat",
+      "maxRank": 3,
+      "kind": "sliceAndDiceDurationMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.15,
+      "source": "sim/rogue/slice_and_dice.go"
     },
     {
       "className": "Hunter",
@@ -907,13 +943,8 @@
     },
     {
       "className": "Rogue",
-      "talent": "Combat Potency",
-      "reason": "Energy returned on off-hand hits. The energy budget is a flat 10/sec, with no income model to feed."
-    },
-    {
-      "className": "Rogue",
-      "talent": "Seal Fate / Ruthlessness / Relentless Strikes",
-      "reason": "Combo-point economy. There is no combo-point resource here at all."
+      "talent": "Seal Fate / Ruthlessness",
+      "reason": "Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do."
     },
     {
       "className": "Rogue",

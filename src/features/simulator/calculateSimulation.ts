@@ -33,6 +33,10 @@ import {
   hunterPetAttackPower,
   hunterPetCritChance,
 } from '../../domain/simulation/hunterPet'
+import {
+  combatPotencyEnergyPerSecond,
+  estimateSliceAndDice,
+} from '../../domain/simulation/sliceAndDice'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -354,6 +358,14 @@ type ResolvedRotation = {
 type MeleeSwingContext = {
   ragePerSecond: number
   mainHandSwingsPerSecond: number
+  /**
+   * Energy per second, which is **not** always the flat 10 the rogue-less path assumes.
+   *
+   * Combat Potency returns energy on landed off-hand hits, so a Combat rogue's income is higher than
+   * a Feral druid's — and the difference is what funds the filler rate that keeps Slice and Dice up.
+   * Carried rather than recomputed, because the branch has already derived it inside a fixed point.
+   */
+  energyPerSecond: number
   /** What one main-hand swing generates, so a swing-replacing ability can give it back. */
   ragePerMainHandSwing: number
   /** Expected damage of the main-hand swing a replacement displaces, after the white attack table. */
@@ -449,7 +461,7 @@ function resolveRotation(
   const specials: ResolvedSpecial[] = []
   const excluded: ResolvedRotation['excluded'] = []
   let gcdBudget = 1 / (abilities[0]?.gcdSeconds || 1.5)
-  let energyBudget = ENERGY_PER_SECOND
+  let energyBudget = melee?.energyPerSecond ?? ENERGY_PER_SECOND
   // A third shared budget, and the one that was missing. Cooldown abilities spend from it in
   // priority order and whatever survives funds the dump at the bottom of the list.
   let rageBudget = melee?.ragePerSecond ?? 0
@@ -733,6 +745,9 @@ function calculatePhysicalDps(
    * carries the tables forward rather than deriving them twice, which is the same reason
    * `MeleeSwingContext` exists.
    */
+  /* Reported after the branch, so the readout can say where a rogue's 30% melee speed came from. */
+  let sliceAndDiceReport: { uptime: number; durationSeconds: number; combatPotencyEnergy: number } | undefined
+
   let petContext:
     | {
         attackTableMultiplier: number
@@ -865,7 +880,66 @@ function calculatePhysicalDps(
      * because crit suppression against a higher-level target is real: a crit that never happens
      * cannot refresh a stack, and using the raw figure would overstate the uptime.
      */
-    const attackSpeedMultiplier = gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit)
+    /*
+     * **Slice and Dice, and the fixed point the architecture report predicted.**
+     *
+     * The loop is real: Slice and Dice speeds both hands, faster off-hand swings mean more Combat
+     * Potency procs, more energy means a higher filler rate, and a higher filler rate means the combo
+     * points to refresh Slice and Dice. Substituting gives an equation with the multiplier on both
+     * sides, so it is iterated — three passes, matching Frenzy and the report's own recommendation.
+     *
+     * **The combo-point ceiling is the one that can actually bind**, which is why the filler's rate
+     * is derived here rather than assumed. A Combat rogue without Improved Slice and Dice needs a
+     * five-point finisher every 21 seconds — 0.24 combo points a second — against roughly 0.22 from
+     * a 45-energy filler on a bare 10 energy a second. Combat Potency is what closes that gap, and
+     * the two talents are in the same tree for that reason.
+     *
+     * The points a use grants are read from the ability rather than assumed to be one, because
+     * **Mutilate grants two**. Assuming one read an Assassination rogue at 70% Slice and Dice uptime
+     * against a real 100% — a visible number, wrong for a reason that is one field wide.
+     */
+    const filler = getRotationAbilities(character.className, character.spec).find(
+      (ability) => ability.resource?.type === 'Energy' && ability.resource.cost > 0,
+    )
+    const fillerEnergyCost = filler?.resource?.cost ?? 0
+    const landedShare = Math.max(0, fullTable.hit + fullTable.crit + fullTable.glance + fullTable.block)
+
+    let sliceAndDice: ReturnType<typeof estimateSliceAndDice> | undefined
+    let energyPerSecond = ENERGY_PER_SECOND
+    let combatPotencyEnergy = 0
+    let sliceAndDiceSpeed = 1
+
+    if (character.className === 'Rogue') {
+      for (let pass = 0; pass < 3; pass += 1) {
+        const speed =
+          gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit) * sliceAndDiceSpeed
+        const offHandSwings = dualWield && offHandItem?.weaponSpeed ? speed / offHandItem.weaponSpeed : 0
+        combatPotencyEnergy = combatPotencyEnergyPerSecond(offHandSwings * landedShare, talents.offHandEnergyPerProc)
+        energyPerSecond = ENERGY_PER_SECOND + combatPotencyEnergy
+
+        sliceAndDice = estimateSliceAndDice({
+          durationMultiplier: talents.sliceAndDiceDurationMultiplier,
+          energyRefundPerFinisher: talents.finisherEnergyRefund,
+          energyPerSecond,
+          // Its own global cooldown is 1s and `IgnoreHaste`, so the budget is one per second minus
+          // what the filler already spends.
+          gcdBudgetPerSecond: Math.max(0, 1 - (fillerEnergyCost > 0 ? energyPerSecond / fillerEnergyCost : 0)),
+          comboPointsPerSecond:
+            fillerEnergyCost > 0 ? (energyPerSecond / fillerEnergyCost) * (filler?.comboPointsPerUse ?? 0) : 0,
+        })
+        sliceAndDiceSpeed = sliceAndDice.speedMultiplier
+      }
+      if (sliceAndDice) {
+        sliceAndDiceReport = {
+          uptime: sliceAndDice.uptime,
+          durationSeconds: sliceAndDice.durationSeconds,
+          combatPotencyEnergy,
+        }
+      }
+    }
+
+    const attackSpeedMultiplier =
+      gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit) * sliceAndDiceSpeed
     const glanceRange = computeGlanceDamageRange(skillDiff)
     const avgGlanceMultiplier = (glanceRange.low + glanceRange.high) / 2
     const effectiveMultiplier =
@@ -1059,6 +1133,7 @@ function calculatePhysicalDps(
       meleeContext = {
         ragePerSecond,
         mainHandSwingsPerSecond,
+        energyPerSecond,
         ragePerMainHandSwing: rageFromOneSwing(mainHandRageInput),
         // Pre-armor, matching every other special's DPS, since mitigation is applied once at the end.
         displacedSwingDamage: mainHandSwingDamage * effectiveMultiplier,
@@ -1214,6 +1289,20 @@ function calculatePhysicalDps(
   )
   if (spendsRage && rotation.ragePerSecond !== undefined && rotation.ragePerSecond > 0) {
     breakdown.push({ label: 'Rage per second', value: round(rotation.ragePerSecond) })
+  }
+
+  /*
+   * Slice and Dice as an uptime, and the energy that pays for it, for the same reason the pet's focus
+   * income is shown: the buff is worth 30% melee speed and nothing else on screen would say where it
+   * came from. The Combat Potency row is separate because it explains why the filler rate is what it
+   * is — and because a rogue who has one talent and not the other should be able to see which.
+   */
+  if (sliceAndDiceReport) {
+    breakdown.push({ label: 'Slice and Dice uptime', value: toPercent(sliceAndDiceReport.uptime) })
+    breakdown.push({ label: 'Slice and Dice duration', value: round(sliceAndDiceReport.durationSeconds) })
+    if (sliceAndDiceReport.combatPotencyEnergy > 0) {
+      breakdown.push({ label: 'Combat Potency energy per second', value: round(sliceAndDiceReport.combatPotencyEnergy) })
+    }
   }
 
   /*

@@ -58,7 +58,7 @@ It has happened three times: 33 sourced raid buffs reaching no number because no
 
 ## Coverage is not completeness, and the refusal count goes next to it
 
-Talents reach 27 of 27 specs *and* 44 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
+Talents reach 27 of 27 specs *and* 43 talent groups are refused by name, each with a reason. Quoting only the first figure would be true and misleading. Every ingest in this repo reports what it skipped, and the surfaces that quote a coverage number quote the refusal beside it — computed from the data, because the version of this note that wrote the number down was stale within a day of the ingest changing.
 
 ## Verify before correcting, even when the data looks obviously wrong
 

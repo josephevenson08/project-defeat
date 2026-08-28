@@ -5,6 +5,75 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, stage 3 begins with the rogue)
+
+**Slice and Dice and Combat Potency, and every rogue spec gained about a fifth.** This is the top of
+the architecture report's leverage order, and it is the first work in this project on a spec other
+than the hunter in a while.
+
+    Rogue Combat          846 -> 1033   (2.0x -> 1.7x)
+    Rogue Assassination   867 -> 1050   (1.6x -> 1.3x)
+    Rogue Subtlety        960 -> 1160   (1.3x -> 1.1x)
+
+### Slice and Dice is a finisher that deals no damage
+
+Which is why it fits nowhere in `SignatureAbility`: it spends 25 energy and five combo points to make
+the rogue swing **30% faster**. The ability schema describes things that hit; this changes how often
+everything else does. It lives in `domain/simulation/sliceAndDice.ts` for the same reason
+`weaponImbues.ts` exists — a buff folded into white damage rather than layered on top.
+
+**Three ceilings, and the combo-point one is the interesting one.** A refresh needs energy, a global
+cooldown (**1 second, not 1.5**, and `IgnoreHaste`), and five combo points. The points are what can
+actually bind, because five points is five fillers and the filler's own rate is energy-bound.
+
+**Relentless Strikes makes it exactly free**, and that is two constants cancelling rather than an
+approximation: it hands back 25 energy against a 25 energy cost. A talented rogue pays only the
+global cooldown and the points, which is why the buff sits at 100% without visibly costing anything.
+
+### The fixed point the architecture report predicted is real
+
+Slice and Dice speeds both hands → faster off-hand swings → more Combat Potency procs → more energy →
+a higher filler rate → the combo points to refresh Slice and Dice. Iterated in three passes, the same
+treatment Frenzy got.
+
+**Combat Potency reads landed off-hand hits and nothing else** — upstream checks `Landed()` and then
+`ProcMaskMeleeOH`, citing the spell's own mask of 8838608. Main-hand swings and specials return zero,
+which is exactly why the talent is worth what the off-hand swing rate is worth, and why it and
+Improved Slice and Dice sit in the same tree.
+
+### One field was worth 30 percentage points of uptime
+
+Assuming one combo point per filler read an Assassination rogue at **70%** Slice and Dice uptime
+against a real 100%, because **Mutilate grants two**. `SignatureAbility` gained `comboPointsPerUse`,
+read from `AddComboPoints` in each ability's own upstream file — Mutilate 2, Sinister Strike 1,
+Hemorrhage 1. Assassination went 987 → 1050 on that one field.
+
+**And my recollection of which tree holds what was wrong**, which is worth recording because the repo
+already has a rule about it. I expected Improved Slice and Dice in Assassination; the ingested
+Wowhead data puts it in **Combat**, row 1. The ingest won, as it has every previous time this project
+has tested curated memory against sourced data.
+
+### The line-ending trap fired again
+
+`abilityTypes.ts` is `w/crlf` while `signatureAbilitiesRogue.ts` is `w/lf`, in the same directory. A
+scripted edit matching `...Cost\n` found nothing in the first and reported success. `git ls-files
+--eol` before the edit is the rule, and it is the rule because this keeps happening.
+
+### What is left in stage 3
+
+1. **Poisons** — Instant (26891, 146-194, 20%+2%/rank proc) and Deadly (27186, 30%+2%/rank, a 4-tick
+   12s DoT stacking to 5 at 180/4 a tick). Both **Nature damage**, so they are unmitigated by armour
+   and take the same care Retribution's Holy damage needed. Both are sourced in
+   `sim_rogue_poisons.go`, already cached. The open question is which poison sits on which hand:
+   upstream reads `Consumes.MainHandImbue`, and this app has no weapon-imbue slot — the same gap
+   Windfury Weapon already names.
+2. **Weapon-enchant and damage procs** — 0 of 91 enchants carry a proc effect, and Mongoose is the
+   recommended main-hand for three specs.
+3. **Windfury Totem, Expose Weakness, Deep Wounds, Elemental Weapons.**
+4. **Spell school**, which blocks four separate things and would also settle where poisons belong.
+
+---
+
 ## Start here (2026-08-27, and the pet is finished)
 
 **Frenzy and Focused Fire land, and that closes the hunter pet.** Beast Mastery **1500 → 1565**, a

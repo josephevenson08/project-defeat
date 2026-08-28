@@ -203,6 +203,10 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   effects this sentence used to name alongside them — Toughness, Vitality, Divine Strength — stopped
   being refused on 2026-08-21 when talents reached `calculateStats`, and a test now fails if any
   refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
+- **Slice and Dice is modelled for every rogue.** It deals no damage — it spends energy and combo
+  points to buy 30% melee speed, which lands in the white-damage swing rate. Combat Potency feeds the
+  energy that pays for it, off landed off-hand hits only. Rogue poisons are still missing, and they
+  are Nature damage rather than physical.
 - **A hunter's pet swings, and presses three buttons.** Its auto attack is modelled — its own weapon
   and attack table, 22% of the owner's ranged attack power, no inherited crit — along with every Beast
   Mastery talent this model can express, a focus bar spent on Bite and Claw, and Kill Command. Whether

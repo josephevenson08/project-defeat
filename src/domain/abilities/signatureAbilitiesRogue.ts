@@ -10,6 +10,7 @@ export const rogueSignatureAbilities: readonly SignatureAbility[] = [
     effectType: 'Melee Special',
     castTimeSeconds: 0,
     gcdSeconds: 1.0,
+    comboPointsPerUse: 2,
     resource: { type: 'Energy', cost: 60 },
     scaling: {
       basis: 'weapon damage',
@@ -33,6 +34,7 @@ export const rogueSignatureAbilities: readonly SignatureAbility[] = [
     effectType: 'Melee Special',
     castTimeSeconds: 0,
     gcdSeconds: 1.0,
+    comboPointsPerUse: 1,
     resource: { type: 'Energy', cost: 45, note: 'reduced to 42/40 by Improved Sinister Strike' },
     scaling: {
       basis: 'weapon damage',
@@ -55,6 +57,7 @@ export const rogueSignatureAbilities: readonly SignatureAbility[] = [
     effectType: 'Melee Special',
     castTimeSeconds: 0,
     gcdSeconds: 1.0,
+    comboPointsPerUse: 1,
     resource: { type: 'Energy', cost: 35 },
     scaling: {
       basis: 'weapon damage',

@@ -238,7 +238,11 @@ const WARRIOR_SKIPPED = [
   ['Shield Mastery', 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
 ]
 
-const ROGUE_SOURCES = [{ path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' }]
+const ROGUE_SOURCES = [
+  { path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' },
+  // Improved Slice and Dice is applied where the buff is registered, not with the other talents.
+  { path: 'sim/rogue/slice_and_dice.go', cache: 'sim_rogue_slice_and_dice.go' },
+]
 
 /*
  * Rogue. Every value here lands on a field Warrior already established, which is the point: adding a
@@ -306,11 +310,47 @@ const ROGUE_STAT_EXTRACTORS = [
   },
 ]
 
+const ROGUE_ENERGY_EXTRACTORS = [
+  {
+    /*
+     * The proc mask is what makes this worth a field of its own: upstream checks `ProcMaskMeleeOH`,
+     * citing the spell's own mask of 8838608, so main-hand swings and specials return nothing. The
+     * talent is therefore worth exactly what the off-hand swing rate is worth — which Slice and Dice
+     * raises by 30%, and which is the whole reason these three are ingested together.
+     */
+    talent: 'Combat Potency',
+    kind: 'offHandEnergyPerProc',
+    unit: 'energy per proc per rank',
+    re: /energyBonus := ([\d.]+) \* float64\(rogue\.Talents\.CombatPotency\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'A 20% chance on LANDED off-hand hits only. A miss or a dodge returns nothing, which matters before hit cap.',
+  },
+  {
+    /*
+     * A boolean talent, so the value is flat rather than per rank. Anchored on the metrics variable
+     * name, which is the only thing tying this AddEnergy call to the talent that owns it.
+     */
+    talent: 'Relentless Strikes',
+    kind: 'finisherEnergyRefund',
+    unit: 'energy per finisher (flat, not per rank)',
+    re: /rogue\.AddEnergy\(sim, (\d+), relentlessStrikesMetrics\)/,
+    value: (m) => Number(m[1]),
+    flat: true,
+    caveat: 'Guaranteed at five combo points (upstream short-circuits on numPoints == 5), random below that. Modelled at five, which is the only refresh a raiding rogue uses.',
+  },
+  {
+    talent: 'Improved Slice and Dice',
+    kind: 'sliceAndDiceDurationMultiplier',
+    unit: 'fraction per rank',
+    re: /durationMultiplier := 1\.0 \+ ([\d.]+)\*float64\(rogue\.Talents\.ImprovedSliceAndDice\)/,
+    value: (m) => Number(m[1]),
+  },
+]
+
 const ROGUE_SKIPPED = [
   ['Murder', 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
   ['Serrated Blades', 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
-  ['Combat Potency', 'Energy returned on off-hand hits. The energy budget is a flat 10/sec, with no income model to feed.'],
-  ['Seal Fate / Ruthlessness / Relentless Strikes', 'Combo-point economy. There is no combo-point resource here at all.'],
+  ['Seal Fate / Ruthlessness', 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
   ['Adrenaline Rush / Blade Flurry / Cold Blood', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
 ]
 
@@ -858,7 +898,7 @@ const WARLOCK_SKIPPED = [
 
 const CLASSES = [
   { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: [...WARRIOR_EXTRACTORS, ...WARRIOR_STAT_EXTRACTORS], skipped: WARRIOR_SKIPPED },
-  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS], skipped: ROGUE_SKIPPED },
+  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS], skipped: ROGUE_SKIPPED },
   { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
   { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS], skipped: DRUID_SKIPPED },
