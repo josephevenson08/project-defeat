@@ -38,6 +38,7 @@ import {
   estimateSliceAndDice,
 } from '../../domain/simulation/sliceAndDice'
 import { estimateRoguePoisons } from '../../domain/simulation/roguePoisons'
+import { estimateFeralBleeds } from '../../domain/simulation/feralBleeds'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -750,6 +751,8 @@ function calculatePhysicalDps(
   let sliceAndDiceReport: { uptime: number; durationSeconds: number; combatPotencyEnergy: number } | undefined
   /* Nature damage, so it rides the unmitigated path beside Retribution's seals rather than the armour one. */
   let roguePoisons: ReturnType<typeof estimateRoguePoisons> | undefined
+  /* Rake and Rip. The ticks ignore armour, so they ride the unmitigated path; Rake's opener does not. */
+  let feralBleeds: ReturnType<typeof estimateFeralBleeds> | undefined
 
   let petContext:
     | {
@@ -963,6 +966,28 @@ function calculatePhysicalDps(
         spellCritMultiplier: SPELL_CRIT_DAMAGE_MULTIPLIER,
         bonusProcChance: talents.poisonProcChance,
         damageMultiplier: talents.poisonDamageMultiplier,
+      })
+    }
+
+    /*
+     * **Feral's bleeds, which ignore armour on their ticks and not on Rake's opener.**
+     *
+     * They are maintained rather than spammed — one cast per duration, because refreshing a bleed
+     * early throws the remainder away — and the energy they take is subtracted from the filler's
+     * budget rather than assumed free. That is the trade `ROTATION-SCOPE.md` warns about made
+     * explicit: what makes these worth it where Mangle was not is that Shred loses a quarter to
+     * armour and a bleed tick loses none.
+     */
+    if (usesCatFormWeapon(character.className, character.spec)) {
+      const bleedCombo = fillerEnergyCost > 0 ? (ENERGY_PER_SECOND / fillerEnergyCost) * (filler?.comboPointsPerUse ?? 0) : 0
+      feralBleeds = estimateFeralBleeds({
+        attackPower,
+        specialAttackTableMultiplier:
+          fullTable.hit + fullTable.block + fullTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER,
+        armorMitigation,
+        energyPerSecond: ENERGY_PER_SECOND,
+        comboPointsPerSecond: bleedCombo,
+        rakeCostReduction: talents.rakeEnergyCostReduction,
       })
     }
 
@@ -1251,7 +1276,12 @@ function calculatePhysicalDps(
    * physical and the distinction could not arise; folding Holy damage into `rawDps` would have
    * quietly shaved a third off it against a raid boss.
    */
-  const unmitigatedDps = (paladinHoly?.totalDps ?? 0) + (roguePoisons?.totalDps ?? 0)
+  /*
+   * `feralBleeds` has already applied armour to the one half that takes it — Rake's opener — so it
+   * joins here rather than on the mitigated side. Sending it through the armour term again would
+   * double-mitigate the opener and wrongly mitigate every tick.
+   */
+  const unmitigatedDps = (paladinHoly?.totalDps ?? 0) + (roguePoisons?.totalDps ?? 0) + (feralBleeds?.totalDps ?? 0)
   /*
    * A buff damage multiplier scales everything, physical and Holy alike — Ferocious Inspiration is
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
@@ -1291,6 +1321,10 @@ function calculatePhysicalDps(
   }
   if (killCommand && killCommand.dps > 0) {
     sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * damageMultiplier })
+  }
+  if (feralBleeds) {
+    if (feralBleeds.rakeDps > 0) sources.push({ name: 'Rake', dps: feralBleeds.rakeDps * damageMultiplier })
+    if (feralBleeds.ripDps > 0) sources.push({ name: 'Rip', dps: feralBleeds.ripDps * damageMultiplier })
   }
   if (roguePoisons) {
     if (roguePoisons.instantDps > 0) {
@@ -1333,6 +1367,11 @@ function calculatePhysicalDps(
    * came from. The Combat Potency row is separate because it explains why the filler rate is what it
    * is — and because a rogue who has one talent and not the other should be able to see which.
    */
+  if (feralBleeds && feralBleeds.totalDps > 0) {
+    breakdown.push({ label: 'Rake uptime', value: toPercent(feralBleeds.rakeUptime) })
+    breakdown.push({ label: 'Rip uptime', value: toPercent(feralBleeds.ripUptime) })
+    breakdown.push({ label: 'Bleed energy per second', value: round(feralBleeds.energyPerSecond) })
+  }
   if (roguePoisons && roguePoisons.totalDps > 0) {
     breakdown.push({ label: 'Deadly Poison stacks', value: round(roguePoisons.deadlyStacks) })
     breakdown.push({ label: 'Instant Poison procs per minute', value: round(roguePoisons.instantProcsPerSecond * 60) })

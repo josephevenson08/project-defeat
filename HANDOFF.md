@@ -5,6 +5,98 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, Feral bleeds and a new worst spec)
+
+**Rake and Rip land, and Feral stops being the outlier.** 728 → 879, a 2.3x → **1.9x** ratio.
+
+### Bleeds ignore armor, and upstream says so in a comment
+
+`sim/core/spell_resistances.go`:
+
+```go
+if spell.SpellSchool.Matches(SpellSchoolPhysical) {
+    // All physical dots (Bleeds) ignore armor.
+    if spellEffect.IsPeriodic { return }
+    spellEffect.Damage *= attackTable.ArmorDamageReduction
+}
+```
+
+Worth about **26% of every tick** against this app's 7,700-armour target, and getting it wrong would
+have been silent. It took four fetches to find — armour is applied in `applyResistances`, not in the
+outcome applier or the damage calculator where you would look first — and it was worth every one,
+because the alternative was recalling it.
+
+**Rake's opening hit is not periodic, so it takes armour while its own ticks do not.** A split inside
+one ability, which is why `estimateFeralBleeds` returns the halves separately and the test asserts
+the loss from armour is *exactly* the opener.
+
+**Rip's opening cast deals nothing at all** — `OutcomeFuncMeleeSpecialHit()` with no base damage. The
+cast exists only to apply the dot and spend the points, so all of Rip is six ticks that ignore armour.
+
+### A bleed is not priced like a special
+
+A special's rate is how often you can afford it; **a bleed's is how often it falls off**, because
+refreshing early throws the remainder away. So each is modelled at one cast per its own duration, and
+the ceilings decide whether even that is affordable — which for Rip means combo points as well as
+energy, since it is a finisher.
+
+They compete with Shred for the same energy, which is the trade `ROTATION-SCOPE.md` already warns
+about. **What makes these worth it where Mangle was not is the armour split**: Shred loses a quarter
+to armour and a bleed tick loses none, so a bleed's effective return per energy beats its raw one.
+
+### Two things this pass got wrong first
+
+- **The bleed block was nested inside the rogue branch.** I anchored the insertion to a comment that
+  happened to sit inside `if (className === 'Rogue')`, so it never ran for a druid — and the symptom
+  was Feral reading *exactly* unchanged, which is a much better failure than reading slightly wrong.
+- **Shred had no combo-point value**, so Rip was unaffordable and silently sat at zero uptime. One
+  point a cast, read from `AddComboPoints` in `shred.go` rather than assumed.
+
+### Ferocity is a fourth shared talent name, and the sharpest yet
+
+**Hunter's Ferocity grants the pet crit; Druid's discounts Rake by one energy a rank.** Same name,
+different classes, unrelated effects. They cannot collide because effects are keyed by talent id and
+every extractor is cross-checked against its own class's tree — the same protection Precision, Weapon
+Mastery and Dual Wield Specialization already rely on. A test asserts both directions.
+
+### The worst spec is Warlock Demonology now, at 2.15x
+
+Feral improving pushed the calibration's upper bracket, so `featureFlags.ts` was rewritten for the
+**fourth** time the bracket has forced. The range is now **1.05x to 2.15x**.
+
+And what Demonology is missing is the same thing the hunter was: **a pet**. Its demon is unmodelled,
+which is why Master Demonologist is still refused with "No pet model here" — now the one place that
+phrase is still true. The hunter pet work is a fairly direct template for it.
+
+### What is left in stage 3
+
+1. **Mangle**, whose prerequisite is now met — its `PeriodicPhysicalDamageTakenMultiplier *= 1.3` has
+   two bleeds to multiply at last. The existing test's measurement still holds (Shred returns more per
+   energy than Mangle *directly*); whether the 30% on two bleeds pays that back is the open question,
+   and the test comment says so rather than being deleted.
+2. **Weapon-enchant and damage procs** — 0 of 91 enchants carry one; Mongoose is the recommended
+   main-hand for three specs.
+3. **Warlock's demon**, now the largest single gap in the table — and **already sourced**, so the next
+   session can start building rather than fetching. `sim/warlock/pet.go` and `pet_abilities.go` are
+   cached. What it says:
+
+   - **The inheritance is from spell power, not attack power**, which is the one structural difference
+     from the hunter: `AttackPower = (SpellPower + ShadowSpellPower) * 0.57` and
+     `SpellPower = same * 0.15`, plus Stamina 0.3, Intellect 0.3, Armor 0.35. So a demon scales off
+     the caster stat its owner already has, and the existing `hunterPet.ts` shape transfers almost
+     directly.
+   - **Three demons, and the spec decides which.** Felguard (Demonology) is melee — an 83.4-123.4
+     weapon on a 2.0s swing, base AP 20 / Str 153 / Agi 108, Cleave and Intercept. Succubus is melee
+     with Lash of Pain. Imp is a caster with Firebolt. Each carries its own base `stats.Stats` block.
+   - **There is no family damage multiplier.** Both `PetConfig.DamageMultiplier` and the line that
+     would apply it are **commented out** upstream — so unlike the hunter pet, nothing here needs the
+     assumed-family treatment. Worth knowing before someone copies that part across.
+   - The blocker is the same one the hunter had before 2026-08-23: `calculateCasterDps` has no pet
+     concept at all, exactly as `calculatePhysicalDps` did not.
+4. **Windfury Totem, Expose Weakness, Deep Wounds, Elemental Weapons**, and **spell school**.
+
+---
+
 ## Start here (2026-08-27, poisons close the rogue)
 
 **The three that make a rogue a rogue are all in.** Poisons are the second unmitigated damage source

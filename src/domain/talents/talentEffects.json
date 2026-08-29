@@ -14,6 +14,7 @@
       "sim/hunter/pet.go",
       "sim/shaman/talents.go",
       "sim/druid/talents.go",
+      "sim/druid/rake.go",
       "sim/paladin/talents.go",
       "sim/mage/talents.go",
       "sim/priest/talents.go",
@@ -32,7 +33,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 76,
+  "effectCount": 77,
   "effects": [
     {
       "className": "Warrior",
@@ -680,6 +681,18 @@
       "perRank": 0.03333333333333333,
       "caveat": "Cat/caster form rate. Bear form is 5x this upstream, and this app does not model bear.",
       "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 796,
+      "talent": "Ferocity",
+      "tree": "Feral",
+      "maxRank": 5,
+      "kind": "rakeEnergyCostReduction",
+      "unit": "energy per rank",
+      "perRank": 1,
+      "caveat": "Upstream writes a bare subtraction with no coefficient, which means one energy a rank. Also discounts Claw, which this model does not have.",
+      "source": "sim/druid/rake.go"
     },
     {
       "className": "Paladin",

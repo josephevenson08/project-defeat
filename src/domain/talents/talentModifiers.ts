@@ -147,6 +147,16 @@ export type TalentModifiers = {
    */
   poisonSpellHitChance: number
   /**
+   * Energy taken off Rake's cost. The **Druid's** Ferocity, one energy a rank.
+   *
+   * A fourth shared talent name, and the sharpest one yet: Hunter's Ferocity grants the pet crit
+   * where Druid's discounts an ability. They land on completely different fields and cannot be
+   * confused, because effects are keyed by talent id and every extractor is cross-checked against
+   * its own class's tree — which is the only reason Precision, Weapon Mastery, Dual Wield
+   * Specialization and now Ferocity do not contaminate each other.
+   */
+  rakeEnergyCostReduction: number
+  /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
    * Skill points rather than rating: the table divides rating by a constant to get points anyway, and
@@ -234,6 +244,7 @@ export const noTalentModifiers: TalentModifiers = {
   poisonProcChance: 0,
   poisonDamageMultiplier: 1,
   poisonSpellHitChance: 0,
+  rakeEnergyCostReduction: 0,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -278,6 +289,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   finisherEnergyRefund: 'finisherEnergyRefund',
   poisonProcChance: 'poisonProcChance',
   poisonSpellHitChance: 'poisonSpellHitChance',
+  rakeEnergyCostReduction: 'rakeEnergyCostReduction',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {

@@ -148,6 +148,7 @@ import {
   INSTANT_POISON_HAND,
   estimateRoguePoisons,
 } from '../src/domain/simulation/roguePoisons'
+import { RAKE, RIP, estimateFeralBleeds } from '../src/domain/simulation/feralBleeds'
 
 /*
  * Gear editing moved into a popup, so a slot's controls only exist while its overlay is open. These
@@ -4626,8 +4627,15 @@ test('a second energy ability would cost a cat more than it pays, until a bleed 
    * is direct damage and is not multiplied by it. The "Shred and Ravage" wording people remember is
    * from a later expansion.
    *
-   * So Rake is the prerequisite rather than the sibling: with no bleed modelled, Mangle's debuff
-   * multiplies nothing at all.
+   * So Rake was the prerequisite rather than the sibling.
+   *
+   * **That prerequisite is met now**, and this comment is kept rather than deleted because the
+   * conclusion it reached has changed while the measurement it made has not. Rake and Rip landed on
+   * 2026-08-27, so Mangle's debuff finally has periodic physical damage to multiply — the reason it
+   * was refused is gone. What is asserted below still holds and is still worth holding: Shred returns
+   * more damage per point of energy than Mangle does *directly*. Whether the 30% on two bleeds now
+   * pays that difference back is an open question and the next piece of Feral work, not something
+   * this test answers.
    */
   const shred = getRotationAbilities('Druid', 'Feral').find((ability) => ability.name === 'Shred')!
   expect(shred.resource?.type).toBe('Energy')
@@ -5219,8 +5227,8 @@ test('every DPS spec is measured against what players actually parse', () => {
    */
   expect(best, 'featureFlags.ts claims the best spec is around 1.05x').toBeGreaterThan(1.02)
   expect(best).toBeLessThan(1.1)
-  expect(worst, 'featureFlags.ts claims the worst spec is around 2.3x').toBeGreaterThan(2.2)
-  expect(worst).toBeLessThan(2.4)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 2.15x').toBeGreaterThan(2.05)
+  expect(worst).toBeLessThan(2.25)
 })
 
 test('a multiplier on a derived stat is applied after the stat is derived', () => {
@@ -6019,6 +6027,92 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
     noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
     'no ranged weapon means no crits to open the window',
   ).toBe(false)
+})
+
+test('bleeds ignore armor, and Rake’s opener does not', () => {
+  /*
+   * **The fact this whole piece turns on, and upstream states it in a comment rather than leaving it
+   * to be inferred** — `sim/core/spell_resistances.go`:
+   *
+   *     if spell.SpellSchool.Matches(SpellSchoolPhysical) {
+   *         // All physical dots (Bleeds) ignore armor.
+   *         if spellEffect.IsPeriodic { return }
+   *         spellEffect.Damage *= attackTable.ArmorDamageReduction
+   *     }
+   *
+   * Worth about 26% of every tick against this app's 7,700-armour target. **Rake's opening hit is not
+   * periodic**, so it takes armour while its own ticks do not — a split inside one ability, and the
+   * reason the module returns the halves separately.
+   */
+  const base = {
+    attackPower: 2000,
+    specialAttackTableMultiplier: 1,
+    armorMitigation: 0,
+    energyPerSecond: 10,
+    comboPointsPerSecond: 5,
+    rakeCostReduction: 0,
+  }
+
+  const soft = estimateFeralBleeds(base)
+  const hard = estimateFeralBleeds({ ...base, armorMitigation: 0.5 })
+
+  expect(hard.ripDps, 'Rip is all ticks, so armor cannot touch it').toBeCloseTo(soft.ripDps, 10)
+  expect(hard.rakeDps, 'Rake loses only its opener to armor').toBeLessThan(soft.rakeDps)
+
+  /*
+   * And the size of that loss is exactly the opener, which is the assertion that would catch the
+   * ticks being mitigated too: half the armour takes half the opener and nothing else.
+   */
+  const opener = RAKE.initialFlat + RAKE.initialAttackPowerCoefficient * base.attackPower
+  const rakeCasts = 1 / (RAKE.ticks * RAKE.tickSeconds)
+  expect(soft.rakeDps - hard.rakeDps).toBeCloseTo(rakeCasts * opener * 0.5, 6)
+
+  /*
+   * **Rip's opening cast deals nothing at all.** Upstream gives it `OutcomeFuncMeleeSpecialHit()`
+   * with no base damage — the cast exists only to apply the dot and spend the points. So Rip's whole
+   * damage is six ticks of `(1554 + 0.24 * AP) / 6`, which is that total over its 12 seconds.
+   */
+  const ripTotal = RIP.byComboPoints[5].flat + RIP.byComboPoints[5].attackPowerCoefficient * base.attackPower
+  expect(soft.ripDps).toBeCloseTo(ripTotal / (RIP.ticks * RIP.tickSeconds), 6)
+
+  /*
+   * **Rip is a finisher, so combo points are a real ceiling** — and Rake is kept first when either
+   * currency runs short, which is both the cheaper choice and the priority every Feral guide gives.
+   */
+  const noPoints = estimateFeralBleeds({ ...base, comboPointsPerSecond: 0 })
+  expect(noPoints.ripUptime, 'no combo points, no Rip').toBe(0)
+  expect(noPoints.rakeUptime, 'but Rake needs none').toBeCloseTo(1, 10)
+
+  const starved = estimateFeralBleeds({ ...base, energyPerSecond: 2 })
+  expect(starved.rakeUptime, 'Rake is maintained first out of a thin budget').toBeGreaterThan(starved.ripUptime)
+
+  // Ferocity is the DRUID talent of that name — one energy off Rake, not the hunter's pet crit.
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const druidFerocity = deriveTalentModifiers({ [idOf('Druid', 'Ferocity')]: 5 })
+  expect(druidFerocity.rakeEnergyCostReduction, 'one energy a rank').toBe(5)
+  expect(druidFerocity.petCritChance, "and none of the hunter's Ferocity").toBe(0)
+  expect(deriveTalentModifiers({ [idOf('Hunter', 'Ferocity')]: 5 }).rakeEnergyCostReduction).toBe(0)
+
+  /*
+   * End to end: both bleeds are their own damage rows, and only a Feral druid has them. Shred needed
+   * a combo-point value for Rip to be affordable at all — one point a cast, read from upstream.
+   */
+  const { result } = bestCaseSimulation('Druid', 'Feral', 'Physical DPS')
+  for (const name of ['Rake', 'Rip']) {
+    expect(
+      result.damageSources?.some((source) => source.name === name),
+      `${name} is its own row`,
+    ).toBe(true)
+  }
+  expect(
+    getRotationAbilities('Druid', 'Feral').find((ability) => ability.name === 'Shred')?.comboPointsPerUse,
+  ).toBe(1)
+
+  const fury: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const furyGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  const furyResult = calculateSimulation(fury, furyGear, calculateStats(fury, furyGear), 'Physical DPS')
+  expect(furyResult.damageSources?.some((source) => source.name === 'Rake' || source.name === 'Rip')).toBe(false)
 })
 
 test('rogue poisons are Nature damage on the spell table, so armor does not touch them', () => {

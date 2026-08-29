@@ -182,6 +182,9 @@ each pinned by an assertion these days.
   pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **Feral's bleeds, Rake and Rip** — maintained at one cast per duration rather than spammed, with
+  Rip gated on combo points as a finisher. Bleed ticks ignore armor, which is what makes them worth
+  the energy they take from Shred; Rake's opening hit is not periodic and so does take it.
 - **Slice and Dice and Combat Potency, for all three rogue specs** — a finisher that deals no damage
   and buys 30% melee speed instead, bounded by energy, a 1-second global cooldown and the combo points
   five fillers generate. Worth about a fifth to every rogue. **Poisons too** — Instant and Deadly,

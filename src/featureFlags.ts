@@ -51,11 +51,15 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.05x to 2.3x low** — a range this file has now got
- *   wrong three times by not moving when the model improved, so the test brackets it on both sides
+ *   best case against them. The model reads **1.05x to 2.15x low** — a range this file has now got
+ *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
- *   up. The third time was Kill Command landing on 2026-08-27. No spec may read *above* its
- *   reference — a spec that does is double-counting something, which has been caught twice.
+ *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
+ *   *above* its reference — a spec that does is double-counting something, caught twice.
+ *
+ *   **The worst spec is Warlock Demonology now, not Feral**, and what it is missing is the same thing
+ *   the hunter was: a pet. Its demon is unmodelled, which is why Master Demonologist is still refused
+ *   with "No pet model here" — the one place that phrase is still true.
  *
  *   **Marksmanship is now within 5% of its reference, and that is worth reading carefully.** It is
  *   the spec with the least left to model — auto shot, Steady Shot and a pet, all three of which are

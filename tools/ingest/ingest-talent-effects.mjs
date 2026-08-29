@@ -602,7 +602,9 @@ const SHAMAN_SKIPPED = [
   ['Shamanistic Rage / Stormstrike cooldowns', 'Activated abilities needing a usage policy.'],
 ]
 
-const DRUID_SOURCES = [{ path: 'sim/druid/talents.go', cache: 'sim_druid_talents.go' }]
+const DRUID_SOURCES = [{ path: 'sim/druid/talents.go', cache: 'sim_druid_talents.go' },
+  // Ferocity is applied where Rake's cost is computed, not in talents.go.
+  { path: 'sim/druid/rake.go', cache: 'sim_druid_rake.go' }]
 
 const DRUID_EXTRACTORS = [
   {
@@ -678,6 +680,22 @@ const DRUID_STAT_EXTRACTORS = [
     re: /\} else \{\s*druid\.AddStat\(stats\.Armor, druid\.Equip\.Stats\(\)\[stats\.Armor\]\*\(([\d.]+)\/([\d.]+)\)\*float64\(druid\.Talents\.ThickHide\)\)/,
     value: (m) => Number(m[1]) / Number(m[2]),
     caveat: 'Cat/caster form rate. Bear form is 5x this upstream, and this app does not model bear.',
+  },
+]
+
+const DRUID_BLEED_EXTRACTORS = [
+  {
+    /*
+     * The **Druid's** Ferocity, which discounts Rake, against the **Hunter's**, which grants the pet
+     * crit. Same name, different classes, entirely different effects — the fourth such pair here, and
+     * the reason every extractor is cross-checked against its own class's tree before an id is taken.
+     */
+    talent: 'Ferocity',
+    kind: 'rakeEnergyCostReduction',
+    unit: 'energy per rank',
+    re: /cost := 40\.0 - float64\(druid\.Talents\.Ferocity\)/,
+    value: () => 1,
+    caveat: 'Upstream writes a bare subtraction with no coefficient, which means one energy a rank. Also discounts Claw, which this model does not have.',
   },
 ]
 
@@ -933,7 +951,7 @@ const CLASSES = [
   { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS, ...ROGUE_POISON_EXTRACTORS], skipped: ROGUE_SKIPPED },
   { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
   { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
-  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS], skipped: DRUID_SKIPPED },
+  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS, ...DRUID_BLEED_EXTRACTORS], skipped: DRUID_SKIPPED },
   { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: [...PALADIN_EXTRACTORS, ...PALADIN_STAT_EXTRACTORS], skipped: PALADIN_SKIPPED },
   { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: [...MAGE_EXTRACTORS, ...MAGE_STAT_EXTRACTORS], skipped: MAGE_SKIPPED },
   { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: [...PRIEST_EXTRACTORS, ...PRIEST_STAT_EXTRACTORS], skipped: PRIEST_SKIPPED },

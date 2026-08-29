@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/abilities/signatureAbilitiesDruid.ts
-lines: 77
+lines: 78
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.signatureAbilitiesDruid
 
-`src/domain/abilities/signatureAbilitiesDruid.ts` · **domain** layer · 77 lines
+`src/domain/abilities/signatureAbilitiesDruid.ts` · **domain** layer · 78 lines
 
 _No doc comment at the top of this file._
 

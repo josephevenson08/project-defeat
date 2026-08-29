@@ -203,6 +203,9 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   effects this sentence used to name alongside them — Toughness, Vitality, Divine Strength — stopped
   being refused on 2026-08-21 when talents reached `calculateStats`, and a test now fails if any
   refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
+- **Feral's bleeds are modelled, and bleeds ignore armor.** Rake and Rip are maintained rather than
+  spammed — a bleed's rate is how often it falls off, not how often you can afford it — and their
+  ticks take no armor mitigation at all, though Rake's opening hit does. Mangle is still missing.
 - **Slice and Dice is modelled for every rogue.** It deals no damage — it spends energy and combo
   points to buy 30% melee speed, which lands in the white-damage swing rate. Combat Potency feeds the
   energy that pays for it, off landed off-hand hits only. **Poisons are modelled too** — Instant on

@@ -32,6 +32,7 @@ export const druidSignatureAbilities: readonly SignatureAbility[] = [
     effectType: 'Melee Special',
     castTimeSeconds: 0,
     gcdSeconds: 1.0,
+    comboPointsPerUse: 1,
     resource: { type: 'Energy', cost: 60 },
     scaling: {
       basis: 'weapon damage',
