@@ -133,6 +133,7 @@ import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
+import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
   SLICE_AND_DICE_COMBO_POINTS,
@@ -5103,14 +5104,32 @@ function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterR
    * whole tree overruns it (Enhancement alone is 65 points), and a ceiling that spends points the
    * game does not give would flatter the model in exactly the direction this table exists to check.
    */
-  const tree = getTalentData(className)?.trees.find((entry) => entry.spec === spec)
-  const points: Record<number, number> = {}
-  let spent = 0
-  for (const talent of tree?.talents ?? []) {
-    if (spent >= 61) break
-    const rank = Math.min(talent.maxRank, 61 - spent)
-    points[talent.id] = rank
-    spent += rank
+  /*
+   * **A real raiding build where upstream has one, and the old rule only where it does not.**
+   *
+   * This used to fill the spec's primary tree in listed order to 61 points, which is not a build any
+   * TBC raider plays and is not a ceiling either — a real 41/20 split can be worth more than 61
+   * points down one tree. It cost a measurable number twice in one hour on 2026-08-27: it handed a
+   * Demonology warlock a talent that spec does not use, and it made Demonic Sacrifice read as exactly
+   * zero for the two specs that actually take it, because they take it out of a second tree.
+   *
+   * `talentBuilds.json` carries wowsims' own presets for **17 of the 20 DPS specs**. The other three
+   * — Hunter Marksmanship, Warlock Affliction, Warlock Demonology — have no upstream preset and keep
+   * the old rule rather than getting an invented build, which was the repo owner's call. The
+   * calibration test names which specs use which, so the table does not mix two methodologies
+   * silently.
+   */
+  const sourced = talentBuilds.builds.find((build) => build.className === className && build.spec === spec)
+  const points: Record<number, number> = sourced ? { ...sourced.points } : {}
+  if (!sourced) {
+    const tree = getTalentData(className)?.trees.find((entry) => entry.spec === spec)
+    let spent = 0
+    for (const talent of tree?.talents ?? []) {
+      if (spent >= 61) break
+      const rank = Math.min(talent.maxRank, 61 - spent)
+      points[talent.id] = rank
+      spent += rank
+    }
   }
 
   const buffIds = sampleBuffs.map((buff) => buff.id)
@@ -5191,6 +5210,38 @@ test('every DPS spec is measured against what players actually parse', () => {
       (row.ratio.toFixed(1) + 'x').padStart(6),
       String(row.slots).padStart(10),
     )
+  }
+
+  /*
+   * **Which specs are measured against a real build, and which are not.** Printed beside the table
+   * because the two are not the same measurement: a sourced spec is compared at a build a raider
+   * plays, and the other three at a synthetic one-tree fill. Mixing them silently would make the
+   * column look more uniform than it is.
+   */
+  console.log(
+    `
+${talentBuilds.buildCount} of 20 specs use a wowsims raiding build; ${talentBuilds.unsourced.length} keep the one-tree fill: ` +
+      talentBuilds.unsourced.map((u) => `${u.className} ${u.spec}`).join(', '),
+  )
+  expect(talentBuilds.buildCount, 'seventeen sourced builds').toBe(17)
+  expect(talentBuilds.unsourced, 'and three that have no upstream preset').toHaveLength(3)
+
+  /*
+   * **Two honest consequences of using real builds, recorded rather than smoothed over.**
+   *
+   * Upstream's Subtlety preset spends only 38 of 61 points, so that spec is measured at a genuinely
+   * incomplete build and reads lower than it would at a full one — a talent gap the ratio will
+   * attribute to the model. And upstream's Destruction build takes Demonic Sacrifice for **+15%
+   * Shadow**, which reaches none of this repo's Destruction rotation, because that rotation is
+   * Immolate and Incinerate and both are Fire. Upstream's own Destruction casts Shadow Bolt; ours
+   * does not. Neither is a defect in the model, and both are reasons a ratio can move for a reason
+   * that is not the model.
+   */
+  const subtlety = talentBuilds.builds.find((build) => build.spec === 'Subtlety')!
+  expect(subtlety.pointsSpent, "upstream's Subtlety preset is partial").toBeLessThan(45)
+  for (const build of talentBuilds.builds) {
+    expect(build.pointsSpent, `${build.spec} cannot exceed the level-70 budget`).toBeLessThanOrEqual(61)
+    expect(build.pointsSpent, `${build.spec} must spend something`).toBeGreaterThan(0)
   }
 
   // Every DPS spec has a reference, and the reference set covers nothing else.

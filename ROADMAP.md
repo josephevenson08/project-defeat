@@ -182,6 +182,10 @@ each pinned by an assertion these days.
   pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **The calibration harness measures a build a raider plays** — wowsims' own raiding presets for 17 of
+  the 20 DPS specs, ingested by `ingest-talent-builds.mjs`. It used to fill one tree to 61 points,
+  which is neither realistic nor a ceiling. Three specs have no upstream preset and keep the old rule,
+  and the calibration output names which specs use which.
 - **Spell school on every caster ability**, sourced from each spell's own `SpellSchool` upstream, plus
   school-scoped damage multipliers in `TalentModifiers`. Demonic Sacrifice is the first user; the
   per-spell talent groups it also unblocks are not built yet.

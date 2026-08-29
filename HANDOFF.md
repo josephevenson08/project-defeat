@@ -5,6 +5,71 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, the harness measures a build a raider plays)
+
+**The calibration harness used a build nobody plays.** It filled a spec's primary tree in listed
+order to 61 points — not realistic, and **not a ceiling either**, because a real 41/20 split can be
+worth more than 61 points down one tree. It cost a measurable number twice in one hour before this:
+it handed a Demonology warlock a talent that spec does not use, and it made Demonic Sacrifice read
+as exactly zero for the two specs that take it, because they take it out of a second tree.
+
+`tools/ingest/ingest-talent-builds.mjs` reads **wowsims' own presets for 17 of the 20 DPS specs**.
+
+### It is an ingest because upstream writes builds as named fields
+
+Not opaque talent strings, which is what made this tractable:
+
+```go
+var defaultDestroTalents = &proto.WarlockTalents{
+    ImprovedShadowBolt: 5,
+    Shadowburn:         true,
+}
+```
+
+Field names are matched to the Wowhead-ingested trees by stripping everything but letters and digits,
+so one rule handles apostrophes, spaces and hyphens alike. Anything unmatched **fails the run** rather
+than being dropped — the same discipline the effects ingest already uses.
+
+### Two conflicts the ingest caught, and how each was settled
+
+- **`PiercingIce: 5` against a 3-rank talent.** An allocation the game would not accept. Clamped to
+  the ingested tree's cap and **reported**, because the Wowhead trees are the game's own data on what
+  a talent can hold. Two presets do it.
+- **`FaerieFire` against "Faerie Fire (Feral)".** A genuine naming difference, handled by an explicit
+  alias rather than fuzzy matching — a near-match is exactly how an effect ends up keyed to the wrong
+  talent, and this repo has already had to get that particular distinction right once before.
+
+### What moved, and it was not small
+
+    Warrior Arms          1166 -> 1325   (1.5x -> 1.3x)
+    Hunter Survival       1201 -> 1263   (1.4x -> 1.3x)
+    Mage Arcane            995 -> 1045   (2.1x -> 2.0x)
+    Rogue Combat          1098 -> 1151
+    Druid Feral            879 ->  927
+    Paladin Retribution    966 ->  999
+    Rogue Subtlety        1220 -> 1167   (down)
+
+### The three specs with no preset keep the old rule
+
+Hunter Marksmanship, Warlock Affliction and Warlock Demonology, on the repo owner's call — a stated
+fallback rather than an invented build. The calibration test **prints which specs use which**, because
+a sourced spec and a synthetic one are not the same measurement and mixing them silently would make
+the column look more uniform than it is.
+
+### Two honest consequences, asserted rather than smoothed over
+
+- **Upstream's Subtlety preset spends 38 of 61 points.** So that spec is measured at a genuinely
+  incomplete build and reads *lower* than it would at a full one — a talent gap the ratio will
+  attribute to the model. It went 1220 → 1167 for that reason and no other.
+- **Upstream's Destruction build takes Demonic Sacrifice for +15% Shadow, which reaches none of this
+  repo's Destruction rotation** — Immolate and Incinerate are both Fire. Upstream's Destruction casts
+  Shadow Bolt and ours does not. The talent is in the build, correctly applied, and worth zero.
+
+Neither is a model defect, and both are reasons a ratio can move for a reason that is not the model.
+That is worth knowing before reading the next table.
+
+---
+
 ## Start here (2026-08-27, spell school, and a measurement that caught an either/or)
 
 **`SignatureAbility` records a spell school now**, for all 18 caster abilities that have one, each read
@@ -1662,6 +1727,7 @@ node tools/ingest/ingest-bis-recommendations.mjs # gem + enchant picks per spec
 node tools/ingest/validate-sample.mjs --sample 32 --max-phase 2 --quality Epic
 node tools/ingest/reconcile-curated.mjs --check-wowhead
 node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 579 talents
+node tools/ingest/ingest-talent-builds.mjs      # wowsims raiding builds for 17 of 20 DPS specs
 node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-buff-scope.mjs         # party vs raid scope for all 39 buffs/debuffs
