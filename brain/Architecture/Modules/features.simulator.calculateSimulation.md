@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateSimulation.ts
-lines: 2042
+lines: 2097
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateSimulation
 
-`src/features/simulator/calculateSimulation.ts` · **features** layer · 2042 lines
+`src/features/simulator/calculateSimulation.ts` · **features** layer · 2097 lines
 
 _No doc comment at the top of this file._
 
@@ -38,6 +38,7 @@ _No doc comment at the top of this file._
 - [[domain.simulation.sliceAndDice]] — `src/domain/simulation/sliceAndDice.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[domain.simulation.spellTable]] — `src/domain/simulation/spellTable.ts`
+- [[domain.simulation.warlockPet]] — `src/domain/simulation/warlockPet.ts`
 - [[domain.simulation.weaponImbues]] — `src/domain/simulation/weaponImbues.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`

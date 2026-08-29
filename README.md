@@ -203,6 +203,9 @@ write below the `<!-- brain:manual -->` marker in a note is preserved. Start at
   effects this sentence used to name alongside them — Toughness, Vitality, Divine Strength — stopped
   being refused on 2026-08-21 when talents reached `calculateStats`, and a test now fails if any
   refusal still claims otherwise. **Expect a talented estimate to read low**, especially for casters.
+- **A Demonology warlock's Felguard is modelled**, scaling off 57% of the owner's spell power rather
+  than any attack power. Only Demonology gets one: Affliction and Destruction sacrifice their demon
+  for a school-scoped damage multiplier, and this simulator records no spell school.
 - **Feral's bleeds are modelled, and bleeds ignore armor.** Rake and Rip are maintained rather than
   spammed — a bleed's rate is how often it falls off, not how often you can afford it — and their
   ticks take no armor mitigation at all, though Rake's opening hit does. Mangle is still missing.

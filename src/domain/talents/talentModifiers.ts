@@ -156,6 +156,14 @@ export type TalentModifiers = {
    * Specialization and now Ferocity do not contaminate each other.
    */
   rakeEnergyCostReduction: number
+  /*
+   * The warlock's demon, which is a **third** actor this record has to reach — after the hunter's pet
+   * and the character themselves. Same principle as the `pet*` fields: name the actor, not the effect.
+   */
+  /** Multiplies the demon's damage. Soul Link, Unholy Power, Master Demonologist. 1 when untalented. */
+  demonDamageMultiplier: number
+  /** Added to the demon's crit chance, as a fraction. Demonic Tactics, +1% a rank. */
+  demonCritChance: number
   /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
@@ -245,6 +253,8 @@ export const noTalentModifiers: TalentModifiers = {
   poisonDamageMultiplier: 1,
   poisonSpellHitChance: 0,
   rakeEnergyCostReduction: 0,
+  demonDamageMultiplier: 1,
+  demonCritChance: 0,
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -290,6 +300,7 @@ const ADDITIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   poisonProcChance: 'poisonProcChance',
   poisonSpellHitChance: 'poisonSpellHitChance',
   rakeEnergyCostReduction: 'rakeEnergyCostReduction',
+  demonCritChance: 'demonCritChance',
 }
 
 const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
@@ -307,6 +318,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
   petFocusRegenMultiplier: 'petFocusRegenMultiplier',
   sliceAndDiceDurationMultiplier: 'sliceAndDiceDurationMultiplier',
   poisonDamageMultiplier: 'poisonDamageMultiplier',
+  demonDamageMultiplier: 'demonDamageMultiplier',
 }
 
 /*

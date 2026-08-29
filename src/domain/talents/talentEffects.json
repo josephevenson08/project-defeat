@@ -18,7 +18,8 @@
       "sim/paladin/talents.go",
       "sim/mage/talents.go",
       "sim/priest/talents.go",
-      "sim/warlock/talents.go"
+      "sim/warlock/talents.go",
+      "sim/warlock/pet.go"
     ]
   },
   "classes": [
@@ -33,7 +34,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 77,
+  "effectCount": 79,
   "effects": [
     {
       "className": "Warrior",
@@ -926,6 +927,29 @@
       "unit": "fraction per rank",
       "perRank": 0.01,
       "caveat": "Upstream writes generic BonusCritRating; taken as spell crit, which is the only half a Warlock uses.",
+      "source": "sim/warlock/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1262,
+      "talent": "Unholy Power",
+      "tree": "Demonology",
+      "maxRank": 5,
+      "kind": "demonDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "source": "sim/warlock/pet.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1673,
+      "talent": "Demonic Tactics",
+      "tree": "Demonology",
+      "maxRank": 5,
+      "kind": "demonCritChance",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "caveat": "Upstream grants the same figure to the demon SpellCrit on the next line; only the melee half is read, because only the demon melee swing is modelled. Separately grants the warlock spell crit, which is a different extractor on the same talent.",
       "source": "sim/warlock/talents.go"
     }
   ],

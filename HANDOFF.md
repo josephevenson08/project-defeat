@@ -5,6 +5,66 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, the demon, and half of it is blocked)
+
+**Demonology gets its Felguard.** 752 → 855, a 2.2x → **1.9x** ratio. The caster path had no pet
+concept at all before this — exactly as `calculatePhysicalDps` did not before 2026-08-23 — so the
+plumbing was most of the work, which is the order this repo insists on for the same reason every
+time: shipping data nothing reads is its recurring failure.
+
+### A demon is either a pet or a damage multiplier, never both
+
+`sim/warlock/warlock.go` makes it one branch:
+
+```go
+if warlock.Talents.DemonicSacrifice && warlock.Options.SacrificeSummon {
+    Succubus -> ShadowDamageDealtMultiplier *= 1.15
+    Imp      -> FireDamageDealtMultiplier   *= 1.15
+    Felguard -> ShadowDamageDealtMultiplier *= 1.10
+} else {
+    warlock.Pet = warlock.NewWarlockPet()
+}
+```
+
+**So only Demonology gets a pet here, and that is sourced rather than chosen.** Affliction and
+Destruction sacrifice — upstream's *only* preset is a Destruction warlock sacrificing a Succubus —
+and what the sacrifice buys is a **school-scoped** multiplier this simulator cannot express. That is
+one more item on the list spell school already blocks, and the most valuable one on it: it is worth
+15% of a caster's damage.
+
+Summon Felguard is the 41-point Demonology talent, so for that spec the demon *is* the spec.
+
+### The structural difference from the hunter's pet
+
+**Attack power comes from the owner's spell power**: `(SpellPower + ShadowSpellPower) * 0.57`. A demon
+scales off the stat its owner already stacks, which is why it could not simply reuse `hunterPet.ts`.
+
+Then a flat **1.65x on the finished attack power** — `ap * 1.5 * 1.1`, which upstream comments as
+"demonic frenzy + hidden 10% boost". The 1.5 is a Demonic Frenzy upstream says it is *simulating* as
+pre-stacked rather than modelling; the 1.1 is labelled only as hidden. Both carried across as read,
+on the same principle as the hunter pet's unexplained `0.85`.
+
+**Its conversions are its own.** Strength at `(strength - 10) * 2` — the offset is not a typo — and
+Agility at 0.04 crit percent a point, against the hunter pet's one percent per 33. Two pets, two
+conversions; a test asserts they differ, because assuming they shared one was the easy mistake.
+
+**There is no family damage multiplier.** Both `PetConfig.DamageMultiplier` and the line applying it
+are **commented out** upstream, so a demon needs none of the assumed-family treatment the hunter pet
+carries. Pinned, so nobody copies that across on the assumption every pet has one.
+
+### What is left
+
+1. **Spell school**, which is now the single highest-value item on the list. It blocks Demonic
+   Sacrifice (+15% to a school, for two of the three warlock specs), the per-spell talent groups
+   Ignite and Shadow Weaving sit in, and partial resists.
+2. **Cleave and Intercept**, the Felguard's own abilities, and Demonic Frenzy as a real stacking aura
+   rather than a pre-stacked constant.
+3. **Weapon-enchant and damage procs** — 0 of 91 enchants carry one.
+4. **Mangle**, whose prerequisite the bleeds just met.
+5. **Windfury Totem, Expose Weakness, Deep Wounds, Elemental Weapons.**
+
+---
+
 ## Start here (2026-08-27, Feral bleeds and a new worst spec)
 
 **Rake and Rip land, and Feral stops being the outlier.** 728 → 879, a 2.3x → **1.9x** ratio.

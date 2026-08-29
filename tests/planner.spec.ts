@@ -121,6 +121,7 @@ import {
   HUNTER_PET_KILL_COMMAND,
   HUNTER_PET_STRENGTH_TO_ATTACK_POWER,
   estimateHunterPet,
+  hunterPetCritChance,
   estimateHunterPetKillCommand,
   frenzySpeedMultiplier,
   hunterPetAbilityRates,
@@ -149,6 +150,17 @@ import {
   estimateRoguePoisons,
 } from '../src/domain/simulation/roguePoisons'
 import { RAKE, RIP, estimateFeralBleeds } from '../src/domain/simulation/feralBleeds'
+import {
+  FELGUARD_ATTACK_POWER_MULTIPLIER,
+  FELGUARD_BASE,
+  FELGUARD_HAS_FAMILY_MULTIPLIER,
+  FELGUARD_SPELL_POWER_TO_ATTACK_POWER,
+  FELGUARD_STRENGTH_OFFSET,
+  FELGUARD_STRENGTH_TO_ATTACK_POWER,
+  estimateWarlockPet,
+  felguardAttackPower,
+  felguardCritChance,
+} from '../src/domain/simulation/warlockPet'
 
 /*
  * Gear editing moved into a popup, so a slot's controls only exist while its overlay is open. These
@@ -6027,6 +6039,85 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
     noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
     'no ranged weapon means no crits to open the window',
   ).toBe(false)
+})
+
+test('only Demonology keeps its demon, because the other two sacrifice it', () => {
+  /*
+   * **A warlock's demon is either a pet or a damage multiplier, never both**, and upstream's branch
+   * is the whole reason this is scoped to one spec:
+   *
+   *     if DemonicSacrifice && SacrificeSummon { school multiplier } else { pet }
+   *
+   * Affliction and Destruction take the sacrifice — upstream's only preset is a Destruction warlock
+   * sacrificing a Succubus for +15% shadow — and what that buys is a **school-scoped** multiplier
+   * this simulator cannot express, because it records no spell school. Summon Felguard is the
+   * 41-point Demonology talent, so for that spec the demon is the spec.
+   */
+  const demonRow = (spec: TbcSpec) => {
+    const { result } = bestCaseSimulation('Warlock', spec, 'Caster DPS')
+    return result.damageSources?.find((source) => source.name === 'Felguard')
+  }
+  expect(demonRow('Demonology'), 'Demonology keeps it').toBeDefined()
+  expect(demonRow('Affliction'), 'Affliction sacrifices it').toBeUndefined()
+  expect(demonRow('Destruction'), 'and so does Destruction').toBeUndefined()
+
+  /*
+   * **Attack power comes from the owner's SPELL power**, which is the structural difference from the
+   * hunter's pet and the reason this could not reuse that module. A demon scales off the stat its
+   * owner already stacks.
+   */
+  const bare = estimateWarlockPet({ ownerSpellPower: 0, attackTableMultiplier: 1, armorMitigation: 0 })
+  const geared = estimateWarlockPet({ ownerSpellPower: 1000, attackTableMultiplier: 1, armorMitigation: 0 })
+  expect(geared.dps, 'spell power reaches the demon').toBeGreaterThan(bare.dps)
+
+  /*
+   * Checked against the arithmetic rather than a literal, so a change to any constant fails here:
+   * base attack power plus `(strength - 10) * 2`, plus 57% of spell power, all times the flat 1.65.
+   *
+   * **The `- 10` is not a typo and the 1.65 is two constants** — `ap * 1.5 * 1.1`, which upstream
+   * comments as "demonic frenzy + hidden 10% boost". The 1.5 is a Demonic Frenzy upstream says it is
+   * *simulating* as pre-stacked rather than modelling, and the 1.1 is labelled only as hidden. Both
+   * are carried across as read, on the same principle as the hunter pet's unexplained 0.85.
+   */
+  const own = FELGUARD_BASE.attackPower + (FELGUARD_BASE.strength - FELGUARD_STRENGTH_OFFSET) * FELGUARD_STRENGTH_TO_ATTACK_POWER
+  expect(felguardAttackPower(1000)).toBeCloseTo(
+    (own + 1000 * FELGUARD_SPELL_POWER_TO_ATTACK_POWER) * FELGUARD_ATTACK_POWER_MULTIPLIER,
+    6,
+  )
+  expect(FELGUARD_ATTACK_POWER_MULTIPLIER).toBeCloseTo(1.5 * 1.1, 10)
+
+  /*
+   * **Its Agility conversion is its own, and it is not the hunter pet's.** A demon gets 0.04 crit
+   * percent a point where a hunter pet gets one percent per 33 Agility — two pets, two conversions,
+   * and assuming they shared one would have been the easy mistake.
+   */
+  expect(felguardCritChance()).toBeCloseTo((FELGUARD_BASE.agility * 0.04) / 100, 10)
+  expect(felguardCritChance()).not.toBeCloseTo(hunterPetCritChance(), 3)
+
+  /*
+   * **There is no family damage multiplier**, unlike the hunter's pet — `PetConfig.DamageMultiplier`
+   * and the line applying it are both commented out upstream. Pinned so nobody copies the hunter's
+   * assumed-family treatment across on the assumption that every pet has one.
+   */
+  expect(FELGUARD_HAS_FAMILY_MULTIPLIER).toBe(false)
+
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const unholy = deriveTalentModifiers({ [idOf('Warlock', 'Unholy Power')]: 5 })
+  expect(unholy.demonDamageMultiplier, '+4% a rank').toBeCloseTo(1.2, 10)
+
+  /*
+   * **Demonic Tactics is one talent with two destinations** — the demon's crit and the warlock's own
+   * spell crit — the same shape Serpent's Swiftness has for the hunter. Two extractors, one id.
+   */
+  const tactics = deriveTalentModifiers({ [idOf('Warlock', 'Demonic Tactics')]: 5 })
+  expect(tactics.demonCritChance, 'the demon half').toBeCloseTo(0.05, 10)
+  expect(tactics.spellCritChance, 'and the warlock half').toBeCloseTo(0.05, 10)
+
+  // And the estimate says what it left out, including why the other two specs have nothing.
+  const { result } = bestCaseSimulation('Warlock', 'Demonology', 'Caster DPS')
+  expect(result.summary).toMatch(/Felguard/)
+  expect(result.summary, 'the spell-school block is named').toMatch(/spell school/i)
 })
 
 test('bleeds ignore armor, and Rake’s opener does not', () => {

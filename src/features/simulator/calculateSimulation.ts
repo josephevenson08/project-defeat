@@ -39,6 +39,11 @@ import {
 } from '../../domain/simulation/sliceAndDice'
 import { estimateRoguePoisons } from '../../domain/simulation/roguePoisons'
 import { estimateFeralBleeds } from '../../domain/simulation/feralBleeds'
+import {
+  WARLOCK_PET_UNMODELLED,
+  estimateWarlockPet,
+  felguardCritChance,
+} from '../../domain/simulation/warlockPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
 import {
@@ -1722,13 +1727,63 @@ function calculateCasterDps(
     breakdown.push({ label: 'Globals spent refreshing DoTs', value: toPercent(rotation.gcdShare) })
   }
 
+  /*
+   * **The demon, and this is the plumbing the caster path did not have** — exactly as
+   * `calculatePhysicalDps` had no pet concept before the hunter needed one. A demon is a second
+   * actor with its own weapon, attack table and attack power, none of which a cast profile can hold.
+   *
+   * **Only Demonology gets one, and upstream's own branch is why.** A warlock either keeps the demon
+   * or sacrifices it for a school-scoped damage multiplier, never both; Affliction and Destruction
+   * take the sacrifice, and the multiplier it buys needs a spell school this model does not record.
+   * Summon Felguard is the 41-point Demonology talent, so for that spec the demon *is* the spec.
+   */
+  let warlockPet: ReturnType<typeof estimateWarlockPet> | undefined
+  if (character.className === 'Warlock' && character.spec === 'Demonology') {
+    /*
+     * Its own table, on its own crit. A demon inherits spell power and turns it into attack power;
+     * it inherits none of the owner's crit, so reading the warlock's would overstate it badly — the
+     * same mistake the hunter pet's table exists to avoid.
+     */
+    const demonTable = buildWhiteAttackTable({
+      skillDiff: computeSkillDiff(target.level),
+      dualWield: false,
+      expertiseSkillPoints: 0,
+      missReduction: 0,
+      rawCritChance: felguardCritChance() + talents.demonCritChance,
+      attacksFromBehind: true,
+    })
+    const demonGlance = computeGlanceDamageRange(computeSkillDiff(target.level))
+    warlockPet = estimateWarlockPet({
+      ownerSpellPower: stats.spellPower,
+      attackTableMultiplier:
+        demonTable.hit +
+        demonTable.block +
+        demonTable.crit * MELEE_CRIT_DAMAGE_MULTIPLIER +
+        demonTable.glance * ((demonGlance.low + demonGlance.high) / 2),
+      armorMitigation: computeArmorMitigation(target.armor, PLAYER_LEVEL),
+      talents: { damageMultiplier: talents.demonDamageMultiplier, critChance: talents.demonCritChance },
+    })
+
+    if (warlockPet.dps > 0) {
+      dps += warlockPet.dps * (1 + buffs.damageMultiplier)
+      casterSources = [...casterSources, { name: 'Felguard', dps: warlockPet.dps * (1 + buffs.damageMultiplier) }]
+      breakdown.push({ label: 'Felguard DPS', value: round(warlockPet.dps * (1 + buffs.damageMultiplier)) })
+      breakdown.push({ label: 'Felguard attack power', value: round(warlockPet.attackPower) })
+    }
+  }
+
+  const demonSummary = warlockPet
+    ? ` A Felguard is counted as a second attacker, scaling off 57% of your spell power rather than any attack power you have, and ${WARLOCK_PET_UNMODELLED}`
+    : ''
+
   const rotationSummary = rotation
     ? ` ${rotation.dots.length} damage-over-time effects maintained on their own durations, costing ${toPercent(rotation.gcdShare)}% of the globals, with ${rotation.filler?.name ?? 'nothing'} filling the rest. **DoTs do not crit in TBC**, so the crit multiplier reaches the filler only.`
     : ''
 
   const summary = cast.ability
-    ? `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base damage, and ${cast.coefficient} spell-power coefficient.${rotationSummary || " Single-ability approximation — cooldowns, procs, and multi-spell rotation priority aren't modeled."}`
-    : `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, assuming a ${cast.label}. Scales from spell power only — this spec has no modeled signature cast.`
+    ? `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, modeling ${cast.label} at its real ${cast.castTimeSeconds}s cast, ${round(cast.baseAmount)} base damage, and ${cast.coefficient} spell-power coefficient.${rotationSummary || " Single-ability approximation — cooldowns, procs, and multi-spell rotation priority aren't modeled."}${demonSummary}`
+    : `Spell hit/crit table vs. a level ${target.level} target using TBC rating conversions, assuming a ${cast.label}. Scales from spell power only — this spec has no modeled signature cast.${demonSummary}`
+
 
   return {
     role: 'Caster DPS',

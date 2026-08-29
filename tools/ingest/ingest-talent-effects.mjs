@@ -916,7 +916,11 @@ const PRIEST_SKIPPED = [
   ['Improved Renew / Empowered Healing', 'Per-spell coefficients; the healer path models one generic cast.'],
 ]
 
-const WARLOCK_SOURCES = [{ path: 'sim/warlock/talents.go', cache: 'sim_warlock_talents.go' }]
+const WARLOCK_SOURCES = [
+  { path: 'sim/warlock/talents.go', cache: 'sim_warlock_talents.go' },
+  // Every demon-scaling talent is applied where the demon is built, not in ApplyTalents.
+  { path: 'sim/warlock/pet.go', cache: 'sim_warlock_pet.go' },
+]
 
 const WARLOCK_EXTRACTORS = [
   {
@@ -939,6 +943,28 @@ const WARLOCK_EXTRACTORS = [
   },
 ]
 
+const WARLOCK_DEMON_EXTRACTORS = [
+  {
+    /*
+     * Read out of `pet.go`, because every demon-scaling talent is applied where the demon is built
+     * rather than in `ApplyTalents` — the same shape Bestial Discipline took for the hunter.
+     */
+    talent: 'Unholy Power',
+    kind: 'demonDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /wp\.PseudoStats\.DamageDealtMultiplier \*= 1\.0 \+ \(([\d.]+) \* float64\(warlock\.Talents\.UnholyPower\)\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Demonic Tactics',
+    kind: 'demonCritChance',
+    unit: 'fraction per rank',
+    re: /stats\.MeleeCrit:\s*float64\(warlock\.Talents\.DemonicTactics\) \* ([\d.]+) \* core\.MeleeCritRatingPerCritChance/,
+    value: (m) => Number(m[1]) / 100,
+    caveat: 'Upstream grants the same figure to the demon SpellCrit on the next line; only the melee half is read, because only the demon melee swing is modelled. Separately grants the warlock spell crit, which is a different extractor on the same talent.',
+  },
+]
+
 const WARLOCK_SKIPPED = [
   ['Master Demonologist', 'Gated on which demon is summoned. No pet model here.'],
   ['Fel Intellect / Fel Stamina', 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
@@ -955,7 +981,7 @@ const CLASSES = [
   { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: [...PALADIN_EXTRACTORS, ...PALADIN_STAT_EXTRACTORS], skipped: PALADIN_SKIPPED },
   { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: [...MAGE_EXTRACTORS, ...MAGE_STAT_EXTRACTORS], skipped: MAGE_SKIPPED },
   { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: [...PRIEST_EXTRACTORS, ...PRIEST_STAT_EXTRACTORS], skipped: PRIEST_SKIPPED },
-  { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: WARLOCK_EXTRACTORS, skipped: WARLOCK_SKIPPED },
+  { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: [...WARLOCK_EXTRACTORS, ...WARLOCK_DEMON_EXTRACTORS], skipped: WARLOCK_SKIPPED },
 ]
 
 const effects = []
