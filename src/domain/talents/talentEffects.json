@@ -19,7 +19,8 @@
       "sim/mage/talents.go",
       "sim/priest/talents.go",
       "sim/warlock/talents.go",
-      "sim/warlock/pet.go"
+      "sim/warlock/pet.go",
+      "sim/warlock/warlock.go"
     ]
   },
   "classes": [
@@ -34,7 +35,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 79,
+  "effectCount": 80,
   "effects": [
     {
       "className": "Warrior",
@@ -928,6 +929,19 @@
       "perRank": 0.01,
       "caveat": "Upstream writes generic BonusCritRating; taken as spell crit, which is the only half a Warlock uses.",
       "source": "sim/warlock/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1281,
+      "talent": "Demonic Sacrifice",
+      "tree": "Demonology",
+      "maxRank": 1,
+      "kind": "schoolDamageMultiplier",
+      "unit": "multiplier (flat, not per rank)",
+      "flatValue": 1.15,
+      "school": "Shadow",
+      "caveat": "The Succubus branch. Assigned to Shadow because Affliction, the spec that takes this, casts nothing else here.",
+      "source": "sim/warlock/warlock.go"
     },
     {
       "className": "Warlock",

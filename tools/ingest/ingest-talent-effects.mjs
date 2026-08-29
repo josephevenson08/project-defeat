@@ -920,6 +920,8 @@ const WARLOCK_SOURCES = [
   { path: 'sim/warlock/talents.go', cache: 'sim_warlock_talents.go' },
   // Every demon-scaling talent is applied where the demon is built, not in ApplyTalents.
   { path: 'sim/warlock/pet.go', cache: 'sim_warlock_pet.go' },
+  // Demonic Sacrifice is applied where the warlock is built, not in ApplyTalents.
+  { path: 'sim/warlock/warlock.go', cache: 'sim_warlock_warlock.go' },
 ]
 
 const WARLOCK_EXTRACTORS = [
@@ -944,6 +946,29 @@ const WARLOCK_EXTRACTORS = [
 ]
 
 const WARLOCK_DEMON_EXTRACTORS = [
+  {
+    /*
+     * Demonic Sacrifice, and **which school it lands on is a build choice this app cannot read**.
+     * Upstream switches on the demon being sacrificed — Succubus grants Shadow, Imp grants Fire, both
+     * at 1.15 — and the demon is a picker no surface here has, the same gap the pet family and the
+     * poison imbue already name.
+     *
+     * So the school is assigned to match the spec's own damage, which is what a warlock actually
+     * does: Affliction casts nothing but Shadow and Destruction nothing but Fire in this model, so
+     * each sacrifices the demon whose bonus it can use. Note this diverges from upstream's single
+     * preset, which gives Destruction a Succubus — their Destruction rotation includes Shadow Bolt
+     * and this one does not.
+     */
+    talent: 'Demonic Sacrifice',
+    kind: 'schoolDamageMultiplier',
+    school: 'Shadow',
+    unit: 'multiplier (flat, not per rank)',
+    re: /Warlock_Options_Succubus:\s*warlock\.PseudoStats\.ShadowDamageDealtMultiplier \*= ([\d.]+)/,
+    value: (m) => Number(m[1]),
+    flat: true,
+    caveat: 'The Succubus branch. Assigned to Shadow because Affliction, the spec that takes this, casts nothing else here.',
+  },
+
   {
     /*
      * Read out of `pet.go`, because every demon-scaling talent is applied where the demon is built
@@ -1036,6 +1061,7 @@ for (const entry of CLASSES) {
       baseBonus: extractor.baseBonus ? extractor.baseBonus(hit.m, second) : undefined,
       // Only the three stat-routed kinds carry these; every other kind names its destination by
       // `kind` alone.
+      school: extractor.school,
       stat: extractor.stat,
       from: extractor.from,
       to: extractor.to,

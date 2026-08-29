@@ -5,6 +5,7 @@ export const shamanSignatureAbilities: readonly SignatureAbility[] = [
     className: 'Shaman',
     spec: 'Elemental',
     name: 'Lightning Bolt',
+    spellSchool: 'Nature',
     spellId: 25449,
     rank: 12,
     requiredLevel: 67,

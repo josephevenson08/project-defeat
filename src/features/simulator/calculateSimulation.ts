@@ -43,6 +43,7 @@ import {
   WARLOCK_PET_UNMODELLED,
   estimateWarlockPet,
   felguardCritChance,
+  sacrificesDemon,
 } from '../../domain/simulation/warlockPet'
 import { bloodrageRagePerSecond, rageDumpUsesPerSecond, rageFromDamageTaken, rageFromOneSwing, ragePerSecondFromWeapon } from '../../domain/simulation/rageModel'
 import { computeManaBudget } from '../../domain/simulation/manaModel'
@@ -61,6 +62,7 @@ import {
 } from '../../domain/simulation/combatConstants'
 import { attackPowerToWhiteDps, computeArmorMitigation, directSpellCoefficient, weaponDiceToWhiteDps } from '../../domain/simulation/damageFormulas'
 import { defaultSimulationTarget } from '../../domain/simulation/sampleEncounters'
+import type { SpellSchool } from '../../domain/abilities/abilityTypes'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import { computeSpellCritChance, computeSpellHitChance } from '../../domain/simulation/spellTable'
 import {
@@ -1681,6 +1683,20 @@ function calculateCasterDps(
    * the single-ability figure above is simply wrong for it — not imprecise. Where the ability data
    * describes a multi-spell rotation, that is what gets scored.
    */
+  /*
+   * **Demonic Sacrifice's bonus is gated on actually sacrificing**, not on owning the talent, which
+   * is the same `DemonicSacrifice && SacrificeSummon` upstream writes. A Demonology warlock spends 41
+   * points in the tree, owns the talent, and still keeps the Felguard — so it must not also collect
+   * the +15%, which upstream's `else` makes impossible.
+   *
+   * Without this a Demonology warlock read 968 rather than 855, holding both halves of an either/or.
+   * A measurement caught that, not a test.
+   */
+  const schoolMultiplier = (school: SpellSchool) => {
+    if (character.className === 'Warlock' && !sacrificesDemon(character.spec)) return 1
+    return talents.schoolDamageMultipliers[school] ?? 1
+  }
+
   const rotationAbilities = getRotationAbilities(character.className, character.spec)
   /*
    * A rotation is "one or more maintained DoTs plus something else", not "two or more DoTs" — the
@@ -1698,13 +1714,33 @@ function calculateCasterDps(
       )
     : undefined
 
-  let dps = singleAbilityDps
-  let casterSources: { name: string; dps: number }[] = [{ name: cast.label, dps: singleAbilityDps }]
+  /*
+   * The single-ability path takes the same treatment, because a spec without a multi-spell rotation
+   * still casts something with a school. Applied here rather than inside `damagePerCast` so the two
+   * paths read the multiplier from one place.
+   */
+  const singleSchool = cast.ability?.spellSchool
+  const singleSchoolFactor = singleSchool ? schoolMultiplier(singleSchool) : 1
+  let dps = singleAbilityDps * singleSchoolFactor
+  let casterSources: { name: string; dps: number }[] = [{ name: cast.label, dps }]
 
   if (rotation) {
     const shared = (1 + debuffs.spellDamageTakenMultiplier) * talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
-    const dotDps = rotation.dots.reduce((sum, dot) => sum + dot.dps, 0) * spellHitChance * shared
-    const fillerDps = (rotation.filler?.dps ?? 0) * spellHitChance * shared
+    /*
+     * **School-scoped multipliers, applied per spell rather than to the total** — which is the whole
+     * point of `spellSchool` existing. Demonic Sacrifice grants 15% to Shadow or to Fire, and folding
+     * it into `shared` would hand it to every spell a spec casts regardless of school. That happens
+     * to give the same answer for Affliction and Destruction today, because each casts one school
+     * only, and would stop the moment a spec mixed two.
+     */
+    const schoolFactor = (name: string) => {
+      const school = rotationAbilities.find((ability) => ability.name === name)?.spellSchool
+      return school ? schoolMultiplier(school) : 1
+    }
+    const dotDps =
+      rotation.dots.reduce((sum, dot) => sum + dot.dps * schoolFactor(dot.name), 0) * spellHitChance * shared
+    const fillerDps =
+      (rotation.filler ? rotation.filler.dps * schoolFactor(rotation.filler.name) : 0) * spellHitChance * shared
     dps = dotDps + fillerDps
 
     /*
@@ -1713,12 +1749,18 @@ function calculateCasterDps(
      * the total is built from rather than a second derivation.
      */
     casterSources = [
-      ...rotation.dots.map((dot) => ({ name: dot.name, dps: dot.dps * spellHitChance * shared })),
+      ...rotation.dots.map((dot) => ({
+        name: dot.name,
+        dps: dot.dps * schoolFactor(dot.name) * spellHitChance * shared,
+      })),
       ...(rotation.filler ? [{ name: rotation.filler.name, dps: fillerDps }] : []),
     ]
 
     for (const dot of rotation.dots) {
-      breakdown.push({ label: `${dot.name} DPS`, value: round(dot.dps * spellHitChance * shared) })
+      breakdown.push({
+        label: `${dot.name} DPS`,
+        value: round(dot.dps * schoolFactor(dot.name) * spellHitChance * shared),
+      })
     }
     if (rotation.filler) {
       breakdown.push({ label: `${rotation.filler.name} DPS`, value: round(fillerDps) })

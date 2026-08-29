@@ -12,6 +12,15 @@ import type { TbcClass, TbcSpec } from '../character/characterTypes'
  * Heal plus a HoT). Those record their dominant component here and describe the secondary one via
  * `periodic` and `notes`.
  */
+/**
+ * TBC damage schools, matching wowsims’ `SpellSchool` constants.
+ *
+ * Physical is included because the enum upstream has it, and because a school field that could not
+ * express "this is a weapon swing" would force every caller to treat absent and physical as the
+ * same thing — which they are not.
+ */
+export type SpellSchool = 'Physical' | 'Arcane' | 'Fire' | 'Frost' | 'Holy' | 'Nature' | 'Shadow'
+
 export type AbilityEffectType =
   | 'Direct Damage'
   | 'DoT'
@@ -177,6 +186,20 @@ export type SignatureAbility = {
    * in this model has a combo-point economy at all.
    */
   comboPointsPerUse?: number
+  /**
+   * The damage school, for the abilities that have one.
+   *
+   * **The thing four separate features were waiting on.** A school-scoped multiplier — Demonic
+   * Sacrifice adding 15% to Shadow or Fire, Shadow Weaving raising Shadow taken — cannot be applied
+   * without knowing which spells it reaches, and until this field existed the honest answer was to
+   * refuse them all by name. Every value is read from the ability’s own `SpellSchool` upstream
+   * rather than inferred from the class, which matters for the ones that surprise: a Druid’s
+   * Starfire is **Arcane**, not Nature, and a Shaman’s Lightning Bolt is Nature rather than the
+   * Frost its icon suggests.
+   *
+   * Absent for physical abilities, where the school is implied by the attack table they roll on.
+   */
+  spellSchool?: SpellSchool
   /** Base damage/healing at max rank before scaling. Omitted when the ability has no flat base. */
   baseAmount?: AmountRange
   /** Present for DoT/HoT effects, and for direct abilities that leave a periodic component behind. */

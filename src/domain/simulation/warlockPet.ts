@@ -114,6 +114,23 @@ export type WarlockPetEstimate = {
   dps: number
 }
 
+/**
+ * Whether a spec **sacrifices** its demon rather than keeping it, which is the same branch upstream
+ * writes and therefore the one place this either/or is decided.
+ *
+ * **Having Demonic Sacrifice is not the same as using it.** Upstream gates the bonus on
+ * `DemonicSacrifice && SacrificeSummon` — the talent *and* the choice — so a Demonology warlock who
+ * has spent 41 points in the tree owns the talent and still keeps the Felguard, because Summon
+ * Felguard is what those points bought.
+ *
+ * That distinction is not academic: without it a Demonology warlock reads **both** the pet and the
+ * +15%, which upstream's `else` makes impossible, and the number looks entirely plausible. A
+ * measurement caught it rather than a test, which is the argument for measuring after every change.
+ */
+export function sacrificesDemon(spec: string): boolean {
+  return spec !== 'Demonology'
+}
+
 /** The demon's own crit before talents — its base Agility at its own conversion. */
 export function felguardCritChance(): number {
   return (FELGUARD_BASE.agility * FELGUARD_AGILITY_TO_CRIT_PERCENT) / 100

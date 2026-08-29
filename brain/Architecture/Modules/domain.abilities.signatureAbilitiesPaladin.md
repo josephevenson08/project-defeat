@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/abilities/signatureAbilitiesPaladin.ts
-lines: 76
+lines: 77
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.signatureAbilitiesPaladin
 
-`src/domain/abilities/signatureAbilitiesPaladin.ts` · **domain** layer · 76 lines
+`src/domain/abilities/signatureAbilitiesPaladin.ts` · **domain** layer · 77 lines
 
 _No doc comment at the top of this file._
 

@@ -160,6 +160,7 @@ import {
   estimateWarlockPet,
   felguardAttackPower,
   felguardCritChance,
+  sacrificesDemon,
 } from '../src/domain/simulation/warlockPet'
 
 /*
@@ -6039,6 +6040,83 @@ test('Kill Command is gated on the owner’s crits, not on its own cooldown', ()
     noShot.damageSources?.some((source) => source.name === 'Pet Kill Command'),
     'no ranged weapon means no crits to open the window',
   ).toBe(false)
+})
+
+test('a school multiplier reaches the spells of that school and no others', () => {
+  /*
+   * **The field four features were waiting on.** A school-scoped multiplier cannot be applied without
+   * knowing which spells it reaches, so until `spellSchool` existed the honest answer was to refuse
+   * every one of them by name.
+   *
+   * Sourced per ability rather than inferred from the class, which matters for the ones that
+   * surprise: a Druid's **Starfire is Arcane**, not Nature, and a Shaman's **Lightning Bolt is
+   * Nature** rather than the Frost its icon suggests.
+   */
+  const schoolOf = (className: TbcClass, spec: TbcSpec, name: string) =>
+    getRotationAbilities(className, spec).find((ability) => ability.name === name)?.spellSchool
+
+  expect(schoolOf('Druid', 'Balance', 'Starfire'), 'Starfire is Arcane, not Nature').toBe('Arcane')
+  expect(schoolOf('Shaman', 'Elemental', 'Lightning Bolt'), 'Lightning Bolt is Nature').toBe('Nature')
+  expect(schoolOf('Warlock', 'Destruction', 'Incinerate')).toBe('Fire')
+  expect(schoolOf('Warlock', 'Affliction', 'Corruption')).toBe('Shadow')
+  expect(schoolOf('Mage', 'Frost', 'Frostbolt')).toBe('Frost')
+  expect(schoolOf('Paladin', 'Protection', 'Consecration'), 'Holy, and on the tank spec').toBe('Holy')
+
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+  const sacrifice = { [idOf('Warlock', 'Demonic Sacrifice')]: 1 }
+
+  expect(
+    deriveTalentModifiers(sacrifice).schoolDamageMultipliers.Shadow,
+    'Demonic Sacrifice is +15% to one school',
+  ).toBeCloseTo(1.15, 10)
+  expect(deriveTalentModifiers({}).schoolDamageMultipliers, 'and {} is the identity').toEqual({})
+
+  /*
+   * **Applied per spell, not to the total**, which is the point of having the school at all. An
+   * Affliction warlock casts nothing but Shadow, so every row moves; a Destruction warlock casts
+   * nothing but Fire, so a Shadow multiplier moves none of them. That second half is the assertion
+   * with teeth — folding the multiplier into the shared term would pass the first and fail this.
+   */
+  const read = (spec: TbcSpec, points: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Gnome', className: 'Warlock', spec }
+    const gear = normalizeGearForCharacter(defaultGear, 'Warlock', spec)
+    const sim = calculateSimulation(character, gear, calculateStats(character, gear), 'Caster DPS', [], undefined, points)
+    return sim.scoreExact
+  }
+
+  expect(read('Affliction', sacrifice) / read('Affliction', {}), 'every Affliction spell is Shadow').toBeCloseTo(
+    1.15,
+    4,
+  )
+  expect(read('Destruction', sacrifice), 'a Shadow bonus cannot reach a Fire spec').toBeCloseTo(
+    read('Destruction', {}),
+    6,
+  )
+
+  /*
+   * **Owning Demonic Sacrifice is not the same as using it**, and this is what a measurement caught
+   * rather than a test. A Demonology warlock spends 41 points in the tree, so the best-case harness
+   * hands them the talent — but they keep the Felguard, and upstream's `else` makes the two mutually
+   * exclusive. Without the gate they read 968 against a correct 855, holding both halves at once.
+   */
+  expect(read('Demonology', sacrifice), 'a spec that keeps its demon collects no sacrifice bonus').toBeCloseTo(
+    read('Demonology', {}),
+    6,
+  )
+  expect(sacrificesDemon('Demonology')).toBe(false)
+  expect(sacrificesDemon('Affliction')).toBe(true)
+  expect(sacrificesDemon('Destruction')).toBe(true)
+
+  /*
+   * **And this is why the calibration table does not move.** The harness fills a spec's *primary*
+   * tree, so only Demonology reaches Demonic Sacrifice — and Demonology is the one spec that does not
+   * use it. A real Affliction or Destruction warlock dips into Demonology for exactly this talent,
+   * which is a build the one-tree harness cannot express. The mechanism is asserted above rather than
+   * through the table, because the table cannot show it.
+   */
+  const { result } = bestCaseSimulation('Warlock', 'Affliction', 'Caster DPS')
+  expect(result.scoreExact, 'best case reaches no Demonology talents at all').toBeGreaterThan(0)
 })
 
 test('only Demonology keeps its demon, because the other two sacrifice it', () => {

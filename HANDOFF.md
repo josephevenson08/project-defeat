@@ -5,6 +5,56 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-27, spell school, and a measurement that caught an either/or)
+
+**`SignatureAbility` records a spell school now**, for all 18 caster abilities that have one, each read
+off its own `SpellSchool` upstream rather than inferred from the class. That matters for the ones
+that surprise: a Druid's **Starfire is Arcane**, not Nature, and a Shaman's **Lightning Bolt is
+Nature** rather than the Frost its icon suggests.
+
+`TalentModifiers.schoolDamageMultipliers` is the field it unlocks — structured like `statFactors`,
+keyed by school, `{}` as the identity — and **Demonic Sacrifice is its first user**.
+
+### The measurement caught a bug no test would have
+
+Wiring it up, Demonology jumped 855 → **968**. That looked like a win and was not: the best-case
+harness fills a spec's primary tree, so a Demonology warlock owns Demonic Sacrifice — and was
+collecting the +15% **while also keeping the Felguard**, which upstream's `else` makes impossible.
+
+**Owning the talent is not using it.** Upstream gates the bonus on `DemonicSacrifice &&
+SacrificeSummon` — the talent *and* the choice — and a Demonology warlock spent those 41 points on
+Summon Felguard. `sacrificesDemon(spec)` is now the one place that either/or is decided, used by both
+the pet and the multiplier, and Demonology is back to a correct 855.
+
+Worth recording how it surfaced: **a number moving in the right direction for the wrong reason**. No
+assertion existed to catch it, because the bug was a spec holding two mutually exclusive things and
+every individual value was right. Measuring after every change is what found it.
+
+### The feature is correct and currently invisible, and that is worth saying plainly
+
+At best case it moves **nothing**, because the harness fills one tree: only Demonology reaches Demonic
+Sacrifice, and Demonology is the one spec that does not use it. A real Affliction or Destruction
+warlock dips into Demonology for exactly this talent — a build the one-tree harness cannot express.
+
+So the mechanism is asserted directly instead: an Affliction warlock handed the talent gains exactly
+**1.15x** (every spell it casts is Shadow), a Destruction warlock gains **nothing** from a Shadow
+bonus (every spell it casts is Fire), and a Demonology warlock gains nothing at all. That second
+assertion is the one with teeth — folding the multiplier into the shared term would pass the first
+and fail it.
+
+### What is left
+
+1. **The rest of what spell school unblocks.** Shadow Weaving, Improved Shadow Bolt, Ignite — the
+   per-spell talent groups that make up most of the 43 still refused by name. The field they were
+   waiting on exists now.
+2. **A best-case harness that can express a real build.** It fills one tree to 61, which no TBC
+   warlock actually plays. This is the first time that has cost a measurable number, and it will cost
+   more as per-spell talents land.
+3. **Cleave and Intercept**, the Felguard's own abilities, and Demonic Frenzy as a real stacking aura.
+4. **Weapon-enchant and damage procs**, **Mangle**, and the assorted buff items.
+
+---
+
 ## Start here (2026-08-27, the demon, and half of it is blocked)
 
 **Demonology gets its Felguard.** 752 → 855, a 2.2x → **1.9x** ratio. The caster path had no pet

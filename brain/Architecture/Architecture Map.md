@@ -21,8 +21,8 @@ The modules everything else leans on — change these carefully.
 - [[domain.gear.gearSlots]] — 17 importers
 - [[domain.stats.statTypes]] — 16 importers
 - [[features.character.characterTypes]] — 15 importers
+- [[domain.abilities.abilityTypes]] — 13 importers
 - [[components.layout.Panel]] — 11 importers
-- [[domain.abilities.abilityTypes]] — 11 importers
 - [[domain.raids.raidTypes]] — 11 importers
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.character.roleTheme]] — 9 importers
@@ -99,7 +99,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
-- [[domain.abilities.abilityTypes]] · 11 importers
+- [[domain.abilities.abilityTypes]] · 13 importers
 - [[domain.abilities.index]] · 3 importers
 - [[domain.abilities.sampleSignatureAbilities]] · 1 importers
 - [[domain.abilities.signatureAbilitiesDruid]] · 1 importers

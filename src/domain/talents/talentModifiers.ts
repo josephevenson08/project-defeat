@@ -2,6 +2,7 @@ import rawTalentEffects from './talentEffects.json' with { type: 'json' }
 import { getTalentData } from './sampleTalents'
 import type { TalentPoints } from './talentTypes'
 import type { StatBlock } from '../stats/statTypes'
+import type { SpellSchool } from '../abilities/abilityTypes'
 
 /** An attribute-to-stat conversion a talent grants outright, in the shape the base rates already use. */
 export type TalentStatConversion = {
@@ -165,6 +166,18 @@ export type TalentModifiers = {
   /** Added to the demon's crit chance, as a fraction. Demonic Tactics, +1% a rank. */
   demonCritChance: number
   /**
+   * Damage multipliers scoped to a **school**, as the factor itself. `{}` is the identity.
+   *
+   * The field four features were waiting on `spellSchool` for. Structured like `statFactors` rather
+   * than exploded into a field per school, for the same reason: the key is data, not a name, and a
+   * school with no multiplier is simply unmultiplied.
+   *
+   * **Demonic Sacrifice is the first user and the reason this exists now.** A warlock who sacrifices
+   * their demon gets +15% to one school — Succubus for Shadow, Imp for Fire — which is worth nothing
+   * at all without knowing which spells it reaches.
+   */
+  schoolDamageMultipliers: Partial<Record<SpellSchool, number>>
+  /**
    * Expertise **skill points**, added directly to the attack table's own figure.
    *
    * Skill points rather than rating: the table divides rating by a constant to get points anyway, and
@@ -255,6 +268,7 @@ export const noTalentModifiers: TalentModifiers = {
   rakeEnergyCostReduction: 0,
   demonDamageMultiplier: 1,
   demonCritChance: 0,
+  schoolDamageMultipliers: {},
   spellCritChance: 0,
   spellHitChance: 0,
   spellDamageMultiplier: 1,
@@ -331,7 +345,7 @@ const MULTIPLICATIVE_BY_KIND: Partial<Record<string, NumericModifierKey>> = {
  * Kinds that carry a target stat and so cannot be dispatched by a name-to-field map. Listed here so
  * the "every kind has a destination" check below still covers them.
  */
-const STRUCTURED_KINDS = new Set(['statFactor', 'statConversion', 'itemArmorMultiplier'])
+const STRUCTURED_KINDS = new Set(['statFactor', 'statConversion', 'itemArmorMultiplier', 'schoolDamageMultiplier'])
 
 const DISPATCHED_KINDS = new Set([
   ...Object.keys(ADDITIVE_BY_KIND),
@@ -356,7 +370,12 @@ if (undispatched.length > 0) {
 export function deriveTalentModifiers(points: TalentPoints): TalentModifiers {
   // Fresh copies of the two reference fields: a shallow spread would alias them to the shared
   // identity constant, and one in-place mutation would then corrupt it for the whole process.
-  const modifiers: TalentModifiers = { ...noTalentModifiers, statFactors: {}, statConversions: [] }
+  const modifiers: TalentModifiers = {
+    ...noTalentModifiers,
+    statFactors: {},
+    statConversions: [],
+    schoolDamageMultipliers: {},
+  }
 
   for (const effect of rawTalentEffects.effects) {
     const rank = points[effect.talentId] ?? 0
@@ -380,6 +399,16 @@ export function deriveTalentModifiers(points: TalentPoints): TalentModifiers {
           perPoint: effect.flatValue ?? (effect.perRank ?? 0) * rank,
         },
       ]
+      continue
+    }
+
+    if (effect.kind === 'schoolDamageMultiplier') {
+      const school = (effect as { school?: string }).school as SpellSchool
+      const factor = effect.flatValue ?? 1 + (effect.perRank ?? 0) * rank
+      modifiers.schoolDamageMultipliers = {
+        ...modifiers.schoolDamageMultipliers,
+        [school]: (modifiers.schoolDamageMultipliers[school] ?? 1) * factor,
+      }
       continue
     }
 

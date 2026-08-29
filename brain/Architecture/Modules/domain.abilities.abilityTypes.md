@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/abilities/abilityTypes.ts
-lines: 188
+lines: 211
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.abilities.abilityTypes
 
-`src/domain/abilities/abilityTypes.ts` · **domain** layer · 188 lines
+`src/domain/abilities/abilityTypes.ts` · **domain** layer · 211 lines
 
 From the top of the file:
 
@@ -26,7 +26,7 @@ From the top of the file:
 
 ## Exports
 
-**type** — `AbilityEffectType`, `AbilityResourceCost`, `AbilityResourceType`, `AbilityScaling`, `AmountRange`, `CoefficientBasis`, `PeriodicEffect`, `SignatureAbility`
+**type** — `AbilityEffectType`, `AbilityResourceCost`, `AbilityResourceType`, `AbilityScaling`, `AmountRange`, `CoefficientBasis`, `PeriodicEffect`, `SignatureAbility`, `SpellSchool`
 
 ## Imports
 
@@ -45,6 +45,8 @@ From the top of the file:
 - [[domain.abilities.signatureAbilitiesShaman]] — `src/domain/abilities/signatureAbilitiesShaman.ts`
 - [[domain.abilities.signatureAbilitiesWarlock]] — `src/domain/abilities/signatureAbilitiesWarlock.ts`
 - [[domain.abilities.signatureAbilitiesWarrior]] — `src/domain/abilities/signatureAbilitiesWarrior.ts`
+- [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 
 ## Concepts & phases
 

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/warlockPet.ts
-lines: 154
+lines: 171
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.warlockPet
 
-`src/domain/simulation/warlockPet.ts` · **domain** layer · 154 lines
+`src/domain/simulation/warlockPet.ts` · **domain** layer · 171 lines
 
 From the top of the file:
 
@@ -40,7 +40,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `estimateWarlockPet`, `felguardAttackPower`, `felguardCritChance`
+**function** — `estimateWarlockPet`, `felguardAttackPower`, `felguardCritChance`, `sacrificesDemon`
 
 **const** — `FELGUARD_AGILITY_TO_CRIT_PERCENT`, `FELGUARD_ATTACK_POWER_MULTIPLIER`, `FELGUARD_BASE`, `FELGUARD_HAS_FAMILY_MULTIPLIER`, `FELGUARD_SPELL_POWER_TO_ATTACK_POWER`, `FELGUARD_STRENGTH_OFFSET`, `FELGUARD_STRENGTH_TO_ATTACK_POWER`, `FELGUARD_SWING_SECONDS`, `FELGUARD_WEAPON`, `noWarlockPetTalents`, `WARLOCK_PET_UNMODELLED`
 

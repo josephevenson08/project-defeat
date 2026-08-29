@@ -103,6 +103,16 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   that grants Kill Command 10% crit a rank — a per-spell bonus, where every field here is shaped
  *   like an actor. The estimate names the pet family it assumes, because the eight families span 0.91
  *   to 1.1 on damage and this app has no picker for them.
+ * - **Spells record a school now**, for all 18 caster abilities that have one, each read off its own
+ *   `SpellSchool` upstream rather than inferred from the class — a Druid's Starfire is Arcane, not
+ *   Nature. That unlocks school-scoped multipliers, of which **Demonic Sacrifice is the first**: a
+ *   warlock who sacrifices their demon gets +15% to Shadow or Fire, applied per spell rather than to
+ *   the total.
+ *
+ *   **It moves nothing in the calibration table, and that is a harness limitation rather than a
+ *   modelling one.** The best-case harness fills one tree, so only Demonology reaches Demonic
+ *   Sacrifice — and Demonology is the one spec that keeps its demon instead of sacrificing it. The
+ *   mechanism is asserted directly instead of through the table, because the table cannot show it.
  * - **Slice and Dice is modelled for every rogue, and it deals no damage.** It spends 25 energy and
  *   five combo points to buy **30% melee speed**, so the multiplier lands in the white-damage swing
  *   rate beside gear haste and Flurry rather than in the damage table. It was worth about a fifth to

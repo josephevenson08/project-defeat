@@ -5,6 +5,7 @@ export const druidSignatureAbilities: readonly SignatureAbility[] = [
     className: 'Druid',
     spec: 'Balance',
     name: 'Starfire',
+    spellSchool: 'Arcane',
     spellId: 26986,
     rank: 8,
     requiredLevel: 67,

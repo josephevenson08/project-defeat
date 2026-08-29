@@ -182,6 +182,9 @@ each pinned by an assertion these days.
   pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **Spell school on every caster ability**, sourced from each spell's own `SpellSchool` upstream, plus
+  school-scoped damage multipliers in `TalentModifiers`. Demonic Sacrifice is the first user; the
+  per-spell talent groups it also unblocks are not built yet.
 - **A Demonology warlock's Felguard, as a second attacker on the caster path** — which had no pet
   concept before, exactly as the physical path did not. It inherits attack power from the owner's
   spell power. Affliction and Destruction sacrifice their demon instead, and the multiplier that buys

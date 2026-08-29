@@ -26,6 +26,7 @@ export const paladinSignatureAbilities: readonly SignatureAbility[] = [
     className: 'Paladin',
     spec: 'Protection',
     name: 'Consecration',
+    spellSchool: 'Holy',
     spellId: 27173,
     rank: 6,
     requiredLevel: 70,
