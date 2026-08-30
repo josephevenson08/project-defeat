@@ -352,6 +352,52 @@ deliver most of the accuracy without it.
 
 ---
 
+## Stage 3 delivered, and what the leverage order got right and wrong, 2026-08-30
+
+Six pieces landed after the pet, in the order this document recommended. Recording them here because
+the sections below stop at the pet and the *recommendation* above is what they were tested against.
+
+| Piece | Specs moved | Result |
+|---|---|---|
+| Slice and Dice + Combat Potency | 3 Rogue | 2.0x → 1.6x, and ~20% each |
+| Poisons | 3 Rogue | Assassination 1.3x → 1.2x |
+| Rake and Rip | Druid Feral | 2.3x → 1.8x |
+| The Felguard | Warlock Demonology | 2.2x → 1.9x |
+| Spell school | none directly | unblocked four things |
+| Real talent builds | 17 specs | Arms 1.5x → 1.3x |
+
+### What the leverage order got right
+
+**"Slice and Dice, poisons and Combat Potency — all of it is rate arithmetic"** was correct, and
+Combat went from second-worst to mid-pack on it. The predicted **fixed point** — haste, off-hand
+swings, Combat Potency energy, filler rate, finishers, haste — turned out to be exactly real and
+converges in three passes, the same treatment Frenzy needed.
+
+### What it got wrong, and both errors are the same shape
+
+**It listed spell school fourth, as infrastructure.** That ranking assumed nothing visible moves the
+day it lands. Wrong: Demonic Sacrifice is +15% of a caster's damage for two of three warlock specs,
+and it is *only* reachable through a school. The item was undervalued because it was described by
+what it *is* rather than by what it *unblocks*.
+
+**It did not mention the harness at all.** The best-case rig filled one tree to 61 points, which is
+neither a real build nor a ceiling, and that turned out to matter more than two of the features on
+the list — it hid a working feature entirely and made a wrong number look plausible. A measurement
+rig is not a feature, so it never made a leverage list; it should have.
+
+The generalisation worth keeping: **rank work by what it unblocks and by what it lets you trust, not
+only by the DPS it adds.**
+
+### The two mechanics most worth not rediscovering
+
+- **Bleeds ignore armor**, and upstream says so in a comment inside `applyResistances` rather than
+  anywhere you would look first. Worth ~26% of every tick. Rake's *opener* is not periodic and does
+  take armour — a split inside one ability.
+- **Poisons roll on the spell table**, so they use spell hit, which a rogue has none of. That is what
+  Master Poisoner exists for, and why its bonus is scoped to two spells rather than to the rogue.
+
+---
+
 ## Frenzy and Focused Fire close the pet, 2026-08-27
 
     Hunter Beast Mastery  1500 -> 1565   (1.4x -> 1.3x)
