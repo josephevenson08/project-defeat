@@ -78,6 +78,13 @@ behind every claim of its that quotes a number.
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
   `public/icons/` (1,625 files, 2.8 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
+- **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
+  coordinates from Wowhead, covering the whole 1-375 climb. Each material shows a density map of where
+  its nodes actually are, with a suggested circuit through the busiest clusters. There is no zone art
+  underneath: coordinates are percentages of a zone's own extent, so the farmable region draws its own
+  shape. The circuit is computed here rather than copied from anyone's guide, and the caption says it
+  is a starting line rather than an optimal one. The other eleven professions carry tiers, trainer
+  levels, and either farm spots or recipe paths — only two professions have world nodes to draw
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations

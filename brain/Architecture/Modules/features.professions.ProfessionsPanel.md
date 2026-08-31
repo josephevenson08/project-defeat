@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/ProfessionsPanel.tsx
-lines: 158
+lines: 185
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.ProfessionsPanel
 
-`src/features/professions/ProfessionsPanel.tsx` · **features** layer · 158 lines
+`src/features/professions/ProfessionsPanel.tsx` · **features** layer · 185 lines
 
 From the top of the file:
 
@@ -27,6 +27,7 @@ From the top of the file:
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[features.professions.FarmingRouteMap]] — `src/features/professions/FarmingRouteMap.tsx`
 
 ## Imported by
 

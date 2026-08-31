@@ -2,23 +2,24 @@
 type: module
 layer: domain
 source: src/domain/professions/index.ts
-lines: 14
+lines: 25
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.index
 
-`src/domain/professions/index.ts` · **domain** layer · 14 lines
+`src/domain/professions/index.ts` · **domain** layer · 25 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `allProfessions`, `craftingLevelingPaths`, `gatheringMaterialFarming`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `MaterialFarmSpot`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RecipeLeveling`, `sampleProfessions`
+**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `gatheringMaterialFarming`, `GatheringNode`, `gatheringNodes`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `MaterialFarmSpot`, `nodesForProfession`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RecipeLeveling`, `routeLength`, `routesForNode`, `sampleProfessions`, `SpawnPoint`
 
 ## Imports
 
+- [[domain.professions.farmingRoutes]] — `src/domain/professions/farmingRoutes.ts`
 - [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.professions.sampleCraftingGuides]] — `src/domain/professions/sampleCraftingGuides.ts`
 - [[domain.professions.sampleGatheringMaterials]] — `src/domain/professions/sampleGatheringMaterials.ts`
@@ -27,6 +28,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.professions.FarmingRouteMap]] — `src/features/professions/FarmingRouteMap.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 ## Concepts & phases

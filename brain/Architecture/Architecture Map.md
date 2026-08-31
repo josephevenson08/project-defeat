@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-163 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+165 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -53,7 +53,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (37)
+### features (38)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -72,6 +72,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
 - [[features.gear.slotGlyphs]] · 3 importers
+- [[features.professions.FarmingRouteMap]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.raidcomp.exportRosterImage]] · 1 importers
 - [[features.raidcomp.RaidCompositionPanel]] · 1 importers
@@ -95,7 +96,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (113)
+### domain (114)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -161,8 +162,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gems.sampleGems]] · 5 importers
 - [[domain.icons.icons]] · 1 importers
 - [[domain.icons.iconsJson.d]] · 0 importers
-- [[domain.professions.index]] · 1 importers
-- [[domain.professions.professionTypes]] · 5 importers
+- [[domain.professions.farmingRoutes]] · 1 importers
+- [[domain.professions.index]] · 2 importers
+- [[domain.professions.professionTypes]] · 6 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleGatheringMaterials]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 1 importers

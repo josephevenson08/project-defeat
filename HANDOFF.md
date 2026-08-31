@@ -5,6 +5,77 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-08-30, the Professions tab has farming routes)
+
+**Every gathering node in the game, and a route drawn from where they actually spawn.** 45 nodes,
+**14,091 real spawn coordinates**, covering the whole 1-375 climb rather than Outland alone.
+
+### It is an ingest because the alternative was taking someone's work
+
+`professionTypes.ts` has recorded since it was written that wow-professions.com's routes are
+**"linked, never copied"** — they are that site's craft. That decision still stands, and this does not
+touch it. Wowhead publishes the **spawn coordinates** of every gathering node as plain data, and a
+loop computed from those points is our own work rather than theirs.
+
+**And Blizzard's zone art cannot be vendored**, which turned out to be a design rather than a
+limitation: coordinates are percentages of a zone's own extent, so plotting them on a bare square
+reproduces the shape of the farmable region without reproducing the map. The node cloud *is* the
+picture. A player who knows the zone recognises it instantly.
+
+### How a route is computed
+
+Spawns bucket into a **16x16 density grid**; cells at 35% or more of the busiest earn a stop;
+nearest-neighbour orders them into a circuit. Felweed in Hellfire Peninsula: 245 spawns, 81 cells,
+26 stops. Copper in the Barrens: 13 stops.
+
+It is a heuristic and **the caption says so on screen**, not only in the source — "a starting line
+rather than an optimal one". The optimum is a travelling-salesman problem nobody needs solved here.
+
+Density is **opacity on one neutral**, and the route takes the profession accent the card already
+carries. A red-to-green heat ramp would break the one rule this design is built on: item quality owns
+saturated colour and nothing competes with it.
+
+### Only two professions have maps, and that is the game rather than a gap
+
+**Herbalism (11 maps) and Mining (18)** are the professions with world nodes. Skinning comes off mobs,
+Fishing off pools, and the eight crafting professions consume materials rather than gathering them.
+
+**All thirteen still carry information**, which was the requirement: tiers and trainer levels for every
+one, zones plus skill range plus character level for the four gathering ones, and recipe paths for the
+eight crafting ones.
+
+### Three things the ingest caught, and one it got wrong
+
+- **Crates.** The first pass swept a range of object ids and kept whatever came back, which pulled in
+  a Crumpled Map, a Dalaran Crate and an Excavation Supply Crate — objects sitting between the herb
+  ids. Every node is declared with the name Wowhead must return now, so a wrong id fails.
+- **The sampling stride.** Wowhead returns coordinates sorted by x, so thinning 2.3 MB down for the
+  bundle by slicing the first N would have cut the eastern half off every zone and the map would have
+  confidently shown nodes in the wrong place. Sampled by stride, asserted against synthetic data.
+- **Two nodes have no spawn data at all** — Ragveil and Ancient Lichen both return an empty
+  `g_mapperData`, checked live rather than from cache. Recorded so the absence reads as known.
+- **And one assertion I had to walk back**: I claimed every zone spans more than 20% of its width, and
+  a real one spans 1.7%. That is a legitimately tight cluster, not truncation. The real-data check is
+  scoped to sampled zones now.
+
+### Three suite runs died before one gave a verdict, all my fault
+
+Worth recording because each failed differently and the second masked the first:
+
+1. **Edited `src` during a running suite** — that run described no single version of the code.
+2. **Started a second suite while the first was still going** — `reuseExistingServer: true` meant it
+   adopted the first run's dev server, and the first took that server down on exit. Result: 21
+   failures across planner panels, raid composition and layout, every one
+   `net::ERR_CONNECTION_REFUSED`. It looked exactly like a broad regression.
+3. **The session ended mid-run**, killing it at 221/221 before the summary printed.
+
+The compromised run also reported **"exit code 0"** through the task notification while
+`SUITE_EXIT=1` sat inside the file — the wrapper's exit, not the suite's. That is precisely the case
+the repo's "never gate on a piped tail" rule exists for, arriving through a channel the rule does not
+name. **Read the exit code the suite itself wrote.**
+
+---
+
 ## Start here (2026-08-27, the harness measures a build a raider plays)
 
 **The calibration harness used a build nobody plays.** It filled a spec's primary tree in listed
@@ -1678,7 +1749,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 220 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 221 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```
@@ -1728,6 +1799,7 @@ node tools/ingest/validate-sample.mjs --sample 32 --max-phase 2 --quality Epic
 node tools/ingest/reconcile-curated.mjs --check-wowhead
 node tools/ingest/ingest-talents.mjs --class Warrior  # one class; 9 classes = 579 talents
 node tools/ingest/ingest-talent-builds.mjs      # wowsims raiding builds for 17 of 20 DPS specs
+node tools/ingest/ingest-node-spawns.mjs        # 45 gathering nodes, 14,091 spawn coordinates
 node tools/ingest/link-raid-loot.mjs            # links raid loot to the catalogue by exact name
 node tools/ingest/wowhead-lookup.mjs --spell-name "Battle Shout"  # read-only lookup aid
 node tools/ingest/ingest-buff-scope.mjs         # party vs raid scope for all 39 buffs/debuffs
