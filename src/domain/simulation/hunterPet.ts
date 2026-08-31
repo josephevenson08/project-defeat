@@ -171,9 +171,34 @@ export const HUNTER_PET_CLAW: HunterPetAbility = {
 /** In `PetConfigs` order: primary first, secondary second, which is the order `OnGCDReady` tries them. */
 export const HUNTER_PET_ABILITIES: readonly HunterPetAbility[] = [HUNTER_PET_BITE, HUNTER_PET_CLAW]
 
-/** Named so the estimate can say what it left out, rather than reporting a pet that is quietly too small. */
-export const HUNTER_PET_UNMODELLED =
-  'the pet presses Bite and Claw out of its focus bar, and Kill Command off the owner’s crits, with Frenzy speeding its swings. Bite and Claw are flat rolls that do not scale with attack power, so gear moves the pet’s auto attack and leaves them exactly where they are; Kill Command is a real weapon swing and does scale. Not modelled: Bestial Wrath, which needs a cooldown usage policy, and the half of Focused Fire that adds 10% crit a rank to Kill Command specifically, which would need a per-spell crit field.'
+/**
+ * What the estimate says the pet is doing, built from what it **actually did** rather than from one
+ * fixed sentence.
+ *
+ * The static version claimed the pet "presses Bite and Claw, and Kill Command off the owner's crits,
+ * with Frenzy speeding its swings" on **every** hunter — including one with no ranged weapon, who
+ * fires no shots, lands no crits and so gets no Kill Command at all, and an untalented one with no
+ * Frenzy. Wrong in the confident direction, on the one surface whose job is being read.
+ *
+ * A browser pass found it and the tests could not have: every number was right and only the prose
+ * was lying. That is the argument for driving the app rather than reading the diff.
+ */
+export function hunterPetUnmodelled(options: { killCommand: boolean; frenzy: boolean }): string {
+  const pressing = ['Bite and Claw out of its focus bar']
+  if (options.killCommand) pressing.push('Kill Command off the owner’s crits')
+
+  const missing = ['Bestial Wrath, which needs a cooldown usage policy']
+  if (!options.killCommand) missing.push('Kill Command, which needs the owner to be critting before it fires at all')
+  if (!options.frenzy) missing.push('Frenzy, which this build has not talented')
+  missing.push('the half of Focused Fire that adds 10% crit a rank to Kill Command specifically')
+
+  return (
+    `the pet presses ${pressing.join(', and ')}.` +
+    (options.frenzy ? ' Frenzy is speeding its swings.' : '') +
+    ' Bite and Claw are flat rolls that do not scale with attack power, so gear moves the pet’s' +
+    ` auto attack and leaves them exactly where they are. Not modelled: ${missing.join('; ')}.`
+  )
+}
 
 /**
  * Kill Command, which is two spells and one attack.

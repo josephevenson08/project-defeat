@@ -5698,6 +5698,24 @@ test('a hunter fights with a pet, and the pet rolls its own crit rather than the
    * names those two and the three real remaining gaps instead.
    */
   expect(result.summary, 'the modelled abilities are named').toMatch(/Bite and Claw/)
+
+  /*
+   * **The summary must not claim a pet ability that did not fire**, which is what a browser pass
+   * caught and the tests could not: every number was right and only the prose was lying. A hunter
+   * with no ranged weapon fires no shots, lands no crits and so gets no Kill Command at all, and an
+   * untalented one has no Frenzy — and the old fixed sentence asserted both on every hunter.
+   *
+   * Asserted against the damage table rather than against a literal, so the sentence and the number
+   * cannot drift apart: if Kill Command contributes nothing it must not be named as something the
+   * pet presses, and if it contributes it must be.
+   */
+  const namesKillCommand = /presses[^.]*Kill Command/.test(result.summary)
+  const firesKillCommand = (result.damageSources ?? []).some((source) => source.name === 'Pet Kill Command')
+  expect(namesKillCommand, 'the summary names Kill Command exactly when it fired').toBe(firesKillCommand)
+
+  const claimsFrenzy = /Frenzy is speeding/.test(result.summary)
+  const frenzyRow = result.breakdown.some((entry) => entry.label === 'Pet Frenzy uptime')
+  expect(claimsFrenzy, 'and claims Frenzy exactly when it is talented').toBe(frenzyRow)
   expect(result.summary, 'and so are the ones that are not').toMatch(/Frenzy/)
   expect(result.summary, 'Kill Command is named as unmodelled, not as unimplemented').toMatch(/Kill Command/)
   expect(result.summary, 'the flat-roll caveat is the one that decides what they are worth').toMatch(
@@ -6246,7 +6264,18 @@ test('only Demonology keeps its demon, because the other two sacrifice it', () =
   // And the estimate says what it left out, including why the other two specs have nothing.
   const { result } = bestCaseSimulation('Warlock', 'Demonology', 'Caster DPS')
   expect(result.summary).toMatch(/Felguard/)
-  expect(result.summary, 'the spell-school block is named').toMatch(/spell school/i)
+  /*
+   * **The demon summary must not still say spell school is unrecorded.** It said exactly that, and
+   * it stopped being true one commit later when `spellSchool` landed — the same rot this repo has
+   * now caught four times. Affliction and Destruction get no demon because they *sacrifice* it for a
+   * multiplier that is modelled, not because the school is missing.
+   */
+  expect(result.summary, 'the reason the other two specs have no demon is the sacrifice').toMatch(
+    /sacrifices it for a school-scoped damage multiplier/,
+  )
+  expect(result.summary, 'and not a claim that spell school is unrecorded').not.toMatch(
+    /records no spell school|no spell school at all/i,
+  )
 })
 
 test('bleeds ignore armor, and Rake’s opener does not', () => {

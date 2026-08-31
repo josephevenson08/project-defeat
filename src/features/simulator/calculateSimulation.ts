@@ -27,10 +27,10 @@ import {
   HUNTER_PET_DEFAULT_FAMILY,
   HUNTER_PET_FRENZY_HASTE,
   HUNTER_PET_KILL_COMMAND,
-  HUNTER_PET_UNMODELLED,
   estimateHunterPet,
   estimateHunterPetKillCommand,
   hunterPetAttackPower,
+  hunterPetUnmodelled,
   hunterPetCritChance,
 } from '../../domain/simulation/hunterPet'
 import {
@@ -1480,7 +1480,7 @@ function calculatePhysicalDps(
    * to be told this number is not about their pet, rather than discovering it by disagreeing with it.
    */
   const petSummary = hunterPet
-    ? ` The pet is counted as a second attacker, modelled as a ${HUNTER_PET_DEFAULT_FAMILY} — the damage families span 0.91 to 1.1 upstream and this app has no pet picker — and ${HUNTER_PET_UNMODELLED}`
+    ? ` The pet is counted as a second attacker, modelled as a ${HUNTER_PET_DEFAULT_FAMILY} — the damage families span 0.91 to 1.1 upstream and this app has no pet picker — and ${hunterPetUnmodelled({ killCommand: (killCommand?.dps ?? 0) > 0, frenzy: hunterPet.frenzyMultiplier > 1 })}`
     : ''
 
   const holySummary = paladinHoly

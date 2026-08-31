@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/hunterPet.ts
-lines: 597
+lines: 622
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.hunterPet
 
-`src/domain/simulation/hunterPet.ts` · **domain** layer · 597 lines
+`src/domain/simulation/hunterPet.ts` · **domain** layer · 622 lines
 
 From the top of the file:
 
@@ -36,9 +36,9 @@ From the top of the file:
 
 ## Exports
 
-**function** — `estimateHunterPet`, `estimateHunterPetKillCommand`, `frenzySpeedMultiplier`, `hunterPetAbilityRates`, `hunterPetAttackPower`, `hunterPetCritChance`, `killCommandUsesPerSecond`
+**function** — `estimateHunterPet`, `estimateHunterPetKillCommand`, `frenzySpeedMultiplier`, `hunterPetAbilityRates`, `hunterPetAttackPower`, `hunterPetCritChance`, `hunterPetUnmodelled`, `killCommandUsesPerSecond`
 
-**const** — `HUNTER_PET_ABILITIES`, `HUNTER_PET_AGILITY_PER_CRIT_PERCENT`, `HUNTER_PET_ATTACK_POWER_INHERITANCE`, `HUNTER_PET_AUTO_ATTACK_MULTIPLIER`, `HUNTER_PET_BASE_AGILITY`, `HUNTER_PET_BASE_STRENGTH`, `HUNTER_PET_BITE`, `HUNTER_PET_CLAW`, `HUNTER_PET_DEFAULT_FAMILY`, `HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER`, `HUNTER_PET_FLAT_ATTACK_POWER`, `HUNTER_PET_FLAT_CRIT_PERCENT`, `HUNTER_PET_FOCUS_PER_SECOND`, `HUNTER_PET_FOCUS_PER_TICK`, `HUNTER_PET_FOCUS_TICK_SECONDS`, `HUNTER_PET_FRENZY_DURATION_SECONDS`, `HUNTER_PET_FRENZY_HASTE`, `HUNTER_PET_FRENZY_PROC_CHANCE_PER_RANK`, `HUNTER_PET_GCD_SECONDS`, `HUNTER_PET_HAPPINESS_MULTIPLIER`, `HUNTER_PET_KILL_COMMAND`, `HUNTER_PET_MAX_FOCUS`, `HUNTER_PET_MELEE_SPEED_MULTIPLIER`, `HUNTER_PET_STRENGTH_TO_ATTACK_POWER`, `HUNTER_PET_SWING_SECONDS`, `HUNTER_PET_UNMODELLED`, `HUNTER_PET_WEAPON_DAMAGE`, `noHunterPetTalents`
+**const** — `HUNTER_PET_ABILITIES`, `HUNTER_PET_AGILITY_PER_CRIT_PERCENT`, `HUNTER_PET_ATTACK_POWER_INHERITANCE`, `HUNTER_PET_AUTO_ATTACK_MULTIPLIER`, `HUNTER_PET_BASE_AGILITY`, `HUNTER_PET_BASE_STRENGTH`, `HUNTER_PET_BITE`, `HUNTER_PET_CLAW`, `HUNTER_PET_DEFAULT_FAMILY`, `HUNTER_PET_FAMILY_DAMAGE_MULTIPLIER`, `HUNTER_PET_FLAT_ATTACK_POWER`, `HUNTER_PET_FLAT_CRIT_PERCENT`, `HUNTER_PET_FOCUS_PER_SECOND`, `HUNTER_PET_FOCUS_PER_TICK`, `HUNTER_PET_FOCUS_TICK_SECONDS`, `HUNTER_PET_FRENZY_DURATION_SECONDS`, `HUNTER_PET_FRENZY_HASTE`, `HUNTER_PET_FRENZY_PROC_CHANCE_PER_RANK`, `HUNTER_PET_GCD_SECONDS`, `HUNTER_PET_HAPPINESS_MULTIPLIER`, `HUNTER_PET_KILL_COMMAND`, `HUNTER_PET_MAX_FOCUS`, `HUNTER_PET_MELEE_SPEED_MULTIPLIER`, `HUNTER_PET_STRENGTH_TO_ATTACK_POWER`, `HUNTER_PET_SWING_SECONDS`, `HUNTER_PET_WEAPON_DAMAGE`, `noHunterPetTalents`
 
 **type** — `FrenzyInput`, `HunterPetAbility`, `HunterPetAbilityEstimate`, `HunterPetEstimate`, `HunterPetInput`, `HunterPetKillCommandEstimate`, `HunterPetKillCommandInput`, `HunterPetTalents`
 

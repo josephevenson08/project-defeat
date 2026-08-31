@@ -13,9 +13,10 @@
  *     }
  *
  * Affliction and Destruction sacrifice — upstream's only preset is a Destruction warlock sacrificing
- * a Succubus — so what they are missing is a **school-scoped damage multiplier**, and this simulator
- * records no spell school at all. That half is genuinely blocked, and it is one more thing on the
- * list of four that spell school already holds up.
+ * a Succubus — so what they get instead is a **school-scoped damage multiplier**. That was genuinely
+ * blocked when this module was written and stopped being so one commit later, when `spellSchool`
+ * landed: those two specs now take the multiplier rather than the pet, which is the trade upstream's
+ * branch describes rather than a gap.
  *
  * **Demonology is the exception, and it is the spec that needs this.** Summon Felguard is the 41-point
  * Demonology talent — the demon *is* the spec — so a Demonology warlock keeps it, and Demonology is
@@ -88,7 +89,7 @@ export const FELGUARD_HAS_FAMILY_MULTIPLIER = false
 
 /** Named so the estimate can say what it left out rather than reporting a demon that is quietly small. */
 export const WARLOCK_PET_UNMODELLED =
-  'the demon contributes white damage only. Cleave and Intercept are not modelled, and neither is Demonic Frenzy as a real stacking aura — upstream pre-stacks it as a flat multiplier and this carries that across. Affliction and Destruction get no demon at all here, because the standard build sacrifices it for a school-scoped damage multiplier and this simulator records no spell school.'
+  'the demon contributes white damage only. Cleave and Intercept are not modelled, and neither is Demonic Frenzy as a real stacking aura — upstream pre-stacks it as a flat multiplier and this carries that across. Affliction and Destruction get no demon at all here, because the standard build sacrifices it for a school-scoped damage multiplier — which is modelled, so those two specs gain the multiplier instead of the pet rather than losing both.'
 
 export type WarlockPetTalents = {
   /** Multiplies the demon's damage. Soul Link 1.05, Unholy Power +4% a rank, Master Demonologist +1%. */

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/warlockPet.ts
-lines: 171
+lines: 172
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.warlockPet
 
-`src/domain/simulation/warlockPet.ts` · **domain** layer · 171 lines
+`src/domain/simulation/warlockPet.ts` · **domain** layer · 172 lines
 
 From the top of the file:
 
@@ -27,9 +27,10 @@ From the top of the file:
 >     }
 > 
 > Affliction and Destruction sacrifice — upstream's only preset is a Destruction warlock sacrificing
-> a Succubus — so what they are missing is a **school-scoped damage multiplier**, and this simulator
-> records no spell school at all. That half is genuinely blocked, and it is one more thing on the
-> list of four that spell school already holds up.
+> a Succubus — so what they get instead is a **school-scoped damage multiplier**. That was genuinely
+> blocked when this module was written and stopped being so one commit later, when `spellSchool`
+> landed: those two specs now take the multiplier rather than the pet, which is the trade upstream's
+> branch describes rather than a gap.
 > 
 > **Demonology is the exception, and it is the spec that needs this.** Summon Felguard is the 41-point
 > Demonology talent — the demon *is* the spec — so a Demonology warlock keeps it, and Demonology is
