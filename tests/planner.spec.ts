@@ -133,6 +133,15 @@ import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
+import {
+  DENSITY_GRID,
+  computeRoute,
+  densityCells,
+  gatheringNodes,
+  nodesWithoutSpawnData,
+  routeLength,
+  routesForNode,
+} from '../src/domain/professions'
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
@@ -6782,6 +6791,109 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
     focusAbilityShareOfPet({ [idOf('Hunter', 'Bestial Discipline')]: 2 }),
     'Bestial Discipline is what makes the focus abilities worth counting',
   ).toBeGreaterThan(focusAbilityShareOfPet({}) * 1.5)
+})
+
+test('a farming route is computed from real spawns, and the sampling keeps the zone’s shape', () => {
+  /*
+   * **The route is ours and the coordinates are Wowhead's**, which is the whole reason this can exist
+   * at all: `professionTypes.ts` records that wow-professions.com's routes are linked and never
+   * copied, because they are that site's craft. Spawn coordinates are facts; a loop derived from them
+   * is our own work.
+   */
+  expect(gatheringNodes.length, 'every gathering node across 1-375').toBe(45)
+  expect(
+    gatheringNodes.filter((node) => node.profession === 'Herbalism').length +
+      gatheringNodes.filter((node) => node.profession === 'Mining').length,
+    'and all of them belong to a gathering profession',
+  ).toBe(gatheringNodes.length)
+
+  /*
+   * **No crates.** A first pass swept a range of object ids and kept whatever came back, which pulled
+   * in a Crumpled Map, a Dalaran Crate and an Excavation Supply Crate — objects sitting between the
+   * herb ids. The ingest declares the name it expects now, so a wrong id fails rather than shipping.
+   */
+  expect(gatheringNodes.filter((node) => /Crate|Crumpled|Supply/.test(node.name))).toEqual([])
+
+  // The two nodes Wowhead publishes nothing for are recorded, so the gap reads as known.
+  expect(nodesWithoutSpawnData.map((n) => n.name).sort()).toEqual(['Ancient Lichen', 'Ragveil'])
+
+  /*
+   * **The sampling stride is the assertion that matters most here.** Wowhead returns coordinates
+   * sorted by x, so thinning by slicing the first N would cut the eastern half off every zone and the
+   * density map would confidently show nodes in the wrong place. Every sampled zone must still span
+   * most of its own width — a truncated one would bunch into the low-x end.
+   */
+  const sampled = gatheringNodes.flatMap((node) => node.zones.filter((zone) => zone.sampled))
+  for (const zone of sampled) {
+    const xs = zone.coords.map(([x]) => x)
+    expect(Math.max(...xs) - Math.min(...xs), `${zone.zone} must still span its zone after sampling`).toBeGreaterThan(
+      40,
+    )
+  }
+
+  /*
+   * The property matters more than the one zone that currently trips it, so it is asserted against
+   * the stride itself: thinning an evenly spread set must keep both ends. A `slice(0, n)` passes
+   * every other check in this test and fails only this one.
+   *
+   * **A tight cluster is not a truncation**, which is why the real-data check above is scoped to
+   * sampled zones. Some nodes legitimately spawn in a single 2%-wide pocket of a secondary zone, and
+   * asserting a minimum spread across every zone called that a defect.
+   */
+  const ascending: [number, number][] = Array.from({ length: 1000 }, (_, i) => [i / 10, 50])
+  const stride = ascending.length / 320
+  const thinned = Array.from({ length: 320 }, (_, i) => ascending[Math.floor(i * stride)])
+  expect(thinned[0][0], 'sampling keeps the western end').toBeCloseTo(0, 5)
+  expect(thinned[thinned.length - 1][0], 'and the eastern one').toBeGreaterThan(99)
+
+  /*
+   * Density buckets the spawns into a coarse grid, and intensity is relative to the busiest cell, so
+   * the map reads the same whether a zone holds 50 nodes or 500.
+   */
+  const cells = densityCells([
+    [0, 0],
+    [1, 1],
+    [99.9, 99.9],
+  ])
+  expect(cells.length, 'two corners, two cells').toBe(2)
+  // The boundary point must land in the last cell rather than one past it.
+  expect(cells.every((cell) => cell.x < DENSITY_GRID && cell.y < DENSITY_GRID)).toBe(true)
+  expect(Math.max(...cells.map((cell) => cell.intensity)), 'the busiest cell is 1').toBe(1)
+
+  /*
+   * **The route skips the lonely cells on purpose.** A circuit that detours for one herb is worse
+   * than one that skips it, and keeping every cell would draw a scribble across the whole zone
+   * rather than a route.
+   */
+  const sparse = densityCells([...Array(40).fill([50, 50]), [5, 95]] as [number, number][])
+  expect(computeRoute(sparse).length, 'one lonely spawn does not earn a stop').toBe(1)
+
+  const felweed = gatheringNodes.find((node) => node.name === 'Felweed')!
+  const route = routesForNode(felweed)[0]
+  expect(route.zone, 'busiest zone first').toBe('Hellfire Peninsula')
+  expect(route.stops.length).toBeGreaterThan(5)
+  expect(route.routeLength).toBeGreaterThan(0)
+
+  // Every stop is inside the zone, since coordinates are percentages of its own extent.
+  for (const [x, y] of route.stops) {
+    expect(x).toBeGreaterThanOrEqual(0)
+    expect(x).toBeLessThanOrEqual(100)
+    expect(y).toBeGreaterThanOrEqual(0)
+    expect(y).toBeLessThanOrEqual(100)
+  }
+  // And visited once each, which is what makes it a circuit rather than a wander.
+  expect(new Set(route.stops.map(([x, y]) => `${x},${y}`)).size).toBe(route.stops.length)
+
+  /*
+   * **Nearest-neighbour has to beat the order the cells arrived in**, or the ordering step is doing
+   * nothing and the line on screen would be decoration. Asserted against the same stops in
+   * density order, which is what `computeRoute` starts from.
+   */
+  const byDensity = route.cells
+    .filter((cell) => cell.intensity >= 0.35)
+    .sort((a, b) => b.count - a.count)
+    .map(({ x, y }) => [((x + 0.5) / DENSITY_GRID) * 100, ((y + 0.5) / DENSITY_GRID) * 100] as [number, number])
+  expect(routeLength(route.stops), 'ordering the stops shortens the loop').toBeLessThan(routeLength(byDensity))
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {

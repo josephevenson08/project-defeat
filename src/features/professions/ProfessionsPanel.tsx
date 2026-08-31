@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { gatheringNodes, routesForNode } from '../../domain/professions'
+import { FarmingRouteMap } from './FarmingRouteMap'
 import { Panel } from '../../components/layout/Panel'
 import { allProfessions, getProfessionProfile } from '../../domain/professions'
 import type { Profession, ProfessionProfile } from '../../domain/professions'
@@ -18,6 +20,23 @@ function describeProfession(profile: ProfessionProfile): string {
     return `${profile.levelingPath.length} recipe ${profile.levelingPath.length === 1 ? 'step' : 'steps'}`
   }
   return `${profile.tiers.length} skill tiers`
+}
+
+/**
+ * The drawable routes for one material, busiest zone first.
+ *
+ * **Only two professions have any**, and that is a fact about the game rather than a gap here:
+ * Herbalism and Mining are the ones with world nodes. Skinning comes off mobs, Fishing off pools,
+ * and the eight crafting professions consume materials rather than gathering them — so their rows
+ * carry the zones, skill range and character level in words, with no map, because there is no node
+ * cloud to draw.
+ *
+ * Capped at the top two zones. A third map for a material's least popular zone is a scroll cost
+ * without a decision behind it.
+ */
+function routesForMaterial(material: string) {
+  const node = gatheringNodes.find((entry) => entry.material === material)
+  return node ? routesForNode(node).slice(0, 2) : []
 }
 
 export function ProfessionsPanel() {
@@ -120,6 +139,14 @@ export function ProfessionsPanel() {
                     </div>
                     <p>{spot.zones.join(', ')}</p>
                     {spot.needsVerification && <small className="needs-verification">{spot.notes ?? 'Needs source verification.'}</small>}
+                    {/*
+                      The route map, for the materials that have a world node to draw. Attached to the
+                      material rather than to the profession, because "where do I farm this" is the
+                      question the row already answers in words and the map answers in a picture.
+                    */}
+                    {routesForMaterial(spot.material).map((route) => (
+                      <FarmingRouteMap key={`${route.node.objectId}-${route.zone}`} route={route} />
+                    ))}
                   </div>
                 ))}
               </div>
