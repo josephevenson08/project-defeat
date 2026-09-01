@@ -4,8 +4,13 @@ Project Defeat is a local-first React + TypeScript + Vite simulator/planner for 
 
 It is a working planner rather than an accuracy-complete simulator: gear, gems, enchants, talents,
 buffs, debuffs, consumables and raid composition are all real and sourced, while rotations remain the
-largest modelling gap. Every dataset is traceable to a pinned source, and anything the app cannot
-model says so on the surface that would otherwise imply it had.
+largest modelling gap. I'm in the process of implementing a simulation rule later on into this planner,
+at the moment it is not my top priority with this project. I'm specifically focusing on phase 2 of The
+Burning Crusade World of Warcraft expansion this go around in 2026. Once I have a working model and have
+it fully implemented, it will be able to be used for phase 2 and beyond. This is my biggest project yet
+because there are a lot of things I want to do with it, so please be patient with me. Every dataset is 
+traceable to a pinned source, and anything the app cannot model says so on the surface that would otherwise 
+imply it had.
 
 **Live: https://josephevenson08.github.io/project-defeat/**
 
