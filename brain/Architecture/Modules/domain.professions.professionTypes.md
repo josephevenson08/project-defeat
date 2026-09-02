@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/professionTypes.ts
-lines: 100
+lines: 118
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.professionTypes
 
-`src/domain/professions/professionTypes.ts` · **domain** layer · 100 lines
+`src/domain/professions/professionTypes.ts` · **domain** layer · 118 lines
 
 _No doc comment at the top of this file._
 

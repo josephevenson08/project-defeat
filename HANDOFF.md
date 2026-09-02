@@ -5,6 +5,103 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-02, the Professions tab is a book rather than a wall)
+
+**Pick a profession, get its own page.** The tab was a thirteen-card picker with the whole selected
+profession printed underneath it — a tier table, nineteen farm rows and up to thirty maps, all
+competing with the choice of profession. It is now an entry grid of icon-and-name cards that opens
+one page per profession, laid out the way a levelling guide actually reads: a skill range, what you
+gather or craft in it, and the trainer visit that gates the next one.
+
+### The bug this found, which is the fourth instance of a rule this repo wrote down itself
+
+**28 of 43 ingested node materials never reached the screen**, and the data had been right the whole
+time. `ProfessionsPanel` joined a route to a row with `node.material === spot.material` — exact string
+equality against a *display label*:
+
+```
+"Liferoot / Fadeleaf / Goldthorn"          -> matched nothing (all three had full coordinates)
+"Thorium Ore (incl. Rich Thorium Vein…)"   -> matched nothing (Thorium Ore had full coordinates)
+```
+
+Eight of Herbalism's nineteen rows and two of Mining's eleven silently drew nothing, so **the entire
+1-300 herb progression was mapless on screen** in the same session that shipped 14,091 coordinates.
+
+| | Before | After |
+|---|---|---|
+| Farm rows drawing a map | 15 | **25** |
+| Zone maps reachable | 29 | **90** |
+| Node materials reached | 15 / 43 | **38 / 43** |
+
+**Every profession test passed throughout, and that is the part worth keeping.** They asserted the
+*data* — 45 nodes, no crates, sampling preserves zone width — and not one asserted that a node
+reaches a surface. That is precisely "data wired to nothing", which the Decision Log names as this
+project's signature failure and lists three prior instances of. This is the fourth, and it landed in
+the same commit that wrote the rule down. There is now a reachability test, and the declared-gap list
+in it is named rather than counted so adding a gap fails rather than losing a map.
+
+The fix is `MaterialFarmSpot.materials` — the individual names, listed explicitly rather than parsed
+out of the label at render time. A split on "/" would have worked until a label contained one for
+another reason.
+
+### What each page carries now
+
+- **A skill range is the unit**, because it is what a player matches against their own skill bar.
+- **Zones are tabs, not stacked maps.** A 1-100 range spans six starting zones; six near-identical
+  squares in a column is the same information at six times the height.
+- **One map per range, merging every material in it.** At 1-100 you are picking Peacebloom,
+  Silverleaf *and* Earthroot on the same lap of Durotar, so that is one loop over three merged clouds
+  rather than three pictures of the same ride. The caption names which herbs the zone actually
+  carries and how many of each — 352 spawns, 31 stops, Silverleaf (150) · Peacebloom (117) ·
+  Earthroot (85).
+- **The tier table is gone and its content is not.** `trainingMilestones` turns it into markers
+  placed in the progression at the skill where the bar stops moving — "Train Expert at skill 125".
+  The field it reads is `minSkillToTrainNext`, whose name reads backwards from what it holds: on
+  Expert it is 125, the skill Expert becomes *trainable* at, not where Expert ends. Reading
+  `skillRange[0]` would have told a player to train at 150, fifty points after they got stuck.
+- **Crafting steps keep their shape** — `300-325 · 496x Bolt of Netherweave · 2,976 Netherweave
+  Cloth` — which the 300-375 data already had.
+
+### Routes are 11.5% shorter, and that is 2-opt rather than a better heuristic
+
+Nearest-neighbour leaves crossings, and a crossing is the one route error a player sees immediately:
+it reads as "why am I riding back past where I just was". 2-opt reverses segments while that shortens
+the loop. Measured across every real node cloud: **25,925 → 22,942**. Still a heuristic, still says so
+on screen — the caption now reads "visits the busiest clusters nearest-first, then uncrosses itself —
+a strong starting line rather than a proven optimum".
+
+### Material icons, from a source already vendored
+
+`materialIcons.json` joins material *name* to icon, because trade goods are not in the item catalogue
+and never will be — nobody equips Peacebloom. It reads the same MIT-licensed wowsims CSV at the same
+pinned commit as the item icons, so the two cannot describe different item sets. **69 of 73 resolve**;
+the four that do not are recorded under `missing` rather than discovered later, and are cases where
+the node and the item it yields are named differently (Netherdust Bush yields Netherdust Pollen).
+
+### Three things this deliberately did not do
+
+- **Crafting 1-300 is still nine placeholder rows** saying "see a dedicated vanilla guide". They now
+  render dimmed and distinct from real steps rather than identically to them, so the page stops
+  implying a detail it does not have. This is the next piece of work and it is a data job.
+- **Five ingested herbs are named by no farm row at all** — Arthas' Tears, Firebloom, Flame Cap,
+  Grave Moss, Purple Lotus. Their coordinates are in the bundle and nothing points at them. That is a
+  content gap in the rows rather than a join bug, so it was left rather than papered over.
+- **Crafting materials get no icons yet**, because `keyMaterials` is still prose in places — "15
+  Golden Sansam, Dreamfoil or Mountain Silversage, whichever matches the craft you picked". Splitting
+  a quantity off the front of a sentence to hang an icon on it is the same "a label is not a key"
+  mistake this session just spent its morning undoing. They get icons when they get structure.
+
+### And the owner's steer on sourcing, recorded
+
+The two wow-professions.com guides are the **reference for shape, not the source for content**. The
+repo's standing rule — routes linked, never copied — is unchanged, and the same move that made the
+maps possible applies to the crafting half when it is filled in: take recipe materials and skill-up
+colours as facts and *compute* the craft counts, rather than transcribing a published "102x Bolt of
+Linen Cloth". The existing 300-375 rows describe themselves as transcribed, which is closer to that
+line than the rest of the repo sits, and is worth revisiting when they are next touched.
+
+---
+
 ## Start here (2026-09-02, the owner set the priority and it is not the simulator)
 
 **The README was edited by the repo owner on 2026-09-01, and it is a scope decision this file was

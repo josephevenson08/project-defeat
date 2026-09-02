@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/FarmingRouteMap.tsx
-lines: 78
+lines: 86
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.FarmingRouteMap
 
-`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 78 lines
+`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 86 lines
 
 From the top of the file:
 
@@ -23,8 +23,12 @@ From the top of the file:
 > 
 > **The route is computed here and copied from nobody.** `professionTypes.ts` records that
 > wow-professions.com's routes are linked and never copied because they are that site's craft. The
-> line below comes out of `computeRoute` — density first, nearest-neighbour ordering — over Wowhead's
-> published spawn coordinates. It is a heuristic and the caption says so.
+> line below comes out of `computeRoute` — density first, nearest-neighbour ordering, then 2-opt to
+> uncross it — over Wowhead's published spawn coordinates. It is a heuristic and the caption says so.
+> 
+> **One map covers a whole skill range rather than one material**, because that is how a range is
+> farmed: at 1-100 you are picking Peacebloom, Silverleaf and Earthroot on the same lap of Durotar,
+> so the three clouds merge into one loop instead of drawing the same ride three times.
 
 ## Exports
 
@@ -36,7 +40,7 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
+- [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
 
 ## Concepts & phases
 

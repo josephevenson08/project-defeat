@@ -184,9 +184,18 @@ each pinned by an assertion these days.
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
 - **Farming route maps for the two gathering professions with world nodes** — 45 nodes and 14,091
   spawn coordinates ingested from Wowhead, bucketed into a density grid with a nearest-neighbour
-  circuit through the busiest clusters. Drawn without zone art, since coordinates are percentages of
-  each zone's own extent. Skinning and Fishing have no node data to draw and keep their written farm
-  spots.
+  circuit through the busiest clusters, then uncrossed with 2-opt (11.5% shorter across every real
+  node cloud). Drawn without zone art, since coordinates are percentages of each zone's own extent.
+  Skinning and Fishing have no node data to draw and keep their written farm spots.
+- **The Professions tab is an entry grid plus one page per profession** (2026-09-02). A skill range
+  is the unit; zones are tabs rather than stacked maps; one map merges every material in the range,
+  because that is how a range is farmed. The skill-tier table is gone and its content is not —
+  training requirements are markers placed in the progression at the skill where the bar stops
+  moving. **Rebuilding the join recovered 28 of 43 ingested nodes that had never reached a screen**:
+  the panel matched a node against a *display label* ("Liferoot / Fadeleaf / Goldthorn"), so most
+  rows silently drew nothing. Farm rows drawing a map went 15 → 25, reachable zone maps 29 → 90.
+  Still open here: crafting 1-300 is nine placeholder rows, and five ingested herbs are named by no
+  farm row at all.
 - **The calibration harness measures a build a raider plays** — wowsims' own raiding presets for 17 of
   the 20 DPS specs, ingested by `ingest-talent-builds.mjs`. It used to fill one tree to 61 points,
   which is neither realistic nor a ceiling. Three specs have no upstream preset and keep the old rule,

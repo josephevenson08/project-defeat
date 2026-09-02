@@ -2,22 +2,24 @@
 type: module
 layer: domain
 source: src/domain/professions/sampleProfessionTiers.ts
-lines: 191
+lines: 230
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.sampleProfessionTiers
 
-`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 191 lines
+`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 230 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `getProfessionTiers`
+**function** — `getProfessionTiers`, `trainingMilestones`
 
 **const** — `professionTiers`
+
+**type** — `TrainingMilestone`
 
 ## Imports
 

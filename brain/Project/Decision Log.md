@@ -188,6 +188,33 @@ Up: [[Project Defeat Brain]]
 
 _Anything you write below the marker above is kept when the brain is regenerated._
 
+## A display label is not a join key, and the test has to be about reachability
+
+Recorded 2026-09-02, after the Professions rebuild found that **28 of 43 ingested gathering nodes had
+never reached the screen**.
+
+`ProfessionsPanel` matched a route to a farm row with `node.material === spot.material`. But
+`spot.material` is written for a reader — "Liferoot / Fadeleaf / Goldthorn", "Thorium Ore (incl. Rich
+Thorium Vein at 275+)" — and equals no node's name. Eight of Herbalism's nineteen rows and two of
+Mining's eleven silently drew nothing, so the whole 1-300 herb progression was mapless on screen in
+the same session that shipped 14,091 coordinates.
+
+**Two rules come out of it, and the second is the load-bearing one.**
+
+The first is the obvious one: when a field is read by a person *and* by code, those are two fields.
+`materials` is now a listed array beside the label, populated explicitly rather than parsed — a split
+on "/" works until a label contains one for another reason.
+
+The second is about what the tests were doing. Every profession test passed throughout, because they
+all asserted the **data**: 45 nodes, no crates, sampling preserves each zone's width. Not one
+asserted that a node reaches a surface. That is this file's "plumbing before data" rule failing from the
+other direction — the plumbing was built, the data was ingested, and the *join between them* was the
+thing nobody tested. A dataset can be perfect, fully ingested, covered by assertions, and still render
+nothing.
+
+So a feature that ingests data now owes a test that the data comes out the far end, and the declared
+gaps in it are **named rather than counted** — a count passes when one gap is swapped for another.
+
 ## The biggest gap and the next piece of work are different claims
 
 Recorded 2026-09-02, after the repo owner's README edit of 2026-09-01 deprioritised the simulation

@@ -81,14 +81,20 @@ behind every claim of its that quotes a number.
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,625 files, 2.8 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,713 files, 3.0 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
+- **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
+  and each one opens on its own progression: a skill range, what you gather or craft in it, and the
+  trainer visit that gates the next one. There is no skill-tier table; training requirements are
+  markers placed at the skill where the bar stops moving
 - **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
-  coordinates from Wowhead, covering the whole 1-375 climb. Each material shows a density map of where
-  its nodes actually are, with a suggested circuit through the busiest clusters. There is no zone art
-  underneath: coordinates are percentages of a zone's own extent, so the farmable region draws its own
-  shape. The circuit is computed here rather than copied from anyone's guide, and the caption says it
-  is a starting line rather than an optimal one. The other eleven professions carry tiers, trainer
+  coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
+  merging every material farmed in that range, because that is how a range is farmed — at 1-100 you
+  are picking Peacebloom, Silverleaf and Earthroot on the same lap. Zones are tabs rather than stacked
+  maps. There is no zone art underneath: coordinates are percentages of a zone's own extent, so the
+  farmable region draws its own shape. The circuit is computed here rather than copied from anyone's
+  guide — density, nearest-neighbour, then 2-opt to uncross it — and the caption says it is a strong
+  starting line rather than a proven optimum. The other eleven professions carry tiers, trainer
   levels, and either farm spots or recipe paths — only two professions have world nodes to draw
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against

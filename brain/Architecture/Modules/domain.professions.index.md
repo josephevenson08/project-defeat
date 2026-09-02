@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/professions/index.ts
-lines: 25
+lines: 29
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.index
 
-`src/domain/professions/index.ts` · **domain** layer · 25 lines
+`src/domain/professions/index.ts` · **domain** layer · 29 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `gatheringMaterialFarming`, `GatheringNode`, `gatheringNodes`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `MaterialFarmSpot`, `nodesForProfession`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RecipeLeveling`, `routeLength`, `routesForNode`, `sampleProfessions`, `SpawnPoint`
+**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `gatheringMaterialFarming`, `GatheringNode`, `gatheringNodes`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `mappableMaterials`, `MaterialFarmSpot`, `nodesForProfession`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RangeRoute`, `RecipeLeveling`, `routeLength`, `routesForMaterials`, `routesForNode`, `sampleProfessions`, `SpawnPoint`, `TrainingMilestone`, `trainingMilestones`, `twoOptimize`
 
 ## Imports
 
@@ -28,8 +28,12 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.professions.CraftingProgression]] — `src/features/professions/CraftingProgression.tsx`
 - [[features.professions.FarmingRouteMap]] — `src/features/professions/FarmingRouteMap.tsx`
+- [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
+- [[features.professions.ProfessionPage]] — `src/features/professions/ProfessionPage.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
+- [[features.professions.TrainingMarker]] — `src/features/professions/TrainingMarker.tsx`
 
 ## Concepts & phases
 
