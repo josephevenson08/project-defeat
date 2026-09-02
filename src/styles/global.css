@@ -2645,26 +2645,54 @@ select:focus,
 }
 
 /* The crafted item leads, because it is what you click in the trade window. */
+/* How the counts were arrived at, said once at the top rather than implied by every number below. */
+.profession-progression-model {
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0 0 6px;
+}
+
+/* The crafted item leads, because it is what you click in the trade window. */
 .profession-craft-recipe {
+  align-items: center;
   color: var(--text-strong);
+  display: flex;
   font-size: 14px;
+  gap: 7px;
   line-height: 1.4;
   margin: 0;
 }
 
+.profession-craft-recipe strong {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The shopping list. A quantity column rather than "35x Bolt of Linen Cloth" inline, so a step with
+ * three reagents reads as three lines to buy rather than a sentence to parse.
+ */
 .profession-craft-materials {
-  color: var(--text-dim);
   display: grid;
-  font-size: 12px;
-  gap: 2px;
+  gap: 3px;
   list-style: none;
-  margin: 0;
+  margin: 2px 0 0;
   padding: 0;
 }
 
-.profession-craft-materials li::before {
-  color: var(--text-faint);
-  content: '· ';
+.profession-craft-materials li {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.profession-craft-materials li > span {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 /*

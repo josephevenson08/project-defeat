@@ -11,6 +11,8 @@ export { professionTiers, getProfessionTiers, trainingMilestones } from './sampl
 export type { TrainingMilestone } from './sampleProfessionTiers'
 export { gatheringMaterialFarming, getMaterialFarmSpots } from './sampleGatheringMaterials'
 export { craftingLevelingPaths, getCraftingLevelingPath } from './sampleCraftingGuides'
+export { craftingPathFor, craftingPathModel, professionsWithCraftingPaths } from './craftingPaths'
+export type { CraftingStep } from './craftingPaths'
 export { allProfessions, sampleProfessions, getProfessionProfile, professionIconNames } from './sampleProfessions'
 export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, FarmingRoute, RangeRoute } from './farmingRoutes'
 export {

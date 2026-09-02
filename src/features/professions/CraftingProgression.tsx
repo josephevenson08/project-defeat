@@ -1,82 +1,103 @@
-import type { RecipeLeveling, TrainingMilestone } from '../../domain/professions'
+import type { CraftingStep, RecipeLeveling, TrainingMilestone } from '../../domain/professions'
+import { MaterialChip } from './MaterialChip'
 import { TrainingMarker } from './TrainingMarker'
 
 /**
- * The crafting climb: what to make, how many, and what it costs.
+ * One computed step: what to make, how many, and the shopping list for the whole step.
  *
- * **The unit is the sub-range, because that is the decision.** "Tailoring 1-375" is not actionable;
- * "40-67: 35x Linen Belt, 35 Bolt of Linen Cloth and 35 Coarse Thread" is a shopping list and a
- * number of clicks. The data already carries exactly this for 300-375 on every crafting profession —
- * what it does not yet carry is the same detail below 300, where nine professions still hold a single
- * summary row. Those render as what they are rather than as a step.
- *
- * **Materials stay text for now, and that is deliberate.** They are still prose in places — "15
- * Golden Sansam, Dreamfoil or Mountain Silversage, whichever matches the craft you picked" — and
- * splitting a quantity off the front of a sentence to hang an icon on it is the same "a label is not
- * a key" mistake that cost the gathering maps most of their coverage. They get icons when
- * `keyMaterials` gets structure.
+ * **The craft count is derived and the page says so**, because a number that looks sourced and is
+ * not is worse than one that admits what it is. `crafts` is an expectation over the skill-up
+ * probabilities, so it is the count that gets you there on average — not a guarantee, and the
+ * caption at the top of the list carries that.
  */
-function CraftingStep({ step }: { step: RecipeLeveling }) {
-  const isPlaceholder = step.needsVerification === true && step.skillRange[1] - step.skillRange[0] >= 200
-
+function Step({ step, note }: { step: CraftingStep; note?: string }) {
   return (
-    <section
-      className={`profession-range profession-craft-step ${isPlaceholder ? 'profession-craft-summary' : ''}`.trim()}
-      data-testid="crafting-step"
-    >
+    <section className="profession-range profession-craft-step" data-testid="crafting-step">
       <header className="profession-range-header">
         <h4>
           {step.skillRange[0]} - {step.skillRange[1]}
         </h4>
+        <span>{step.trainerTaught ? 'Trainer-taught' : 'Recipe found elsewhere'}</span>
       </header>
 
-      <p className="profession-craft-recipe">{step.recipeOrItem}</p>
+      <p className="profession-craft-recipe">
+        {step.createsIcon && (
+          <img
+            className="material-chip-icon"
+            src={`${import.meta.env.BASE_URL}icons/${step.createsIcon}.jpg`}
+            alt=""
+            loading="lazy"
+          />
+        )}
+        <strong>{step.crafts}×</strong> {step.name}
+      </p>
 
-      {step.keyMaterials && step.keyMaterials.length > 0 && (
-        <ul className="profession-craft-materials">
-          {step.keyMaterials.map((material) => (
-            <li key={material}>{material}</li>
-          ))}
-        </ul>
-      )}
+      <ul className="profession-craft-materials">
+        {step.materials.map((material) => (
+          <li key={material.name}>
+            <MaterialChip material={material.name} icon={material.icon} />
+            <span>{material.quantity}</span>
+          </li>
+        ))}
+      </ul>
 
-      <p className="profession-range-zones">{step.recipeSource}</p>
-
-      {step.needsVerification && (
-        <small className="needs-verification">{step.notes ?? 'Needs source verification.'}</small>
-      )}
-      {!step.needsVerification && step.notes && <p className="profession-range-note">{step.notes}</p>}
+      {/*
+        The curated 300-375 rows carry editorial detail no computation produces — which trainer, which
+        vendor sells the recipe, "buy the other pattern on the same trip". Those notes are kept and
+        attached to the computed step whose range they overlap, rather than thrown away with the rows
+        that held them.
+      */}
+      {note && <p className="profession-range-note">{note}</p>}
     </section>
   )
 }
 
 /**
- * The whole crafting path, with the training stops interleaved.
+ * The crafting climb, computed end to end.
  *
- * Same placement rule as the gathering side: a milestone goes before the first step that begins at or
- * after the skill it unlocks, so "train Expert at 125" arrives between the range that took you there
- * and the range that will not start without it.
+ * **This replaces nine placeholder rows that covered 1-300 with a single sentence each.** The old
+ * data had real detail from 300 up and "see a dedicated vanilla guide" below it, because filling in
+ * the rest by hand meant transcribing somebody's guide. Deriving it from recipe facts does not.
+ *
+ * Milestones interleave the same way the gathering side does: a trainer visit goes before the first
+ * step that begins at or after the skill it unlocks.
  */
 export function CraftingProgression({
   steps,
+  curated,
   milestones,
+  model,
 }: {
-  steps: readonly RecipeLeveling[]
+  steps: readonly CraftingStep[]
+  curated: readonly RecipeLeveling[]
   milestones: readonly TrainingMilestone[]
+  model: string
 }) {
-  const ordered = [...steps].sort((a, b) => a.skillRange[0] - b.skillRange[0])
   const pending = [...milestones]
+
+  /** A curated note belongs to the computed step whose range it overlaps. */
+  const noteFor = (step: CraftingStep) =>
+    curated.find(
+      (row) =>
+        row.notes &&
+        row.skillRange[0] < step.skillRange[1] &&
+        row.skillRange[1] > step.skillRange[0] &&
+        row.skillRange[1] - row.skillRange[0] < 200,
+    )?.notes
 
   return (
     <div className="profession-progression">
       <h3>What to craft</h3>
-      {ordered.map((step) => {
+      <p className="profession-progression-model" data-testid="crafting-model">
+        {model}
+      </p>
+      {steps.map((step) => {
         const due = []
         while (pending.length > 0 && pending[0].atSkill <= step.skillRange[0]) due.push(pending.shift()!)
         return (
-          <div key={`${step.skillRange[0]}-${step.recipeOrItem}`}>
+          <div key={step.spellId + '-' + step.skillRange[0]}>
             <TrainingMarker milestones={due} />
-            <CraftingStep step={step} />
+            <Step step={step} note={noteFor(step)} />
           </div>
         )
       })}

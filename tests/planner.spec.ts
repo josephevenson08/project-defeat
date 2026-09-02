@@ -442,7 +442,7 @@ import {
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
-import { allProfessions, getProfessionProfile } from '../src/domain/professions'
+import { allProfessions, getProfessionProfile, craftingPathFor, craftingPathModel } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getAttunementChainForRaid, sampleAttunements } from '../src/domain/raids/sampleAttunements'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -8984,6 +8984,71 @@ test('2-opt shortens the circuit and leaves it a circuit', () => {
   expect(new Set(optimised.map(([x, y]) => `${x},${y}`))).toEqual(
     new Set(stops.map(([x, y]) => `${x},${y}`)),
   )
+})
+
+test('every crafting path runs unbroken from 1 to 375 and says how its counts were made', () => {
+  /*
+   * **The counts here are derived, and the test is mostly about that being safe to do.** Wowhead
+   * publishes a recipe's reagents and its orange/yellow/green/grey breakpoints and no craft count at
+   * all; `compute-leveling-paths.mjs` does the arithmetic. That is what lets this repo carry a
+   * levelling path without transcribing wow-professions.com's, which `professionTypes.ts` has
+   * recorded as off-limits since it was written.
+   */
+  const crafting = [
+    'Alchemy',
+    'Blacksmithing',
+    'Enchanting',
+    'Engineering',
+    'Jewelcrafting',
+    'Leatherworking',
+    'Tailoring',
+    'Cooking',
+    'First Aid',
+  ] as const
+
+  for (const profession of crafting) {
+    const steps = craftingPathFor(profession)
+    expect(steps.length, `${profession} has a computed path`).toBeGreaterThan(5)
+
+    /*
+     * **Contiguity is the assertion that matters most, because the bug it catches ships silently.**
+     * The first coalescing pass dropped steps shorter than five skill points as noise, which punched
+     * holes in the path — Tailoring claimed 1 to 375 while skipping 74-75, 121-125 and 135, all
+     * skill points where recipes were demonstrably available. A holed path looks finished.
+     */
+    /*
+     * **Not every profession starts at 1, and asserting that it did was wrong.** Jewelcrafting's
+     * earliest recipe is Heavy Copper Ring at skill 5 — there is nothing to make below it — so its
+     * path opens at 5 and the data is right. Cooking has a recipe at 0. The claim worth making is
+     * that a path starts as early as its profession allows, not that every profession allows 1.
+     */
+    expect(steps[0].skillRange[0], `${profession} starts at its earliest recipe`).toBeLessThanOrEqual(5)
+    expect(steps[steps.length - 1].skillRange[1], `${profession} reaches the cap`).toBe(375)
+    for (let i = 1; i < steps.length; i += 1) {
+      expect(steps[i].skillRange[0], `${profession} has no hole before ${steps[i].name}`).toBe(
+        steps[i - 1].skillRange[1],
+      )
+    }
+
+    for (const step of steps) {
+      expect(step.crafts, `${profession}: ${step.name} takes at least one craft`).toBeGreaterThan(0)
+      expect(step.materials.length, `${profession}: ${step.name} consumes something`).toBeGreaterThan(0)
+      expect(step.skillRange[1], `${profession}: ${step.name} moves forward`).toBeGreaterThan(step.skillRange[0])
+      for (const material of step.materials) {
+        expect(material.quantity, `${profession}: ${material.name} has a real quantity`).toBeGreaterThan(0)
+        // A reagent named "item 12345" means the pinned CSV had no name for it, which should not reach a page.
+        expect(material.name, `${profession}: ${material.name} resolved to a real name`).not.toMatch(/^item \d+$/)
+      }
+    }
+  }
+
+  /*
+   * **A derived number has to admit it is derived.** The model string is rendered above the steps, so
+   * the page says how the counts were arrived at rather than letting them read as sourced — the same
+   * rule the farming maps follow when they call the route a starting line rather than an optimum.
+   */
+  expect(craftingPathModel).toMatch(/computed, not sourced/)
+  expect(craftingPathModel).toMatch(/grey/)
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {

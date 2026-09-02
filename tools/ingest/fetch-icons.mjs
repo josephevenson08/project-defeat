@@ -82,11 +82,32 @@ const materialIcons = JSON.parse(
 )
 const materialIconNames = Object.values(materialIcons.materials).map((entry) => entry.icon)
 
+/*
+ * The computed crafting paths are the sixth source, and much the largest of the profession ones: a
+ * levelling path names every reagent it consumes and every item it makes, which is 324 distinct
+ * icons across the nine professions. They come from the recipe ingest rather than a lookup, so a
+ * reagent the name-keyed material map has never heard of still arrives with its artwork.
+ */
+const craftingPaths = JSON.parse(
+  readFileSync(resolve(REPO, 'src/domain/professions/craftingPaths.json'), 'utf8'),
+)
+const craftingIconNames = Object.values(craftingPaths.paths)
+  .flat()
+  .flatMap((step) => [step.createsIcon, ...step.materials.map((material) => material.icon)])
+  .filter(Boolean)
+
 const names = [
-  ...new Set([...itemNames, ...talentIconNames, ...raidcompNames, ...professionIconNames, ...materialIconNames]),
+  ...new Set([
+    ...itemNames,
+    ...talentIconNames,
+    ...raidcompNames,
+    ...professionIconNames,
+    ...materialIconNames,
+    ...craftingIconNames,
+  ]),
 ].sort()
 console.log(
-  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp + ${professionIconNames.length} profession + ${materialIconNames.length} material icons -> ${names.length} distinct`,
+  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp + ${professionIconNames.length} profession + ${materialIconNames.length} material + ${craftingIconNames.length} crafting icons -> ${names.length} distinct`,
 )
 
 mkdirSync(OUT_DIR, { recursive: true })

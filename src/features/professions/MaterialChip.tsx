@@ -11,15 +11,20 @@ const ICONS: Record<string, { wowItemId: number; icon: string }> = materialIcons
  * `materialIcons.json` under `missing` so the absence is recorded rather than discovered. A chip with
  * no icon still reads correctly; a broken image would not.
  */
-export function MaterialChip({ material }: { material: string }) {
-  const entry = ICONS[material]
+export function MaterialChip({ material, icon }: { material: string; icon?: string }) {
+  /*
+   * An explicit icon wins over the lookup, because crafting reagents carry their own from the recipe
+   * ingest. The name-keyed map only covers the 73 gathered materials; a crafting path names hundreds,
+   * and looking those up here would quietly drop every icon the map has never heard of.
+   */
+  const art = icon ?? ICONS[material]?.icon
 
   return (
     <span className="material-chip" data-testid="material-chip">
-      {entry && (
+      {art && (
         <img
           className="material-chip-icon"
-          src={`${import.meta.env.BASE_URL}icons/${entry.icon}.jpg`}
+          src={`${import.meta.env.BASE_URL}icons/${art}.jpg`}
           alt=""
           loading="lazy"
         />
