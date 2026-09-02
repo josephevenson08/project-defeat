@@ -91,6 +91,22 @@ the node and the item it yields are named differently (Netherdust Bush yields Ne
   a quantity off the front of a sentence to hang an icon on it is the same "a label is not a key"
   mistake this session just spent its morning undoing. They get icons when they get structure.
 
+### Two things that cost this session time, both worth not rediscovering
+
+**A suite run goes silent for 2.8 minutes and it is not hung.** `tests/planner.spec.ts:3039` — "no
+spec can equip, default to, or be upgraded into an unobtainable item" — takes **2.8 minutes on its
+own**, verified by running it alone. With the `line` reporter that is three minutes with no output
+around test 86 of 223, which looks exactly like a stall, and this session killed a healthy run
+because of it. The tell that it was alive: the node process was burning CPU steadily. Check that
+before killing a run, and expect the whole suite to take **~9 minutes**.
+
+**Only Tirisfal Glades carries all three starter herbs.** Durotar has Peacebloom and neither of the
+others. A new test asserted three herbs in Durotar, and the suite failed it — 222 passed, that one
+did not, and the data was right. The merge is correctly selective per zone, which is a feature: a
+zone tab shows what is actually there rather than what the range names. The assertion now covers both
+directions, because the original could not have failed in the direction that mattered — a merge
+wrongly claiming every herb in every zone would have passed it.
+
 ### And the owner's steer on sourcing, recorded
 
 The two wow-professions.com guides are the **reference for shape, not the source for content**. The
