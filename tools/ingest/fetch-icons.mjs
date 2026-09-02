@@ -71,9 +71,22 @@ const itemNames = new Set(Object.values(icons))
  */
 const { professionIconNames } = await import(pathToFileURL(resolve(REPO, 'src/domain/professions/sampleProfessions.ts')).href)
 
-const names = [...new Set([...itemNames, ...talentIconNames, ...raidcompNames, ...professionIconNames])].sort()
+/*
+ * Materials are the fifth source, and the artwork is item artwork this time -- but trade goods are
+ * not in the item catalogue, so the generated id->icon mapping does not reach them. They come from
+ * `materialIcons.json`, which joins by name instead. Without this the profession pages named every
+ * herb and ore and drew none of them.
+ */
+const materialIcons = JSON.parse(
+  readFileSync(resolve(REPO, 'src/domain/professions/materialIcons.json'), 'utf8'),
+)
+const materialIconNames = Object.values(materialIcons.materials).map((entry) => entry.icon)
+
+const names = [
+  ...new Set([...itemNames, ...talentIconNames, ...raidcompNames, ...professionIconNames, ...materialIconNames]),
+].sort()
 console.log(
-  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp + ${professionIconNames.length} profession icons -> ${names.length} distinct`,
+  `${itemNames.size} item/gem + ${talentIconNames.length} talent + ${raidcompNames.length} raidcomp + ${professionIconNames.length} profession + ${materialIconNames.length} material icons -> ${names.length} distinct`,
 )
 
 mkdirSync(OUT_DIR, { recursive: true })
