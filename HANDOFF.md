@@ -1,7 +1,53 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-08-30.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-02.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-02, the owner set the priority and it is not the simulator)
+
+**The README was edited by the repo owner on 2026-09-01, and it is a scope decision this file was
+contradicting.** `6c618fc` is the only commit since the Professions work, it touches the README and
+nothing else, and it says the simulation rule model is **"not my top priority with this project"**
+right now — that it gets implemented "later on into this planner", and that the target is **phase 2
+of The Burning Crusade**, usable for phase 2 and beyond once the model works.
+
+No code changed. What changed is which open item is next, and two sentences in this file said the
+wrong thing about that:
+
+- **"25 of 27 specs are still single-ability approximations, which is now the top of the queue"** —
+  written 2026-08-21, true then, and since overruled by the owner. The count is still right; the
+  queue position is not.
+- **"Rotations are the biggest remaining gap"** — still true as a *modelling* gap and left standing
+  as one. A modelling gap and the next piece of work are different claims, and this file had been
+  using the first to assert the second.
+
+Both are corrected in place below rather than deleted, because the reasoning that put rotations at
+the top of the modelling queue is still the right reasoning *about rotations*. What it is not is a
+statement about what to build next.
+
+### "Phase 2" means the game's phase, not this roadmap's
+
+Worth pinning before it gets misread, because the two numbers collide on the same word:
+
+| Where | "Phase 2" means |
+|---|---|
+| `ROADMAP.md` | This project's second milestone — Gear, Gems, Enchants |
+| `README.md`, the owner | **TBC content phase 2** — Serpentshrine Cavern and Tempest Keep |
+
+They are unrelated numbering schemes. The BiS data has always targeted the *content* phase, so the
+README is confirming the existing data target rather than moving it.
+
+### Today's focus is the Professions tab and its logic
+
+Stated by the owner at the top of this session, ahead of a walkthrough that has not happened yet —
+two attempts to start the dev server were interrupted, and a third session died on a full context
+window before the handoff edit landed. That edit is this section.
+
+The tab is at its largest and has never been looked at by its owner in a browser: **45 nodes, 14,091
+spawn coordinates, 29 route maps** (11 Herbalism, 18 Mining) across all 13 professions. Expect the
+next work to come out of that walkthrough rather than out of this file's queue.
 
 ---
 
@@ -2648,7 +2694,9 @@ no `StatBlock` field.
 1. ~~**Unhide the Simulation tab?**~~ **Taken 2026-08-21, per role.** Shown for the 20 DPS specs,
    hidden for the 5 Healer and 2 Tank ones, because this project is for DPS. `?simulation=1` remains
    an escape hatch for development and tests. **25 of 27 specs are still single-ability
-   approximations**, which is now the top of the queue rather than a reason to hide the tab.
+   approximations**, which was a reason to keep working rather than a reason to hide the tab. It was
+   written here as "the top of the queue"; **the owner overruled that on 2026-09-01** — see the
+   2026-09-02 entry at the top of this file.
 2. ~~**Should talents reach `calculateStats`?**~~ **Taken 2026-08-21 — yes.** They now move the
    always-visible stat rail, gear rankings, stat weights and the upgrade finder. "An empty tree
    reproduces today's numbers exactly" is a hard invariant, asserted across all 27 specs.
@@ -2694,7 +2742,8 @@ file twice, `featureFlags.ts` and a test comment. Counted from `getRoleForSpec` 
 Tank**. So talents reach 11 and the uncovered remainder is 16. The split is now asserted in
 `tests/planner.spec.ts` rather than written in prose, because prose is exactly how it drifted.
 
-**Rotations are the biggest remaining gap and the reason the tab reads as indicative.** 25 of 27
+**Rotations are the biggest remaining gap and the reason the tab reads as indicative** — the
+biggest *modelling* gap, which since 2026-09-01 is no longer the same thing as the next work. 25 of 27
 specs are modelled from a single signature ability. ~~wowsims has full ability implementations for
 all nine classes at the pinned commit, so this may be an ingest rather than a research project.~~
 **Scoped 2026-08-18, and that hypothesis is wrong — `ROTATION-SCOPE.md`.** Talents were cheap because

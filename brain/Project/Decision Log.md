@@ -187,3 +187,18 @@ Up: [[Project Defeat Brain]]
 ## Notes
 
 _Anything you write below the marker above is kept when the brain is regenerated._
+
+## The biggest gap and the next piece of work are different claims
+
+Recorded 2026-09-02, after the repo owner's README edit of 2026-09-01 deprioritised the simulation
+rule model and named **TBC content phase 2** as the target.
+
+Every doc in this repo ranked its open items by *size of modelling gap* and then wrote the top of
+that list down as the queue — `HANDOFF.md` said rotations were "the top of the queue", and
+[[Roadmap Board]]'s generated "next honest step" said the same thing in different words. Nobody
+decided that; it fell out of the ranking. The owner then decided otherwise, and two documents were
+contradicting an owner decision the day after it was pushed.
+
+**A gap ranking is not a plan.** Both are worth writing down, and they answer different questions:
+how wrong is the model, versus what gets built next. Only the second is the owner's to set, and it
+is the one this project's docs had been quietly answering on their own.

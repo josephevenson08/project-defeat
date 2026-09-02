@@ -1334,7 +1334,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       '## Next honest step',
       '',
-      'Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one:',
+      'Build save/load is now wired, so the largest remaining gap is an accuracy one rather than a reachability one. Ranked by size of gap, not by build order — the repo owner set the priority on 2026-09-01 and the simulation model is explicitly not it, so these are the honest *gaps*, not the honest *next commit*:',
       '',
       `1. **Multi-ability rotations** — started, and **only Fury and Arms Warrior have more than one ability**. Both now press Whirlwind on its 10s cooldown alongside their signature button, resolved against a shared global-cooldown budget. Every other spec still models exactly one ability, and all specs still lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated by differing amounts. The engine handles arbitrary ability lists; what gates the rest is sourced ability data. Still the biggest accuracy gap in ${link('Phase 4 - Simulation')}.`,
       `2. **Tank score severity weighting** — the tank path now resolves one ordered incoming table including crushing blows (see ${link('Tank Avoidance')}), but the headline Survivability Score still weights avoidance, armor and stamina without pricing how much worse a crit or a crush is than a plain hit. The breakdown carries a damage-per-swing figure that does account for it; folding that into the score is a metric redesign and deliberately hasn't been done unilaterally.`,
