@@ -2334,9 +2334,9 @@ select:focus,
   cursor: pointer;
   display: grid;
   font: inherit;
-  gap: 2px 10px;
+  gap: 10px;
   grid-template-columns: 34px 1fr;
-  padding: 10px 12px;
+  padding: 12px;
   text-align: left;
   transition: background 120ms ease, border-color 120ms ease;
 }
@@ -2359,31 +2359,17 @@ select:focus,
   border-top-color: var(--profession-accent, var(--line-strong));
 }
 
-/* The selected card is the one the detail below belongs to, so it reads as attached rather than merely hovered. */
-.profession-card-selected {
-  background: var(--surface-3);
-  border-color: var(--line-strong);
-}
-
 .profession-card-icon {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  grid-row: 1 / span 2;
   height: 34px;
   width: 34px;
 }
 
 .profession-card-name {
+  align-self: center;
   color: var(--text-strong);
-  font-size: 13px;
-}
-
-.profession-card-meta {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: var(--label-tracking);
-  text-transform: uppercase;
+  font-size: 14px;
 }
 
 /* Outbound guides. Underlined because they leave the app, which a button-shaped link would hide. */
@@ -2410,98 +2396,260 @@ select:focus,
   color: var(--text-faint);
 }
 
-.professions-picker {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.professions-picker-label {
+.professions-empty {
   color: var(--text-dim);
-  display: block;
+}
+
+/*
+ * One profession, on its own page.
+ *
+ * The tab bar stays where it is; this is a level below it, so the way back is a text link rather than
+ * a second row of tabs competing with the first.
+ */
+.profession-back {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
   font-size: 12px;
-  font-weight: 750;
-  margin-bottom: 6px;
-  text-transform: uppercase;
+  margin: 0 0 14px;
+  padding: 0;
 }
 
-.professions-picker-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.profession-back:hover {
+  color: var(--text-strong);
 }
 
-.profession-detail-header {
+/*
+ * The page carries its category's accent, the same three the entry cards use, so a range border and a
+ * route line on the Mining page read as belonging to the card you clicked to get here.
+ */
+.profession-page-gathering {
+  --profession-accent: #6f8f6a;
+}
+
+.profession-page-crafting {
+  --profession-accent: #6a7fa8;
+}
+
+.profession-page-secondary {
+  --profession-accent: #9a8558;
+}
+
+.profession-progression {
+  display: grid;
+  gap: 10px;
+}
+
+.profession-progression h3 {
+  color: var(--text);
+  font-size: 15px;
+  margin: 22px 0 2px;
+}
+
+/*
+ * A skill range, which is the unit a profession is actually levelled in.
+ *
+ * The range number leads because it is what a player matches against their own skill bar — they open
+ * this at 214 and want the block that contains 214, not the third bullet of a list.
+ */
+.profession-range {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--profession-accent, var(--line-strong));
+  border-radius: var(--radius);
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+}
+
+.profession-range-header {
   align-items: baseline;
   display: flex;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 12px;
 }
 
-.profession-detail-header h3 {
+.profession-range-header h4 {
   color: var(--text-strong);
-  font-size: var(--heading-detail);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
   margin: 0;
 }
 
-.profession-detail-header span {
+.profession-range-header span {
   color: var(--text-dim);
   font-size: 12px;
-  font-weight: 750;
-  text-transform: uppercase;
 }
 
-.profession-detail h4 {
-  color: var(--text);
-  font-size: 15px;
-  margin: 20px 0 10px;
-}
-
-.profession-tier-list,
-.profession-material-list {
-  display: grid;
-  gap: 8px;
-}
-
-.profession-tier-row,
-.profession-material-row {
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  display: grid;
-  gap: 4px;
-  padding: 10px 12px;
-}
-
-.profession-tier-row > div,
-.profession-material-row > div {
-  align-items: baseline;
+.profession-range-materials {
+  align-items: center;
+  color: var(--text-dim);
   display: flex;
-  gap: 10px;
-}
-
-.profession-tier-row strong,
-.profession-material-row strong {
-  color: var(--text-strong);
-  font-size: 14px;
-}
-
-.profession-tier-row span,
-.profession-material-row span {
-  color: var(--text-dim);
+  flex-wrap: wrap;
   font-size: 12px;
+  gap: 6px;
+  margin: 0;
 }
 
-.profession-tier-row p,
-.profession-material-row p {
+.profession-range-zones {
   color: var(--text);
   font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.profession-range-note {
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.profession-range-nomap {
+  color: var(--text-faint);
+  font-size: 12px;
+  margin: 2px 0 0;
+}
+
+/* A material, with its artwork. Small enough to sit inside a sentence rather than break it. */
+.material-chip {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  display: inline-flex;
+  gap: 5px;
+  padding: 2px 7px 2px 3px;
+  font-size: 12px;
+}
+
+.material-chip-icon {
+  border-radius: 2px;
+  height: 18px;
+  width: 18px;
+}
+
+/*
+ * Zones as tabs rather than stacked maps.
+ *
+ * A 1-100 range spans six starting zones. Six squares in a column is the same information at six
+ * times the height, and the choice between them is one a player makes instantly on faction — so it
+ * is a row of names, busiest first, and one map.
+ */
+.profession-zone-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.profession-zone-tab {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 9px;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.profession-zone-tab:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.profession-zone-tab-active {
+  background: var(--surface-3);
+  border-color: var(--profession-accent, var(--line-strong));
+  color: var(--text-strong);
+}
+
+/*
+ * "Stop and go train."
+ *
+ * Deliberately not a card: it is an interruption in the climb, so it reads as a rule drawn across the
+ * page rather than another item in the list of things to farm.
+ */
+.profession-training {
+  border-left: 2px solid var(--profession-accent, var(--line-strong));
+  display: grid;
+  gap: 2px;
+  margin: 12px 0 4px;
+  padding: 2px 0 2px 12px;
+}
+
+.profession-training strong {
+  color: var(--text-strong);
+  font-size: 13px;
+}
+
+.profession-training span {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.profession-training p {
+  color: var(--text-faint);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 2px 0 0;
+}
+
+/* The collapsed form: several trainer visits inside one un-itemised range. */
+.profession-training-list {
+  color: var(--text-dim);
+  display: grid;
+  font-size: 12px;
+  gap: 1px;
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+.profession-training-list b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* The crafted item leads, because it is what you click in the trade window. */
+.profession-craft-recipe {
+  color: var(--text-strong);
+  font-size: 14px;
   line-height: 1.4;
   margin: 0;
 }
 
-.professions-empty {
+.profession-craft-materials {
   color: var(--text-dim);
+  display: grid;
+  font-size: 12px;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profession-craft-materials li::before {
+  color: var(--text-faint);
+  content: '· ';
+}
+
+/*
+ * The pre-300 summary rows, which are not steps and should not look like them.
+ *
+ * Nine crafting professions still hold their whole 1-300 climb in a single row saying "see a
+ * dedicated vanilla guide". Rendering that identically to a real "35x Linen Belt" step would make the
+ * page claim a detail it does not have.
+ */
+.profession-craft-summary {
+  border-left-color: var(--line);
+  opacity: 0.75;
 }
 
 input[type='number'] {
@@ -4580,16 +4728,16 @@ input[type='text']:focus {
  * profession accent the card already uses.
  */
 .farming-route {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   display: grid;
-  grid-template-columns: 132px 1fr;
-  gap: 12px;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
   align-items: start;
 }
 
 .farming-route-map {
-  width: 132px;
-  height: 132px;
+  width: 280px;
+  height: 280px;
   border: 1px solid var(--line);
   background: var(--surface-0);
   border-radius: var(--radius);
@@ -4624,14 +4772,17 @@ input[type='text']:focus {
   gap: 3px;
 }
 
-.farming-route figcaption strong {
-  font-size: var(--heading-callout);
-}
-
-.farming-route figcaption span {
+.farming-route-stats {
   color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 11px;
+}
+
+/* Which of the range's materials this zone actually carries, and how many of each. */
+.farming-route-materials {
+  color: var(--text-faint);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .farming-route figcaption small {
@@ -4648,6 +4799,7 @@ input[type='text']:focus {
   .farming-route-map {
     width: 100%;
     height: auto;
+    max-width: 280px;
     aspect-ratio: 1;
   }
 }

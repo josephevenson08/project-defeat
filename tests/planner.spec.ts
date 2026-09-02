@@ -141,6 +141,9 @@ import {
   nodesWithoutSpawnData,
   routeLength,
   routesForNode,
+  routesForMaterials,
+  twoOptimize,
+  mappableMaterials,
 } from '../src/domain/professions'
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
@@ -1389,7 +1392,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Destruction Holo-gogs' })).toBeVisible()
 })
 
-test('Professions tab shows skill tiers and material farming, and switches between professions', async ({ page }) => {
+test('Professions is a grid you pick from, and each profession opens its own page', async ({ page }) => {
   await openApp(page)
 
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
@@ -1398,14 +1401,42 @@ test('Professions tab shows skill tiers and material farming, and switches betwe
   await expect(page.getByRole('heading', { name: 'Professions', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toHaveCount(0)
 
-  const detail = page.getByTestId('profession-detail')
-  await expect(detail.getByRole('heading', { name: 'Mining', exact: true })).toBeVisible()
-  await expect(detail.getByText('Master', { exact: true })).toBeVisible()
-  await expect(detail.getByText('Copper Ore')).toBeVisible()
+  /*
+   * **The entry grid shows no profession's contents.** It used to render the whole selected
+   * profession underneath the picker, so the page opened on thirteen cards plus a tier table plus
+   * nineteen farm rows plus thirty maps. Nothing below the grid until something is picked.
+   */
+  await expect(page.getByTestId('profession-pick-mining')).toBeVisible()
+  await expect(page.getByTestId('gathering-range')).toHaveCount(0)
+  await expect(page.getByTestId('crafting-step')).toHaveCount(0)
+
+  await page.getByTestId('profession-pick-mining').click()
+  await expect(page.getByRole('heading', { name: 'Mining', exact: true })).toBeVisible()
+  await expect(page.getByText('Copper Ore').first()).toBeVisible()
+
+  /*
+   * **A range draws a map, and the map covers the whole range rather than one ore.** The join used to
+   * be `node.material === spot.material` against a display label, so "Thorium Ore (incl. Rich Thorium
+   * Vein at 275+)" matched nothing and drew nothing — see `MaterialFarmSpot.materials`.
+   */
+  await expect(page.getByTestId('gathering-range').first()).toBeVisible()
+  await expect(page.locator('svg.farming-route-map').first()).toBeVisible()
+
+  /*
+   * **The tier table is gone and its content is not.** Training requirements are markers inside the
+   * progression now, at the skill where you actually have to stop.
+   */
+  await expect(page.getByTestId('training-marker').first()).toBeVisible()
+  await expect(page.getByText('Train Journeyman at skill 50')).toBeVisible()
+
+  await page.getByTestId('profession-back').click()
+  await expect(page.getByTestId('profession-pick-alchemy')).toBeVisible()
+  await expect(page.getByTestId('gathering-range')).toHaveCount(0)
 
   await page.getByTestId('profession-pick-alchemy').click()
-  await expect(detail.getByRole('heading', { name: 'Alchemy', exact: true })).toBeVisible()
-  await expect(detail.getByText('Copper Ore')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Alchemy', exact: true })).toBeVisible()
+  await expect(page.getByTestId('crafting-step').first()).toBeVisible()
+  await expect(page.getByText('Copper Ore')).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
@@ -8772,6 +8803,101 @@ test('every raid loot row can draw an icon', async () => {
     const item = entry!.itemId ? getItemById(entry!.itemId) : undefined
     expect(getIconName(entry!.wowItemId ?? item?.wowItemId), `${name} has artwork`).toBeTruthy()
   }
+})
+
+test('every gathered material a farm row names can still be found in the node data', () => {
+  /*
+   * **This is the test that was missing, and its absence cost 28 of 43 nodes.**
+   *
+   * The data was right the whole time: `nodeSpawns.json` carried Liferoot, Fadeleaf, Goldthorn and
+   * every other classic herb with full coordinates. The *join* was wrong — the panel matched
+   * `node.material === spot.material`, and `spot.material` is a display label written for a reader
+   * ("Liferoot / Fadeleaf / Goldthorn"), which equals no node's name. Eight of Herbalism's nineteen
+   * rows and two of Mining's eleven silently drew nothing, and the whole 1-300 herb progression was
+   * mapless on screen.
+   *
+   * Every existing profession test passed throughout, because they all asserted the *data* — 45
+   * nodes, no crates, sampling preserves zone width — and none asserted that a node reaches a
+   * surface. That is this repo's signature failure ("data wired to nothing", Decision Log) arriving
+   * for the fourth time, in the same commit that wrote the rule down.
+   *
+   * So the assertion is deliberately about reachability rather than about shape.
+   */
+  const rows = (['Herbalism', 'Mining'] as const).flatMap(
+    (profession) => getProfessionProfile(profession)?.materialFarming ?? [],
+  )
+  expect(rows.length, 'the two professions the game gives world nodes').toBeGreaterThan(25)
+
+  /*
+   * **Named, not counted.** These are materials a farm row mentions that the node ingest has no
+   * spawn data for — Wowhead publishes none for Ragveil or Ancient Lichen, and the rest are items
+   * whose node is named differently or was never swept. Listing them means adding one fails this
+   * test rather than quietly losing another map, and clearing one is a visible deletion here.
+   */
+  const knownGaps = new Set([
+    'Ancient Lichen',
+    'Bloodthistle',
+    'Fel Lotus',
+    'Ghost Mushroom',
+    'Gromsblood',
+    'Netherdust Bush',
+    'Ragveil',
+    'Sorrowmoss',
+  ])
+
+  const unreachable = rows
+    .flatMap((row) => row.materials)
+    .filter((material) => !mappableMaterials.has(material) && !knownGaps.has(material))
+  expect(unreachable, 'every named material resolves to a node or is a declared gap').toEqual([])
+
+  // And the join actually produces maps, which is the thing the old code failed to do.
+  const drawn = rows.filter((row) => routesForMaterials(row.materials).length > 0)
+  expect(drawn.length, 'most gathering rows draw at least one route').toBeGreaterThanOrEqual(15)
+
+  const felweed = routesForMaterials(['Felweed'])
+  expect(felweed[0].zone, 'busiest zone first').toBe('Hellfire Peninsula')
+  expect(felweed[0].materials[0].material).toBe('Felweed')
+
+  /*
+   * **A range merges its materials into one loop**, because that is how it is farmed: at 1-100 you
+   * pick all three on the same lap. So the merged route must carry more spawns than any one herb.
+   */
+  const starter = routesForMaterials(['Peacebloom', 'Silverleaf', 'Earthroot'])
+  const durotar = starter.find((route) => route.zone === 'Durotar')!
+  expect(durotar.materials.length, 'all three herbs share the zone').toBe(3)
+  expect(durotar.spawnCount).toBeGreaterThan(routesForMaterials(['Peacebloom'])
+    .find((route) => route.zone === 'Durotar')!.spawnCount)
+})
+
+test('2-opt shortens the circuit and leaves it a circuit', () => {
+  /*
+   * **Nearest-neighbour leaves crossings, and a crossing is the one route error a player sees.** It
+   * reads as "why am I riding back past where I just was". 2-opt reverses segments while doing so
+   * shortens the loop, which removes exactly that.
+   *
+   * Asserted as an aggregate over every real node cloud rather than one hand-made case: a single
+   * zone could improve by luck, and the claim being made on screen is about the whole feature.
+   */
+  let before = 0
+  let after = 0
+  for (const node of gatheringNodes) {
+    for (const zone of node.zones) {
+      const nearest = computeRoute(densityCells(zone.coords))
+      if (nearest.length < 4) continue
+      before += routeLength(nearest)
+      after += routeLength(twoOptimize(nearest))
+    }
+  }
+  expect(after, 'uncrossing never makes the total longer').toBeLessThan(before)
+  expect(after / before, 'and it is worth doing — at least 5% off').toBeLessThan(0.95)
+
+  // It reorders the same stops rather than inventing or dropping any.
+  const stops = computeRoute(densityCells(gatheringNodes[0].zones[0].coords))
+  const optimised = twoOptimize(stops)
+  expect(optimised.length).toBe(stops.length)
+  expect(new Set(optimised.map(([x, y]) => `${x},${y}`))).toEqual(
+    new Set(stops.map(([x, y]) => `${x},${y}`)),
+  )
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {
