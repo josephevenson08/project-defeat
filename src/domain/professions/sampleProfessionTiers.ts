@@ -188,3 +188,42 @@ export const professionTiers: Readonly<Record<Profession, readonly ProfessionTie
 export function getProfessionTiers(profession: Profession): readonly ProfessionTier[] {
   return professionTiers[profession]
 }
+
+/**
+ * The moment you have to stop and go train, as a point on the skill line.
+ *
+ * **This replaces the tier table rather than summarising it.** A five-row Apprentice-to-Master table
+ * is the same five rows on all thirteen professions and answers a question nobody asks in that form;
+ * what a player actually needs is "you are at 125, go train Expert before you can gain another
+ * point", delivered *between* the range they just finished and the one they are starting.
+ *
+ * **The skill that matters is `minSkillToTrainNext`, not the tier's own range start**, and the field
+ * name reads backwards from what it holds: on Expert it is 125, which is the skill at which Expert
+ * becomes trainable — not the skill at which Expert stops. Reading `skillRange[0]` here would tell a
+ * player to train at 150, fifty points after they stopped gaining skill and stood there confused.
+ *
+ * Apprentice is dropped: it is where everyone already is when the page opens.
+ */
+export type TrainingMilestone = {
+  tier: ProfessionTier['tier']
+  /** The skill at which this tier becomes trainable, which is where the marker belongs. */
+  atSkill: number
+  requiredCharacterLevel: number
+  trainedFrom: string
+  needsVerification?: boolean
+  notes?: string
+}
+
+export function trainingMilestones(profession: Profession): TrainingMilestone[] {
+  return professionTiers[profession]
+    .filter((tier) => tier.tier !== 'Apprentice')
+    .map((tier) => ({
+      tier: tier.tier,
+      atSkill: tier.minSkillToTrainNext ?? tier.skillRange[0],
+      requiredCharacterLevel: tier.requiredCharacterLevel,
+      trainedFrom: tier.trainedFrom,
+      ...(tier.needsVerification ? { needsVerification: true } : {}),
+      ...(tier.notes ? { notes: tier.notes } : {}),
+    }))
+    .sort((a, b) => a.atSkill - b.atSkill)
+}

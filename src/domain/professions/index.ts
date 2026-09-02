@@ -7,11 +7,12 @@ export type {
   RecipeLeveling,
   ProfessionProfile,
 } from './professionTypes'
-export { professionTiers, getProfessionTiers } from './sampleProfessionTiers'
+export { professionTiers, getProfessionTiers, trainingMilestones } from './sampleProfessionTiers'
+export type { TrainingMilestone } from './sampleProfessionTiers'
 export { gatheringMaterialFarming, getMaterialFarmSpots } from './sampleGatheringMaterials'
 export { craftingLevelingPaths, getCraftingLevelingPath } from './sampleCraftingGuides'
 export { allProfessions, sampleProfessions, getProfessionProfile, professionIconNames } from './sampleProfessions'
-export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, FarmingRoute } from './farmingRoutes'
+export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, FarmingRoute, RangeRoute } from './farmingRoutes'
 export {
   DENSITY_GRID,
   computeRoute,
@@ -21,4 +22,7 @@ export {
   nodesWithoutSpawnData,
   routeLength,
   routesForNode,
+  routesForMaterials,
+  twoOptimize,
+  mappableMaterials,
 } from './farmingRoutes'

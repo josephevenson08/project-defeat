@@ -41,7 +41,25 @@ export type ProfessionTier = {
  * at a given skill range.
  */
 export type MaterialFarmSpot = {
+  /**
+   * The row's display label, which is frequently several materials — "Peacebloom / Silverleaf /
+   * Earthroot", "Thorium Ore (incl. Rich Thorium Vein at 275+)". It is written for a reader.
+   */
   material: string
+  /**
+   * The individual material names in this row, which is what joins it to `gatheringNodes`.
+   *
+   * **Separate from `material` because a display label is not a key**, and treating it as one cost
+   * this project 28 of its 43 ingested nodes: `routesForMaterial` matched `node.material === material`
+   * exactly, so every combined row — eight of Herbalism's nineteen and two of Mining's eleven —
+   * silently found nothing and rendered no map, while the coordinates for all nine classic herbs sat
+   * in `nodeSpawns.json` unreachable. The whole 1-300 herb progression was mapless on screen.
+   *
+   * Listed rather than parsed out of the label at render time: a split on "/" would have worked until
+   * a label contained one for another reason, and a name that stops matching should fail a test
+   * rather than quietly drop a map again. `tests/planner.spec.ts` asserts every name here resolves.
+   */
+  materials: readonly string[]
   /** Inclusive skill point range at which this material is the relevant one to farm. */
   skillRange: [number, number]
   /** Zones/subzones where this material is found. */

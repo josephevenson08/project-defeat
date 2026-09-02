@@ -170,3 +170,112 @@ export function routesForNode(node: GatheringNode): FarmingRoute[] {
 export function nodesForProfession(profession: Profession): GatheringNode[] {
   return gatheringNodes.filter((node) => node.profession === profession)
 }
+
+/**
+ * Improves a tour by uncrossing it.
+ *
+ * **Nearest-neighbour alone leaves crossings, and a crossing is the one route error a player sees
+ * immediately** — it reads as "why am I riding back past where I just was". 2-opt repeatedly reverses
+ * the segment between two edges whenever doing so shortens the loop, which removes exactly that class
+ * of mistake for a few milliseconds of work.
+ *
+ * This is still a heuristic and the caption still says so. 2-opt converges to a local optimum, not
+ * the shortest possible circuit; the difference from optimal on a 25-stop cloud is small and the
+ * difference from *crossed* is the one a player would have complained about.
+ */
+export function twoOptimize(stops: readonly SpawnPoint[]): SpawnPoint[] {
+  const tour = stops.map((point) => [...point] as unknown as SpawnPoint)
+  if (tour.length < 4) return tour
+
+  const gap = (a: SpawnPoint, b: SpawnPoint) => Math.hypot(a[0] - b[0], a[1] - b[1])
+  const n = tour.length
+
+  // Bounded rather than "until no improvement": a pathological cloud should cost a frame, not a tab.
+  for (let pass = 0, improved = true; improved && pass < 40; pass += 1) {
+    improved = false
+    for (let i = 0; i < n - 1; i += 1) {
+      for (let k = i + 2; k < n; k += 1) {
+        // The edge after k wraps, so skip the pair that would "reverse" the whole closed tour.
+        if (i === 0 && k === n - 1) continue
+        const delta =
+          gap(tour[i], tour[k]) + gap(tour[i + 1], tour[(k + 1) % n]) -
+          gap(tour[i], tour[i + 1]) - gap(tour[k], tour[(k + 1) % n])
+        if (delta < -1e-9) {
+          for (let lo = i + 1, hi = k; lo < hi; lo += 1, hi -= 1) {
+            const swap = tour[lo]
+            tour[lo] = tour[hi]
+            tour[hi] = swap
+          }
+          improved = true
+        }
+      }
+    }
+  }
+
+  return tour
+}
+
+/** One zone's circuit for a whole skill range, over every material that range gathers. */
+export type RangeRoute = {
+  zone: string
+  /** The range's materials that actually spawn here, busiest first. Drives the map's caption. */
+  materials: { material: string; count: number }[]
+  spawnCount: number
+  sampled: boolean
+  grid: number
+  cells: DensityCell[]
+  stops: SpawnPoint[]
+  routeLength: number
+}
+
+/**
+ * A route per zone for a set of materials farmed together.
+ *
+ * **The unit is the skill range, not the material, because that is the unit a player farms in.**
+ * At 1-100 you are picking Peacebloom, Silverleaf *and* Earthroot on the same lap of Durotar — so
+ * one loop over the three clouds merged is the route that exists, and three separate single-herb
+ * loops of the same zone is three pictures of the same ride.
+ *
+ * It also fixes what the per-material version could not express: a herb whose row names two others
+ * had no way to draw them together, and the exact-match join meant most rows drew nothing at all.
+ */
+export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
+  type ZoneBucket = { coords: SpawnPoint[]; sampled: boolean; parts: Map<string, number> }
+  const byZone = new Map<string, ZoneBucket>()
+
+  for (const material of materials) {
+    const node = gatheringNodes.find((entry) => entry.material === material)
+    if (!node) continue
+    for (const zone of node.zones) {
+      const bucket: ZoneBucket =
+        byZone.get(zone.zone) ?? { coords: [], sampled: false, parts: new Map<string, number>() }
+      bucket.coords.push(...zone.coords)
+      bucket.sampled = bucket.sampled || zone.sampled === true
+      bucket.parts.set(material, (bucket.parts.get(material) ?? 0) + zone.count)
+      byZone.set(zone.zone, bucket)
+    }
+  }
+
+  return [...byZone.entries()]
+    .map(([zone, bucket]) => {
+      const cells = densityCells(bucket.coords)
+      const stops = twoOptimize(computeRoute(cells))
+      return {
+        zone,
+        materials: [...bucket.parts.entries()]
+          .map(([material, count]) => ({ material, count }))
+          .sort((a, b) => b.count - a.count),
+        spawnCount: [...bucket.parts.values()].reduce((sum, count) => sum + count, 0),
+        sampled: bucket.sampled,
+        grid: DENSITY_GRID,
+        cells,
+        stops,
+        routeLength: routeLength(stops),
+      }
+    })
+    .filter((route) => route.stops.length > 0)
+    .sort((a, b) => b.spawnCount - a.spawnCount)
+}
+
+/** Every material name the node data can draw, for asserting that a farm row's names still resolve. */
+export const mappableMaterials: ReadonlySet<string> = new Set(gatheringNodes.map((node) => node.material))
