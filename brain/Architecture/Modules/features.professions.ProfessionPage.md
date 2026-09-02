@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/ProfessionPage.tsx
-lines: 66
+lines: 71
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.ProfessionPage
 
-`src/features/professions/ProfessionPage.tsx` · **features** layer · 66 lines
+`src/features/professions/ProfessionPage.tsx` · **features** layer · 71 lines
 
 From the top of the file:
 

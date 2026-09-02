@@ -40,7 +40,7 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
+- [[features.professions.ZoneRoutes]] — `src/features/professions/ZoneRoutes.tsx`
 
 ## Concepts & phases
 

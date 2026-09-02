@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/MaterialChip.tsx
-lines: 31
+lines: 36
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.MaterialChip
 
-`src/features/professions/MaterialChip.tsx` · **features** layer · 31 lines
+`src/features/professions/MaterialChip.tsx` · **features** layer · 36 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _None._
 
 ## Imported by
 
+- [[features.professions.CraftingProgression]] — `src/features/professions/CraftingProgression.tsx`
 - [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
 
 ## Concepts & phases

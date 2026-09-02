@@ -87,6 +87,11 @@ behind every claim of its that quotes a number.
   and each one opens on its own progression: a skill range, what you gather or craft in it, and the
   trainer visit that gates the next one. There is no skill-tier table; training requirements are
   markers placed at the skill where the bar stops moving
+- **Crafting paths that are computed rather than copied** — 2,079 TBC recipes ingested for their
+  reagents and their orange/yellow/green/grey breakpoints, from which all nine crafting professions
+  get a path from their first recipe to 375: what to make, how many, and the shopping list. The craft
+  counts are derived from the skill-up curve, not taken from anyone's guide, and the page prints the
+  model it used
 - **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
   coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
   merging every material farmed in that range, because that is how a range is farmed — at 1-100 you

@@ -23,6 +23,7 @@ _None._
 
 ## Imported by
 
+- [[domain.professions.craftingPaths]] — `src/domain/professions/craftingPaths.ts`
 - [[domain.professions.farmingRoutes]] — `src/domain/professions/farmingRoutes.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 - [[domain.professions.sampleCraftingGuides]] — `src/domain/professions/sampleCraftingGuides.ts`

@@ -78,18 +78,18 @@ pinned commit as the item icons, so the two cannot describe different item sets.
 the four that do not are recorded under `missing` rather than discovered later, and are cases where
 the node and the item it yields are named differently (Netherdust Bush yields Netherdust Pollen).
 
-### Three things this deliberately did not do
+### Three things this deliberately did not do — and all three were then done
 
-- **Crafting 1-300 is still nine placeholder rows** saying "see a dedicated vanilla guide". They now
-  render dimmed and distinct from real steps rather than identically to them, so the page stops
-  implying a detail it does not have. This is the next piece of work and it is a data job.
-- **Five ingested herbs are named by no farm row at all** — Arthas' Tears, Firebloom, Flame Cap,
-  Grave Moss, Purple Lotus. Their coordinates are in the bundle and nothing points at them. That is a
-  content gap in the rows rather than a join bug, so it was left rather than papered over.
-- **Crafting materials get no icons yet**, because `keyMaterials` is still prose in places — "15
-  Golden Sansam, Dreamfoil or Mountain Silversage, whichever matches the craft you picked". Splitting
-  a quantity off the front of a sentence to hang an icon on it is the same "a label is not a key"
-  mistake this session just spent its morning undoing. They get icons when they get structure.
+Left open at the end of the UI rebuild, and closed in the same session. Recorded rather than deleted,
+because the order matters: the shell existed first and the data landed into it, which is the
+sequencing this repo's Decision Log argues for.
+
+- ~~**Crafting 1-300 is nine placeholder rows.**~~ **Done.** All nine professions now carry a computed
+  path from their first recipe to 375 — see the next section.
+- ~~**Five ingested herbs are named by no farm row.**~~ **Done.** They attach to the range whose skill
+  window unlocks them, each with its own map.
+- ~~**Crafting materials get no icons.**~~ **Done.** The recipe ingest carries an icon per reagent, so
+  they never needed the prose `keyMaterials` to be parsed at all.
 
 ### Two things that cost this session time, both worth not rediscovering
 
@@ -106,6 +106,56 @@ did not, and the data was right. The merge is correctly selective per zone, whic
 zone tab shows what is actually there rather than what the range names. The assertion now covers both
 directions, because the original could not have failed in the direction that mattered — a merge
 wrongly claiming every herb in every zone would have passed it.
+
+### The crafting path is computed, which is what makes it ours to publish
+
+**2,079 recipes ingested, nine paths derived, and not one craft count copied.** The blocker was never
+the data — it was that a levelling path *is* the guide, and transcribing wow-professions.com's is
+exactly what `professionTypes.ts` has forbidden since it was written.
+
+The way through is the same one the farming routes took: **go one level below the guide and derive
+it.** Wowhead publishes, per recipe, what it consumes and the four skill points where it turns
+orange, yellow, green and grey. Those are facts. The craft count is not published anywhere — every
+guide quoting "102x Bolt of Linen Cloth" worked it out, and so does this.
+
+| | |
+|---|---|
+| Model | chance = (grey − skill) / (grey − yellow) between yellow and grey, 1 below yellow |
+| Craft count | the reciprocal summed across the range, rounded up |
+| Recipe choice | fewest reagent **items** per skill point, trainer-taught preferred |
+
+**The cost metric counts items, not gold, and the page says so.** This repo has no price data, and
+inventing one would be inventing the answer. A path that saves ten Netherweave Cloth by spending two
+Primal Might is worse than it looks here — that is a real limitation, printed above the steps rather
+than buried.
+
+**Two failures worth keeping, both of which produced plausible output.**
+
+- **The wrong URL does not 404.** Cooking and First Aid live under `secondary-skills/`, not
+  `professions/`, and Wowhead answers the wrong path with a generic listing capped at 1,000 rows —
+  identical for both, full of Tailoring and Leatherworking. Filed by name alone, all 1,000 would have
+  become Cooking recipes. The declared skill id rejected every one, which is the same discipline the
+  node ingest uses when it declares the name Wowhead must return.
+- **Dropping "noise" punched holes in the path.** The first coalescing pass discarded any step under
+  five skill points. They were not noise: Tailoring claimed to run 1 to 375 while silently skipping
+  74-75, 121-125 and 135, skill points where recipes were demonstrably available. **A fragmented path
+  looks fragmented; a holed one looks finished.** Fragmentation is handled at the source now — the
+  chosen recipe is sticky, so a rival must beat it by a real margin — and a contiguity check refuses
+  to write a path with a hole. A test asserts the same thing.
+
+**And a second test assumption the data corrected**, after Durotar earlier the same day: not every
+profession starts at skill 1. Jewelcrafting's earliest recipe is Heavy Copper Ring at 5, and there is
+nothing to make below it.
+
+### Still open on the professions tab
+
+- **Intermediate crafts are named but not expanded.** A Tailoring step says "39 Bolt of Linen Cloth"
+  without telling you those are themselves crafted from 78 Linen Cloth. The path is correct; the
+  shopping list is one level too shallow.
+- **The curated 300-375 rows survive only as notes.** Their editorial detail — which trainer, which
+  vendor, "buy the other pattern on the same trip" — is attached to the computed step whose range it
+  overlaps. Their skill ranges and craft counts are no longer rendered, so the two provenance stories
+  no longer sit side by side claiming the same thing.
 
 ### And the owner's steer on sourcing, recorded
 
