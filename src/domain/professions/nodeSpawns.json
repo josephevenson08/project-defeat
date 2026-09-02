@@ -10,6 +10,7 @@
       "name": "Adamantite Deposit",
       "profession": "Mining",
       "material": "Adamantite Ore",
+      "requiredSkill": 325,
       "totalSpawns": 549,
       "zones": [
         {
@@ -2233,6 +2234,7 @@
       "name": "Arthas' Tears",
       "profession": "Herbalism",
       "material": "Arthas' Tears",
+      "requiredSkill": 220,
       "totalSpawns": 118,
       "zones": [
         {
@@ -2726,6 +2728,7 @@
       "name": "Black Lotus",
       "profession": "Herbalism",
       "material": "Black Lotus",
+      "requiredSkill": 300,
       "totalSpawns": 149,
       "zones": [
         {
@@ -3349,6 +3352,7 @@
       "name": "Blindweed",
       "profession": "Herbalism",
       "material": "Blindweed",
+      "requiredSkill": 235,
       "totalSpawns": 237,
       "zones": [
         {
@@ -4318,6 +4322,7 @@
       "name": "Briarthorn",
       "profession": "Herbalism",
       "material": "Briarthorn",
+      "requiredSkill": 70,
       "totalSpawns": 317,
       "zones": [
         {
@@ -5613,6 +5618,7 @@
       "name": "Bruiseweed",
       "profession": "Herbalism",
       "material": "Bruiseweed",
+      "requiredSkill": 100,
       "totalSpawns": 288,
       "zones": [
         {
@@ -6792,6 +6798,7 @@
       "name": "Copper Vein",
       "profession": "Mining",
       "material": "Copper Ore",
+      "requiredSkill": 1,
       "totalSpawns": 566,
       "zones": [
         {
@@ -9083,6 +9090,7 @@
       "name": "Dreamfoil",
       "profession": "Herbalism",
       "material": "Dreamfoil",
+      "requiredSkill": 270,
       "totalSpawns": 269,
       "zones": [
         {
@@ -10186,6 +10194,7 @@
       "name": "Dreaming Glory",
       "profession": "Herbalism",
       "material": "Dreaming Glory",
+      "requiredSkill": 315,
       "totalSpawns": 396,
       "zones": [
         {
@@ -11797,6 +11806,7 @@
       "name": "Earthroot",
       "profession": "Herbalism",
       "material": "Earthroot",
+      "requiredSkill": 15,
       "totalSpawns": 232,
       "zones": [
         {
@@ -12752,6 +12762,7 @@
       "name": "Fadeleaf",
       "profession": "Herbalism",
       "material": "Fadeleaf",
+      "requiredSkill": 160,
       "totalSpawns": 155,
       "zones": [
         {
@@ -13399,6 +13410,7 @@
       "name": "Fel Iron Deposit",
       "profession": "Mining",
       "material": "Fel Iron Ore",
+      "requiredSkill": 300,
       "totalSpawns": 568,
       "zones": [
         {
@@ -15647,6 +15659,7 @@
       "name": "Felweed",
       "profession": "Herbalism",
       "material": "Felweed",
+      "requiredSkill": 300,
       "totalSpawns": 617,
       "zones": [
         {
@@ -18142,6 +18155,7 @@
       "name": "Firebloom",
       "profession": "Herbalism",
       "material": "Firebloom",
+      "requiredSkill": 205,
       "totalSpawns": 296,
       "zones": [
         {
@@ -19353,6 +19367,7 @@
       "name": "Flame Cap",
       "profession": "Herbalism",
       "material": "Flame Cap",
+      "requiredSkill": 335,
       "totalSpawns": 243,
       "zones": [
         {
@@ -20340,6 +20355,7 @@
       "name": "Gold Vein",
       "profession": "Mining",
       "material": "Gold Ore",
+      "requiredSkill": 155,
       "totalSpawns": 551,
       "zones": [
         {
@@ -22571,6 +22587,7 @@
       "name": "Golden Sansam",
       "profession": "Herbalism",
       "material": "Golden Sansam",
+      "requiredSkill": 260,
       "totalSpawns": 244,
       "zones": [
         {
@@ -23574,6 +23591,7 @@
       "name": "Goldthorn",
       "profession": "Herbalism",
       "material": "Goldthorn",
+      "requiredSkill": 170,
       "totalSpawns": 335,
       "zones": [
         {
@@ -24941,6 +24959,7 @@
       "name": "Grave Moss",
       "profession": "Herbalism",
       "material": "Grave Moss",
+      "requiredSkill": 120,
       "totalSpawns": 86,
       "zones": [
         {
@@ -25312,6 +25331,7 @@
       "name": "Icecap",
       "profession": "Herbalism",
       "material": "Icecap",
+      "requiredSkill": 290,
       "totalSpawns": 183,
       "zones": [
         {
@@ -26059,6 +26079,7 @@
       "name": "Iron Deposit",
       "profession": "Mining",
       "material": "Iron Ore",
+      "requiredSkill": 125,
       "totalSpawns": 441,
       "zones": [
         {
@@ -27850,6 +27871,7 @@
       "name": "Khadgar's Whisker",
       "profession": "Herbalism",
       "material": "Khadgar's Whisker",
+      "requiredSkill": 185,
       "totalSpawns": 280,
       "zones": [
         {
@@ -28997,6 +29019,7 @@
       "name": "Khorium Vein",
       "profession": "Mining",
       "material": "Khorium Ore",
+      "requiredSkill": 375,
       "totalSpawns": 710,
       "zones": [
         {
@@ -31864,6 +31887,7 @@
       "name": "Kingsblood",
       "profession": "Herbalism",
       "material": "Kingsblood",
+      "requiredSkill": 125,
       "totalSpawns": 329,
       "zones": [
         {
@@ -33207,6 +33231,7 @@
       "name": "Liferoot",
       "profession": "Herbalism",
       "material": "Liferoot",
+      "requiredSkill": 150,
       "totalSpawns": 265,
       "zones": [
         {
@@ -34294,6 +34319,7 @@
       "name": "Mageroyal",
       "profession": "Herbalism",
       "material": "Mageroyal",
+      "requiredSkill": 50,
       "totalSpawns": 272,
       "zones": [
         {
@@ -35409,6 +35435,7 @@
       "name": "Mana Thistle",
       "profession": "Herbalism",
       "material": "Mana Thistle",
+      "requiredSkill": 375,
       "totalSpawns": 62,
       "zones": [
         {
@@ -35684,6 +35711,7 @@
       "name": "Mithril Deposit",
       "profession": "Mining",
       "material": "Mithril Ore",
+      "requiredSkill": 175,
       "totalSpawns": 339,
       "zones": [
         {
@@ -37067,6 +37095,7 @@
       "name": "Mountain Silversage",
       "profession": "Herbalism",
       "material": "Mountain Silversage",
+      "requiredSkill": 280,
       "totalSpawns": 244,
       "zones": [
         {
@@ -38070,6 +38099,7 @@
       "name": "Netherbloom",
       "profession": "Herbalism",
       "material": "Netherbloom",
+      "requiredSkill": 350,
       "totalSpawns": 189,
       "zones": [
         {
@@ -38841,6 +38871,7 @@
       "name": "Nightmare Vine",
       "profession": "Herbalism",
       "material": "Nightmare Vine",
+      "requiredSkill": 365,
       "totalSpawns": 179,
       "zones": [
         {
@@ -39584,6 +39615,7 @@
       "name": "Peacebloom",
       "profession": "Herbalism",
       "material": "Peacebloom",
+      "requiredSkill": 1,
       "totalSpawns": 353,
       "zones": [
         {
@@ -41023,6 +41055,7 @@
       "name": "Purple Lotus",
       "profession": "Herbalism",
       "material": "Purple Lotus",
+      "requiredSkill": 210,
       "totalSpawns": 271,
       "zones": [
         {
@@ -42134,6 +42167,7 @@
       "name": "Rich Adamantite Deposit",
       "profession": "Mining",
       "material": "Adamantite Ore",
+      "requiredSkill": 350,
       "totalSpawns": 330,
       "zones": [
         {
@@ -43481,6 +43515,7 @@
       "name": "Rich Thorium Vein",
       "profession": "Mining",
       "material": "Thorium Ore",
+      "requiredSkill": 275,
       "totalSpawns": 201,
       "zones": [
         {
@@ -44312,6 +44347,7 @@
       "name": "Silver Vein",
       "profession": "Mining",
       "material": "Silver Ore",
+      "requiredSkill": 75,
       "totalSpawns": 571,
       "zones": [
         {
@@ -46623,6 +46659,7 @@
       "name": "Silverleaf",
       "profession": "Herbalism",
       "material": "Silverleaf",
+      "requiredSkill": 1,
       "totalSpawns": 431,
       "zones": [
         {
@@ -48374,6 +48411,7 @@
       "name": "Small Thorium Vein",
       "profession": "Mining",
       "material": "Thorium Ore",
+      "requiredSkill": 245,
       "totalSpawns": 188,
       "zones": [
         {
@@ -49153,6 +49191,7 @@
       "name": "Stranglekelp",
       "profession": "Herbalism",
       "material": "Stranglekelp",
+      "requiredSkill": 85,
       "totalSpawns": 401,
       "zones": [
         {
@@ -50784,6 +50823,7 @@
       "name": "Sungrass",
       "profession": "Herbalism",
       "material": "Sungrass",
+      "requiredSkill": 230,
       "totalSpawns": 305,
       "zones": [
         {
@@ -52031,6 +52071,7 @@
       "name": "Terocone",
       "profession": "Herbalism",
       "material": "Terocone",
+      "requiredSkill": 325,
       "totalSpawns": 256,
       "zones": [
         {
@@ -53076,6 +53117,7 @@
       "name": "Tin Vein",
       "profession": "Mining",
       "material": "Tin Ore",
+      "requiredSkill": 65,
       "totalSpawns": 336,
       "zones": [
         {
@@ -54447,6 +54489,7 @@
       "name": "Truesilver Deposit",
       "profession": "Mining",
       "material": "Truesilver Ore",
+      "requiredSkill": 230,
       "totalSpawns": 428,
       "zones": [
         {
@@ -56186,6 +56229,7 @@
       "name": "Wild Steelbloom",
       "profession": "Herbalism",
       "material": "Wild Steelbloom",
+      "requiredSkill": 115,
       "totalSpawns": 273,
       "zones": [
         {
@@ -57305,6 +57349,7 @@
       "name": "Wintersbite",
       "profession": "Herbalism",
       "material": "Wintersbite",
+      "requiredSkill": 195,
       "totalSpawns": 51,
       "zones": [
         {

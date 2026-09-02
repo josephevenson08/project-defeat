@@ -32,6 +32,14 @@ export type GatheringNode = {
   name: string
   profession: Profession
   material: string
+  /**
+   * The gathering skill the node requires, read off Wowhead's "Requires Herbalism (205)".
+   *
+   * **This is the only sourced check on a written farm range.** A row offering Firebloom at 150-210
+   * is wrong, and nothing could catch that while the requirement lived only on a web page. It also
+   * places the herbs no row mentions, which is otherwise a guess sitting next to sourced data.
+   */
+  requiredSkill: number
   totalSpawns: number
   zones: NodeZoneSpawns[]
 }
@@ -279,3 +287,32 @@ export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
 
 /** Every material name the node data can draw, for asserting that a farm row's names still resolve. */
 export const mappableMaterials: ReadonlySet<string> = new Set(gatheringNodes.map((node) => node.material))
+
+/**
+ * Nodes a profession can gather in a skill window that no farm row names.
+ *
+ * **Computed rather than authored, because the alternative was inventing a levelling window.** Five
+ * ingested herbs — Arthas' Tears, Firebloom, Flame Cap, Grave Moss, Purple Lotus — had full spawn
+ * coordinates and no row pointing at them, so their maps were unreachable. Writing five new rows
+ * would have meant deciding a skill range and a character level for each, and only the skill
+ * requirement and the zones are sourced; the rest would have been a guess printed beside real data.
+ *
+ * So they attach to the row whose range already contains their requirement. `requiredSkill` and the
+ * zone list both come from the ingest, the row supplies the window, and nothing here is authored.
+ *
+ * **Each one lands on exactly one row**, the earliest whose range contains it — Purple Lotus at 210
+ * qualifies for two overlapping rows and belongs on the first, not on both.
+ */
+export function supplementaryNodes(
+  profession: Profession,
+  skillRange: readonly [number, number],
+  claimedByAnyRow: ReadonlySet<string>,
+  earlierRanges: readonly (readonly [number, number])[] = [],
+): GatheringNode[] {
+  return gatheringNodes
+    .filter((node) => node.profession === profession)
+    .filter((node) => !claimedByAnyRow.has(node.material))
+    .filter((node) => node.requiredSkill >= skillRange[0] && node.requiredSkill <= skillRange[1])
+    .filter((node) => !earlierRanges.some(([lo, hi]) => node.requiredSkill >= lo && node.requiredSkill <= hi))
+    .sort((a, b) => a.requiredSkill - b.requiredSkill)
+}

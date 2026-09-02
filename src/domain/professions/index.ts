@@ -23,6 +23,7 @@ export {
   routeLength,
   routesForNode,
   routesForMaterials,
+  supplementaryNodes,
   twoOptimize,
   mappableMaterials,
 } from './farmingRoutes'

@@ -148,6 +148,28 @@ for (const declared of NODES) {
     continue
   }
 
+  /*
+   * **The gathering skill the node requires**, which the page carries as "Requires Herbalism (205)"
+   * and this ingest was throwing away.
+   *
+   * Worth having for a reason beyond display: it is the only sourced check on whether a farm row's
+   * written skill range is right. A row offering Firebloom at 150-210 is wrong, and nothing could
+   * have caught that while the requirement lived only on a web page. It also places a herb no row
+   * mentions — five of them had full coordinates and no row pointing at them, and guessing where
+   * they belonged would have been inventing data next to sourced data.
+   *
+   * The profession in the pattern is the declared one, so a Herbalism node that somehow returns a
+   * Mining requirement fails rather than recording a number from the wrong skill.
+   */
+  const skillMatch = /Requires (Herbalism|Mining) \((\d+)\)/.exec(page)
+  if (!skillMatch || skillMatch[1] !== profession) {
+    skipped.push(
+      `${id} (${title}): expected a ${profession} requirement, page said ${skillMatch?.[1] ?? 'nothing'}`,
+    )
+    continue
+  }
+  const requiredSkill = Number(skillMatch[2])
+
   let parsed
   try {
     parsed = JSON.parse(mapper)
@@ -195,7 +217,7 @@ for (const declared of NODES) {
   })
   zones.length = 0
   zones.push(...trimmed)
-  nodes.push({ objectId: id, name: title, profession, material, totalSpawns: zones.reduce((s, z) => s + z.count, 0), zones })
+  nodes.push({ objectId: id, name: title, profession, material, requiredSkill, totalSpawns: zones.reduce((s, z) => s + z.count, 0), zones })
 }
 
 if (nodes.length === 0) {
@@ -225,7 +247,7 @@ if (previous === next) {
 }
 
 for (const n of nodes) {
-  console.log(`  ${n.name.padEnd(26)} ${String(n.totalSpawns).padStart(5)} spawns  ${n.zones.length} zones  top: ${n.zones[0].zone}`)
+  console.log(`  ${n.name.padEnd(26)} skill ${String(n.requiredSkill).padStart(3)}  ${String(n.totalSpawns).padStart(5)} spawns  ${n.zones.length} zones  top: ${n.zones[0].zone}`)
 }
 if (skipped.length > 0) {
   console.log(`\n${skipped.length} candidate(s) dropped:`)
