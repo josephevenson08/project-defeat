@@ -51,7 +51,9 @@ export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile
         )}
       </div>
 
-      {farming.length > 0 && <GatheringProgression spots={farming} milestones={milestones} />}
+      {farming.length > 0 && (
+        <GatheringProgression profession={profile.profession} spots={farming} milestones={milestones} />
+      )}
       {crafting.length > 0 && <CraftingProgression steps={crafting} milestones={milestones} />}
 
       {farming.length === 0 && crafting.length === 0 && (

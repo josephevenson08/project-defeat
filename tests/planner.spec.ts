@@ -142,6 +142,7 @@ import {
   routeLength,
   routesForNode,
   routesForMaterials,
+  supplementaryNodes,
   twoOptimize,
   mappableMaterials,
 } from '../src/domain/professions'
@@ -8883,6 +8884,75 @@ test('every gathered material a farm row names can still be found in the node da
 
   const durotar = starter.find((route) => route.zone === 'Durotar')!
   expect(durotar.materials.map((entry) => entry.material), 'one herb, named as one').toEqual(['Peacebloom'])
+})
+
+test('every ingested node reaches a surface, and no row offers a herb before you can pick it', () => {
+  /*
+   * **The complement of the reachability test above, and the one that finishes the job.** That one
+   * asks whether every name a row writes down resolves to a node. This one asks the reverse: whether
+   * every node the ingest paid for is visible anywhere. Five were not — Arthas' Tears, Firebloom,
+   * Flame Cap, Grave Moss and Purple Lotus had full spawn coordinates and no row naming them, so
+   * their maps existed and nothing could reach them.
+   *
+   * They are placed by `supplementaryNodes` rather than by five new hand-written rows, because only
+   * the skill requirement and the zones are sourced — a levelling window and a character level for
+   * each would have been a guess printed beside real data.
+   */
+  const reached = new Set<string>()
+  for (const profession of ['Herbalism', 'Mining'] as const) {
+    const spots = [...(getProfessionProfile(profession)?.materialFarming ?? [])].sort(
+      (a, b) => a.skillRange[0] - b.skillRange[0],
+    )
+    const claimed = new Set(spots.flatMap((spot) => spot.materials))
+    const seen: [number, number][] = []
+    for (const spot of spots) {
+      spot.materials.forEach((material) => reached.add(material))
+      supplementaryNodes(profession, spot.skillRange, claimed, seen).forEach((node) => reached.add(node.material))
+      seen.push(spot.skillRange)
+    }
+  }
+
+  const unreachable = [...new Set(gatheringNodes.map((node) => node.material))].filter(
+    (material) => !reached.has(material),
+  )
+  expect(unreachable, 'every ingested node is named somewhere a player can see it').toEqual([])
+
+  /*
+   * **A supplementary node lands on exactly one row.** Purple Lotus at 210 falls inside two
+   * overlapping ranges, and showing it twice would be two maps of the same herb on one page.
+   */
+  const spots = [...(getProfessionProfile('Herbalism')?.materialFarming ?? [])].sort(
+    (a, b) => a.skillRange[0] - b.skillRange[0],
+  )
+  const claimed = new Set(spots.flatMap((spot) => spot.materials))
+  const seen: [number, number][] = []
+  const placements: string[] = []
+  for (const spot of spots) {
+    supplementaryNodes('Herbalism', spot.skillRange, claimed, seen).forEach((node) => placements.push(node.material))
+    seen.push(spot.skillRange)
+  }
+  expect(placements.length, 'placed once each, not once per overlapping range').toBe(new Set(placements).size)
+  expect(placements.sort()).toEqual(["Arthas' Tears", 'Firebloom', 'Flame Cap', 'Grave Moss', 'Purple Lotus'])
+
+  /*
+   * **`requiredSkill` is the only sourced check on a written range**, so it is worth spending here.
+   * A row that offers a herb above its own range is telling a player to farm something they cannot
+   * pick yet. All 45 nodes carry the figure, read off Wowhead's "Requires Herbalism (205)".
+   */
+  expect(gatheringNodes.every((node) => Number.isInteger(node.requiredSkill))).toBe(true)
+
+  const impossible: string[] = []
+  for (const profession of ['Herbalism', 'Mining'] as const) {
+    for (const spot of getProfessionProfile(profession)?.materialFarming ?? []) {
+      for (const material of spot.materials) {
+        const node = gatheringNodes.find((entry) => entry.material === material)
+        if (node && node.requiredSkill > spot.skillRange[1]) {
+          impossible.push(`${material} needs ${node.requiredSkill}, row ends at ${spot.skillRange[1]}`)
+        }
+      }
+    }
+  }
+  expect(impossible, 'no row offers a material above its own skill range').toEqual([])
 })
 
 test('2-opt shortens the circuit and leaves it a circuit', () => {
