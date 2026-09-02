@@ -8860,13 +8860,29 @@ test('every gathered material a farm row names can still be found in the node da
 
   /*
    * **A range merges its materials into one loop**, because that is how it is farmed: at 1-100 you
-   * pick all three on the same lap. So the merged route must carry more spawns than any one herb.
+   * pick all three on the same lap.
+   *
+   * **But not every zone carries every herb, and the merge is right to be selective.** This assertion
+   * first named Durotar and failed — Durotar has Peacebloom and neither of the others, and only
+   * Tirisfal Glades carries all three. The data was correct and the test was wrong, which is the
+   * useful direction for that to happen in. Both halves are asserted now: a zone that has all three
+   * says three, and a zone that has one says one rather than implying the other two are there.
    */
   const starter = routesForMaterials(['Peacebloom', 'Silverleaf', 'Earthroot'])
+
+  const busiest = starter[0]
+  expect(busiest.zone, 'busiest zone first').toBe('Tirisfal Glades')
+  expect(busiest.materials.length, 'and it is the one zone carrying all three').toBe(3)
+  expect(busiest.spawnCount, 'the count is the sum of what is actually here').toBe(
+    busiest.materials.reduce((sum, entry) => sum + entry.count, 0),
+  )
+
+  // The merged loop covers more than any one herb's loop of the same zone, which is why it merges.
+  const silverleaf = routesForMaterials(['Silverleaf']).find((route) => route.zone === 'Tirisfal Glades')!
+  expect(busiest.spawnCount).toBeGreaterThan(silverleaf.spawnCount)
+
   const durotar = starter.find((route) => route.zone === 'Durotar')!
-  expect(durotar.materials.length, 'all three herbs share the zone').toBe(3)
-  expect(durotar.spawnCount).toBeGreaterThan(routesForMaterials(['Peacebloom'])
-    .find((route) => route.zone === 'Durotar')!.spawnCount)
+  expect(durotar.materials.map((entry) => entry.material), 'one herb, named as one').toEqual(['Peacebloom'])
 })
 
 test('2-opt shortens the circuit and leaves it a circuit', () => {
