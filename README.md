@@ -30,20 +30,15 @@ behind every claim of its that quotes a number.
 - TBC class/spec selection for all nine TBC classes
 - Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior)
 - Full TBC-style gear slot model
-- **4,554 catalogued items**, 99.5% carrying a real WoW item ID, ingested from a pinned wowsims/tbc
-  commit and merged with a curated provenance layer (drop location, roles, crafting)
-- **Phase 2 and only Phase 2.** 1,196 later-phase items are ingested but gated out of every path a
-  player can reach — the picker, the default set, the upgrade finder, saved builds and imports
+- **Phase 2 and only Phase 2.** 
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location
-- Phase 1/2 starter ranked/BiS data for all nine TBC classes and every spec (27 specs total: Shaman, Warrior, Paladin, Priest, Druid, Hunter, Mage, Rogue, Warlock)
 - Spec-aware starter filtering for gear, relics, and enchants across every class (legal weapon types per class, dual-wield vs. single-weapon rules, class-appropriate relic type)
 - Spec-aware gear slot visibility for every class, including the Totem/Libram/Idol relic display for Shaman/Paladin/Druid and the hidden Ranged-vs-Relic slot swap
 - 212 gems and 91 enchants, ingested and validated, with per-spec gem and enchant recommendations from Wowhead
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
 - Role-aware prototype simulation outputs:
-  - Physical DPS
-  - Caster DPS
+  - DPS (separation between melee, ranged and caster)
   - Healer
   - Tank
 - Result breakdown panel
