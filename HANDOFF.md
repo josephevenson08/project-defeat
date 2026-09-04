@@ -49,6 +49,20 @@ on screen, and on a profession map none is.
 The spawn dots went smaller and more transparent in the same pass. They are the background layer —
 they describe the farmable shape, and the route has to be readable over them.
 
+### The art was dimmed on an assumption, and the measurement said the opposite
+
+The first pass filtered the maps to **55% brightness**, on the reasoning that Blizzard's zone art is
+parchment-bright and would drown the overlay. The Barrens came out a black square with dots on it.
+
+Measured across all 41 vendored maps, mean luma runs **80 to 112 out of 255, median 92** — they are
+uniformly *dark* already, which is why they work as a background at all. The assumption was backwards
+and multiplying by 0.55 took the darkest to about 50.
+
+**The narrow spread is the reusable part.** 32 points of variation across every zone in the game
+means one filter genuinely serves all of them, and the per-zone normalisation that looked necessary
+is not. It is now `brightness(1.15)`, which puts the median near 106 and the darkest near 92:
+terrain, roads and zone labels readable, still well below the cyan route.
+
 ### Alterac Mountains has no map, and that is recorded rather than patched
 
 Area 36 is a 404 at Wowhead's CDN at every size, while Alterac Valley next door is fine. So Wintersbite

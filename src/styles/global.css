@@ -4820,8 +4820,20 @@ input[type='text']:focus {
    * out from under coordinates that address the whole image.
    */
   object-fit: fill;
-  /* Blizzard's maps are parchment-bright; the overlay has to win, so the art sits back a little. */
-  filter: saturate(0.7) brightness(0.55);
+  /*
+   * **Brightened, not dimmed — the opposite of the first attempt.**
+   *
+   * These were filtered down to 55% on the assumption that Blizzard's maps are parchment-bright and
+   * would drown the overlay. Measured across all 41, mean luma runs 80 to 112 out of 255, median 92:
+   * they are uniformly *dark* already, which is why they work as a background at all. Multiplying
+   * that by 0.55 took The Barrens to about 50 and rendered it as a black square with dots on it.
+   *
+   * The narrow spread is the useful part — 32 points across every zone in the game — so one filter
+   * genuinely does serve all of them, and no per-zone normalisation is needed. 1.15 puts the median
+   * near 106 and the darkest near 92: terrain readable, still well below the cyan route and the
+   * pale nodes, which carry dark halos for the brightest zones.
+   */
+  filter: saturate(0.8) brightness(1.15);
 }
 
 .farming-route-map {
