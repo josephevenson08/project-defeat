@@ -27,5 +27,6 @@ export {
   routesForMaterials,
   supplementaryNodes,
   twoOptimize,
+  snapToSpawns,
   mappableMaterials,
 } from './farmingRoutes'

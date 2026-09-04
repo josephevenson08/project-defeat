@@ -144,8 +144,10 @@ import {
   routesForMaterials,
   supplementaryNodes,
   twoOptimize,
+  snapToSpawns,
   mappableMaterials,
 } from '../src/domain/professions'
+import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
@@ -8953,6 +8955,80 @@ test('every ingested node reaches a surface, and no row offers a herb before you
     }
   }
   expect(impossible, 'no row offers a material above its own skill range').toEqual([])
+})
+
+test('every zone a route draws has map art, or is recorded as having none', () => {
+  /*
+   * **The overlay works because two coordinate spaces already agreed**, and this test is what keeps
+   * them agreeing. Spawn coordinates are percentages of a zone's own extent on each axis
+   * independently; Wowhead's zone art covers exactly that space. So the art needs no transform — and
+   * equally, nothing may quietly change that assumption without failing here.
+   */
+  const drawn = [...new Set(gatheringNodes.flatMap((node) => node.zones.map((zone) => zone.zone)))]
+  const covered = drawn.filter((zone) => zone in zoneMaps.zones)
+  const missing = drawn.filter((zone) => !(zone in zoneMaps.zones))
+
+  expect(covered.length, 'nearly every zone has vendored art').toBeGreaterThanOrEqual(40)
+
+  /*
+   * **Named, not counted.** Alterac Mountains is a 404 at the CDN at every size while Alterac Valley
+   * next door is fine, so Wintersbite keeps the bare density square the maps used before. Listing it
+   * means a second zone losing its art fails this test rather than silently rendering an empty frame.
+   */
+  expect(missing.sort(), 'the only zone with no art is the known one').toEqual(['Alterac Mountains'])
+  expect(zoneMaps.withoutArt).toEqual(['Alterac Mountains'])
+
+  /*
+   * **The art is not square and the frame has to know it.** 772x515 and 772x579 are the two shapes.
+   * A frame forced to 1:1 would crop the art out from under coordinates that address the whole
+   * image, putting every dot somewhere the node is not — invisible in a screenshot, wrong everywhere.
+   */
+  for (const [zone, art] of Object.entries(zoneMaps.zones)) {
+    expect(art.width, `${zone} records its width`).toBeGreaterThan(100)
+    expect(art.height, `${zone} records its height`).toBeGreaterThan(100)
+    expect(art.width / art.height, `${zone} is wider than tall, as its art is`).toBeGreaterThan(1.2)
+  }
+
+  // Blizzard's artwork is credited, and the credit travels with the data rather than living in CSS.
+  expect(zoneMaps.attribution).toMatch(/Blizzard/)
+  expect(zoneMaps.attribution).toMatch(/Game Content Usage Rules/)
+})
+
+test('a route stop is a node that exists, not the average of a cluster', () => {
+  /*
+   * **A grid cell's centre is a coordinate, not a place.** It is the mean of a cluster, which on real
+   * terrain can land in a lake, off a cliff or inside a wall — nowhere a player can stand and nothing
+   * they can gather. That was invisible while the map was a bare square and is obvious with the zone
+   * art behind it, so every stop is snapped onto the nearest actual spawn.
+   */
+  const felweed = gatheringNodes.find((node) => node.name === 'Felweed')!
+  const zone = felweed.zones[0]
+  const raw = computeRoute(densityCells(zone.coords))
+  const snapped = snapToSpawns(raw, zone.coords)
+
+  expect(snapped.length, 'snapping moves stops, it does not add or drop them').toBe(raw.length)
+
+  const spawnKeys = new Set(zone.coords.map(([x, y]) => `${x},${y}`))
+  for (const [x, y] of snapped) {
+    expect(spawnKeys.has(`${x},${y}`), `stop ${x},${y} is a recorded spawn`).toBe(true)
+  }
+
+  // Two stops on one node would draw a doubled-back leg to nowhere.
+  expect(new Set(snapped.map(([x, y]) => `${x},${y}`)).size).toBe(snapped.length)
+
+  /*
+   * **Snapping must not wreck the route.** The nearest spawn to a dense cell's centre is inside that
+   * cluster by construction, so the loop should stay close to its pre-snap length rather than
+   * wandering. Asserted as a band because the exact figure is data, not a target.
+   */
+  const before = routeLength(raw)
+  const after = routeLength(snapped)
+  expect(after).toBeLessThan(before * 1.35)
+
+  // And the rendered route carries the spawns it was derived from, so the map can plot them.
+  const route = routesForMaterials(['Felweed'])[0]
+  expect(route.spawns.length).toBeGreaterThan(0)
+  expect(route.spawns.reduce((sum, group) => sum + group.coords.length, 0)).toBeGreaterThan(50)
 })
 
 test('2-opt shortens the circuit and leaves it a circuit', () => {

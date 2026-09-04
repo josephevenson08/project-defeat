@@ -4785,39 +4785,105 @@ input[type='text']:focus {
 .farming-route {
   margin: 8px 0 0;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 380px 1fr;
   gap: 16px;
   align-items: start;
 }
 
-.farming-route-map {
-  width: 280px;
-  height: 280px;
+/*
+ * The art and the overlay share one square, stacked.
+ *
+ * `preserveAspectRatio: none` on the SVG is what makes this correct rather than approximately
+ * correct: spawn coordinates are percentages of the zone's own extent on each axis independently, so
+ * the overlay must stretch with the image rather than keep its own aspect. The zone maps are not all
+ * square, and a route that kept 1:1 would drift further off true the wider the zone.
+ */
+.farming-route-frame {
+  position: relative;
+  width: 380px;
+  /* Overridden inline from the image's real dimensions; square is the no-art fallback's shape. */
+  aspect-ratio: 1;
   border: 1px solid var(--line);
-  background: var(--surface-0);
   border-radius: var(--radius);
+  background: var(--surface-0);
+  overflow: hidden;
+}
+
+.farming-route-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /*
+   * `fill`, not `cover`. The frame already matches the image's aspect ratio, so there is nothing to
+   * crop — and cropping is the one thing that must not happen here, because it would slide the art
+   * out from under coordinates that address the whole image.
+   */
+  object-fit: fill;
+  /* Blizzard's maps are parchment-bright; the overlay has to win, so the art sits back a little. */
+  filter: saturate(0.7) brightness(0.55);
+}
+
+.farming-route-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .farming-route-cell {
   fill: var(--text-dim);
 }
 
+/*
+ * The route reads in a colour of its own, not the profession accent.
+ *
+ * **Two layers of green do not separate.** The nodes are pale green and the gathering accent is a
+ * muted green, so over forest-and-parchment artwork the line disappeared into its own dots — the
+ * route was drawn correctly and could not be followed, which is the same failure as not drawing it.
+ *
+ * Cyan is chosen because nothing in a WoW zone map is cyan: the palette there is earth, forest and
+ * water, and this has to beat all three. The repo's rule that saturated colour belongs to item
+ * quality binds where item quality is on screen, and on a profession map none is.
+ */
 .farming-route-path {
   fill: none;
-  stroke: var(--profession-accent, var(--text));
-  stroke-width: 1.1;
+  stroke: #6fe3ff;
+  stroke-width: 2.2;
   stroke-linejoin: round;
+  stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+  /* Over art rather than a flat square, the line needs its own edge to stay readable. */
+  paint-order: stroke;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.95));
 }
 
 .farming-route-stop {
-  fill: var(--profession-accent, var(--text));
+  fill: #6fe3ff;
+  stroke: rgba(0, 0, 0, 0.8);
+  stroke-width: 0.5;
 }
 
+/*
+ * The nodes themselves — the background layer, deliberately.
+ *
+ * A few hundred of these describe the farmable shape of a zone, and the route has to be readable
+ * *over* them. They were brighter and larger at first and won the fight, which made the picture
+ * pretty and the route unfollowable. Small, semi-transparent, dark-haloed so they still read against
+ * parchment, forest and water alike.
+ */
+.farming-route-spawns circle {
+  fill: #e8f2dc;
+  fill-opacity: 0.62;
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 0.2;
+}
+
+/* Where the lap begins, ringed rather than filled so it is findable at a glance. */
 .farming-route-start {
-  fill: var(--surface-0);
-  stroke: var(--profession-accent, var(--text));
-  stroke-width: 1.2;
+  fill: #0b1418;
+  stroke: #6fe3ff;
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
 }
 
@@ -4845,16 +4911,21 @@ input[type='text']:focus {
   line-height: 1.45;
 }
 
+/* Blizzard's artwork, credited where it is used rather than only in a data file. */
+.farming-route-credit {
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+  opacity: 0.75;
+}
+
 /* The map is the first thing to give up its column when there is no room for two. */
 @media (max-width: 620px) {
   .farming-route {
     grid-template-columns: 1fr;
   }
 
-  .farming-route-map {
+  .farming-route-frame {
     width: 100%;
-    height: auto;
-    max-width: 280px;
-    aspect-ratio: 1;
+    max-width: 380px;
   }
 }

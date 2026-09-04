@@ -8,10 +8,14 @@
  * node cloud will draw similar lines, which is the point — the shape is a property of the zone, not
  * of anyone's guide.
  *
- * **And there is no map underneath.** Blizzard's zone art cannot be vendored, so the density of the
- * nodes *is* the picture. A zone's farmable region draws itself: coordinates are percentages of the
- * zone's own extent, so plotting them on a bare square reproduces the shape of where you can gather
- * without reproducing the map.
+ * **There is a map underneath now, and there was not until 2026-09-04.** For most of this file's life
+ * Blizzard's zone art was treated as un-vendorable, so the density of the nodes *was* the picture — a
+ * zone's farmable region drew its own shape, because coordinates are percentages of the zone's own
+ * extent. The owner has since decided to vendor the art under Blizzard's fan-content rules, and that
+ * same percentage space is what makes the overlay register with no transform at all.
+ *
+ * The design the constraint forced is still doing work: `zoneMaps.json` records the one zone with no
+ * art on the CDN, and its map falls back to the bare square rather than to a hole.
  */
 
 import nodeSpawns from './nodeSpawns.json' with { type: 'json' }
@@ -228,12 +232,53 @@ export type RangeRoute = {
   zone: string
   /** The range's materials that actually spawn here, busiest first. Drives the map's caption. */
   materials: { material: string; count: number }[]
+  /**
+   * Every recorded spawn, grouped by material, for plotting over the zone art.
+   *
+   * **Separate from `cells` because they answer different questions.** The density grid decides where
+   * a route should stop; these are the nodes themselves, and with Blizzard's zone art behind them
+   * they are what makes the map read like the in-game one rather than like a heat square.
+   */
+  spawns: { material: string; coords: SpawnPoint[] }[]
   spawnCount: number
   sampled: boolean
   grid: number
   cells: DensityCell[]
   stops: SpawnPoint[]
   routeLength: number
+}
+
+/**
+ * Moves each stop onto the nearest real spawn.
+ *
+ * **A grid cell's centre is a coordinate, not a place.** It is the average of a cluster, which on a
+ * zone map can land in a lake, off a cliff, or inside a wall — nowhere a player can stand and
+ * nothing they can mine. That was invisible while the map was a bare square and is obvious the
+ * moment the art is behind it.
+ *
+ * Snapping costs nothing in route quality — the nearest spawn to a dense cell's centre is by
+ * construction inside that cluster — and it buys a route whose every stop is a node that exists.
+ */
+export function snapToSpawns(stops: readonly SpawnPoint[], coords: readonly SpawnPoint[]): SpawnPoint[] {
+  if (coords.length === 0) return [...stops]
+
+  const used = new Set<number>()
+  return stops.map((stop) => {
+    let bestIndex = -1
+    let bestDistance = Number.POSITIVE_INFINITY
+    coords.forEach((coord, index) => {
+      // Two stops on one node would draw a doubled-back leg to nowhere.
+      if (used.has(index)) return
+      const distance = (coord[0] - stop[0]) ** 2 + (coord[1] - stop[1]) ** 2
+      if (distance < bestDistance) {
+        bestDistance = distance
+        bestIndex = index
+      }
+    })
+    if (bestIndex < 0) return stop
+    used.add(bestIndex)
+    return coords[bestIndex]
+  })
 }
 
 /**
@@ -248,18 +293,28 @@ export type RangeRoute = {
  * had no way to draw them together, and the exact-match join meant most rows drew nothing at all.
  */
 export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
-  type ZoneBucket = { coords: SpawnPoint[]; sampled: boolean; parts: Map<string, number> }
+  type ZoneBucket = {
+    coords: SpawnPoint[]
+    sampled: boolean
+    parts: Map<string, number>
+    byMaterial: Map<string, SpawnPoint[]>
+  }
   const byZone = new Map<string, ZoneBucket>()
 
   for (const material of materials) {
     const node = gatheringNodes.find((entry) => entry.material === material)
     if (!node) continue
     for (const zone of node.zones) {
-      const bucket: ZoneBucket =
-        byZone.get(zone.zone) ?? { coords: [], sampled: false, parts: new Map<string, number>() }
+      const bucket: ZoneBucket = byZone.get(zone.zone) ?? {
+        coords: [],
+        sampled: false,
+        parts: new Map<string, number>(),
+        byMaterial: new Map<string, SpawnPoint[]>(),
+      }
       bucket.coords.push(...zone.coords)
       bucket.sampled = bucket.sampled || zone.sampled === true
       bucket.parts.set(material, (bucket.parts.get(material) ?? 0) + zone.count)
+      bucket.byMaterial.set(material, [...(bucket.byMaterial.get(material) ?? []), ...zone.coords])
       byZone.set(zone.zone, bucket)
     }
   }
@@ -267,12 +322,17 @@ export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
   return [...byZone.entries()]
     .map(([zone, bucket]) => {
       const cells = densityCells(bucket.coords)
-      const stops = twoOptimize(computeRoute(cells))
+      /*
+       * Density picks the clusters, snapping puts each stop on a node that exists, and 2-opt runs
+       * again afterwards because moving the stops changes which order is shortest.
+       */
+      const stops = twoOptimize(snapToSpawns(computeRoute(cells), bucket.coords))
       return {
         zone,
         materials: [...bucket.parts.entries()]
           .map(([material, count]) => ({ material, count }))
           .sort((a, b) => b.count - a.count),
+        spawns: [...bucket.byMaterial.entries()].map(([material, coords]) => ({ material, coords })),
         spawnCount: [...bucket.parts.values()].reduce((sum, count) => sum + count, 0),
         sampled: bucket.sampled,
         grid: DENSITY_GRID,

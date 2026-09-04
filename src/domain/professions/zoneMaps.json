@@ -9,167 +9,249 @@
   "zones": {
     "Arathi Highlands": {
       "areaId": 45,
-      "file": "45.jpg"
+      "file": "45.jpg",
+      "width": 772,
+      "height": 515
     },
     "Ashenvale": {
       "areaId": 331,
-      "file": "331.jpg"
+      "file": "331.jpg",
+      "width": 772,
+      "height": 515
     },
     "Azshara": {
       "areaId": 16,
-      "file": "16.jpg"
+      "file": "16.jpg",
+      "width": 772,
+      "height": 515
     },
     "Azuremyst Isle": {
       "areaId": 3524,
-      "file": "3524.jpg"
+      "file": "3524.jpg",
+      "width": 772,
+      "height": 579
     },
     "Badlands": {
       "areaId": 3,
-      "file": "3.jpg"
+      "file": "3.jpg",
+      "width": 772,
+      "height": 515
     },
     "Blade's Edge Mountains": {
       "areaId": 3522,
-      "file": "3522.jpg"
+      "file": "3522.jpg",
+      "width": 772,
+      "height": 579
     },
     "Burning Steppes": {
       "areaId": 46,
-      "file": "46.jpg"
+      "file": "46.jpg",
+      "width": 772,
+      "height": 515
     },
     "Desolace": {
       "areaId": 405,
-      "file": "405.jpg"
+      "file": "405.jpg",
+      "width": 772,
+      "height": 515
     },
     "Dun Morogh": {
       "areaId": 1,
-      "file": "1.jpg"
+      "file": "1.jpg",
+      "width": 772,
+      "height": 515
     },
     "Durotar": {
       "areaId": 14,
-      "file": "14.jpg"
+      "file": "14.jpg",
+      "width": 772,
+      "height": 515
     },
     "Duskwood": {
       "areaId": 10,
-      "file": "10.jpg"
+      "file": "10.jpg",
+      "width": 772,
+      "height": 515
     },
     "Dustwallow Marsh": {
       "areaId": 15,
-      "file": "15.jpg"
+      "file": "15.jpg",
+      "width": 772,
+      "height": 515
     },
     "Eastern Plaguelands": {
       "areaId": 139,
-      "file": "139.jpg"
+      "file": "139.jpg",
+      "width": 772,
+      "height": 515
     },
     "Elwynn Forest": {
       "areaId": 12,
-      "file": "12.jpg"
+      "file": "12.jpg",
+      "width": 772,
+      "height": 515
     },
     "Feralas": {
       "areaId": 357,
-      "file": "357.jpg"
+      "file": "357.jpg",
+      "width": 772,
+      "height": 515
     },
     "Hellfire Peninsula": {
       "areaId": 3483,
-      "file": "3483.jpg"
+      "file": "3483.jpg",
+      "width": 772,
+      "height": 579
     },
     "Hillsbrad Foothills": {
       "areaId": 267,
-      "file": "267.jpg"
+      "file": "267.jpg",
+      "width": 772,
+      "height": 515
     },
     "Loch Modan": {
       "areaId": 38,
-      "file": "38.jpg"
+      "file": "38.jpg",
+      "width": 772,
+      "height": 515
     },
     "Nagrand": {
       "areaId": 3518,
-      "file": "3518.jpg"
+      "file": "3518.jpg",
+      "width": 772,
+      "height": 579
     },
     "Netherstorm": {
       "areaId": 3523,
-      "file": "3523.jpg"
+      "file": "3523.jpg",
+      "width": 772,
+      "height": 579
     },
     "Redridge Mountains": {
       "areaId": 44,
-      "file": "44.jpg"
+      "file": "44.jpg",
+      "width": 772,
+      "height": 515
     },
     "Searing Gorge": {
       "areaId": 51,
-      "file": "51.jpg"
+      "file": "51.jpg",
+      "width": 772,
+      "height": 515
     },
     "Shadowmoon Valley": {
       "areaId": 3520,
-      "file": "3520.jpg"
+      "file": "3520.jpg",
+      "width": 772,
+      "height": 579
     },
     "Silithus": {
       "areaId": 1377,
-      "file": "1377.jpg"
+      "file": "1377.jpg",
+      "width": 772,
+      "height": 515
     },
     "Silverpine Forest": {
       "areaId": 130,
-      "file": "130.jpg"
+      "file": "130.jpg",
+      "width": 772,
+      "height": 515
     },
     "Stonetalon Mountains": {
       "areaId": 406,
-      "file": "406.jpg"
+      "file": "406.jpg",
+      "width": 772,
+      "height": 515
     },
     "Stranglethorn Vale": {
       "areaId": 33,
-      "file": "33.jpg"
+      "file": "33.jpg",
+      "width": 772,
+      "height": 515
     },
     "Swamp of Sorrows": {
       "areaId": 8,
-      "file": "8.jpg"
+      "file": "8.jpg",
+      "width": 772,
+      "height": 515
     },
     "Tanaris": {
       "areaId": 440,
-      "file": "440.jpg"
+      "file": "440.jpg",
+      "width": 772,
+      "height": 515
     },
     "Teldrassil": {
       "areaId": 141,
-      "file": "141.jpg"
+      "file": "141.jpg",
+      "width": 772,
+      "height": 515
     },
     "Terokkar Forest": {
       "areaId": 3519,
-      "file": "3519.jpg"
+      "file": "3519.jpg",
+      "width": 772,
+      "height": 579
     },
     "The Barrens": {
       "areaId": 17,
-      "file": "17.jpg"
+      "file": "17.jpg",
+      "width": 772,
+      "height": 515
     },
     "The Hinterlands": {
       "areaId": 47,
-      "file": "47.jpg"
+      "file": "47.jpg",
+      "width": 772,
+      "height": 515
     },
     "Thousand Needles": {
       "areaId": 400,
-      "file": "400.jpg"
+      "file": "400.jpg",
+      "width": 772,
+      "height": 515
     },
     "Tirisfal Glades": {
       "areaId": 85,
-      "file": "85.jpg"
+      "file": "85.jpg",
+      "width": 772,
+      "height": 515
     },
     "Un'Goro Crater": {
       "areaId": 490,
-      "file": "490.jpg"
+      "file": "490.jpg",
+      "width": 772,
+      "height": 515
     },
     "Western Plaguelands": {
       "areaId": 28,
-      "file": "28.jpg"
+      "file": "28.jpg",
+      "width": 772,
+      "height": 515
     },
     "Westfall": {
       "areaId": 40,
-      "file": "40.jpg"
+      "file": "40.jpg",
+      "width": 772,
+      "height": 515
     },
     "Wetlands": {
       "areaId": 11,
-      "file": "11.jpg"
+      "file": "11.jpg",
+      "width": 772,
+      "height": 515
     },
     "Winterspring": {
       "areaId": 618,
-      "file": "618.jpg"
+      "file": "618.jpg",
+      "width": 772,
+      "height": 515
     },
     "Zangarmarsh": {
       "areaId": 3521,
-      "file": "3521.jpg"
+      "file": "3521.jpg",
+      "width": 772,
+      "height": 579
     }
   }
 }

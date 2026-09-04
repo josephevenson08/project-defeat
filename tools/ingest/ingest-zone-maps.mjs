@@ -46,6 +46,34 @@ const force = process.argv.includes('--force')
  */
 const CDN = 'https://wow.zamimg.com/images/wow/maps/enus/zoom'
 
+/**
+ * Reads a JPEG's pixel dimensions out of its own header.
+ *
+ * **The maps are not square and the overlay has to know it.** Tirisfal Glades is 772x515. Spawn
+ * coordinates are percentages of the zone's extent on each axis independently, so they map onto the
+ * *whole* image — which means a frame that forces a square either crops the art (and puts every dot
+ * in the wrong place) or stretches it. Carrying the real aspect ratio lets the frame match the image
+ * and the coordinates land where they belong.
+ *
+ * Walks the segment markers to the first SOF rather than pulling in an image library for two numbers.
+ */
+function jpegSize(buffer) {
+  let offset = 2 // skip SOI
+  while (offset < buffer.length - 9) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1
+      continue
+    }
+    const marker = buffer[offset + 1]
+    // SOF0-SOF15, excluding the non-frame markers that share the range.
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+      return { height: buffer.readUInt16BE(offset + 5), width: buffer.readUInt16BE(offset + 7) }
+    }
+    offset += 2 + buffer.readUInt16BE(offset + 2)
+  }
+  return null
+}
+
 /** Zone name -> Wowhead area id, harvested from the spawn pages already on disk. */
 function resolveAreaIds() {
   const byName = new Map()
@@ -87,25 +115,30 @@ let fetched = 0
 for (const zone of wanted) {
   const areaId = areaIds.get(zone)
   const target = resolve(OUT_DIR, `${areaId}.jpg`)
-  zones[zone] = { areaId, file: `${areaId}.jpg` }
-
-  if (!force && existsSync(target) && statSync(target).size > 2000) continue
 
   try {
-    const res = await fetch(`${CDN}/${areaId}.jpg`, {
-      headers: { 'User-Agent': 'project-defeat-map-fetch' },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const buffer = Buffer.from(await res.arrayBuffer())
-    // A CDN error page is also "successful" bytes; a real zone map is never this small.
-    if (buffer.length < 2000) throw new Error(`suspiciously small (${buffer.length} bytes)`)
-    writeFileSync(target, buffer)
-    fetched += 1
+    let buffer
+    if (!force && existsSync(target) && statSync(target).size > 2000) {
+      buffer = readFileSync(target)
+    } else {
+      const res = await fetch(`${CDN}/${areaId}.jpg`, {
+        headers: { 'User-Agent': 'project-defeat-map-fetch' },
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      buffer = Buffer.from(await res.arrayBuffer())
+      // A CDN error page is also "successful" bytes; a real zone map is never this small.
+      if (buffer.length < 2000) throw new Error(`suspiciously small (${buffer.length} bytes)`)
+      writeFileSync(target, buffer)
+      fetched += 1
+      await new Promise((r) => setTimeout(r, 250))
+    }
+
+    const size = jpegSize(buffer)
+    if (!size) throw new Error('could not read its own dimensions')
+    zones[zone] = { areaId, file: `${areaId}.jpg`, width: size.width, height: size.height }
   } catch (err) {
     failed.push(`${zone} (${areaId}): ${err.message}`)
-    delete zones[zone]
   }
-  await new Promise((r) => setTimeout(r, 250))
 }
 
 /*
