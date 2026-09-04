@@ -185,7 +185,10 @@ each pinned by an assertion these days.
 - **Farming route maps for the two gathering professions with world nodes** — 45 nodes and 14,091
   spawn coordinates ingested from Wowhead, bucketed into a density grid with a nearest-neighbour
   circuit through the busiest clusters, then uncrossed with 2-opt (11.5% shorter across every real
-  node cloud). Drawn without zone art, since coordinates are percentages of each zone's own extent.
+  node cloud). Every spawn is plotted over the zone's own map art — 41 zones vendored under Blizzard's
+  Game Content Usage Rules and credited on each map — which needs no transform, since coordinates are
+  percentages of each zone's extent and the art covers that same space. One zone has no art on file
+  and falls back to the bare density grid the maps used before.
   Skinning and Fishing have no node data to draw and keep their written farm spots.
 - **The Professions tab is an entry grid plus one page per profession** (2026-09-02). A skill range
   is the unit; zones are tabs rather than stacked maps; one map merges every material in the range,

@@ -1,7 +1,60 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-02.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-04.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-04, the maps have the game's own art under them)
+
+**41 zone maps vendored, every spawn plotted on them, and the route snapped onto real nodes.** The
+farming maps were bare density squares because this repo treated Blizzard's zone art as
+un-vendorable. The owner lifted that on 2026-09-04; Blizzard's Game Content Usage Rules permit a
+non-commercial fan project to use game assets with attribution, and the attribution ships on every
+map and in `zoneMaps.json`.
+
+### The old constraint is why the new version was a day's work rather than a rewrite
+
+The bare square was built on **percentages of each zone's own extent**, because that was the only
+frame available without a map. Wowhead's zone art covers exactly that space. So the art went
+underneath with **no transform, no calibration and no per-zone fudge factor** — an ingest and a CSS
+layer.
+
+That is the reusable lesson and it is in the Decision Log: *when you cannot have the thing, build in
+the units the thing would have used.* A workaround that stays in the real coordinate system is one
+you can delete later; one that invents its own frame is a fork you maintain forever.
+
+### Three things that would each have put every dot in the wrong place
+
+- **The maps are not square.** 772x515 or 772x579, two aspect ratios across 41 zones. The frame takes
+  its shape from the JPEG's own header, read by walking to the SOF marker rather than pulling in an
+  image library for two numbers. A square frame with `object-fit: cover` would have cropped the art
+  out from under coordinates that address the whole image — every dot subtly, invisibly wrong.
+- **`preserveAspectRatio="none"`** on the overlay, because the two axes are independent percentages.
+  An SVG defending its own 1:1 would drift further off true the wider the zone.
+- **Stops were grid-cell centres, which are coordinates rather than places.** A cell centre is the
+  average of a cluster and on a real map can sit in a lake or inside a wall. `snapToSpawns` moves each
+  stop onto the nearest actual spawn, then 2-opt runs again because moving the stops changes which
+  order is shortest. Invisible on a bare square; obvious the moment there is terrain underneath.
+
+### And one thing that was drawn correctly and could not be followed
+
+The route line took the profession accent, a muted green, and the spawn dots were pale green. Over
+forest-and-parchment artwork **the route disappeared into its own nodes** — drawn right, unusable,
+which is the same failure as not drawing it. The line and its stops are cyan now, chosen because
+nothing in a WoW zone map is cyan: that palette is earth, forest and water, and the route has to beat
+all three. The repo's rule that saturated colour belongs to item quality binds where item quality is
+on screen, and on a profession map none is.
+
+The spawn dots went smaller and more transparent in the same pass. They are the background layer —
+they describe the farmable shape, and the route has to be readable over them.
+
+### Alterac Mountains has no map, and that is recorded rather than patched
+
+Area 36 is a 404 at Wowhead's CDN at every size, while Alterac Valley next door is fine. So Wintersbite
+keeps the bare density square, which makes the pre-2026-09-04 rendering a **live fallback rather than
+dead code**. It is named in `zoneMaps.json` under `withoutArt` rather than counted, so a second such
+zone is a visible change instead of a background that quietly stops appearing.
 
 ---
 
@@ -230,6 +283,12 @@ loop computed from those points is our own work rather than theirs.
 limitation: coordinates are percentages of a zone's own extent, so plotting them on a bare square
 reproduces the shape of the farmable region without reproducing the map. The node cloud *is* the
 picture. A player who knows the zone recognises it instantly.
+
+> **Superseded 2026-09-04 — the art is vendored now**, by the owner's decision, under Blizzard's Game
+> Content Usage Rules with attribution on every map. The paragraph above is left standing because the
+> groundwork it describes is exactly what made the overlay trivial: the percentage coordinate space it
+> was built around is the space the zone art covers, so the maps went underneath with no transform,
+> no calibration and no per-zone fudge. See the 2026-09-04 entry at the top of this file.
 
 ### How a route is computed
 

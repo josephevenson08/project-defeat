@@ -91,11 +91,14 @@ behind every claim of its that quotes a number.
   coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
   merging every material farmed in that range, because that is how a range is farmed — at 1-100 you
   are picking Peacebloom, Silverleaf and Earthroot on the same lap. Zones are tabs rather than stacked
-  maps. There is no zone art underneath: coordinates are percentages of a zone's own extent, so the
-  farmable region draws its own shape. The circuit is computed here rather than copied from anyone's
-  guide — density, nearest-neighbour, then 2-opt to uncross it — and the caption says it is a strong
-  starting line rather than a proven optimum. The other eleven professions carry tiers, trainer
-  levels, and either farm spots or recipe paths — only two professions have world nodes to draw
+  maps. Every recorded spawn is plotted over the zone's own map art, which registers with no transform
+  because coordinates are percentages of the zone's extent and that is exactly the space the art
+  covers. The circuit is computed here rather than copied from anyone's guide — density, snapped onto
+  nodes that actually exist, then 2-opt to uncross it — and the caption says it is a strong starting
+  line rather than a proven optimum. Zone maps are Blizzard artwork used under the Game Content Usage
+  Rules, credited on every map; the one zone with no art on file falls back to a bare density grid.
+  The other eleven professions carry tiers, trainer levels, and either farm spots or recipe paths —
+  only two professions have world nodes to draw
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations

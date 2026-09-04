@@ -188,6 +188,34 @@ Up: [[Project Defeat Brain]]
 
 _Anything you write below the marker above is kept when the brain is regenerated._
 
+## Designing around a constraint is what makes lifting it cheap
+
+Recorded 2026-09-04, when the repo owner decided to vendor Blizzard's zone art after two years of
+this project treating it as off-limits.
+
+For as long as the farming maps existed, the entry above described the workaround: no zone art could
+be vendored, so the node cloud *was* the picture, drawn on a bare square in a coordinate space of
+percentages of each zone's own extent. That was a real constraint honestly answered.
+
+**When the constraint lifted, the workaround turned out to be the integration.** Wowhead's zone maps
+cover exactly that percentage space, so the art dropped underneath with no transform, no calibration
+and no per-zone fudge factor. The work was an ingest and a CSS layer. Had the original design
+invented its own coordinate frame — pixels, or a normalised bounding box of the observed spawns — the
+same change would have meant re-deriving every coordinate in the bundle.
+
+The general form is worth keeping: **when you cannot have the thing, build in the units the thing
+would have used.** A workaround that stays in the real coordinate system is a workaround you can
+delete later; one that invents its own is a fork you have to maintain.
+
+Two smaller things came with it, both instances of rules already in this log:
+
+- **The art is not square** — 772x515 or 772x579, never 1:1 — and the frame takes its aspect from the
+  image's own header. A square frame would crop or stretch, and cropping slides the art out from
+  under coordinates that address the whole image. Every dot would have been subtly, invisibly wrong.
+- **One zone has no art at the source**, and it is named in `zoneMaps.json` rather than counted, so
+  the old bare-square rendering is a live fallback rather than dead code, and a second such zone is a
+  visible change rather than a silently missing background.
+
 ## A display label is not a join key, and the test has to be about reachability
 
 Recorded 2026-09-02, after the Professions rebuild found that **28 of 43 ingested gathering nodes had

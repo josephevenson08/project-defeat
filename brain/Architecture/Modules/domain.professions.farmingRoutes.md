@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/farmingRoutes.ts
-lines: 319
+lines: 379
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.farmingRoutes
 
-`src/domain/professions/farmingRoutes.ts` · **domain** layer · 319 lines
+`src/domain/professions/farmingRoutes.ts` · **domain** layer · 379 lines
 
 From the top of the file:
 
@@ -22,14 +22,18 @@ From the top of the file:
 > node cloud will draw similar lines, which is the point — the shape is a property of the zone, not
 > of anyone's guide.
 > 
-> **And there is no map underneath.** Blizzard's zone art cannot be vendored, so the density of the
-> nodes *is* the picture. A zone's farmable region draws itself: coordinates are percentages of the
-> zone's own extent, so plotting them on a bare square reproduces the shape of where you can gather
-> without reproducing the map.
+> **There is a map underneath now, and there was not until 2026-09-04.** For most of this file's life
+> Blizzard's zone art was treated as un-vendorable, so the density of the nodes *was* the picture — a
+> zone's farmable region drew its own shape, because coordinates are percentages of the zone's own
+> extent. The owner has since decided to vendor the art under Blizzard's fan-content rules, and that
+> same percentage space is what makes the overlay register with no transform at all.
+> 
+> The design the constraint forced is still doing work: `zoneMaps.json` records the one zone with no
+> art on the CDN, and its map falls back to the bare square rather than to a hole.
 
 ## Exports
 
-**function** — `computeRoute`, `densityCells`, `nodesForProfession`, `routeLength`, `routesForMaterials`, `routesForNode`, `supplementaryNodes`, `twoOptimize`
+**function** — `computeRoute`, `densityCells`, `nodesForProfession`, `routeLength`, `routesForMaterials`, `routesForNode`, `snapToSpawns`, `supplementaryNodes`, `twoOptimize`
 
 **const** — `DENSITY_GRID`, `gatheringNodes`, `mappableMaterials`, `nodesWithoutSpawnData`
 
