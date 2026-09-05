@@ -192,7 +192,17 @@ const unmatchedCurated = sampleItems.filter((curated) => !consumedCurated.has(cu
 for (const curated of unmatchedCurated) {
   if (usedIds.has(curated.id)) continue
   usedIds.add(curated.id)
-  merged.push(curated)
+  /*
+   * **These are the only items in the catalogue whose stats nothing has checked**, and that is now
+   * said in a field rather than left implicit in which loop appended them. Everything above this
+   * point came from the ingest or the Wowhead supplement; these came from nowhere but the curated
+   * file, and the audit that produced this merge found invented stats and fabricated sockets in it.
+   *
+   * It is deliberately not `needsVerification`: that field describes provenance and most of these
+   * carry no provenance flag at all, which is exactly how 25 items with made-up stats were being
+   * reported to the upgrade finder as "sourced".
+   */
+  merged.push({ ...curated, statsEstimated: true })
 }
 
 /** Every item in the catalogue, across all phases. */

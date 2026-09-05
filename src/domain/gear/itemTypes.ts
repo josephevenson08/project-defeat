@@ -146,7 +146,29 @@ export type GearItem = {
   reputation?: string
   craftedBy?: string
   crafting?: CraftingInfo
+  /**
+   * The **provenance** is unconfirmed — where it drops, which roles want it, what crafts it.
+   *
+   * **It says nothing about the stats**, and reading it as if it did is a mistake this repo has
+   * already made. `itemCatalogue.ts` carries this field over from the curated entry through
+   * `PROVENANCE_FIELDS`, while everything mechanical comes from the ingest, so 141 of the 142 items
+   * carrying this flag have stats that are fully sourced. Use `statsEstimated` for that question.
+   */
   needsVerification?: boolean
+  /**
+   * The **stats themselves** are unverified, because this item reached the catalogue with no
+   * ingested counterpart at all.
+   *
+   * These are the 26 `unmatchedCurated` entries — the least trustworthy rows in the project, where an
+   * audit found invented stats, fabricated sockets and at least one item that does not exist. They
+   * are kept only so existing BiS and raid-loot references resolve.
+   *
+   * **Separate from `needsVerification` because the two were conflated and it ran the wrong way.**
+   * The upgrade finder read `needsVerification` as "the stats are estimated", which over-warned on
+   * 141 items whose stats are sourced and, far worse, stayed silent on 25 whose stats are invented —
+   * those carry no provenance flag, so the app vouched for numbers it had made up.
+   */
+  statsEstimated?: boolean
   notes?: string
 }
 
