@@ -148,6 +148,7 @@ import {
   mappableMaterials,
 } from '../src/domain/professions'
 import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
+import craftingPathFile from '../src/domain/professions/craftingPaths.json' with { type: 'json' }
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
@@ -9125,6 +9126,80 @@ test('every crafting path runs unbroken from 1 to 375 and says how its counts we
    */
   expect(craftingPathModel).toMatch(/computed, not sourced/)
   expect(craftingPathModel).toMatch(/grey/)
+})
+
+type ExpandedMaterial = {
+  name: string
+  quantity: number
+  craftedFrom?: { name: string; quantity: number }[]
+}
+const craftingPathsAll = craftingPathFile.paths as unknown as Record<
+  string,
+  { materials: ExpandedMaterial[] }[]
+>
+
+test('a step says what its intermediates cost, without telling you to craft a world drop', () => {
+  /*
+   * **26% of step reagents are things the same profession can make**, and a shopping list that stops
+   * at "39 Bolt of Linen Cloth" is one level too shallow: nobody farms bolts. The expansion flattens
+   * to what the profession cannot craft, which is what you actually take to the auction house.
+   *
+   * **It is offered, never substituted.** Alchemy's "31 Primal Air" is a world drop that merely
+   * happens to be transmutable, and swapping in the transmute would be worse advice than saying
+   * nothing. Only the player knows which they have, so both numbers are shown.
+   */
+  const withExpansion = Object.values(craftingPathsAll)
+    .flat()
+    .flatMap((step) => step.materials)
+    .filter((material) => material.craftedFrom)
+
+  expect(withExpansion.length, 'a quarter of reagents are intermediates').toBeGreaterThan(50)
+
+  /*
+   * **A transmute never sources an expansion**, and this is the assertion that pins it. Alchemy's
+   * Earth-to-Life and Life-to-Earth form a ring, so blocking the self-referential chain only made the
+   * next recipe in the ring answer instead: the list read "23 Essence of Earth <- 23 Essence of
+   * Water". True, and useless — both are world drops of the same tier, so nothing is reduced. These
+   * reagents must stand alone.
+   */
+  const lateral = (craftingPathsAll.Alchemy ?? [])
+    .flatMap((step) => step.materials)
+    .filter((material) => /^(Essence of|Primal )/.test(material.name) && material.craftedFrom)
+  expect(lateral.map((material) => material.name), 'transmutable drops expand to nothing').toEqual([])
+
+  for (const material of withExpansion) {
+    expect(material.quantity, 'the reagent keeps its own quantity').toBeGreaterThan(0)
+    expect(material.craftedFrom!.length, `${material.name} expands to something`).toBeGreaterThan(0)
+    for (const leaf of material.craftedFrom!) {
+      expect(leaf.quantity, `${leaf.name} has a real quantity`).toBeGreaterThan(0)
+      expect(leaf.name, 'a leaf never repeats its own parent').not.toBe(material.name)
+    }
+    // Flattened, not a tree: each base material appears once with its total.
+    const names = material.craftedFrom!.map((leaf) => leaf.name)
+    expect(new Set(names).size, `${material.name} folds duplicates together`).toBe(names.length)
+  }
+
+  /*
+   * **The arithmetic, pinned on a case anyone can check.** Bolt of Linen Cloth is two Linen Cloth,
+   * so a step needing 39 bolts needs 78 cloth — the same 1:2 ratio published guides quote, arrived
+   * at here from the reagent list rather than copied from them.
+   */
+  const bolts = craftingPathsAll.Tailoring.flatMap((step) => step.materials).find(
+    (material) => material.name === 'Bolt of Linen Cloth' && material.craftedFrom,
+  )!
+  const linen = bolts.craftedFrom!.find((leaf) => leaf.name === 'Linen Cloth')!
+  expect(linen.quantity).toBe(bolts.quantity * 2)
+
+  /*
+   * **Depth is real and worth having.** Dark Leather Gloves genuinely consumes Fine Leather Gloves,
+   * which is leather, which is scraps — so the expansion reaches past one level to the things you
+   * gather. A single-level version would have stopped at "26 Fine Leather Gloves" and helped nobody.
+   */
+  const gloves = craftingPathsAll.Leatherworking.flatMap((step) => step.materials).find(
+    (material) => material.name === 'Fine Leather Gloves' && material.craftedFrom,
+  )
+  expect(gloves, 'the deep Leatherworking case still resolves').toBeDefined()
+  expect(gloves!.craftedFrom!.some((leaf) => leaf.name === 'Ruined Leather Scraps')).toBe(true)
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {

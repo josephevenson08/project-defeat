@@ -35,8 +35,27 @@ function Step({ step, note }: { step: CraftingStep; note?: string }) {
       <ul className="profession-craft-materials">
         {step.materials.map((material) => (
           <li key={material.name}>
-            <MaterialChip material={material.name} icon={material.icon} />
-            <span>{material.quantity}</span>
+            <div className="profession-craft-material-row">
+              <MaterialChip material={material.name} icon={material.icon} />
+              <span>{material.quantity}</span>
+            </div>
+            {/*
+              What the reagent costs if you make it rather than buy it, flattened to what this
+              profession cannot craft. Shown beside the material rather than replacing it: nobody
+              farms Bolt of Linen Cloth, so 39 bolts really is 78 Linen Cloth — but a step asking for
+              Primal Air is asking for a world drop that merely happens to be transmutable, and
+              swapping in the transmute would be worse advice than saying nothing.
+            */}
+            {material.craftedFrom && (
+              <p className="profession-craft-from">
+                <span>if you craft it</span>
+                {material.craftedFrom.map((leaf) => (
+                  <span key={leaf.name} className="profession-craft-from-item">
+                    {leaf.quantity} {leaf.name}
+                  </span>
+                ))}
+              </p>
+            )}
           </li>
         ))}
       </ul>

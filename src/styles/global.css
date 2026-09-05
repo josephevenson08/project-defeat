@@ -2683,9 +2683,41 @@ select:focus,
 }
 
 .profession-craft-materials li {
+  display: grid;
+  gap: 2px;
+}
+
+.profession-craft-material-row {
   align-items: center;
   display: flex;
   gap: 8px;
+}
+
+/*
+ * The make-it-yourself cost, set back from the reagent it belongs to.
+ *
+ * Deliberately quieter than the material above it: it is an alternative, not an instruction. A step
+ * asking for 39 Bolt of Linen Cloth is asking for 78 Linen Cloth to anyone who makes their own, and
+ * for 39 bolts to anyone buying them.
+ */
+.profession-craft-from {
+  color: var(--text-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 11px;
+  gap: 4px 10px;
+  margin: 0 0 2px 26px;
+}
+
+.profession-craft-from > span:first-child {
+  font-family: var(--font-mono);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.profession-craft-from-item {
+  color: var(--text-dim);
 }
 
 .profession-craft-materials li > span {
