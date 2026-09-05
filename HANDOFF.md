@@ -41,6 +41,22 @@ supplement's list**. So it was an off-by-one gap rather than a missing item. Add
 and an empty stat block, which is correct: it is a Libram, and TBC relics carry spell-specific
 bonuses rather than stats. Its two neighbours are the same.
 
+### Three more tests were using the invented gear as fixtures
+
+The suite came back **226 passed, 3 failed**, all of them equipping a deleted placeholder: a caster
+robe and staff, healer gloves, a tank chest. Repointed at real Phase 2 items chosen to suit the role
+each test asserts — spell power under a caster sim, healing power under a healing enchant, 1,825
+armour under a tank assertion.
+
+There is precedent in the file for exactly this: a comment records that Shield of Rehearsal was
+removed as fictional and replaced with Aldori Legacy Defender, because "a test asserting real block
+mechanics must rest on an item that exists". Same reasoning, four more fixtures.
+
+**One of them found another invented number.** The crafting-detail test asserted 350 skill and 4x
+Spellcloth, read off the invented Spellfire Training Robe. The real Spellfire recipes are **375 skill
+and 2x Spellcloth**, which is what it asserts now against the genuine Spellfire Gloves. The test was
+green for as long as it checked fabricated data against itself.
+
 ### Two tests had to change, and one of them was asserting the bug
 
 The disclosure guard from earlier the same day asserted that estimated-stat items stay *selectable*,

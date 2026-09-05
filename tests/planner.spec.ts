@@ -556,8 +556,11 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await expect(page.getByLabel('Class')).toHaveValue('Mage')
   await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
 
-  await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
-  await selectSlotItem(page, 'Main Hand', 'apprentice-focus-staff')
+  // Real Phase 2 caster gear, replacing the invented "Spellfire Training Robe" and "Apprentice Focus
+  // Staff" fixtures deleted on 2026-09-05 — the same reason Shield of Rehearsal went below. A test
+  // exercising the caster path should rest on items that exist and actually carry spell power.
+  await selectSlotItem(page, 'Chest', 'vestments-of-the-sea-witch')
+  await selectSlotItem(page, 'Main Hand', 'the-nexus-key')
   // Equip a head piece known to have a red socket rather than assuming the default one does — the
   // default moved when the catalogue was re-ingested, and socketing is the point of this test.
   await selectSlotItem(page, 'Head', 'flamebane-helm')
@@ -578,7 +581,10 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await page.getByLabel('Class').selectOption('Priest')
   await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Discipline')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
-  await selectSlotItem(page, 'Hands', 'healers-grace-gloves')
+  // Real healing gloves, replacing the invented "Healer's Grace Gloves" fixture. The enchant applied
+  // below is a healing enchant, so the item under it has to carry healing power for the assertion to
+  // mean anything.
+  await selectSlotItem(page, 'Hands', 'glorious-gauntlets-of-crestfall')
   await selectSlotEnchant(page, 'Hands', 'Gloves - Major Healing')
 
   // Gear on the planner, results on the simulation tab, and back again for the tank half.
@@ -589,7 +595,9 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await openPlannerTab(page)
   await page.getByLabel('Class').selectOption('Paladin')
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
-  await selectSlotItem(page, 'Chest', 'bulwark-chestguard')
+  // Real plate, replacing the invented "Bulwark Chestguard" fixture — 1,825 armour and 56 stamina,
+  // which is what a tank assertion needs underneath it.
+  await selectSlotItem(page, 'Chest', 'bulwark-of-the-ancient-kings')
   // Aldori Legacy Defender rather than the old Shield of Rehearsal fixture, which could not be found
   // in Wowhead's TBC database at all and has since been deleted from the catalogue as fictional.
   // A test asserting real block mechanics must rest on an item that exists.
@@ -948,15 +956,23 @@ test('crafted items show recipe source, required skill, and material farm locati
   await openApp(page)
 
   await page.getByLabel('Class').selectOption('Mage')
-  await selectSlotItem(page, 'Chest', 'spellfire-training-robe')
 
-  await openSlot(page, 'Chest')
-  const craftingDetails = page.getByLabel('Chest crafting details')
+  /*
+   * **Spellfire Gloves, the real set piece, rather than the invented "Spellfire Training Robe" this
+   * test used to equip.** That entry was deleted on 2026-09-05 along with the rest of the Phase 1
+   * placeholder gear, and the numbers it carried show why: it claimed 350 skill and 4x Spellcloth,
+   * where the real Spellfire recipes are 375 and 2x. The assertions below are the item's actual
+   * crafting data, which is the only kind worth asserting on a panel whose job is to report it.
+   */
+  await selectSlotItem(page, 'Hands', 'spellfire-gloves')
+
+  await openSlot(page, 'Hands')
+  const craftingDetails = page.getByLabel('Hands crafting details')
   await expect(craftingDetails).toContainText('Tailoring')
-  await expect(craftingDetails).toContainText('350 skill')
+  await expect(craftingDetails).toContainText('375 skill')
   await expect(craftingDetails).toContainText('Spellfire Tailoring')
   await expect(craftingDetails).toContainText('Gidge Spellweave')
-  await expect(craftingDetails).toContainText('4x Spellcloth')
+  await expect(craftingDetails).toContainText('2x Spellcloth')
   await expect(craftingDetails).toContainText('Primal Mana')
 })
 
