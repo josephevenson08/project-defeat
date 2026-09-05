@@ -18,8 +18,21 @@ export type CraftingStep = {
   skillRange: [number, number]
   /** Expected crafts to cross the range, rounded up. An expectation, not a guarantee. */
   crafts: number
-  /** The whole step's reagents, already multiplied by `crafts`. */
-  materials: { name: string; quantity: number; icon?: string }[]
+  /**
+   * The whole step's reagents, already multiplied by `crafts`.
+   *
+   * `craftedFrom` is what the reagent costs **if you make it rather than buy it**, flattened to
+   * things this profession cannot craft. Offered rather than substituted, because only the player
+   * knows which they have: nobody farms Bolt of Linen Cloth, so 39 bolts really is 78 Linen Cloth —
+   * but "31 Primal Air" is a world drop that merely happens to be transmutable, and replacing it
+   * with a transmute would be worse advice than saying nothing.
+   */
+  materials: {
+    name: string
+    quantity: number
+    icon?: string
+    craftedFrom?: { name: string; quantity: number; icon?: string }[]
+  }[]
   creates?: string
   createsIcon?: string
   trainerTaught: boolean

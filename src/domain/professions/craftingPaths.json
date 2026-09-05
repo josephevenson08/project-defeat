@@ -44,7 +44,24 @@
           {
             "name": "Minor Healing Potion",
             "quantity": 52,
-            "icon": "inv_potion_49"
+            "icon": "inv_potion_49",
+            "craftedFrom": [
+              {
+                "name": "Peacebloom",
+                "quantity": 52,
+                "icon": "inv_misc_flower_02"
+              },
+              {
+                "name": "Silverleaf",
+                "quantity": 52,
+                "icon": "inv_misc_herb_10"
+              },
+              {
+                "name": "Empty Vial",
+                "quantity": 52,
+                "icon": "inv_drink_06"
+              }
+            ]
           },
           {
             "name": "Briarthorn",
@@ -309,7 +326,19 @@
           {
             "name": "Stonescale Oil",
             "quantity": 6,
-            "icon": "inv_potion_68"
+            "icon": "inv_potion_68",
+            "craftedFrom": [
+              {
+                "name": "Stonescale Eel",
+                "quantity": 6,
+                "icon": "inv_misc_fish_11"
+              },
+              {
+                "name": "Leaded Vial",
+                "quantity": 6,
+                "icon": "inv_drink_06"
+              }
+            ]
           },
           {
             "name": "Thorium Ore",
@@ -604,7 +633,14 @@
           {
             "name": "Rough Grinding Stone",
             "quantity": 27,
-            "icon": "inv_stone_grindingstone_01"
+            "icon": "inv_stone_grindingstone_01",
+            "craftedFrom": [
+              {
+                "name": "Rough Stone",
+                "quantity": 54,
+                "icon": "inv_stone_06"
+              }
+            ]
           }
         ],
         "creates": "Silver Skeleton Key",
@@ -704,7 +740,14 @@
           {
             "name": "Heavy Grinding Stone",
             "quantity": 26,
-            "icon": "inv_stone_grindingstone_03"
+            "icon": "inv_stone_grindingstone_03",
+            "craftedFrom": [
+              {
+                "name": "Heavy Stone",
+                "quantity": 78,
+                "icon": "inv_stone_12"
+              }
+            ]
           }
         ],
         "creates": "Golden Skeleton Key",
@@ -728,7 +771,14 @@
           {
             "name": "Coarse Grinding Stone",
             "quantity": 58,
-            "icon": "inv_stone_grindingstone_02"
+            "icon": "inv_stone_grindingstone_02",
+            "craftedFrom": [
+              {
+                "name": "Coarse Stone",
+                "quantity": 116,
+                "icon": "inv_stone_09"
+              }
+            ]
           },
           {
             "name": "Lesser Moonstone",
@@ -757,7 +807,14 @@
           {
             "name": "Heavy Grinding Stone",
             "quantity": 12,
-            "icon": "inv_stone_grindingstone_03"
+            "icon": "inv_stone_grindingstone_03",
+            "craftedFrom": [
+              {
+                "name": "Heavy Stone",
+                "quantity": 36,
+                "icon": "inv_stone_12"
+              }
+            ]
           }
         ],
         "creates": "Golden Scale Bracers",
@@ -800,7 +857,14 @@
           {
             "name": "Solid Grinding Stone",
             "quantity": 21,
-            "icon": "inv_stone_grindingstone_04"
+            "icon": "inv_stone_grindingstone_04",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 84,
+                "icon": "inv_stone_10"
+              }
+            ]
           }
         ],
         "creates": "Truesilver Skeleton Key",
@@ -872,7 +936,14 @@
           {
             "name": "Solid Grinding Stone",
             "quantity": 42,
-            "icon": "inv_stone_grindingstone_04"
+            "icon": "inv_stone_grindingstone_04",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 168,
+                "icon": "inv_stone_10"
+              }
+            ]
           }
         ],
         "creates": "Mithril Spurs",
@@ -915,7 +986,14 @@
           {
             "name": "Solid Grinding Stone",
             "quantity": 24,
-            "icon": "inv_stone_grindingstone_04"
+            "icon": "inv_stone_grindingstone_04",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 96,
+                "icon": "inv_stone_10"
+              }
+            ]
           }
         ],
         "creates": "Mithril Spurs",
@@ -963,7 +1041,14 @@
           {
             "name": "Dense Grinding Stone",
             "quantity": 15,
-            "icon": "inv_stone_grindingstone_05"
+            "icon": "inv_stone_grindingstone_05",
+            "craftedFrom": [
+              {
+                "name": "Dense Stone",
+                "quantity": 60,
+                "icon": "inv_misc_stonetablet_07"
+              }
+            ]
           }
         ],
         "creates": "Arcanite Skeleton Key",
@@ -1683,7 +1768,19 @@
           {
             "name": "Bronze Tube",
             "quantity": 18,
-            "icon": "inv_gizmo_pipe_01"
+            "icon": "inv_gizmo_pipe_01",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 36,
+                "icon": "inv_ingot_bronze"
+              },
+              {
+                "name": "Weak Flux",
+                "quantity": 18,
+                "icon": "inv_misc_ammo_gunpowder_02"
+              }
+            ]
           },
           {
             "name": "Moss Agate",
@@ -1707,7 +1804,19 @@
           {
             "name": "Whirring Bronze Gizmo",
             "quantity": 2,
-            "icon": "inv_gizmo_02"
+            "icon": "inv_gizmo_02",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 4,
+                "icon": "inv_ingot_bronze"
+              },
+              {
+                "name": "Wool Cloth",
+                "quantity": 2,
+                "icon": "inv_fabric_wool_01"
+              }
+            ]
           },
           {
             "name": "Small Flame Sac",
@@ -1750,7 +1859,19 @@
           {
             "name": "Whirring Bronze Gizmo",
             "quantity": 14,
-            "icon": "inv_gizmo_02"
+            "icon": "inv_gizmo_02",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 28,
+                "icon": "inv_ingot_bronze"
+              },
+              {
+                "name": "Wool Cloth",
+                "quantity": 14,
+                "icon": "inv_fabric_wool_01"
+              }
+            ]
           },
           {
             "name": "Frost Oil",
@@ -1774,7 +1895,19 @@
           {
             "name": "Bronze Tube",
             "quantity": 22,
-            "icon": "inv_gizmo_pipe_01"
+            "icon": "inv_gizmo_pipe_01",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 44,
+                "icon": "inv_ingot_bronze"
+              },
+              {
+                "name": "Weak Flux",
+                "quantity": 22,
+                "icon": "inv_misc_ammo_gunpowder_02"
+              }
+            ]
           },
           {
             "name": "Jade",
@@ -1813,7 +1946,14 @@
           {
             "name": "Solid Blasting Powder",
             "quantity": 7,
-            "icon": "inv_misc_powder_black"
+            "icon": "inv_misc_powder_black",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 14,
+                "icon": "inv_stone_10"
+              }
+            ]
           }
         ],
         "creates": "Mechanical Repair Kit",
@@ -1837,7 +1977,14 @@
           {
             "name": "Solid Blasting Powder",
             "quantity": 19,
-            "icon": "inv_misc_powder_black"
+            "icon": "inv_misc_powder_black",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 38,
+                "icon": "inv_stone_10"
+              }
+            ]
           }
         ],
         "creates": "Hi-Impact Mithril Slugs",
@@ -1856,7 +2003,14 @@
           {
             "name": "Solid Blasting Powder",
             "quantity": 23,
-            "icon": "inv_misc_powder_black"
+            "icon": "inv_misc_powder_black",
+            "craftedFrom": [
+              {
+                "name": "Solid Stone",
+                "quantity": 46,
+                "icon": "inv_stone_10"
+              }
+            ]
           },
           {
             "name": "Thick Leather",
@@ -1880,7 +2034,14 @@
           {
             "name": "Mithril Tube",
             "quantity": 10,
-            "icon": "inv_musket_01"
+            "icon": "inv_musket_01",
+            "craftedFrom": [
+              {
+                "name": "Mithril Bar",
+                "quantity": 30,
+                "icon": "inv_ingot_06"
+              }
+            ]
           },
           {
             "name": "Star Ruby",
@@ -1928,7 +2089,14 @@
           {
             "name": "Mithril Tube",
             "quantity": 8,
-            "icon": "inv_musket_01"
+            "icon": "inv_musket_01",
+            "craftedFrom": [
+              {
+                "name": "Mithril Bar",
+                "quantity": 24,
+                "icon": "inv_ingot_06"
+              }
+            ]
           },
           {
             "name": "Star Ruby",
@@ -1981,7 +2149,14 @@
           {
             "name": "Dense Blasting Powder",
             "quantity": 9,
-            "icon": "inv_misc_ammo_gunpowder_01"
+            "icon": "inv_misc_ammo_gunpowder_01",
+            "craftedFrom": [
+              {
+                "name": "Dense Stone",
+                "quantity": 18,
+                "icon": "inv_misc_stonetablet_07"
+              }
+            ]
           },
           {
             "name": "Rugged Leather",
@@ -2096,17 +2271,43 @@
           {
             "name": "Fel Iron Casing",
             "quantity": 15,
-            "icon": "inv_gizmo_felironcasing"
+            "icon": "inv_gizmo_felironcasing",
+            "craftedFrom": [
+              {
+                "name": "Fel Iron Bar",
+                "quantity": 45,
+                "icon": "inv_ingot_feliron"
+              }
+            ]
           },
           {
             "name": "Handful of Fel Iron Bolts",
             "quantity": 30,
-            "icon": "inv_gizmo_felironbolts"
+            "icon": "inv_gizmo_felironbolts",
+            "craftedFrom": [
+              {
+                "name": "Fel Iron Bar",
+                "quantity": 30,
+                "icon": "inv_ingot_feliron"
+              }
+            ]
           },
           {
             "name": "Elemental Blasting Powder",
             "quantity": 15,
-            "icon": "inv_misc_ammo_gunpowder_07"
+            "icon": "inv_misc_ammo_gunpowder_07",
+            "craftedFrom": [
+              {
+                "name": "Mote of Fire",
+                "quantity": 4,
+                "icon": "inv_elemental_mote_fire01"
+              },
+              {
+                "name": "Mote of Earth",
+                "quantity": 8,
+                "icon": "inv_elemental_mote_earth01"
+              }
+            ]
           }
         ],
         "creates": "Fel Iron Bomb",
@@ -2125,22 +2326,55 @@
           {
             "name": "Adamantite Frame",
             "quantity": 6,
-            "icon": "inv_gizmo_adamantiteframe"
+            "icon": "inv_gizmo_adamantiteframe",
+            "craftedFrom": [
+              {
+                "name": "Adamantite Bar",
+                "quantity": 24,
+                "icon": "inv_ingot_10"
+              },
+              {
+                "name": "Primal Earth",
+                "quantity": 6,
+                "icon": "inv_elemental_primal_earth"
+              }
+            ]
           },
           {
             "name": "Fel Iron Casing",
             "quantity": 12,
-            "icon": "inv_gizmo_felironcasing"
+            "icon": "inv_gizmo_felironcasing",
+            "craftedFrom": [
+              {
+                "name": "Fel Iron Bar",
+                "quantity": 36,
+                "icon": "inv_ingot_feliron"
+              }
+            ]
           },
           {
             "name": "Gold Power Core",
             "quantity": 6,
-            "icon": "inv_battery_02"
+            "icon": "inv_battery_02",
+            "craftedFrom": [
+              {
+                "name": "Gold Bar",
+                "quantity": 2,
+                "icon": "inv_ingot_03"
+              }
+            ]
           },
           {
             "name": "Handful of Fel Iron Bolts",
             "quantity": 12,
-            "icon": "inv_gizmo_felironbolts"
+            "icon": "inv_gizmo_felironbolts",
+            "craftedFrom": [
+              {
+                "name": "Fel Iron Bar",
+                "quantity": 12,
+                "icon": "inv_ingot_feliron"
+              }
+            ]
           }
         ],
         "creates": "Crashin' Thrashin' Robot",
@@ -2159,7 +2393,19 @@
           {
             "name": "Elemental Blasting Powder",
             "quantity": 6,
-            "icon": "inv_misc_ammo_gunpowder_07"
+            "icon": "inv_misc_ammo_gunpowder_07",
+            "craftedFrom": [
+              {
+                "name": "Mote of Fire",
+                "quantity": 2,
+                "icon": "inv_elemental_mote_fire01"
+              },
+              {
+                "name": "Mote of Earth",
+                "quantity": 4,
+                "icon": "inv_elemental_mote_earth01"
+              }
+            ]
           },
           {
             "name": "Netherweave Cloth",
@@ -2202,7 +2448,14 @@
           {
             "name": "Hardened Adamantite Tube",
             "quantity": 10,
-            "icon": "inv_gizmo_hardenedadamantitetube"
+            "icon": "inv_gizmo_hardenedadamantitetube",
+            "craftedFrom": [
+              {
+                "name": "Hardened Adamantite Bar",
+                "quantity": 30,
+                "icon": "inv_ingot_adamantite"
+              }
+            ]
           },
           {
             "name": "Khorium Bar",
@@ -2238,7 +2491,14 @@
           {
             "name": "Delicate Copper Wire",
             "quantity": 30,
-            "icon": "inv_jewelcrafting_delicatecopperwire"
+            "icon": "inv_jewelcrafting_delicatecopperwire",
+            "craftedFrom": [
+              {
+                "name": "Copper Bar",
+                "quantity": 60,
+                "icon": "inv_ingot_02"
+              }
+            ]
           }
         ],
         "creates": "Heavy Copper Ring",
@@ -2262,7 +2522,14 @@
           {
             "name": "Delicate Copper Wire",
             "quantity": 30,
-            "icon": "inv_jewelcrafting_delicatecopperwire"
+            "icon": "inv_jewelcrafting_delicatecopperwire",
+            "craftedFrom": [
+              {
+                "name": "Copper Bar",
+                "quantity": 60,
+                "icon": "inv_ingot_02"
+              }
+            ]
           }
         ],
         "creates": "Malachite Pendant",
@@ -2324,7 +2591,14 @@
           {
             "name": "Bronze Setting",
             "quantity": 35,
-            "icon": "inv_jewelcrafting_bronzesetting"
+            "icon": "inv_jewelcrafting_bronzesetting",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 70,
+                "icon": "inv_ingot_bronze"
+              }
+            ]
           }
         ],
         "creates": "Pendant of the Agate Shield",
@@ -2348,7 +2622,14 @@
           {
             "name": "Mithril Filigree",
             "quantity": 43,
-            "icon": "inv_jewelcrafting_mithrilfiligree"
+            "icon": "inv_jewelcrafting_mithrilfiligree",
+            "craftedFrom": [
+              {
+                "name": "Mithril Bar",
+                "quantity": 86,
+                "icon": "inv_ingot_06"
+              }
+            ]
           }
         ],
         "creates": "Blazing Citrine Ring",
@@ -2372,7 +2653,14 @@
           {
             "name": "Mithril Filigree",
             "quantity": 64,
-            "icon": "inv_jewelcrafting_mithrilfiligree"
+            "icon": "inv_jewelcrafting_mithrilfiligree",
+            "craftedFrom": [
+              {
+                "name": "Mithril Bar",
+                "quantity": 128,
+                "icon": "inv_ingot_06"
+              }
+            ]
           }
         ],
         "creates": "Engraved Truesilver Ring",
@@ -2406,7 +2694,14 @@
           {
             "name": "Bronze Setting",
             "quantity": 3,
-            "icon": "inv_jewelcrafting_bronzesetting"
+            "icon": "inv_jewelcrafting_bronzesetting",
+            "craftedFrom": [
+              {
+                "name": "Bronze Bar",
+                "quantity": 6,
+                "icon": "inv_ingot_bronze"
+              }
+            ]
           }
         ],
         "creates": "Citrine Pendant of Golden Healing",
@@ -2430,7 +2725,14 @@
           {
             "name": "Mithril Filigree",
             "quantity": 15,
-            "icon": "inv_jewelcrafting_mithrilfiligree"
+            "icon": "inv_jewelcrafting_mithrilfiligree",
+            "craftedFrom": [
+              {
+                "name": "Mithril Bar",
+                "quantity": 30,
+                "icon": "inv_ingot_06"
+              }
+            ]
           }
         ],
         "creates": "Aquamarine Pendant of the Warrior",
@@ -2473,7 +2775,14 @@
           {
             "name": "Thorium Setting",
             "quantity": 28,
-            "icon": "inv_jewelcrafting_thoriumsetting"
+            "icon": "inv_jewelcrafting_thoriumsetting",
+            "craftedFrom": [
+              {
+                "name": "Thorium Bar",
+                "quantity": 28,
+                "icon": "inv_ingot_07"
+              }
+            ]
           }
         ],
         "creates": "The Aquamarine Ward",
@@ -2497,7 +2806,14 @@
           {
             "name": "Thorium Setting",
             "quantity": 23,
-            "icon": "inv_jewelcrafting_thoriumsetting"
+            "icon": "inv_jewelcrafting_thoriumsetting",
+            "craftedFrom": [
+              {
+                "name": "Thorium Bar",
+                "quantity": 23,
+                "icon": "inv_ingot_07"
+              }
+            ]
           }
         ],
         "creates": "Diamond Focus Ring",
@@ -2521,7 +2837,14 @@
           {
             "name": "Thorium Setting",
             "quantity": 6,
-            "icon": "inv_jewelcrafting_thoriumsetting"
+            "icon": "inv_jewelcrafting_thoriumsetting",
+            "craftedFrom": [
+              {
+                "name": "Thorium Bar",
+                "quantity": 6,
+                "icon": "inv_ingot_07"
+              }
+            ]
           }
         ],
         "creates": "Emerald Lion Ring",
@@ -2621,7 +2944,19 @@
           {
             "name": "Mercurial Adamantite",
             "quantity": 9,
-            "icon": "spell_arcane_arcanepotency"
+            "icon": "spell_arcane_arcanepotency",
+            "craftedFrom": [
+              {
+                "name": "Adamantite Powder",
+                "quantity": 36,
+                "icon": "inv_misc_powder_adamantite"
+              },
+              {
+                "name": "Primal Earth",
+                "quantity": 9,
+                "icon": "inv_elemental_primal_earth"
+              }
+            ]
           }
         ],
         "creates": "Heavy Adamantite Ring",
@@ -2699,7 +3034,14 @@
           {
             "name": "Light Leather",
             "quantity": 54,
-            "icon": "inv_misc_leatherscrap_03"
+            "icon": "inv_misc_leatherscrap_03",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 162,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           }
         ],
         "creates": "Light Armor Kit",
@@ -2742,7 +3084,14 @@
           {
             "name": "Light Leather",
             "quantity": 81,
-            "icon": "inv_misc_leatherscrap_03"
+            "icon": "inv_misc_leatherscrap_03",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 243,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Coarse Thread",
@@ -2771,7 +3120,19 @@
           {
             "name": "Cured Light Hide",
             "quantity": 6,
-            "icon": "inv_misc_pelt_wolf_01"
+            "icon": "inv_misc_pelt_wolf_01",
+            "craftedFrom": [
+              {
+                "name": "Light Hide",
+                "quantity": 6,
+                "icon": "inv_misc_pelt_wolf_ruin_02"
+              },
+              {
+                "name": "Salt",
+                "quantity": 6,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2819,12 +3180,46 @@
           {
             "name": "Fine Leather Gloves",
             "quantity": 26,
-            "icon": "inv_gauntlets_05"
+            "icon": "inv_gauntlets_05",
+            "craftedFrom": [
+              {
+                "name": "Light Hide",
+                "quantity": 26,
+                "icon": "inv_misc_pelt_wolf_ruin_02"
+              },
+              {
+                "name": "Salt",
+                "quantity": 26,
+                "icon": "inv_misc_dust_02"
+              },
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 312,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              },
+              {
+                "name": "Coarse Thread",
+                "quantity": 52,
+                "icon": "inv_fabric_linen_03"
+              }
+            ]
           },
           {
             "name": "Cured Medium Hide",
             "quantity": 26,
-            "icon": "inv_misc_pelt_bear_02"
+            "icon": "inv_misc_pelt_bear_02",
+            "craftedFrom": [
+              {
+                "name": "Medium Hide",
+                "quantity": 26,
+                "icon": "inv_misc_pelt_boar_ruin_02"
+              },
+              {
+                "name": "Salt",
+                "quantity": 26,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2853,7 +3248,14 @@
           {
             "name": "Heavy Leather",
             "quantity": 10,
-            "icon": "inv_misc_leatherscrap_07"
+            "icon": "inv_misc_leatherscrap_07",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 600,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2877,12 +3279,46 @@
           {
             "name": "Fine Leather Gloves",
             "quantity": 6,
-            "icon": "inv_gauntlets_05"
+            "icon": "inv_gauntlets_05",
+            "craftedFrom": [
+              {
+                "name": "Light Hide",
+                "quantity": 6,
+                "icon": "inv_misc_pelt_wolf_ruin_02"
+              },
+              {
+                "name": "Salt",
+                "quantity": 6,
+                "icon": "inv_misc_dust_02"
+              },
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 72,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              },
+              {
+                "name": "Coarse Thread",
+                "quantity": 12,
+                "icon": "inv_fabric_linen_03"
+              }
+            ]
           },
           {
             "name": "Cured Medium Hide",
             "quantity": 6,
-            "icon": "inv_misc_pelt_bear_02"
+            "icon": "inv_misc_pelt_bear_02",
+            "craftedFrom": [
+              {
+                "name": "Medium Hide",
+                "quantity": 6,
+                "icon": "inv_misc_pelt_boar_ruin_02"
+              },
+              {
+                "name": "Salt",
+                "quantity": 6,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2935,7 +3371,14 @@
           {
             "name": "Heavy Leather",
             "quantity": 70,
-            "icon": "inv_misc_leatherscrap_07"
+            "icon": "inv_misc_leatherscrap_07",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 4200,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2959,12 +3402,31 @@
           {
             "name": "Cured Heavy Hide",
             "quantity": 26,
-            "icon": "inv_misc_pelt_wolf_02"
+            "icon": "inv_misc_pelt_wolf_02",
+            "craftedFrom": [
+              {
+                "name": "Heavy Hide",
+                "quantity": 26,
+                "icon": "inv_misc_pelt_wolf_ruin_03"
+              },
+              {
+                "name": "Salt",
+                "quantity": 78,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           },
           {
             "name": "Heavy Leather",
             "quantity": 52,
-            "icon": "inv_misc_leatherscrap_07"
+            "icon": "inv_misc_leatherscrap_07",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 3120,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -2993,12 +3455,31 @@
           {
             "name": "Heavy Leather",
             "quantity": 96,
-            "icon": "inv_misc_leatherscrap_07"
+            "icon": "inv_misc_leatherscrap_07",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 5760,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Cured Heavy Hide",
             "quantity": 24,
-            "icon": "inv_misc_pelt_wolf_02"
+            "icon": "inv_misc_pelt_wolf_02",
+            "craftedFrom": [
+              {
+                "name": "Heavy Hide",
+                "quantity": 24,
+                "icon": "inv_misc_pelt_wolf_ruin_03"
+              },
+              {
+                "name": "Salt",
+                "quantity": 72,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3022,7 +3503,14 @@
           {
             "name": "Thick Leather",
             "quantity": 70,
-            "icon": "inv_misc_leatherscrap_08"
+            "icon": "inv_misc_leatherscrap_08",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 25200,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3046,7 +3534,14 @@
           {
             "name": "Thick Leather",
             "quantity": 65,
-            "icon": "inv_misc_leatherscrap_08"
+            "icon": "inv_misc_leatherscrap_08",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 23400,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3070,7 +3565,14 @@
           {
             "name": "Thick Leather",
             "quantity": 100,
-            "icon": "inv_misc_leatherscrap_08"
+            "icon": "inv_misc_leatherscrap_08",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 36000,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Wildvine",
@@ -3080,7 +3582,19 @@
           {
             "name": "Cured Thick Hide",
             "quantity": 10,
-            "icon": "inv_misc_pelt_bear_01"
+            "icon": "inv_misc_pelt_bear_01",
+            "craftedFrom": [
+              {
+                "name": "Thick Hide",
+                "quantity": 10,
+                "icon": "inv_misc_pelt_bear_ruin_01"
+              },
+              {
+                "name": "Deeprock Salt",
+                "quantity": 10,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           }
         ],
         "creates": "Wild Leather Shoulders",
@@ -3099,7 +3613,14 @@
           {
             "name": "Thick Leather",
             "quantity": 70,
-            "icon": "inv_misc_leatherscrap_08"
+            "icon": "inv_misc_leatherscrap_08",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 25200,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Wildvine",
@@ -3109,7 +3630,19 @@
           {
             "name": "Cured Thick Hide",
             "quantity": 7,
-            "icon": "inv_misc_pelt_bear_01"
+            "icon": "inv_misc_pelt_bear_01",
+            "craftedFrom": [
+              {
+                "name": "Thick Hide",
+                "quantity": 7,
+                "icon": "inv_misc_pelt_bear_ruin_01"
+              },
+              {
+                "name": "Deeprock Salt",
+                "quantity": 7,
+                "icon": "inv_misc_dust_02"
+              }
+            ]
           }
         ],
         "creates": "Wild Leather Helmet",
@@ -3152,7 +3685,14 @@
           {
             "name": "Rugged Leather",
             "quantity": 30,
-            "icon": "inv_misc_leatherscrap_02"
+            "icon": "inv_misc_leatherscrap_02",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 64800,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           }
         ],
         "creates": "Rugged Armor Kit",
@@ -3171,7 +3711,14 @@
           {
             "name": "Rugged Leather",
             "quantity": 72,
-            "icon": "inv_misc_leatherscrap_02"
+            "icon": "inv_misc_leatherscrap_02",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 155520,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Heavy Scorpid Scale",
@@ -3200,7 +3747,14 @@
           {
             "name": "Rugged Leather",
             "quantity": 114,
-            "icon": "inv_misc_leatherscrap_02"
+            "icon": "inv_misc_leatherscrap_02",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 246240,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Essence of Fire",
@@ -3234,7 +3788,14 @@
           {
             "name": "Rugged Leather",
             "quantity": 32,
-            "icon": "inv_misc_leatherscrap_02"
+            "icon": "inv_misc_leatherscrap_02",
+            "craftedFrom": [
+              {
+                "name": "Ruined Leather Scraps",
+                "quantity": 69120,
+                "icon": "inv_misc_pelt_bear_ruin_05"
+              }
+            ]
           },
           {
             "name": "Essence of Fire",
@@ -3268,7 +3829,14 @@
           {
             "name": "Knothide Leather",
             "quantity": 14,
-            "icon": "inv_misc_leatherscrap_10"
+            "icon": "inv_misc_leatherscrap_10",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 70,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           }
         ],
         "creates": "Comfortable Insoles",
@@ -3316,7 +3884,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 45,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 1125,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Primal Mana",
@@ -3340,7 +3915,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 24,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 600,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Fel Scales",
@@ -3364,7 +3946,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 16,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 400,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Primal Mana",
@@ -3388,7 +3977,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 75,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 1875,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           }
         ],
         "creates": "Heavy Knothide Armor Kit",
@@ -3407,7 +4003,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 8,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 200,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Primal Might",
@@ -3441,7 +4044,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 36,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 900,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Thick Clefthoof Leather",
@@ -3465,7 +4075,14 @@
           {
             "name": "Heavy Knothide Leather",
             "quantity": 36,
-            "icon": "inv_misc_leatherscrap_11"
+            "icon": "inv_misc_leatherscrap_11",
+            "craftedFrom": [
+              {
+                "name": "Knothide Leather Scraps",
+                "quantity": 900,
+                "icon": "inv_misc_leatherscrap_09"
+              }
+            ]
           },
           {
             "name": "Fel Hide",
@@ -3491,7 +4108,14 @@
           {
             "name": "Bolt of Linen Cloth",
             "quantity": 39,
-            "icon": "inv_fabric_linen_02"
+            "icon": "inv_fabric_linen_02",
+            "craftedFrom": [
+              {
+                "name": "Linen Cloth",
+                "quantity": 78,
+                "icon": "inv_fabric_linen_01"
+              }
+            ]
           },
           {
             "name": "Coarse Thread",
@@ -3515,7 +4139,14 @@
           {
             "name": "Bolt of Linen Cloth",
             "quantity": 45,
-            "icon": "inv_fabric_linen_02"
+            "icon": "inv_fabric_linen_02",
+            "craftedFrom": [
+              {
+                "name": "Linen Cloth",
+                "quantity": 90,
+                "icon": "inv_fabric_linen_01"
+              }
+            ]
           },
           {
             "name": "Coarse Thread",
@@ -3539,7 +4170,14 @@
           {
             "name": "Bolt of Linen Cloth",
             "quantity": 10,
-            "icon": "inv_fabric_linen_02"
+            "icon": "inv_fabric_linen_02",
+            "craftedFrom": [
+              {
+                "name": "Linen Cloth",
+                "quantity": 20,
+                "icon": "inv_fabric_linen_01"
+              }
+            ]
           },
           {
             "name": "Coarse Thread",
@@ -3563,7 +4201,14 @@
           {
             "name": "Bolt of Woolen Cloth",
             "quantity": 62,
-            "icon": "inv_fabric_wool_03"
+            "icon": "inv_fabric_wool_03",
+            "craftedFrom": [
+              {
+                "name": "Wool Cloth",
+                "quantity": 186,
+                "icon": "inv_fabric_wool_01"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -3587,7 +4232,14 @@
           {
             "name": "Bolt of Woolen Cloth",
             "quantity": 6,
-            "icon": "inv_fabric_wool_03"
+            "icon": "inv_fabric_wool_03",
+            "craftedFrom": [
+              {
+                "name": "Wool Cloth",
+                "quantity": 18,
+                "icon": "inv_fabric_wool_01"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -3630,7 +4282,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 17,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 68,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Yellow Dye",
@@ -3659,7 +4318,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 16,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 64,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Blue Dye",
@@ -3688,7 +4354,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 22,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 88,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Gray Dye",
@@ -3717,7 +4390,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 21,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 84,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Fine Thread",
@@ -3741,7 +4421,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 8,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 32,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3789,7 +4476,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 52,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 208,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3818,7 +4512,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 16,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 64,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Purple Dye",
@@ -3847,7 +4548,14 @@
           {
             "name": "Bolt of Silk Cloth",
             "quantity": 32,
-            "icon": "inv_fabric_silk_03"
+            "icon": "inv_fabric_silk_03",
+            "craftedFrom": [
+              {
+                "name": "Silk Cloth",
+                "quantity": 128,
+                "icon": "inv_fabric_silk_01"
+              }
+            ]
           },
           {
             "name": "Mana Potion",
@@ -3876,7 +4584,14 @@
           {
             "name": "Bolt of Mageweave",
             "quantity": 10,
-            "icon": "inv_fabric_mageweave_03"
+            "icon": "inv_fabric_mageweave_03",
+            "craftedFrom": [
+              {
+                "name": "Mageweave Cloth",
+                "quantity": 50,
+                "icon": "inv_fabric_mageweave_01"
+              }
+            ]
           },
           {
             "name": "Silken Thread",
@@ -3900,7 +4615,14 @@
           {
             "name": "Bolt of Mageweave",
             "quantity": 15,
-            "icon": "inv_fabric_mageweave_03"
+            "icon": "inv_fabric_mageweave_03",
+            "craftedFrom": [
+              {
+                "name": "Mageweave Cloth",
+                "quantity": 75,
+                "icon": "inv_fabric_mageweave_01"
+              }
+            ]
           },
           {
             "name": "Heavy Silken Thread",
@@ -3924,7 +4646,14 @@
           {
             "name": "Bolt of Mageweave",
             "quantity": 10,
-            "icon": "inv_fabric_mageweave_03"
+            "icon": "inv_fabric_mageweave_03",
+            "craftedFrom": [
+              {
+                "name": "Mageweave Cloth",
+                "quantity": 50,
+                "icon": "inv_fabric_mageweave_01"
+              }
+            ]
           },
           {
             "name": "Bleach",
@@ -3953,7 +4682,14 @@
           {
             "name": "Bolt of Mageweave",
             "quantity": 36,
-            "icon": "inv_fabric_mageweave_03"
+            "icon": "inv_fabric_mageweave_03",
+            "craftedFrom": [
+              {
+                "name": "Mageweave Cloth",
+                "quantity": 180,
+                "icon": "inv_fabric_mageweave_01"
+              }
+            ]
           },
           {
             "name": "Heavy Silken Thread",
@@ -3977,7 +4713,14 @@
           {
             "name": "Bolt of Mageweave",
             "quantity": 33,
-            "icon": "inv_fabric_mageweave_03"
+            "icon": "inv_fabric_mageweave_03",
+            "craftedFrom": [
+              {
+                "name": "Mageweave Cloth",
+                "quantity": 165,
+                "icon": "inv_fabric_mageweave_01"
+              }
+            ]
           },
           {
             "name": "Heavy Silken Thread",
@@ -4020,7 +4763,14 @@
           {
             "name": "Bolt of Netherweave",
             "quantity": 51,
-            "icon": "inv_fabric_netherweave_bolt"
+            "icon": "inv_fabric_netherweave_bolt",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 306,
+                "icon": "inv_fabric_netherweave"
+              }
+            ]
           },
           {
             "name": "Rune Thread",
@@ -4044,7 +4794,14 @@
           {
             "name": "Bolt of Netherweave",
             "quantity": 30,
-            "icon": "inv_fabric_netherweave_bolt"
+            "icon": "inv_fabric_netherweave_bolt",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 180,
+                "icon": "inv_fabric_netherweave"
+              }
+            ]
           },
           {
             "name": "Arcane Dust",
@@ -4068,7 +4825,14 @@
           {
             "name": "Bolt of Netherweave",
             "quantity": 6,
-            "icon": "inv_fabric_netherweave_bolt"
+            "icon": "inv_fabric_netherweave_bolt",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 36,
+                "icon": "inv_fabric_netherweave"
+              }
+            ]
           },
           {
             "name": "Rune Thread",
@@ -4116,7 +4880,19 @@
           {
             "name": "Bolt of Imbued Netherweave",
             "quantity": 5,
-            "icon": "inv_fabric_netherweave_bolt_imbued"
+            "icon": "inv_fabric_netherweave_bolt_imbued",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 90,
+                "icon": "inv_fabric_netherweave"
+              },
+              {
+                "name": "Arcane Dust",
+                "quantity": 10,
+                "icon": "inv_enchant_dustarcane"
+              }
+            ]
           },
           {
             "name": "Netherweb Spider Silk",
@@ -4145,7 +4921,19 @@
           {
             "name": "Bolt of Imbued Netherweave",
             "quantity": 15,
-            "icon": "inv_fabric_netherweave_bolt_imbued"
+            "icon": "inv_fabric_netherweave_bolt_imbued",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 270,
+                "icon": "inv_fabric_netherweave"
+              },
+              {
+                "name": "Arcane Dust",
+                "quantity": 30,
+                "icon": "inv_enchant_dustarcane"
+              }
+            ]
           },
           {
             "name": "Primal Life",
@@ -4174,7 +4962,19 @@
           {
             "name": "Bolt of Imbued Netherweave",
             "quantity": 8,
-            "icon": "inv_fabric_netherweave_bolt_imbued"
+            "icon": "inv_fabric_netherweave_bolt_imbued",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 144,
+                "icon": "inv_fabric_netherweave"
+              },
+              {
+                "name": "Arcane Dust",
+                "quantity": 16,
+                "icon": "inv_enchant_dustarcane"
+              }
+            ]
           },
           {
             "name": "Primal Fire",
@@ -4198,7 +4998,19 @@
           {
             "name": "Bolt of Imbued Netherweave",
             "quantity": 84,
-            "icon": "inv_fabric_netherweave_bolt_imbued"
+            "icon": "inv_fabric_netherweave_bolt_imbued",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 1512,
+                "icon": "inv_fabric_netherweave"
+              },
+              {
+                "name": "Arcane Dust",
+                "quantity": 168,
+                "icon": "inv_enchant_dustarcane"
+              }
+            ]
           },
           {
             "name": "Netherweb Spider Silk",
@@ -4227,7 +5039,19 @@
           {
             "name": "Bolt of Soulcloth",
             "quantity": 12,
-            "icon": "inv_fabric_soulcloth_bolt"
+            "icon": "inv_fabric_soulcloth_bolt",
+            "craftedFrom": [
+              {
+                "name": "Netherweave Cloth",
+                "quantity": 72,
+                "icon": "inv_fabric_netherweave"
+              },
+              {
+                "name": "Soul Essence",
+                "quantity": 96,
+                "icon": "spell_shadow_soulleech_3"
+              }
+            ]
           },
           {
             "name": "Rune Thread",

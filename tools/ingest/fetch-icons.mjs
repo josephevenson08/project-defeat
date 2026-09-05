@@ -93,7 +93,14 @@ const craftingPaths = JSON.parse(
 )
 const craftingIconNames = Object.values(craftingPaths.paths)
   .flat()
-  .flatMap((step) => [step.createsIcon, ...step.materials.map((material) => material.icon)])
+  .flatMap((step) => [
+    step.createsIcon,
+    ...step.materials.flatMap((material) => [
+      material.icon,
+      // The make-it-yourself expansion reaches materials no step names directly.
+      ...(material.craftedFrom ?? []).map((leaf) => leaf.icon),
+    ]),
+  ])
   .filter(Boolean)
 
 const names = [

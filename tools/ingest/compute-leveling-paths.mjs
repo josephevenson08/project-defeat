@@ -58,6 +58,83 @@ function skillUpChance(recipe, skill) {
   return (grey - skill) / (grey - yellow)
 }
 
+/**
+ * Item name -> the recipe of this profession that produces it.
+ *
+ * Lowest-yield recipe wins a tie, so an expansion quotes what you must gather rather than the best
+ * case. A recipe that consumes what it makes is skipped: Alchemy's transmutes form real cycles
+ * (Primal Air to Fire, Primal Fire to Air) and one of them would otherwise expand forever.
+ */
+function outputIndex(recipes) {
+  const byOutput = new Map()
+  for (const recipe of recipes) {
+    if (!recipe.creates) continue
+    if (recipe.reagents.some((reagent) => reagent.itemId === recipe.creates.itemId)) continue
+
+    /*
+     * **A transmute is a lateral swap, not an intermediate craft, so it never sources an expansion.**
+     * Dropping self-referential chains was not enough: with Earth-to-Life blocked, the next recipe in
+     * the ring answered instead, and the shopping list read "23 Essence of Earth <- 23 Essence of
+     * Water". That is true and useless — both are world drops of the same tier, equally hard to get,
+     * so the expansion reduces nothing. There are 25 of these and Blizzard names every one of them
+     * "Transmute: X to Y", which is the discriminator rather than a guess about item tiers.
+     */
+    if (/^Transmute:/.test(recipe.name)) continue
+    const existing = byOutput.get(recipe.creates.name)
+    if (!existing || (recipe.creates.min || 1) < (existing.creates.min || 1)) {
+      byOutput.set(recipe.creates.name, recipe)
+    }
+  }
+  return byOutput
+}
+
+/**
+ * What a material costs if you make it rather than buy it, flattened to things you cannot craft.
+ *
+ * **Offered rather than prescribed, which is why it does not replace the material.** A step asking
+ * for 39 Bolt of Linen Cloth is a step asking for 78 Linen Cloth, since nobody farms bolts — but
+ * "31 Primal Air" is a world drop that merely happens to be transmutable, and telling a player to
+ * transmute it would be worse advice than saying nothing. Only the player knows which they have.
+ * Both numbers are shown and the wording says "if you craft it".
+ *
+ * Flattened to base materials rather than shown as a tree: Bolt of Imbued Netherweave is bolts and
+ * dust, and the bolts are cloth. What a player takes to the auction house is the leaves.
+ */
+function expandMaterial(name, quantity, byOutput, seen = new Set(), depth = 0) {
+  const recipe = byOutput.get(name)
+  if (!recipe || depth > 4 || seen.has(name)) return null
+
+  const yieldPer = Math.max(1, recipe.creates?.min ?? 1)
+  const crafts = Math.ceil(quantity / yieldPer)
+  const nextSeen = new Set(seen).add(name)
+
+  const flattened = new Map()
+  for (const reagent of recipe.reagents) {
+    const needed = reagent.quantity * crafts
+    const deeper = expandMaterial(reagent.name, needed, byOutput, nextSeen, depth + 1)
+    // `deeper` is a record, not a list — its `materials` are the leaves to fold in.
+    const leaves = deeper?.materials ?? [{ name: reagent.name, quantity: needed, icon: reagent.icon }]
+    for (const leaf of leaves) {
+      const running = flattened.get(leaf.name)
+      if (running) running.quantity += leaf.quantity
+      else flattened.set(leaf.name, { ...leaf })
+    }
+  }
+
+  /*
+   * **A chain that loops back to its own starting material expands to nothing useful, so it expands
+   * to nothing.** Alchemy's transmutes are a genuine cycle — Earth to Life and Life to Earth both
+   * exist — and the `seen` guard stops the recursion but then emits the blocked material as a leaf.
+   * The result reads "to make 31 Essence of Earth you need 31 Essence of Earth", which is worse than
+   * silence. Dropping the expansion leaves the reagent standing on its own, which is correct: these
+   * are world drops that merely happen to be transmutable.
+   */
+  const leaves = [...flattened.values()]
+  if (leaves.some((leaf) => leaf.name === name || seen.has(leaf.name))) return null
+
+  return { crafts, of: name, materials: leaves }
+}
+
 /** Reagent items consumed by one craft. Items, not gold — see the note above. */
 function reagentCost(recipe) {
   return recipe.reagents.reduce((sum, reagent) => sum + reagent.quantity, 0)
@@ -112,6 +189,7 @@ function bestAt(recipes, skill, staying) {
  * recipe fades — 1/chance summed across the range, not the range divided by one chance.
  */
 function computePath(recipes) {
+  const byOutput = outputIndex(recipes)
   const steps = []
   let current = null
 
@@ -153,11 +231,17 @@ function computePath(recipes) {
       skillRange: [step.from, step.to],
       crafts,
       /** Total reagents for the whole step, which is the shopping list. */
-      materials: step.reagents.map((reagent) => ({
-        name: reagent.name,
-        quantity: reagent.quantity * crafts,
-        ...(reagent.icon ? { icon: reagent.icon } : {}),
-      })),
+      materials: step.reagents.map((reagent) => {
+        const quantity = reagent.quantity * crafts
+        const expansion = expandMaterial(reagent.name, quantity, byOutput)
+        return {
+          name: reagent.name,
+          quantity,
+          ...(reagent.icon ? { icon: reagent.icon } : {}),
+          // What it costs if you make it yourself. Offered, not prescribed — see expandMaterial.
+          ...(expansion ? { craftedFrom: expansion.materials } : {}),
+        }
+      }),
       ...(step.creates ? { creates: step.creates.name, createsIcon: step.creates.icon } : {}),
       trainerTaught: Array.isArray(step.source) && step.source.includes(TRAINER),
     }
