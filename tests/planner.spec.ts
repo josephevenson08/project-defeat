@@ -148,6 +148,8 @@ import {
   mappableMaterials,
 } from '../src/domain/professions'
 import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
+import rawCatalogueJson from '../src/domain/gear/itemCatalogue.json' with { type: 'json' }
+import rawSupplementJson from '../src/domain/gear/itemSupplement.json' with { type: 'json' }
 import craftingPathFile from '../src/domain/professions/craftingPaths.json' with { type: 'json' }
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
@@ -9200,6 +9202,58 @@ test('a step says what its intermediates cost, without telling you to craft a wo
   )
   expect(gloves, 'the deep Leatherworking case still resolves').toBeDefined()
   expect(gloves!.craftedFrom!.some((leaf) => leaf.name === 'Ruined Leather Scraps')).toBe(true)
+})
+
+test('an unverified drop source and an invented stat block are different admissions', () => {
+  /*
+   * **These two were one field, and conflating them failed in both directions at once.**
+   *
+   * `itemCatalogue.ts` takes everything mechanical from the ingest and layers the curated entry's
+   * provenance on top — `needsVerification` among it, via `PROVENANCE_FIELDS`. So the flag means "we
+   * are not sure where this drops", and says nothing about the stats.
+   *
+   * The upgrade finder read it as "the stats are estimated" when labelling a comparison. That
+   * over-warned on **141** items whose stats are fully sourced, which is merely noisy — and stayed
+   * silent on **25** whose stats were invented, which is not. Those 25 are `unmatchedCurated` rows,
+   * the entries this catalogue's own comment calls the least trustworthy in the project, and they
+   * carry no provenance flag, so the app reported a comparison against made-up numbers as "sourced".
+   */
+  const sourcedIds = new Set<number>()
+  for (const raw of rawCatalogueJson.items) if (raw.wowItemId) sourcedIds.add(raw.wowItemId)
+  for (const raw of rawSupplementJson.items) if (raw.wowItemId) sourcedIds.add(raw.wowItemId)
+
+  const noIngestedCounterpart = allItems.filter(
+    (item) => item.wowItemId === undefined || !sourcedIds.has(item.wowItemId),
+  )
+  const marked = allItems.filter((item) => item.statsEstimated)
+
+  expect(marked.length, 'every item with no ingested counterpart is marked').toBe(noIngestedCounterpart.length)
+  expect(marked.every((item) => item.statsEstimated === true)).toBe(true)
+  for (const item of noIngestedCounterpart) {
+    expect(item.statsEstimated, `${item.name} has no source for its stats and must say so`).toBe(true)
+  }
+
+  /*
+   * **The two flags must stay independent**, because that independence is the whole finding. Most
+   * items with unconfirmed provenance have sourced stats, and most items with invented stats have no
+   * provenance flag. A change that made one imply the other would put the bug back.
+   */
+  const flaggedProvenance = allItems.filter((item) => item.needsVerification)
+  const provenanceButSourced = flaggedProvenance.filter((item) => !item.statsEstimated)
+  const inventedButUnflagged = marked.filter((item) => !item.needsVerification)
+
+  expect(provenanceButSourced.length, 'unconfirmed drop source, sourced stats').toBeGreaterThan(100)
+  expect(inventedButUnflagged.length, 'invented stats, no provenance flag — the silent case').toBeGreaterThan(10)
+
+  /*
+   * And an item whose stats came from the ingest is never marked, however unsure the drop data is.
+   * This is the assertion that would fail if the flags were merged back together.
+   */
+  for (const item of allItems) {
+    if (item.wowItemId !== undefined && sourcedIds.has(item.wowItemId)) {
+      expect(item.statsEstimated, `${item.name} has ingested stats and must not claim otherwise`).toBeUndefined()
+    }
+  }
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {

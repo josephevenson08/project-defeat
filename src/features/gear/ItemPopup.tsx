@@ -376,7 +376,18 @@ function ItemFacts({ item, slotLabel }: { item: GearItem; slotLabel: string }) {
           {item.crafting.needsVerification && <small className="needs-verification">Recipe/materials need source verification.</small>}
         </div>
       )}
-      {item.needsVerification && <small className="needs-verification">Needs source/rank verification.</small>}
+      {/*
+        Two different admissions, and they were one for too long. `needsVerification` is about where
+        the item comes from; `statsEstimated` is about whether the numbers above it were ever checked.
+        An item can have perfectly sourced stats and unconfirmed drop information, and 141 in this
+        catalogue do — so saying "needs verification" over sourced stats trains a reader to ignore it.
+      */}
+      {item.statsEstimated && (
+        <small className="needs-verification">
+          These stats are unverified — this entry has no counterpart in the ingested database.
+        </small>
+      )}
+      {item.needsVerification && <small className="needs-verification">Drop source/rank needs verification.</small>}
     </div>
   )
 }

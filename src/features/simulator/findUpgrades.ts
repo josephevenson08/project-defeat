@@ -195,8 +195,16 @@ export function findUpgrades(
       const scoreDelta = scoreFor(candidateGear).scoreExact - baseline.scoreExact
       if (scoreDelta <= 0) continue
 
-      const candidateEstimated = item.needsVerification === true
-      const equippedEstimated = equipped.item.needsVerification === true
+      /*
+       * **`statsEstimated`, not `needsVerification`.** The score below is computed from stats, so the
+       * disclosure has to be about stats. `needsVerification` describes provenance — where an item
+       * drops, which roles want it — and the catalogue carries it over from the curated layer while
+       * taking everything mechanical from the ingest. Reading it here got both directions wrong: it
+       * warned "estimated" on 141 items whose stats are fully sourced, and stayed silent on 25 whose
+       * stats were invented, because those carry no provenance flag.
+       */
+      const candidateEstimated = item.statsEstimated === true
+      const equippedEstimated = equipped.item.statsEstimated === true
       const dataQuality: UpgradeCandidate['dataQuality'] =
         candidateEstimated === equippedEstimated ? (candidateEstimated ? 'estimated' : 'sourced') : 'skewed'
 
