@@ -5,6 +5,51 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-05, the app was vouching for numbers it invented)
+
+**25 items with made-up stats were being reported to the player as "sourced".** Found while checking
+whether the roadmap's "120 items still need verification" was a real gap or a stale claim. It was
+neither.
+
+### One flag was answering two questions
+
+`itemCatalogue.ts` takes everything mechanical from the ingest and layers the curated entry's
+provenance on top, `needsVerification` among it via `PROVENANCE_FIELDS`. So the flag means **"we are
+not sure where this drops"** — and says nothing at all about the stats.
+
+`findUpgrades.ts` read it as "the stats are estimated" when labelling a comparison `sourced`,
+`estimated` or `skewed`. That is wrong in both directions at once:
+
+| | count | consequence |
+|---|---|---|
+| Flagged, stats fully ingested | **141** | over-warns; trains a reader to ignore the warning |
+| Stats invented, no flag at all | **25** | **the app vouches for data it made up** |
+
+The second row is the one that matters. Those 25 are `unmatchedCurated` rows — entries the
+catalogue's own comment calls *"the least trustworthy entries in the project (the audit found
+invented names and at least one item that does not exist)"* — kept only so BiS and raid-loot
+references keep resolving. They carry no provenance flag, so nothing marked them, and several have no
+item level at all: Prototype Adventurer Helm, Cloak of Practice, Spellfire Training Robe.
+
+### The fix is a second field, not a wider one
+
+`statsEstimated` is set at merge time on exactly the entries that reached the catalogue with no
+ingested counterpart — 26 of 4,554. `findUpgrades` reads that instead, and `ItemPopup` now makes two
+separate admissions: *"These stats are unverified"* and *"Drop source/rank needs verification"*.
+
+**Keeping them separate is the finding, so a test asserts they stay independent**: an item with
+ingested stats is never marked estimated however unsure its drop data is, and the two populations
+overlap in exactly one row. Merging them back would put the bug straight back.
+
+### And the roadmap item that started this was wrong in a third way
+
+`Roadmap Board` says *"120 of 226 items still carry needsVerification, so 106 are now sourced against
+real tooltips"*, implying 120 items have unverified stats. Measured: **one** did. The other 141
+flagged items have ingested stats and unconfirmed drop data. The real gap was never the one written
+down, and it is a quarter the size — 26 items rather than 120.
+
+---
+
 ## Start here (2026-09-05, the shopping list goes all the way down)
 
 **A quarter of every crafting step's reagents were things the same profession makes**, and the list

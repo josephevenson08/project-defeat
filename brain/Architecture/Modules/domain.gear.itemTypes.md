@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/gear/itemTypes.ts
-lines: 160
+lines: 182
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.gear.itemTypes
 
-`src/domain/gear/itemTypes.ts` · **domain** layer · 160 lines
+`src/domain/gear/itemTypes.ts` · **domain** layer · 182 lines
 
 _No doc comment at the top of this file._
 

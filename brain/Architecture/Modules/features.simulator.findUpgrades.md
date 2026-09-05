@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/findUpgrades.ts
-lines: 236
+lines: 244
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.findUpgrades
 
-`src/features/simulator/findUpgrades.ts` · **features** layer · 236 lines
+`src/features/simulator/findUpgrades.ts` · **features** layer · 244 lines
 
 _No doc comment at the top of this file._
 

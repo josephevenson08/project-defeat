@@ -255,6 +255,7 @@ export { getBaseStats } from '../../src/domain/character/baseStats'
 export { default as talentEffects } from '../../src/domain/talents/talentEffects.json' with { type: 'json' }
 export { gearSlots } from '../../src/domain/gear/gearSlots'
 export { sampleItems } from '../../src/domain/gear/sampleItems'
+export { allItems } from '../../src/domain/gear/itemCatalogue'
 export { sampleRaids } from '../../src/domain/raids/sampleRaids'
 export { sampleRaidBosses } from '../../src/domain/raids/sampleRaidBosses'
 export { sampleAttunements } from '../../src/domain/raids/sampleAttunements'
@@ -755,7 +756,7 @@ async function writeArchitectureMap(modules) {
 }
 
 async function writeDomainNotes(data, modules) {
-  const { tbcClasses, getRoleForSpec, racesByClass, racesByFaction, gearSlots, sampleItems, getBaseStats } = data
+  const { tbcClasses, getRoleForSpec, racesByClass, racesByFaction, gearSlots, sampleItems, allItems, getBaseStats } = data
   const { sampleRaids, sampleRaidBosses, sampleAttunements, sampleSignatureAbilities } = data
   const { allProfessions, sampleProfessions, sampleBuffs, sampleTargetDebuffs, sampleConsumables } = data
   const { sampleEnchants, sampleGems, bisLists } = data
@@ -1194,6 +1195,13 @@ async function writeDomainNotes(data, modules) {
     // batch landed, while the README promised the vault "cannot drift from the code" — which was
     // only true of the parts that were actually derived from it.
     itemsFlagged: sampleItems.filter((item) => item.needsVerification).length,
+    /*
+     * Items whose *stats* nothing has checked, which is a different and much smaller set than the
+     * ones whose *drop source* is unconfirmed. Conflating the two had the app reporting invented
+     * stats as sourced — see `statsEstimated` in `itemTypes.ts`.
+     */
+    itemsStatsEstimated: allItems.filter((item) => item.statsEstimated).length,
+    itemsTotal: allItems.length,
     // Same rule, and the same lesson learned twice: "49 talent groups are refused by name" was
     // written into four documents and the brain generator, and every copy went stale on the day the
     // ingest changed, with nothing failing.
@@ -1338,7 +1346,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       `1. **Multi-ability rotations** — started, and **only Fury and Arms Warrior have more than one ability**. Both now press Whirlwind on its 10s cooldown alongside their signature button, resolved against a shared global-cooldown budget. Every other spec still models exactly one ability, and all specs still lose any special whose sustained rate is not computable (rage-costed abilities with no cooldown, and Steady Shot), so they remain understated by differing amounts. The engine handles arbitrary ability lists; what gates the rest is sourced ability data. Still the biggest accuracy gap in ${link('Phase 4 - Simulation')}.`,
       `2. **Tank score severity weighting** — the tank path now resolves one ordered incoming table including crushing blows (see ${link('Tank Avoidance')}), but the headline Survivability Score still weights avoidance, armor and stamina without pricing how much worse a crit or a crush is than a plain hit. The breakdown carries a damage-per-swing figure that does account for it; folding that into the score is a metric redesign and deliberately hasn't been done unilaterally.`,
-      `3. **Item catalog verification** — ${counts.itemsFlagged} of ${counts.items} items in ${link('domain.gear.sampleItems')} still carry \`needsVerification\`, so ${counts.items - counts.itemsFlagged} are now sourced against real tooltips. Every audited batch so far has found real errors — invented stats, fabricated sockets, placeholder item levels — so an unflagged item is meaningfully different from a flagged one, and a sourced-versus-estimated comparison is skewed in the sourced item's favour until the rest catch up.`,
+      `3. **Item catalog stat provenance** — ${counts.itemsStatsEstimated} of ${counts.itemsTotal} catalogue items have stats nothing has checked, and they are the ones to care about: entries that reached the catalogue with no ingested counterpart, where an audit found invented stats, fabricated sockets and at least one item that does not exist. They are marked \`statsEstimated\` and kept only so BiS and raid-loot references resolve. This item used to read \"${counts.itemsFlagged} of ${counts.items} items still carry needsVerification\", which counted the wrong thing: that flag describes an item's *drop source*, and the catalogue takes everything mechanical from the ingest, so almost every flagged item has fully sourced stats. Measured, exactly one did not.`,
       `4. **BiS depth is no longer the gap it was recorded as** — ${counts.bisEntries} ranked entries cover ${counts.bisSlotCount} slots across all 27 specs, and only **${counts.bisSlotsWithOneOption}** of those slots still offer a single option. This item used to read "BiS lists are one item deep", which was true of the 27 hand-written lists but stopped being true when the Wowhead ingest replaced them, and nothing updated the prose. Measured per slot rather than per entry, because a list can be thousands of entries deep while individual slots still show one option. What is left here is a thin tail, not the core promise of the planner.`,
       '',
       '## Related',
