@@ -5,6 +5,57 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-05, the invented gear is gone)
+
+**23 items with made-up stats were deleted from the catalogue, and the last real one was sourced.**
+They were the Phase 1 prototype starter set — one placeholder per gear slot, still equippable years
+later: Girdle of Testing, Cloak of Practice, Prototype Adventurer Helm, Orb of Prototype Power.
+
+| | before | after |
+|---|---|---|
+| catalogue items | 4,554 | **4,531** |
+| curated entries with no ingested match | 28 | **5** |
+| items with invented stats | 26 | **2** |
+| items with invented stats a player can reach | 24 | **0** |
+
+The two that remain are `No Relic Recommended` and `No Ranged Weapon Recommended` — the "None"
+options for slots a class cannot fill. They carry no stats because they represent an empty slot, not
+because anyone guessed.
+
+### Deleting data needs the checks done first, and they were
+
+Nothing referenced them: **zero** BiS entries, **zero** raid-loot rows. The justification in
+`itemCatalogue.ts` — kept "so existing BiS and raid-loot references keep resolving" — had expired
+when the Wowhead ingest replaced the hand-written rankings, and nothing noticed. The default loadout
+used none of them, and removing them left **no visible slot empty**.
+
+That last check mattered more than it looked. Removing them empties fifteen *slot/spec* combinations
+— every one of them the Relic slot for Hunter, Mage, Priest and Rogue, classes with no relic in TBC.
+`getVisibleGearSlotsForSpec` hides that slot for exactly those classes, so nothing user-facing broke,
+but the raw count would have read as fifteen regressions to anyone checking without it.
+
+### Blessed Book of Nagrand was real the whole time
+
+It carried a genuine item id, 25644, and sat between 25643 and 25645 — **both already in the
+supplement's list**. So it was an off-by-one gap rather than a missing item. Adding it gives ilvl 103
+and an empty stat block, which is correct: it is a Libram, and TBC relics carry spell-specific
+bonuses rather than stats. Its two neighbours are the same.
+
+### Two tests had to change, and one of them was asserting the bug
+
+The disclosure guard from earlier the same day asserted that estimated-stat items stay *selectable*,
+so the warning stays reachable. With the invented items deleted there are none to select, and the
+right assertion inverts: **no item a player can reach has invented stats.** That is a stronger claim
+than the one it replaced.
+
+The other is worth flagging as a habit to avoid. A test asserted "more than ten items have invented
+stats and no provenance flag", which was written to capture the size of the bug and therefore
+**asserted the bug's continued existence**. Deleting the placeholders failed it. It now asserts the
+property that actually matters — that neither flag implies the other — without depending on how many
+of either exist.
+
+---
+
 ## Start here (2026-09-05, the app was vouching for numbers it invented)
 
 **25 items with made-up stats were being reported to the player as "sourced".** Found while checking
