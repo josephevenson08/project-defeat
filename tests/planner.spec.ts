@@ -9295,6 +9295,64 @@ test('an unverified drop source and an invented stat block are different admissi
   }
 })
 
+test('a BiS slot with one option is the guide being definitive, not a truncated ingest', () => {
+  /*
+   * **"BiS lists are thin" has been on the roadmap as remaining work, and it is not a gap.**
+   *
+   * 37 of the 402 ranked slots offer a single item. Every one of them carries a *definitive*
+   * qualifier — "BiS", "Best", "Best OH" — which is the guide saying this slot is settled, not the
+   * ingest losing rows. Measured rather than assumed, because the alternative reading (we dropped
+   * alternatives) would look identical from a count.
+   *
+   * The distinction is worth a permanent guard, since a future ingest that truncated a slot would
+   * restore exactly the ambiguity this test removes.
+   */
+  const qualifierOf = (entry: { notes?: string }) => (entry.notes ?? '').split(' — ')[0].trim()
+
+  const slotsOf = (list: (typeof bisLists)[number]) => {
+    const bySlot = new Map<string, typeof list.entries[number][]>()
+    for (const entry of list.entries) bySlot.set(entry.slot, [...(bySlot.get(entry.slot) ?? []), entry])
+    return bySlot
+  }
+
+  const singles: { where: string; qualifier: string }[] = []
+  for (const list of bisLists) {
+    for (const [slot, entries] of slotsOf(list)) {
+      if (entries.length === 1) {
+        singles.push({ where: `${list.className} ${list.spec} ${slot}`, qualifier: qualifierOf(entries[0]) })
+      }
+    }
+  }
+
+  expect(singles.length, 'a thin tail exists and is small').toBeLessThan(60)
+
+  /*
+   * **A lone entry may never be provisional.** "Best Until Tier 5" promises something better in the
+   * same slot; if that is the only row, the successor was lost on the way in. This is the assertion
+   * that tells a truncated ingest apart from a settled slot.
+   */
+  const provisionalAndAlone = singles.filter((entry) => /until|optional|alternative/i.test(entry.qualifier))
+  expect(provisionalAndAlone, 'no slot is left holding only a stopgap').toEqual([])
+
+  /*
+   * And the same rule across every slot, not just the single-entry ones: an entry that calls itself a
+   * stopgap must have a better-ranked sibling to be a stopgap *for*. Eleven entries say "…Until…"
+   * today and all eleven do.
+   */
+  const orphanedStopgaps: string[] = []
+  for (const list of bisLists) {
+    for (const [slot, entries] of slotsOf(list)) {
+      for (const entry of entries) {
+        if (!/until/i.test(qualifierOf(entry))) continue
+        if (!entries.some((other) => other.rank < entry.rank)) {
+          orphanedStopgaps.push(`${list.className} ${list.spec} ${slot}: "${qualifierOf(entry)}"`)
+        }
+      }
+    }
+  }
+  expect(orphanedStopgaps, 'every stopgap has the item it is a stopgap for').toEqual([])
+})
+
 test('every profession has vendored artwork and a guide to send you to', async () => {
   /*
    * The Professions tab was the one screen in the app with no artwork on it at all — thirteen text

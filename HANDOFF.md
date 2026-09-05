@@ -5,6 +5,52 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-05, the last two roadmap gaps were both non-gaps)
+
+**BiS depth is closed, and closing it took a measurement rather than any data work.** That makes two
+in a row: item-catalogue verification the same afternoon, and this.
+
+### 37 thin slots, none of them thin because of us
+
+402 ranked slots across 27 specs, 37 offering a single item. The roadmap listed that as remaining
+work. It is not:
+
+| Qualifier on the lone entry | count |
+|---|---|
+| `BiS` | 31 |
+| `Best` | 3 |
+| `Best OH` | 2 |
+| `Best OH - Personal DPS` | 1 |
+
+**Every one is a settled recommendation.** Not one says "Best Until Tier 5" or "Optional" — the
+qualifiers that would mean the guide had more to give and the ingest lost it. Wowhead simply has one
+answer for those slots.
+
+**A count alone could not have told the difference**, which is the reason this sat on the board for
+weeks looking like work. "37 slots have one option" reads identically whether the source is
+definitive or the ingest is truncated, and only the qualifier separates them.
+
+### The guard is the useful artefact
+
+A test now asserts the distinction rather than the count: **a lone entry may never be provisional**,
+and more generally an entry calling itself a stopgap must have a better-ranked sibling to be a
+stopgap *for*. Eleven entries say "…Until…" today and all eleven do.
+
+That fires if a future ingest truncates a slot, which is the failure the old prose was worried about
+and could not detect.
+
+### What is actually left
+
+Nothing on the roadmap that is not simulation work the owner deprioritised on 2026-09-01, plus tank
+scoring, which is out of scope for a DPS planner. The crafting-path cost metric is the one open
+question, and it is **not** a coding task: it counts reagent items rather than gold, the obvious fix
+would mean baking in realm-specific auction prices that are neither facts nor stable, and the
+defensible version — weighting vendor-buyable reagents near zero — needs a vendor-availability ingest
+of roughly 300 items. Whether the paths *feel* right is a judgement only someone who has levelled the
+profession can make.
+
+---
+
 ## Start here (2026-09-05, the invented gear is gone)
 
 **23 items with made-up stats were deleted from the catalogue, and the last real one was sourced.**
