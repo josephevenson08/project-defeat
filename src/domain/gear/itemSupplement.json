@@ -2,7 +2,7 @@
   "$schema": "wowhead item supplement",
   "note": "Items referenced by the Wowhead BiS guides that the wowsims database does not carry.",
   "generatedBy": "tools/ingest/supplement-items.mjs",
-  "itemCount": 23,
+  "itemCount": 24,
   "items": [
     {
       "id": "master-firestone",
@@ -113,6 +113,18 @@
       "stats": {},
       "armorType": "Relic",
       "weaponType": "Idol",
+      "needsVerification": true
+    },
+    {
+      "id": "blessed-book-of-nagrand",
+      "wowItemId": 25644,
+      "name": "Blessed Book of Nagrand",
+      "slot": "Relic",
+      "quality": "Rare",
+      "itemLevel": 103,
+      "stats": {},
+      "armorType": "Relic",
+      "weaponType": "Libram",
       "needsVerification": true
     },
     {

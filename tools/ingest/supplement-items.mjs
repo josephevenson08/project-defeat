@@ -22,10 +22,17 @@ const REPO = resolve(HERE, '../..')
 const CACHE = resolve(HERE, '.cache/items')
 const OUT_PATH = resolve(REPO, 'src/domain/gear/itemSupplement.json')
 
-/** Ids the BiS guides reference that wowsims has no row for. Regenerate with tools/ingest/ingest-bis.mjs. */
+/**
+ * Ids the BiS guides reference that wowsims has no row for. Regenerate with tools/ingest/ingest-bis.mjs.
+ *
+ * **25644 is here for a different reason and is worth noting.** It is not BiS-referenced; it is
+ * Blessed Book of Nagrand, which reached the catalogue only as a hand-written entry with invented
+ * stats. It sat between 25643 and 25645 — both already supplemented — so the gap was an oversight
+ * rather than an absence. Sourcing it was what let the last invented stat block be deleted.
+ */
 const MISSING_IDS = [
-  22128, 22401, 23199, 23203, 24692, 25043, 25294, 25295, 25643, 25645, 28064, 30675, 30676, 30677,
-  30680, 30682, 30684, 30685, 30686, 31166, 31201, 31225, 31255,
+  22128, 22401, 23199, 23203, 24692, 25043, 25294, 25295, 25643, 25644, 25645, 28064, 30675, 30676,
+  30677, 30680, 30682, 30684, 30685, 30686, 31166, 31201, 31225, 31255,
 ]
 
 const SLOT_BY_INVENTORY = {
