@@ -3077,28 +3077,86 @@ test('no spec can equip, default to, or be upgraded into an unobtainable item', 
 })
 
 test('the upgrade finder still discloses when a gain rests on estimated stats', () => {
-  // Guards the assertion loosened in the upgrade-finder UI test above. That test stopped being able
-  // to require a flagged row once Fury Warrior's defaults became fully sourced; this checks the
-  // classification is still reachable rather than quietly dead, across every spec at once.
-  let skewed = 0
-  const specsWithNotes: string[] = []
+  /*
+   * **Rewritten 2026-09-05, because the signal it watched changed meaning.**
+   *
+   * It used to sweep every spec's default gear and require that *some* candidate came back not
+   * 'sourced'. That worked while the classification read `needsVerification`, which fires on 142
+   * items — including 141 whose stats are fully ingested. Pointing it at `statsEstimated` instead
+   * dropped the population to the 26 entries with no ingested counterpart, and the sweep went to
+   * zero: those 26 are placeholder rows with no item level, so they never beat real gear and never
+   * reach a candidate list.
+   *
+   * That is the classification behaving correctly, not dying — but the old test could not tell the
+   * difference, because it asserted an incidental property of the catalogue rather than the
+   * mechanism. So it now exercises the mechanism directly: equip an item whose stats are estimated
+   * and every sourced upgrade off it must be labelled `skewed`.
+   */
+  const estimated = allItems.filter((item) => item.statsEstimated)
+  expect(estimated.length, 'there are entries with no sourced stats').toBeGreaterThan(0)
 
+  /*
+   * **They must stay reachable in the picker**, which is where the disclosure earns its keep — a
+   * player can equip one of these, and the item popup is what tells them the numbers are invented.
+   * If a future filter hides them, this fails rather than the warning silently becoming unreachable.
+   */
+  const offered = new Set<string>()
   for (const definition of tbcClasses) {
     for (const spec of definition.specs) {
-      const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(definition.className), className: definition.className, spec }
-      const gear = normalizeGearForCharacter(defaultGear, definition.className, spec)
-      const report = findUpgrades(character, gear, getRoleForSpec(definition.className, spec), [], [], [], defaultSimulationTarget)
-
-      const flagged = report.candidates.filter((candidate) => candidate.dataQuality !== 'sourced')
-      skewed += flagged.length
-      if (flagged.length > 0) specsWithNotes.push(`${definition.className} ${spec}`)
+      for (const slot of gearSlots) {
+        for (const option of getItemsForSlotAndCharacter(slot, definition.className, spec)) {
+          if (option.statsEstimated) offered.add(option.name)
+        }
+      }
     }
   }
+  expect(offered.size, 'estimated-stat items are still selectable, so the warning is reachable').toBeGreaterThan(10)
 
-  expect(skewed, 'the estimated-data disclosure should still fire somewhere').toBeGreaterThan(0)
-  // Deliberately a floor rather than an exact count: verifying more of the catalogue lowers this,
-  // and the test should track the mechanism being alive rather than the size of the backlog.
-  expect(specsWithNotes.length).toBeGreaterThan(10)
+  /*
+   * And the classification itself, driven rather than observed. With an estimated item equipped,
+   * a sourced candidate is a comparison between unlike data and must say so.
+   */
+  const className = 'Warrior' as const
+  const spec = 'Fury' as const
+  const character: CharacterProfile = {
+    faction: 'Alliance',
+    race: legalRaceFor(className),
+    className,
+    spec,
+  }
+  const baseGear = normalizeGearForCharacter(defaultGear, className, spec)
+
+  const slotWithEstimated = gearSlots.find((slot) =>
+    getItemsForSlotAndCharacter(slot, className, spec).some((option) => option.statsEstimated),
+  )
+  expect(slotWithEstimated, 'some slot offers an estimated-stat item to a Fury Warrior').toBeDefined()
+
+  const poorItem = getItemsForSlotAndCharacter(slotWithEstimated!, className, spec).find(
+    (option) => option.statsEstimated,
+  )!
+  const gearWithEstimated = {
+    ...baseGear,
+    [slotWithEstimated!]: { item: poorItem, gemIds: [], enchantId: undefined },
+  }
+
+  const report = findUpgrades(
+    character,
+    gearWithEstimated,
+    getRoleForSpec(className, spec),
+    [],
+    [],
+    [],
+    defaultSimulationTarget,
+  )
+
+  const inThatSlot = report.candidates.filter((candidate) => candidate.slot === slotWithEstimated)
+  expect(inThatSlot.length, 'replacing an invented-stat item is an upgrade').toBeGreaterThan(0)
+  for (const candidate of inThatSlot) {
+    expect(
+      candidate.dataQuality,
+      `${candidate.item.name} replaces an estimated-stat item and the comparison is unlike-for-unlike`,
+    ).toBe('skewed')
+  }
 })
 
 test('every raid loot entry that names a catalogued item is linked to it', () => {

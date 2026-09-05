@@ -41,6 +41,27 @@ separate admissions: *"These stats are unverified"* and *"Drop source/rank needs
 ingested stats is never marked estimated however unsure its drop data is, and the two populations
 overlap in exactly one row. Merging them back would put the bug straight back.
 
+### The test that caught the fix was itself watching the wrong thing
+
+**228 passed, one failed** — the guard asserting the upgrade finder's estimated-data disclosure is
+"still reachable rather than quietly dead". It swept every spec's default gear and required that some
+candidate came back not `sourced`. With the signal corrected it went to zero.
+
+**That is the classification working, and the test could not tell.** The 26 estimated-stat entries are
+placeholder rows with no item level, so they never beat real gear and never reach a candidate list —
+while the old signal fired on 142 items including 141 with sourced stats, which is why a sweep found
+one easily. The test was asserting an incidental property of the catalogue, not the mechanism.
+
+It drives the mechanism now: equip an item whose stats are estimated, and every sourced upgrade off
+it must come back `skewed`. It also asserts those items stay *selectable*, since the picker is where
+the disclosure actually earns its keep — a player can equip one, and the popup is what tells them the
+numbers are invented. A future filter hiding them would now fail here rather than making the warning
+quietly unreachable.
+
+**Worth generalising: a test that waits for a condition to occur naturally will pass for the wrong
+reason and fail for the wrong reason.** This one passed for years because a broken signal was noisy
+enough to trip it.
+
 ### And the roadmap item that started this was wrong in a third way
 
 `Roadmap Board` says *"120 of 226 items still carry needsVerification, so 106 are now sourced against
