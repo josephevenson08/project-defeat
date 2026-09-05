@@ -455,7 +455,6 @@ import { existsSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
 import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/domain/gear/obtainability'
-import { findUpgrades } from '../src/features/simulator/findUpgrades'
 import { relevantStats } from '../src/domain/stats/statRelevance'
 import { statLabels } from '../src/domain/stats/statTypes'
 import {
@@ -3076,87 +3075,43 @@ test('no spec can equip, default to, or be upgraded into an unobtainable item', 
   }
 })
 
-test('the upgrade finder still discloses when a gain rests on estimated stats', () => {
+test('the planner never offers gear whose stats were invented', () => {
   /*
-   * **Rewritten 2026-09-05, because the signal it watched changed meaning.**
+   * **This assertion replaced a disclosure test, because the thing being disclosed is gone.**
    *
-   * It used to sweep every spec's default gear and require that *some* candidate came back not
-   * 'sourced'. That worked while the classification read `needsVerification`, which fires on 142
-   * items — including 141 whose stats are fully ingested. Pointing it at `statsEstimated` instead
-   * dropped the population to the 26 entries with no ingested counterpart, and the sweep went to
-   * zero: those 26 are placeholder rows with no item level, so they never beat real gear and never
-   * reach a candidate list.
+   * The catalogue used to carry 26 entries with no ingested counterpart — one placeholder per gear
+   * slot, left over from the Phase 1 prototype: Girdle of Testing, Cloak of Practice, Prototype
+   * Adventurer Helm. Their stats were invented, they were equippable, and until 2026-09-05 the
+   * upgrade finder reported comparisons against them as "sourced".
    *
-   * That is the classification behaving correctly, not dying — but the old test could not tell the
-   * difference, because it asserted an incidental property of the catalogue rather than the
-   * mechanism. So it now exercises the mechanism directly: equip an item whose stats are estimated
-   * and every sourced upgrade off it must be labelled `skewed`.
+   * 23 were deleted once it was established that nothing referenced them, no visible slot emptied
+   * and the default loadout did not touch them. Blessed Book of Nagrand was real all along and got
+   * sourced through the supplement instead — its id sat between two that were already there.
+   *
+   * So the honest guard is no longer "the warning still fires somewhere". It is that **no item a
+   * player can reach has invented stats at all**, which is a stronger claim and the one worth
+   * defending.
    */
-  const estimated = allItems.filter((item) => item.statsEstimated)
-  expect(estimated.length, 'there are entries with no sourced stats').toBeGreaterThan(0)
-
-  /*
-   * **They must stay reachable in the picker**, which is where the disclosure earns its keep — a
-   * player can equip one of these, and the item popup is what tells them the numbers are invented.
-   * If a future filter hides them, this fails rather than the warning silently becoming unreachable.
-   */
-  const offered = new Set<string>()
+  const reachable: string[] = []
   for (const definition of tbcClasses) {
     for (const spec of definition.specs) {
-      for (const slot of gearSlots) {
+      for (const slot of getVisibleGearSlotsForSpec(definition.className, spec)) {
         for (const option of getItemsForSlotAndCharacter(slot, definition.className, spec)) {
-          if (option.statsEstimated) offered.add(option.name)
+          if (option.statsEstimated) reachable.push(`${definition.className} ${spec} ${slot}: ${option.name}`)
         }
       }
     }
   }
-  expect(offered.size, 'estimated-stat items are still selectable, so the warning is reachable').toBeGreaterThan(10)
+  expect(reachable, 'no reachable item has invented stats').toEqual([])
 
   /*
-   * And the classification itself, driven rather than observed. With an estimated item equipped,
-   * a sourced candidate is a comparison between unlike data and must say so.
+   * **The mechanism stays, and so does the field**, because the next hand-written entry that fails to
+   * match an ingested row will be marked by the same merge step. What is asserted is that the
+   * remainder are not gear: the two that survive are the "None" options for slots a class cannot
+   * fill, which carry no stats because they represent an empty slot rather than an invented item.
    */
-  const className = 'Warrior' as const
-  const spec = 'Fury' as const
-  const character: CharacterProfile = {
-    faction: 'Alliance',
-    race: legalRaceFor(className),
-    className,
-    spec,
-  }
-  const baseGear = normalizeGearForCharacter(defaultGear, className, spec)
-
-  const slotWithEstimated = gearSlots.find((slot) =>
-    getItemsForSlotAndCharacter(slot, className, spec).some((option) => option.statsEstimated),
-  )
-  expect(slotWithEstimated, 'some slot offers an estimated-stat item to a Fury Warrior').toBeDefined()
-
-  const poorItem = getItemsForSlotAndCharacter(slotWithEstimated!, className, spec).find(
-    (option) => option.statsEstimated,
-  )!
-  const gearWithEstimated = {
-    ...baseGear,
-    [slotWithEstimated!]: { item: poorItem, gemIds: [], enchantId: undefined },
-  }
-
-  const report = findUpgrades(
-    character,
-    gearWithEstimated,
-    getRoleForSpec(className, spec),
-    [],
-    [],
-    [],
-    defaultSimulationTarget,
-  )
-
-  const inThatSlot = report.candidates.filter((candidate) => candidate.slot === slotWithEstimated)
-  expect(inThatSlot.length, 'replacing an invented-stat item is an upgrade').toBeGreaterThan(0)
-  for (const candidate of inThatSlot) {
-    expect(
-      candidate.dataQuality,
-      `${candidate.item.name} replaces an estimated-stat item and the comparison is unlike-for-unlike`,
-    ).toBe('skewed')
-  }
+  const stillEstimated = allItems.filter((item) => item.statsEstimated)
+  expect(stillEstimated.every((item) => item.name.startsWith('No ')), 'only the empty-slot options remain').toBe(true)
 })
 
 test('every raid loot entry that names a catalogued item is linked to it', () => {
@@ -9300,8 +9255,18 @@ test('an unverified drop source and an invented stat block are different admissi
   const provenanceButSourced = flaggedProvenance.filter((item) => !item.statsEstimated)
   const inventedButUnflagged = marked.filter((item) => !item.needsVerification)
 
+  /*
+   * **Independence, asserted without leaning on the size of either population.** An earlier version
+   * required more than ten items with invented stats and no provenance flag, which asserted that the
+   * bug still existed: deleting the 23 placeholder entries took that count to two and failed it. What
+   * matters is that neither flag implies the other, in both directions, whatever the counts become.
+   */
   expect(provenanceButSourced.length, 'unconfirmed drop source, sourced stats').toBeGreaterThan(100)
-  expect(inventedButUnflagged.length, 'invented stats, no provenance flag — the silent case').toBeGreaterThan(10)
+  expect(inventedButUnflagged.length, 'unsourced stats can carry no provenance flag').toBeGreaterThan(0)
+  expect(
+    flaggedProvenance.some((item) => item.statsEstimated) || marked.some((item) => item.needsVerification),
+    'the two are allowed to overlap, but neither is a subset of the other',
+  ).toBe(false)
 
   /*
    * And an item whose stats came from the ingest is never marked, however unsure the drop data is.
