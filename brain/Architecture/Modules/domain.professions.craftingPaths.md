@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/craftingPaths.ts
-lines: 39
+lines: 52
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.craftingPaths
 
-`src/domain/professions/craftingPaths.ts` · **domain** layer · 39 lines
+`src/domain/professions/craftingPaths.ts` · **domain** layer · 52 lines
 
 From the top of the file:
 

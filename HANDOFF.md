@@ -1,7 +1,51 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-04.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-05.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-05, the shopping list goes all the way down)
+
+**A quarter of every crafting step's reagents were things the same profession makes**, and the list
+stopped at them. "39 Bolt of Linen Cloth" is a true reagent and a useless shopping list, because
+nobody farms bolts — it is 78 Linen Cloth. 97 of 380 step reagents now carry that second number,
+flattened past however many levels to what the profession cannot craft.
+
+**Offered, never substituted.** The reagent keeps its own quantity and the expansion sits under it as
+"if you craft it". That distinction is the whole design, and the reason is in the next section.
+
+### Two failures, and both produced output that looked fine
+
+**The recursion returned a record and the caller iterated it as a list.** Loud, immediate, fixed in a
+minute — the cheap kind.
+
+**The expensive kind: expanding things that should not be expanded.** Alchemy's transmutes form a
+genuine ring — Earth to Life and Life to Earth both exist — and the first version walked straight
+into it. The cycle guard stopped infinite recursion but then emitted the blocked material as its own
+leaf, so the list read **"31 Essence of Earth ← 31 Essence of Earth"**. Dropping self-referential
+chains fixed that and was still not enough: with one recipe in the ring blocked, **the next one
+answered instead**, giving "23 Essence of Earth ← 23 Essence of Water". True, and useless — both are
+world drops of the same tier, so the expansion reduces nothing and reads as advice to go transmute.
+
+The rule that actually holds: **a transmute is a lateral swap, not an intermediate craft.** There are
+25 of them and Blizzard names every one "Transmute: X to Y", which is a fact in the data rather than
+a guess about item tiers. They never source an expansion now, and a test pins it.
+
+**The general shape is worth keeping**: a guard against infinite recursion is not a guard against
+meaningless output. The first fix made the loop terminate; it took a second look to notice that
+terminating on nonsense is still nonsense.
+
+### Depth earns its keep, on a case that is not obvious
+
+**Dark Leather Gloves genuinely consumes Fine Leather Gloves** — an upgrade recipe that eats the
+lower-tier item. So the expansion runs gloves → leather → scraps and lands on **312 Ruined Leather
+Scraps, 26 Light Hide, 26 Salt, 52 Coarse Thread**. A single-level version would have stopped at "26
+Fine Leather Gloves" and helped nobody.
+
+The arithmetic is pinned on a case anyone can check: Bolt of Linen Cloth is two Linen Cloth, so 39
+bolts is 78 cloth — the same 1:2 ratio published guides quote, arrived at from the reagent list
+rather than copied from them.
 
 ---
 
@@ -216,9 +260,9 @@ nothing to make below it.
 
 ### Still open on the professions tab
 
-- **Intermediate crafts are named but not expanded.** A Tailoring step says "39 Bolt of Linen Cloth"
-  without telling you those are themselves crafted from 78 Linen Cloth. The path is correct; the
-  shopping list is one level too shallow.
+- ~~**Intermediate crafts are named but not expanded.**~~ **Done 2026-09-05.** 97 of 380 step
+  reagents now carry what they cost if you make them rather than buy them, flattened to what the
+  profession cannot craft — see the 2026-09-05 entry at the top of this file.
 - **The curated 300-375 rows survive only as notes.** Their editorial detail — which trainer, which
   vendor, "buy the other pattern on the same trip" — is attached to the computed step whose range it
   overlaps. Their skill ranges and craft counts are no longer rendered, so the two provenance stories
