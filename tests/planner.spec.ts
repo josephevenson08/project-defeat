@@ -151,6 +151,7 @@ import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'jso
 import rawCatalogueJson from '../src/domain/gear/itemCatalogue.json' with { type: 'json' }
 import rawSupplementJson from '../src/domain/gear/itemSupplement.json' with { type: 'json' }
 import craftingPathFile from '../src/domain/professions/craftingPaths.json' with { type: 'json' }
+import professionRecipes from '../tools/ingest/data/professionRecipes.json' with { type: 'json' }
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
@@ -9166,7 +9167,12 @@ type ExpandedMaterial = {
 }
 const craftingPathsAll = craftingPathFile.paths as unknown as Record<
   string,
-  { materials: ExpandedMaterial[] }[]
+  {
+    spellId: number
+    name: string
+    vendorCopper?: number
+    materials: (ExpandedMaterial & { vendorOnly?: boolean; unitCopper?: number })[]
+  }[]
 >
 
 test('a step says what its intermediates cost, without telling you to craft a world drop', () => {
@@ -9351,6 +9357,97 @@ test('a BiS slot with one option is the guide being definitive, not a truncated 
     }
   }
   expect(orphanedStopgaps, 'every stopgap has the item it is a stopgap for').toEqual([])
+})
+
+test('a vendor staple is bought, a farmed reagent is not, and the metric knows the difference', () => {
+  /*
+   * **The cost metric used to count one Coarse Thread as equal to one Primal Might.** Thread is ten
+   * copper and infinite at a vendor; Primal Might is an evening. `ingest-reagent-sources.mjs` records
+   * which reagents a vendor is the *only* source for, and those are excluded from the count that
+   * chooses a recipe.
+   *
+   * **Three simpler discriminators were tried and rejected**, each against known items:
+   *
+   *   "sold by NPCs" in the page description — true of Linen Cloth and Peacebloom, both farmed.
+   *   buyprice > 0                          — same, plus Mote of Air at sixteen silver.
+   *   source *contains* 5                   — same again.
+   *
+   * All three are true of anything a vendor stocks at all, including three-at-a-time limited stock.
+   * The rule that holds is `source === [5]` exactly: a vendor is the only way to get it, which is
+   * what makes the supply unlimited and the price fixed.
+   */
+  const materials = Object.values(craftingPathsAll)
+    .flat()
+    .flatMap((step) => step.materials)
+
+  const vendorNames = new Set(materials.filter((m) => m.vendorOnly).map((m) => m.name))
+  const farmedNames = new Set(materials.filter((m) => !m.vendorOnly).map((m) => m.name))
+
+  // The staples, which must be bought.
+  for (const staple of ['Coarse Thread', 'Fine Thread']) {
+    expect(vendorNames.has(staple), `${staple} is a vendor staple`).toBe(true)
+  }
+
+  /*
+   * **The false positives, which must not be.** These are the exact items that broke the simpler
+   * signals: a vendor does stock them, and they are still farmed goods. If a future change relaxes
+   * the rule to "has a vendor", these flip and this fails.
+   */
+  for (const farmed of ['Linen Cloth', 'Bolt of Linen Cloth']) {
+    expect(vendorNames.has(farmed), `${farmed} is farmed, whatever some vendor stocks`).toBe(false)
+  }
+  expect(farmedNames.size, 'most reagents are farmed').toBeGreaterThan(vendorNames.size)
+
+  // A vendor staple carries a real price; a farmed one carries none, because none is knowable.
+  for (const material of materials) {
+    if (material.vendorOnly) {
+      expect(material.unitCopper, `${material.name} has a vendor price`).toBeGreaterThan(0)
+    } else {
+      expect(material.unitCopper, `${material.name} must not claim a price`).toBeUndefined()
+    }
+  }
+
+  /*
+   * And the step's vendor bill is the sum of its own parts — an internal check, since the total is
+   * computed separately from the per-material figures and could drift from them.
+   */
+  for (const step of Object.values(craftingPathsAll).flat()) {
+    const expected = step.materials.reduce(
+      (sum, m) => sum + (m.vendorOnly ? m.quantity * (m.unitCopper ?? 0) : 0),
+      0,
+    )
+    expect(step.vendorCopper ?? 0, `${step.name} totals its own vendor materials`).toBe(expected)
+  }
+})
+
+test('a levelling path names things you end up holding', () => {
+  /*
+   * **Discounting vendor staples had one degenerate consequence, and this is the guard against it.**
+   *
+   * Basic Campfire consumes a single vendor-bought Simple Wood and produces nothing at all. With
+   * vendor reagents excluded from the cost its farmed price was zero, so it beat every real recipe
+   * and took 42 skill points: the Cooking path read "make 217 campfires for 82 gold". True, useless,
+   * and stated with total confidence.
+   *
+   * A path headed "what to craft" should name things you end up holding, so a recipe that creates
+   * nothing is not eligible — **except in Enchanting**, the one TBC profession whose product is not
+   * an item. Excluding enchants there would leave an enchanter no way to level at all.
+   */
+  const producing = (profession: string, step: { spellId: number }) =>
+    professionRecipes.professions[profession]?.find((r) => r.spellId === step.spellId)?.creates !== undefined
+
+  const offenders: string[] = []
+  for (const [profession, steps] of Object.entries(craftingPathsAll)) {
+    if (profession === 'Enchanting') continue
+    for (const step of steps) {
+      if (!producing(profession, step)) offenders.push(`${profession}: ${step.name}`)
+    }
+  }
+  expect(offenders, 'every step outside Enchanting produces an item').toEqual([])
+
+  // Enchanting is the exception, and it is a real one rather than an untested escape hatch.
+  const enchantSteps = craftingPathsAll.Enchanting ?? []
+  expect(enchantSteps.some((step) => !producing('Enchanting', step)), 'enchants still level enchanting').toBe(true)
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {
