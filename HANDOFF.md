@@ -5,6 +5,41 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-06, the suite runs in under four minutes)
+
+**232 tests, 232.7 seconds, slowest test 5.9s.** It was ~9 minutes with a three-minute silence in the
+middle, and the fix was one test.
+
+### The assertion machinery was the runtime
+
+"No spec can equip an unobtainable item" sweeps 27 specs across every slot, which reaches **65,566
+gear options**, and called `expect` on each. Measured: the domain work underneath runs in **115ms**,
+and each `expect` costs about **2.5ms**. So 99.9% of that test was Playwright building matcher
+context for assertions that all passed.
+
+Collecting the violations into an array and asserting once takes it to **4.5 seconds**. It checks
+nothing less closely and is better when it fires, naming every offender rather than stopping at the
+first.
+
+**A scan for the same shape found no second instance** — the distribution is flat now, so this was one
+test rather than a habit. Worth knowing before anyone goes looking for more of them.
+
+### The speedup was verified by breaking it
+
+A faster test that stops catching the bug is worth less than the slow one, and nothing about a green
+run tells you which you have. So `isObtainable` was stubbed to return `true`, the rewritten test was
+confirmed to **fail**, and the stub was reverted. That is the check that makes the rewrite safe to
+believe.
+
+### And it retired a warning in this file
+
+The 2026-09-04 entry told the next person that three minutes of silence is normal and to expect a
+nine-minute suite. Both were true and are now false, so that paragraph is struck through rather than
+left to mislead. What survives is the part that still holds: **a node process burning CPU steadily is
+alive**, whatever the reporter shows, and that is what to check before killing a run.
+
+---
+
 ## Start here (2026-09-06, the cost metric can tell buying from farming)
 
 **The known limitation printed on the crafting pages is half fixed, and the half that is left is
@@ -442,12 +477,14 @@ sequencing this repo's Decision Log argues for.
 
 ### Two things that cost this session time, both worth not rediscovering
 
-**A suite run goes silent for 2.8 minutes and it is not hung.** `tests/planner.spec.ts:3039` — "no
-spec can equip, default to, or be upgraded into an unobtainable item" — takes **2.8 minutes on its
-own**, verified by running it alone. With the `line` reporter that is three minutes with no output
-around test 86 of 223, which looks exactly like a stall, and this session killed a healthy run
-because of it. The tell that it was alive: the node process was burning CPU steadily. Check that
-before killing a run, and expect the whole suite to take **~9 minutes**.
+~~**A suite run goes silent for 2.8 minutes and it is not hung.**~~ **Fixed 2026-09-06 — the silence
+is gone rather than explained.** "No spec can equip an unobtainable item" swept 65,566 gear options
+calling `expect` on each; the assertion machinery was the whole runtime, since the domain work under
+it runs in 115ms. Collecting the violations and asserting once took the test to **4.5 seconds** and
+the suite from ~9 minutes to **under 4**, with the slowest remaining test at 5.9s.
+
+The advice that outlives it: **a node process burning CPU steadily is alive**, whatever the reporter
+is showing, and that is the thing to check before killing a run. This session killed a healthy one.
 
 **Only Tirisfal Glades carries all three starter herbs.** Durotar has Peacebloom and neither of the
 others. A new test asserted three herbs in Durotar, and the suite failed it — 222 passed, that one
