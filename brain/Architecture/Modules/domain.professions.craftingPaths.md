@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/craftingPaths.ts
-lines: 52
+lines: 81
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.craftingPaths
 
-`src/domain/professions/craftingPaths.ts` · **domain** layer · 52 lines
+`src/domain/professions/craftingPaths.ts` · **domain** layer · 81 lines
 
 From the top of the file:
 
@@ -24,7 +24,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `craftingPathFor`
+**function** — `craftingPathFor`, `formatCopper`
 
 **const** — `craftingPathModel`, `professionsWithCraftingPaths`
 

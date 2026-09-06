@@ -1,7 +1,66 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-05.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-06.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-06, the cost metric can tell buying from farming)
+
+**The known limitation printed on the crafting pages is half fixed, and the half that is left is
+stated more precisely.** The metric counted one Coarse Thread — ten copper, infinite at a vendor — as
+equal to one Primal Might. 42 reagents are now known to be vendor staples, excluded from the count
+that chooses a recipe, and priced separately at a figure that is a game constant rather than a market.
+
+### Three obvious discriminators, all wrong, all wrong the same way
+
+Tested against known items before anything was built:
+
+| Signal | Fires wrongly on |
+|---|---|
+| "sold by NPCs" in the page description | Linen Cloth, Peacebloom |
+| `buyprice > 0` | those, plus Mote of Air at 16s |
+| `source` **contains** 5 | those again |
+
+Every one is true of anything a vendor stocks *at all*, including three-at-a-time limited stock. The
+rule that holds is **`source === [5]` exactly** — a vendor is the only source, which is what makes
+supply unlimited and price fixed. Confirmed in both directions: 1 is crafted and 2 is dropped, so
+every farmed reagent carries a 1 or a 2 and an exact `[5]` is unambiguous.
+
+The 42 it finds are threads, dyes, vials, flux, spices, parchment, wood stock — every classic
+reagent-vendor staple and nothing else.
+
+**And `buyprice` on those is a real number this repo is allowed to keep.** Coarse Thread is ten copper
+on every realm forever. `avgbuyout` sits in the same payload and is ignored: it is realm-specific and
+weekly, exactly the kind of plausible unverifiable figure this project removes rather than adds.
+
+### Copper breaks ties and never joins the total
+
+There is no honest exchange rate between a copper and a unit of farming effort, so vendor cost cannot
+be added to an item count. It orders recipes that tie on farmed cost, and each step carries its own
+vendor bill for the page to show. **What is still not modelled is now narrower and said plainly**: ten
+Netherweave Cloth against two Primal Might are still counted alike, because pricing *that* needs
+auction data.
+
+### Discounting vendor mats had one degenerate consequence
+
+**Basic Campfire consumes one vendor-bought Simple Wood and produces nothing.** With vendor reagents
+free, its farmed cost was zero, so it beat every real recipe and took 42 skill points — the Cooking
+path read *"make 217 campfires for 82 gold"*. True, useless, and completely confident.
+
+A path headed "what to craft" should name things you end up holding, so a recipe that creates nothing
+is no longer eligible — **except in Enchanting**, the one TBC profession whose product is not an item.
+Excluding enchants there would leave an enchanter unable to level at all. The carve-out is one named
+profession with the reason attached, and a test asserts both halves.
+
+**The general shape is worth keeping: making one cost free exposes everything that was only ever
+winning because it was expensive.** Zero is not a small number, it is a different kind of number.
+
+### The paths moved, and one of them agrees with the guide
+
+Six of nine professions changed recipe choices. Tailoring independently arrived at **Reinforced Linen
+Cape for 70-75**, which is the item the reference guide uses at 67-75 — reached from reagent counts
+and colour breakpoints rather than by copying it.
 
 ---
 

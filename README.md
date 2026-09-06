@@ -86,7 +86,9 @@ behind every claim of its that quotes a number.
   reagents and their orange/yellow/green/grey breakpoints, from which all nine crafting professions
   get a path from their first recipe to 375: what to make, how many, and the shopping list. The craft
   counts are derived from the skill-up curve, not taken from anyone's guide, and the page prints the
-  model it used
+  model it used. Reagents a vendor is the only source for — thread, dye, vials, flux — are counted as
+  bought rather than farmed and priced at their fixed vendor cost, so a step separates its shopping
+  list from its farming list
 - **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
   coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
   merging every material farmed in that range, because that is how a range is farmed — at 1-100 you

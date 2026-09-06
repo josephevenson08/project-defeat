@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/CraftingProgression.tsx
-lines: 127
+lines: 142
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.CraftingProgression
 
-`src/features/professions/CraftingProgression.tsx` · **features** layer · 127 lines
+`src/features/professions/CraftingProgression.tsx` · **features** layer · 142 lines
 
 From the top of the file:
 
