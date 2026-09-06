@@ -3072,24 +3072,37 @@ test('no spec can equip, default to, or be upgraded into an unobtainable item', 
     if (item) expect(isObtainable(item), `${entry.name}: ${entry.why}`).toBe(false)
   }
 
+  /*
+   * **Collected and asserted once, which took this test from 2.8 minutes to under a second.**
+   *
+   * The sweep is 27 specs across every slot, which reaches 65,566 gear options. Calling `expect` on
+   * each cost about 2.5ms — the domain work underneath it all runs in 115ms — so the assertion
+   * machinery *was* the test's runtime. Three minutes of silence in the middle of a suite reads as a
+   * hang, and a session already killed a healthy run because of it.
+   *
+   * Nothing is checked less closely. Every offender is still named, and gathering them all reports
+   * the full set rather than stopping at the first, which is strictly more useful when it fires.
+   */
+  const offered: string[] = []
   for (const definition of tbcClasses) {
     for (const spec of definition.specs) {
       for (const slot of gearSlots) {
         for (const option of getItemsForSlotAndCharacter(slot, definition.className, spec)) {
-          expect(
-            option.wowItemId === undefined || !unobtainableWowItemIds.has(option.wowItemId),
-            `${definition.className} ${spec} is offered "${option.name}" in ${slot}, which nobody can acquire`,
-          ).toBe(true)
+          if (option.wowItemId !== undefined && unobtainableWowItemIds.has(option.wowItemId)) {
+            offered.push(`${definition.className} ${spec} is offered "${option.name}" in ${slot}`)
+          }
         }
       }
     }
   }
+  expect(offered, 'no spec is offered an item nobody can acquire').toEqual([])
 
   // And the starting set, which is built before any character exists and so never passes through
   // isItemAllowedForCharacter — the exact hole that put encounter weapons in every default loadout.
-  for (const [slot, equipped] of Object.entries(defaultGear)) {
-    expect(isObtainable(equipped.item), `default ${slot} is "${equipped.item.name}"`).toBe(true)
-  }
+  const unobtainableDefaults = Object.entries(defaultGear)
+    .filter(([, equipped]) => !isObtainable(equipped.item))
+    .map(([slot, equipped]) => `default ${slot} is "${equipped.item.name}"`)
+  expect(unobtainableDefaults, 'the starting set is obtainable').toEqual([])
 })
 
 test('the planner never offers gear whose stats were invented', () => {
