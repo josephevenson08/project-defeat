@@ -31,8 +31,21 @@ export type CraftingStep = {
     name: string
     quantity: number
     icon?: string
+    /**
+     * A vendor is the only source, so this is bought rather than farmed.
+     *
+     * **Stricter than "a vendor stocks it"**, which is true of Linen Cloth and Peacebloom and would
+     * have priced two farmed goods at zero. Vendor-only means unlimited supply at a fixed price, so
+     * it costs time to click and nothing to find — which is why the recipe that chose this step
+     * excluded these from its count.
+     */
+    vendorOnly?: boolean
+    /** Fixed vendor price per unit, in copper. A game constant, never an auction price. */
+    unitCopper?: number
     craftedFrom?: { name: string; quantity: number; icon?: string }[]
   }[]
+  /** What the whole step costs at a vendor, in copper. Zero when it buys nothing. */
+  vendorCopper?: number
   creates?: string
   createsIcon?: string
   trainerTaught: boolean
@@ -49,3 +62,19 @@ export function craftingPathFor(profession: Profession): CraftingStep[] {
 
 /** Every profession with a computed path, which is the nine that craft rather than gather. */
 export const professionsWithCraftingPaths: readonly string[] = Object.keys(PATHS)
+
+
+/**
+ * Copper as a player reads it.
+ *
+ * Trailing zero denominations are dropped — 2g 0s 0c is "2g" — because a shopping total is read at a
+ * glance and the zeroes carry nothing. Sub-copper totals cannot occur: every price here is an integer
+ * count of copper from the game's own data.
+ */
+export function formatCopper(copper: number): string {
+  if (copper <= 0) return '0c'
+  const gold = Math.floor(copper / 10000)
+  const silver = Math.floor((copper % 10000) / 100)
+  const rest = copper % 100
+  return [gold && `${gold}g`, silver && `${silver}s`, rest && `${rest}c`].filter(Boolean).join(' ')
+}

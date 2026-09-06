@@ -21,11 +21,22 @@
 //
 // Choosing the recipe
 // -------------------
-// At each skill point the cheapest recipe wins, where cheapest means **fewest reagent items per
-// point of skill** — expected crafts multiplied by reagents per craft. It counts items, not gold,
-// because this repo has no price data and inventing one would be inventing the answer. That is a
-// real limitation and it is recorded next to the number: a path that saves ten Netherweave Cloth by
-// spending two Primal Might is worse than it looks here.
+// At each skill point the cheapest recipe wins, where cheapest means **fewest reagent items you have
+// to go and get, per point of skill**.
+//
+// **Vendor staples are not counted, because they are not a cost you pay in effort.** Coarse Thread is
+// ten copper and infinite; treating one of those as equal to one Primal Might is what made the old
+// metric wrong. `ingest-reagent-sources.mjs` records which reagents a vendor is the *only* source
+// for, which is a stricter test than "a vendor stocks it" — Linen Cloth and Peacebloom are sold in
+// limited stock by somebody and are still farmed goods.
+//
+// Their copper does not vanish, it just cannot be added to an item count without inventing an
+// exchange rate between gold and effort. So it **breaks ties** rather than joining the total, and
+// each step carries its own vendor bill for the page to show.
+//
+// What is still not modelled is the relative cost of two *farmed* reagents — ten Netherweave Cloth
+// against two Primal Might is still ten against two here. Fixing that needs auction prices, which are
+// realm-specific and weekly, and this repo does not invent numbers of that kind.
 //
 // Trainer-taught recipes are preferred where they compete, since a path built on world drops is not
 // a path a leveller can follow.
@@ -33,13 +44,14 @@
 // Run: node tools/ingest/compute-leveling-paths.mjs
 // Writes: src/domain/professions/craftingPaths.json
 
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
 const IN_PATH = resolve(HERE, 'data/professionRecipes.json')
+const REAGENTS_PATH = resolve(HERE, 'data/reagentSources.json')
 const OUT_PATH = resolve(REPO, 'src/domain/professions/craftingPaths.json')
 
 const SKILL_CAP = 375
@@ -47,6 +59,22 @@ const SKILL_CAP = 375
 const TRAINER = 2
 
 const { professions } = JSON.parse(readFileSync(IN_PATH, 'utf8'))
+
+/**
+ * How each reagent is obtained. Absent means "treat as farmed", which is the conservative reading:
+ * over-counting a vendor staple picks a slightly worse recipe, while wrongly treating a farmed
+ * reagent as free would recommend a path nobody can follow.
+ */
+const reagentSources = existsSync(REAGENTS_PATH)
+  ? JSON.parse(readFileSync(REAGENTS_PATH, 'utf8')).items
+  : {}
+if (Object.keys(reagentSources).length === 0) {
+  console.error('REFUSING TO WRITE — no reagent sources. Run tools/ingest/ingest-reagent-sources.mjs first.')
+  process.exit(1)
+}
+
+const isVendorStaple = (itemId) => reagentSources[itemId]?.vendorOnly === true
+const buyPriceOf = (itemId) => reagentSources[itemId]?.buyPriceCopper ?? 0
 
 /** Probability that one craft at `skill` raises it. See the model note above. */
 function skillUpChance(recipe, skill) {
@@ -135,9 +163,20 @@ function expandMaterial(name, quantity, byOutput, seen = new Set(), depth = 0) {
   return { crafts, of: name, materials: leaves }
 }
 
-/** Reagent items consumed by one craft. Items, not gold — see the note above. */
+/** Reagent items one craft consumes that you have to go and get. Vendor staples are excluded. */
 function reagentCost(recipe) {
-  return recipe.reagents.reduce((sum, reagent) => sum + reagent.quantity, 0)
+  return recipe.reagents.reduce(
+    (sum, reagent) => sum + (isVendorStaple(reagent.itemId) ? 0 : reagent.quantity),
+    0,
+  )
+}
+
+/** Copper one craft spends at a vendor. A fixed game constant, never an auction price. */
+function vendorCost(recipe) {
+  return recipe.reagents.reduce(
+    (sum, reagent) => sum + (isVendorStaple(reagent.itemId) ? reagent.quantity * buyPriceOf(reagent.itemId) : 0),
+    0,
+  )
 }
 
 /**
@@ -146,7 +185,22 @@ function reagentCost(recipe) {
  * Ties break toward the trainer-taught option, then toward the one that stays useful longest, so a
  * path does not flap between two equal recipes and fragment into one-point steps.
  */
-function bestAt(recipes, skill, staying) {
+/**
+ * Enchanting is the one profession whose product is not an item.
+ *
+ * **This carve-out exists because excluding non-producing recipes is otherwise correct.** A path
+ * headed "what to craft" should name things you end up holding, and the first run with vendor
+ * staples discounted proved why: Basic Campfire consumes one vendor-bought Simple Wood, produces
+ * nothing at all, and — being free of farmed reagents — beat every real food recipe to win 42 skill
+ * points. The path read "make 217 campfires for 82 gold", which is true, useless, and confident.
+ *
+ * Enchants produce nothing either, and for them that is the whole point: an enchanter's output is an
+ * enchantment. So the rule is "produce something", with the single profession that cannot as the
+ * stated exception rather than a silent one.
+ */
+const OUTPUT_IS_NOT_AN_ITEM = 'Enchanting'
+
+function bestAt(recipes, skill, staying, profession) {
   let best = null
   let bestCost = Number.POSITIVE_INFINITY
 
@@ -160,6 +214,7 @@ function bestAt(recipes, skill, staying) {
 
   for (const recipe of recipes) {
     if (recipe.learnedAt > skill) continue
+    if (!recipe.creates && profession !== OUTPUT_IS_NOT_AN_ITEM) continue
     const chance = skillUpChance(recipe, skill)
     if (chance <= 0) continue
 
@@ -168,10 +223,22 @@ function bestAt(recipes, skill, staying) {
     const trainer = Array.isArray(recipe.source) && recipe.source.includes(TRAINER)
     const bestTrainer = best && Array.isArray(best.source) && best.source.includes(TRAINER)
 
+    /*
+     * **Vendor copper breaks ties and never joins the total**, because there is no honest exchange
+     * rate between a copper and a unit of farming effort. It matters more than it sounds: excluding
+     * vendor staples from the count leaves whole families of recipes tied at the same farmed cost —
+     * and among those, the one that spends less at the vendor is simply better.
+     */
+    const copper = vendorCost(recipe) / chance
+    const bestCopper = best ? vendorCost(best) / skillUpChance(best, skill) : Number.POSITIVE_INFINITY
+
     const better =
       cost < bestCost - 1e-9 ||
       (Math.abs(cost - bestCost) <= 1e-9 &&
-        ((trainer && !bestTrainer) || (trainer === bestTrainer && best && recipe.colors[3] > best.colors[3])))
+        (copper < bestCopper - 1e-9 ||
+          (Math.abs(copper - bestCopper) <= 1e-9 &&
+            ((trainer && !bestTrainer) ||
+              (trainer === bestTrainer && best && recipe.colors[3] > best.colors[3])))))
 
     if (better) {
       best = recipe
@@ -188,13 +255,13 @@ function bestAt(recipes, skill, staying) {
  * Expected crafts accumulate per point rather than per step, because the chance changes as the
  * recipe fades — 1/chance summed across the range, not the range divided by one chance.
  */
-function computePath(recipes) {
+function computePath(recipes, profession) {
   const byOutput = outputIndex(recipes)
   const steps = []
   let current = null
 
   for (let skill = 1; skill < SKILL_CAP; skill += 1) {
-    const recipe = bestAt(recipes, skill, current)
+    const recipe = bestAt(recipes, skill, current, profession)
     if (!recipe) {
       // No craftable recipe raises skill here: a real gap, usually waiting on a trainer rank.
       if (current) {
@@ -234,14 +301,27 @@ function computePath(recipes) {
       materials: step.reagents.map((reagent) => {
         const quantity = reagent.quantity * crafts
         const expansion = expandMaterial(reagent.name, quantity, byOutput)
+        const staple = isVendorStaple(reagent.itemId)
         return {
           name: reagent.name,
           quantity,
           ...(reagent.icon ? { icon: reagent.icon } : {}),
+          /*
+           * A vendor sells this and nothing else does, so it is bought rather than farmed. Marked so
+           * the page can separate the shopping list from the farming list, and excluded from the
+           * cost that chose this recipe.
+           */
+          ...(staple ? { vendorOnly: true, unitCopper: buyPriceOf(reagent.itemId) } : {}),
           // What it costs if you make it yourself. Offered, not prescribed — see expandMaterial.
           ...(expansion ? { craftedFrom: expansion.materials } : {}),
         }
       }),
+      /** What the whole step costs at a vendor, in copper. A game constant, not a market price. */
+      vendorCopper: step.reagents.reduce(
+        (sum, reagent) =>
+          sum + (isVendorStaple(reagent.itemId) ? reagent.quantity * crafts * buyPriceOf(reagent.itemId) : 0),
+        0,
+      ),
       ...(step.creates ? { creates: step.creates.name, createsIcon: step.creates.icon } : {}),
       trainerTaught: Array.isArray(step.source) && step.source.includes(TRAINER),
     }
@@ -295,7 +375,7 @@ function assertContiguous(profession, steps) {
 
 const paths = {}
 for (const [profession, recipes] of Object.entries(professions)) {
-  const steps = coalesce(computePath(recipes))
+  const steps = coalesce(computePath(recipes, profession))
   assertContiguous(profession, steps)
   paths[profession] = steps
   const reach = steps.length > 0 ? steps[steps.length - 1].skillRange[1] : 0
@@ -308,7 +388,7 @@ writeFileSync(
     {
       note: 'Generated by tools/ingest/compute-leveling-paths.mjs from tools/ingest/data/professionRecipes.json. Do not edit by hand.',
       model:
-        'Craft counts are computed, not sourced: chance = (grey - skill) / (grey - yellow) between yellow and grey, 1 below yellow. Expected crafts is the reciprocal summed across the range, rounded up. Recipe choice minimises reagent items per skill point, which counts items rather than gold.',
+        'Craft counts are computed, not sourced: chance = (grey - skill) / (grey - yellow) between yellow and grey, 1 below yellow. Expected crafts is the reciprocal summed across the range, rounded up. Recipe choice minimises the reagents you have to go and get per skill point; vendor staples are bought rather than farmed, so they are excluded from that count and priced separately at their fixed vendor cost. Two farmed reagents are still counted alike, since pricing those would need auction data that varies by realm and week.',
       paths,
     },
     null,
