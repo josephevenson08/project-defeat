@@ -1,3 +1,4 @@
+import { formatCopper } from '../../domain/professions'
 import type { CraftingStep, RecipeLeveling, TrainingMilestone } from '../../domain/professions'
 import { MaterialChip } from './MaterialChip'
 import { TrainingMarker } from './TrainingMarker'
@@ -18,6 +19,10 @@ function Step({ step, note }: { step: CraftingStep; note?: string }) {
           {step.skillRange[0]} - {step.skillRange[1]}
         </h4>
         <span>{step.trainerTaught ? 'Trainer-taught' : 'Recipe found elsewhere'}</span>
+        {/* The step's whole vendor bill, so the shopping half of the list has a total. */}
+        {step.vendorCopper ? (
+          <span className="profession-craft-vendor-total">{formatCopper(step.vendorCopper)} at a vendor</span>
+        ) : null}
       </header>
 
       <p className="profession-craft-recipe">
@@ -38,6 +43,16 @@ function Step({ step, note }: { step: CraftingStep; note?: string }) {
             <div className="profession-craft-material-row">
               <MaterialChip material={material.name} icon={material.icon} />
               <span>{material.quantity}</span>
+              {/*
+                Bought, not farmed — and worth saying, because it changes what the number means. 45
+                Coarse Thread is one vendor click; 45 Netherweave Cloth is an evening. The recipe that
+                chose this step counted only the second kind.
+              */}
+              {material.vendorOnly && (
+                <span className="profession-craft-vendor">
+                  vendor{material.unitCopper ? ` · ${formatCopper(material.unitCopper)} ea` : ''}
+                </span>
+              )}
             </div>
             {/*
               What the reagent costs if you make it rather than buy it, flattened to what this

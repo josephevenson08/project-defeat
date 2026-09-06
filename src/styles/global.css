@@ -2728,6 +2728,28 @@ select:focus,
 }
 
 /*
+ * Bought rather than farmed.
+ *
+ * Quiet, because it is a qualifier on the quantity beside it rather than a fact of its own — but
+ * present, because it changes what that quantity costs you. The recipe that chose this step counted
+ * only the reagents this label is absent from.
+ */
+.profession-craft-vendor {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.profession-craft-vendor-total {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-left: auto;
+}
+
+/*
  * The pre-300 summary rows, which are not steps and should not look like them.
  *
  * Nine crafting professions still hold their whole 1-300 climb in a single row saying "see a
