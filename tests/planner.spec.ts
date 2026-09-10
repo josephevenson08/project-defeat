@@ -452,7 +452,7 @@ import { allProfessions, getProfessionProfile, craftingPathFor, craftingPathMode
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getAttunementChainForRaid, sampleAttunements } from '../src/domain/raids/sampleAttunements'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { distinctIconCount, getIconName, mappedIconCount } from '../src/domain/icons/icons'
 import { isObtainable, unobtainableItems, unobtainableWowItemIds } from '../src/domain/gear/obtainability'
@@ -9461,6 +9461,103 @@ test('a levelling path names things you end up holding', () => {
   // Enchanting is the exception, and it is a real one rather than an untested escape hatch.
   const enchantSteps = craftingPathsAll.Enchanting ?? []
   expect(enchantSteps.some((step) => !producing('Enchanting', step)), 'enchants still level enchanting').toBe(true)
+})
+
+test('the numbers README and ROADMAP quote are the numbers the data holds', () => {
+  /*
+   * **This repo's named recurring failure is prose that was true when written.** The Decision Log
+   * calls it out, the handoff has a table of four simulator self-descriptions that all went false in
+   * one sitting, and three more were found in a single week: an icon count, a BiS entry count and a
+   * catalogue size, every one of them stale because a commit changed the data and not the sentence.
+   *
+   * A number in a hand-written document cannot defend itself, so this defends it. Each row ties a
+   * sentence to the measurement it claims, and adding a claim means adding a row — which is the point:
+   * the cost of writing a number into prose should include the cost of keeping it true.
+   *
+   * Generated documents do not need this. `Roadmap Board` derives its counts, which is strictly
+   * better, and is why nothing from the brain appears below.
+   */
+  /*
+   * **Whitespace is normalised before matching, and that is not tidiness.** Prose gets reflowed — a
+   * sentence moves across a line break and every multi-line pattern stops matching, failing this
+   * test for a change that altered no claim at all. Collapsing runs of whitespace makes a claim
+   * depend on its words rather than on where the paragraph happened to wrap.
+   */
+  const read = (file: string) =>
+    readFileSync(resolve(process.cwd(), file), 'utf8').replace(/\s+/g, ' ')
+  const parse = (text: string) => Number(text.replace(/,/g, ''))
+
+  const iconCount = readdirSync(resolve(process.cwd(), 'public/icons')).length
+  const iconBytes = readdirSync(resolve(process.cwd(), 'public/icons')).reduce(
+    (sum, file) => sum + statSync(resolve(process.cwd(), 'public/icons', file)).size,
+    0,
+  )
+  const bisEntries = bisLists.reduce((total, list) => total + list.entries.length, 0)
+  const withWowId = allItems.filter((item) => item.wowItemId !== undefined).length
+
+  const claims: { where: string; pattern: RegExp; actual: number; tolerance?: number }[] = [
+    {
+      where: 'README: vendored icon count',
+      pattern: /`public\/icons\/` \(([\d,]+) files/,
+      actual: iconCount,
+    },
+    {
+      where: 'README: vendored icon size in MB',
+      pattern: /`public\/icons\/` \([\d,]+ files, ([\d.]+) MB\)/,
+      actual: Number((iconBytes / 1024 / 1024).toFixed(1)),
+      // Rounded to one decimal in prose, so a tenth either way is the same claim.
+      tolerance: 0.05,
+    },
+    {
+      where: 'README: gathering nodes',
+      pattern: /([\d,]+) gathering nodes/,
+      actual: gatheringNodes.length,
+    },
+    {
+      where: 'README: spawn coordinates',
+      pattern: /([\d,]+) real spawn coordinates/,
+      actual: gatheringNodes.reduce(
+        (total, node) => total + node.zones.reduce((sum, zone) => sum + zone.coords.length, 0),
+        0,
+      ),
+    },
+  ]
+
+  const roadmapClaims: typeof claims = [
+    { where: 'ROADMAP: BiS ranked entries', pattern: /There are now \*\*([\d,]+) entries\*\*/, actual: bisEntries },
+    { where: 'ROADMAP: catalogue size', pattern: /- \*\*Items\*\* — ([\d,]+),/, actual: allItems.length },
+    {
+      where: 'ROADMAP: share of items with a real id',
+      pattern: /- \*\*Items\*\* — [\d,]+, of which ([\d.]+)% carry a real WoW item ID/,
+      actual: Number(((100 * withWowId) / allItems.length).toFixed(0)),
+      tolerance: 0.5,
+    },
+    { where: 'ROADMAP: zone maps vendored', pattern: /([\d,]+) zones vendored/, actual: readdirSync(resolve(process.cwd(), 'public/maps')).length },
+  ]
+
+  const readme = read('README.md')
+  const roadmap = read('ROADMAP.md')
+
+  const wrong: string[] = []
+  for (const [text, rows] of [
+    [readme, claims],
+    [roadmap, roadmapClaims],
+  ] as const) {
+    for (const claim of rows) {
+      const found = claim.pattern.exec(text)
+      // A claim that vanished is as much a problem as one that drifted: the row and the sentence
+      // are meant to move together, so a missing match means one of them was edited alone.
+      if (!found) {
+        wrong.push(`${claim.where}: sentence no longer matches its pattern`)
+        continue
+      }
+      const quoted = parse(found[1])
+      const ok = Math.abs(quoted - claim.actual) <= (claim.tolerance ?? 0)
+      if (!ok) wrong.push(`${claim.where}: prose says ${quoted}, data says ${claim.actual}`)
+    }
+  }
+
+  expect(wrong, 'every quoted figure matches what the data actually holds').toEqual([])
 })
 
 test('every profession has vendored artwork and a guide to send you to', async () => {
