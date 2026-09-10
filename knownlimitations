@@ -5,10 +5,16 @@
   10/sec regen, or — since 2026-08-23 — a hunter's shot weave, bounded by the 1.5s hunter global
   cooldown and by one shot per auto-shot cycle. **Rage-costed abilities with no cooldown are still
   excluded**, because rage income depends on damage taken, and the simulation names what it left out
-  rather than guessing a rate. Multi-ability rotations have started but cover **only Fury and Arms
-  Warrior**, which press Whirlwind alongside their signature button against a shared global-cooldown
-  budget. Every other spec still models a single ability, so melee specs remain understated by
-  differing amounts.
+  rather than guessing a rate — Heroic Strike is carried in the ability data and contributes nothing,
+  which is that exclusion doing its job. **Multi-ability rotations now cover 15 of the 20 DPS specs**,
+  from two abilities up to five: the hunters run a shot weave beside a pet that swings and presses
+  three buttons, Affliction maintains four dots under Shadow Bolt, Feral keeps Rake and Rip, and the
+  rogues layer a poison over their builder. **Five specs still model a single ability** — Balance, all
+  three Mage specs and Elemental — and every one of them is a pure-nuke caster, which is the shape of
+  the remaining gap rather than a melee one.
+
+  *(This bullet read "only Fury and Arms Warrior" until 2026-09-10, which was true when written and
+  understated the estimate by thirteen specs.)*
 - **Retribution's Holy damage is modelled and is faction-split.** Seal of Blood adds 35% of weapon
   damage to every landed swing, Seal of Command 70% at 7 procs per minute, and the judgement lands on
   a 10s cooldown. Seal of Blood is Horde-only in Phase 2, and the difference is large — Judgement of
@@ -28,9 +34,13 @@
 - Feral Druid is modelled in cat form, which in TBC swings a fixed internal weapon rather than the
   equipped one — so weapon damage and speed genuinely don't matter for Feral. What matters is Feral
   Attack Power, an explicit stat TBC prints on druid weapons, which is now modelled and adds 1:1 into
-  attack power. Only **one** catalogued weapon carries a real value for it so far
-  (Terestian's Stranglestaff, 829), so Feral weapon comparisons still under-differentiate against the
-  rest of the catalog.
+  attack power. **26 catalogued weapons now carry a real value**, from 285 on the Wild Wood Staff to
+  1,459 on Staff of Disintegration, and the spread reaches the stat rail — swapping the lowest for the
+  highest moves a Feral druid's attack power by 1,079. Feral weapon comparisons differentiate properly
+  now; what remains is that a weapon *without* the stat is indistinguishable from one that has none.
+
+  *(This bullet said only Terestian's Stranglestaff carried the stat until 2026-09-10. That was true
+  when written and became false when the catalogue was re-ingested.)*
 - Caster and healer estimates model one real signature ability per spec rather than a rotation — no
   cooldowns, procs, downranking, or multi-spell priority.
 - No multi-iteration variance and no result charts, so every number is a point estimate.
