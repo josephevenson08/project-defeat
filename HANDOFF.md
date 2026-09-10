@@ -1,7 +1,55 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-06.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-10.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-10, the hand-written numbers now defend themselves)
+
+**Four figures in README and ROADMAP had gone stale, and three of them this week's own commits made
+stale.** Fetching crafting icons moved the icon count; deleting 23 invented items moved the catalogue
+size. Neither commit touched the sentence quoting it.
+
+| Claim | Said | Actually |
+|---|---|---|
+| Vendored icons | 1,713 files, 3.0 MB | **1,963 files, 3.4 MB** |
+| BiS ranked entries | 1,428 | **1,427** |
+| Catalogue size | 4,554 | **4,531** |
+| Items with a real WoW id | 99.5% | **100%** |
+
+The last one moved in the good direction: the invented entries were most of what lacked an id, so
+deleting them took the share to 100%.
+
+**Six other checkable figures were correct** — 2,079 recipes, 45 nodes, 14,091 coordinates, 41 zone
+maps, 212 gems, 91 enchants. This is not a document full of lies; it is a document where a number
+drifts every time the data behind it moves and nothing says so.
+
+### The fix is a guard, not a correction
+
+Correcting four numbers buys nothing — they rot again on the next ingest. Each figure is now tied to
+the measurement it claims, and **adding a number to README or ROADMAP means adding a row to that
+test**. That cost is deliberate: writing a figure into prose should carry the cost of keeping it true.
+
+**Generated documents need none of this**, which is why nothing from `brain/` is in the list. Roadmap
+Board derives its counts from the data already, and deriving beats asserting — the guard exists only
+for the two documents a human types.
+
+Two details that make it usable rather than annoying:
+
+- **Whitespace is normalised before matching.** Prose gets reflowed constantly, and a multi-line
+  pattern that breaks when a sentence crosses a line break would fail for a change that altered no
+  claim. A claim should depend on its words, not on where the paragraph wrapped.
+- **A missing match fails as loudly as a wrong number.** The row and the sentence are meant to move
+  together; if one was edited alone the guard has stopped guarding, and silently passing is the worst
+  thing it could do.
+
+### And a misreading worth not repeating
+
+Playwright prints `Received + 3` for a one-element array — that is the **line count of the diff**
+(`Array [`, the entry, `]`), not three failures. Two falsification runs were read as "three claims are
+broken" before isolating it to one. When an assertion diff reports a count, check whether it is
+counting failures or counting lines.
 
 ---
 
