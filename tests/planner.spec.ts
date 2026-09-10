@@ -9463,7 +9463,7 @@ test('a levelling path names things you end up holding', () => {
   expect(enchantSteps.some((step) => !producing('Enchanting', step)), 'enchants still level enchanting').toBe(true)
 })
 
-test('the numbers README and ROADMAP quote are the numbers the data holds', () => {
+test('the numbers the hand-written docs quote are the numbers the data holds', () => {
   /*
    * **This repo's named recurring failure is prose that was true when written.** The Decision Log
    * calls it out, the handoff has a table of four simulator self-descriptions that all went false in
@@ -9535,13 +9535,58 @@ test('the numbers README and ROADMAP quote are the numbers the data holds', () =
     { where: 'ROADMAP: zone maps vendored', pattern: /([\d,]+) zones vendored/, actual: readdirSync(resolve(process.cwd(), 'public/maps')).length },
   ]
 
+  /*
+   * `knownlimitations` is the file that matters most here and the one that rots worst, because a
+   * limitation is a claim about *absence* and nothing fails when an absence quietly fills in. Two of
+   * its bullets were false on 2026-09-10: multi-ability rotations said "only Fury and Arms Warrior"
+   * when fifteen of twenty DPS specs fire several, and Feral Attack Power said one weapon carried it
+   * when twenty-six do. Both understated the app — a caveat that undersells is still wrong, and this
+   * repo's own rule is that a wrong caveat is worse than none.
+   */
+  const dpsSpecs = tbcClasses.flatMap((definition) =>
+    definition.specs
+      .map((spec) => ({ className: definition.className, spec, role: getRoleForSpec(definition.className, spec) }))
+      .filter((entry) => entry.role === 'Physical DPS' || entry.role === 'Caster DPS'),
+  )
+  const raceFor = (className: TbcClass) => legalRaceFor(className)
+  const isWhiteDamage = (name: string) => /^(melee|ranged)\b|white|auto/i.test(name)
+  const multiAbilitySpecs = dpsSpecs.filter((entry) => {
+    const character: CharacterProfile = {
+      faction: 'Alliance',
+      race: raceFor(entry.className),
+      className: entry.className,
+      spec: entry.spec,
+    }
+    const gear = normalizeGearForCharacter(defaultGear, entry.className, entry.spec)
+    const stats = calculateStats(character, gear)
+    const sim = calculateSimulation(character, gear, stats, entry.role)
+    return sim.damageSources.filter((source) => !isWhiteDamage(source.name)).length > 1
+  }).length
+
+  const feralWeapons = allItems.filter((item) => (item.stats?.feralAttackPower ?? 0) > 0).length
+
+  const limitationClaims: typeof claims = [
+    {
+      where: 'knownlimitations: DPS specs with multi-ability rotations',
+      pattern: /cover ([\d,]+) of the 20 DPS specs/,
+      actual: multiAbilitySpecs,
+    },
+    {
+      where: 'knownlimitations: weapons carrying Feral Attack Power',
+      pattern: /\*\*([\d,]+) catalogued weapons now carry a real value\*\*/,
+      actual: feralWeapons,
+    },
+  ]
+
   const readme = read('README.md')
   const roadmap = read('ROADMAP.md')
+  const limitations = read('knownlimitations')
 
   const wrong: string[] = []
   for (const [text, rows] of [
     [readme, claims],
     [roadmap, roadmapClaims],
+    [limitations, limitationClaims],
   ] as const) {
     for (const claim of rows) {
       const found = claim.pattern.exec(text)
