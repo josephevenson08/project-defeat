@@ -11,16 +11,30 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 | Bullet said | Measured |
 |---|---|
-| Multi-ability covers "only Fury and Arms Warrior" | **15 of 20 DPS specs**, two abilities up to five |
+| Multi-ability covers "only Fury and Arms Warrior" | **5 specs of 27** — the two warriors, Affliction, Shadow, Destruction |
 | One weapon carries Feral Attack Power | **26 weapons**, 285 to 1,459 |
 
 The Feral spread reaches the stat rail: swapping the lowest for the highest moves a Feral druid's
 attack power by **1,079**. So Feral weapon comparisons differentiate properly, and the real remaining
 gap is narrower — a weapon *without* the stat still looks like one that has none.
 
-The five specs still on a single ability are Balance, all three Mage specs and Elemental. Every one is
-a pure-nuke caster, which makes the remaining gap a **caster** shape rather than the melee one the
-bullet described.
+### The first correction to that first row was itself wrong, which is the part worth reading
+
+It was corrected to **"15 of 20 DPS specs"** before being corrected again to 5 of 27. The 15 came from
+counting **damage sources** rather than rotational abilities — a hunter's pet, a rogue's poison, a
+paladin's seal and Enhancement's Windfury all add a source, and none of them is a button a rotation
+presses. The sentence said "rotations"; the measurement answered a different question and happened to
+produce a larger number.
+
+**`featureFlags.ts` had the right figure the whole time** — "Rotations cover 5 specs of 27" — because
+that file pins every numeric claim it makes to an assertion, by its own stated policy after being
+wrong twice. The file with the discipline was right; the file without it was wrong in both directions
+within an hour.
+
+**Widening a definition to make a number bigger is the same failure as letting it go stale**, and it
+is harder to catch: the number is defensible, the sentence is not, and nothing about the arithmetic
+looks wrong. The guard row now counts entries in `sampleSignatureAbilities` per spec, which is what
+`resolveRotation` actually presses.
 
 ### A limitations file rots faster than any other, and structurally
 

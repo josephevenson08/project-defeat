@@ -57,6 +57,7 @@ import {
 import { exclusiveGroupFor, exclusiveGroups } from '../src/domain/buffs/buffExclusivity'
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
+import { sampleSignatureAbilities } from '../src/domain/abilities/sampleSignatureAbilities'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
 import { calculateStatWeights } from '../src/features/simulator/calculateStatWeights'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
@@ -9538,37 +9539,31 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   /*
    * `knownlimitations` is the file that matters most here and the one that rots worst, because a
    * limitation is a claim about *absence* and nothing fails when an absence quietly fills in. Two of
-   * its bullets were false on 2026-09-10: multi-ability rotations said "only Fury and Arms Warrior"
-   * when fifteen of twenty DPS specs fire several, and Feral Attack Power said one weapon carried it
-   * when twenty-six do. Both understated the app — a caveat that undersells is still wrong, and this
-   * repo's own rule is that a wrong caveat is worse than none.
+   * its bullets were false on 2026-09-10: multi-ability rotations still said "only Fury and Arms
+   * Warrior" after three more specs gained one, and Feral Attack Power said a single weapon carried
+   * it when twenty-six do. Both understated the app — a caveat that undersells is still wrong, and
+   * this repo's own rule is that a wrong caveat is worse than none.
    */
-  const dpsSpecs = tbcClasses.flatMap((definition) =>
-    definition.specs
-      .map((spec) => ({ className: definition.className, spec, role: getRoleForSpec(definition.className, spec) }))
-      .filter((entry) => entry.role === 'Physical DPS' || entry.role === 'Caster DPS'),
-  )
-  const raceFor = (className: TbcClass) => legalRaceFor(className)
-  const isWhiteDamage = (name: string) => /^(melee|ranged)\b|white|auto/i.test(name)
-  const multiAbilitySpecs = dpsSpecs.filter((entry) => {
-    const character: CharacterProfile = {
-      faction: 'Alliance',
-      race: raceFor(entry.className),
-      className: entry.className,
-      spec: entry.spec,
-    }
-    const gear = normalizeGearForCharacter(defaultGear, entry.className, entry.spec)
-    const stats = calculateStats(character, gear)
-    const sim = calculateSimulation(character, gear, stats, entry.role)
-    return sim.damageSources.filter((source) => !isWhiteDamage(source.name)).length > 1
-  }).length
+  /*
+   * **Rotational abilities, not damage sources**, and the difference is the whole reason this row
+   * exists. The first version of it counted non-white damage sources and reported 15 — true of
+   * sources, false of rotations, because a hunter's pet, a rogue's poison, a paladin's seal and
+   * Enhancement's Windfury are attackers and procs rather than buttons anything presses. Widening a
+   * definition to make a number larger is the same failure as letting the number go stale.
+   */
+  const abilitiesPerSpec = new Map<string, number>()
+  for (const ability of sampleSignatureAbilities) {
+    const key = `${ability.className} ${ability.spec}`
+    abilitiesPerSpec.set(key, (abilitiesPerSpec.get(key) ?? 0) + 1)
+  }
+  const multiAbilitySpecs = [...abilitiesPerSpec.values()].filter((count) => count > 1).length
 
   const feralWeapons = allItems.filter((item) => (item.stats?.feralAttackPower ?? 0) > 0).length
 
   const limitationClaims: typeof claims = [
     {
-      where: 'knownlimitations: DPS specs with multi-ability rotations',
-      pattern: /cover ([\d,]+) of the 20 DPS specs/,
+      where: 'knownlimitations: specs with a multi-ability rotation',
+      pattern: /\*\*Multi-ability rotations cover ([\d,]+) specs of 27\*\*/,
       actual: multiAbilitySpecs,
     },
     {

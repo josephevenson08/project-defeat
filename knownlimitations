@@ -6,15 +6,20 @@
   cooldown and by one shot per auto-shot cycle. **Rage-costed abilities with no cooldown are still
   excluded**, because rage income depends on damage taken, and the simulation names what it left out
   rather than guessing a rate — Heroic Strike is carried in the ability data and contributes nothing,
-  which is that exclusion doing its job. **Multi-ability rotations now cover 15 of the 20 DPS specs**,
-  from two abilities up to five: the hunters run a shot weave beside a pet that swings and presses
-  three buttons, Affliction maintains four dots under Shadow Bolt, Feral keeps Rake and Rip, and the
-  rogues layer a poison over their builder. **Five specs still model a single ability** — Balance, all
-  three Mage specs and Elemental — and every one of them is a pure-nuke caster, which is the shape of
-  the remaining gap rather than a melee one.
+  which is that exclusion doing its job. **Multi-ability rotations cover 5 specs of 27**: Warrior Arms
+  and Fury press three buttons each, Affliction maintains four damage-over-time effects under a Shadow
+  Bolt filler, Shadow keeps two dots up with Mind Blast on cooldown and Mind Flay in the gaps, and
+  Destruction maintains Immolate and fills with Incinerate. **The other 22 are a single-ability
+  approximation**, which understates any spec whose damage is spread across several buttons.
 
-  *(This bullet read "only Fury and Arms Warrior" until 2026-09-10, which was true when written and
-  understated the estimate by thirteen specs.)*
+  Several specs nonetheless show more than one damage source — a hunter's pet, a rogue's poison, a
+  paladin's seal, Enhancement's Windfury — but those are attackers and procs rather than buttons a
+  rotation presses, and counting them here would inflate the figure by redefining it.
+
+  *(This bullet read "only Fury and Arms Warrior" until 2026-09-10 — stale, since Affliction, Shadow
+  and Destruction had joined. The first correction said "15 of 20" by counting damage sources instead
+  of rotational abilities, which measured a different thing and overstated it; `featureFlags.ts` had
+  the right figure all along.)*
 - **Retribution's Holy damage is modelled and is faction-split.** Seal of Blood adds 35% of weapon
   damage to every landed swing, Seal of Command 70% at 7 procs per minute, and the judgement lands on
   a 10s cooldown. Seal of Blood is Horde-only in Phase 2, and the difference is large — Judgement of
