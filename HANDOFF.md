@@ -5,6 +5,52 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-10, the limitations page was underselling the app)
+
+**Two bullets in `knownlimitations` were false, and both understated what the estimate does.**
+
+| Bullet said | Measured |
+|---|---|
+| Multi-ability covers "only Fury and Arms Warrior" | **15 of 20 DPS specs**, two abilities up to five |
+| One weapon carries Feral Attack Power | **26 weapons**, 285 to 1,459 |
+
+The Feral spread reaches the stat rail: swapping the lowest for the highest moves a Feral druid's
+attack power by **1,079**. So Feral weapon comparisons differentiate properly, and the real remaining
+gap is narrower — a weapon *without* the stat still looks like one that has none.
+
+The five specs still on a single ability are Balance, all three Mage specs and Elemental. Every one is
+a pure-nuke caster, which makes the remaining gap a **caster** shape rather than the melee one the
+bullet described.
+
+### A limitations file rots faster than any other, and structurally
+
+Everything else here describes something that exists, and a thing that exists tends to break loudly
+when it changes. **A limitation is a claim about absence, and nothing fails when an absence quietly
+fills in.** Both bullets had been false for weeks against a fully green suite. That file is now in the
+doc guard alongside README and ROADMAP, and it is the one that needed it most.
+
+The two guard rows are measured **end to end rather than from the data files** — the multi-ability
+count runs a real simulation per DPS spec and counts non-white damage sources. A claim about what the
+estimate does has to be checked against the estimate, not against the ability list feeding it.
+
+### One claim held, and checking it was the point
+
+"Rage-costed abilities with no cooldown are still excluded" is correct. Heroic Strike sits in both
+warriors' ability data and contributes **zero DPS** — the exclusion working, not a gap. Worth stating
+because the data alone looks like the opposite: the ability is right there in the list.
+
+### And a measurement bug caught before it reached the docs
+
+The first sweep counted specials with `source.label`; the field is `source.name`. Every row came back
+`undefined`, the white-damage filter matched nothing, and every count was inflated by one. It happened
+to reach the same 15 — the threshold was `> 1` and one extra row rarely crosses it — so a wrong probe
+produced a right answer, which is the most dangerous kind.
+
+**Checking the field name against a printed row is what caught it**, not the plausibility of the
+result. A number that looks reasonable is not evidence the measurement was reasonable.
+
+---
+
 ## Start here (2026-09-10, the hand-written numbers now defend themselves)
 
 **Four figures in README and ROADMAP had gone stale, and three of them this week's own commits made
