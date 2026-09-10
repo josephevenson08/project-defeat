@@ -5,6 +5,53 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-10, the sweep reached the code comments)
+
+**Four more stale counts, this time inside `src/`.** Three were written days earlier by the very work
+that moved the data underneath them.
+
+| Comment | Said | Actually |
+|---|---|---|
+| `sampleItems.ts` flagged entries matching an ingest | 119 of 120 | **all 120** |
+| `itemTypes.ts` flagged items with sourced stats | 141 of 142 | **all 142** |
+| `icons.ts` mapping | 4,740 → 1,238 | **4,779 → 1,245** |
+| `BisPanel.tsx` slot groups | 288 of 398 | **281 of 402** |
+
+The first two moved together for one reason: deleting 23 invented items and sourcing Blessed Book of
+Nagrand removed the last entry that had unverified stats, so both "all but one" phrasings became
+"all". The icon mapping moved when crafting artwork was fetched.
+
+**A stale comment is worse than a stale document line**, because a comment is read by whoever is
+editing that code, at the moment they are deciding what it does.
+
+### One of the four is deliberately not guarded
+
+`BisPanel`'s figures justify a **UI default** — how many entries a slot shows before it needs opening
+— rather than stating something the app's correctness rests on. Pinning it would fail the suite for a
+change that misleads nobody, and **a guard that fires on harmless drift teaches people to disable
+it.** It is corrected and left unpinned, on purpose.
+
+### The scan, so nobody repeats it
+
+146 numeric claims sit in `src` comments. Almost all are **game constants** — 25 energy, 73 boss
+level, 30% haste — which do not rot, because the game does not change. The ones that rot are counts
+*of this repo's own data*, and there are far fewer of them. That is the filter worth applying if this
+is ever swept again: is the number a fact about TBC, or a fact about us?
+
+### Two measurement errors caught before they reached the docs
+
+Both were mine, and both produced plausible numbers:
+
+- Counting flagged curated entries that "match an ingested row" by `wowItemId` alone gave **23 of
+  120**, which looked like a catastrophe. The merge also falls back to slug matching, so the real
+  figure is 120 of 120. Measuring what was easy to measure rather than what the sentence claimed.
+- The multi-ability count earlier the same day, corrected in the entry below.
+
+**Both were caught by reading the code that produces the number, not by the number looking wrong.**
+23 of 120 looked exactly as alarming as a real finding would.
+
+---
+
 ## Start here (2026-09-10, the limitations page was underselling the app)
 
 **Two bullets in `knownlimitations` were false, and both understated what the estimate does.**
