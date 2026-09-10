@@ -13,8 +13,7 @@ import type { GearItem } from './itemTypes'
  *
  * ## What `needsVerification` means on an entry here
  *
- * **It is about the provenance, not the stats** — for all but one entry. 119 of the 120 flagged
- * entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
+ * **It is about the provenance, not the stats.** All 120 flagged entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
  * only `PROVENANCE_FIELDS`; their stat blocks are dead weight that never reaches the app. Most of
  * their notes still say "stats are approximate pending final Wowhead audit", which described a real
  * risk when this file *was* the catalogue and describes unused data now. Read such a note as "the

@@ -28,7 +28,7 @@ type BisPanelProps = {
  * at 1280x720, from 64 entries across 15 slot groups. The entries are not the problem individually —
  * the median one is 61px, which is already tight — there are simply a lot of them.
  *
- * Entries per slot across all 27 specs run min 1, median 4, max 8, and 288 of the 398 slot groups
+ * Entries per slot across all 27 specs run min 1, median 4, max 8, and 281 of the 402 slot groups
  * hold exactly 4. That is what makes the obvious cap ineffective: capping at 3 hides only 22.9% of
  * all entries and lands at ~7.4 screens, which is not a fix. Measured alternatives were 3 → ~7.4
  * screens, 2 → ~6.1, 1 → ~4.8.

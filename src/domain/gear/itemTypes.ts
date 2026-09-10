@@ -151,7 +151,7 @@ export type GearItem = {
    *
    * **It says nothing about the stats**, and reading it as if it did is a mistake this repo has
    * already made. `itemCatalogue.ts` carries this field over from the curated entry through
-   * `PROVENANCE_FIELDS`, while everything mechanical comes from the ingest, so 141 of the 142 items
+   * `PROVENANCE_FIELDS`, while everything mechanical comes from the ingest, so all 142 items
    * carrying this flag have stats that are fully sourced. Use `statsEstimated` for that question.
    */
   needsVerification?: boolean
