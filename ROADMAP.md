@@ -61,7 +61,7 @@ could not be found in Wowhead's TBC database at all by two independent searches.
 
 ~~**The larger Phase 2 gap is not verification, it is BiS depth.**~~ **Closed.** This read "463 ranked
 entries exist across all 27 specs and only 2 sit at rank 2 or lower", which was the state before the
-rankings were ingested from Wowhead's guides. There are now **1,428 entries**, min 1 / **median 4** /
+rankings were ingested from Wowhead's guides. There are now **1,427 entries**, min 1 / **median 4** /
 max 8 per slot, so the panel shows a real ranking rather than one guess labelled "1 ranked" — and
 Ranked Gear collapses to the top 2 per slot by default precisely because depth stopped being the
 problem and length became one.
@@ -366,7 +366,7 @@ project's history.
 
 Every dataset is now ingested from a pinned source and regenerable:
 
-- **Items** — 4,554, of which 99.5% carry a real WoW item ID, from `wowsims/tbc` at commit
+- **Items** — 4,531, of which 100% carry a real WoW item ID, from `wowsims/tbc` at commit
   `3301fca5`, merged with a curated layer that contributes *provenance only* (drop location, roles,
   crafting). Mechanical data is never authored by hand.
 - **BiS rankings, gem and enchant picks, tier lists** — parsed from Wowhead's own guide markup, not
