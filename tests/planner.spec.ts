@@ -58,6 +58,8 @@ import { exclusiveGroupFor, exclusiveGroups } from '../src/domain/buffs/buffExcl
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
 import { sampleSignatureAbilities } from '../src/domain/abilities/sampleSignatureAbilities'
+import iconMap from '../src/domain/icons/icons.json' with { type: 'json' }
+import { sampleItems } from '../src/domain/gear/sampleItems'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
 import { calculateStatWeights } from '../src/features/simulator/calculateStatWeights'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
@@ -9573,15 +9575,51 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
     },
   ]
 
+  /*
+   * **Source comments carry numbers too, and they rot the same way.** Four were stale on 2026-09-10,
+   * three of them written days earlier by the work that changed the data underneath them: the
+   * catalogue's flagged-entry counts moved when 23 invented items were deleted and one was sourced,
+   * and the icon mapping moved when crafting artwork was fetched.
+   *
+   * Only the ones describing *data* are guarded. `BisPanel`'s "281 of 402 slot groups hold exactly
+   * four" was stale too and is corrected, but it justifies a UI default rather than stating a fact
+   * the app relies on, so pinning it would fail the suite for a change that misleads nobody.
+   */
+  const flaggedMerged = allItems.filter((item) => item.needsVerification).length
+  const iconEntries = Object.keys(iconMap.icons).length
+  const distinctIcons = new Set(Object.values(iconMap.icons)).size
+
+  const sourceClaims: typeof claims = [
+    {
+      where: 'sampleItems.ts: flagged curated entries',
+      pattern: /All ([\d,]+) flagged entries match an ingested row/,
+      actual: sampleItems.filter((item) => item.needsVerification).length,
+    },
+    {
+      where: 'itemTypes.ts: flagged items with sourced stats',
+      pattern: /so all ([\d,]+) items\s+\* carrying this flag have stats that are fully sourced/,
+      actual: flaggedMerged,
+    },
+    { where: 'icons.ts: mapping entries', pattern: /([\d,]+) entries map to [\d,]+ distinct icons/, actual: iconEntries },
+    { where: 'icons.ts: distinct icons', pattern: /[\d,]+ entries map to ([\d,]+) distinct icons/, actual: distinctIcons },
+  ]
+
   const readme = read('README.md')
   const roadmap = read('ROADMAP.md')
   const limitations = read('knownlimitations')
+  const sourceComments =
+    read('src/domain/gear/sampleItems.ts') +
+    ' ' +
+    read('src/domain/gear/itemTypes.ts') +
+    ' ' +
+    read('src/domain/icons/icons.ts')
 
   const wrong: string[] = []
   for (const [text, rows] of [
     [readme, claims],
     [roadmap, roadmapClaims],
     [limitations, limitationClaims],
+    [sourceComments, sourceClaims],
   ] as const) {
     for (const claim of rows) {
       const found = claim.pattern.exec(text)
