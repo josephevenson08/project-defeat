@@ -156,6 +156,7 @@ import {
   planRows,
   trainingOutsideRanges,
 } from '../src/domain/professions'
+import ts from 'typescript'
 import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
 import materialIcons from '../src/domain/professions/materialIcons.json' with { type: 'json' }
 import rawCatalogueJson from '../src/domain/gear/itemCatalogue.json' with { type: 'json' }
@@ -9287,6 +9288,58 @@ test('exactly one TBC profession puts a stat on your character sheet, and it is 
       if (perk.phase !== undefined) expect(perk.phase).toBeLessThanOrEqual(5)
     }
   }
+})
+
+test('no JSX element sets the same prop twice', () => {
+  /*
+   * **This exists because a duplicate `style` prop silently deleted half a layout.**
+   *
+   * `GearPanel` set `style={{ gridArea }}` to place each slot on the body, and eleven lines later set
+   * `style={{ '--slot-quality' }}` on the same button. JSX keeps the last one and drops the first
+   * without a word: the grid placement vanished, every slot auto-placed into the wrong position, and
+   * the paperdoll rendered as three ragged columns.
+   *
+   * **Nothing caught it.** `tsc --noEmit` passed — duplicate JSX attributes are legal TypeScript.
+   * ESLint passed too, because the rule that would catch it (`react/jsx-no-duplicate-props`) lives in
+   * `eslint-plugin-react`, which this project does not install. It was found by looking at a
+   * screenshot, which is not a method.
+   *
+   * So the check is here instead, built on the TypeScript compiler API rather than a regex. Matching
+   * JSX attributes with a regex means matching balanced braces inside attribute values, which does
+   * not work; the parser already knows where every attribute starts and ends. No new dependency —
+   * `typescript` is already required to build.
+   */
+  const files = readdirSync(resolve(process.cwd(), 'src'), { recursive: true, encoding: 'utf8' })
+    .filter((file) => file.endsWith('.tsx'))
+    .map((file) => resolve(process.cwd(), 'src', file))
+
+  expect(files.length, 'there are components to check').toBeGreaterThan(20)
+
+  const duplicates: string[] = []
+  for (const file of files) {
+    const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+
+    const visit = (node: import('typescript').Node): void => {
+      if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+        const seen = new Set<string>()
+        for (const attribute of node.attributes.properties) {
+          // A spread carries no single name and can legitimately repeat; only named props are checked.
+          if (!ts.isJsxAttribute(attribute)) continue
+          const name = attribute.name.getText(source)
+          if (seen.has(name)) {
+            const { line } = source.getLineAndCharacterOfPosition(attribute.getStart(source))
+            duplicates.push(`${file.split(/[\\/]/).slice(-2).join('/')}:${line + 1} sets ${name} twice`)
+          }
+          seen.add(name)
+        }
+      }
+      ts.forEachChild(node, visit)
+    }
+
+    visit(source)
+  }
+
+  expect(duplicates, 'a repeated prop is silently dropped, so it must not be written').toEqual([])
 })
 
 test('every zone a route draws has map art, or is recorded as having none', () => {

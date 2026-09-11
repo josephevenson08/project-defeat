@@ -27,11 +27,70 @@ type GearPanelProps = {
  * Every slot the app knows appears here exactly once; `getVisibleGearSlotsForSpec` then filters it
  * per spec, so a Rogue's Relic and a Druid's Ranged simply do not render.
  */
-const PAPERDOLL: Record<'left' | 'right' | 'weapons', readonly GearSlot[]> = {
-  left: ['Head', 'Neck', 'Shoulders', 'Back', 'Chest', 'Wrists'],
-  right: ['Hands', 'Waist', 'Legs', 'Feet', 'Finger 1', 'Finger 2', 'Trinket 1', 'Trinket 2'],
-  weapons: ['Main Hand', 'Off Hand', 'Ranged', 'Relic'],
+/**
+ * Where each slot sits on the body.
+ *
+ * **This replaced two flat columns, and the arrangement is the label.** The old layout listed Head
+ * through Wrists down the left and Hands through Trinket 2 down the right, which is how WoWSims does
+ * it — but it means finding your boots is reading fourteen slot names, because nothing about a
+ * slot's position tells you what it is. The game's own character sheet does not work that way, and
+ * neither does anyone's mental model of armour.
+ *
+ * So: head at the top centre, feet at the bottom centre, and the body slots down either side in
+ * roughly the order you would meet them going down a person. You find the boots by looking where
+ * boots go.
+ *
+ * The names are CSS grid areas, which is what makes the layout declarative rather than a stack of
+ * columns that have to be kept balanced by hand. A slot a spec cannot use is simply not rendered and
+ * its area stays empty — no reflow, no re-balancing, and the rest of the body stays where it was.
+ */
+const SLOT_AREA: Partial<Record<GearSlot, string>> = {
+  Head: 'head',
+  Shoulders: 'shoulders',
+  Chest: 'chest',
+  Wrists: 'wrists',
+  Waist: 'waist',
+  Legs: 'legs',
+  Neck: 'neck',
+  Back: 'back',
+  Hands: 'hands',
+  'Finger 1': 'f1',
+  'Finger 2': 'f2',
+  Feet: 'feet',
+  'Trinket 1': 't1',
+  'Trinket 2': 't2',
+  Relic: 'relic',
+  'Main Hand': 'mh',
+  'Off Hand': 'oh',
+  Ranged: 'rg',
 }
+
+/**
+ * Which side of the body a slot sits on.
+ *
+ * Only used for presentation: the right-hand slots are mirrored so their glyphs sit on the outside
+ * edge pointing in at the figure, and the equipped item's quality hairline moves to whichever edge
+ * is outermost. That was keyed off two wrapper elements before the paperdoll became a single grid,
+ * and the mirroring is worth keeping — it is what makes the two sides read as flanking something
+ * rather than as two lists.
+ *
+ * A visual reversal only. DOM order is unchanged, so tab order and screen-reader order still run
+ * top to bottom down the body.
+ */
+const SLOT_SIDE: Partial<Record<GearSlot, 'left' | 'right'>> = {
+  Shoulders: 'left',
+  Chest: 'left',
+  Wrists: 'left',
+  Waist: 'left',
+  Legs: 'left',
+  Neck: 'right',
+  Back: 'right',
+  Hands: 'right',
+  'Finger 1': 'right',
+  'Finger 2': 'right',
+}
+
+const PAPERDOLL_SLOTS: readonly GearSlot[] = Object.keys(SLOT_AREA) as GearSlot[]
 
 /**
  * The equipped-gear list, laid out like the WoWSims gear panel the user pointed at: two columns of
@@ -69,14 +128,26 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
         type="button"
         className="gear-cell"
         key={slot}
+        data-side={SLOT_SIDE[slot]}
         aria-label={`${displayName} slot`}
         onClick={() => setOpenSlot(slot)}
         /*
-         * The equipped item's quality, as a hairline down the edge of its slot. Quality is already the
-         * one colour this interface lets carry meaning, and repeating it on the frame means the
-         * paperdoll reads at a glance — which slots hold epics is answerable without reading a name.
+         * Two things in one style object, and they have to be one: JSX takes the *last* `style` prop
+         * and silently drops any earlier one. This was two props for one render cycle and the grid
+         * placement vanished without a type error or a lint warning — `react/jsx-no-duplicate-props`
+         * is switched on now so the next one fails the build instead of the layout.
+         *
+         * `gridArea` puts the slot where that body part is. `--slot-quality` is the equipped item's
+         * quality as a hairline down the slot's outer edge: quality is already the one colour this
+         * interface lets carry meaning, and repeating it on the frame means which slots hold epics is
+         * answerable without reading a name.
          */
-        style={{ '--slot-quality': getQualityColor(equipped.item.quality) } as React.CSSProperties}
+        style={
+          {
+            gridArea: SLOT_AREA[slot],
+            '--slot-quality': getQualityColor(equipped.item.quality),
+          } as React.CSSProperties
+        }
       >
         <span className="gear-glyph" aria-hidden="true">
           <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
@@ -119,9 +190,20 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
       </header>
 
       <div className="gear-paperdoll">
-        <div className="gear-column gear-column-left">{PAPERDOLL.left.filter(visible).map(renderSlot)}</div>
-        <div className="gear-column gear-column-right">{PAPERDOLL.right.filter(visible).map(renderSlot)}</div>
-        <div className="gear-weapons">{PAPERDOLL.weapons.filter(visible).map(renderSlot)}</div>
+        {/*
+          The figure the slots are arranged around. Decorative and marked as such: it carries no
+          information the slots do not, and a screen reader announcing "armoured silhouette" between
+          Shoulders and Neck would be noise. It is what makes the arrangement read as a body rather
+          than as three columns that happen to be uneven.
+        */}
+        <svg className="gear-figure" viewBox="0 0 100 210" aria-hidden="true" focusable="false">
+          <g className="gear-figure-ink">
+            <circle cx="50" cy="20" r="13" />
+            <path d="M50 34 C34 34 26 42 24 56 L20 92 L31 95 L34 70 L34 118 L66 118 L66 70 L69 95 L80 92 L76 56 C74 42 66 34 50 34 Z" />
+            <path d="M36 122 L34 168 L30 200 L44 200 L47 168 L50 140 L53 168 L56 200 L70 200 L66 168 L64 122 Z" />
+          </g>
+        </svg>
+        {PAPERDOLL_SLOTS.filter(visible).map(renderSlot)}
       </div>
 
       <SetBonuses activeSets={activeSets} />

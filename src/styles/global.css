@@ -1168,70 +1168,97 @@ select {
  * an item name in. The order still reads left column, then right, then weapons, which is the same
  * order the DOM is in — so the mobile layout is the source order and needs no reshuffling.
  */
+/*
+ * The paperdoll is a body, not two columns.
+ *
+ * Head at the top centre, feet at the bottom centre, body slots down either side in the order you
+ * meet them going down a person, and the figure itself behind the middle. **Position is the label**:
+ * you find the boots by looking where boots go, rather than reading fourteen slot names.
+ *
+ * Grid areas rather than nested columns, so a slot a spec cannot use simply leaves its area empty and
+ * nothing else moves. A Mage losing Relic used to shorten a column and shift everything under it.
+ */
 .gear-paperdoll {
   display: grid;
   gap: 8px;
+  grid-template-columns: 1fr minmax(150px, 0.7fr) 1fr;
   grid-template-areas:
-    'left right'
-    'weapons weapons';
-  grid-template-columns: 1fr 1fr;
-}
-
-.gear-column-left {
-  grid-area: left;
-}
-
-.gear-column-right {
-  grid-area: right;
-}
-
-.gear-weapons {
-  grid-area: weapons;
-}
-
-.gear-column,
-.gear-weapons {
-  display: grid;
-  gap: 8px;
-}
-
-/* Weapons sit in a row of their own, as they do on the character sheet. */
-.gear-weapons {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin-top: 4px;
+    '.         head   .'
+    'shoulders fig    neck'
+    'chest     fig    back'
+    'wrists    fig    hands'
+    'waist     fig    f1'
+    'legs      fig    f2'
+    '.         feet   .'
+    't1        t2     relic'
+    'mh        oh     rg';
+  position: relative;
 }
 
 /*
- * The right column is mirrored so its glyphs sit on the outside edge, pointing in at the character —
- * again matching the game. It is a visual reversal only: the DOM order is unchanged, so tab order
- * and screen-reader order still run top to bottom.
+ * Under 900px the body collapses to a single column in anatomical order, because three columns of
+ * slot rows on a phone are three slivers — and the figure goes with it, since a silhouette behind
+ * one narrow column is just a smudge under the text.
  */
-.gear-column-right .gear-cell {
+@media (max-width: 900px) {
+  .gear-paperdoll {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'head' 'neck' 'shoulders' 'back' 'chest' 'wrists' 'hands'
+      'waist' 'legs' 'feet' 'f1' 'f2' 't1' 't2' 'relic' 'mh' 'oh' 'rg';
+  }
+
+  .gear-figure {
+    display: none;
+  }
+}
+
+/*
+ * The figure sits in the centre column, spanning the body rows.
+ *
+ * Faint on purpose. It is there to make the arrangement legible as a body at a glance; the moment it
+ * competes with an item name for attention it has stopped helping and started decorating.
+ */
+.gear-figure {
+  grid-area: fig;
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+  pointer-events: none;
+}
+
+.gear-figure-ink {
+  fill: var(--metal-1);
+  stroke: var(--metal-edge);
+  stroke-width: 1.2;
+  opacity: 0.4;
+}
+
+/*
+ * The right-hand slots are mirrored so their glyphs sit on the outside edge, pointing in at the
+ * figure — which is what makes the two sides read as flanking a body rather than as two lists.
+ *
+ * A visual reversal only. DOM order is unchanged, so tab order and screen-reader order still run top
+ * to bottom down the body.
+ */
+.gear-cell[data-side='right'] {
   flex-direction: row-reverse;
   text-align: right;
 }
 
 /* `.gear-cell-text` is a grid, so end-alignment is justify-items rather than align-items. */
-.gear-column-right .gear-cell-text {
+.gear-cell[data-side='right'] .gear-cell-text {
   justify-items: end;
 }
 
-@media (max-width: 760px) {
-  .gear-paperdoll {
-    grid-template-areas:
-      'left'
-      'right'
-      'weapons';
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Mirroring only makes sense with two columns flanking something. */
-  .gear-column-right .gear-cell {
+/* Mirroring only makes sense with two sides flanking something, and below 900px there is one column. */
+@media (max-width: 900px) {
+  .gear-cell[data-side='right'] {
     flex-direction: row;
     text-align: left;
   }
 
-  .gear-column-right .gear-cell-text {
+  .gear-cell[data-side='right'] .gear-cell-text {
     justify-items: start;
   }
 }
@@ -1259,18 +1286,18 @@ select {
 }
 
 /* The equipped item's quality as a hairline on the slot's outer edge — see GearPanel for why. */
-.gear-column-left .gear-cell,
-.gear-weapons .gear-cell {
+.gear-cell {
   border-left: 2px solid var(--slot-quality, var(--line));
 }
 
-/* Mirrored, so the right column's rule sits on its outer edge too. */
-.gear-column-right .gear-cell {
+/* Mirrored, so a right-hand slot's rule sits on its outer edge too. */
+.gear-cell[data-side='right'] {
+  border-left: 1px solid var(--line);
   border-right: 2px solid var(--slot-quality, var(--line));
 }
 
-@media (max-width: 760px) {
-  .gear-column-right .gear-cell {
+@media (max-width: 900px) {
+  .gear-cell[data-side='right'] {
     border-left: 2px solid var(--slot-quality, var(--line));
     border-right: 1px solid var(--line);
   }
