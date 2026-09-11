@@ -5406,12 +5406,30 @@ h4,
  * page behind it without competing with the per-section accent on the top edge, which is doing real
  * work: it is how you tell the five apart at a glance.
  */
-.section-card {
+/*
+ * The three entry grids share one treatment, because they are the same object.
+ *
+ * The landing page's five sections, the raid picker's five raids and the professions grid's thirteen
+ * are all *front doors* — a card you click to go somewhere, as opposed to a row in a list. Framing
+ * exactly those and nothing else is what keeps the bevel meaningful: if every card in the app had
+ * one, it would say nothing about which things are doors.
+ *
+ * Each keeps its own top-edge accent, which is doing real work underneath the frame — it is how you
+ * tell five sections, five raids or thirteen professions apart at a glance.
+ */
+.section-card,
+.raid-picker-card,
+.profession-card {
   position: relative;
+}
+
+.section-card {
   padding: 18px 20px;
 }
 
-.section-card::before {
+.section-card::before,
+.raid-picker-card::before,
+.profession-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -5428,7 +5446,9 @@ h4,
     1;
 }
 
-.section-card::after {
+.section-card::after,
+.raid-picker-card::after,
+.profession-card::after {
   content: '';
   position: absolute;
   inset: 0;
