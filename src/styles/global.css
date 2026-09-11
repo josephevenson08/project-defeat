@@ -5339,53 +5339,123 @@ input[type='text']:focus {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Typography, applied after the component rules so it wins without !important.
+ * Typography.
  *
- * The display face goes on headings and on the two navs, because those are the app's structural
- * voice. It deliberately does *not* go on body copy or on any number: Cinzel has no tabular figures
- * and a column of stats set in it would not line up, which is the whole reason the UI face is a
- * condensed grotesk in the first place.
+ * Applied after every component rule so it wins on specificity rather than by `!important`.
+ *
+ * **The display face goes on structure, never on data.** Cinzel has no tabular figures, so a column
+ * of stat values set in it would not line up — which is the whole reason the UI face is a condensed
+ * grotesk. Headings, the two navs and the section cards are structure; everything numeric is not.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-.rail-brand h1,
-.panel h3,
-.panel h4 {
-  font-family: var(--font-display);
-  letter-spacing: 0.035em;
-}
-
-.rail-brand h1 {
-  color: var(--metal-edge);
-  font-weight: 700;
-}
-
-/* The tab strip is the most game-like surface in the app, so it carries the face at label size. */
+h1,
+h2,
+h3,
+h4,
+.section-card-label,
 .tab-nav button,
 .profession-zone-tab,
-.section-picker-card h3 {
+.planner-view-tab {
   font-family: var(--font-display);
   letter-spacing: 0.04em;
 }
 
 /*
- * The active tab is one of the two places white is spent.
+ * The one heading that is not a heading.
  *
- * Everything else in the nav sits at --text-dim, so the one you are on is the brightest thing in
- * the strip — which is what an active state is for, and what the faction's metal underlines.
+ * `.bis-slot-heading h3` is marked up as a heading because it genuinely labels a group, but it is
+ * styled as a small tracked mono label so the item names underneath carry the weight instead. That
+ * was a deliberate call before this retheme and it is still right, so it opts back out.
+ */
+.bis-slot-heading h3 {
+  font-family: var(--font-mono);
+  letter-spacing: var(--label-tracking);
+}
+
+/*
+ * The wordmark and the landing page.
+ *
+ * These are the first thing anyone sees, so they carry the face at its largest and take the
+ * faction's metal — which is also the only place in the app the metal is used as type colour rather
+ * than as an edge.
+ */
+.rail-brand h1,
+.section-picker-head h1 {
+  color: var(--metal-edge);
+  font-weight: 700;
+}
+
+/*
+ * The active tab is one of exactly two places white is spent.
+ *
+ * Every other label in the strip sits at --text-dim, so the one you are on is the brightest thing
+ * in it. The other place is the training callout. Spending white anywhere else would flatten it
+ * against the item-quality colours, which are the hierarchy that actually matters here.
  */
 .tab-nav button[aria-current='page'],
-.tab-nav button.is-active {
+.tab-nav button.is-active,
+.planner-view-tab[aria-current='page'] {
   color: var(--text-strong);
 }
 
 /*
- * Section rules take the faction accent.
+ * Section cards get the frame too, at a smaller scale than a panel.
  *
- * This is where royal blue lands on the Alliance side and blood on the Horde side: a hairline under
- * a heading, repeated on every card, so the faction is present on every screen without ever being
- * the loudest thing on it.
+ * The landing page is the app's front door and was the one surface with no chrome on it at all —
+ * five flat rectangles on a black field. A 3px bevel and the same corner brackets tie it to every
+ * page behind it without competing with the per-section accent on the top edge, which is doing real
+ * work: it is how you tell the five apart at a glance.
  */
-.profession-range-header,
-.panel-head {
-  border-bottom: 1px solid var(--line);
+.section-card {
+  position: relative;
+  padding: 18px 20px;
+}
+
+.section-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 3px solid transparent;
+  border-image: linear-gradient(
+      135deg,
+      var(--metal-1),
+      var(--metal-0) 30%,
+      var(--metal-2) 50%,
+      var(--metal-0) 70%,
+      var(--metal-1)
+    )
+    1;
+}
+
+.section-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
+  opacity: 0.75;
+  background:
+    var(--bracket) left 1px top 1px / 10px 2px no-repeat,
+    var(--bracket) left 1px top 1px / 2px 10px no-repeat,
+    var(--bracket) right 1px top 1px / 10px 2px no-repeat,
+    var(--bracket) right 1px top 1px / 2px 10px no-repeat,
+    var(--bracket) left 1px bottom 1px / 10px 2px no-repeat,
+    var(--bracket) left 1px bottom 1px / 2px 10px no-repeat,
+    var(--bracket) right 1px bottom 1px / 10px 2px no-repeat,
+    var(--bracket) right 1px bottom 1px / 2px 10px no-repeat;
+}
+
+/*
+ * The popup is a tooltip, and tooltips in this game are black with a lit edge.
+ *
+ * It is the surface where looking like the game matters most, because it is the one the game itself
+ * renders constantly and everyone recognises instantly.
+ */
+.popup,
+.item-popup {
+  border-color: var(--metal-1);
+  box-shadow:
+    inset 0 0 0 1px var(--surface-0),
+    0 4px 18px rgba(0, 0, 0, 0.8);
 }

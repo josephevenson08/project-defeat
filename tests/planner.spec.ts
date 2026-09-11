@@ -2946,16 +2946,50 @@ test('no spec is marked on the tier lists until a character has been chosen', as
 test('tier letters stay out of the item quality palette', async ({ page }) => {
   await openApp(page, 'tierlists')
 
-  // Wowhead draws S in q5 orange, A in q4 purple and B in q3 blue. This app spends quality colour on
-  // exactly one thing — "this item is epic" — and borrowing it to mean "this spec is strong" would
-  // make the loudest colour on the page ambiguous. Rank reads through ink weight instead, so every
-  // tier letter must be a neutral grey: r, g and b equal.
+  /*
+   * Wowhead draws S in q5 orange, A in q4 purple and B in q3 blue. This app spends quality colour on
+   * exactly one thing — "this item is epic" — and borrowing it to mean "this spec is strong" would
+   * make the loudest colour on the page ambiguous. Rank reads through ink weight instead, so every
+   * tier letter has to stay neutral.
+   *
+   * **This asserted `r === g && g === b` until the 2026-09-11 retheme, and that check was the old
+   * palette's definition of neutral rather than the requirement.** Every neutral in the app now
+   * carries a deliberate hue bias — cool for Alliance, warm for Horde — which is what makes brass
+   * read as metal against them rather than as yellow. `--text` is rgb(205, 210, 214): nine points of
+   * spread, unmistakably grey, and it failed an exact-equality check.
+   *
+   * So the check measures saturation, which is what "neutral" actually meant. The bound is 0.20 and
+   * the gap it has to police is not close: the four quality colours measure 0.79 to 1.00, and the
+   * app's most saturated neutral is Horde's --text-dim at 0.14. A tier letter painted any quality
+   * colour still fails this, which is the only thing the test was ever for.
+   */
   const letters = page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-letter')
   await expect(letters).toHaveCount(5)
 
+  const NEUTRAL_MAX = 0.2
   for (const color of await letters.evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n).color))) {
     const [r, g, b] = color.match(/\d+/g)!.slice(0, 3).map(Number)
-    expect(r === g && g === b, `tier letter drawn in ${color}, which carries a hue`).toBe(true)
+    const saturation = Math.max(r, g, b) === 0 ? 0 : (Math.max(r, g, b) - Math.min(r, g, b)) / Math.max(r, g, b)
+    expect(
+      saturation,
+      `tier letter drawn in ${color}, saturation ${saturation.toFixed(2)} — that reads as a hue, not a neutral`,
+    ).toBeLessThan(NEUTRAL_MAX)
+  }
+
+  /*
+   * And the bound is checked against the thing it is protecting, rather than trusted. If a quality
+   * colour ever drifted under 0.20 the assertion above would stop meaning anything, and it would do
+   * so silently.
+   */
+  for (const [name, hex] of [
+    ['uncommon', '#1eff00'],
+    ['rare', '#0070dd'],
+    ['epic', '#a335ee'],
+    ['legendary', '#ff8000'],
+  ] as const) {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+    const saturation = (Math.max(r, g, b) - Math.min(r, g, b)) / Math.max(r, g, b)
+    expect(saturation, `${name} must stay well clear of the neutral bound`).toBeGreaterThan(NEUTRAL_MAX)
   }
 
   // And the ramp has to actually distinguish all five tiers. Five tiers against four text tokens is
