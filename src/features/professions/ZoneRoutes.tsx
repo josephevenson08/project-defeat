@@ -1,24 +1,24 @@
 import { useState } from 'react'
-import { routesForMaterials } from '../../domain/professions'
+import { routesForRange, recommendedWithoutMaps } from '../../domain/professions'
+import type { GatheringRange, Profession } from '../../domain/professions'
 import { FarmingRouteMap } from './FarmingRouteMap'
 
 /**
- * Zone tabs over one map, for any set of materials farmed together.
+ * Zone tabs over one map, for a whole skill range.
  *
- * **Zones are tabs rather than stacked maps.** A 1-100 range spans six starting zones and a mid-range
- * one spans four; drawing them all would put six near-identical squares in a column and make the page
- * scroll past the thing it is for. One at a time, busiest first, is the same information at a
- * fraction of the height — and it matches how the choice is actually made, which is "I am Horde, show
- * me Durotar".
+ * **Zones are tabs rather than stacked maps.** A range spans three to eight zones; drawing them all
+ * would put eight near-identical rectangles in a column and make the page scroll past the thing it
+ * is for. One at a time is the same information at a fraction of the height, and it matches how the
+ * choice is actually made, which is "I am Horde, show me Durotar".
  *
- * Extracted so a supplementary herb gets the same treatment as a range. The alternative was folding
- * those herbs into the range's own material list, which was measured and rejected: it took the
- * 150-210 range from six zone tabs to eleven, and it would have put Firebloom's Searing Gorge on a
- * map captioned as the route for Liferoot, Fadeleaf and Goldthorn — zones that share a skill window
- * are not zones that share a lap.
+ * **The tab order is the range's recommendation, not the spawn counts.** `routesForRange` carries
+ * that; the reason is worth repeating here because the nav is where it would be tempting to "fix" it
+ * back to sorting by size. Silver's busiest zones are level 30-40 and a player mining Silver is
+ * around level 20.
  */
-export function ZoneRoutes({ materials, label }: { materials: readonly string[]; label: string }) {
-  const routes = routesForMaterials(materials)
+export function ZoneRoutes({ profession, range }: { profession: Profession; range: GatheringRange }) {
+  const routes = routesForRange(profession, range)
+  const unmapped = recommendedWithoutMaps(profession, range)
   const [zone, setZone] = useState(0)
 
   if (routes.length === 0) {
@@ -35,11 +35,15 @@ export function ZoneRoutes({ materials, label }: { materials: readonly string[];
   }
 
   const active = routes[Math.min(zone, routes.length - 1)]
+  const note = range.zoneNotes?.find((entry) => entry.zone === active.zone)
 
   return (
     <>
       {routes.length > 1 && (
-        <nav className="profession-zone-tabs" aria-label={`Zones for ${label}`}>
+        <nav
+          className="profession-zone-tabs"
+          aria-label={`Zones for skill ${range.skillRange[0]} to ${range.skillRange[1]}`}
+        >
           {routes.map((route, index) => (
             <button
               key={route.zone}
@@ -53,7 +57,31 @@ export function ZoneRoutes({ materials, label }: { materials: readonly string[];
           ))}
         </nav>
       )}
+
       <FarmingRouteMap route={active} />
+
+      {/*
+        The zone's own aside, under the map it belongs to rather than in the range's prose. "Arathi
+        Highlands carries Iron, Gold and Silver together" is a claim about this node cloud and has a
+        different lifetime from the range's guidance, so it moves with the tab.
+      */}
+      {note && (
+        <p className="profession-zone-note" data-testid="zone-note">
+          {note.note}
+        </p>
+      )}
+
+      {/*
+        **Recommended zones with no map, named rather than quietly dropped.** The ingest keeps each
+        node's three busiest zones, which is the right trade for a 1 MB bundle and the wrong thing to
+        stay silent about: Thousand Needles is standard advice for 125-175 mining and is not in
+        Iron's top three, so tabs alone would look like this guide had never heard of it.
+      */}
+      {unmapped.length > 0 && (
+        <p className="profession-range-unmapped" data-testid="unmapped-zones">
+          Also recommended, no spawn coordinates in our ingest: {unmapped.join(', ')}.
+        </p>
+      )}
     </>
   )
 }

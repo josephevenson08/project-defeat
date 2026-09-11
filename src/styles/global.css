@@ -2493,13 +2493,6 @@ select:focus,
   margin: 0;
 }
 
-.profession-range-zones {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.45;
-  margin: 0;
-}
-
 .profession-range-note {
   color: var(--text-dim);
   font-size: 12px;
@@ -2514,30 +2507,132 @@ select:focus,
 }
 
 /*
- * Herbs a range unlocks that its own row does not name.
+ * The opening paragraphs, above the table.
  *
- * Set apart from the row's own materials rather than merged into them: these are a supplementary
- * pickup in a different zone, not part of the loop the map below draws, and folding them into
- * "Gather these" would put them on a route they are not on.
+ * Wider leading and a slightly larger size than the range prose, because this is the part read
+ * start-to-finish once. The range guidance is read in fragments by somebody hunting for their own
+ * skill number, and it is set to match the rest of the block instead.
  */
-.profession-range-also {
-  border-top: 1px solid var(--line);
-  display: grid;
-  gap: 3px;
-  margin-top: 2px;
-  padding-top: 8px;
+.profession-intro {
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0 0 2px;
+  max-width: 74ch;
 }
 
-.profession-range-also > span {
+.profession-range-guidance {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 74ch;
+}
+
+/*
+ * Zones the range recommends that have no map, and the sources the prose was checked against.
+ *
+ * Both are admissions, and they are styled as the quietest thing in the block on purpose — present
+ * for anyone who wants to check, never competing with the guidance for attention.
+ */
+.profession-range-unmapped,
+.profession-range-sources {
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.profession-range-sources {
+  border-top: 1px solid var(--line);
+  padding-top: 7px;
+}
+
+/* The active tab's own aside, tied to the map above it rather than to the range. */
+.profession-zone-note {
+  border-left: 2px solid var(--line-strong);
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 9px;
+}
+
+/*
+ * The summary table.
+ *
+ * A spine you can read in five seconds before committing to anything. The skill column is monospace
+ * and tabular so the ranges line up as a column of numbers to match your own skill against — that
+ * is the only thing anybody scans this table for.
+ */
+.profession-plan {
+  display: grid;
+  gap: 6px;
+}
+
+.profession-plan-table {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12.5px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.profession-plan-table th,
+.profession-plan-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.profession-plan-table tr:last-child th,
+.profession-plan-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.profession-plan-table thead th {
+  background: var(--surface-2);
   color: var(--text-faint);
   font-family: var(--font-mono);
   font-size: 10px;
+  font-weight: 500;
   letter-spacing: var(--label-tracking);
   text-transform: uppercase;
 }
 
-.profession-range-also > span strong {
+.profession-plan-table tbody th {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.profession-plan-table td {
   color: var(--text);
+}
+
+/*
+ * "Then go and train."
+ *
+ * On its own line inside the cell and in the accent colour, because it is the one thing in this
+ * table a player loses an hour to by missing. A column of its own was the alternative and it reads
+ * wrong: the stop happens partway through the range, not before it.
+ */
+.profession-plan-train {
+  color: var(--profession-accent, var(--text-strong));
+  display: block;
+  font-size: 11.5px;
+  margin-top: 3px;
+}
+
+.profession-plan-orphans {
+  color: var(--text-dim);
+  font-size: 12px;
+  margin: 0;
 }
 
 /* A material, with its artwork. Small enough to sit inside a sentence rather than break it. */
@@ -4836,12 +4931,21 @@ input[type='text']:focus {
  * whole design is built on. Density is carried by opacity on a single neutral, and the route by the
  * profession accent the card already uses.
  */
+/*
+ * The map is the hero of a range, not an illustration beside it.
+ *
+ * **It used to be 380px in the left column of a two-column grid, with the caption filling the
+ * right.** That was the correct shape when the map was a bare density square — a diagram, sized like
+ * a diagram. With Blizzard's zone art underneath it is a map, and a map at 380px across a zone the
+ * size of Hellfire Peninsula is one where the route is visible and the terrain it follows is not.
+ * The caption reads perfectly well underneath; the ridgeline you are being told to ride does not
+ * read at all at half width.
+ */
 .farming-route {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 16px;
-  align-items: start;
+  gap: 8px;
+  justify-items: start;
 }
 
 /*
@@ -4854,7 +4958,9 @@ input[type='text']:focus {
  */
 .farming-route-frame {
   position: relative;
-  width: 380px;
+  width: 100%;
+  /* Wide enough for the terrain to read, capped so a big panel does not stretch it to a mural. */
+  max-width: 720px;
   /* Overridden inline from the image's real dimensions; square is the no-art fallback's shape. */
   aspect-ratio: 1;
   border: 1px solid var(--line);

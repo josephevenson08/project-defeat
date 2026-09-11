@@ -1,5 +1,5 @@
 import { Panel } from '../../components/layout/Panel'
-import { craftingPathFor, craftingPathModel, trainingMilestones } from '../../domain/professions'
+import { craftingPathFor, craftingPathModel, guideFor, trainingMilestones } from '../../domain/professions'
 import type { ProfessionProfile } from '../../domain/professions'
 import { GatheringProgression } from './GatheringProgression'
 import { CraftingProgression } from './CraftingProgression'
@@ -19,7 +19,7 @@ import { CraftingProgression } from './CraftingProgression'
  */
 export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile; onBack: () => void }) {
   const milestones = trainingMilestones(profile.profession)
-  const farming = profile.materialFarming ?? []
+  const gathering = guideFor(profile.profession)
   const crafting = craftingPathFor(profile.profession)
   const curated = profile.levelingPath ?? []
 
@@ -52,14 +52,12 @@ export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile
         )}
       </div>
 
-      {farming.length > 0 && (
-        <GatheringProgression profession={profile.profession} spots={farming} milestones={milestones} />
-      )}
+      {gathering && <GatheringProgression profession={profile.profession} />}
       {crafting.length > 0 && (
         <CraftingProgression steps={crafting} curated={curated} milestones={milestones} model={craftingPathModel} />
       )}
 
-      {farming.length === 0 && crafting.length === 0 && curated.length === 0 && (
+      {!gathering && crafting.length === 0 && curated.length === 0 && (
         <p className="panel-copy professions-empty">
           No levelling path recorded for {profile.profession} yet — the guide above covers it in the
           meantime.

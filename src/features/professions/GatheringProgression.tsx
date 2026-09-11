@@ -1,106 +1,117 @@
-import { supplementaryNodes } from '../../domain/professions'
-import type { GatheringNode, MaterialFarmSpot, Profession, TrainingMilestone } from '../../domain/professions'
+import { guideFor, materialsForRange, planRows, trainingOutsideRanges } from '../../domain/professions'
+import type { GatheringRange, Profession, TrainingMilestone } from '../../domain/professions'
+import { GatheringPlanTable } from './GatheringPlanTable'
 import { MaterialChip } from './MaterialChip'
 import { TrainingMarker } from './TrainingMarker'
 import { ZoneRoutes } from './ZoneRoutes'
 
 /**
- * One skill range: what you gather, where, and the loop to ride.
+ * One skill range: what it opens, what to expect, and where to ride it.
  */
-function GatheringRange({ spot, alsoHere }: { spot: MaterialFarmSpot; alsoHere: readonly GatheringNode[] }) {
-  const window = `skill ${spot.skillRange[0]} to ${spot.skillRange[1]}`
+function Range({
+  profession,
+  range,
+  training,
+}: {
+  profession: Profession
+  range: GatheringRange
+  training: readonly TrainingMilestone[]
+}) {
+  const materials = materialsForRange(profession, range)
 
   return (
     <section className="profession-range" data-testid="gathering-range">
       <header className="profession-range-header">
         <h4>
-          {spot.skillRange[0]} - {spot.skillRange[1]}
+          {range.skillRange[0]} - {range.skillRange[1]}
         </h4>
-        <span>Level {spot.recommendedCharacterLevel}</span>
+        <span>Level {range.recommendedCharacterLevel}</span>
       </header>
 
+      {/*
+        Prose first, then the chips, then the map — the order the reference guides use and the order
+        the questions arrive in. "What is this range" comes before "what am I picking" comes before
+        "where exactly". Leading with the chips, which is what the old layout did, answers the second
+        question to somebody who has not asked the first.
+      */}
+      <p className="profession-range-guidance">{range.guidance}</p>
+
+      {/*
+        **The trainer stop goes inside the range that contains it, not before the next one.**
+        Placing it between blocks worked while ranges were one material wide and breaks now they are
+        seventy skill points: Artisan is trainable at 200, which falls mid-way through 175-245, and
+        the between-blocks rule pushed its marker below that entire section — past the map a player
+        would be looking at when their bar stopped. Containment is the same rule the summary table
+        uses, so the two placements cannot disagree.
+      */}
+      <TrainingMarker milestones={training} />
+
       <p className="profession-range-materials">
-        Gather these:{' '}
-        {spot.materials.map((material) => (
+        {materials.map((material) => (
           <MaterialChip key={material} material={material} />
         ))}
       </p>
 
-      {/*
-        The written zone list stays even where maps exist, because the two are not the same claim.
-        The maps show the zones Wowhead publishes coordinates for; this line carries the sourced
-        recommendation, including the ones no node cloud can express — "any level 1-10 starting zone".
-      */}
-      <p className="profession-range-zones">{spot.zones.join(' · ')}</p>
+      <ZoneRoutes profession={profession} range={range} />
 
-      {spot.needsVerification && (
-        <small className="needs-verification">{spot.notes ?? 'Needs source verification.'}</small>
+      {range.needsVerification && (
+        <small className="needs-verification">{range.notes ?? 'Needs source verification.'}</small>
       )}
-      {!spot.needsVerification && spot.notes && <p className="profession-range-note">{spot.notes}</p>}
-
-      <ZoneRoutes materials={spot.materials} label={window} />
+      {!range.needsVerification && range.notes && <p className="profession-range-note">{range.notes}</p>}
 
       {/*
-        Herbs this skill window unlocks that the row itself does not name. Every value is from the
-        ingest — the required skill and the zones both — so nothing is authored to fill a gap. Five
-        ingested herbs had full spawn maps that no surface could reach before this.
-
-        Each gets its own map rather than joining the range's, because a zone that shares a skill
-        window is not a zone that shares a lap: Firebloom's Searing Gorge is nowhere near the Liferoot
-        circuit, and one map captioned for both would claim a route that does not exist. Measured too
-        — merging took the 150-210 range from six zone tabs to eleven.
+        The citation is the check, not a footnote. Every claim in the guidance above was verified
+        against these before it was written, and printing them is what makes that verifiable by
+        somebody who did not do it.
       */}
-      {alsoHere.map((node) => (
-        <div className="profession-range-also" key={node.objectId} data-testid="supplementary-node">
-          <span>
-            Also unlocked here · <strong>{node.material}</strong> at skill {node.requiredSkill}
-          </span>
-          <ZoneRoutes materials={[node.material]} label={node.material} />
-        </div>
-      ))}
+      <p className="profession-range-sources">Checked against {range.sources.join(', ')}</p>
     </section>
   )
 }
 
 /**
- * The whole gathering climb, with the training stops interleaved.
+ * The whole gathering climb: prose, then the table, then the ranges with their maps.
  *
- * A milestone belongs *before* the first range that starts at or after the skill it unlocks: you hit
- * 50, you go and train Journeyman, and only then does the 50-125 range mean anything. Placing them
- * between blocks rather than in a table is the whole point of dropping the tier table.
+ * **The shape is borrowed and the content is not.** wow-professions.com puts the written guidance
+ * first, a skill table under it, and the zone tabs below that, because it answers "should I be here
+ * at all" before "where exactly" — and this app's previous layout, which opened with eleven
+ * overlapping material sections, answered neither. `professionTypes.ts` records the standing rule
+ * that their routes and orderings are linked and never copied; a page layout is not a route.
+ *
+ * Training appears twice on purpose. Once in the table, where it is part of the summary a player
+ * reads before starting, and once as a marker in the progression, at the point where the bar
+ * actually stops. Neither placement works alone: the table is read once and the marker is only found
+ * by somebody already scrolling.
  */
-export function GatheringProgression({
-  profession,
-  spots,
-  milestones,
-}: {
-  profession: Profession
-  spots: readonly MaterialFarmSpot[]
-  milestones: readonly TrainingMilestone[]
-}) {
-  const ordered = [...spots].sort((a, b) => a.skillRange[0] - b.skillRange[0])
-  const pending = [...milestones]
+export function GatheringProgression({ profession }: { profession: Profession }) {
+  const guide = guideFor(profession)
+  if (!guide) return null
 
-  // Every material any row names, so a supplementary node is one no row claims at all.
-  const claimed = new Set(spots.flatMap((spot) => spot.materials))
-  const seenRanges: [number, number][] = []
+  // Same containment rule as the table, computed once, so the two can never place a stop differently.
+  const training = new Map(planRows(profession).map((row) => [row.skillRange[0], row.training]))
+  const stranded = trainingOutsideRanges(profession)
 
   return (
-    <div className="profession-progression">
+    <div className="profession-progression profession-guide">
+      {guide.intro.map((paragraph) => (
+        <p className="profession-intro" key={paragraph.slice(0, 40)}>
+          {paragraph}
+        </p>
+      ))}
+
+      <GatheringPlanTable profession={profession} />
+
       <h3>Where to farm</h3>
-      {ordered.map((spot) => {
-        const due = []
-        while (pending.length > 0 && pending[0].atSkill <= spot.skillRange[0]) due.push(pending.shift()!)
-        const alsoHere = supplementaryNodes(profession, spot.skillRange, claimed, seenRanges)
-        seenRanges.push(spot.skillRange)
-        return (
-          <div key={`${spot.skillRange[0]}-${spot.material}`}>
-            <TrainingMarker milestones={due} />
-            <GatheringRange spot={spot} alsoHere={alsoHere} />
-          </div>
-        )
-      })}
-      <TrainingMarker milestones={pending} />
+      {guide.ranges.map((range) => (
+        <Range
+          key={range.skillRange[0]}
+          profession={profession}
+          range={range}
+          training={training.get(range.skillRange[0]) ?? []}
+        />
+      ))}
+      {/* A tier whose skill falls outside every range would otherwise have nowhere to appear. */}
+      <TrainingMarker milestones={stranded} />
     </div>
   )
 }
