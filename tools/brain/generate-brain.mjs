@@ -541,7 +541,7 @@ const PHASES = [
       'Talent trees for all nine classes: 579 talents across 27 trees, with icons, per-rank descriptions and prerequisite gating',
     ],
     remaining: [
-      'Profession *bonuses to stats* (e.g. extra sockets from Blacksmithing) — distinct from the profession reference data that is done',
+      "Profession stat bonuses in the *simulator* — the payoff data is done and says what each profession is worth at 70, but CharacterProfile carries no professions, so Enchanting's ring enchants (the only always-on stat bonus in TBC) do not reach calculateStats",
       'Race/class-specific assumptions beyond legality checks',
       'Feral bear/cat mode split',
     ],

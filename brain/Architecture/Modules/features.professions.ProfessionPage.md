@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/ProfessionPage.tsx
-lines: 73
+lines: 80
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.ProfessionPage
 
-`src/features/professions/ProfessionPage.tsx` · **features** layer · 73 lines
+`src/features/professions/ProfessionPage.tsx` · **features** layer · 80 lines
 
 From the top of the file:
 
@@ -35,6 +35,7 @@ From the top of the file:
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 - [[features.professions.CraftingProgression]] — `src/features/professions/CraftingProgression.tsx`
 - [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
+- [[features.professions.ProfessionPayoff]] — `src/features/professions/ProfessionPayoff.tsx`
 
 ## Imported by
 

@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-176 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+178 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -24,10 +24,10 @@ The modules everything else leans on — change these carefully.
 - [[domain.abilities.abilityTypes]] — 13 importers
 - [[components.layout.Panel]] — 12 importers
 - [[domain.raids.raidTypes]] — 11 importers
+- [[domain.professions.index]] — 10 importers
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.character.roleTheme]] — 9 importers
 - [[domain.gear.slotCompatibility]] — 9 importers
-- [[domain.professions.index]] — 9 importers
 
 ## By layer
 
@@ -53,7 +53,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (46)
+### features (47)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -79,6 +79,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.professions.GatheringProgression]] · 1 importers
 - [[features.professions.MaterialChip]] · 2 importers
 - [[features.professions.ProfessionPage]] · 1 importers
+- [[features.professions.ProfessionPayoff]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.professions.TrainingMarker]] · 2 importers
 - [[features.professions.ZoneRoutes]] · 1 importers
@@ -104,7 +105,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (117)
+### domain (118)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -175,8 +176,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.gatheringGuides]] · 2 importers
 - [[domain.professions.gatheringPlan]] · 1 importers
 - [[domain.professions.gatheringRangeTypes]] · 3 importers
-- [[domain.professions.index]] · 9 importers
-- [[domain.professions.professionTypes]] · 8 importers
+- [[domain.professions.index]] · 10 importers
+- [[domain.professions.professionPayoffs]] · 1 importers
+- [[domain.professions.professionTypes]] · 9 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 1 importers
 - [[domain.professions.sampleProfessionTiers]] · 4 importers

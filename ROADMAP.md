@@ -182,6 +182,15 @@ each pinned by an assertion these days.
   pipeline as well. The effect count is deliberately not written here: this sentence said "62" while
   the file held 63, and then 67, which is the repo's own rule about counts in prose demonstrating
   itself. `talentEffects.json` carries the figure and a test asserts it matches the list.
+- **Every profession says what it is worth at 70** (2026-09-11). The landing page had promised it
+  since the tab was built and nothing delivered it. The research changed the item's shape: the
+  roadmap wrote this as "profession bonuses to stats (e.g. extra sockets from Blacksmithing)", and
+  Socket Bracer needs Blacksmithing 400 — it is Wrath, as are Herbalism's Lifeblood, Mining's
+  Toughness, Skinning's Master of Anatomy, Leatherworking's Fur Lining and Jewelcrafting's BoP gems.
+  **In TBC exactly one profession puts an always-on stat on your character sheet**, and it is
+  Enchanting's four ring enchants. Everything else is access to gear only you can wear or something
+  only you can make, and five entries are corrections rather than payoffs. Guarded by the count, so a
+  Wrath perk leaking back in stops the suite.
 - **Farming route maps for the two gathering professions with world nodes** — 45 nodes and 14,091
   spawn coordinates ingested from Wowhead, bucketed into a density grid with a nearest-neighbour
   circuit through the busiest clusters, then uncrossed with 2-opt (11.5% shorter across every real

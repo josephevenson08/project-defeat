@@ -23,7 +23,7 @@ Buffs, debuffs, and consumables are wired into the stat pipeline. Talents are no
 
 ## Remaining
 
-- Profession *bonuses to stats* (e.g. extra sockets from Blacksmithing) — distinct from the profession reference data that is done
+- Profession stat bonuses in the *simulator* — the payoff data is done and says what each profession is worth at 70, but CharacterProfile carries no professions, so Enchanting's ring enchants (the only always-on stat bonus in TBC) do not reach calculateStats
 - Race/class-specific assumptions beyond legality checks
 - Feral bear/cat mode split
 
