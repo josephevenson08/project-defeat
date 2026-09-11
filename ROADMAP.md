@@ -84,8 +84,8 @@ Buffs (flat stats + percentage multipliers), target debuffs (armor reduction, cr
 damage taken), and consumables (flasks/elixirs/food with Alchemy/Cooking crafting provenance) are
 implemented and wired into `calculateStats`/`calculateSimulation`, with a Buffs & Consumables panel
 in the UI. A separate Professions domain (`src/domain/professions/`) covers all 13 TBC professions'
-skill tiers/trainer requirements and raw-material farm locations/leveling paths, surfaced in its own
-Professions tab — this is leveling/farming reference data, distinct from the still-unstarted
+skill tiers/trainer requirements, gathering levelling ranges with routes, and crafting levelling
+paths, surfaced in its own Professions tab — this is leveling/farming reference data, distinct from the still-unstarted
 "profession bonuses to stats" item above (e.g. extra sockets from Blacksmithing). Talent trees,
 race/class-specific assumptions beyond legality checks, and the Feral bear/cat mode split remain
 unstarted.
@@ -189,16 +189,27 @@ each pinned by an assertion these days.
   Game Content Usage Rules and credited on each map — which needs no transform, since coordinates are
   percentages of each zone's extent and the art covers that same space. One zone has no art on file
   and falls back to the bare density grid the maps used before.
-  Skinning and Fishing have no node data to draw and keep their written farm spots.
-- **The Professions tab is an entry grid plus one page per profession** (2026-09-02). A skill range
-  is the unit; zones are tabs rather than stacked maps; one map merges every material in the range,
-  because that is how a range is farmed. The skill-tier table is gone and its content is not —
-  training requirements are markers placed in the progression at the skill where the bar stops
-  moving. **Rebuilding the join recovered 28 of 43 ingested nodes that had never reached a screen**:
-  the panel matched a node against a *display label* ("Liferoot / Fadeleaf / Goldthorn"), so most
-  rows silently drew nothing. Farm rows drawing a map went 15 → 25, reachable zone maps 29 → 90.
-  Still open here: crafting 1-300 is nine placeholder rows, and five ingested herbs are named by no
-  farm row at all.
+  Skinning and Fishing have no nodes to draw — Skinning comes off mobs and Fishing off pools — so
+  they carry the same page structure with an explicit material list in place of a map.
+- **The Professions tab is an entry grid plus one page per profession** (2026-09-02). The skill-tier
+  table is gone and its content is not — training requirements are markers placed at the skill where
+  the bar actually stops. **Rebuilding the join recovered 28 of 43 ingested nodes that had never
+  reached a screen**: the panel matched a node against a *display label* ("Liferoot / Fadeleaf /
+  Goldthorn"), so most rows silently drew nothing. Farm rows drawing a map went 15 → 25, reachable
+  zone maps 29 → 90.
+- **The gathering pages are levelling guides rather than material lists** (2026-09-11). Prose, then a
+  table of the whole climb, then the ranges with their maps. A range owns a skill window and every
+  node that window unlocks, **derived from each node's skill requirement rather than written down** —
+  which is what lets Gold sit on the 125-175 range instead of in a section of its own, and what makes
+  the five herbs that no row used to name impossible to strand rather than merely caught. Tab order is
+  the range's recommendation, not the spawn counts, because Silver's busiest zones would send a level
+  20 player to Arathi Highlands. Two live bugs fell out: the by-name route lookup used `find`, so Rich
+  Thorium's and Rich Adamantite's coordinates were unreachable from anywhere in the app, and Cooking,
+  First Aid and Fishing claimed the trainer breakpoints when all three gate Expert on a book, Artisan
+  on a quest at 225, and Master on a second book at 300. `MaterialFarmSpot`, `supplementaryNodes` and
+  `mappableMaterials` are deleted rather than kept alongside — two models of one fact is how the join
+  bug survived.
+  Still open here: crafting 1-300 is nine placeholder rows.
 - **The calibration harness measures a build a raider plays** — wowsims' own raiding presets for 17 of
   the 20 DPS specs, ingested by `ingest-talent-builds.mjs`. It used to fill one tree to 61 points,
   which is neither realistic nor a ceiling. Three specs have no upstream preset and keep the old rule,

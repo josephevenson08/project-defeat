@@ -1,7 +1,82 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-10.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-11.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+---
+
+## Start here (2026-09-11, the gathering pages became guides)
+
+**The professions pages had a section per material and now have one per decision.** Eleven sections
+for Mining, nineteen for Herbalism, and they overlapped — Tin runs 65-125 while Silver runs 75-125,
+so two sections covered nearly the same window and a player standing at 80 had to work out which one
+they were in. Gold had a block of its own, which is the clearest symptom: Gold Veins sit in Iron's
+zones and you pick them up on the Iron lap, so a section to itself described a trip nobody takes.
+
+Nine ranges for Mining, ten for Herbalism, seven for Skinning, six for Fishing. Each owns a skill
+window, the zones worth riding in it, and every node that window unlocks.
+
+### The one structural decision worth keeping
+
+**Which nodes a range covers is derived from `requiredSkill`; only the tab *order* is authored.**
+
+| Question | Decided by | Why |
+|---|---|---|
+| Which nodes are in this range | `requiredSkill`, from the ingest | A range cannot offer an ore you cannot mine yet, and a re-ingest re-files it |
+| Which zones earn a tab | Spawn counts, ≥15% of the busiest | A merged range drags in noise — 7 Nightmare Vine spawns against 189 |
+| What order the tabs go in | **Written down** | Silver's busiest zones are level 30-40; a player mining Silver is level 20 |
+
+That third row is the one that will look like a bug to the next person. Sorting the nav by spawn
+count is the obvious "fix" and it hands a level 20 player Arathi Highlands. There is a guard, and
+its failure message says so.
+
+### Two live bugs fell out of the rewrite
+
+**`routesForMaterials` resolved each name with `find`.** Two ingested nodes share a material name and
+differ only by requirement — Small Thorium Vein at 245 against Rich Thorium at 275, Adamantite at 325
+against Rich Adamantite at 350 — so first-match-wins made the rich variants' coordinates unreachable
+from anywhere in the app. Four of the nine mining ranges draw from them. `routesForNodes` takes the
+skill as half the key. Same lesson as the display-label join that cost 28 maps: **a name is not a
+key.**
+
+**Cooking, First Aid and Fishing claimed the trainer breakpoints.** All three gate Expert on a book,
+Artisan on a quest at skill 225 and character level 35, and Master on a second book at 300 — none of
+it a trainer visit, and none of it the 200/275 the trainer professions use. Cooking had no override
+at all and told players to visit a city trainer for two tiers no trainer teaches; First Aid's own
+wording read "requires level 35 and skill 225" beside a number that said 200. It survived because the
+tier table was five identical-looking rows at the top of a page. The new summary table prints the
+gate as a sentence, which is where a wrong number starts sending somebody to Stormwind for a quest in
+Gadgetzan.
+
+### What was checked, and what did not move
+
+All thirteen ore and thirty-two herb skill requirements from icy-veins.com and warcrafttavern.com
+agree with each other **and** with the `requiredSkill` this repo read off Wowhead during the node
+ingest — 45 of 45, nothing to correct. One web-search summary put Fel Iron at 275; three detailed
+sources and the ingest say 300, so the summary is wrong. Recorded in `gatheringGuides.ts` because "I
+checked and nothing moved" is a result, and the next person should be able to see it was done.
+
+One name *was* wrong and the ingest caught it: **Zangarmarsh Sporefish is not an item.** The school is
+a Sporefish School; the fish is `Zangarian Sporefish`. The icon ingest had been printing "1 missing"
+and nobody was reading the line. Its count is an assertion now.
+
+### Deleted rather than kept alongside
+
+`sampleGatheringMaterials.ts`, `MaterialFarmSpot`, `materialFarming`, `supplementaryNodes`,
+`routesForMaterials` and `mappableMaterials` are all gone. Two models of one fact is how the
+display-label join bug survived as long as it did.
+
+`supplementaryNodes` is the interesting one. It existed to place five herbs — Arthas' Tears,
+Firebloom, Flame Cap, Grave Moss, Purple Lotus — that had full coordinates and no row naming them.
+Deriving a range's contents from `requiredSkill` makes that orphan **impossible to create** rather
+than merely caught, so the patch goes with the problem it patched.
+
+### Still open here
+
+Crafting 1-300 is nine placeholder rows — unchanged by this work, which only touched the gathering
+side. The ingest keeps each node's three busiest zones, so standard advice like Thousand Needles for
+125-175 mining has no map; the page now names those zones under the tabs rather than staying silent,
+which is the honest version of the same limitation rather than a fix for it.
 
 ---
 

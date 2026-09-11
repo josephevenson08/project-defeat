@@ -89,18 +89,29 @@ behind every claim of its that quotes a number.
   model it used. Reagents a vendor is the only source for — thread, dye, vials, flux — are counted as
   bought rather than farmed and priced at their fixed vendor cost, so a step separates its shopping
   list from its farming list
+- **A levelling guide for each of the four gathering professions** — written guidance, then a table
+  of the whole climb with every trainer stop in the row it falls in, then the ranges themselves with
+  a map each. The unit is a skill range rather than a material, which is the change that makes Gold
+  read correctly: Gold Veins sit in Iron's zones and you pick them up on the Iron lap, so Gold is one
+  of the ores the 125-175 range draws rather than a section describing a trip nobody takes. Which
+  nodes a range covers is derived from each node's skill requirement, so no range can offer an ore you
+  cannot mine yet and a re-ingest moves a node to the right section on its own. Every claim in the
+  prose was checked against at least two published guides plus our own ingest, and each range prints
+  what it was checked against
 - **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
   coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
-  merging every material farmed in that range, because that is how a range is farmed — at 1-100 you
+  merging every material farmed in that range, because that is how a range is farmed — at 1-70 you
   are picking Peacebloom, Silverleaf and Earthroot on the same lap. Zones are tabs rather than stacked
-  maps. Every recorded spawn is plotted over the zone's own map art, which registers with no transform
-  because coordinates are percentages of the zone's extent and that is exactly the space the art
-  covers. The circuit is computed here rather than copied from anyone's guide — density, snapped onto
-  nodes that actually exist, then 2-opt to uncross it — and the caption says it is a strong starting
-  line rather than a proven optimum. Zone maps are Blizzard artwork used under the Game Content Usage
-  Rules, credited on every map; the one zone with no art on file falls back to a bare density grid.
-  The other eleven professions carry tiers, trainer levels, and either farm spots or recipe paths —
-  only two professions have world nodes to draw
+  maps, ordered by the range's recommendation rather than by spawn count — Silver's busiest zones are
+  level 30-40 and a player mining Silver is around level 20. Every recorded spawn is plotted over the
+  zone's own map art, which registers with no transform because coordinates are percentages of the
+  zone's extent and that is exactly the space the art covers. The circuit is computed here rather than
+  copied from anyone's guide — density, snapped onto nodes that actually exist, then 2-opt to uncross
+  it — and the caption says it is a strong starting line rather than a proven optimum. Zone maps are
+  Blizzard artwork used under the Game Content Usage Rules, credited on every map; the one zone with
+  no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
+  for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
+  maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations

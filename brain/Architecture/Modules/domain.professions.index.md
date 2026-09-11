@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/professions/index.ts
-lines: 43
+lines: 42
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.index
 
-`src/domain/professions/index.ts` · **domain** layer · 43 lines
+`src/domain/professions/index.ts` · **domain** layer · 42 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `craftingPathFor`, `craftingPathModel`, `CraftingStep`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `formatCopper`, `GatheringGuide`, `gatheringGuides`, `GatheringNode`, `GatheringNodeRef`, `gatheringNodes`, `GatheringRange`, `getCraftingLevelingPath`, `getProfessionProfile`, `getProfessionTiers`, `guideFor`, `mappableMaterials`, `materialsForRange`, `nodesForProfession`, `nodesForRange`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `PlanRow`, `planRows`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `professionsWithCraftingPaths`, `professionsWithGatheringGuides`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RangeRoute`, `RecipeLeveling`, `recommendedWithoutMaps`, `routeLength`, `routesForNode`, `routesForNodes`, `routesForRange`, `sampleProfessions`, `snapToSpawns`, `SpawnPoint`, `TrainingMilestone`, `trainingMilestones`, `trainingOutsideRanges`, `twoOptimize`, `ZoneNote`
+**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `craftingPathFor`, `craftingPathModel`, `CraftingStep`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `formatCopper`, `GatheringGuide`, `gatheringGuides`, `GatheringNode`, `GatheringNodeRef`, `gatheringNodes`, `GatheringRange`, `getCraftingLevelingPath`, `getProfessionProfile`, `getProfessionTiers`, `guideFor`, `materialsForRange`, `nodesForProfession`, `nodesForRange`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `PlanRow`, `planRows`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `professionsWithCraftingPaths`, `professionsWithGatheringGuides`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RangeRoute`, `RecipeLeveling`, `recommendedWithoutMaps`, `routeLength`, `routesForNode`, `routesForNodes`, `routesForRange`, `sampleProfessions`, `snapToSpawns`, `SpawnPoint`, `TrainingMilestone`, `trainingMilestones`, `trainingOutsideRanges`, `twoOptimize`, `ZoneNote`
 
 ## Imports
 

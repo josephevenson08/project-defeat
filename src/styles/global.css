@@ -5051,12 +5051,20 @@ input[type='text']:focus {
   stroke-width: 0.2;
 }
 
-/* Where the lap begins, ringed rather than filled so it is findable at a glance. */
+/*
+ * Where the lap begins — the brightest point on the line, not a ring.
+ *
+ * **It was a dark fill inside a thin cyan ring, and over zone art that reads as a hole rather than a
+ * marker.** The ring is 2 CSS pixels against a circle sixteen wide, so the dark centre wins and the
+ * one stop a player needs to find looks like a gap in the route. Inverted: a solid cyan disc with a
+ * dark edge, which makes it the largest and brightest thing on the map instead of the only dark one.
+ */
 .farming-route-start {
-  fill: #0b1418;
-  stroke: #6fe3ff;
-  stroke-width: 2;
+  fill: #6fe3ff;
+  stroke: #0b1418;
+  stroke-width: 2.5;
   vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.95));
 }
 
 .farming-route figcaption {
