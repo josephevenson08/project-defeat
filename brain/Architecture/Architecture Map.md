@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-175 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+176 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -27,7 +27,7 @@ The modules everything else leans on — change these carefully.
 - [[features.gear.gearTypes]] — 10 importers
 - [[domain.character.roleTheme]] — 9 importers
 - [[domain.gear.slotCompatibility]] — 9 importers
-- [[domain.simulation.combatConstants]] — 9 importers
+- [[domain.professions.index]] — 9 importers
 
 ## By layer
 
@@ -53,7 +53,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (45)
+### features (46)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -72,6 +72,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
 - [[features.gear.slotGlyphs]] · 3 importers
+- [[features.professions.CraftingPlanTable]] · 1 importers
 - [[features.professions.CraftingProgression]] · 1 importers
 - [[features.professions.FarmingRouteMap]] · 1 importers
 - [[features.professions.GatheringPlanTable]] · 1 importers
@@ -174,11 +175,11 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.gatheringGuides]] · 2 importers
 - [[domain.professions.gatheringPlan]] · 1 importers
 - [[domain.professions.gatheringRangeTypes]] · 3 importers
-- [[domain.professions.index]] · 8 importers
+- [[domain.professions.index]] · 9 importers
 - [[domain.professions.professionTypes]] · 8 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 1 importers
-- [[domain.professions.sampleProfessionTiers]] · 3 importers
+- [[domain.professions.sampleProfessionTiers]] · 4 importers
 - [[domain.raidcomp.buffCoverage]] · 1 importers
 - [[domain.raidcomp.index]] · 3 importers
 - [[domain.raidcomp.raidBuilds]] · 2 importers

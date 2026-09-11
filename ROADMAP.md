@@ -209,6 +209,9 @@ each pinned by an assertion these days.
   on a quest at 225, and Master on a second book at 300. `MaterialFarmSpot`, `supplementaryNodes` and
   `mappableMaterials` are deleted rather than kept alongside — two models of one fact is how the join
   bug survived.
+  The crafting pages got the same summary table, derived from their computed steps, and the same
+  containment rule for trainer stops — thirty-three rows for Blacksmithing against Mining's nine,
+  because a crafting step is a recipe rather than a skill window.
   Still open here: crafting 1-300 is nine placeholder rows.
 - **The calibration harness measures a build a raider plays** — wowsims' own raiding presets for 17 of
   the 20 DPS specs, ingested by `ingest-talent-builds.mjs`. It used to fill one tree to 61 points,

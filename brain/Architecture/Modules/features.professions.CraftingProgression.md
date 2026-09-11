@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/CraftingProgression.tsx
-lines: 142
+lines: 167
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.CraftingProgression
 
-`src/features/professions/CraftingProgression.tsx` · **features** layer · 142 lines
+`src/features/professions/CraftingProgression.tsx` · **features** layer · 167 lines
 
 From the top of the file:
 
@@ -27,6 +27,7 @@ From the top of the file:
 ## Imports
 
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[features.professions.CraftingPlanTable]] — `src/features/professions/CraftingPlanTable.tsx`
 - [[features.professions.MaterialChip]] — `src/features/professions/MaterialChip.tsx`
 - [[features.professions.TrainingMarker]] — `src/features/professions/TrainingMarker.tsx`
 

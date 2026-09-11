@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/professions/sampleProfessionTiers.ts
-lines: 280
+lines: 304
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.sampleProfessionTiers
 
-`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 280 lines
+`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 304 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `getProfessionTiers`, `trainingMilestones`
+**function** — `getProfessionTiers`, `milestonesWithin`, `trainingMilestones`
 
 **const** — `professionTiers`
 
@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.professions.craftingPaths]] — `src/domain/professions/craftingPaths.ts`
 - [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`

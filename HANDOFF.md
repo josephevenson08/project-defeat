@@ -71,10 +71,22 @@ Firebloom, Flame Cap, Grave Moss, Purple Lotus — that had full coordinates and
 Deriving a range's contents from `requiredSkill` makes that orphan **impossible to create** rather
 than merely caught, so the patch goes with the problem it patched.
 
+### The crafting pages got the spine too
+
+Same summary table, derived from the computed steps, and the same containment rule for trainer
+stops — `milestonesWithin` is shared, so four placements across two page types cannot disagree.
+That matters more on the crafting side than the gathering one: crafting step boundaries are
+*computed* rather than hand-written and asserted to tile, so a milestone falling down a gap between
+two steps is a live possibility rather than a theoretical one. The test covers all nine paths.
+
+Blacksmithing's table is thirty-three rows against Mining's nine, because a crafting step is a recipe
+rather than a skill window. That is still the right shape — a row you scan past costs nothing, a card
+you scroll past costs a screen.
+
 ### Still open here
 
-Crafting 1-300 is nine placeholder rows — unchanged by this work, which only touched the gathering
-side. The ingest keeps each node's three busiest zones, so standard advice like Thousand Needles for
+Crafting 1-300 is nine placeholder rows — unchanged by this work, which added a table above them
+rather than itemising them. The ingest keeps each node's three busiest zones, so standard advice like Thousand Needles for
 125-175 mining has no map; the page now names those zones under the tabs rather than staying silent,
 which is the honest version of the same limitation rather than a fix for it.
 

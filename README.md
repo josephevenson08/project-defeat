@@ -89,9 +89,13 @@ behind every claim of its that quotes a number.
   model it used. Reagents a vendor is the only source for — thread, dye, vials, flux — are counted as
   bought rather than farmed and priced at their fixed vendor cost, so a step separates its shopping
   list from its farming list
-- **A levelling guide for each of the four gathering professions** — written guidance, then a table
-  of the whole climb with every trainer stop in the row it falls in, then the ranges themselves with
-  a map each. The unit is a skill range rather than a material, which is the change that makes Gold
+- **Every profession page opens with a table of the whole climb**, with each trainer stop written into
+  the row it falls in — the moment a player needs "Expert is trainable at 125" is the moment their bar
+  stops at 125, which a five-row tier table at the top of the page is three screens away from. The
+  gathering and crafting tables read the same placement function, so they cannot disagree about where
+  you stop
+- **A levelling guide for each of the four gathering professions** — written guidance, then that
+  table, then the ranges themselves with a map each. The unit is a skill range rather than a material, which is the change that makes Gold
   read correctly: Gold Veins sit in Iron's zones and you pick them up on the Iron lap, so Gold is one
   of the ores the 125-175 range draws rather than a section describing a trip nobody takes. Which
   nodes a range covers is derived from each node's skill requirement, so no range can offer an ore you
