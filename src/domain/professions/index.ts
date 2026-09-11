@@ -25,8 +25,22 @@ export {
   routeLength,
   routesForNode,
   routesForMaterials,
+  routesForNodes,
   supplementaryNodes,
   twoOptimize,
   snapToSpawns,
   mappableMaterials,
 } from './farmingRoutes'
+export type { GatheringNodeRef, ZoneNote, GatheringRange, GatheringGuide } from './gatheringRangeTypes'
+export { gatheringGuides } from './gatheringGuides'
+export {
+  guideFor,
+  professionsWithGatheringGuides,
+  nodesForRange,
+  materialsForRange,
+  routesForRange,
+  recommendedWithoutMaps,
+  planRows,
+  trainingOutsideRanges,
+} from './gatheringPlan'
+export type { PlanRow } from './gatheringPlan'

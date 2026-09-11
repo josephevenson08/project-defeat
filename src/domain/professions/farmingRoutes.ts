@@ -293,6 +293,31 @@ export function snapToSpawns(stops: readonly SpawnPoint[], coords: readonly Spaw
  * had no way to draw them together, and the exact-match join meant most rows drew nothing at all.
  */
 export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
+  return routesFromNodes(materials.flatMap((material) => gatheringNodes.filter((node) => node.material === material)))
+}
+
+/**
+ * The same thing, addressed by node rather than by name.
+ *
+ * **Two ingested nodes share a material name and differ only by requirement** — Small Thorium Vein
+ * at 245 against Rich Thorium Vein at 275, Adamantite Deposit at 325 against Rich Adamantite at 350.
+ * A skill range wants one of each pair and not the other: the 245-275 section is about the small
+ * veins and the 275-300 section is about the rich ones, and they are in different zones.
+ *
+ * `routesForMaterials` cannot express that, and until this existed it could not even express the
+ * union — it resolved each name with `find`, which returns the first match, so Rich Thorium's and
+ * Rich Adamantite's coordinates were unreachable from any surface in the app. Four of the nine
+ * mining ranges are drawn from those two nodes.
+ */
+export function routesForNodes(refs: readonly { material: string; atSkill: number }[]): RangeRoute[] {
+  return routesFromNodes(
+    refs.flatMap((ref) =>
+      gatheringNodes.filter((node) => node.material === ref.material && node.requiredSkill === ref.atSkill),
+    ),
+  )
+}
+
+function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
   type ZoneBucket = {
     coords: SpawnPoint[]
     sampled: boolean
@@ -301,9 +326,8 @@ export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
   }
   const byZone = new Map<string, ZoneBucket>()
 
-  for (const material of materials) {
-    const node = gatheringNodes.find((entry) => entry.material === material)
-    if (!node) continue
+  for (const node of nodes) {
+    const material = node.material
     for (const zone of node.zones) {
       const bucket: ZoneBucket = byZone.get(zone.zone) ?? {
         coords: [],
