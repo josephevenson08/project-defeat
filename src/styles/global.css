@@ -1,68 +1,92 @@
+@import './fonts.css';
+
 /*
  * Design tokens.
  *
- * The visual language is monochrome and flat, in the spirit of Nothing's industrial look: no
- * gradients, no coloured chrome, hairline rules instead of soft cards, and data set in a monospace
- * so columns of numbers line up and read as instrument output rather than prose.
+ * **The visual language is Warcraft's character sheet, and it replaced a deliberately flat one.**
+ * What was here before was monochrome and industrial — hairline rules, no gradients, system fonts,
+ * item quality as the only colour in the interface. That was a coherent design and it is gone on
+ * purpose: this is a tool for a game with a very specific look, and looking like the game is worth
+ * more here than looking like an instrument.
  *
- * The one deliberate exception is item quality. Epic purple and rare blue are not decoration in
- * WoW — they carry meaning a player reads instantly — so quality is the only chromatic signal in
- * the interface, and everything else stays grey precisely so it stands out.
+ * Three things survived the change because they were right for reasons that have nothing to do with
+ * style:
  *
- * Fonts are system stacks on purpose. This is a local-first app and pulling a webfont would add a
- * network dependency to something that otherwise works offline.
+ * 1. **Item quality is still the only colour the app assigns to data it did not choose.** Epic
+ *    purple and rare blue carry meaning a player reads instantly. Every theme colour below was
+ *    picked to sit beside them without competing.
+ * 2. **Every ink still clears WCAG AA on every ground it lands on.** The old file recorded that
+ *    `--text-faint` had once measured 3.88:1 and failed; each value here was measured before it was
+ *    written, and the ratios are in the comments where they are close.
+ * 3. **No third-party request.** The fonts are vendored in `public/fonts` rather than fetched from
+ *    Google, so the app still loads with no external dependency — which is what the old "system
+ *    stacks on purpose" note was actually protecting.
+ *
+ * **The faction is the theme.** Alliance is brass and steel with royal blue and gold; Horde is iron
+ * and blood with steel and white. They are the same construction with different tokens, so the app
+ * reads as one product either way, and switching is `data-faction` on `<html>` — see `App.tsx`,
+ * which drives it from the character you already chose.
  */
 :root {
-  /* Surfaces, darkest to lightest. Neutral greys, no blue cast. */
-  --surface-0: #0a0a0a;
-  --surface-1: #121212;
-  --surface-2: #181818;
-  --surface-3: #202020;
-
-  /* Hairlines. Borders do the work that shadows and rounded cards used to. */
-  --line: #2a2a2a;
-  --line-strong: #3d3d3d;
-
-  --text: #ededed;
-  --text-dim: #a3a3a3;
   /*
-   * Pure white, one step above --text, for the headings and values that should read as the primary
-   * thing in their panel. This existed already as 14 hardcoded `#ffffff` declarations — an
-   * undocumented fourth text level that no token described and nothing could change centrally.
-   * Naming it is the fix; flattening it to --text would have thrown away emphasis that was doing
-   * real work.
+   * Surfaces, darkest to lightest. Cool and slightly blue-black for Alliance, which is what makes
+   * brass read as warm metal against them rather than as yellow.
    */
+  --surface-0: #08090a;
+  --surface-1: #0e1012;
+  --surface-2: #16191c;
+  --surface-3: #1f2327;
+
+  --line: #2a2f33;
+  --line-strong: #3d4348;
+
+  /*
+   * Steel body text at 12.5:1 on the panel ground, and **white reserved for the two things that
+   * should win**: the active tab and the callout telling you to go and train. White outranks every
+   * item-quality colour in the app, so spending it anywhere else would flatten the hierarchy the
+   * quality colours depend on.
+   */
+  --text: #cdd2d6;
+  --text-dim: #8b9196;
   --text-strong: #ffffff;
-  /*
-   * Was #6e6e6e, which measured 3.88:1 on --surface-0 and failed WCAG AA. It carries the uppercase
-   * eyebrows and the rail's group headers — all 11-12px, so none of them qualify as large text and
-   * all of them needed 4.5:1. #858585 measures 5.37:1 on --surface-0 and 5.08:1 on the --surface-1
-   * rail, and stays visibly a step fainter than --text-dim, which is the distinction this token
-   * exists to make.
-   */
-  --text-faint: #858585;
+  /* 6.00:1 on --surface-0, 5.31:1 on --surface-2. The old file's 3.88:1 failure is the reason this
+     is measured rather than eyeballed. */
+  --text-faint: #878e93;
 
   /* Reserved for genuine warnings — unverified data, unmodelled effects. Not decoration. */
   --warn: #d4a017;
 
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  /*
+   * The frame. Four stops of one metal, which the panel bevel interpolates between to read as a
+   * lit edge rather than a flat border.
+   */
+  --metal-0: #1b1811;
+  --metal-1: #4e432a;
+  --metal-2: #8b7648;
+  --metal-edge: #c6ad77;
 
-  /* Small uppercase tracked labels are the main texture in this design. */
+  /*
+   * Faction accents. `--accent` carries structure — section rules, the nav underline — and
+   * `--accent-2` carries emphasis inside text, which is where gold does its work on the Alliance
+   * side. Both are measured: royal 6.47:1 and gold 12.17:1 on --surface-1.
+   */
+  --accent: #5b9bd8;
+  --accent-2: #e8cd72;
+
+  /*
+   * Typefaces, vendored latin-subset in `public/fonts`.
+   *
+   * Cinzel stands in for Friz Quadrata, which is the game's own UI face and is licensed — it is the
+   * closest free relative, epigraphic and Roman in the same way. Barlow Semi Condensed stands in for
+   * Arial Narrow, which the game uses for dense numbers, and is doing the same job here.
+   */
+  --font-display: Cinzel, 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Barlow Semi Condensed', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  /* Small uppercase tracked labels are still the main texture in this design. */
   --label-size: 11px;
   --label-tracking: 0.14em;
-  /*
-   * Heading sizes, named by the job rather than the tag.
-   *
-   * `h3` was styled at four different sizes through four different descendant selectors, so what a
-   * heading looked like depended entirely on which container it landed in, and the tag said nothing.
-   * These name the roles instead: a new heading picks one, rather than inventing a fifth size.
-   *
-   * `--label-size` above is the fifth treatment and is deliberately *not* a heading size — the
-   * tracked uppercase mono label is a label pattern that happens to be marked up as a heading where
-   * it genuinely labels a group (the ranked-gear slot names). Semantics and weight are separate
-   * decisions, and that one is correct as it stands.
-   */
   --heading-detail: 20px;
   --heading-section: 15px;
   --heading-callout: 13px;
@@ -75,6 +99,42 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
+
+/*
+ * Horde.
+ *
+ * **Iron and blood where Alliance has brass and steel**, and white doing exactly the same job in
+ * both. Only the tokens change — no selector below this point knows which faction it is rendering,
+ * which is what keeps a retheme from becoming a second stylesheet.
+ *
+ * `--accent` is blood at #df5647 rather than the #d94a3a it started as: the darker red measured
+ * 4.28:1 on --surface-2 and failed AA, and it is used for section rules that sit on exactly that
+ * ground. #df5647 measures 4.77:1.
+ */
+[data-faction='horde'] {
+  --surface-0: #0a0605;
+  --surface-1: #120c0a;
+  --surface-2: #1c1512;
+  --surface-3: #261d19;
+
+  --line: #33251f;
+  --line-strong: #4a342c;
+
+  --text: #ddd0ca;
+  --text-dim: #9a8a84;
+  --text-strong: #ffffff;
+  /* 5.36:1 on --surface-0, 4.78:1 on --surface-2. */
+  --text-faint: #8e817b;
+
+  --metal-0: #1a1412;
+  --metal-1: #40302a;
+  --metal-2: #6e5248;
+  --metal-edge: #b08a78;
+
+  --accent: #df5647;
+  --accent-2: #dbe2e8;
+}
+
 
 * {
   box-sizing: border-box;
@@ -299,7 +359,7 @@ select {
   background: var(--creator-accent);
   border: 1px solid var(--creator-accent);
   border-radius: var(--radius);
-  color: #0a0a0a;
+  color: var(--surface-0);
   cursor: pointer;
   font: inherit;
   font-size: 13px;
@@ -1537,22 +1597,85 @@ select {
   text-align: right;
 }
 
+/*
+ * A panel is a framed plate, the way the character sheet and the spellbook are.
+ *
+ * **The metal frame sits inside the panel's own border rather than replacing it**, and that is a
+ * correctness constraint rather than an aesthetic one. The role accent lives on `border-top` and a
+ * test asserts its colour there; swapping the border for a `border-image` would leave
+ * `border-top-color` computing correctly while the gradient painted over it — the test would pass
+ * and the accent would be invisible, which is worse than either failing outright.
+ *
+ * So the panel keeps its hairline border and its accent, and `::before` draws a 6px metal ring just
+ * inside it. Padding went 20px → 26px to give the ring its room without moving the content.
+ */
 .panel {
+  position: relative;
   background: var(--surface-1);
   border: 1px solid var(--line);
-  /* The role accent stays on the top border, but as a hairline rather than a 3px bar with a drop
-     shadow under it. It still tells you which role you are looking at; it stops shouting over the
-     content. Keeping it on the border rather than a pseudo-element matters — a test asserts the
-     accent is readable there, and that assertion is protecting a real requirement. */
   border-top: 1px solid var(--panel-accent, var(--line-strong));
   border-radius: var(--radius);
   min-height: 260px;
-  padding: 20px;
+  padding: 26px;
 }
 
+/*
+ * The bevel: one metal interpolated across five stops so the frame reads as a lit edge catching
+ * light from the top-left, rather than as a flat coloured border.
+ */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 6px solid transparent;
+  border-image: linear-gradient(
+      135deg,
+      var(--metal-1),
+      var(--metal-0) 30%,
+      var(--metal-2) 50%,
+      var(--metal-0) 70%,
+      var(--metal-1)
+    )
+    1;
+}
+
+/*
+ * Corner brackets.
+ *
+ * **These are what make a frame read as Warcraft rather than as a border**, more than the gold
+ * does — the game's panels are cornered, not merely edged. Eight thin bars rather than an image, so
+ * they take the faction's metal with everything else and cost no asset.
+ */
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
+  background:
+    var(--bracket) left 2px top 2px / 15px 2px no-repeat,
+    var(--bracket) left 2px top 2px / 2px 15px no-repeat,
+    var(--bracket) right 2px top 2px / 15px 2px no-repeat,
+    var(--bracket) right 2px top 2px / 2px 15px no-repeat,
+    var(--bracket) left 2px bottom 2px / 15px 2px no-repeat,
+    var(--bracket) left 2px bottom 2px / 2px 15px no-repeat,
+    var(--bracket) right 2px bottom 2px / 15px 2px no-repeat,
+    var(--bracket) right 2px bottom 2px / 2px 15px no-repeat;
+}
+
+/*
+ * A panel title is the one place the display face earns its keep at size.
+ *
+ * Cinzel is an all-caps-feeling Roman face, so it wants letter-spacing and it wants to not be set
+ * too large — 20px with tracking reads as carved, 22px unspaced read as a wedding invitation.
+ */
 .panel h2 {
-  color: var(--text);
-  font-size: 22px;
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.045em;
   margin: 0 0 16px;
 }
 
@@ -2024,7 +2147,7 @@ select:focus,
 .bis-equip-button {
   background: #5d8c57;
   border-color: #5d8c57;
-  color: #0a0a0a;
+  color: var(--surface-0);
   font-weight: 600;
   gap: 8px;
   min-height: 38px;
@@ -3536,7 +3659,7 @@ input[type='text']:focus {
 }
 
 .upgrade-data-note-skewed {
-  color: #fbbf24;
+  color: var(--warn);
 }
 
 .upgrade-data-note-estimated {
@@ -3578,7 +3701,7 @@ input[type='text']:focus {
 }
 
 .set-bonus-active {
-  color: #fbbf24;
+  color: var(--warn);
   display: block;
   margin-top: 3px;
 }
@@ -5212,4 +5335,57 @@ input[type='text']:focus {
   color: var(--text-faint);
   font-size: 11px;
   line-height: 1.45;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Typography, applied after the component rules so it wins without !important.
+ *
+ * The display face goes on headings and on the two navs, because those are the app's structural
+ * voice. It deliberately does *not* go on body copy or on any number: Cinzel has no tabular figures
+ * and a column of stats set in it would not line up, which is the whole reason the UI face is a
+ * condensed grotesk in the first place.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.rail-brand h1,
+.panel h3,
+.panel h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.035em;
+}
+
+.rail-brand h1 {
+  color: var(--metal-edge);
+  font-weight: 700;
+}
+
+/* The tab strip is the most game-like surface in the app, so it carries the face at label size. */
+.tab-nav button,
+.profession-zone-tab,
+.section-picker-card h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+/*
+ * The active tab is one of the two places white is spent.
+ *
+ * Everything else in the nav sits at --text-dim, so the one you are on is the brightest thing in
+ * the strip — which is what an active state is for, and what the faction's metal underlines.
+ */
+.tab-nav button[aria-current='page'],
+.tab-nav button.is-active {
+  color: var(--text-strong);
+}
+
+/*
+ * Section rules take the faction accent.
+ *
+ * This is where royal blue lands on the Alliance side and blood on the Horde side: a hairline under
+ * a heading, repeated on every card, so the faction is present on every screen without ever being
+ * the loudest thing on it.
+ */
+.profession-range-header,
+.panel-head {
+  border-bottom: 1px solid var(--line);
 }

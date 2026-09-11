@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
@@ -35,6 +35,24 @@ import { RaidPicker } from './features/raids/RaidPicker'
 import { RaidRail } from './features/raids/RaidRail'
 import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
+
+/**
+ * The faction theme is stamped on `<html>`, not on a wrapper inside the app.
+ *
+ * **It has to be the root element or the page's own ground is the wrong colour.** `:root` paints the
+ * body background, and a Horde character on an Alliance-blue ground would show a warm panel sitting
+ * on a cool page — visible in exactly the gap the app does not control. Stamping the document
+ * element means the background, the scrollbar and every panel change together.
+ *
+ * Driven from the character rather than from a separate control, because the app already asks which
+ * faction you are before anything else, and a second switch for the same fact is a second thing to
+ * keep in sync.
+ */
+function useFactionTheme(faction: CharacterProfile['faction']) {
+  useEffect(() => {
+    document.documentElement.dataset.faction = faction.toLowerCase()
+  }, [faction])
+}
 
 const initialCharacter: CharacterProfile = {
   faction: 'Alliance',
@@ -132,6 +150,8 @@ function App() {
   // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
   const [plannerView, setPlannerView] = useState<PlannerView>('gear')
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
+  useFactionTheme(character.faction)
+
   const [gear, setGear] = useState<EquippedGear>(emptyGear)
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
   const [activeConsumableIds, setActiveConsumableIds] = useState<readonly string[]>([])
