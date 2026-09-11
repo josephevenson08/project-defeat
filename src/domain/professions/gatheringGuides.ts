@@ -22,6 +22,12 @@ import type { GatheringGuide } from './gatheringRangeTypes'
 /** The three that carry the skill tables and the range-by-range zone recommendations. */
 const TABLES = ['icy-veins.com', 'warcrafttavern.com', 'wowhead.com (object pages, via our own ingest)']
 
+/** Skinning has no ingest to check against, so the two published guides are the whole check. */
+const SKIN_SOURCES = ['icy-veins.com', 'warcrafttavern.com']
+
+/** Fishing's gates are the claims worth sourcing here, and they are vendor and quest facts. */
+const FISH_SOURCES = ['icy-veins.com', 'wowhead.com']
+
 const miningGuide: GatheringGuide = {
   profession: 'Mining',
   intro: [
@@ -288,4 +294,176 @@ const herbalismGuide: GatheringGuide = {
   ],
 }
 
-export const gatheringGuides: readonly GatheringGuide[] = [miningGuide, herbalismGuide]
+/**
+ * The two gathering professions with nothing to draw.
+ *
+ * **Skinning comes off mobs and Fishing off pools, so neither has a node to publish coordinates
+ * for.** They get the same structure anyway — prose, table, ranges — because the structure is what
+ * answers the questions and a map is only one of the answers. What replaces the map is an explicit
+ * `materials` list: there is no ingest to derive from, so these ranges say what they gather rather
+ * than working it out.
+ *
+ * Skinning's ranges are a different kind of statement from an ore range, too. They are fixed by a
+ * formula rather than by node requirements — from mob level 21 up, the skill needed to skin a beast
+ * is five times its level — so a range is really "which animals will now offer a skin", and the
+ * zones follow from that.
+ */
+const skinningGuide: GatheringGuide = {
+  profession: 'Skinning',
+  intro: [
+    "Skinning has no nodes, so there is no route to ride and no map below — what there is instead is a rule. From mob level 21 upwards the skinning skill you need is exactly five times the mob's level, so your own skill divided by five is the highest-level beast you can skin. At 200 skinning that is a level 40 mob, and nothing above it will offer.",
+    'Below that the rule bends: mobs of level 10 and under need 1 skill, and levels 11 to 20 need ten times the level minus a hundred. The practical effect is the same either way — skinning levels fastest on the highest-level beasts you can still kill quickly, and the ranges below are named for those.',
+    'Because the skill comes off kills rather than off nodes, Skinning costs no extra time if you are levelling through these zones anyway. It is the one gathering profession that does not ask you to go anywhere.',
+  ],
+  ranges: [
+    {
+      skillRange: [1, 65],
+      materials: ['Ruined Leather Scraps', 'Light Leather'],
+      zones: ['Mulgore', 'Dun Morogh', 'Durotar', 'Elwynn Forest', 'Teldrassil'],
+      recommendedCharacterLevel: '1-12',
+      guidance:
+        'Any starting zone with beasts in it. Mulgore and Dun Morogh are the usual picks because both are thick with low-level animals and short on everything else, so there is nothing to fight through between skins.',
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [65, 150],
+      materials: ['Light Leather', 'Medium Leather'],
+      zones: ['The Barrens', 'Darkshore', 'Loch Modan', 'Westfall', 'Stonetalon Mountains'],
+      recommendedCharacterLevel: '13-30',
+      guidance:
+        'Level 13 to 30 beasts, which is most of what lives in these zones. The Barrens is the standout for Horde and Darkshore or Loch Modan for Alliance — all three are large, open, and full of animals rather than humanoids.',
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [150, 205],
+      materials: ['Medium Leather', 'Heavy Leather'],
+      zones: ['Thousand Needles', 'Arathi Highlands', 'Alterac Mountains', 'Desolace'],
+      recommendedCharacterLevel: '30-41',
+      guidance:
+        'Level 30 to 41 beasts. Thousand Needles is the classic answer — the Shimmering Flats is a bowl of kodo and raptors with almost nothing else in it — and Arathi Highlands is the eastern equivalent.',
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [205, 250],
+      materials: ['Heavy Leather', 'Thick Leather'],
+      zones: ['The Hinterlands', 'Feralas', 'Tanaris', 'Dustwallow Marsh'],
+      recommendedCharacterLevel: '41-50',
+      guidance:
+        'Level 41 to 50 beasts. Zone choice matters more here than anywhere else, because at five skill per mob level a zone ten levels too low stops offering skins at all rather than merely slowing down.',
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [250, 300],
+      materials: ['Rugged Leather', 'Thick Hide'],
+      zones: ["Un'Goro Crater", 'Winterspring', 'Silithus', 'Eastern Plaguelands', 'Felwood'],
+      recommendedCharacterLevel: '50-60',
+      guidance:
+        "Un'Goro Crater is the standard finish to Azeroth — very nearly a zone of nothing but large skinnable beasts, and the stegodons and devilsaurs there carry Rugged Leather and Thick Hide together. Train Master at 275 before you reach 300 or the bar stops.",
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [300, 330],
+      materials: ['Knothide Leather', 'Fel Hide'],
+      zones: ['Hellfire Peninsula', 'Zangarmarsh'],
+      recommendedCharacterLevel: '58-63',
+      guidance:
+        'Hellboars first and then ravagers, both in Hellfire Peninsula. Everything skinnable in Outland yields Knothide Leather; Fel Hide comes off the demon-touched beasts and is worth noticeably more.',
+      sources: SKIN_SOURCES,
+    },
+    {
+      skillRange: [330, 375],
+      materials: [
+        'Knothide Leather',
+        'Thick Clefthoof Leather',
+        'Cobra Scales',
+        'Nether Dragonscales',
+        'Fel Hide',
+      ],
+      zones: ['Nagrand', 'Terokkar Forest', "Blade's Edge Mountains", 'Netherstorm', 'Shadowmoon Valley'],
+      recommendedCharacterLevel: '64-70',
+      guidance:
+        'Nagrand clefthoofs and talbuks finish the climb, and they stay worth killing afterwards: Thick Clefthoof Leather is a rare skin off the same mobs and a serious material sink for endgame Leatherworking. Nether Dragonscales come off the nether dragonkin in Netherstorm and Shadowmoon Valley, and Cobra Scales off the serpents in Zangarmarsh and Terokkar.',
+      sources: SKIN_SOURCES,
+    },
+  ],
+}
+
+/**
+ * Fishing, whose gates are books and a quest rather than zones.
+ *
+ * **Three of its five tiers are not trained at all**, which is the single most useful thing a fishing
+ * guide can say: the bar stops at 150, at 225 and at 300 for reasons no trainer will explain, and
+ * the fix each time is somewhere else entirely. That is why the ranges here read as gates rather
+ * than as places.
+ */
+const fishingGuide: GatheringGuide = {
+  profession: 'Fishing',
+  intro: [
+    'Fishing has no nodes either, and unlike every other gathering profession its progress is gated by books and a quest rather than by where you stand. Three of the five tiers are bought or earned instead of trained: Expert from a book in Booty Bay, Artisan from a quest chain in Dustwallow Marsh, and Master from a book in Zangarmarsh.',
+    'Up to 300, any water will do — including a capital city fountain. Skill comes off catches rather than off what you catch, so lures matter more than location: a Shiny Bauble or Bright Baubles adds flat skill for ten minutes and turns escapes into catches.',
+    'Outland is where location starts mattering, and then it is for what the pools contain rather than for the skill they give.',
+  ],
+  ranges: [
+    {
+      skillRange: [1, 75],
+      materials: ['Raw Brilliant Smallfish', 'Raw Longjaw Mud Snapper'],
+      zones: ['Any capital city', 'Any starting zone water'],
+      recommendedCharacterLevel: '1-10',
+      guidance:
+        'Any water at all, including the fountains and canals inside a capital city. Apply a Shiny Bauble and fish until the bar stops at 75.',
+      sources: FISH_SOURCES,
+    },
+    {
+      skillRange: [75, 150],
+      materials: ['Raw Bristle Whisker Catfish', 'Oily Blackmouth'],
+      zones: ['Any capital city', 'Loch Modan', 'The Barrens'],
+      recommendedCharacterLevel: '10-25',
+      guidance:
+        'Unchanged from the range above — train Journeyman and keep fishing the same water. Nothing about the location matters yet.',
+      sources: FISH_SOURCES,
+    },
+    {
+      skillRange: [150, 225],
+      materials: ['Raw Bristle Whisker Catfish', 'Firefin Snapper'],
+      zones: ['Any water, once you have read the Expert Fishing book'],
+      recommendedCharacterLevel: '20-40',
+      guidance:
+        'Expert Fishing is not trained. It is a book — "Expert Fishing - The Bass and You", sold by Old Man Heming in Booty Bay for a gold — and the bar simply stops at 150 until you have read it.',
+      sources: FISH_SOURCES,
+    },
+    {
+      skillRange: [225, 300],
+      materials: ['Raw Nightfin Snapper', 'Raw Sunscale Salmon'],
+      zones: ['Dustwallow Marsh'],
+      recommendedCharacterLevel: '40-55',
+      guidance:
+        'Artisan Fishing is a quest rather than a book: "Nat Pagle, Angler Extreme", from Nat Pagle on his island in Dustwallow Marsh, wants four rare fish from four separate zones. It is the longest gate on any profession in the game and there is no way around it.',
+      sources: FISH_SOURCES,
+    },
+    {
+      skillRange: [300, 350],
+      materials: ['Spotted Feltail', 'Zangarmarsh Sporefish'],
+      zones: ['Zangarmarsh'],
+      recommendedCharacterLevel: '60-64',
+      guidance:
+        'Master Fishing is another book — "Master Fishing - The Art of Angling", from Juno Dufrain at Cenarion Refuge for five gold — and the water outside that door is where to use it. The sporefish schools around the central lakes are the densest pools in the zone.',
+      sources: FISH_SOURCES,
+    },
+    {
+      skillRange: [350, 375],
+      materials: ['Golden Darter', 'Furious Crawdad', 'Enormous Barbed Gill Trout'],
+      zones: ['Terokkar Forest', 'Nagrand'],
+      recommendedCharacterLevel: '64-70',
+      guidance:
+        'The Highland Mixed Schools in Terokkar Forest finish the climb and stay worth fishing long after it — Furious Crawdad is the best fish in the expansion for a melee character. Keep a lure on: Outland pools are unforgiving of a bare rod even at cap.',
+      sources: FISH_SOURCES,
+    },
+  ],
+}
+
+export const gatheringGuides: readonly GatheringGuide[] = [
+  miningGuide,
+  herbalismGuide,
+  skinningGuide,
+  fishingGuide,
+]
