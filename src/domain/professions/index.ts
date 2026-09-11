@@ -6,11 +6,18 @@ export type {
   RecipeLeveling,
   ProfessionProfile,
 } from './professionTypes'
-export { professionTiers, getProfessionTiers, trainingMilestones } from './sampleProfessionTiers'
+export { professionTiers, getProfessionTiers, trainingMilestones, milestonesWithin } from './sampleProfessionTiers'
 export type { TrainingMilestone } from './sampleProfessionTiers'
 export { craftingLevelingPaths, getCraftingLevelingPath } from './sampleCraftingGuides'
-export { craftingPathFor, craftingPathModel, professionsWithCraftingPaths, formatCopper } from './craftingPaths'
-export type { CraftingStep } from './craftingPaths'
+export {
+  craftingPathFor,
+  craftingPathModel,
+  professionsWithCraftingPaths,
+  formatCopper,
+  craftingPlanRows,
+  craftingTrainingOutsideSteps,
+} from './craftingPaths'
+export type { CraftingStep, CraftingPlanRow } from './craftingPaths'
 export { allProfessions, sampleProfessions, getProfessionProfile, professionIconNames } from './sampleProfessions'
 export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, FarmingRoute, RangeRoute } from './farmingRoutes'
 export {

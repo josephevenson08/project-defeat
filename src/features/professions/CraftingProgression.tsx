@@ -1,5 +1,6 @@
-import { formatCopper } from '../../domain/professions'
-import type { CraftingStep, RecipeLeveling, TrainingMilestone } from '../../domain/professions'
+import { craftingPlanRows, craftingTrainingOutsideSteps, formatCopper } from '../../domain/professions'
+import type { CraftingStep, Profession, RecipeLeveling, TrainingMilestone } from '../../domain/professions'
+import { CraftingPlanTable } from './CraftingPlanTable'
 import { MaterialChip } from './MaterialChip'
 import { TrainingMarker } from './TrainingMarker'
 
@@ -11,7 +12,15 @@ import { TrainingMarker } from './TrainingMarker'
  * probabilities, so it is the count that gets you there on average — not a guarantee, and the
  * caption at the top of the list carries that.
  */
-function Step({ step, note }: { step: CraftingStep; note?: string }) {
+function Step({
+  step,
+  note,
+  training,
+}: {
+  step: CraftingStep
+  note?: string
+  training: readonly TrainingMilestone[]
+}) {
   return (
     <section className="profession-range profession-craft-step" data-testid="crafting-step">
       <header className="profession-range-header">
@@ -24,6 +33,9 @@ function Step({ step, note }: { step: CraftingStep; note?: string }) {
           <span className="profession-craft-vendor-total">{formatCopper(step.vendorCopper)} at a vendor</span>
         ) : null}
       </header>
+
+      {/* The stop sits inside the step it interrupts, at the skill where the bar stops moving. */}
+      <TrainingMarker milestones={training} />
 
       <p className="profession-craft-recipe">
         {step.createsIcon && (
@@ -97,17 +109,24 @@ function Step({ step, note }: { step: CraftingStep; note?: string }) {
  * step that begins at or after the skill it unlocks.
  */
 export function CraftingProgression({
+  profession,
   steps,
   curated,
-  milestones,
   model,
 }: {
+  profession: Profession
   steps: readonly CraftingStep[]
   curated: readonly RecipeLeveling[]
-  milestones: readonly TrainingMilestone[]
   model: string
 }) {
-  const pending = [...milestones]
+  /*
+    **Same containment rule as the table, computed by the same function.** A milestone belongs to the
+    step whose skill window contains it, not before the step that follows — Artisan is trainable at
+    200 and a step running 175-245 is where a player's bar actually stops. Both surfaces read
+    `craftingPlanRows`, so they cannot disagree about where that is.
+  */
+  const training = new Map(craftingPlanRows(profession).map((row) => [`${row.skillRange[0]}-${row.name}`, row.training]))
+  const stranded = craftingTrainingOutsideSteps(profession)
 
   /** A curated note belongs to the computed step whose range it overlaps. */
   const noteFor = (step: CraftingStep) =>
@@ -121,21 +140,27 @@ export function CraftingProgression({
 
   return (
     <div className="profession-progression">
-      <h3>What to craft</h3>
+      {/*
+        The model line goes above the table rather than above the steps, because it qualifies every
+        count in both — and the table is where a reader meets the first one.
+      */}
       <p className="profession-progression-model" data-testid="crafting-model">
         {model}
       </p>
-      {steps.map((step) => {
-        const due = []
-        while (pending.length > 0 && pending[0].atSkill <= step.skillRange[0]) due.push(pending.shift()!)
-        return (
-          <div key={step.spellId + '-' + step.skillRange[0]}>
-            <TrainingMarker milestones={due} />
-            <Step step={step} note={noteFor(step)} />
-          </div>
-        )
-      })}
-      <TrainingMarker milestones={pending} />
+
+      <CraftingPlanTable profession={profession} />
+
+      <h3>What to craft</h3>
+      {steps.map((step) => (
+        <div key={step.spellId + '-' + step.skillRange[0]}>
+          <Step
+            step={step}
+            note={noteFor(step)}
+            training={training.get(`${step.skillRange[0]}-${step.name}`) ?? []}
+          />
+        </div>
+      ))}
+      <TrainingMarker milestones={stranded} />
     </div>
   )
 }

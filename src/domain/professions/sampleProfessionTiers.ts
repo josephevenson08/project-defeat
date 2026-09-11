@@ -264,6 +264,30 @@ export type TrainingMilestone = {
   notes?: string
 }
 
+/**
+ * The trainer stops that fall inside one step's skill window.
+ *
+ * **Shared by both progressions so the two surfaces cannot place a stop differently.** Gathering and
+ * crafting each print training twice — once in the summary table, once as a marker in the step it
+ * interrupts — and four placements computed four ways is four chances to disagree about where a
+ * player has to stop.
+ *
+ * The window is half-open at the top, because step boundaries are shared: a milestone at 175 belongs
+ * to the range that *starts* at 175, not the one that ends there. `isLast` reopens it, or the tier
+ * trainable at the 375 cap would fall off the end of the profession.
+ */
+export function milestonesWithin(
+  profession: Profession,
+  skillRange: readonly [number, number],
+  isLast: boolean,
+): TrainingMilestone[] {
+  const [low, high] = skillRange
+  return trainingMilestones(profession).filter(
+    (milestone) =>
+      milestone.atSkill >= low && (isLast ? milestone.atSkill <= high : milestone.atSkill < high),
+  )
+}
+
 export function trainingMilestones(profession: Profession): TrainingMilestone[] {
   return professionTiers[profession]
     .filter((tier) => tier.tier !== 'Apprentice')

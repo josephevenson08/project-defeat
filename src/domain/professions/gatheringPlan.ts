@@ -12,7 +12,7 @@ import type { GatheringNode, RangeRoute } from './farmingRoutes'
 import type { GatheringRange, GatheringNodeRef } from './gatheringRangeTypes'
 import { gatheringGuides } from './gatheringGuides'
 import type { Profession } from './professionTypes'
-import { trainingMilestones } from './sampleProfessionTiers'
+import { milestonesWithin, trainingMilestones } from './sampleProfessionTiers'
 import type { TrainingMilestone } from './sampleProfessionTiers'
 
 export function guideFor(profession: Profession) {
@@ -134,21 +134,13 @@ export type PlanRow = {
 export function planRows(profession: Profession): PlanRow[] {
   const guide = guideFor(profession)
   if (!guide) return []
-  const milestones = trainingMilestones(profession)
 
-  return guide.ranges.map((range, index) => {
-    const [low, high] = range.skillRange
-    const last = index === guide.ranges.length - 1
-    return {
-      skillRange: range.skillRange,
-      materials: materialsForRange(profession, range),
-      zones: range.zones,
-      training: milestones.filter(
-        (milestone) =>
-          milestone.atSkill >= low && (last ? milestone.atSkill <= high : milestone.atSkill < high),
-      ),
-    }
-  })
+  return guide.ranges.map((range, index) => ({
+    skillRange: range.skillRange,
+    materials: materialsForRange(profession, range),
+    zones: range.zones,
+    training: milestonesWithin(profession, range.skillRange, index === guide.ranges.length - 1),
+  }))
 }
 
 /**

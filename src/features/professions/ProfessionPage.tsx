@@ -1,5 +1,5 @@
 import { Panel } from '../../components/layout/Panel'
-import { craftingPathFor, craftingPathModel, guideFor, trainingMilestones } from '../../domain/professions'
+import { craftingPathFor, craftingPathModel, guideFor } from '../../domain/professions'
 import type { ProfessionProfile } from '../../domain/professions'
 import { GatheringProgression } from './GatheringProgression'
 import { CraftingProgression } from './CraftingProgression'
@@ -18,7 +18,6 @@ import { CraftingProgression } from './CraftingProgression'
  * counts and materials. Forcing one layout to serve both is what made the old panel read as a list.
  */
 export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile; onBack: () => void }) {
-  const milestones = trainingMilestones(profile.profession)
   const gathering = guideFor(profile.profession)
   const crafting = craftingPathFor(profile.profession)
   const curated = profile.levelingPath ?? []
@@ -54,7 +53,12 @@ export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile
 
       {gathering && <GatheringProgression profession={profile.profession} />}
       {crafting.length > 0 && (
-        <CraftingProgression steps={crafting} curated={curated} milestones={milestones} model={craftingPathModel} />
+        <CraftingProgression
+          profession={profile.profession}
+          steps={crafting}
+          curated={curated}
+          model={craftingPathModel}
+        />
       )}
 
       {!gathering && crafting.length === 0 && curated.length === 0 && (

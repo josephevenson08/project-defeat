@@ -1,5 +1,7 @@
 import craftingPathData from './craftingPaths.json' with { type: 'json' }
 import type { Profession } from './professionTypes'
+import { milestonesWithin, trainingMilestones } from './sampleProfessionTiers'
+import type { TrainingMilestone } from './sampleProfessionTiers'
 
 /**
  * A computed levelling step: what to make, how many, and the shopping list for the whole step.
@@ -77,4 +79,50 @@ export function formatCopper(copper: number): string {
   const silver = Math.floor((copper % 10000) / 100)
   const rest = copper % 100
   return [gold && `${gold}g`, silver && `${silver}s`, rest && `${rest}c`].filter(Boolean).join(' ')
+}
+
+
+/**
+ * One row of a crafting profession's summary table.
+ *
+ * **The crafting side needed the same spine the gathering side got**, and for the same reason: a page
+ * that opens on thirty-three step cards answers "where exactly" to somebody who has not yet asked
+ * "how long is this going to take". The table is the answer to the second question, and it is the
+ * only place training appears before you are already scrolling past it.
+ *
+ * Materials are trimmed to the three largest by quantity. The full shopping list is on the step
+ * below; repeating eleven reagent names here would make the summary longer than the thing it
+ * summarises.
+ */
+export type CraftingPlanRow = {
+  skillRange: [number, number]
+  name: string
+  crafts: number
+  /** The three biggest reagents by quantity, which is what the trip is actually for. */
+  materials: readonly string[]
+  training: readonly TrainingMilestone[]
+}
+
+const SUMMARY_MATERIALS = 3
+
+export function craftingPlanRows(profession: Profession): CraftingPlanRow[] {
+  const steps = craftingPathFor(profession)
+  return steps.map((step, index) => ({
+    skillRange: step.skillRange,
+    name: step.name,
+    crafts: step.crafts,
+    materials: [...step.materials]
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, SUMMARY_MATERIALS)
+      .map((material) => material.name),
+    training: milestonesWithin(profession, step.skillRange, index === steps.length - 1),
+  }))
+}
+
+/** Trainer visits no step's window contains, so a table that claims the whole climb still shows them. */
+export function craftingTrainingOutsideSteps(profession: Profession): TrainingMilestone[] {
+  const rows = craftingPlanRows(profession)
+  if (rows.length === 0) return trainingMilestones(profession)
+  const placed = new Set(rows.flatMap((row) => row.training.map((milestone) => milestone.tier)))
+  return trainingMilestones(profession).filter((milestone) => !placed.has(milestone.tier))
 }

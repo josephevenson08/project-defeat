@@ -458,7 +458,17 @@ import {
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
-import { allProfessions, getProfessionProfile, craftingPathFor, craftingPathModel, trainingMilestones } from '../src/domain/professions'
+import {
+  allProfessions,
+  getProfessionProfile,
+  craftingPathFor,
+  craftingPathModel,
+  craftingPlanRows,
+  craftingTrainingOutsideSteps,
+  professionsWithCraftingPaths,
+  trainingMilestones,
+} from '../src/domain/professions'
+import type { Profession } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getAttunementChainForRaid, sampleAttunements } from '../src/domain/raids/sampleAttunements'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -9142,6 +9152,38 @@ test('the summary table and the inline markers put every trainer stop in the sam
     const tiers = trainingMilestones(profession)
     expect(tiers.find((tier) => tier.tier === 'Artisan')!.atSkill).toBe(200)
     expect(tiers.find((tier) => tier.tier === 'Master')!.atSkill).toBe(275)
+  }
+
+  /*
+   * **The crafting side runs the same rule through the same function**, so the two kinds of page
+   * cannot disagree about where a player stops. `milestonesWithin` is shared; this asserts that
+   * sharing it actually produces a total placement rather than dropping one down a gap between two
+   * steps, which a crafting path is far more likely to have than a gathering one — thirty-three
+   * steps with computed boundaries against nine hand-written windows that are asserted to tile.
+   */
+  for (const profession of professionsWithCraftingPaths as readonly Profession[]) {
+    const rows = craftingPlanRows(profession)
+    expect(rows.length, `${profession} has a computed path`).toBeGreaterThan(5)
+
+    const placed = rows.flatMap((row) => row.training)
+    const stranded = craftingTrainingOutsideSteps(profession)
+    expect(
+      placed.length + stranded.length,
+      `${profession}: every tier appears once`,
+    ).toBe(trainingMilestones(profession).length)
+    expect(new Set(placed.map((milestone) => milestone.tier)).size).toBe(placed.length)
+
+    for (const row of rows) {
+      for (const milestone of row.training) {
+        expect(
+          milestone.atSkill,
+          `${profession}: ${milestone.tier}@${milestone.atSkill} sits inside ${row.skillRange.join('-')}`,
+        ).toBeGreaterThanOrEqual(row.skillRange[0])
+        expect(milestone.atSkill).toBeLessThanOrEqual(row.skillRange[1])
+      }
+      expect(row.materials.length, `${profession} ${row.name} names what it needs`).toBeGreaterThan(0)
+      expect(row.crafts, `${profession} ${row.name} craft count`).toBeGreaterThan(0)
+    }
   }
 })
 
