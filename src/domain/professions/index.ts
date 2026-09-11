@@ -3,13 +3,11 @@ export type {
   ProfessionCategory,
   ProfessionTierName,
   ProfessionTier,
-  MaterialFarmSpot,
   RecipeLeveling,
   ProfessionProfile,
 } from './professionTypes'
 export { professionTiers, getProfessionTiers, trainingMilestones } from './sampleProfessionTiers'
 export type { TrainingMilestone } from './sampleProfessionTiers'
-export { gatheringMaterialFarming, getMaterialFarmSpots } from './sampleGatheringMaterials'
 export { craftingLevelingPaths, getCraftingLevelingPath } from './sampleCraftingGuides'
 export { craftingPathFor, craftingPathModel, professionsWithCraftingPaths, formatCopper } from './craftingPaths'
 export type { CraftingStep } from './craftingPaths'
@@ -24,9 +22,7 @@ export {
   nodesWithoutSpawnData,
   routeLength,
   routesForNode,
-  routesForMaterials,
   routesForNodes,
-  supplementaryNodes,
   twoOptimize,
   snapToSpawns,
   mappableMaterials,

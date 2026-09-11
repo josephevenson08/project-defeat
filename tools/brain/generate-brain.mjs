@@ -262,6 +262,7 @@ export { sampleAttunements } from '../../src/domain/raids/sampleAttunements'
 export { sampleSignatureAbilities } from '../../src/domain/abilities/sampleSignatureAbilities'
 export { bisLists } from '../../src/domain/bis/bisLists'
 export { allProfessions, sampleProfessions } from '../../src/domain/professions/sampleProfessions'
+export { gatheringGuides } from '../../src/domain/professions/gatheringGuides'
 export { sampleBuffs } from '../../src/domain/buffs/sampleBuffs'
 export { sampleTargetDebuffs } from '../../src/domain/buffs/sampleTargetDebuffs'
 export { sampleConsumables } from '../../src/domain/consumables/sampleConsumables'
@@ -758,7 +759,7 @@ async function writeArchitectureMap(modules) {
 async function writeDomainNotes(data, modules) {
   const { tbcClasses, getRoleForSpec, racesByClass, racesByFaction, gearSlots, sampleItems, allItems, getBaseStats } = data
   const { sampleRaids, sampleRaidBosses, sampleAttunements, sampleSignatureAbilities } = data
-  const { allProfessions, sampleProfessions, sampleBuffs, sampleTargetDebuffs, sampleConsumables } = data
+  const { allProfessions, sampleProfessions, gatheringGuides, sampleBuffs, sampleTargetDebuffs, sampleConsumables } = data
   const { sampleEnchants, sampleGems, bisLists } = data
 
   const specTitle = (className, spec) => (spec === className ? spec : `${spec} ${className}`)
@@ -1124,6 +1125,7 @@ async function writeDomainNotes(data, modules) {
   // --- Professions -----------------------------------------------------------------------------
   for (const profession of allProfessions) {
     const profile = (sampleProfessions ?? []).find((candidate) => candidate.profession === profession)
+    const gathering = (gatheringGuides ?? []).find((candidate) => candidate.profession === profession)
     const body = [
       frontmatter({
         type: 'profession',
@@ -1142,8 +1144,8 @@ async function writeDomainNotes(data, modules) {
         ? `## Skill tiers\n\n${bullets(profile.tiers.map((tier) => `**${tier.tier}** — skill ${tier.skillRange[0]}–${tier.skillRange[1]}, level ${tier.requiredCharacterLevel}+ · ${tier.trainedFrom}`))}`
         : '',
       '',
-      profile?.materialFarming?.length
-        ? `## Material farming\n\n${bullets(profile.materialFarming.slice(0, 12).map((spot) => `**${spot.material}** (skill ${spot.skillRange[0]}–${spot.skillRange[1]}) — ${spot.zones.join(', ')}`))}`
+      gathering?.ranges?.length
+        ? `## Levelling ranges\n\n${bullets(gathering.ranges.map((range) => `**${range.skillRange[0]}–${range.skillRange[1]}** (level ${range.recommendedCharacterLevel}) — ${range.zones.slice(0, 4).join(', ')}`))}`
         : '',
       '',
       profile?.levelingPath?.length
@@ -1152,7 +1154,7 @@ async function writeDomainNotes(data, modules) {
       '',
       '## Where this lives in the code',
       '',
-      bullets(moduleLinks(['domain/professions/sampleProfessions.ts', 'features/professions/ProfessionsPanel.tsx'], modules)),
+      bullets(moduleLinks(['domain/professions/sampleProfessions.ts', 'domain/professions/gatheringGuides.ts', 'features/professions/ProfessionsPanel.tsx'], modules)),
       '',
       `Up: ${link('TBC Knowledge Map')}`,
     ].join('\n')

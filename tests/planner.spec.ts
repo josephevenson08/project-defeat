@@ -144,11 +144,18 @@ import {
   nodesWithoutSpawnData,
   routeLength,
   routesForNode,
-  routesForMaterials,
-  supplementaryNodes,
+  routesForNodes,
   twoOptimize,
   snapToSpawns,
   mappableMaterials,
+  gatheringGuides,
+  guideFor,
+  nodesForRange,
+  materialsForRange,
+  routesForRange,
+  recommendedWithoutMaps,
+  planRows,
+  trainingOutsideRanges,
 } from '../src/domain/professions'
 import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
 import rawCatalogueJson from '../src/domain/gear/itemCatalogue.json' with { type: 'json' }
@@ -451,7 +458,7 @@ import {
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
-import { allProfessions, getProfessionProfile, craftingPathFor, craftingPathModel } from '../src/domain/professions'
+import { allProfessions, getProfessionProfile, craftingPathFor, craftingPathModel, trainingMilestones } from '../src/domain/professions'
 import { getBossesForRaid } from '../src/domain/raids/sampleRaidBosses'
 import { getAttunementChainForRaid, sampleAttunements } from '../src/domain/raids/sampleAttunements'
 import { getPlacementsForSpec, specTierLists } from '../src/domain/tierlists'
@@ -1442,7 +1449,7 @@ test('Professions is a grid you pick from, and each profession opens its own pag
   /*
    * **A range draws a map, and the map covers the whole range rather than one ore.** The join used to
    * be `node.material === spot.material` against a display label, so "Thorium Ore (incl. Rich Thorium
-   * Vein at 275+)" matched nothing and drew nothing — see `MaterialFarmSpot.materials`.
+   * Vein at 275+)" matched nothing and drew nothing — see `GatheringNodeRef`.
    */
   await expect(page.getByTestId('gathering-range').first()).toBeVisible()
   await expect(page.locator('svg.farming-route-map').first()).toBeVisible()
@@ -8857,153 +8864,297 @@ test('every raid loot row can draw an icon', async () => {
   }
 })
 
-test('every gathered material a farm row names can still be found in the node data', () => {
+test('every range names only nodes it unlocks, and every ingested node lands in exactly one', () => {
   /*
-   * **This is the test that was missing, and its absence cost 28 of 43 nodes.**
+   * **The reachability guard, rewritten for a model that makes most of it structural.**
    *
-   * The data was right the whole time: `nodeSpawns.json` carried Liferoot, Fadeleaf, Goldthorn and
-   * every other classic herb with full coordinates. The *join* was wrong — the panel matched
-   * `node.material === spot.material`, and `spot.material` is a display label written for a reader
-   * ("Liferoot / Fadeleaf / Goldthorn"), which equals no node's name. Eight of Herbalism's nineteen
-   * rows and two of Mining's eleven silently drew nothing, and the whole 1-300 herb progression was
-   * mapless on screen.
+   * The version this replaces defended a hand-written list of materials per row against the node
+   * ingest, because the two could drift: a row could name a herb that no longer existed, or a herb
+   * could exist that no row named. Five did — Arthas' Tears, Firebloom, Flame Cap, Grave Moss and
+   * Purple Lotus had full coordinates and no row pointing at them — and they were placed by a
+   * `supplementaryNodes` patch that hung them off whichever row's window contained them.
    *
-   * Every existing profession test passed throughout, because they all asserted the *data* — 45
-   * nodes, no crates, sampling preserves zone width — and none asserted that a node reaches a
-   * surface. That is this repo's signature failure ("data wired to nothing", Decision Log) arriving
-   * for the fourth time, in the same commit that wrote the rule down.
-   *
-   * So the assertion is deliberately about reachability rather than about shape.
+   * `nodesForRange` derives the list from `requiredSkill` instead, so both failures are now
+   * impossible to write rather than merely caught, and `supplementaryNodes` is deleted along with
+   * the problem it patched. What is left worth asserting is that the derivation itself holds: the
+   * windows have to tile the whole climb, or a node falls through a gap between two ranges and
+   * disappears exactly as quietly as before.
    */
-  const rows = (['Herbalism', 'Mining'] as const).flatMap(
-    (profession) => getProfessionProfile(profession)?.materialFarming ?? [],
-  )
-  expect(rows.length, 'the two professions the game gives world nodes').toBeGreaterThan(25)
+  for (const guide of gatheringGuides) {
+    const ranges = guide.ranges
+    expect(ranges.length, `${guide.profession} has ranges`).toBeGreaterThan(3)
 
-  /*
-   * **Named, not counted.** These are materials a farm row mentions that the node ingest has no
-   * spawn data for — Wowhead publishes none for Ragveil or Ancient Lichen, and the rest are items
-   * whose node is named differently or was never swept. Listing them means adding one fails this
-   * test rather than quietly losing another map, and clearing one is a visible deletion here.
-   */
-  const knownGaps = new Set([
-    'Ancient Lichen',
-    'Bloodthistle',
-    'Fel Lotus',
-    'Ghost Mushroom',
-    'Gromsblood',
-    'Netherdust Bush',
-    'Ragveil',
-    'Sorrowmoss',
-  ])
+    // Ordered, touching, and covering 1 to the cap: any gap is somewhere a node can hide.
+    expect(ranges[0].skillRange[0], `${guide.profession} starts at 1`).toBe(1)
+    expect(ranges[ranges.length - 1].skillRange[1], `${guide.profession} ends at the cap`).toBe(375)
+    for (let i = 1; i < ranges.length; i += 1) {
+      expect(
+        ranges[i].skillRange[0],
+        `${guide.profession} ${ranges[i - 1].skillRange.join('-')} hands over cleanly`,
+      ).toBe(ranges[i - 1].skillRange[1])
+    }
 
-  const unreachable = rows
-    .flatMap((row) => row.materials)
-    .filter((material) => !mappableMaterials.has(material) && !knownGaps.has(material))
-  expect(unreachable, 'every named material resolves to a node or is a declared gap').toEqual([])
-
-  // And the join actually produces maps, which is the thing the old code failed to do.
-  const drawn = rows.filter((row) => routesForMaterials(row.materials).length > 0)
-  expect(drawn.length, 'most gathering rows draw at least one route').toBeGreaterThanOrEqual(15)
-
-  const felweed = routesForMaterials(['Felweed'])
-  expect(felweed[0].zone, 'busiest zone first').toBe('Hellfire Peninsula')
-  expect(felweed[0].materials[0].material).toBe('Felweed')
+    for (const range of ranges) {
+      const [low, high] = range.skillRange
+      expect(high, `${guide.profession} ${low}-${high} runs forwards`).toBeGreaterThan(low)
+      for (const node of nodesForRange(guide.profession, range.skillRange)) {
+        expect(
+          node.requiredSkill,
+          `${node.material} needs ${node.requiredSkill} and is offered at ${low}-${high}`,
+        ).toBeGreaterThanOrEqual(low)
+        expect(node.requiredSkill).toBeLessThanOrEqual(high)
+      }
+    }
+  }
 
   /*
-   * **A range merges its materials into one loop**, because that is how it is farmed: at 1-100 you
-   * pick all three on the same lap.
-   *
-   * **But not every zone carries every herb, and the merge is right to be selective.** This assertion
-   * first named Durotar and failed — Durotar has Peacebloom and neither of the others, and only
-   * Tirisfal Glades carries all three. The data was correct and the test was wrong, which is the
-   * useful direction for that to happen in. Both halves are asserted now: a zone that has all three
-   * says three, and a zone that has one says one rather than implying the other two are there.
+   * **Every ingested node reaches a surface, and reaches exactly one.** Showing a node twice is two
+   * maps of the same herb on one page; showing it zero times is a coordinate sweep nobody can see.
    */
-  const starter = routesForMaterials(['Peacebloom', 'Silverleaf', 'Earthroot'])
+  const placements = new Map<string, number>()
+  for (const guide of gatheringGuides) {
+    for (const range of guide.ranges) {
+      for (const node of nodesForRange(guide.profession, range.skillRange)) {
+        const key = `${node.material}@${node.requiredSkill}`
+        placements.set(key, (placements.get(key) ?? 0) + 1)
+      }
+    }
+  }
+  const everyNode = gatheringNodes.map((node) => `${node.material}@${node.requiredSkill}`)
+  expect([...placements.entries()].filter(([, count]) => count !== 1), 'placed once each').toEqual([])
+  expect(everyNode.filter((key) => !placements.has(key)), 'no node falls through a gap').toEqual([])
+  expect(placements.size, 'all 45 ingested nodes are on a page').toBe(everyNode.length)
+})
 
-  const busiest = starter[0]
-  expect(busiest.zone, 'busiest zone first').toBe('Tirisfal Glades')
-  expect(busiest.materials.length, 'and it is the one zone carrying all three').toBe(3)
-  expect(busiest.spawnCount, 'the count is the sum of what is actually here').toBe(
-    busiest.materials.reduce((sum, entry) => sum + entry.count, 0),
-  )
+test('a range draws its whole skill window, including the ores that have no section of their own', () => {
+  /*
+   * **The point of the whole model, asserted.** Gold used to have a block to itself, which described
+   * a trip nobody takes: Gold Veins sit in Iron's zones and you pick them up on the Iron lap. It is
+   * now one of the ores the 125-175 range draws, on the 125-175 map.
+   */
+  const mining = guideFor('Mining')!
+  const ironRange = mining.ranges.find((range) => range.skillRange[0] === 125)!
+  expect(materialsForRange('Mining', ironRange)).toEqual(['Iron Ore', 'Gold Ore'])
 
-  // The merged loop covers more than any one herb's loop of the same zone, which is why it merges.
-  const silverleaf = routesForMaterials(['Silverleaf']).find((route) => route.zone === 'Tirisfal Glades')!
-  expect(busiest.spawnCount).toBeGreaterThan(silverleaf.spawnCount)
+  const arathi = routesForRange('Mining', ironRange).find((route) => route.zone === 'Arathi Highlands')!
+  expect(
+    arathi.materials.map((entry) => entry.material).sort(),
+    'one map, both ores, one loop',
+  ).toEqual(['Gold Ore', 'Iron Ore'])
+  expect(arathi.spawnCount).toBe(arathi.materials.reduce((sum, entry) => sum + entry.count, 0))
 
+  /*
+   * **Addressing a node by name alone silently dropped half the mining climb.** Thorium Ore and
+   * Adamantite Ore each name two nodes that differ only by requirement, and the old by-name lookup
+   * used `find` — first match wins — so Rich Thorium's and Rich Adamantite's coordinates were
+   * unreachable from anywhere in the app. Four of the nine mining ranges draw from them.
+   */
+  const small = routesForNodes([{ material: 'Thorium Ore', atSkill: 245 }]).map((route) => route.zone)
+  const rich = routesForNodes([{ material: 'Thorium Ore', atSkill: 275 }]).map((route) => route.zone)
+  expect(small.length).toBeGreaterThan(0)
+  expect(rich.length).toBeGreaterThan(0)
+  expect(small, 'the two variants are genuinely different zones').not.toEqual(rich)
+  expect(rich).toContain('Winterspring')
+
+  const richAdamantite = routesForNodes([{ material: 'Adamantite Ore', atSkill: 350 }])
+  expect(richAdamantite.length).toBeGreaterThan(0)
+  expect(richAdamantite[0].materials[0].material).toBe('Adamantite Ore')
+
+  /*
+   * **A range merges its materials into one loop**, because that is how it is farmed: at 1-70 you
+   * pick all four on the same lap. Not every zone carries every herb, and the merge is right to be
+   * selective — only Tirisfal Glades has all three of the first herbs, and Durotar says one rather
+   * than implying the other two are there.
+   */
+  const starter = routesForRange('Herbalism', guideFor('Herbalism')!.ranges[0])
+  const tirisfal = starter.find((route) => route.zone === 'Tirisfal Glades')!
+  expect(tirisfal.materials.length, 'the one starting zone carrying all three').toBe(3)
   const durotar = starter.find((route) => route.zone === 'Durotar')!
   expect(durotar.materials.map((entry) => entry.material), 'one herb, named as one').toEqual(['Peacebloom'])
 })
 
-test('every ingested node reaches a surface, and no row offers a herb before you can pick it', () => {
+test('the zone tabs are the range’s recommendation, and nothing points at a tab that is not there', () => {
   /*
-   * **The complement of the reachability test above, and the one that finishes the job.** That one
-   * asks whether every name a row writes down resolves to a node. This one asks the reverse: whether
-   * every node the ingest paid for is visible anywhere. Five were not — Arthas' Tears, Firebloom,
-   * Flame Cap, Grave Moss and Purple Lotus had full spawn coordinates and no row naming them, so
-   * their maps existed and nothing could reach them.
-   *
-   * They are placed by `supplementaryNodes` rather than by five new hand-written rows, because only
-   * the skill requirement and the zones are sourced — a levelling window and a character level for
-   * each would have been a guess printed beside real data.
+   * **Tab order is authored and has to stay authored.** Sorting by spawn count is the obvious
+   * "improvement" and it is wrong in a way that gets somebody killed: Silver's busiest recorded
+   * zones are Arathi Highlands, Thousand Needles and Desolace, all level 30-40, while a player
+   * mining Silver at skill 75 is around level 20. The recommended zones lead whatever their counts.
    */
-  const reached = new Set<string>()
-  for (const profession of ['Herbalism', 'Mining'] as const) {
-    const spots = [...(getProfessionProfile(profession)?.materialFarming ?? [])].sort(
-      (a, b) => a.skillRange[0] - b.skillRange[0],
-    )
-    const claimed = new Set(spots.flatMap((spot) => spot.materials))
-    const seen: [number, number][] = []
-    for (const spot of spots) {
-      spot.materials.forEach((material) => reached.add(material))
-      supplementaryNodes(profession, spot.skillRange, claimed, seen).forEach((node) => reached.add(node.material))
-      seen.push(spot.skillRange)
+  const tin = guideFor('Mining')!.ranges.find((range) => range.skillRange[0] === 65)!
+  const tabs = routesForRange('Mining', tin)
+  expect(tabs[0].zone, 'the recommendation leads, not the biggest pile of nodes').toBe('Loch Modan')
+  const arathi = tabs.find((route) => route.zone === 'Arathi Highlands')!
+  expect(arathi.spawnCount, 'and it really is out-ranked by a bigger zone').toBeGreaterThan(tabs[0].spawnCount)
+
+  for (const guide of gatheringGuides) {
+    for (const range of guide.ranges) {
+      const zones = new Set(routesForRange(guide.profession, range).map((route) => route.zone))
+
+      /*
+       * A zone note under a tab nobody can select is invisible. This caught two while the ranges
+       * were being written — a Thousand Needles note on a range whose Iron data does not reach it,
+       * and an Alterac Mountains note pushed off the end of an eight-tab cap.
+       */
+      for (const note of range.zoneNotes ?? []) {
+        expect(zones.has(note.zone), `${guide.profession} ${range.skillRange.join('-')}: ${note.zone}`).toBe(true)
+      }
+
+      // The nav stops being a chooser past eight, and one zone needs no nav at all.
+      expect(zones.size, `${guide.profession} ${range.skillRange.join('-')} tab count`).toBeLessThanOrEqual(8)
+
+      /*
+       * **Recommended-but-unmapped is a claim about our ingest, so it has to be exactly the
+       * complement.** Anything else means the page is either hiding a zone it recommends or naming
+       * one it has a map for.
+       */
+      const unmapped = recommendedWithoutMaps(guide.profession, range)
+      expect(unmapped.every((zone) => !zones.has(zone))).toBe(true)
+      expect(
+        range.zones.filter((zone) => !zones.has(zone)),
+        `${guide.profession} ${range.skillRange.join('-')} unmapped list is the complement`,
+      ).toEqual(unmapped)
+    }
+  }
+})
+
+test('the written half of a gathering guide carries its sources, and only says what it can', () => {
+  /*
+   * **The prose is the one authored part of a range and the only part that can be wrong in a way no
+   * derivation catches.** Everything else comes out of the ingest. So the check is that each range
+   * was actually checked: two independent sources minimum, named on the range itself, because a
+   * citation nobody can see is a citation nobody can dispute.
+   */
+  for (const guide of gatheringGuides) {
+    expect(guide.intro.length, `${guide.profession} opens with prose`).toBeGreaterThanOrEqual(2)
+    for (const range of guide.ranges) {
+      const where = `${guide.profession} ${range.skillRange.join('-')}`
+      expect(range.guidance.length, `${where} says something`).toBeGreaterThan(80)
+      expect(range.sources.length, `${where} was checked twice`).toBeGreaterThanOrEqual(2)
+      expect(range.zones.length, `${where} recommends somewhere`).toBeGreaterThan(0)
+      expect(range.recommendedCharacterLevel).toMatch(/^\d+-\d+$/)
     }
   }
 
-  const unreachable = [...new Set(gatheringNodes.map((node) => node.material))].filter(
-    (material) => !reached.has(material),
-  )
-  expect(unreachable, 'every ingested node is named somewhere a player can see it').toEqual([])
-
   /*
-   * **A supplementary node lands on exactly one row.** Purple Lotus at 210 falls inside two
-   * overlapping ranges, and showing it twice would be two maps of the same herb on one page.
+   * **`materials` is written by hand only where there is nothing to derive from.** Skinning comes off
+   * mobs and Fishing off pools, so neither has a node in the ingest. Mining and Herbalism must not
+   * carry one: a hand-written list beside a derived one is two sources of truth, which is this
+   * repo's signature failure and the exact thing this model was built to stop.
    */
-  const spots = [...(getProfessionProfile('Herbalism')?.materialFarming ?? [])].sort(
-    (a, b) => a.skillRange[0] - b.skillRange[0],
-  )
-  const claimed = new Set(spots.flatMap((spot) => spot.materials))
-  const seen: [number, number][] = []
-  const placements: string[] = []
-  for (const spot of spots) {
-    supplementaryNodes('Herbalism', spot.skillRange, claimed, seen).forEach((node) => placements.push(node.material))
-    seen.push(spot.skillRange)
+  for (const guide of gatheringGuides) {
+    const hasNodes = gatheringNodes.some((node) => node.profession === guide.profession)
+    for (const range of guide.ranges) {
+      const written = range.materials !== undefined
+      expect(written, `${guide.profession} ${range.skillRange.join('-')} materials`).toBe(!hasNodes)
+      if (written) expect(range.materials!.length).toBeGreaterThan(0)
+      expect(materialsForRange(guide.profession, range).length).toBeGreaterThan(0)
+    }
   }
-  expect(placements.length, 'placed once each, not once per overlapping range').toBe(new Set(placements).size)
-  expect(placements.sort()).toEqual(["Arthas' Tears", 'Firebloom', 'Flame Cap', 'Grave Moss', 'Purple Lotus'])
 
   /*
-   * **`requiredSkill` is the only sourced check on a written range**, so it is worth spending here.
-   * A row that offers a herb above its own range is telling a player to farm something they cannot
-   * pick yet. All 45 nodes carry the figure, read off Wowhead's "Requires Herbalism (205)".
+   * **Every material named anywhere resolves to a node or is a declared gap.** Naming the gaps means
+   * adding one fails here rather than quietly losing a map, and clearing one is a visible deletion.
+   * Wowhead publishes no coordinates for Ragveil or Ancient Lichen; the rest are Skinning and
+   * Fishing materials, which have no nodes by nature.
    */
-  expect(gatheringNodes.every((node) => Number.isInteger(node.requiredSkill))).toBe(true)
+  const knownGaps = new Set([
+    'Ancient Lichen',
+    'Ragveil',
+    'Ruined Leather Scraps',
+    'Light Leather',
+    'Medium Leather',
+    'Heavy Leather',
+    'Thick Leather',
+    'Rugged Leather',
+    'Thick Hide',
+    'Knothide Leather',
+    'Fel Hide',
+    'Cobra Scales',
+    'Nether Dragonscales',
+    'Thick Clefthoof Leather',
+    'Raw Brilliant Smallfish',
+    'Raw Longjaw Mud Snapper',
+    'Raw Bristle Whisker Catfish',
+    'Oily Blackmouth',
+    'Firefin Snapper',
+    'Raw Nightfin Snapper',
+    'Raw Sunscale Salmon',
+    'Spotted Feltail',
+    'Zangarmarsh Sporefish',
+    'Golden Darter',
+    'Furious Crawdad',
+    'Enormous Barbed Gill Trout',
+  ])
+  const unreachable = gatheringGuides
+    .flatMap((guide) => guide.ranges.flatMap((range) => range.materials ?? []))
+    .filter((material) => !mappableMaterials.has(material) && !knownGaps.has(material))
+  expect(unreachable, 'every named material resolves to a node or is a declared gap').toEqual([])
+})
 
-  const impossible: string[] = []
-  for (const profession of ['Herbalism', 'Mining'] as const) {
-    for (const spot of getProfessionProfile(profession)?.materialFarming ?? []) {
-      for (const material of spot.materials) {
-        const node = gatheringNodes.find((entry) => entry.material === material)
-        if (node && node.requiredSkill > spot.skillRange[1]) {
-          impossible.push(`${material} needs ${node.requiredSkill}, row ends at ${spot.skillRange[1]}`)
-        }
+test('the summary table and the inline markers put every trainer stop in the same place', () => {
+  /*
+   * **Two surfaces show training and they must not disagree.** The table says "At 200, train Artisan"
+   * inside the 175-245 row; the progression puts a marker inside the same range. They are computed
+   * from one function for exactly that reason.
+   *
+   * The rule is containment, and it is not the rule this page started with. Placing a milestone
+   * *before the next range* worked while ranges were one material wide and broke at seventy skill
+   * points: Artisan is trainable at 200, mid-way through 175-245, and the old rule pushed its marker
+   * below that whole section — past the map the player would have been staring at.
+   */
+  for (const guide of gatheringGuides) {
+    const rows = planRows(guide.profession)
+    expect(rows.length).toBe(guide.ranges.length)
+
+    const placed = rows.flatMap((row) => row.training)
+    const stranded = trainingOutsideRanges(guide.profession)
+    expect(
+      placed.length + stranded.length,
+      `${guide.profession}: every tier appears once`,
+    ).toBe(trainingMilestones(guide.profession).length)
+    expect(new Set(placed.map((milestone) => milestone.tier)).size).toBe(placed.length)
+
+    for (const row of rows) {
+      for (const milestone of row.training) {
+        expect(
+          milestone.atSkill,
+          `${guide.profession}: ${milestone.tier}@${milestone.atSkill} sits inside ${row.skillRange.join('-')}`,
+        ).toBeGreaterThanOrEqual(row.skillRange[0])
+        expect(milestone.atSkill).toBeLessThanOrEqual(row.skillRange[1])
       }
     }
+
+    // Nothing should be stranded today; the escape hatch exists so a future range edit says so.
+    expect(stranded.map((milestone) => milestone.tier), `${guide.profession} strands nobody`).toEqual([])
   }
-  expect(impossible, 'no row offers a material above its own skill range').toEqual([])
+
+  /*
+   * **The three secondary professions do not use the trainer breakpoints, and used to claim they
+   * did.** Expert is a book, Artisan is a quest at 225 and character level 35, and Master is a second
+   * book at 300. Cooking got no override at all and told players to visit a city trainer for two
+   * tiers no trainer teaches; First Aid's own wording read "requires level 35 and skill 225" beside a
+   * number that said 200.
+   */
+  for (const profession of ['Cooking', 'First Aid', 'Fishing'] as const) {
+    const tiers = trainingMilestones(profession)
+    const artisan = tiers.find((tier) => tier.tier === 'Artisan')!
+    const master = tiers.find((tier) => tier.tier === 'Master')!
+    expect(artisan.atSkill, `${profession} Artisan is a quest at 225`).toBe(225)
+    expect(artisan.requiredCharacterLevel).toBe(35)
+    expect(master.atSkill, `${profession} Master is a book at 300`).toBe(300)
+    for (const tier of tiers.filter((entry) => entry.tier !== 'Journeyman')) {
+      expect(tier.trainedFrom, `${profession} ${tier.tier} says it is not a trainer`).toContain(
+        'Not a live trainer',
+      )
+    }
+  }
+
+  // And the trainer professions are untouched by that: 200 and 275, from a trainer.
+  for (const profession of ['Mining', 'Herbalism', 'Skinning'] as const) {
+    const tiers = trainingMilestones(profession)
+    expect(tiers.find((tier) => tier.tier === 'Artisan')!.atSkill).toBe(200)
+    expect(tiers.find((tier) => tier.tier === 'Master')!.atSkill).toBe(275)
+  }
 })
 
 test('every zone a route draws has map art, or is recorded as having none', () => {
@@ -9075,7 +9226,7 @@ test('a route stop is a node that exists, not the average of a cluster', () => {
   expect(after).toBeLessThan(before * 1.35)
 
   // And the rendered route carries the spawns it was derived from, so the map can plot them.
-  const route = routesForMaterials(['Felweed'])[0]
+  const route = routesForNodes([{ material: 'Felweed', atSkill: 300 }])[0]
   expect(route.spawns.length).toBeGreaterThan(0)
   expect(route.spawns.reduce((sum, group) => sum + group.coords.length, 0)).toBeGreaterThan(50)
 })

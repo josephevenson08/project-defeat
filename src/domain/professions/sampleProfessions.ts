@@ -1,6 +1,5 @@
 import type { Profession, ProfessionCategory, ProfessionProfile } from './professionTypes'
 import { getProfessionTiers } from './sampleProfessionTiers'
-import { getMaterialFarmSpots } from './sampleGatheringMaterials'
 import { getCraftingLevelingPath } from './sampleCraftingGuides'
 
 const categoryByProfession: Record<Profession, ProfessionCategory> = {
@@ -100,7 +99,6 @@ export const allProfessions: readonly Profession[] = [
 ]
 
 export const sampleProfessions: readonly ProfessionProfile[] = allProfessions.map((profession) => {
-  const materialFarming = getMaterialFarmSpots(profession)
   const levelingPath = getCraftingLevelingPath(profession)
   const notes = professionNotes[profession]
 
@@ -112,7 +110,6 @@ export const sampleProfessions: readonly ProfessionProfile[] = allProfessions.ma
     guideUrl: presentation[profession].guideUrl,
     ...(presentation[profession].specializationUrl ? { specializationUrl: presentation[profession].specializationUrl } : {}),
     tiers: getProfessionTiers(profession),
-    ...(materialFarming.length > 0 ? { materialFarming } : {}),
     ...(levelingPath.length > 0 ? { levelingPath } : {}),
     ...(notes ? { notes } : {}),
   }

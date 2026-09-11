@@ -9,7 +9,7 @@
 //
 // **Only the structured `materials` field is read, never the display label.** `material` is written
 // for a person ("Thorium Ore (incl. Rich Thorium Vein at 275+)") and parsing it back into a key is
-// precisely the mistake that cost this repo 28 of its 43 route maps — see `MaterialFarmSpot`.
+// precisely the mistake that cost this repo 28 of its 43 route maps — see `GatheringNodeRef`.
 //
 // Crafting `keyMaterials` are deliberately out of scope: they are still prose ("15 Golden Sansam,
 // Dreamfoil or Mountain Silversage — whichever matches the craft you picked"), and splitting a
@@ -78,16 +78,27 @@ for (const line of csv.split('\n')) {
   if (!byName.has(name) || byName.get(name).id > id) byName.set(name, { id, icon })
 }
 
-const { gatheringMaterialFarming } = await import(
-  pathToFileURL(resolve(REPO, 'src/domain/professions/sampleGatheringMaterials.ts')).href
+/*
+ * **Two sources, because the app now has two kinds of gathered material.** Mining and Herbalism
+ * derive their range contents from the node ingest, so the authoritative list of what they gather is
+ * `nodeSpawns.json` rather than anything written by hand. Skinning and Fishing have no nodes at all
+ * and name their materials explicitly on each range.
+ *
+ * Reading only the guides would miss every ore and herb; reading only the spawns would miss every
+ * leather and fish. The union is what the icon map has to cover.
+ */
+const { gatheringGuides } = await import(
+  pathToFileURL(resolve(REPO, 'src/domain/professions/gatheringGuides.ts')).href
+)
+const { nodes } = JSON.parse(
+  readFileSync(resolve(REPO, 'src/domain/professions/nodeSpawns.json'), 'utf8'),
 )
 
 const wanted = [
-  ...new Set(
-    Object.values(gatheringMaterialFarming)
-      .flat()
-      .flatMap((spot) => spot.materials),
-  ),
+  ...new Set([
+    ...nodes.map((node) => node.material),
+    ...gatheringGuides.flatMap((guide) => guide.ranges.flatMap((range) => range.materials ?? [])),
+  ]),
 ].sort()
 
 const materials = {}

@@ -39,9 +39,14 @@ export type GatheringNode = {
   /**
    * The gathering skill the node requires, read off Wowhead's "Requires Herbalism (205)".
    *
-   * **This is the only sourced check on a written farm range.** A row offering Firebloom at 150-210
-   * is wrong, and nothing could catch that while the requirement lived only on a web page. It also
-   * places the herbs no row mentions, which is otherwise a guess sitting next to sourced data.
+   * **This is what decides which section a node appears in, so it is load-bearing rather than
+   * descriptive.** `nodesForRange` derives a range's whole material list from it, which is why no
+   * range can offer a herb you cannot pick yet: the window decides, nothing is written down, and a
+   * re-ingest that moves a requirement moves the node to the right section on its own.
+   *
+   * It is also the reason `GatheringNodeRef` carries it. Two nodes share a material name and differ
+   * only here — Small against Rich Thorium, Adamantite against Rich Adamantite — so it is half the
+   * key, not a property of the row.
    */
   requiredSkill: number
   totalSpawns: number
@@ -282,32 +287,23 @@ export function snapToSpawns(stops: readonly SpawnPoint[], coords: readonly Spaw
 }
 
 /**
- * A route per zone for a set of materials farmed together.
+ * A route per zone for a set of nodes farmed together.
  *
  * **The unit is the skill range, not the material, because that is the unit a player farms in.**
- * At 1-100 you are picking Peacebloom, Silverleaf *and* Earthroot on the same lap of Durotar — so
- * one loop over the three clouds merged is the route that exists, and three separate single-herb
- * loops of the same zone is three pictures of the same ride.
+ * At 1-70 you are picking Peacebloom, Silverleaf *and* Earthroot on the same lap of Tirisfal Glades
+ * — so one loop over the three clouds merged is the route that exists, and three separate
+ * single-herb loops of the same zone is three pictures of the same ride.
  *
- * It also fixes what the per-material version could not express: a herb whose row names two others
- * had no way to draw them together, and the exact-match join meant most rows drew nothing at all.
- */
-export function routesForMaterials(materials: readonly string[]): RangeRoute[] {
-  return routesFromNodes(materials.flatMap((material) => gatheringNodes.filter((node) => node.material === material)))
-}
-
-/**
- * The same thing, addressed by node rather than by name.
+ * **Addressed by node rather than by name, and that is not a detail.** Two ingested nodes share a
+ * material name and differ only by requirement: Small Thorium Vein at 245 against Rich Thorium Vein
+ * at 275, Adamantite Deposit at 325 against Rich Adamantite at 350. A skill range wants one of each
+ * pair and not the other — the 245-275 section is about the small veins, the 275-300 section about
+ * the rich ones, and they are in different zones.
  *
- * **Two ingested nodes share a material name and differ only by requirement** — Small Thorium Vein
- * at 245 against Rich Thorium Vein at 275, Adamantite Deposit at 325 against Rich Adamantite at 350.
- * A skill range wants one of each pair and not the other: the 245-275 section is about the small
- * veins and the 275-300 section is about the rich ones, and they are in different zones.
- *
- * `routesForMaterials` cannot express that, and until this existed it could not even express the
- * union — it resolved each name with `find`, which returns the first match, so Rich Thorium's and
- * Rich Adamantite's coordinates were unreachable from any surface in the app. Four of the nine
- * mining ranges are drawn from those two nodes.
+ * The by-name version this replaced could not express that. It resolved each name with `find`, which
+ * returns the first match, so the rich variants' coordinates were unreachable from any surface in
+ * the app. Four of the nine mining ranges draw from those two nodes. Same lesson as
+ * `GatheringNodeRef`: a display label is not a join key.
  */
 export function routesForNodes(refs: readonly { material: string; atSkill: number }[]): RangeRoute[] {
   return routesFromNodes(
@@ -371,32 +367,3 @@ function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
 
 /** Every material name the node data can draw, for asserting that a farm row's names still resolve. */
 export const mappableMaterials: ReadonlySet<string> = new Set(gatheringNodes.map((node) => node.material))
-
-/**
- * Nodes a profession can gather in a skill window that no farm row names.
- *
- * **Computed rather than authored, because the alternative was inventing a levelling window.** Five
- * ingested herbs — Arthas' Tears, Firebloom, Flame Cap, Grave Moss, Purple Lotus — had full spawn
- * coordinates and no row pointing at them, so their maps were unreachable. Writing five new rows
- * would have meant deciding a skill range and a character level for each, and only the skill
- * requirement and the zones are sourced; the rest would have been a guess printed beside real data.
- *
- * So they attach to the row whose range already contains their requirement. `requiredSkill` and the
- * zone list both come from the ingest, the row supplies the window, and nothing here is authored.
- *
- * **Each one lands on exactly one row**, the earliest whose range contains it — Purple Lotus at 210
- * qualifies for two overlapping rows and belongs on the first, not on both.
- */
-export function supplementaryNodes(
-  profession: Profession,
-  skillRange: readonly [number, number],
-  claimedByAnyRow: ReadonlySet<string>,
-  earlierRanges: readonly (readonly [number, number])[] = [],
-): GatheringNode[] {
-  return gatheringNodes
-    .filter((node) => node.profession === profession)
-    .filter((node) => !claimedByAnyRow.has(node.material))
-    .filter((node) => node.requiredSkill >= skillRange[0] && node.requiredSkill <= skillRange[1])
-    .filter((node) => !earlierRanges.some(([lo, hi]) => node.requiredSkill >= lo && node.requiredSkill <= hi))
-    .sort((a, b) => a.requiredSkill - b.requiredSkill)
-}
