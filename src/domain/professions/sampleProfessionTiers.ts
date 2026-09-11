@@ -126,10 +126,27 @@ const categoryNoteByProfession: Partial<Record<Profession, string>> = {
 }
 
 /**
- * Fishing and First Aid have quirky pre-Master unlocks in vanilla-derived systems (Fishing's
- * Expert/Artisan tiers are gated by a purchase and a quest rather than a plain trainer visit;
- * First Aid's Artisan tier is gated by the "Triage" quest). We keep the shared skill/level
- * breakpoints but override `trainedFrom` and flag the quirk on those specific tiers.
+ * The three secondary professions do not use the shared breakpoints, and pretending they do is a
+ * defect rather than a simplification.
+ *
+ * **Cooking, First Aid and Fishing gate Expert on a book, Artisan on a quest, and Master on a second
+ * book.** None of those is a trainer visit, and the skills differ too: Artisan is 225 and character
+ * level 35 rather than the 200 the trainer professions use, and Master is 300 rather than 275. Until
+ * 2026-09-11 this file kept the shared numbers and overrode only the wording for two of the three —
+ * so Cooking told a player to visit a city trainer for a tier no trainer teaches, and First Aid's own
+ * override text read "requires level 35 and skill 225" directly beside a `minSkillToTrainNext` of
+ * 200. The prose contradicted the number next to it.
+ *
+ * It stayed invisible while the tier table was five identical-looking rows at the top of a page.
+ * The gathering revamp prints the gate as a sentence in the summary table — "At 200, train Artisan"
+ * — which is where a wrong number stops being cosmetic and starts sending somebody to Stormwind for
+ * a quest in Tanaris.
+ *
+ * **One number is still not settled and is flagged rather than guessed.** Sources split on Expert's
+ * skill gate: warcrafttavern.com's rank table says 150, while icy-veins.com and the wow.gg guide put
+ * it at 125, matching Expert Cooking and Expert First Aid. 125 is kept because it agrees with the
+ * other two books, and the disagreement is recorded on the tier instead of being resolved by
+ * picking.
  */
 function withTierOverride(
   tiers: readonly ProfessionTier[],
@@ -139,24 +156,57 @@ function withTierOverride(
   return tiers.map((tier) => (tier.tier === tierName ? { ...tier, ...overrides } : tier))
 }
 
+/** Expert is a book for all three, and the skill gate is the one figure sources disagree on. */
+const EXPERT_BOOK_NOTE =
+  'Expert is a book rather than a trainer, and sources split on its skill gate: most put it at 125, matching the other two secondary professions, while warcrafttavern.com lists 150. 125 is used here.'
+
+/** Artisan is a quest for all three, at skill 225 and character level 35 — not the trainer 200. */
+const ARTISAN_QUEST_SKILL = 225
+
+/** Master is a book for all three, and the books require 300 rather than the trainer tiers' 275. */
+const MASTER_BOOK_SKILL = 300
+
 function buildTiers(profession: Profession): ProfessionTier[] {
   let tiers = [...standardLeveling, masterTierByProfession[profession]]
 
-  if (profession === 'Fishing') {
+  const secondary = profession === 'Cooking' || profession === 'First Aid' || profession === 'Fishing'
+  if (secondary) {
     tiers = withTierOverride(tiers, 'Expert', {
-      trainedFrom: 'Purchase "Expert Fishing - The Bass and You" from Old Man Heming in Booty Bay (Horde and Alliance can both use this vendor).',
+      minSkillToTrainNext: 125,
+      needsVerification: true,
+      notes: EXPERT_BOOK_NOTE,
     })
     tiers = withTierOverride(tiers, 'Artisan', {
-      trainedFrom: "Complete Nat Pagle's fishing quest line in Dustwallow Marsh to unlock Artisan Fishing.",
+      minSkillToTrainNext: ARTISAN_QUEST_SKILL,
+      requiredCharacterLevel: 35,
+    })
+    tiers = withTierOverride(tiers, 'Master', { minSkillToTrainNext: MASTER_BOOK_SKILL })
+  }
+
+  if (profession === 'Fishing') {
+    tiers = withTierOverride(tiers, 'Expert', {
+      trainedFrom: 'Not a live trainer: purchase "Expert Fishing - The Bass and You" from Old Man Heming in Booty Bay for 1 gold, then learn it from your bag. Both factions can use this vendor.',
+    })
+    tiers = withTierOverride(tiers, 'Artisan', {
+      trainedFrom: 'Not a live trainer: complete "Nat Pagle, Angler Extreme" from Nat Pagle in Dustwallow Marsh. The quest wants four rare fish from four separate zones and needs Fishing 225 and character level 35.',
+    })
+  }
+
+  if (profession === 'Cooking') {
+    tiers = withTierOverride(tiers, 'Expert', {
+      trainedFrom: 'Not a live trainer: purchase the Expert Cookbook from a cooking supplies vendor, then learn it from your bag.',
+    })
+    tiers = withTierOverride(tiers, 'Artisan', {
+      trainedFrom: 'Not a live trainer: complete the "Clamlette Surprise" quest from Dirge Quikcleave in Gadgetzan, Tanaris. Needs Cooking 225 and character level 35.',
     })
   }
 
   if (profession === 'First Aid') {
     tiers = withTierOverride(tiers, 'Expert', {
-      trainedFrom: 'Purchase the Expert First Aid manual from Balai Lok\'Wein (Horde, Dustwallow Marsh) or Deneb Walker (Alliance, Arathi Highlands), then learn it from your bag.',
+      trainedFrom: 'Not a live trainer: purchase the Expert First Aid manual from Balai Lok\'Wein (Horde, Dustwallow Marsh) or Deneb Walker (Alliance, Arathi Highlands), then learn it from your bag.',
     })
     tiers = withTierOverride(tiers, 'Artisan', {
-      trainedFrom: 'Complete the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde) to unlock Artisan First Aid; requires level 35 and skill 225.',
+      trainedFrom: 'Not a live trainer: complete the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde). Needs First Aid 225 and character level 35.',
     })
   }
 
