@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { getClassColor } from '../../domain/character/classColors'
+import { getFactionColor } from '../../domain/character/factionColors'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { factions, getClassDefinition, getClassesForRace, racesByFaction, getRoleForSpec } from './characterData'
 import type { CharacterClass, CharacterProfile, CharacterSpec, Faction, Race } from './characterTypes'
@@ -56,9 +58,29 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
     setDraft({ ...draft, className, spec: getClassDefinition(className).specs[0] })
   }
 
-  const options: { value: string; label: string; onSelect: () => void; selected: boolean }[] =
+  /*
+   * **Each option carries its own colour, and three of the four steps have one to carry.**
+   *
+   * A faction button is Alliance blue or Horde red, a class button is that class's own colour, and a
+   * spec button takes the colour of the class it belongs to. Those are not decoration — they are the
+   * colours this game has trained every player to read, and a list of nine identical grey rectangles
+   * throws that away and makes you read nine words instead.
+   *
+   * **Race is deliberately the exception.** The game gives races no colour of their own, and
+   * inventing nine would be this app asserting something the game does not say. The step stays
+   * neutral and the frame's metal carries it.
+   */
+  type Option = { value: string; label: string; onSelect: () => void; selected: boolean; accent?: string }
+
+  const options: Option[] =
     step.id === 'faction'
-      ? factions.map((faction) => ({ value: faction, label: faction, onSelect: () => chooseFaction(faction), selected: draft.faction === faction }))
+      ? factions.map((faction) => ({
+          value: faction,
+          label: faction,
+          onSelect: () => chooseFaction(faction),
+          selected: draft.faction === faction,
+          accent: getFactionColor(faction),
+        }))
       : step.id === 'race'
         ? racesByFaction[draft.faction].map((race) => ({ value: race, label: race, onSelect: () => chooseRace(race), selected: draft.race === race }))
         : step.id === 'class'
@@ -67,12 +89,14 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
               label: className,
               onSelect: () => chooseClass(className),
               selected: draft.className === className,
+              accent: getClassColor(className),
             }))
           : getClassDefinition(draft.className).specs.map((spec: CharacterSpec) => ({
               value: spec,
               label: spec,
               onSelect: () => setDraft({ ...draft, spec }),
               selected: draft.spec === spec,
+              accent: getClassColor(draft.className),
             }))
 
   return (
@@ -114,6 +138,7 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
                 key={option.value}
                 type="button"
                 className={`creator-option${option.selected ? ' creator-option-selected' : ''}`}
+                style={option.accent ? ({ '--option-accent': option.accent } as React.CSSProperties) : undefined}
                 onClick={option.onSelect}
                 data-testid={`creator-option-${option.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                 aria-pressed={option.selected}

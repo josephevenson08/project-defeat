@@ -327,26 +327,71 @@ select {
   margin-bottom: 28px;
 }
 
+/*
+ * An option wears the colour of the thing it is.
+ *
+ * **Faction, class and spec all have a colour the game itself assigns**, and a player already reads
+ * them without thinking — Shaman blue, Mage light blue, Warrior brown. Rendering nine classes as nine
+ * identical grey rectangles throws that recognition away and makes somebody read nine words instead.
+ * So the left edge and the glyph take `--option-accent`, which the component sets per button.
+ *
+ * Race is the one step with no accent, because the game gives races no colour and inventing nine
+ * would be this app asserting something the game does not. Those fall back to the frame's metal.
+ */
 .creator-option {
-  background: var(--surface-1);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
   border: 1px solid var(--line);
+  border-left: 3px solid var(--option-accent, var(--metal-1));
   border-radius: var(--radius);
   color: var(--text);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font: inherit;
+  font-family: var(--font-display);
   font-size: 14px;
-  padding: 12px 14px;
+  letter-spacing: 0.03em;
+  padding: 13px 15px;
   text-align: left;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+/*
+ * The glyph is a filled lozenge in the option's own colour, so the colour reads even at a glance
+ * where the 3px edge alone would be easy to miss — and so an unaccented race option still looks
+ * deliberate rather than broken.
+ */
+.creator-option::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex: none;
+  transform: rotate(45deg);
+  background: var(--option-accent, var(--metal-2));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
 .creator-option:hover {
-  background: var(--surface-2);
+  background: linear-gradient(180deg, var(--surface-3), var(--surface-2));
   border-color: var(--line-strong);
+  border-left-color: var(--option-accent, var(--metal-2));
 }
 
-.creator-option-selected {
-  border-color: var(--creator-accent);
+/*
+ * Selected is the option's colour taken all the way: the full border, a tinted ground and a halo.
+ * `color-mix` keeps the tint derived from the accent rather than a second value to maintain, so a
+ * new class colour needs no new rule here.
+ */
+.creator-option-selected,
+.creator-option-selected:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--option-accent, var(--metal-2)) 22%, var(--surface-2)),
+    var(--surface-1)
+  );
+  border-color: var(--option-accent, var(--creator-accent));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--option-accent, var(--metal-2)) 40%, transparent);
   color: var(--text-strong);
 }
 
@@ -396,23 +441,47 @@ select {
   margin: 6px 0 8px;
 }
 
+/*
+ * Five raids, five equal columns, the full width of the page.
+ *
+ * **`auto-fit` with a 240px minimum was wrong for a fixed set of five.** It packs as many as fit and
+ * leaves the last row short — at most widths that meant four across and one orphan underneath, on a
+ * page whose entire job is "pick one of these five". A fixed five-column track makes them one row of
+ * equal doors, which is what they are. Below 1100px they go to two columns and then one, because five
+ * across a laptop would be five slivers.
+ */
 .raid-picker-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 1100px) {
+  .raid-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .raid-picker-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .raid-picker-card {
-  background: var(--surface-1);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
   border: 1px solid var(--line);
   border-radius: var(--radius);
   border-top: 2px solid #6a7fa8;
   color: inherit;
   cursor: pointer;
   display: grid;
+  align-content: start;
+  gap: 7px;
+  /* Tall enough to read as a door rather than a table row, now that there are five across. */
+  min-height: 150px;
+  padding: 18px 18px 20px;
   font: inherit;
-  gap: 6px;
-  padding: 16px;
   text-align: left;
   transition: background 120ms ease, border-color 120ms ease;
 }
@@ -3792,15 +3861,36 @@ input[type='text']:focus {
   padding: 0;
 }
 
+/*
+ * A chip wears its class colour on the edge and in the class label.
+ *
+ * The tint is derived from the colour with `color-mix` rather than being a second value per class,
+ * so the nine classes need nine values in one place and nothing here. It is kept low — 14% — because
+ * a row holds up to nine chips and nine saturated grounds side by side is a paint chart, not a
+ * ranking.
+ */
 .tier-spec {
-  background: var(--surface-1);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--spec-class, var(--metal-2)) 14%, var(--surface-1)),
+    var(--surface-1)
+  );
   border: 1px solid var(--line);
-  border-left: 2px solid var(--tier-rule);
+  border-left: 3px solid var(--spec-class, var(--tier-rule));
   border-radius: var(--radius);
   display: grid;
   gap: 3px;
   min-width: 148px;
   padding: 9px 12px;
+}
+
+/*
+ * The class name takes the colour at full strength, since it is the shortest label on the chip and
+ * the one the colour is about. The spec name above it stays on the tier ink, because that is what
+ * carries rank.
+ */
+.tier-spec .tier-spec-class {
+  color: var(--spec-class, var(--text-faint));
 }
 
 .tier-spec-spec {

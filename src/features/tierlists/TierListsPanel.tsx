@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { Panel } from '../../components/layout/Panel'
+import { getClassColor } from '../../domain/character/classColors'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { getRoleForSpec } from '../../domain/character/tbcClasses'
 import type { CharacterProfile } from '../character/characterTypes'
@@ -90,12 +91,29 @@ function TierRowView({ tier, depth, highlight }: { tier: TierRow; depth: number;
           const isHighlight = highlight?.className === placement.className && highlight?.spec === placement.spec
           const accent = isHighlight ? getRoleAccentColor(getRoleForSpec(placement.className, placement.spec)) : undefined
 
+          /*
+           * **Every chip wears its class colour, which is the thing a reader is actually scanning
+           * for.** "Where do Shamans sit" is the question this page gets asked, and answering it
+           * with nine identical grey chips per row means reading every label. Blizzard's class
+           * colours are what players already parse without thinking.
+           *
+           * This does not touch the tier *letters*, which stay neutral — a guard asserts that, and
+           * it is the rule that stops rank being confused with item quality. The chip says which
+           * class; the letter says how good. Colouring both would collapse the distinction.
+           */
+          const classColor = getClassColor(placement.className)
+
           return (
             <li
               key={placement.slug}
               className="tier-spec"
               data-current={isHighlight || undefined}
-              style={accent ? ({ '--tier-accent': accent } as CSSProperties) : undefined}
+              style={
+                {
+                  '--spec-class': classColor,
+                  ...(accent ? { '--tier-accent': accent } : {}),
+                } as CSSProperties
+              }
               data-testid={`tier-spec-${placement.slug}`}
             >
               <span className="tier-spec-spec">{placement.spec}</span>
