@@ -466,6 +466,9 @@ import {
   craftingPlanRows,
   craftingTrainingOutsideSteps,
   professionsWithCraftingPaths,
+  professionPayoffs,
+  payoffFor,
+  professionsWithStatPayoff,
   trainingMilestones,
 } from '../src/domain/professions'
 import type { Profession } from '../src/domain/professions'
@@ -1455,6 +1458,16 @@ test('Professions is a grid you pick from, and each profession opens its own pag
   await page.getByTestId('profession-pick-mining').click()
   await expect(page.getByRole('heading', { name: 'Mining', exact: true })).toBeVisible()
   await expect(page.getByText('Copper Ore').first()).toBeVisible()
+
+  /*
+   * **The landing page has promised this since the tab was built and nothing delivered it.** Its
+   * blurb reads "how to take a profession to 375 without wasting materials, and what each one is
+   * actually worth at 70" — the first half is the levelling guide, and the second half had no code
+   * path at all until 2026-09-11. A claim in your own copy that nothing satisfies is the same class
+   * of defect as a wrong number, and this is what stops it going quiet again.
+   */
+  await expect(page.getByTestId('profession-payoff')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What it is worth at 70' })).toBeVisible()
 
   /*
    * **A range draws a map, and the map covers the whole range rather than one ore.** The join used to
@@ -9183,6 +9196,61 @@ test('the summary table and the inline markers put every trainer stop in the sam
       }
       expect(row.materials.length, `${profession} ${row.name} names what it needs`).toBeGreaterThan(0)
       expect(row.crafts, `${profession} ${row.name} craft count`).toBeGreaterThan(0)
+    }
+  }
+})
+
+test('exactly one TBC profession puts a stat on your character sheet, and it is Enchanting', () => {
+  /*
+   * **This test is the finding, not a check on it.**
+   *
+   * The roadmap item this data closes was written as "profession *bonuses to stats* (e.g. extra
+   * sockets from Blacksmithing)". Socket Bracer and Socket Gloves need Blacksmithing 400 and do not
+   * exist in The Burning Crusade. Neither does Herbalism's Lifeblood, Mining's Toughness, Skinning's
+   * Master of Anatomy, Leatherworking's Fur Lining, or Jewelcrafting's bind-on-pickup gems — every
+   * one is a Wrath addition, and every one is a thing people are certain TBC has.
+   *
+   * So the assertion is the count. In TBC exactly one profession gives a level 70 character an
+   * always-on stat bonus, and if a future edit makes that two, it is either a real discovery worth
+   * stopping for or a Wrath perk leaking back in. Both deserve to fail here rather than ship.
+   */
+  expect(professionsWithStatPayoff, 'Enchanting, and nothing else').toEqual(['Enchanting'])
+
+  const enchanting = payoffFor('Enchanting')!
+  expect(enchanting.perks.filter((perk) => perk.kind === 'stat').length, 'all four ring enchants').toBe(4)
+  expect(enchanting.perks.some((perk) => /\+4 all stats per ring/.test(perk.detail))).toBe(true)
+
+  /*
+   * **The gathering professions give nothing, and say so.** An empty section would read as data
+   * nobody got round to; the sentence explaining that the perk they are thinking of arrived in Wrath
+   * is the useful version, and it has to survive somebody "filling in the gap" later.
+   */
+  for (const profession of ['Herbalism', 'Mining', 'Skinning'] as const) {
+    const payoff = payoffFor(profession)!
+    expect(payoff.perks.every((perk) => perk.kind === 'feeds'), `${profession} grants nothing`).toBe(true)
+    expect(payoff.perks.some((perk) => /Wrath/.test(perk.detail)), `${profession} says why`).toBe(true)
+  }
+
+  /* Every profession answers the question, because the landing page promises all thirteen do. */
+  expect(professionPayoffs.length, 'one per profession').toBe(allProfessions.length)
+  expect(
+    allProfessions.filter((profession) => !payoffFor(profession)),
+    'no profession is left without an answer',
+  ).toEqual([])
+
+  for (const payoff of professionPayoffs) {
+    const where = payoff.profession
+    expect(payoff.verdict.length, `${where} has a verdict worth reading`).toBeGreaterThan(60)
+    expect(payoff.perks.length, `${where} names something`).toBeGreaterThan(0)
+    expect(payoff.sources.length, `${where} was checked`).toBeGreaterThan(0)
+    for (const perk of payoff.perks) {
+      expect(perk.detail.length, `${where}: ${perk.name} explains itself`).toBeGreaterThan(40)
+      /*
+       * A phase qualifier is not trivia here: this app plans Phase 2, so a perk three phases out is
+       * different advice. Where it is recorded it has to be a real TBC phase.
+       */
+      if (perk.phase !== undefined) expect(perk.phase).toBeGreaterThanOrEqual(1)
+      if (perk.phase !== undefined) expect(perk.phase).toBeLessThanOrEqual(5)
     }
   }
 })

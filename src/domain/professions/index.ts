@@ -46,3 +46,5 @@ export {
   trainingOutsideRanges,
 } from './gatheringPlan'
 export type { PlanRow } from './gatheringPlan'
+export { professionPayoffs, payoffFor, professionsWithStatPayoff } from './professionPayoffs'
+export type { PayoffKind, ProfessionPerk, ProfessionPayoff } from './professionPayoffs'

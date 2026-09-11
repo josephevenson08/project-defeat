@@ -5109,3 +5109,107 @@ input[type='text']:focus {
     max-width: 380px;
   }
 }
+
+/*
+ * "What is this worth at 70."
+ *
+ * Above the levelling climb, because it is the question asked first — somebody opening the
+ * Blacksmithing page has usually not decided to level Blacksmithing yet.
+ */
+.profession-payoff {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.profession-payoff-verdict {
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 74ch;
+}
+
+.profession-payoff-perks {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profession-payoff-perk {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--line-strong);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 3px;
+  padding: 9px 12px;
+}
+
+.profession-payoff-perk p {
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 74ch;
+}
+
+.profession-payoff-perk strong {
+  color: var(--text-strong);
+  font-size: 13px;
+}
+
+.profession-payoff-kind {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+/*
+ * The one kind that is a number you can add up gets the accent edge.
+ *
+ * **Exactly one profession in the expansion earns it**, which is the whole finding: Enchanting's ring
+ * enchants are the only always-on stat bonus in TBC, and every perk people remember as a stat —
+ * Blacksmithing's sockets, Herbalism's Lifeblood, Skinning's crit — is a Wrath addition. Making the
+ * rare case look different from the common one is the point rather than decoration.
+ */
+.profession-payoff-stat {
+  border-left-color: var(--profession-accent, var(--line-strong));
+}
+
+/*
+ * And the kind that says "this does not exist here" is deliberately the quietest.
+ *
+ * Five perks are corrections rather than payoffs — three gathering professions give nothing, and two
+ * crafting ones lack a perk people are certain they have. They earn their place by pre-empting a
+ * wrong assumption, not by being good news, so they read as a footnote sitting in the list.
+ */
+.profession-payoff-feeds {
+  border-left-color: var(--line);
+  opacity: 0.85;
+}
+
+.profession-payoff-meta {
+  display: flex;
+  gap: 10px;
+}
+
+.profession-payoff-meta span {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.profession-payoff-meta:empty {
+  display: none;
+}
+
+.profession-payoff-note {
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.45;
+}

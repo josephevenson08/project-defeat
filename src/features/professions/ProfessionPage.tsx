@@ -2,6 +2,7 @@ import { Panel } from '../../components/layout/Panel'
 import { craftingPathFor, craftingPathModel, guideFor } from '../../domain/professions'
 import type { ProfessionProfile } from '../../domain/professions'
 import { GatheringProgression } from './GatheringProgression'
+import { ProfessionPayoff } from './ProfessionPayoff'
 import { CraftingProgression } from './CraftingProgression'
 
 /**
@@ -50,6 +51,12 @@ export function ProfessionPage({ profile, onBack }: { profile: ProfessionProfile
           </a>
         )}
       </div>
+
+      {/*
+        The payoff goes above the climb, because it is the question asked first. Somebody opening the
+        Blacksmithing page has usually not decided to level Blacksmithing yet.
+      */}
+      <ProfessionPayoff profession={profile.profession} />
 
       {gathering && <GatheringProgression profession={profile.profession} />}
       {crafting.length > 0 && (
