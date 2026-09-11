@@ -1,15 +1,15 @@
 ---
 type: module
 layer: app
-source: src/styles/global.css
-lines: 5482
+source: src/styles/fonts.css
+lines: 51
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
-# styles.global
+# styles.fonts
 
-`src/styles/global.css` · **app** layer · 5482 lines
+`src/styles/fonts.css` · **app** layer · 51 lines
 
 _No doc comment at the top of this file._
 
@@ -19,11 +19,11 @@ _Nothing exported (side-effect or style module)._
 
 ## Imports
 
-- [[styles.fonts]] — `src/styles/fonts.css`
+_None._
 
 ## Imported by
 
-- [[main]] — `src/main.tsx`
+- [[styles.global]] — `src/styles/global.css`
 
 ## Concepts & phases
 

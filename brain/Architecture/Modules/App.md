@@ -2,16 +2,27 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 358
+lines: 378
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 358 lines
+`src/App.tsx` · **app** layer · 378 lines
 
-_No doc comment at the top of this file._
+From the top of the file:
+
+> The faction theme is stamped on `<html>`, not on a wrapper inside the app.
+> 
+> **It has to be the root element or the page's own ground is the wrong colour.** `:root` paints the
+> body background, and a Horde character on an Alliance-blue ground would show a warm panel sitting
+> on a cool page — visible in exactly the gap the app does not control. Stamping the document
+> element means the background, the scrollbar and every panel change together.
+> 
+> Driven from the character rather than from a separate control, because the app already asks which
+> faction you are before anything else, and a second switch for the same fact is a second thing to
+> keep in sync.
 
 ## Exports
 

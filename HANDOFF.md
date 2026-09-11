@@ -5,6 +5,78 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-11, the app looks like the game now)
+
+**A complete retheme, replacing a design that was deliberately the opposite.** What was here was
+monochrome and industrial — hairline rules, no gradients, system fonts, item quality as the only
+colour in the interface. That was coherent and it is gone on purpose: this is a tool for a game with
+a very specific look, and looking like the game is worth more here than looking like an instrument.
+
+Panels are framed plates with a bevelled metal edge and corner brackets. Cinzel carries every heading
+and both navs. The palette follows the character's faction.
+
+### Three things survived the change, and they are the ones to not undo
+
+| Kept | Why |
+|---|---|
+| Item quality is the only colour assigned to data the app didn't choose | Epic purple and rare blue carry meaning a player reads instantly. Every theme colour was picked to sit beside them without competing |
+| Every ink clears WCAG AA on every ground | Measured before written, not after. The old file recorded a 3.88:1 failure; that lesson is why |
+| No third-party request | Fonts are vendored, not fetched. This is what the old "system stacks on purpose" note was actually protecting |
+
+### The faction is the theme, and it is only tokens
+
+`data-faction` on `<html>`, driven from the character you already chose — see `useFactionTheme` in
+`App.tsx`. Alliance is brass and steel with royal blue and gold; Horde is iron and blood. **No
+selector below the token block knows which faction it is rendering**, which is what stops a retheme
+becoming a second stylesheet. It has to be the root element rather than a wrapper: `:root` paints the
+body background, and a Horde character on an Alliance-blue ground would show a warm panel on a cool
+page in exactly the gap the app does not control.
+
+### Two things that look like they could be simplified and cannot
+
+**The metal frame sits inside each panel's border rather than replacing it.** The role accent lives
+on `border-top` and a test asserts its colour there. A `border-image` would leave `border-top-color`
+computing correctly while the gradient painted over it — the test would pass and the accent would be
+invisible, which is worse than either failing outright.
+
+**Only the three entry grids are framed.** The landing page's five sections, the raid picker's five
+raids and the professions grid's thirteen are all doors you click to go somewhere. If every card in
+the app had a bevel it would stop meaning "this is a door", and the app has a lot of cards that are
+not doors.
+
+### One guard was rewritten rather than satisfied
+
+"Tier letters stay out of the item quality palette" asserted `r === g === b`. That was the old
+palette's *definition* of neutral rather than the requirement — every neutral now carries a
+deliberate hue bias, cool for Alliance and warm for Horde, which is what makes brass read as metal
+rather than as yellow. `--text` at rgb(205, 210, 214) is nine points of spread, unmistakably grey,
+and failed exact equality.
+
+The replacement measures saturation, bounded at 0.20. The four quality colours measure 0.79 to 1.00
+and the app's most saturated neutral is 0.14, so the gap is not close — and the test now also asserts
+the quality colours stay clear of that bound, so the check cannot quietly stop meaning anything.
+Falsified by painting the tier letters Legendary orange.
+
+### Incidental finds
+
+- **Cinzel is a variable font** served by Google under three identical filenames. Shipping all three
+  would have cost 52 KB for nothing; it is one file with a `font-weight: 400 700` range. 104 KB for
+  four faces total.
+- **`Inter` was never loaded.** The old stylesheet asked for it, no font file existed and no `<link>`
+  fetched it, so every visitor saw their system sans rather than the typeface the design was written
+  for. Nothing depended on it, so this was invisible.
+- Two stale values: `#0a0a0a` was the *old* `--surface-0` hardcoded in two button rules, and
+  `#fbbf24` was a second amber doing `--warn`'s job in two more.
+
+### What the theme does not yet do
+
+The item-quality colours for rare and epic come in under AA at 3.96:1 and 3.90:1 on the panel ground.
+They did on the old palette too (3.89 and 3.84) — slightly better now — and they are Blizzard's
+colours, not ours. Repainting them to pass a contrast check would break the one thing the whole
+palette is built around, so they stay and this is the note saying the trade was deliberate.
+
+---
+
 ## Start here (2026-09-11, the gathering pages became guides)
 
 **The professions pages had a section per material and now have one per decision.** Eleven sections
