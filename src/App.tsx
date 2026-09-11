@@ -338,7 +338,9 @@ function App() {
             ariaLabel="Planner sections"
             className="tab-nav tab-nav-sub"
           />
-          {plannerView === 'gear' && <GearPanel character={character} gear={gear} onChange={updateGear} />}
+          {plannerView === 'gear' && (
+            <GearPanel character={character} gear={gear} onChange={updateGear} stats={stats} role={role} />
+          )}
           {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}
           {plannerView === 'buffs' && (
             <BuffsPanel

@@ -9,11 +9,22 @@ import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes
 import { ItemIcon } from './ItemIcon'
 import { ItemPopup } from './ItemPopup'
 import { slotGlyph } from './slotGlyphs'
+import { GearStatSummary } from './GearStatSummary'
+import type { StatBlock } from '../../domain/stats/statTypes'
+import type { CharacterRole } from '../../domain/character/characterTypes'
 
 type GearPanelProps = {
   character: CharacterProfile
   gear: EquippedGear
   onChange: (slot: GearSlot, equippedSlot: EquippedSlot) => void
+  /**
+   * The same totals the rail shows, computed once in `App` and passed down.
+   *
+   * Passed rather than recomputed here: `calculateStats` already runs for the rail on every gear
+   * change, and a second call would be a second answer to keep in agreement with the first.
+   */
+  stats: StatBlock
+  role: CharacterRole
 }
 
 /**
@@ -100,7 +111,7 @@ const PAPERDOLL_SLOTS: readonly GearSlot[] = Object.keys(SLOT_AREA) as GearSlot[
  * Nothing here edits in place. Clicking a slot opens `ItemPopup`, so the list keeps its height and
  * stays scannable no matter what is being changed.
  */
-export function GearPanel({ character, gear, onChange }: GearPanelProps) {
+export function GearPanel({ character, gear, onChange, stats, role }: GearPanelProps) {
   const [openSlot, setOpenSlot] = useState<GearSlot>()
 
   function updateItem(slot: GearSlot, item: GearItem) {
@@ -191,18 +202,15 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
 
       <div className="gear-paperdoll">
         {/*
-          The figure the slots are arranged around. Decorative and marked as such: it carries no
-          information the slots do not, and a screen reader announcing "armoured silhouette" between
-          Shoulders and Neck would be noise. It is what makes the arrangement read as a body rather
-          than as three columns that happen to be uneven.
+          **The middle of the body holds the totals, not a drawing.**
+
+          A silhouette was here first and it did one useful thing — it made the arrangement read as a
+          body rather than as three uneven columns. But the job on this page is moving a number, and
+          the number was in the rail on the other side of the screen. Six totals between the two
+          columns of slots puts the effect of a swap next to its cause, which is worth more than the
+          picture was. The anatomy still reads: head is still at the top, feet still at the bottom.
         */}
-        <svg className="gear-figure" viewBox="0 0 100 210" aria-hidden="true" focusable="false">
-          <g className="gear-figure-ink">
-            <circle cx="50" cy="20" r="13" />
-            <path d="M50 34 C34 34 26 42 24 56 L20 92 L31 95 L34 70 L34 118 L66 118 L66 70 L69 95 L80 92 L76 56 C74 42 66 34 50 34 Z" />
-            <path d="M36 122 L34 168 L30 200 L44 200 L47 168 L50 140 L53 168 L56 200 L70 200 L66 168 L64 122 Z" />
-          </g>
-        </svg>
+        <GearStatSummary stats={stats} role={role} className={character.className} spec={character.spec} />
         {PAPERDOLL_SLOTS.filter(visible).map(renderSlot)}
       </div>
 
