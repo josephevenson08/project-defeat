@@ -5596,3 +5596,101 @@ h4,
     inset 0 0 0 1px var(--surface-0),
     0 4px 18px rgba(0, 0, 0, 0.8);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Colour, past the point where the theme tokens stop.
+ *
+ * The retheme made the chrome warm and left the *grounds* flat near-black, which is a lot of black
+ * on a 1500px page. These four rules put the faction back into the surfaces the frame sits on,
+ * without ever reaching the intensity where an item-quality colour stops winning.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * The page is lit from the top-left, the way the frames are.
+ *
+ * Two very low-alpha washes rather than a flat fill: the faction colour up in the corner where the
+ * wordmark is, and its metal low and to the right. At 5% and 4% neither is nameable as a colour —
+ * what they do is stop the background reading as switched-off, and make the frame's bevel look like
+ * it is catching light from somewhere.
+ */
+body {
+  background:
+    radial-gradient(1200px 700px at 8% -8%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 70%),
+    radial-gradient(900px 600px at 92% 100%, color-mix(in srgb, var(--metal-edge) 4%, transparent), transparent 70%),
+    var(--surface-0);
+  background-attachment: fixed;
+}
+
+/*
+ * The creator is the app's first screen and had no chrome at all — a form floating on black.
+ *
+ * It gets the panel's own frame rather than a smaller one, because at this moment it *is* the page:
+ * there is nothing else on screen to be subordinate to.
+ */
+.creator-inner {
+  position: relative;
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+}
+
+.creator-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 6px solid transparent;
+  border-image: linear-gradient(
+      135deg,
+      var(--metal-1),
+      var(--metal-0) 30%,
+      var(--metal-2) 50%,
+      var(--metal-0) 70%,
+      var(--metal-1)
+    )
+    1;
+}
+
+.creator-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
+  background:
+    var(--bracket) left 2px top 2px / 15px 2px no-repeat,
+    var(--bracket) left 2px top 2px / 2px 15px no-repeat,
+    var(--bracket) right 2px top 2px / 15px 2px no-repeat,
+    var(--bracket) right 2px top 2px / 2px 15px no-repeat,
+    var(--bracket) left 2px bottom 2px / 15px 2px no-repeat,
+    var(--bracket) left 2px bottom 2px / 2px 15px no-repeat,
+    var(--bracket) right 2px bottom 2px / 15px 2px no-repeat,
+    var(--bracket) right 2px bottom 2px / 2px 15px no-repeat;
+}
+
+/*
+ * The rail's character block takes the class colour.
+ *
+ * It is the one place in the app that is *about* your class rather than about gear, and the colour
+ * is already on screen everywhere else — the creator that chose it, the tier list, the raid planner.
+ * Leaving the one panel that names your class as the only grey one was the inconsistency.
+ */
+.rail-character,
+.rail-brand {
+  border-bottom: 1px solid var(--line);
+}
+
+.rail-brand {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--metal-edge) 7%, transparent), transparent);
+}
+
+/*
+ * The tab strip gets a ground and a lit bottom edge, so it reads as a frame member rather than as
+ * text floating above the content.
+ */
+.topbar {
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
+  border-bottom: 1px solid var(--metal-0);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--metal-edge) 22%, transparent);
+}

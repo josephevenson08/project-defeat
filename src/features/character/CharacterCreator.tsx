@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getClassColor } from '../../domain/character/classColors'
 import { getFactionColor } from '../../domain/character/factionColors'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
@@ -36,6 +36,26 @@ type CharacterCreatorProps = {
 export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCreatorProps) {
   const [draft, setDraft] = useState<CharacterProfile>(initial)
   const [stepIndex, setStepIndex] = useState(0)
+
+  /*
+   * **The theme follows the draft, not the saved character.**
+   *
+   * Picking Horde turns the frame to iron and the accents to blood immediately, before you have
+   * confirmed anything — which is the point: the choice is easier to make when you can see what it
+   * does.
+   *
+   * The cleanup restores the faction you arrived with, and it has to be here rather than left to
+   * `App`. `App`'s effect is keyed on the *committed* faction, so cancelling a half-made Horde
+   * character never changes that value and never re-runs — the page would simply stay iron. On
+   * confirm both fire, cleanup first and then `App`'s, which lands on the new faction correctly.
+   */
+  const committedFaction = initial.faction
+  useEffect(() => {
+    document.documentElement.dataset.faction = draft.faction.toLowerCase()
+    return () => {
+      document.documentElement.dataset.faction = committedFaction.toLowerCase()
+    }
+  }, [draft.faction, committedFaction])
 
   const step = STEPS[stepIndex]
   const isLast = stepIndex === STEPS.length - 1
