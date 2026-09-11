@@ -2,28 +2,30 @@
 type: module
 layer: domain
 source: src/domain/professions/index.ts
-lines: 33
+lines: 43
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.index
 
-`src/domain/professions/index.ts` · **domain** layer · 33 lines
+`src/domain/professions/index.ts` · **domain** layer · 43 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `craftingPathFor`, `craftingPathModel`, `CraftingStep`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `formatCopper`, `gatheringMaterialFarming`, `GatheringNode`, `gatheringNodes`, `getCraftingLevelingPath`, `getMaterialFarmSpots`, `getProfessionProfile`, `getProfessionTiers`, `mappableMaterials`, `MaterialFarmSpot`, `nodesForProfession`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `professionsWithCraftingPaths`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RangeRoute`, `RecipeLeveling`, `routeLength`, `routesForMaterials`, `routesForNode`, `sampleProfessions`, `snapToSpawns`, `SpawnPoint`, `supplementaryNodes`, `TrainingMilestone`, `trainingMilestones`, `twoOptimize`
+**re-export** — `allProfessions`, `computeRoute`, `craftingLevelingPaths`, `craftingPathFor`, `craftingPathModel`, `CraftingStep`, `DENSITY_GRID`, `DensityCell`, `densityCells`, `FarmingRoute`, `formatCopper`, `GatheringGuide`, `gatheringGuides`, `GatheringNode`, `GatheringNodeRef`, `gatheringNodes`, `GatheringRange`, `getCraftingLevelingPath`, `getProfessionProfile`, `getProfessionTiers`, `guideFor`, `mappableMaterials`, `materialsForRange`, `nodesForProfession`, `nodesForRange`, `nodesWithoutSpawnData`, `NodeZoneSpawns`, `PlanRow`, `planRows`, `Profession`, `ProfessionCategory`, `professionIconNames`, `ProfessionProfile`, `professionsWithCraftingPaths`, `professionsWithGatheringGuides`, `ProfessionTier`, `ProfessionTierName`, `professionTiers`, `RangeRoute`, `RecipeLeveling`, `recommendedWithoutMaps`, `routeLength`, `routesForNode`, `routesForNodes`, `routesForRange`, `sampleProfessions`, `snapToSpawns`, `SpawnPoint`, `TrainingMilestone`, `trainingMilestones`, `trainingOutsideRanges`, `twoOptimize`, `ZoneNote`
 
 ## Imports
 
 - [[domain.professions.craftingPaths]] — `src/domain/professions/craftingPaths.ts`
 - [[domain.professions.farmingRoutes]] — `src/domain/professions/farmingRoutes.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
+- [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
+- [[domain.professions.gatheringRangeTypes]] — `src/domain/professions/gatheringRangeTypes.ts`
 - [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.professions.sampleCraftingGuides]] — `src/domain/professions/sampleCraftingGuides.ts`
-- [[domain.professions.sampleGatheringMaterials]] — `src/domain/professions/sampleGatheringMaterials.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 - [[domain.professions.sampleProfessionTiers]] — `src/domain/professions/sampleProfessionTiers.ts`
 
@@ -31,6 +33,7 @@ _No doc comment at the top of this file._
 
 - [[features.professions.CraftingProgression]] — `src/features/professions/CraftingProgression.tsx`
 - [[features.professions.FarmingRouteMap]] — `src/features/professions/FarmingRouteMap.tsx`
+- [[features.professions.GatheringPlanTable]] — `src/features/professions/GatheringPlanTable.tsx`
 - [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
 - [[features.professions.ProfessionPage]] — `src/features/professions/ProfessionPage.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`

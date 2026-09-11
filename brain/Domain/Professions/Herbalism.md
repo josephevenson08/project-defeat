@@ -19,26 +19,25 @@ tags: [brain/domain, domain/profession]
 - **Artisan** — skill 225–300, level 35+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Master** — skill 300–375, level 40+ · Master Herbalism trainer in Outland, Hellfire Peninsula (Honor Hold/Thrallmar).
 
-## Material farming
+## Levelling ranges
 
-- **Peacebloom / Silverleaf / Earthroot** (skill 1–100) — Elwynn Forest, Durotar, Mulgore, any level 1-10 starting zone
-- **Mageroyal / Briarthorn / Stranglekelp** (skill 50–125) — Westfall, Loch Modan, The Barrens, Stranglethorn Vale (coastal)
-- **Bruiseweed / Wild Steelbloom / Kingsblood** (skill 100–175) — Redridge Mountains, Duskwood, Ashenvale, Hillsbrad Foothills
-- **Liferoot / Fadeleaf / Goldthorn** (skill 150–210) — Stonetalon Mountains, Arathi Highlands, Thousand Needles, Desolace
-- **Khadgar's Whisker / Wintersbite / Sungrass** (skill 185–250) — Tanaris, Feralas, Swamp of Sorrows, Dustwallow Marsh
-- **Blindweed / Ghost Mushroom / Gromsblood** (skill 230–300) — Un'Goro Crater, Felwood, Swamp of Sorrows
-- **Golden Sansam / Dreamfoil / Mountain Silversage** (skill 230–300) — Un'Goro Crater, Winterspring, Silithus, Eastern Plaguelands
-- **Sorrowmoss / Icecap / Black Lotus (rare)** (skill 260–300) — Eastern Plaguelands, Winterspring, various high-level zones (Black Lotus is a rare spawn anywhere high-level herbs grow)
-- **Felweed** (skill 300–375) — All Outland zones, most densely in Hellfire Peninsula
-- **Dreaming Glory** (skill 315–375) — Nagrand, Blade's Edge Mountains, rocky outcroppings across Outland
-- **Terocone** (skill 325–375) — Terokkar Forest (very dense)
-- **Ragveil** (skill 325–375) — Zangarmarsh (swampy ground)
+- **1–70** (level 1-12) — Tirisfal Glades, Teldrassil, Elwynn Forest, Durotar
+- **70–115** (level 15-25) — Redridge Mountains, Duskwood, Silverpine Forest, Westfall
+- **115–150** (level 25-35) — Stranglethorn Vale, Wetlands, Hillsbrad Foothills, Stonetalon Mountains
+- **150–185** (level 35-45) — Dustwallow Marsh, Stranglethorn Vale, Feralas, Swamp of Sorrows
+- **185–230** (level 45-55) — Feralas, Tanaris, Searing Gorge, Azshara
+- **230–270** (level 50-58) — Swamp of Sorrows, Azshara, Feralas, Un'Goro Crater
+- **270–300** (level 55-60) — Winterspring, Eastern Plaguelands, Azshara, Silithus
+- **300–325** (level 58-64) — Hellfire Peninsula, Nagrand, Terokkar Forest, Zangarmarsh
+- **325–350** (level 62-67) — Terokkar Forest, Zangarmarsh, Shadowmoon Valley
+- **350–375** (level 67-70) — Netherstorm, Shadowmoon Valley, Terokkar Forest, Nagrand
 
 
 
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

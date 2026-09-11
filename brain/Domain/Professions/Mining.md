@@ -19,25 +19,24 @@ tags: [brain/domain, domain/profession]
 - **Artisan** — skill 225–300, level 35+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Master** — skill 300–375, level 40+ · Master Mining trainer in Outland: Hurnak Grimmord (Alliance, Honor Hold) / Krugosh (Horde, Thrallmar), Hellfire Peninsula.
 
-## Material farming
+## Levelling ranges
 
-- **Copper Ore** (skill 1–100) — Elwynn Forest, Dun Morogh, Durotar, Mulgore, any level 1-10 starting zone
-- **Tin Ore** (skill 65–125) — Westfall, Loch Modan, The Barrens, Silverpine Forest
-- **Silver Ore** (skill 75–125) — Found alongside Tin in the same low-to-mid zones (Westfall, Loch Modan, The Barrens)
-- **Iron Ore** (skill 125–225) — Redridge Mountains, Duskwood, Stonetalon Mountains, Arathi Highlands, Hillsbrad Foothills
-- **Gold Ore** (skill 155–255) — Found alongside Iron/Mithril in mid-level zones (Arathi Highlands, Hillsbrad Foothills, Thousand Needles)
-- **Mithril Ore** (skill 175–275) — Thousand Needles, Tanaris, Badlands, Swamp of Sorrows, Feralas
-- **Truesilver Ore** (skill 230–330) — Found alongside Mithril/Thorium in mid-to-high zones (Tanaris, Un'Goro Crater, Felwood)
-- **Thorium Ore (incl. Rich Thorium Vein at 275+)** (skill 245–375) — Un'Goro Crater, Silithus, Felwood, Blasted Lands, Winterspring, Eastern Plaguelands
-- **Fel Iron Ore** (skill 300–375) — All Outland zones, most densely in Hellfire Peninsula and Zangarmarsh
-- **Adamantite Ore (incl. Rich Adamantite Vein at 350+)** (skill 325–375) — All Outland zones except Hellfire Peninsula; especially Zangarmarsh, Terokkar Forest, Nagrand
-- **Khorium Ore** (skill 375–375) — Rare secondary spawn from Adamantite deposits in all Outland zones; most reliably farmed in Nagrand, Blade's Edge Mountains, and Netherstorm
+- **1–65** (level 1-12) — Dun Morogh, Elwynn Forest, The Barrens, Durotar
+- **65–125** (level 15-30) — Loch Modan, Redridge Mountains, Ashenvale, Hillsbrad Foothills
+- **125–175** (level 30-40) — Arathi Highlands, Desolace, Thousand Needles, Stranglethorn Vale
+- **175–245** (level 43-52) — The Hinterlands, Tanaris, Azshara, Un'Goro Crater
+- **245–275** (level 50-58) — Un'Goro Crater, Burning Steppes, Silithus
+- **275–300** (level 53-60) — Winterspring, Eastern Plaguelands, Azshara, Un'Goro Crater
+- **300–325** (level 58-63) — Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley
+- **325–350** (level 64-68) — Nagrand, Blade's Edge Mountains, Netherstorm, Terokkar Forest
+- **350–375** (level 67-70) — Netherstorm, Shadowmoon Valley, Blade's Edge Mountains, Nagrand
 
 
 
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

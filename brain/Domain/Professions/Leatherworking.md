@@ -34,6 +34,7 @@ tags: [brain/domain, domain/profession]
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

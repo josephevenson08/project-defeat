@@ -15,8 +15,8 @@ tags: [brain/domain, domain/profession]
 
 - **Apprentice** — skill 1–75, level 5+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Journeyman** — skill 75–150, level 10+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
-- **Expert** — skill 150–225, level 20+ · Purchase the Expert First Aid manual from Balai Lok'Wein (Horde, Dustwallow Marsh) or Deneb Walker (Alliance, Arathi Highlands), then learn it from your bag.
-- **Artisan** — skill 225–300, level 35+ · Complete the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde) to unlock Artisan First Aid; requires level 35 and skill 225.
+- **Expert** — skill 150–225, level 20+ · Not a live trainer: purchase the Expert First Aid manual from Balai Lok'Wein (Horde, Dustwallow Marsh) or Deneb Walker (Alliance, Arathi Highlands), then learn it from your bag.
+- **Artisan** — skill 225–300, level 35+ · Not a live trainer: complete the "Triage" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde). Needs First Aid 225 and character level 35.
 - **Master** — skill 300–375, level 50+ · Not a live trainer: purchase "Master First Aid - Doctor in the House" from Burko (Alliance, Temple of Telhamat) or Aresella (Horde, Falcon Watch), Hellfire Peninsula, then learn it from your bag.
 
 
@@ -35,6 +35,7 @@ tags: [brain/domain, domain/profession]
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

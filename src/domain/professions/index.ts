@@ -25,7 +25,6 @@ export {
   routesForNodes,
   twoOptimize,
   snapToSpawns,
-  mappableMaterials,
 } from './farmingRoutes'
 export type { GatheringNodeRef, ZoneNote, GatheringRange, GatheringGuide } from './gatheringRangeTypes'
 export { gatheringGuides } from './gatheringGuides'

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/sampleProfessionTiers.ts
-lines: 230
+lines: 280
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.sampleProfessionTiers
 
-`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 230 lines
+`src/domain/professions/sampleProfessionTiers.ts` · **domain** layer · 280 lines
 
 _No doc comment at the top of this file._
 
@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 

@@ -365,5 +365,3 @@ function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
     .sort((a, b) => b.spawnCount - a.spawnCount)
 }
 
-/** Every material name the node data can draw, for asserting that a farm row's names still resolve. */
-export const mappableMaterials: ReadonlySet<string> = new Set(gatheringNodes.map((node) => node.material))

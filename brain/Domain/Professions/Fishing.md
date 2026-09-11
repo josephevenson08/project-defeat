@@ -15,26 +15,25 @@ tags: [brain/domain, domain/profession]
 
 - **Apprentice** — skill 1–75, level 5+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Journeyman** — skill 75–150, level 10+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
-- **Expert** — skill 150–225, level 20+ · Purchase "Expert Fishing - The Bass and You" from Old Man Heming in Booty Bay (Horde and Alliance can both use this vendor).
-- **Artisan** — skill 225–300, level 35+ · Complete Nat Pagle's fishing quest line in Dustwallow Marsh to unlock Artisan Fishing.
+- **Expert** — skill 150–225, level 20+ · Not a live trainer: purchase "Expert Fishing - The Bass and You" from Old Man Heming in Booty Bay for 1 gold, then learn it from your bag. Both factions can use this vendor.
+- **Artisan** — skill 225–300, level 35+ · Not a live trainer: complete "Nat Pagle, Angler Extreme" from Nat Pagle in Dustwallow Marsh. The quest wants four rare fish from four separate zones and needs Fishing 225 and character level 35.
 - **Master** — skill 300–375, level 55+ · Not a live trainer: purchase "Master Fishing - The Art of Angling" from Juno Dufrain at Cenarion Refuge, Zangarmarsh, then learn it from your bag.
 
-## Material farming
+## Levelling ranges
 
-- **Raw Brilliant Smallfish / Raw Bristlefish (low-level pools)** (skill 1–75) — Any coastal or lake pool near a level 1-15 starting zone
-- **Raw Loch Frenzy / Longjaw Mud Snapper** (skill 75–150) — Loch Modan, Westfall, The Barrens
-- **Raw Bristle Whisker Catfish / Raw Brilliant Smallfish (mid pools)** (skill 150–225) — Any Azeroth zone after buying the Expert Fishing manual (Old Man Heming, Booty Bay)
-- **Raw Nightfin Snapper / Oily Blackmouth / Firefin Snapper (pre-Outland)** (skill 225–300) — Dustwallow Marsh (unlocked via Nat Pagle questline for Artisan Fishing), Winterspring
-- **Spotted Feltail / Zangarmarsh Sporefish** (skill 300–350) — Zangarmarsh (Sporefish Schools around the central lakes near Cenarion Refuge)
-- **Golden Darter / Furious Crawdad / Enormous Barbed Gill Trout (Highland Mixed School)** (skill 325–375) — Terokkar Forest (Highland Mixed Schools, considered the best pools in Outland)
-- **Figluster's Mudfish / Icefin Bluefish** (skill 325–375) — Nagrand (Bluefish Schools and Pure Water pools across the zone)
-- **Barbed Gill Trout (open water, no pool required)** (skill 300–375) — Any Outland outdoor zone; also found in Deadwind Pass and inside Serpentshrine Cavern/The Underbog
+- **1–75** (level 1-10) — Any capital city, Any starting zone water
+- **75–150** (level 10-25) — Any capital city, Loch Modan, The Barrens
+- **150–225** (level 20-40) — Any water, once you have read the Expert Fishing book
+- **225–300** (level 40-55) — Dustwallow Marsh
+- **300–350** (level 60-64) — Zangarmarsh
+- **350–375** (level 64-70) — Terokkar Forest, Nagrand
 
 
 
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

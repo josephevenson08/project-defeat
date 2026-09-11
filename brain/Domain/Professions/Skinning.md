@@ -19,24 +19,22 @@ tags: [brain/domain, domain/profession]
 - **Artisan** — skill 225–300, level 35+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Master** — skill 300–375, level 40+ · Master Skinning trainer in Outland: Jelena Nightsky (Alliance) / Moorutu (Horde), both at Honor Hold/Thrallmar, Hellfire Peninsula.
 
-## Material farming
+## Levelling ranges
 
-- **Ruined Leather Scraps / Light Leather** (skill 1–65) — Skinnable beasts in any level 1-15 starting zone
-- **Medium Leather** (skill 65–150) — Skinnable beasts (levels ~13-30) in Westfall, Loch Modan, The Barrens, Stonetalon Mountains
-- **Heavy Leather** (skill 150–225) — Skinnable beasts (levels ~30-45) in Arathi Highlands, Desolace, Stranglethorn Vale, Thousand Needles
-- **Thick Leather** (skill 175–250) — Skinnable beasts in Feralas, Tanaris, Swamp of Sorrows, Dustwallow Marsh
-- **Rugged Leather** (skill 225–300) — Un'Goro Crater, Winterspring, Silithus, Eastern Plaguelands, Felwood
-- **Knothide Leather** (skill 300–375) — All Outland zones; boars and ravagers are especially dense in Hellfire Peninsula and Zangarmarsh
-- **Fel Hide** (skill 300–375) — Skinned from demon-type beasts across Outland (Shadowmoon Valley, Hellfire Peninsula)
-- **Cobra Scales** (skill 300–375) — Skinned from serpents in Zangarmarsh and Terokkar Forest
-- **Nether Dragonscales** (skill 350–375) — Skinned from nether dragonkin in Netherstorm and Shadowmoon Valley
-- **Thick Clefthoof Leather** (skill 350–375) — Skinned from Clefthoof beasts in Nagrand (northern half)
+- **1–65** (level 1-12) — Mulgore, Dun Morogh, Durotar, Elwynn Forest
+- **65–150** (level 13-30) — The Barrens, Darkshore, Loch Modan, Westfall
+- **150–205** (level 30-41) — Thousand Needles, Arathi Highlands, Alterac Mountains, Desolace
+- **205–250** (level 41-50) — The Hinterlands, Feralas, Tanaris, Dustwallow Marsh
+- **250–300** (level 50-60) — Un'Goro Crater, Winterspring, Silithus, Eastern Plaguelands
+- **300–330** (level 58-63) — Hellfire Peninsula, Zangarmarsh
+- **330–375** (level 64-70) — Nagrand, Terokkar Forest, Blade's Edge Mountains, Netherstorm
 
 
 
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

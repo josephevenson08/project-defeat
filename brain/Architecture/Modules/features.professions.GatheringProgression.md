@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/GatheringProgression.tsx
-lines: 107
+lines: 118
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.GatheringProgression
 
-`src/features/professions/GatheringProgression.tsx` · **features** layer · 107 lines
+`src/features/professions/GatheringProgression.tsx` · **features** layer · 118 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[features.professions.GatheringPlanTable]] — `src/features/professions/GatheringPlanTable.tsx`
 - [[features.professions.MaterialChip]] — `src/features/professions/MaterialChip.tsx`
 - [[features.professions.TrainingMarker]] — `src/features/professions/TrainingMarker.tsx`
 - [[features.professions.ZoneRoutes]] — `src/features/professions/ZoneRoutes.tsx`

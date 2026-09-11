@@ -15,8 +15,8 @@ tags: [brain/domain, domain/profession]
 
 - **Apprentice** — skill 1–75, level 5+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
 - **Journeyman** — skill 75–150, level 10+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
-- **Expert** — skill 150–225, level 20+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
-- **Artisan** — skill 225–300, level 35+ · Any profession trainer for this skill in a major Azeroth city (Stormwind, Ironforge, Darnassus, Exodar / Orgrimmar, Undercity, Thunder Bluff, Silvermoon).
+- **Expert** — skill 150–225, level 20+ · Not a live trainer: purchase the Expert Cookbook from a cooking supplies vendor, then learn it from your bag.
+- **Artisan** — skill 225–300, level 35+ · Not a live trainer: complete the "Clamlette Surprise" quest from Dirge Quikcleave in Gadgetzan, Tanaris. Needs Cooking 225 and character level 35.
 - **Master** — skill 300–375, level 55+ · Not a live trainer: purchase the Master Cookbook from Gaston (Alliance, Honor Hold), Baxter (Horde, Thrallmar), or Naka (neutral, Cenarion Refuge, Zangarmarsh), then learn it from your bag.
 
 
@@ -34,6 +34,7 @@ tags: [brain/domain, domain/profession]
 ## Where this lives in the code
 
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.gatheringGuides]] — `src/domain/professions/gatheringGuides.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 
 Up: [[TBC Knowledge Map]]

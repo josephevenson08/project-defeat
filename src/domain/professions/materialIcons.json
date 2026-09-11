@@ -10,13 +10,9 @@
       "wowItemId": 23425,
       "icon": "inv_ore_adamantium"
     },
-    "Ancient Lichen": {
-      "wowItemId": 22790,
-      "icon": "inv_misc_herb_ancientlichen"
-    },
-    "Barbed Gill Trout": {
-      "wowItemId": 27422,
-      "icon": "inv_misc_fish_37"
+    "Arthas' Tears": {
+      "wowItemId": 8836,
+      "icon": "inv_misc_herb_13"
     },
     "Black Lotus": {
       "wowItemId": 13468,
@@ -25,10 +21,6 @@
     "Blindweed": {
       "wowItemId": 8839,
       "icon": "inv_misc_herb_14"
-    },
-    "Bloodthistle": {
-      "wowItemId": 22710,
-      "icon": "inv_misc_herb_11"
     },
     "Briarthorn": {
       "wowItemId": 2450,
@@ -74,29 +66,25 @@
       "wowItemId": 23424,
       "icon": "inv_ore_feliron"
     },
-    "Fel Lotus": {
-      "wowItemId": 22794,
-      "icon": "inv_misc_herb_fellotus"
-    },
     "Felweed": {
       "wowItemId": 22785,
       "icon": "inv_misc_herb_felweed"
     },
-    "Figluster's Mudfish": {
-      "wowItemId": 27435,
-      "icon": "inv_misc_fish_41"
+    "Firebloom": {
+      "wowItemId": 4625,
+      "icon": "inv_misc_herb_19"
     },
     "Firefin Snapper": {
       "wowItemId": 6359,
       "icon": "inv_misc_monsterhead_01"
     },
+    "Flame Cap": {
+      "wowItemId": 22788,
+      "icon": "inv_misc_herb_flamecap"
+    },
     "Furious Crawdad": {
       "wowItemId": 27439,
       "icon": "inv_misc_fish_14"
-    },
-    "Ghost Mushroom": {
-      "wowItemId": 8845,
-      "icon": "inv_mushroom_08"
     },
     "Gold Ore": {
       "wowItemId": 2776,
@@ -114,9 +102,9 @@
       "wowItemId": 3821,
       "icon": "inv_misc_herb_15"
     },
-    "Gromsblood": {
-      "wowItemId": 8846,
-      "icon": "inv_misc_herb_16"
+    "Grave Moss": {
+      "wowItemId": 3369,
+      "icon": "inv_misc_dust_02"
     },
     "Heavy Leather": {
       "wowItemId": 4234,
@@ -125,10 +113,6 @@
     "Icecap": {
       "wowItemId": 13467,
       "icon": "inv_misc_herb_icecap"
-    },
-    "Icefin Bluefish": {
-      "wowItemId": 27437,
-      "icon": "inv_misc_fish_23"
     },
     "Iron Ore": {
       "wowItemId": 2772,
@@ -157,10 +141,6 @@
     "Light Leather": {
       "wowItemId": 2318,
       "icon": "inv_misc_leatherscrap_03"
-    },
-    "Longjaw Mud Snapper": {
-      "wowItemId": 4592,
-      "icon": "inv_misc_fish_32"
     },
     "Mageroyal": {
       "wowItemId": 785,
@@ -202,9 +182,9 @@
       "wowItemId": 2447,
       "icon": "inv_misc_flower_02"
     },
-    "Ragveil": {
-      "wowItemId": 22787,
-      "icon": "inv_misc_herb_ragveil"
+    "Purple Lotus": {
+      "wowItemId": 8831,
+      "icon": "inv_misc_herb_17"
     },
     "Raw Brilliant Smallfish": {
       "wowItemId": 6291,
@@ -214,13 +194,17 @@
       "wowItemId": 6308,
       "icon": "inv_misc_fish_30"
     },
-    "Raw Loch Frenzy": {
-      "wowItemId": 6317,
-      "icon": "inv_misc_fish_03"
+    "Raw Longjaw Mud Snapper": {
+      "wowItemId": 6289,
+      "icon": "inv_misc_fish_32"
     },
     "Raw Nightfin Snapper": {
       "wowItemId": 13759,
       "icon": "inv_misc_fish_23"
+    },
+    "Raw Sunscale Salmon": {
+      "wowItemId": 13760,
+      "icon": "inv_misc_fish_19"
     },
     "Rugged Leather": {
       "wowItemId": 8170,
@@ -258,6 +242,10 @@
       "wowItemId": 25708,
       "icon": "inv_misc_leatherscrap_14"
     },
+    "Thick Hide": {
+      "wowItemId": 8169,
+      "icon": "inv_misc_pelt_bear_ruin_01"
+    },
     "Thick Leather": {
       "wowItemId": 4304,
       "icon": "inv_misc_leatherscrap_08"
@@ -281,12 +269,11 @@
     "Wintersbite": {
       "wowItemId": 3819,
       "icon": "inv_misc_flower_03"
+    },
+    "Zangarian Sporefish": {
+      "wowItemId": 27429,
+      "icon": "inv_misc_fish_34"
     }
   },
-  "missing": [
-    "Netherdust Bush",
-    "Raw Bristlefish",
-    "Sorrowmoss",
-    "Zangarmarsh Sporefish"
-  ]
+  "missing": []
 }

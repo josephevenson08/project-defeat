@@ -442,7 +442,7 @@ const fishingGuide: GatheringGuide = {
     },
     {
       skillRange: [300, 350],
-      materials: ['Spotted Feltail', 'Zangarmarsh Sporefish'],
+      materials: ['Spotted Feltail', 'Zangarian Sporefish'],
       zones: ['Zangarmarsh'],
       recommendedCharacterLevel: '60-64',
       guidance:

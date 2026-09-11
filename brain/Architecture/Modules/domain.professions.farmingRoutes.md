@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/farmingRoutes.ts
-lines: 379
+lines: 370
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.farmingRoutes
 
-`src/domain/professions/farmingRoutes.ts` · **domain** layer · 379 lines
+`src/domain/professions/farmingRoutes.ts` · **domain** layer · 370 lines
 
 From the top of the file:
 
@@ -33,7 +33,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `computeRoute`, `densityCells`, `nodesForProfession`, `routeLength`, `routesForMaterials`, `routesForNode`, `snapToSpawns`, `supplementaryNodes`, `twoOptimize`
+**function** — `computeRoute`, `densityCells`, `nodesForProfession`, `routeLength`, `routesForNode`, `routesForNodes`, `snapToSpawns`, `twoOptimize`
 
 **const** — `DENSITY_GRID`, `gatheringNodes`, `mappableMaterials`, `nodesWithoutSpawnData`
 
@@ -45,6 +45,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 
 ## Concepts & phases

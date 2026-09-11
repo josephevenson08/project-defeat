@@ -147,7 +147,6 @@ import {
   routesForNodes,
   twoOptimize,
   snapToSpawns,
-  mappableMaterials,
   gatheringGuides,
   guideFor,
   nodesForRange,
@@ -158,6 +157,7 @@ import {
   trainingOutsideRanges,
 } from '../src/domain/professions'
 import zoneMaps from '../src/domain/professions/zoneMaps.json' with { type: 'json' }
+import materialIcons from '../src/domain/professions/materialIcons.json' with { type: 'json' }
 import rawCatalogueJson from '../src/domain/gear/itemCatalogue.json' with { type: 'json' }
 import rawSupplementJson from '../src/domain/gear/itemSupplement.json' with { type: 'json' }
 import craftingPathFile from '../src/domain/professions/craftingPaths.json' with { type: 'json' }
@@ -9052,43 +9052,31 @@ test('the written half of a gathering guide carries its sources, and only says w
   }
 
   /*
-   * **Every material named anywhere resolves to a node or is a declared gap.** Naming the gaps means
-   * adding one fails here rather than quietly losing a map, and clearing one is a visible deletion.
-   * Wowhead publishes no coordinates for Ragveil or Ancient Lichen; the rest are Skinning and
-   * Fishing materials, which have no nodes by nature.
+   * **A hand-written material name has to be the item's real name, and one of mine was not.**
+   *
+   * Skinning and Fishing name their materials by hand, because there is no ingest to derive them
+   * from — which puts them one typo away from a chip with no artwork. "Zangarmarsh Sporefish" was
+   * exactly that: the school in Zangarmarsh is a Sporefish School and the fish it holds is
+   * `Zangarian Sporefish`. The icon ingest found it, printed "1 missing", and nothing failed,
+   * because nobody was reading that line.
+   *
+   * So the ingest's own count becomes the assertion. Every name a guide writes resolves to a real
+   * item in the pinned upstream, or it is in the file's declared `missing` list and the absence is
+   * on the record.
+   *
+   * **This replaced a check that could not fail.** The version before it asked whether every named
+   * material resolved to a *node* or sat in a hand-maintained `knownGaps` set — but only Skinning
+   * and Fishing name materials at all, and neither has a node by nature, so every name went in the
+   * gap list and the list was a second copy of the material list. It passed by construction and cost
+   * an edit in two places. Resolving against the item catalogue is a claim that can actually be
+   * wrong.
    */
-  const knownGaps = new Set([
-    'Ancient Lichen',
-    'Ragveil',
-    'Ruined Leather Scraps',
-    'Light Leather',
-    'Medium Leather',
-    'Heavy Leather',
-    'Thick Leather',
-    'Rugged Leather',
-    'Thick Hide',
-    'Knothide Leather',
-    'Fel Hide',
-    'Cobra Scales',
-    'Nether Dragonscales',
-    'Thick Clefthoof Leather',
-    'Raw Brilliant Smallfish',
-    'Raw Longjaw Mud Snapper',
-    'Raw Bristle Whisker Catfish',
-    'Oily Blackmouth',
-    'Firefin Snapper',
-    'Raw Nightfin Snapper',
-    'Raw Sunscale Salmon',
-    'Spotted Feltail',
-    'Zangarmarsh Sporefish',
-    'Golden Darter',
-    'Furious Crawdad',
-    'Enormous Barbed Gill Trout',
-  ])
-  const unreachable = gatheringGuides
+  const iconedMaterials = new Set(Object.keys(materialIcons.materials))
+  const declaredMissing = new Set(materialIcons.missing as readonly string[])
+  const iconless = gatheringGuides
     .flatMap((guide) => guide.ranges.flatMap((range) => range.materials ?? []))
-    .filter((material) => !mappableMaterials.has(material) && !knownGaps.has(material))
-  expect(unreachable, 'every named material resolves to a node or is a declared gap').toEqual([])
+    .filter((material) => !iconedMaterials.has(material) && !declaredMissing.has(material))
+  expect(iconless, 'every hand-written material name is a real item').toEqual([])
 })
 
 test('the summary table and the inline markers put every trainer stop in the same place', () => {
