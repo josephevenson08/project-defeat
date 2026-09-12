@@ -347,3 +347,29 @@ the raid loot tables, and the resolver takes the place and the encounter **from 
 because mixing the guide's instance with the catalogue's boss put Kael'thas Sunstrider in
 Magtheridon's Lair across 52 rows. A join that draws each field from whichever source has one reads
 as the richest answer and is the easiest way to state something no source ever claimed.
+
+## Measure the pixel, not the stylesheet
+
+Recorded 2026-09-12, after a boss name that computed as `rgb(255, 255, 255)` reached the screen as
+`rgb(57, 57, 57)` and a contrast pass had already declared it fine.
+
+`::after` is a child of its element in tree order, and it comes *after* the real children. A plate
+with `position: relative` and no `z-index` therefore paints **underneath** the card's own scrim. Every
+boss card and — as it turned out — every raid card in the picker had been drawing its title beneath a
+black gradient at 0.93. The picker had shipped that way: name painted `rgb(126,126,126)` against a
+declared white, drop count `rgb(56,59,61)` against a declared `rgb(135,142,147)`.
+
+**The contrast check that should have caught it instead confirmed the bug.** It sampled the ground
+behind each line and compared that to the colour the stylesheet *declared* — a ratio the page never
+rendered. It reported 8.31:1 for text a reader could barely see. Worse, believing it sent the fix the
+wrong way: the wash under the text got darker, which hid more of the artwork and changed nothing about
+the cause.
+
+**So a rendering check has to read the rendered thing.** The probe now takes two screenshots — one
+normal, one with the glyphs hidden — and compares the painted ink to the declared colour *and* the
+bare ground to the ink. Either half alone is a check that can pass while the screen is wrong.
+
+This is the same shape as *[[Decision Log#An audit that cannot say what it looked at cannot say it
+found nothing|the audit that measured zero maps]]*, one layer down: there the sweep never looked at
+the thing it claimed to clear, and here it looked at the wrong thing and cleared it anyway. **A
+measurement is only evidence about what it actually sampled.**

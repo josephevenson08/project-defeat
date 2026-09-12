@@ -19,11 +19,12 @@ away, this should go back.
 
 ### Things worth knowing before touching it
 
-**The card and its table are siblings, not parent and child.** That is what lets them have different
-widths — the card is held at a size the artwork can fill (506px at the current rail width) while the
-table spans all columns and keeps the measure its rows were built for. `grid-auto-flow: dense` on the
-container is load-bearing: a full-span table placed after the *first* card of a row would leave the
-second column empty, and dense pulls the next card up into it.
+**One card per row, table directly beneath it.** It was two across for a day, and that version had a
+real problem: the table had to break out of the grid to get its measure, so opening two bosses put
+their tables in a stack that no longer sat under the picture they belonged to. One per row makes the
+relationship structural instead. The grid is capped at **1152px — the width of the narrowest boss
+panel** — so a full-width card still never magnifies its art, and the cards are `aspect-ratio: 2.6`
+rather than the picker's 1.85 because eleven full-width 1.85 cards is six thousand pixels of Karazhan.
 
 **Art is optional and its absence is a state, not a fault.** A boss with no panel keeps its card and
 simply has no background, which is what lets Serpentshrine and Tempest Keep read as unfinished. The
@@ -46,10 +47,21 @@ it** — an armoured warrior with a great axe and a dark horned steed behind him
 Midnight; Karazhan's only other unillustrated encounter is Nightbane, a skeletal dragon. **Worth
 re-checking with the owner.** Nightbane still has no art.
 
-**The plate wash is heavier than the raid picker's, and it was measured.** These cards are half the
-size, so the plate is a smaller share of a busier picture; the first version left "6 drops" on the
-Maiden's halo at roughly 2:1. It is now 8.31:1 at worst, sampled against the *brightest* pixel behind
-each line on all eleven Karazhan cards.
+**A scrim was painting over the card text, and a contrast check missed it.** `::after` is a later
+sibling in tree order, so a plate left at `z-index: auto` is drawn *underneath* the card's own scrim.
+The boss name computed as `rgb(255,255,255)` and the brightest pixel actually painted inside it was
+`rgb(57,57,57)`. **The raid picker had the same bug and had shipped with it** — its name painted
+`rgb(126,126,126)`, its drop count `rgb(56,59,61)`. Both plates now carry `z-index: 1`.
+
+**It survived an earlier contrast pass because that pass measured the ground, not the ink.** Sampling
+what sits behind a line and comparing it to the *declared* colour measures a ratio the page never
+rendered — and it then sent the fix in the wrong direction, darkening the wash to fix something the
+wash was not causing. The probe now hides the glyphs, screenshots the bare plate, and compares that
+ground to the declared colour; the painted ink is checked separately against what was declared. Worst
+line is **9.26:1** across all four illustrated raids.
+
+**If a plate's text ever looks washed out again, screenshot it and read the pixel before touching a
+colour.** Declared and painted are different questions and only one of them is what a reader sees.
 
 ---
 

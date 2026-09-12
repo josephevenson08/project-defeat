@@ -6094,8 +6094,16 @@ body {
  * Keep's violet both sit exactly there. The small type (boss count, the call to action) is the part
  * that fails first, so the plate carries a heavier wash than the card behind it does.
  */
+/*
+ * `z-index` for the same reason the boss card's plate needs one: `::after` is a later sibling in tree
+ * order, so this plate was being painted *under* the card's own scrim. The name declared
+ * `rgb(255,255,255)` and reached the screen as `rgb(126,126,126)`; the drop count declared
+ * `rgb(135,142,147)` and painted `rgb(56,59,61)`. It has read as washed-out since the reel shipped,
+ * and the reason it survived a contrast pass is that the pass measured the ground rather than the ink.
+ */
 .raid-picker-plate {
   position: relative;
+  z-index: 1;
   display: grid;
   gap: 5px;
   padding: 26px 26px 26px;
@@ -6193,31 +6201,35 @@ body {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 /*
- * **Two cards to a row, and the loot table spanning the whole width beneath them.**
+ * **One card to a row, with its loot opening directly underneath it.**
  *
- * The card and its table are siblings rather than nested, which is what lets them have different
- * widths: the card is held at a size the artwork can fill, while the table gets the full measure its
- * rows were built for. `dense` is doing real work here — a full-span table placed after the first
- * card of a row would otherwise leave the second column of that row empty, and dense pulls the next
- * card up into it so the grid never develops holes as you open things.
+ * This was two across for a day and the two-column version had a real problem: a full-width table
+ * had to break out of the grid to get its measure, so opening two bosses put their tables in a
+ * stack that no longer sat under the picture they belonged to. One per row makes the relationship
+ * structural instead — the table is simply the next element after its own card — and opening several
+ * reads as several open cards rather than a pile of bars at the bottom.
  *
- * The cap is the same 1180px the raid picker uses and for the same reason: two cards across puts each
- * at 582px, and the boss panels are 1152-1200px wide, so a 2x display is served at roughly 1:1 and
- * everything else downsamples. The guard that enforces this is the app-wide image test.
+ * **1152 is the width of the narrowest boss panel** (Attumen's), so a full-width card is still never
+ * asked to magnify its art. That is the same rule the raid picker's 1180 comes from, recalculated
+ * for this set of images; raising it puts the blur back. The app-wide image test is the guard.
  */
 .raid-boss-grid {
   display: grid;
-  grid-auto-flow: dense;
   grid-template-columns: minmax(0, 1fr);
   gap: 14px;
-  width: min(100%, 1180px);
+  width: min(100%, 1152px);
   margin-inline: auto;
 }
 
 .raid-boss-card {
   position: relative;
-  /* The shape the raid cards use, so the two screens read as one family. */
-  aspect-ratio: 1.85;
+  /*
+   * Wider than the raid cards' 1.85, because these run the full width and eleven of them at that
+   * shape would be six thousand pixels of Karazhan before you reached the bottom. 2.6 keeps a card
+   * that reads as artwork at roughly 400px tall, and still shows about half the height of the
+   * portrait-ish Karazhan panels — enough that the encounter is never cropped to its knees.
+   */
+  aspect-ratio: 2.6;
   min-height: 190px;
   width: 100%;
   min-width: 0;
@@ -6277,31 +6289,56 @@ body {
  * relied on to be dark where the text lands — the Chess Event is a bright board and Netherspite is
  * lit from below.
  */
+/*
+ * **`z-index` here is the whole reason this text was legible-in-theory and grey-on-screen.**
+ *
+ * `::after` is a child of the card in tree order and comes *after* the real children, so a positioned
+ * plate with `z-index: auto` paints underneath it. The card's scrim — black at 0.93 where the plate
+ * sits — was being drawn straight over the top of the name. The ink computed as `rgb(255,255,255)`
+ * and the brightest pixel actually painted inside the heading was `rgb(57,57,57)`.
+ *
+ * Worth remembering how that was missed: the first contrast pass sampled the *ground* behind each
+ * line and compared it to the declared colour, which measured a ratio the page never rendered.
+ * Measuring the ground is not measuring the text.
+ */
 .raid-boss-card-plate {
   position: relative;
+  z-index: 1;
   display: grid;
   gap: 3px;
   padding: 14px 16px 15px;
   width: 100%;
   /*
-   * Heavier than the raid picker's, and measured rather than matched.
+   * Enough wash to carry the ink and no more, checked against the pixels actually painted.
    *
-   * These cards are half the size, so the plate is a smaller share of a busier picture, and the
-   * first version left "6 drops" and "See the loot" sitting on the Maiden's halo at about 2:1. The
-   * ground under the two small lines has to be effectively black for inks chosen against
-   * `--surface-0` to keep the contrast they were picked for.
+   * An earlier version of this was far heavier, because the text looked grey and the wash was the
+   * suspect. It was not — the plate was being painted under the card's scrim, see the `z-index`
+   * above — and the extra darkness was buying nothing except less of the artwork. These numbers hold
+   * every line above 4.5:1 against the brightest ground under it, on all eleven Karazhan cards.
    */
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.58) 28%, rgba(0, 0, 0, 0.9) 58%, rgba(0, 0, 0, 0.97));
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.42) 26%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.9));
 }
 
+/*
+ * **The ink was already `#ffffff` and the name still read grey — the shadow was doing it.**
+ *
+ * The raid picker draws its title at 40px, where `0 2px 0 #000` plus a 20px black glow is a halo
+ * around heavy letterforms. At 22px the same shadow is proportionally enormous, and Cinzel is a
+ * serif with thin strokes: the glow bled through the antialiased edges of every stem until the
+ * letters read as mid-grey. Copying a treatment across a size change is what went wrong, not the
+ * colour choice.
+ *
+ * A tight, dark, small-radius shadow instead. It still lifts the name off a bright picture — that is
+ * what it is for — without sitting inside the glyphs.
+ */
 .raid-boss-card-name {
   color: var(--text-strong);
   font-family: var(--font-display);
-  font-size: clamp(17px, 1.6vw, 22px);
+  font-size: clamp(19px, 1.8vw, 25px);
   font-weight: 700;
   letter-spacing: 0.03em;
   line-height: 1.1;
-  text-shadow: 0 2px 0 #000, 0 0 20px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.8);
 }
 
 .raid-boss-card-count {
@@ -6320,22 +6357,24 @@ body {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
-/* The loot table: full width, and visibly the thing the card opened rather than a new section. */
+/*
+ * The loot table, sitting immediately under the card that opened it.
+ *
+ * The lit top edge and the negative margin are what tie it to that card rather than leaving it
+ * looking like the next section down — it reads as the card having unfolded, which is what a reader
+ * needs when three of them are open at once.
+ */
 .raid-boss-drop {
-  grid-column: 1 / -1;
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--metal-edge);
-  border-radius: var(--radius);
+  margin-top: -14px;
+  border: 1px solid var(--metal-edge);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
   background: var(--surface-0);
   padding: 4px 16px 10px;
 }
 
-.raid-boss-grid-note {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 760px) {
-  .raid-boss-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* An open card meets its table, so the two read as one object rather than two stacked ones. */
+.raid-boss-card[data-open] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
