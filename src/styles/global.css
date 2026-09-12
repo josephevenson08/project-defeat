@@ -441,57 +441,6 @@ select {
   margin: 6px 0 8px;
 }
 
-/*
- * Five raids, five equal columns, the full width of the page.
- *
- * **`auto-fit` with a 240px minimum was wrong for a fixed set of five.** It packs as many as fit and
- * leaves the last row short — at most widths that meant four across and one orphan underneath, on a
- * page whose entire job is "pick one of these five". A fixed five-column track makes them one row of
- * equal doors, which is what they are. Below 1100px they go to two columns and then one, because five
- * across a laptop would be five slivers.
- */
-.raid-picker-grid {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(5, 1fr);
-}
-
-@media (max-width: 1100px) {
-  .raid-picker-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 620px) {
-  .raid-picker-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.raid-picker-card {
-  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  border-top: 2px solid #6a7fa8;
-  color: inherit;
-  cursor: pointer;
-  display: grid;
-  align-content: start;
-  gap: 7px;
-  /* Tall enough to read as a door rather than a table row, now that there are five across. */
-  min-height: 150px;
-  padding: 18px 18px 20px;
-  font: inherit;
-  text-align: left;
-  transition: background 120ms ease, border-color 120ms ease;
-}
-
-.raid-picker-card:hover {
-  background: var(--surface-2);
-  border-color: var(--line-strong);
-  border-top-color: #6a7fa8;
-}
-
 .raid-picker-tier,
 .raid-picker-count {
   color: var(--text-faint);
@@ -5986,4 +5935,140 @@ body {
 .section-card-blurb {
   font-size: 13.5px;
   line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * The raid reel: one raid per screen, scrolled through.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.raid-picker-reel {
+  display: grid;
+  gap: 16px;
+  /*
+   * Proximity rather than mandatory snapping. Mandatory fights a trackpad — it hijacks a flick that
+   * was meant to carry past two raids — while proximity only tidies up a scroll that already stopped
+   * near an edge. A picker should not take the scroll wheel away from you.
+   */
+  scroll-snap-type: y proximity;
+}
+
+.raid-picker-card {
+  position: relative;
+  /* Tall enough that one raid fills the view, short enough that the next one's edge shows. */
+  min-height: min(78vh, 620px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  scroll-snap-align: start;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+
+/*
+ * The art, and the scrim that keeps the plate readable over it.
+ *
+ * A pseudo-element rather than the card's own background so the two can be transformed
+ * independently — the image lifts slightly on hover while the frame stays put, which reads as depth
+ * rather than as the whole card jumping.
+ */
+.raid-picker-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--raid-art);
+  background-size: cover;
+  background-position: center 35%;
+  transition: transform 400ms ease;
+}
+
+.raid-picker-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.1) 35%,
+    rgba(0, 0, 0, 0.72) 74%,
+    rgba(0, 0, 0, 0.92) 100%
+  );
+}
+
+.raid-picker-card:hover::before,
+.raid-picker-card:focus-visible::before {
+  transform: scale(1.03);
+}
+
+.raid-picker-card:hover,
+.raid-picker-card:focus-visible {
+  border-color: var(--metal-edge);
+  outline: none;
+}
+
+/*
+ * The plate sits at the bottom, where the art is darkest and where a caption belongs.
+ *
+ * It carries its own faint ground as well as the gradient above, because a raid's art cannot be
+ * relied on to be dark in the corner the text happens to land in — Tempest Keep is bright violet
+ * exactly there.
+ */
+.raid-picker-plate {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  padding: 22px 26px 24px;
+  width: 100%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+}
+
+.raid-picker-name {
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1.05;
+  text-shadow: 0 2px 0 #000, 0 0 24px rgba(0, 0, 0, 0.9);
+}
+
+.raid-picker-go {
+  color: var(--metal-edge);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.raid-picker-card:hover .raid-picker-go,
+.raid-picker-card:focus-visible .raid-picker-go {
+  opacity: 1;
+  transform: none;
+}
+
+/* Touch has no hover, so the affordance has to be permanent there rather than revealed. */
+@media (hover: none) {
+  .raid-picker-go {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .raid-picker-card {
+    min-height: 62vh;
+  }
+
+  .raid-picker-plate {
+    padding: 18px 18px 20px;
+  }
 }

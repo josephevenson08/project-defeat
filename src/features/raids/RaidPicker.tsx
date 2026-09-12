@@ -23,20 +23,43 @@ export function RaidPicker({ onSelect }: RaidPickerProps) {
         </p>
       </div>
 
-      <div className="raid-picker-grid">
+      {/*
+        **One raid per screen, scrolled through rather than scanned across.**
+
+        Five cards in a row is a picker you read; five full-height panels is a thing you move through,
+        which suits a set of five that each have a character and an atmosphere of their own. The art
+        is the point — the loot table behind each of these is several hundred rows and the boss on the
+        front is what tells you which one you want.
+
+        Each raid looks for `public/raids/<id>.jpg` and simply has no background if the file is
+        absent, so the page is complete either way. `--raid-art` carries the URL rather than an inline
+        `background-image`, which keeps the gradient scrim in the stylesheet where it can be tuned
+        with everything else.
+      */}
+      <div className="raid-picker-reel">
         {sampleRaids.map((raid) => {
           const bosses = getBossesForRaid(raid.id)
           const drops = bosses.reduce((total, boss) => total + boss.loot.length, 0) + (raid.notableTrashLoot?.length ?? 0)
 
           return (
-            <button key={raid.id} type="button" className="raid-picker-card" onClick={() => onSelect(raid.id)} data-testid={`raid-pick-${raid.id}`}>
-              <span className="raid-picker-tier">
-                {raid.tier} · {raid.playerSize}-player
-              </span>
-              <span className="raid-picker-name">{raid.name}</span>
-              {/* Counts are computed rather than written, so they cannot drift from the data. */}
-              <span className="raid-picker-count">
-                {bosses.length} {bosses.length === 1 ? 'boss' : 'bosses'} · {drops} notable drops
+            <button
+              key={raid.id}
+              type="button"
+              className="raid-picker-card"
+              style={{ '--raid-art': `url(${import.meta.env.BASE_URL}raids/${raid.id}.jpg)` } as React.CSSProperties}
+              onClick={() => onSelect(raid.id)}
+              data-testid={`raid-pick-${raid.id}`}
+            >
+              <span className="raid-picker-plate">
+                <span className="raid-picker-tier">
+                  {raid.tier} · {raid.playerSize}-player
+                </span>
+                <span className="raid-picker-name">{raid.name}</span>
+                {/* Counts are computed rather than written, so they cannot drift from the data. */}
+                <span className="raid-picker-count">
+                  {bosses.length} {bosses.length === 1 ? 'boss' : 'bosses'} · {drops} notable drops
+                </span>
+                <span className="raid-picker-go">See what drops here →</span>
               </span>
             </button>
           )
