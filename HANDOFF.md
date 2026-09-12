@@ -5,7 +5,55 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
-## The raid art was too big for the raid art (2026-09-11, latest)
+## Boss cards, and one decision deliberately reversed (2026-09-12, latest)
+
+Inside a raid, the encounters are **cards with their own artwork**, and each one's loot table opens
+behind a click on it. The owner made the art; `tools/ingest/prepare-boss-art.mjs` places it.
+
+**This reverses "everything is expanded", which was itself a deliberate choice, so the reasoning
+matters.** The accordion that was removed showed a stack of identical grey headers — the page's whole
+subject was one click away behind rows that gave you no reason to press any of them. With artwork the
+closed page is no longer empty: you arrive at Karazhan and see Attumen, Moroes, the Curator. What
+costs a click now is one loot table rather than the entire point of the tab. If the art ever goes
+away, this should go back.
+
+### Things worth knowing before touching it
+
+**The card and its table are siblings, not parent and child.** That is what lets them have different
+widths — the card is held at a size the artwork can fill (506px at the current rail width) while the
+table spans all columns and keeps the measure its rows were built for. `grid-auto-flow: dense` on the
+container is load-bearing: a full-span table placed after the *first* card of a row would leave the
+second column empty, and dense pulls the next card up into it.
+
+**Art is optional and its absence is a state, not a fault.** A boss with no panel keeps its card and
+simply has no background, which is what lets Serpentshrine and Tempest Keep read as unfinished. The
+image guard asserts the missing set *by name* (`missingArt` on each screen), so a newly broken path
+fails and so does art arriving without the line being removed.
+
+**`prepare-boss-art.mjs` matches on the filename, so new art only has to be named after its boss.**
+Drop `Serpentshrine/Lady Vashj.jpg` in and re-run; the folder name picks the raid. A file it cannot
+place is an **error, not a skip** — silently ignoring one is how art ends up never reaching the
+screen. It also copies anything already inside the 1200px cap byte for byte rather than re-encoding:
+the first run re-encoded the Karazhan panels and they came out *larger* (309 KB → 314 KB) while
+losing a generation of quality. Only a resize earns a re-encode.
+
+**The source folder is gitignored.** `images for raid bosses/` is the owner's masters, in OneDrive;
+the repo carries the sized output in `public/raids/bosses/`. Committing both would store the same
+3.7 MB twice, since most are copied through unchanged.
+
+**Attumen the Huntsman's panel arrived as `grok-image-8b0e7773…jpg` and was identified by looking at
+it** — an armoured warrior with a great axe and a dark horned steed behind him, which is Attumen and
+Midnight; Karazhan's only other unillustrated encounter is Nightbane, a skeletal dragon. **Worth
+re-checking with the owner.** Nightbane still has no art.
+
+**The plate wash is heavier than the raid picker's, and it was measured.** These cards are half the
+size, so the plate is a smaller share of a busier picture; the first version left "6 drops" on the
+Maiden's halo at roughly 2:1. It is now 8.31:1 at worst, sampled against the *brightest* pixel behind
+each line on all eleven Karazhan cards.
+
+---
+
+## The raid art was too big for the raid art (2026-09-11)
 
 The owner reported two things about the raids page and they turned out to be one thing: the boss
 panels looked "really pixelated and blurry", and the page lagged.
@@ -112,6 +160,9 @@ passed from `App`, never recomputed: `calculateStats` already runs for the rail 
 drops its "Where" column at 300px because the range beside it names those zones as tabs. Below
 1100px it stops being a sidebar entirely — a sticky column on a phone covers what it is meant to help
 you navigate. Crafting got the same split and earns it harder: Blacksmithing is 33 steps.
+
+**Inside a raid — a card per encounter, loot behind a click.** Added 2026-09-12; see *Boss cards, and
+one decision deliberately reversed* at the top.
 
 **Raids — two to a row, sized by the artwork.** This started as a reel, one raid per screen, and was
 cut down on 2026-09-11 because the cards had grown larger than the images behind them. See *The raid

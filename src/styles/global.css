@@ -6187,3 +6187,155 @@ body {
     padding: 18px 18px 20px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Inside a raid: a card per encounter, its loot behind a click.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * **Two cards to a row, and the loot table spanning the whole width beneath them.**
+ *
+ * The card and its table are siblings rather than nested, which is what lets them have different
+ * widths: the card is held at a size the artwork can fill, while the table gets the full measure its
+ * rows were built for. `dense` is doing real work here — a full-span table placed after the first
+ * card of a row would otherwise leave the second column of that row empty, and dense pulls the next
+ * card up into it so the grid never develops holes as you open things.
+ *
+ * The cap is the same 1180px the raid picker uses and for the same reason: two cards across puts each
+ * at 582px, and the boss panels are 1152-1200px wide, so a 2x display is served at roughly 1:1 and
+ * everything else downsamples. The guard that enforces this is the app-wide image test.
+ */
+.raid-boss-grid {
+  display: grid;
+  grid-auto-flow: dense;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.raid-boss-card {
+  position: relative;
+  /* The shape the raid cards use, so the two screens read as one family. */
+  aspect-ratio: 1.85;
+  min-height: 190px;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  transition: border-color 140ms ease;
+}
+
+/*
+ * The art. A pseudo-element rather than the button's own background so the picture can lift on hover
+ * while the frame stays put, and so `--boss-art` being absent simply paints nothing.
+ */
+.raid-boss-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--boss-art);
+  background-size: cover;
+  background-position: center 30%;
+  transition: transform 400ms ease;
+}
+
+.raid-boss-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.06) 38%, rgba(0, 0, 0, 0.74) 76%, rgba(0, 0, 0, 0.93) 100%);
+}
+
+.raid-boss-card:hover::before,
+.raid-boss-card:focus-visible::before {
+  transform: scale(1.03);
+}
+
+.raid-boss-card:hover,
+.raid-boss-card:focus-visible {
+  border-color: var(--metal-edge);
+  outline: none;
+}
+
+/* An open card keeps its lit edge, so which table belongs to which boss is never ambiguous. */
+.raid-boss-card[data-open] {
+  border-color: var(--metal-edge);
+}
+
+/*
+ * The plate carries its own wash as well as the card's gradient, because a boss's art cannot be
+ * relied on to be dark where the text lands — the Chess Event is a bright board and Netherspite is
+ * lit from below.
+ */
+.raid-boss-card-plate {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px 15px;
+  width: 100%;
+  /*
+   * Heavier than the raid picker's, and measured rather than matched.
+   *
+   * These cards are half the size, so the plate is a smaller share of a busier picture, and the
+   * first version left "6 drops" and "See the loot" sitting on the Maiden's halo at about 2:1. The
+   * ground under the two small lines has to be effectively black for inks chosen against
+   * `--surface-0` to keep the contrast they were picked for.
+   */
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.58) 28%, rgba(0, 0, 0, 0.9) 58%, rgba(0, 0, 0, 0.97));
+}
+
+.raid-boss-card-name {
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.6vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  text-shadow: 0 2px 0 #000, 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.raid-boss-card-count {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+.raid-boss-card-cue {
+  color: var(--metal-edge);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+/* The loot table: full width, and visibly the thing the card opened rather than a new section. */
+.raid-boss-drop {
+  grid-column: 1 / -1;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--metal-edge);
+  border-radius: var(--radius);
+  background: var(--surface-0);
+  padding: 4px 16px 10px;
+}
+
+.raid-boss-grid-note {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 760px) {
+  .raid-boss-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

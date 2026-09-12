@@ -43,3 +43,10 @@ coverage/
 
 # Upstream item data fetched by tools/ingest; regenerated on demand, not part of the repo.
 tools/ingest/.cache/
+
+# The owner's original boss artwork. `tools/ingest/prepare-boss-art.mjs` reads this folder and writes
+# the panels the app actually loads into public/raids/bosses/, and for anything already inside the
+# size cap it copies the bytes straight through — so committing both would store 3.7 MB of the same
+# pictures twice. The folder lives in OneDrive, which is where the masters belong; the repo carries
+# the sized output. Drop new art in and re-run the script.
+images for raid bosses/

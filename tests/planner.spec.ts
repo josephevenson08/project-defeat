@@ -1828,13 +1828,33 @@ test('Raids opens on a picker, then shows one raid’s loot with the rest in the
   await expect(detail).toBeVisible()
   await expect(detail).toContainText('Lady Vashj')
 
-  // Loot is expanded on arrival. The accordion this replaced hid the one thing the page is for
-  // behind a click per boss.
-  const firstDrop = detail.locator('.raid-loot-row').first()
+  /*
+   * **A card per encounter, and the loot behind a click on it.**
+   *
+   * This asserted the opposite until 2026-09-12, and the reversal is deliberate. Loot was expanded on
+   * arrival because the accordion before it showed nothing but a stack of identical grey headers —
+   * the page's whole subject was one click away behind rows that gave you no reason to pick any of
+   * them. The cards carry artwork, so a closed page now tells you which encounters a raid holds; what
+   * costs a click is one loot table rather than the entire point of the tab.
+   */
+  await expect(detail.locator('.raid-loot-row')).toHaveCount(0)
+  const vashj = page.getByTestId('boss-card-lady-vashj')
+  await expect(vashj).toBeVisible()
+  await expect(vashj).toHaveAttribute('aria-expanded', 'false')
+
+  await vashj.click()
+  await expect(vashj).toHaveAttribute('aria-expanded', 'true')
+
+  const opened = page.getByTestId('boss-loot-lady-vashj')
+  const firstDrop = opened.locator('.raid-loot-row').first()
   await expect(firstDrop).toBeVisible()
   await expect(firstDrop.locator('.raid-loot-frame')).toBeVisible()
   // A loot table of names alone says what drops but not whether you want it.
-  await expect(detail.locator('.raid-loot-stats').first()).toBeVisible()
+  await expect(opened.locator('.raid-loot-stats').first()).toBeVisible()
+
+  // And it closes again, so the card is a toggle rather than a one-way reveal.
+  await vashj.click()
+  await expect(page.getByTestId('boss-loot-lady-vashj')).toHaveCount(0)
 
   // Explicitly not a fight guide any more.
   await expect(detail.locator('.raid-boss-mechanics')).toHaveCount(0)
@@ -3118,6 +3138,10 @@ test('the paperdoll renders real item icons rather than the placeholder glyphs',
 test('a raid loot row with no catalogued item still renders a frame', async ({ page }) => {
   await openApp(page, 'raids')
   await page.getByTestId('raid-pick-karazhan').click()
+  // Every encounter opened: the drops live behind a click on their card now, so a page left closed
+  // has no loot rows to check and this test would pass over an empty set.
+  const bossCards = page.locator('.raid-boss-card')
+  for (let index = 0; index < (await bossCards.count()); index += 1) await bossCards.nth(index).click()
 
   // 124 of the 272 raid loot entries across all five raids name an item the catalogue does not carry,
   // which predates icons entirely — those rows have always shown "??". Real icons make the gap
@@ -10563,12 +10587,28 @@ test('no image in the app is painted larger than the file it comes from', async 
   const screens = [
     { name: 'raid picker', needs: { raids: 5 }, open: async () => await openApp(page, 'raids') },
     {
+      // Karazhan is the raid with art for ten of its eleven encounters, so it is the one that proves
+      // the boss cards are drawing their panels at a size those panels can actually fill.
       name: 'raid loot',
-      needs: { icons: 30 },
+      needs: { icons: 30, raids: 10 },
+      /*
+       * **Nightbane has no artwork, and that is a state rather than a fault.** A boss card whose
+       * panel is absent simply has no background, the same way the raid picker handles a raid without
+       * one — which is what lets Serpentshrine and Tempest Keep read as unfinished rather than broken.
+       *
+       * Named rather than tolerated by count, so this fails in both directions: a newly broken path
+       * appears here, and art arriving for Nightbane fails until the line is removed. A bare
+       * "some images may be missing" would have quietly swallowed both.
+       */
+      missingArt: ['/raids/bosses/nightbane.jpg'],
       open: async () => {
         await openApp(page, 'raids')
         await page.getByTestId('raid-pick-karazhan').click()
         await expect(page.getByTestId('raid-detail')).toBeVisible()
+        // Every card opened, because the loot icons only exist once their table does — the encounters
+        // are cards now and the drops are behind a click on each.
+        const cards = page.locator('.raid-boss-card')
+        for (let index = 0; index < (await cards.count()); index += 1) await cards.nth(index).click()
         await walkThePage()
       },
     },
@@ -10586,7 +10626,7 @@ test('no image in the app is painted larger than the file it comes from', async 
   ]
 
   const magnified: string[] = []
-  const undecodable: string[] = []
+  const wrongGaps: string[] = []
   const thin: string[] = []
 
   for (const screen of screens) {
@@ -10594,13 +10634,14 @@ test('no image in the app is painted larger than the file it comes from', async 
     const painted = await paintedImages(page)
 
     const counted = new Map<string, Set<string>>()
+    const missing = new Set<string>()
     for (const row of painted) {
       const family = familyOf(row.src)
       if (!counted.has(family)) counted.set(family, new Set())
       counted.get(family)!.add(row.src)
 
       if (!row.nat) {
-        undecodable.push(`${screen.name}: ${row.what} — ${row.src}`)
+        missing.add(row.src.replace(/^https?:\/\/[^/]+/, ''))
         continue
       }
       // A hair over 1 is subpixel rounding on a box that was sized to the file, not a stretch.
@@ -10616,10 +10657,18 @@ test('no image in the app is painted larger than the file it comes from', async 
       const found = counted.get(family)?.size ?? 0
       if (found < least) thin.push(`${screen.name}: expected at least ${least} ${family} images, measured ${found}`)
     }
+
+    // Exactly the declared gaps, in both directions: a new break appears, and a gap that gets filled
+    // fails until its line is removed.
+    const declared = [...(screen.missingArt ?? [])].sort()
+    const actual = [...missing].sort()
+    if (JSON.stringify(declared) !== JSON.stringify(actual)) {
+      wrongGaps.push(`${screen.name}: declared missing ${JSON.stringify(declared)}, actually missing ${JSON.stringify(actual)}`)
+    }
   }
 
   expect(thin, 'each screen measured the images it exists to show').toEqual([])
-  expect(undecodable, 'every painted image decodes').toEqual([])
+  expect(wrongGaps, 'the only images that fail to load are the ones known to have no art yet').toEqual([])
   expect(magnified, 'no image is drawn larger than its own file').toEqual([])
 })
 

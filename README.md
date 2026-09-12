@@ -51,9 +51,12 @@ behind every claim of its that quotes a number.
   - Healer
   - Tank
 - Result breakdown panel
-- Raids tab: all five Phase 1/2 raids boss by boss, with notable drops colour-coded by item quality
-  where the drop exists in the catalog, and step-by-step attunement chains for Karazhan,
-  Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
+- Raids tab: all five Phase 1/2 raids, **a card per encounter with its own artwork**, and that
+  encounter's notable drops behind a click on it — colour-coded by item quality where the drop
+  exists in the catalog. Thirteen of the twenty-four encounters have art so far (Karazhan bar
+  Nightbane, Gruul's Lair, Magtheridon); the rest keep their card and simply have no picture, so a
+  raid without art reads as unfinished rather than broken. Step-by-step attunement chains for
+  Karazhan, Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
   callouts are still in the domain data but are deliberately not rendered: the tab answers "what
   drops here", and a fight guide is a different question asked at a different time
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
