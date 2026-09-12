@@ -257,3 +257,33 @@ contradicting an owner decision the day after it was pushed.
 **A gap ranking is not a plan.** Both are worth writing down, and they answer different questions:
 how wrong is the model, versus what gets built next. Only the second is the owner's to set, and it
 is the one this project's docs had been quietly answering on their own.
+
+## An element is sized by the asset inside it, not the space around it
+
+Recorded 2026-09-11, after the raid picker's cards had grown to **twice the width of two of the five
+images behind them**.
+
+The owner reported two separate complaints — the boss art looked pixelated, and the page lagged — and
+they had one cause. A card filled the panel at 1353 CSS pixels, 2706 device pixels on a 2x display,
+while the Serpentshrine and Tempest Keep panels only exist at 690px. Magnifying an image is the blur;
+repainting five magnified images per scroll frame is the lag. Measured: **24 of 108 frames over 32ms
+before, 0 after**.
+
+**The layout was asking the artwork a question it could not answer.** Nothing in the CSS knew how big
+the images were, so the cards were sized by the room available — which is the normal way to lay a
+page out and the wrong way when the content is a fixed-resolution asset. The picker is now capped at
+1180px, the width of the *narrowest* panel, with two cards to a row so each is served 1:1 on a 2x
+screen. The constant is derived from the assets and the comment beside it says so, because the next
+person to want bigger cards needs to know the price.
+
+**The general rule: when a layout's job is to present a fixed-size asset, the asset sets the layout's
+bounds.** Growing the container past the asset never adds information — it only invents pixels and
+spends paint time doing it.
+
+**And the corollary for the test suite.** The guard added here asserts the *outcome* — for every
+card, the `cover` scale factor against its own `naturalWidth` stays at or below 1 — rather than the
+constant that currently produces it. A test pinned to `1180px` would pass while someone reintroduced
+the magnification by a different route; two of them were available here, the width cap and the
+two-up grid, and only one of them is the number. This is the same lesson as
+*[[Decision Log#A display label is not a join key, and the test has to be about reachability|the gathering-node join]]*, aimed at CSS:
+assert the thing you actually care about, at the surface where it can go wrong.

@@ -9834,6 +9834,32 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   const bisEntries = bisLists.reduce((total, list) => total + list.entries.length, 0)
   const withWowId = allItems.filter((item) => item.wowItemId !== undefined).length
 
+  /*
+   * The raid picker's width cap is a derived number wearing a constant's clothes: it is the width of
+   * the *narrowest* raid panel, so that two cards to a row are each served at 1:1 on a 2x display.
+   * Both the CSS and the handoff say so in prose, and the day someone drops a better Serpentshrine
+   * file in, that sentence becomes false and the cap becomes free to rise — which is exactly the
+   * moment they need telling. The runtime guard below covers the invariant; this covers the claim.
+   */
+  const narrowestRaidPanel = Math.min(
+    ...readdirSync(resolve(process.cwd(), 'public/raids'))
+      .filter((file) => file.endsWith('.jpg'))
+      .map((file) => {
+        const bytes = readFileSync(resolve(process.cwd(), 'public/raids', file))
+        for (let at = 2; at < bytes.length - 8; ) {
+          if (bytes[at] !== 0xff) {
+            at += 1
+            continue
+          }
+          const marker = bytes[at + 1]
+          const startOfFrame = marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc
+          if (startOfFrame) return bytes.readUInt16BE(at + 7)
+          at += 2 + bytes.readUInt16BE(at + 2)
+        }
+        throw new Error(`${file} is not a JPEG this can read`)
+      }),
+  )
+
   const claims: { where: string; pattern: RegExp; actual: number; tolerance?: number }[] = [
     {
       where: 'README: vendored icon count',
@@ -9940,8 +9966,17 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
     { where: 'icons.ts: distinct icons', pattern: /[\d,]+ entries map to ([\d,]+) distinct icons/, actual: distinctIcons },
   ]
 
+  const handoffClaims: typeof claims = [
+    {
+      where: 'HANDOFF: raid picker cap equals the narrowest raid panel',
+      pattern: /Picker width \| the whole panel \| `min\(100%, ([\d,]+)px\)`, centred \|/,
+      actual: narrowestRaidPanel,
+    },
+  ]
+
   const readme = read('README.md')
   const roadmap = read('ROADMAP.md')
+  const handoff = read('HANDOFF.md')
   const limitations = read('knownlimitations')
   const sourceComments =
     read('src/domain/gear/sampleItems.ts') +
@@ -9954,6 +9989,7 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   for (const [text, rows] of [
     [readme, claims],
     [roadmap, roadmapClaims],
+    [handoff, handoffClaims],
     [limitations, limitationClaims],
     [sourceComments, sourceClaims],
   ] as const) {
@@ -10363,4 +10399,76 @@ test('a buff that comes from a talent comes from one spec', async () => {
     .map((entry) => `${entry.name}: ${entry.providedByClass} has no ${entry.providedBySpec}`)
 
   expect(impossible, 'every restricted buff names a real spec of its class').toEqual([])
+})
+
+test('no raid panel is painted larger than the file it is drawn from', async ({ page }) => {
+  /*
+   * The raid picker's cards are capped at a width the artwork can actually fill.
+   *
+   * Two of the five panels only exist at 1180px, and the reel used to paint them across 1353 CSS
+   * pixels — 2706 on a 2x display. That showed up twice: those two raids looked soft beside the
+   * three that ship at 1536px, and scrolling the page dropped roughly a fifth of its frames
+   * repainting five magnified images. Both went away by making the card smaller than its art.
+   *
+   * So this measures the thing the cap exists to protect rather than the cap itself: for every card,
+   * the `cover` scale factor against its own image. At or below 1 the browser is downsampling. Above
+   * it, it is inventing pixels, and the blur and the jank are both back.
+   *
+   * Checked at two viewports because the failure is width-dependent — a wide window is where the
+   * cards have room to outgrow the art, and the narrow one catches a card overflowing its column,
+   * which an `aspect-ratio` and a `min-height` together once caused.
+   */
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await openApp(page, 'raids')
+
+    const measured = await page.locator('.raid-picker-card').evaluateAll((cards) =>
+      Promise.all(
+        cards.map(async (card) => {
+          const box = card.getBoundingClientRect()
+          const source = getComputedStyle(card)
+            .getPropertyValue('--raid-art')
+            .trim()
+            .replace(/^url\(["']?/, '')
+            .replace(/["']?\)$/, '')
+
+          const art = await new Promise<{ width: number; height: number } | null>((done) => {
+            const image = new Image()
+            image.onload = () => done({ width: image.naturalWidth, height: image.naturalHeight })
+            image.onerror = () => done(null)
+            image.src = source
+          })
+
+          return {
+            raid: (card as HTMLElement).dataset.testid ?? '(unnamed)',
+            art,
+            // `background-size: cover` scales by whichever axis needs more.
+            scale: art ? Math.max(box.width / art.width, box.height / art.height) : null,
+            overflows: box.width > document.documentElement.clientWidth + 1,
+          }
+        }),
+      ),
+    )
+
+    expect(measured, 'every raid still has a card').toHaveLength(5)
+
+    // A panel that failed to load would make the scale unmeasurable, which is not a pass.
+    expect(
+      measured.filter((card) => !card.art).map((card) => card.raid),
+      `every raid panel decodes at ${viewport.width}px`,
+    ).toEqual([])
+
+    expect(
+      measured.filter((card) => card.scale! > 1).map((card) => `${card.raid} at ${card.scale!.toFixed(2)}x`),
+      `no raid panel is magnified at ${viewport.width}px`,
+    ).toEqual([])
+
+    expect(
+      measured.filter((card) => card.overflows).map((card) => card.raid),
+      `no raid card is wider than the window at ${viewport.width}px`,
+    ).toEqual([])
+  }
 })

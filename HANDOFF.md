@@ -5,7 +5,67 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
-## Start here (2026-09-11 evening, the layout pass — READ THIS FIRST IF RESUMING)
+## The raid art was too big for the raid art (2026-09-11, latest)
+
+The owner reported two things about the raids page and they turned out to be one thing: the boss
+panels looked "really pixelated and blurry", and the page lagged.
+
+**Both were the card being wider than the image in it.** A card filled the panel — 1353 CSS pixels on
+a 1440px window, 2706 device pixels on a 2x display — while two of the five panels only exist at
+690px. Those two were being magnified nearly 2x, which is the blur. All five were being repainted at
+that size on every scroll frame, which is the lag: **24 of 108 frames over 32ms, worst 67ms**, versus
+**0 over 32ms** once the cards came down. One cause, two symptoms, one fix.
+
+Numbers are from a rAF frame-timing probe run against the dev server before and after, on the same
+machine in the same session. Worth re-running rather than re-arguing if this comes up again.
+
+### What changed
+
+| | Before | After |
+|---|---|---|
+| Card | 1353 × 620, one per row | 582 × 315, two per row |
+| Picker width | the whole panel | `min(100%, 1180px)`, centred |
+| Card shape | `min-height: min(78vh, 620px)` | `aspect-ratio: 1.85` + a 240px floor |
+| SSC / Tempest Keep art | 690px | 1180px |
+| Art scale at 2x | 3.9x | 1.0x |
+
+**1180 is not a taste number.** It is the width of the narrowest panel, so two cards across means
+each is served 1:1 on a 2x display and downsampled everywhere else. Raising it puts both problems
+back, which is why the CSS says so where someone would go to change it.
+
+**1.85 is the aspect the two weak panels already are**, so they fill a card with nothing cropped and
+nothing stretched; the three 1536×1024 ones spare 19% top and bottom to `background-position`.
+
+**Four tracks, each card spanning two** — that is what centres the odd fifth card rather than
+orphaning it left or stretching it to double width. Same arrangement, same reason, as the front door.
+
+### Three traps in this, all now guarded or written down
+
+**`aspect-ratio` plus `min-height` is secretly a `min-width`.** The ratio reads the height and works
+backwards, so a 240px floor meant a 444px minimum width, and a 390px phone got a card hanging off the
+side of the screen. Fixed by stating `width: 100%` so the ratio runs height-from-width instead. The
+same thing bit the grid *track* first: an implicit `auto` track sized itself to that phantom minimum,
+which is why the reel is `minmax(0, 1fr)`.
+
+**A `max-width` on a grid item with auto side margins does nothing useful.** Auto margins make the
+item fit-content rather than stretched, so `max-width: 960px` left the reel 629px wide — the width of
+its longest line of plate text. It needs `width`.
+
+**Upscaling the two weak panels was worth doing, and is not pretending to add detail.** The card
+shrinking is the real fix; the resample only buys back HiDPI, where a 582px card still asks for 1164
+device pixels. `tools/ingest/upscale-raid-art.mjs` climbs to the target in ≤1.25x steps (one bicubic
+jump across a 1.7x gap goes soft) and then unsharp-masks with a threshold, because every 8×8 JPEG
+block boundary is an edge as far as a sharpening filter is concerned. It skips anything already at
+1180px, so it is safe to re-run. Browser canvas, not `sharp` — same reasoning as `split-raid-art.mjs`.
+
+**The guard is `no raid panel is painted larger than the file it is drawn from`**, at 1920px and
+390px. It measures the `cover` scale factor per card against that card's own `naturalWidth`, so it
+protects the outcome rather than the constant — a later change that makes cards bigger by some other
+route still trips it. Verified to fail on the old layout before being left passing.
+
+---
+
+## The layout pass (2026-09-11 evening — read this second)
 
 The retheme entry below covers the *look*. This covers the *layouts*, which is where the work stopped
 and where it picks up.
@@ -39,8 +99,13 @@ drops its "Where" column at 300px because the range beside it names those zones 
 1100px it stops being a sidebar entirely — a sticky column on a phone covers what it is meant to help
 you navigate. Crafting got the same split and earns it harder: Blacksmithing is 33 steps.
 
-**Raids — a reel.** One raid per screen, scrolled through, boss art behind each. Snapping is
-`proximity`, **not `mandatory`** — mandatory hijacks a trackpad flick meant to carry past two raids.
+**Raids — two to a row, sized by the artwork.** This started as a reel, one raid per screen, and was
+cut down on 2026-09-11 because the cards had grown larger than the images behind them. See *The raid
+art was too big for the raid art* below; the short version is that the picker is now a two-up grid
+capped at 1180px — the width of the narrowest panel — with the odd fifth card centred on four tracks,
+the same arrangement the front door uses. Snapping survives only below 760px, where the layout is
+still one-per-screen and still behaves like a reel; there it is `proximity`, **not `mandatory`**,
+because mandatory hijacks a trackpad flick meant to carry past two raids.
 
 **Front door.** Three cards across, two centred beneath, on six equal tracks. `auto-fit` was wrong for
 a fixed set of five the same way it was wrong for the raids: it packs what fits and orphans the rest.
@@ -100,9 +165,10 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 1. **Five-design boards for the remaining tabs** — tier lists, raid composition, simulation. The
    owner was asked which to do next and had not answered. This is the active thread.
-2. **Serpentshrine Cavern and Tempest Keep art is still ~690px** and visibly softer than the other
-   three, which are 1536x1024. Only 690px versions have ever been sent. Dropping full-resolution
-   files into `public/raids/` replaces them with no code change — same filenames.
+2. ~~Serpentshrine Cavern and Tempest Keep art is still ~690px.~~ **Closed 2026-09-11** — the cards
+   were shrunk to fit the art rather than the art stretched to fit the cards, and those two files
+   were resampled to 1180px offline. Still the smallest panels, and still the number that sets the
+   card width. A genuine high-resolution pair would let the cap rise; nothing else would.
 3. **A later batch of all five panels at ~455px was deliberately not used.** For three of the five it
    would be a downgrade from 1536x1024; for the other two it is the same source already placed. If
    someone "fixes" this by using them, the page gets worse.

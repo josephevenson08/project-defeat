@@ -5949,9 +5949,48 @@ body {
  * The raid reel: one raid per screen, scrolled through.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
+/*
+ * **Capped at the width of the artwork, and centred rather than run to the panel's edge.**
+ *
+ * This number is set by the images, not by taste. A card that filled the panel was 1353px across on
+ * a 1440px window and 2706 device pixels on a 2x screen — so every panel was being magnified, the
+ * two that only exist at 1180px by nearly 2x. That is what made those two look soft while the other
+ * three, which are 1536px, looked fine.
+ *
+ * It is also what made the page lag. Repainting five 1.5-megapixel images across that much surface
+ * on every scroll frame dropped 24 of 108 frames, the worst taking 67ms. At the sizes below, none.
+ * The blur and the jank were the same fact measured two ways.
+ *
+ * 1180 is the width of the narrowest panel, so with two cards to a row each one is served at 1:1 on
+ * a 2x display and downsampled everywhere else — the browser never invents a pixel. Raising this
+ * puts both problems back. If the cards want to be bigger, the panels have to get bigger first;
+ * `tools/ingest/upscale-raid-art.mjs` is where that happens.
+ *
+ * The cap goes on the whole picker rather than on the reel alone so the heading keeps the cards'
+ * left edge. A centred reel under a full-width heading reads as two columns that failed to line up.
+ *
+ * A `width` rather than a `max-width`, which matters here: this is a grid item, and a grid item with
+ * auto side margins is sized to fit-content instead of stretching — `max-width` left the reel 629px
+ * across, the width of its longest line of plate text.
+ */
+.raid-picker {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
 .raid-picker-reel {
   display: grid;
   gap: 16px;
+  /*
+   * An explicit track rather than the implicit `auto` one.
+   *
+   * A card with both `aspect-ratio` and a `min-height` floor has a *minimum width* — the ratio
+   * transfers the floor across — and an `auto` track sizes itself to that. On a 390px phone the
+   * 300px floor became a 555px card and the reel ran off the side of the screen. `minmax(0, 1fr)`
+   * takes the track's width from the container instead, and leaves the floor doing only the job it
+   * was added for.
+   */
+  grid-template-columns: minmax(0, 1fr);
   /*
    * Proximity rather than mandatory snapping. Mandatory fights a trackpad — it hijacks a flick that
    * was meant to carry past two raids — while proximity only tidies up a scroll that already stopped
@@ -5962,8 +6001,29 @@ body {
 
 .raid-picker-card {
   position: relative;
-  /* Tall enough that one raid fills the view, short enough that the next one's edge shows. */
-  min-height: min(78vh, 620px);
+  /*
+   * A fixed shape rather than a fixed height, and 1.85 rather than anything rounder.
+   *
+   * That is the aspect the two 1180px panels already are, so they fill the card with nothing cropped
+   * and nothing stretched; the three 1536x1024 ones can spare the 19% off the top and bottom that
+   * `background-position` then places. Deriving height from width also means the card shrinks with
+   * the window — a narrow window now asks *less* of the art, where `78vh` used to ask a short window
+   * for a wide letterbox, which is the crop that suits these images worst.
+   */
+  aspect-ratio: 1.85;
+  /* A floor so a narrow window gets a card rather than a 200px strip. Low enough that it never wins
+     against the ratio at the two-up sizes, where it would only squash the art into a taller crop. */
+  min-height: 240px;
+  /*
+   * The width has to be stated, or the floor above becomes a *width* floor.
+   *
+   * `aspect-ratio` with an auto width reads the height and works backwards, so `min-height: 240px`
+   * quietly meant `min-width: 444px` — and a 390px phone got a card hanging off the side of the
+   * screen. Taking the width from the grid area makes the ratio run the other way, height from
+   * width, and leaves the floor clamping only the thing it names.
+   */
+  width: 100%;
+  min-width: 0;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
@@ -6083,11 +6143,46 @@ body {
   }
 }
 
-@media (max-width: 700px) {
-  .raid-picker-card {
-    min-height: 62vh;
+/*
+ * **Two raids to a row once there is room for two.**
+ *
+ * Four tracks with every card spanning two, rather than two tracks — that is what lets the odd fifth
+ * card sit centred in its own row instead of being orphaned against the left margin or stretched to
+ * double width, which would undo everything above. The front door arranges its five section cards
+ * the same way for the same reason.
+ *
+ * Halving the card again is what takes the two 1180px panels to 1:1 on a 2x screen. It is also the
+ * point at which scrolling this page stops costing anything.
+ */
+@media (min-width: 760px) {
+  .raid-picker-reel {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /*
+     * Snapping belonged to a reel of one-per-screen panels. At this size three rows are in view at
+     * once, and a snap that tugs the scroll between them is friction with nothing left to gain.
+     */
+    scroll-snap-type: none;
   }
 
+  .raid-picker-card {
+    grid-column: span 2;
+  }
+
+  .raid-picker-card:last-child {
+    grid-column: 2 / span 2;
+  }
+
+  /* The plate and its title were drawn for a card twice this wide. */
+  .raid-picker-plate {
+    padding: 18px 20px 20px;
+  }
+
+  .raid-picker-name {
+    font-size: clamp(21px, 2vw, 28px);
+  }
+}
+
+@media (max-width: 700px) {
   .raid-picker-plate {
     padding: 18px 18px 20px;
   }
