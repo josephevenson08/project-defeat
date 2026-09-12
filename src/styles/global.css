@@ -5871,10 +5871,18 @@ body {
     linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 35%, rgba(0, 0, 0, 0.55));
 }
 
+/*
+ * Tuned against the real illustration rather than guessed at.
+ *
+ * The first pass was 0.70 rising to 0.86 and it drowned the artwork — a battle scene rendered as a
+ * dark smudge, which is worse than no image at all. These numbers let the two armies read while the
+ * cards still sit on enough ground to be legible; the wordmark carries its own shadow and does not
+ * need the scrim's help.
+ */
 .section-picker[data-backdrop='image'] .section-picker-backdrop::after {
   background:
-    radial-gradient(70% 55% at 50% 42%, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.86) 70%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.84));
+    radial-gradient(78% 62% at 50% 44%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.66) 74%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.22) 38%, rgba(0, 0, 0, 0.72));
 }
 
 .section-picker-head {
@@ -6019,13 +6027,25 @@ body {
  * relied on to be dark in the corner the text happens to land in — Tempest Keep is bright violet
  * exactly there.
  */
+/*
+ * The plate needs its own ground, not just the card's gradient.
+ *
+ * A raid's art cannot be relied on to be dark where the text lands — Karazhan's moon and Tempest
+ * Keep's violet both sit exactly there. The small type (boss count, the call to action) is the part
+ * that fails first, so the plate carries a heavier wash than the card behind it does.
+ */
 .raid-picker-plate {
   position: relative;
   display: grid;
   gap: 5px;
-  padding: 22px 26px 24px;
+  padding: 26px 26px 26px;
   width: 100%;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.62) 42%, rgba(0, 0, 0, 0.86));
+}
+
+.raid-picker-plate .raid-picker-tier,
+.raid-picker-plate .raid-picker-count {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
 .raid-picker-name {
