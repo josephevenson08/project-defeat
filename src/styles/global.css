@@ -951,12 +951,44 @@ select {
   text-transform: uppercase;
 }
 
+/*
+ * Three across the top, two centred beneath.
+ *
+ * **`auto-fit` was wrong for a fixed set of five**, the same way it was wrong for the five raids: it
+ * packs as many as fit and leaves the remainder wherever they land, which at most widths meant three
+ * and two left-aligned, with the bottom row starting under the first card rather than centred.
+ *
+ * Six equal tracks make that arrangement explicit. The top three span two each; the bottom two span
+ * two each and start at track two, which centres them under the three above without any margin
+ * arithmetic that breaks at a different width.
+ */
 .section-picker-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  max-width: 900px;
+  gap: 18px;
+  grid-template-columns: repeat(6, 1fr);
+  max-width: 1120px;
   width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.section-picker-grid .section-card {
+  grid-column: span 2;
+}
+
+.section-picker-grid .section-card:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+@media (max-width: 900px) {
+  .section-picker-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-picker-grid .section-card,
+  .section-picker-grid .section-card:nth-child(4) {
+    grid-column: auto;
+  }
 }
 
 /*
@@ -5750,4 +5782,208 @@ body {
   background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
   border-bottom: 1px solid var(--metal-0);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--metal-edge) 22%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * The professions split: summary pinned left, the climb scrolling right.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.profession-split {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: start;
+}
+
+/*
+ * `position: sticky` needs a scroll container that is not itself clipped, and `align-items: start`
+ * above is what stops the grid stretching this column to full height — a stretched sticky element
+ * has nowhere to stick to and silently does nothing.
+ */
+.profession-split-side {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  /* The scrollbar only appears on the professions with more rows than fit — Blacksmithing's 33. */
+  scrollbar-width: thin;
+}
+
+.profession-split-main {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+/*
+ * The pinned table is a denser thing than the same table full-width: it is being glanced at rather
+ * than read, so the zone column goes and the type steps down.
+ */
+.profession-split-side .profession-plan-table {
+  font-size: 11.5px;
+}
+
+.profession-split-side .profession-plan-table th,
+.profession-split-side .profession-plan-table td {
+  padding: 5px 8px;
+}
+
+/*
+ * The "Where" column is the first thing to go when the table is 300px wide — the range block beside
+ * it names its zones as tabs, at full width, a few pixels to the right.
+ */
+.profession-split-side .profession-plan-table thead th:last-child,
+.profession-split-side .profession-plan-table tbody td:last-child {
+  display: none;
+}
+
+/*
+ * Below 1100px the sidebar stops being a sidebar.
+ *
+ * A 300px pinned column against a 500px main column leaves neither enough room, and a sticky element
+ * on a phone covers the content it is meant to help you navigate.
+ */
+@media (max-width: 1100px) {
+  .profession-split {
+    grid-template-columns: 1fr;
+  }
+
+  .profession-split-side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .profession-split-side .profession-plan-table thead th:last-child,
+  .profession-split-side .profession-plan-table tbody td:last-child {
+    display: table-cell;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * The front door.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.section-picker {
+  position: relative;
+  isolation: isolate;
+}
+
+/*
+ * A faction clash, drawn rather than photographed.
+ *
+ * Alliance blue masses from the left, Horde red from the right, and they meet in a lit seam down the
+ * middle — the composition of every "two sides" splash without depicting anybody, which keeps the
+ * front door clear of whose characters these are.
+ *
+ * **The last layer is an optional file.** `url(/backdrop.jpg)` paints nothing while that file does
+ * not exist and takes over the moment one is added, so an illustration can be dropped in with no
+ * code change. Everything below it is sized to still read under a busy image.
+ */
+.section-picker-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/*
+ * The drawn clash: Alliance blue massing from the left, Horde red from the right, meeting in a lit
+ * seam down the middle. The composition of every "two sides" splash, without depicting anybody.
+ */
+.section-picker[data-backdrop='drawn'] .section-picker-backdrop {
+  background-image:
+    linear-gradient(90deg, transparent 43%, color-mix(in srgb, var(--metal-edge) 22%, transparent) 50%, transparent 57%),
+    radial-gradient(125% 95% at 112% 55%, color-mix(in srgb, #c0392b 40%, transparent), transparent 60%),
+    radial-gradient(125% 95% at -12% 45%, color-mix(in srgb, #2f6bb0 38%, transparent), transparent 60%),
+    radial-gradient(95% 65% at 50% -12%, color-mix(in srgb, #4a6b4a 22%, transparent), transparent 68%);
+}
+
+/*
+ * The scrim, sized to whichever backdrop is actually there.
+ *
+ * **The two cases want opposite amounts of it.** An illustration needs a lot or every heading goes
+ * unreadable over it; the drawn version is already dark and nearly disappears under the same
+ * treatment. Guessing one number for both produced a front door where the clash was invisible, which
+ * is why `SectionPicker` preloads the file and says which case this is.
+ */
+.section-picker-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.section-picker[data-backdrop='drawn'] .section-picker-backdrop::after {
+  background:
+    radial-gradient(75% 58% at 50% 42%, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.3) 72%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 35%, rgba(0, 0, 0, 0.55));
+}
+
+.section-picker[data-backdrop='image'] .section-picker-backdrop::after {
+  background:
+    radial-gradient(70% 55% at 50% 42%, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.86) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.84));
+}
+
+.section-picker-head {
+  position: relative;
+  z-index: 1;
+}
+
+.section-picker-head h1 {
+  font-size: clamp(34px, 6vw, 52px);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 #000, 0 0 26px rgba(0, 0, 0, 0.9);
+}
+
+/*
+ * Both sides named, in their own colours.
+ *
+ * This is the only screen in the app that exists before a character does, so it is the only place
+ * that can say "both" without picking one. Everything past it themes to whichever you choose.
+ */
+.section-picker-sides {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.section-picker-sides .side-alliance {
+  color: #6aa6de;
+}
+
+.section-picker-sides .side-horde {
+  color: #e2665a;
+}
+
+.section-picker-sides .side-versus {
+  color: var(--text-faint);
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+}
+
+/*
+ * Bigger cards, now that there are five in a deliberate arrangement rather than however many fit.
+ */
+.section-card {
+  min-height: 172px;
+  padding: 22px 24px;
+}
+
+.section-card-label {
+  font-size: 21px;
+}
+
+.section-card-blurb {
+  font-size: 13.5px;
+  line-height: 1.55;
 }

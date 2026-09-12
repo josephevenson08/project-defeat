@@ -99,19 +99,33 @@ export function GatheringProgression({ profession }: { profession: Profession })
         </p>
       ))}
 
-      <GatheringPlanTable profession={profession} />
+      {/*
+        **The table is pinned and the ranges scroll past it.**
 
-      <h3>Where to farm</h3>
-      {guide.ranges.map((range) => (
-        <Range
-          key={range.skillRange[0]}
-          profession={profession}
-          range={range}
-          training={training.get(range.skillRange[0]) ?? []}
-        />
-      ))}
-      {/* A tier whose skill falls outside every range would otherwise have nowhere to appear. */}
-      <TrainingMarker milestones={stranded} />
+        A gathering guide is nine ranges deep and about nine screens tall, so the summary used to
+        scroll away within seconds of being read — which made it a thing you saw once rather than a
+        thing you navigated by. Sticky, it answers "where am I in this" and "when do I train next"
+        at any scroll position, which is exactly what a whole-climb table is for.
+      */}
+      <div className="profession-split">
+        <div className="profession-split-side">
+          <GatheringPlanTable profession={profession} />
+        </div>
+
+        <div className="profession-split-main">
+          <h3>Where to farm</h3>
+          {guide.ranges.map((range) => (
+            <Range
+              key={range.skillRange[0]}
+              profession={profession}
+              range={range}
+              training={training.get(range.skillRange[0]) ?? []}
+            />
+          ))}
+          {/* A tier whose skill falls outside every range would otherwise have nowhere to appear. */}
+          <TrainingMarker milestones={stranded} />
+        </div>
+      </div>
     </div>
   )
 }

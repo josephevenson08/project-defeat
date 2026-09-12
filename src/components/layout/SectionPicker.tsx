@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 export type SectionId = 'planner' | 'raidcomp' | 'tierlists' | 'raids' | 'professions'
 
 type SectionDefinition = {
@@ -63,12 +65,73 @@ type SectionPickerProps = {
   onSelect: (section: SectionId) => void
 }
 
+/**
+ * Whether an illustration is actually behind the front door.
+ *
+ * **The scrim has to know, because the two cases want opposite amounts of it.** The drawn backdrop is
+ * already dark and nearly disappears under a scrim sized for a busy illustration; an illustration
+ * without one makes every heading unreadable. CSS cannot ask whether a file exists, so this does —
+ * it preloads the path and reports what happened.
+ *
+ * Absent is the normal case and not an error: `public/backdrop.jpg` is optional by design, so the
+ * page is built to look finished without one and to take one with no code change.
+ */
+function useBackdropImage(src: string) {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    const image = new Image()
+    let cancelled = false
+    image.onload = () => {
+      if (!cancelled) setLoaded(true)
+    }
+    image.src = src
+    return () => {
+      cancelled = true
+    }
+  }, [src])
+
+  return loaded
+}
+
+const BACKDROP_SRC = `${import.meta.env.BASE_URL}backdrop.jpg`
+
 export function SectionPicker({ onSelect }: SectionPickerProps) {
+  const hasImage = useBackdropImage(BACKDROP_SRC)
+
   return (
-    <div className="section-picker">
+    <div className="section-picker" data-backdrop={hasImage ? 'image' : 'drawn'}>
+      {/*
+        **The backdrop is a layer, not an image tag.**
+
+        It renders a faction clash drawn in CSS — Alliance blue massing from the left, Horde red from
+        the right, meeting in a lit seam down the middle. That is deliberate rather than a
+        placeholder: it says "both sides" without depicting anyone, which keeps the front door clear
+        of the question of whose characters these are.
+
+        Dropping a file at `public/backdrop.jpg` layers it over the gradient automatically — the rule
+        in the stylesheet references it and simply paints nothing while the file is absent. The scrim
+        above it is sized for a busy illustration, so text stays legible either way.
+      */}
+      <div
+        className="section-picker-backdrop"
+        aria-hidden="true"
+        style={hasImage ? { backgroundImage: `url(${BACKDROP_SRC})` } : undefined}
+      />
+
       <div className="section-picker-head">
         <h1>Project Defeat</h1>
         <p className="section-picker-sub">TBC Classic · Phase 2</p>
+        {/*
+          Both factions named, in their own colours, on the one screen that exists before a character
+          does. Everything past this point themes to whichever side you pick; this is the only place
+          the app can say it is for both without picking one.
+        */}
+        <p className="section-picker-sides">
+          <span className="side-alliance">For the Alliance</span>
+          <span className="side-versus">and for the</span>
+          <span className="side-horde">Horde</span>
+        </p>
       </div>
 
       <nav className="section-picker-grid" aria-label="Choose a section">

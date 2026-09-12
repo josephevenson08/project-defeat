@@ -148,19 +148,30 @@ export function CraftingProgression({
         {model}
       </p>
 
-      <CraftingPlanTable profession={profession} />
-
-      <h3>What to craft</h3>
-      {steps.map((step) => (
-        <div key={step.spellId + '-' + step.skillRange[0]}>
-          <Step
-            step={step}
-            note={noteFor(step)}
-            training={training.get(`${step.skillRange[0]}-${step.name}`) ?? []}
-          />
+      {/*
+        Same split as the gathering side, and it earns it harder: Blacksmithing is thirty-three steps
+        where Mining is nine ranges. A summary that scrolls away after the first screen of a
+        thirty-three step page is a summary nobody uses twice.
+      */}
+      <div className="profession-split">
+        <div className="profession-split-side">
+          <CraftingPlanTable profession={profession} />
         </div>
-      ))}
-      <TrainingMarker milestones={stranded} />
+
+        <div className="profession-split-main">
+          <h3>What to craft</h3>
+          {steps.map((step) => (
+            <div key={step.spellId + '-' + step.skillRange[0]}>
+              <Step
+                step={step}
+                note={noteFor(step)}
+                training={training.get(`${step.skillRange[0]}-${step.name}`) ?? []}
+              />
+            </div>
+          ))}
+          <TrainingMarker milestones={stranded} />
+        </div>
+      </div>
     </div>
   )
 }
