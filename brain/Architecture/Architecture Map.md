@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-179 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+181 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,10 +16,10 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 43 importers
+- [[domain.character.characterTypes]] — 46 importers
 - [[domain.gear.itemTypes]] — 26 importers
+- [[domain.stats.statTypes]] — 18 importers
 - [[domain.gear.gearSlots]] — 17 importers
-- [[domain.stats.statTypes]] — 16 importers
 - [[features.character.characterTypes]] — 15 importers
 - [[domain.abilities.abilityTypes]] — 13 importers
 - [[components.layout.Panel]] — 12 importers
@@ -54,7 +54,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (47)
+### features (48)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -68,6 +68,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.character.characterTypes]] · 15 importers
 - [[features.gear.gearData]] · 8 importers
 - [[features.gear.GearPanel]] · 1 importers
+- [[features.gear.GearStatSummary]] · 1 importers
 - [[features.gear.gearTypes]] · 10 importers
 - [[features.gear.ItemIcon]] · 3 importers
 - [[features.gear.ItemPopup]] · 1 importers
@@ -106,7 +107,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (118)
+### domain (119)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -138,8 +139,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
-- [[domain.character.characterTypes]] · 43 importers
-- [[domain.character.classColors]] · 2 importers
+- [[domain.character.characterTypes]] · 46 importers
+- [[domain.character.classColors]] · 4 importers
+- [[domain.character.factionColors]] · 1 importers
 - [[domain.character.races]] · 3 importers
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 9 importers
@@ -217,8 +219,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.warlockPet]] · 1 importers
 - [[domain.simulation.weaponImbues]] · 1 importers
 - [[domain.stats.describeStats]] · 4 importers
-- [[domain.stats.statRelevance]] · 1 importers
-- [[domain.stats.statTypes]] · 16 importers
+- [[domain.stats.statRelevance]] · 2 importers
+- [[domain.stats.statTypes]] · 18 importers
 - [[domain.stats.statUtils]] · 3 importers
 - [[domain.talents.sampleTalents]] · 2 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers

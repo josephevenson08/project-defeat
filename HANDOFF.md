@@ -5,6 +5,123 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
+## Start here (2026-09-11 evening, the layout pass — READ THIS FIRST IF RESUMING)
+
+The retheme entry below covers the *look*. This covers the *layouts*, which is where the work stopped
+and where it picks up.
+
+### The working method, because it is the thing to keep doing
+
+The owner asked for **parallel designs before implementation** — five options per page, rendered as
+real CSS rather than described, then one picked and built. That has worked well and should continue.
+Two design boards are published and still live:
+
+| Board | URL |
+|---|---|
+| Gear page, five layouts | `https://claude.ai/code/artifact/91e00994-e29d-4b73-aa05-50dd54478b1c` |
+| Professions page, five layouts | `https://claude.ai/code/artifact/b9d8a64f-6b1b-48da-a5f7-319ac585f021` |
+
+Earlier boards (theme direction, faction themes) are at `b0ab6375-7596-4303-9e7e-1ed142b47f09`.
+**Screenshots did not reach the owner reliably** — 2000px-wide PNGs failed on their phone. Publishing
+a responsive artifact is the format that worked; prefer it over `SendUserFile` for anything wide.
+
+### What was built, and the reasoning that is not obvious from the diff
+
+**Gear page — layout C.** The paperdoll's centre column holds six stat totals rather than the
+silhouette that was there. The anatomy still reads (head top, feet bottom, right side mirrored); what
+changed is that the number you are moving now sits between the two columns of slots you move it with.
+Six of twenty-six, chosen per role, **then filtered through the same `statRelevance` rules the rail
+uses** — a per-role list is a guess and `statRelevance` knows the per-*spec* exceptions. Stats are
+passed from `App`, never recomputed: `calculateStats` already runs for the rail on every gear change.
+
+**Professions — layout B.** The whole-climb table is a sticky left column; ranges scroll past it. It
+drops its "Where" column at 300px because the range beside it names those zones as tabs. Below
+1100px it stops being a sidebar entirely — a sticky column on a phone covers what it is meant to help
+you navigate. Crafting got the same split and earns it harder: Blacksmithing is 33 steps.
+
+**Raids — a reel.** One raid per screen, scrolled through, boss art behind each. Snapping is
+`proximity`, **not `mandatory`** — mandatory hijacks a trackpad flick meant to carry past two raids.
+
+**Front door.** Three cards across, two centred beneath, on six equal tracks. `auto-fit` was wrong for
+a fixed set of five the same way it was wrong for the raids: it packs what fits and orphans the rest.
+Both factions are named in their own colours — this is the one screen that exists before a character
+does, so it is the only place the app can say "both" without picking one.
+
+**Colour.** Creator options wear the colour of the thing they are: faction blue/red, class colours,
+spec taking its class's. **Race is deliberately the exception** — the game gives races no colour and
+inventing nine would be this app asserting something the game does not. Tier-list chips wear class
+colour too; the tier *letters* stay neutral, which the saturation guard enforces.
+
+**The faction theme follows the creator's draft, not the saved character.** Picking Horde turns the
+frame to iron immediately. The cleanup restoring the committed faction has to live in
+`CharacterCreator`, not `App` — App's effect is keyed on the committed value, so cancelling a
+half-made Horde character never changes it, never re-runs, and the page would stay iron.
+
+### Two traps this session fell into, both now guarded
+
+**A duplicate `style` prop silently deleted half a layout.** `GearPanel` set `style={{ gridArea }}`
+and eleven lines later set `style={{ '--slot-quality' }}` on the same button. JSX keeps the last and
+drops the first without a word. `tsc` passed — duplicate JSX attributes are legal TypeScript — and
+ESLint passed because `react/jsx-no-duplicate-props` lives in `eslint-plugin-react`, which this
+project does not install. There is a test for it now, built on the TypeScript compiler API (a regex
+cannot match balanced braces inside attribute values). **If a style stops applying for no reason,
+this is the first thing to check.**
+
+**A guard was rewritten rather than satisfied.** "Tier letters stay out of the item quality palette"
+asserted `r === g === b`, which was the old palette's *definition* of neutral rather than the
+requirement — every neutral now carries a deliberate hue bias. It measures saturation now, bounded at
+0.20, and also asserts the quality colours stay clear of that bound so the check cannot quietly stop
+meaning anything.
+
+### How the artwork got in, because it is not obvious
+
+The owner's images were **attachments on the conversation, not files on disk**. Claude Code stores
+those as base64 in the session transcript at
+`~/.claude/projects/<project>/<session>.jsonl`. A streaming extractor pulls them out; the scratchpad
+copy is `extract.mjs`.
+
+**Images from one message come back in reverse order.** The walker pops a stack. Checking two panels
+against what they actually depict — rather than trusting position — is the only reason Kael'thas is
+not sitting behind Karazhan. **Always verify visually before placing.**
+
+Image cropping and format conversion is done in a **Playwright browser canvas**, not with `sharp`.
+Cropping a JPEG means decoding it; `sharp` is a native dependency with a build step, added to a
+project with no image pipeline, for a job that runs once. Playwright is already a devDependency.
+Pass bytes as a **data URL** — a `file://` image on `about:blank` is refused as cross-origin and
+taints the canvas so `toDataURL` throws. `tools/ingest/split-raid-art.mjs` does this for a 3-over-2
+sheet and is the reusable version.
+
+Scrims were **tuned against the real images, not guessed**. The front door started at 0.70→0.86 and
+turned the battle scene into a dark smudge, which is worse than no image. It is 0.42→0.66 now. The
+raid plate carries a heavier wash of its own because a raid's art cannot be relied on to be dark
+where the text lands — Karazhan's moon and Tempest Keep's violet both sit exactly there.
+
+### Open, in the order it was left
+
+1. **Five-design boards for the remaining tabs** — tier lists, raid composition, simulation. The
+   owner was asked which to do next and had not answered. This is the active thread.
+2. **Serpentshrine Cavern and Tempest Keep art is still ~690px** and visibly softer than the other
+   three, which are 1536x1024. Only 690px versions have ever been sent. Dropping full-resolution
+   files into `public/raids/` replaces them with no code change — same filenames.
+3. **A later batch of all five panels at ~455px was deliberately not used.** For three of the five it
+   would be a downgrade from 1536x1024; for the other two it is the same source already placed. If
+   someone "fixes" this by using them, the page gets worse.
+4. **The professions step-through (board option E) was offered and not chosen** — B won. E remains a
+   reasonable answer to "the page is nine screens tall" if that ever comes back.
+
+### Suite behaviour worth knowing
+
+238 tests, **~4.5 minutes when the machine is free**. Two failure modes seen this session, neither a
+real defect:
+
+- A second dev server running (the Browser pane preview) takes it to ~15 minutes and produces
+  spurious `locator.click` timeouts. Stop the preview before a full run.
+- A browser crash mid-run reports a *contiguous block* of failures with `browserContext.newPage`
+  timeouts and "browser has been closed". Those are lifecycle errors, not assertion errors. Re-run
+  the named tests in isolation before believing them.
+
+---
+
 ## Start here (2026-09-11, the app looks like the game now)
 
 **A complete retheme, replacing a design that was deliberately the opposite.** What was here was

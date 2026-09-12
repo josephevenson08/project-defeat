@@ -40,6 +40,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases

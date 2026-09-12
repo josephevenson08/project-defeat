@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidPicker.tsx
-lines: 48
+lines: 71
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidPicker
 
-`src/features/raids/RaidPicker.tsx` · **features** layer · 48 lines
+`src/features/raids/RaidPicker.tsx` · **features** layer · 71 lines
 
 _No doc comment at the top of this file._
 

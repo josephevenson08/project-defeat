@@ -34,6 +34,7 @@ _None._
 - [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
 - [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
+- [[domain.character.factionColors]] — `src/domain/character/factionColors.ts`
 - [[domain.character.races]] — `src/domain/character/races.ts`
 - [[domain.character.racialTypes]] — `src/domain/character/racialTypes.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
@@ -59,6 +60,8 @@ _None._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`

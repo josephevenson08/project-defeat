@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/tierlists/TierListsPanel.tsx
-lines: 112
+lines: 130
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.tierlists.TierListsPanel
 
-`src/features/tierlists/TierListsPanel.tsx` · **features** layer · 112 lines
+`src/features/tierlists/TierListsPanel.tsx` · **features** layer · 130 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
+- [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.tierlists.index]] — `src/domain/tierlists/index.ts`

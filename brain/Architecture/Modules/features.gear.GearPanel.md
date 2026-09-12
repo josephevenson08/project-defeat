@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearPanel.tsx
-lines: 147
+lines: 237
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearPanel
 
-`src/features/gear/GearPanel.tsx` · **features** layer · 147 lines
+`src/features/gear/GearPanel.tsx` · **features** layer · 237 lines
 
 _No doc comment at the top of this file._
 
@@ -19,11 +19,14 @@ _No doc comment at the top of this file._
 
 ## Imports
 
+- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
+- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`

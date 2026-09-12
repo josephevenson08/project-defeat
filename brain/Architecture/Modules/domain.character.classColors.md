@@ -36,8 +36,10 @@ From the top of the file:
 
 ## Imported by
 
+- [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases
 

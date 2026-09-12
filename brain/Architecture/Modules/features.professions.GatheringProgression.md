@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/GatheringProgression.tsx
-lines: 118
+lines: 132
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.GatheringProgression
 
-`src/features/professions/GatheringProgression.tsx` · **features** layer · 118 lines
+`src/features/professions/GatheringProgression.tsx` · **features** layer · 132 lines
 
 _No doc comment at the top of this file._
 
