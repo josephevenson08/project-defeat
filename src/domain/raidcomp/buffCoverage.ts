@@ -1,8 +1,6 @@
 import type { Buff, BuffProvider, TargetDebuff } from '../buffs/buffTypes'
 import { describeProvider } from '../buffs/buffTypes'
 import { getBuffScope, isPartyScoped } from '../buffs/buffScope'
-import { applyExclusivity, exclusiveGroupFor } from '../buffs/buffExclusivity'
-import type { ExclusiveGroup } from '../buffs/buffExclusivity'
 import { sampleBuffs } from '../buffs/sampleBuffs'
 import { sampleTargetDebuffs } from '../buffs/sampleTargetDebuffs'
 import type { CharacterRole } from '../character/characterTypes'
@@ -105,74 +103,39 @@ function describeNeed(provider: BuffProvider): string {
   return provider.providedBySpec ? `an ${who}`.replace(/^an (?![AEIOU])/, 'a ') : `any ${who}`
 }
 
-/**
- * How many seats could supply an exclusive group — i.e. how many of its buffs are actually
- * maintainable at once.
- *
- * Counted per *provider*, not per buff, because that is what the constraint is about: one Paladin
- * holds one Blessing and one aura, so three Paladins cover three blessings and three auras. Every
- * buff in a group shares a class today, so the first entry's class is the group's class.
+/*
+ * `providerBudget` lived here and capped each exclusive group by how many of its class were seated.
+ * It went with the exclusivity capping on 2026-09-12, when this screen moved to Wowhead's model. The
+ * constraint itself still lives in `buffExclusivity.ts`, which is where it belongs — it is a sourced
+ * game rule, and this screen having stopped applying it does not make it less true.
  */
-function providerBudget(
-  group: ExclusiveGroup,
-  entries: readonly (BuffProvider & { id: string })[],
-  slots: readonly RosterSlot[],
-): number {
-  const first = entries.find((entry) => group.buffIds.includes(entry.id))
-  if (!first) return 0
-  return slots.filter((slot) => slotProvides(slot, first)).length
-}
 
 function sectionFor<T extends BuffProvider & { id: string }>(
   entries: readonly T[],
   slots: readonly RosterSlot[],
 ): CoverageSection<T> {
   /*
-   * Exclusivity is applied *before* anything is called covered. A Paladin can bring one Blessing, so
-   * a roster with one Paladin covers one — listing all five was the single largest over-credit in
-   * this tool, and it read as "you are fine" to a raid leader who was four Paladins short.
-   */
-  const canProvide = entries.filter((entry) => slots.some((slot) => slotProvides(slot, entry))).map((entry) => entry.id)
-
-  /*
-   * Only assignments whose seat can actually supply the buff count. A Paladin carrying a stale
-   * assignment from before a class switch must not hold a slot open for something they cannot cast.
+   * **Counted as "someone here can cast this", not "this will be up."**
    *
-   * The group key is not trusted either: what makes an assignment real is that some entry has that
-   * **id** and this seat provides it. A key naming the wrong group, or a group that no longer exists,
-   * therefore contributes nothing rather than being honoured on the strength of its label.
+   * This used to apply exclusivity first, so one Paladin covered one Greater Blessing rather than
+   * six. That is the more truthful answer to "what will my raid actually have", and it is not the
+   * question this screen was rebuilt to answer: the owner asked for Wowhead's raid-composition model
+   * on 2026-09-12, and Wowhead counts a lone Holy Paladin as providing all six Blessings at 1 each —
+   * verified against the live page rather than assumed.
+   *
+   * The tradeoff is real and is stated on the surface rather than hidden: a thin roster reads better
+   * here than it will play. `buffExclusivity.ts` still holds the sourced constraint, and the panel
+   * marks the buffs that compete, so nothing about which Blessings collide has been forgotten — only
+   * the capping has, deliberately.
    */
-  const assigned = new Set(
-    slots.flatMap((slot) =>
-      Object.values(slot.assignments ?? {}).filter((buffId) =>
-        entries.some((entry) => entry.id === buffId && slotProvides(slot, entry)),
-      ),
-    ),
-  )
-
-  const allowed = applyExclusivity(canProvide, (group) => providerBudget(group, entries, slots), assigned)
-
   const covered: CoveredEntry<T>[] = []
   const missing: MissingEntry<T>[] = []
 
   for (const entry of entries) {
     const providedBy = slots.filter((slot) => slotProvides(slot, entry)).length
 
-    if (providedBy > 0 && allowed.has(entry.id)) {
-      covered.push({ entry, providedBy })
-      continue
-    }
-
-    /*
-     * A buff the roster *could* bring but cannot maintain reads differently from one nobody can
-     * bring at all, and saying so is the point: "you have the Paladin, they are holding Kings" is
-     * actionable, "needs any Paladin" would be a lie.
-     */
-    const group = exclusiveGroupFor(entry.id)
-    missing.push({
-      entry,
-      needs: providedBy > 0 && group ? `another ${describeProvider(entry)} — ${group.label} compete` : describeNeed(entry),
-    })
+    if (providedBy > 0) covered.push({ entry, providedBy })
+    else missing.push({ entry, needs: describeNeed(entry) })
   }
 
   return { covered, missing }
@@ -187,22 +150,15 @@ function coverageForGroup(group: RaidGroup, groupIndex: number): GroupCoverage {
   const seated = group.filter((slot): slot is RosterSlot => slot !== undefined)
 
   /*
-   * Exclusivity applies per *group* here, not per raid, and that is the whole point of the feature.
-   * One Warrior in this group runs one shout; a second Warrior is what puts Commanding Shout beside
-   * Battle Shout. Same for a Paladin's aura — three Paladins spread across three groups give each of
-   * those groups one aura, not three.
-   *
-   * This path had its own loop and missed the constraint entirely while `sectionFor` applied it,
-   * so a lone Fury warrior showed both shouts here and one shout in the checklist.
+   * Every party buff anyone seated here can cast, matching the raid-wide count above rather than
+   * capping by exclusivity — see `sectionFor`. A group holding one Paladin lists every aura, the
+   * same way Wowhead's per-group row does.
    */
-  const canProvide = PARTY_BUFFS.filter((buff) => seated.some((slot) => slotProvides(slot, buff))).map((buff) => buff.id)
-  const allowed = applyExclusivity(canProvide, (exclusive) => providerBudget(exclusive, PARTY_BUFFS, seated))
-
   const partyBuffs: Buff[] = []
   const missingPartyBuffs: Buff[] = []
 
   for (const buff of PARTY_BUFFS) {
-    if (allowed.has(buff.id)) partyBuffs.push(buff)
+    if (seated.some((slot) => slotProvides(slot, buff))) partyBuffs.push(buff)
     else missingPartyBuffs.push(buff)
   }
 

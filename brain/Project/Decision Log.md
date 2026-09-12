@@ -373,3 +373,37 @@ This is the same shape as *[[Decision Log#An audit that cannot say what it looke
 found nothing|the audit that measured zero maps]]*, one layer down: there the sweep never looked at
 the thing it claimed to clear, and here it looked at the wrong thing and cleared it anyway. **A
 measurement is only evidence about what it actually sampled.**
+
+## A model can be more correct than the one the owner wants, and the owner still decides
+
+Recorded 2026-09-12, after the raid-composition screen was rebuilt on Wowhead's counting model and
+deliberately became **less accurate about the game**.
+
+Coverage capped every exclusive group: one Paladin held one Greater Blessing and one aura, one Shaman
+one totem per element, one Warrior one shout. Those caps are sourced from spell tooltips and raid
+convention, they are right about TBC, and a previous session had called the uncapped version "the
+single largest over-credit in this tool". The owner asked for Wowhead's model instead — verified
+against the live page, where a lone Holy Paladin lights up all six Blessings at 1 each — and that is
+what shipped.
+
+**The fork was surfaced before it was crossed, not after.** Everything else in the rebuild — the
+per-party buff rows, the count-led lists, dropping the per-seat pickers — was identical under either
+model, so the only thing the question gated was how the numbers are computed. That is the shape of a
+decision worth interrupting for: cheap to ask, and expensive to get wrong silently.
+
+**Three things paid for the accuracy that was given up**, and they are the pattern to repeat when a
+requested design is less truthful than the one it replaces:
+
+1. **The screen says what the number means.** A line under the heading states that counts are "who
+   could cast it, not what will be up", and a test asserts that line is present — so the app never
+   claims coverage in its own voice that it cannot stand behind.
+2. **The knowledge was kept, not deleted.** `buffExclusivity.ts` still holds the rule and is still
+   tested, now against `applyExclusivity` directly rather than through coverage. The two tests that
+   asserted the cap through `computeCoverage` were replaced rather than adjusted, because coverage
+   had become the wrong place to ask the question.
+3. **The reversal is written down where the next reader lands** — in the code, here, and in the
+   handoff — because a later session reading only the old comments would "fix" this straight back.
+
+The general rule: *[[Decision Log#The biggest gap and the next piece of work are different claims|a
+gap ranking is not a plan]]*, and neither is a correctness ranking. What the app asserts is a
+correctness question and stays non-negotiable; which model it presents is the owner's.

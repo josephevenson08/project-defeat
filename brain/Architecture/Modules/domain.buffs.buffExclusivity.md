@@ -42,8 +42,6 @@ _None._
 
 ## Imported by
 
-- [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
-- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 
 ## Concepts & phases

@@ -36,7 +36,6 @@ import type { BisList } from '../src/domain/bis'
 import { getClassDefinition, getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import {
   addToGroup,
-  assignBuff,
   computeCoverage,
   emptyRoster,
   filledSlots,
@@ -54,7 +53,7 @@ import {
   setRosterMeta,
   seatAt,
 } from '../src/domain/raidcomp'
-import { exclusiveGroupFor, exclusiveGroups } from '../src/domain/buffs/buffExclusivity'
+import { applyExclusivity, exclusiveGroups } from '../src/domain/buffs/buffExclusivity'
 import type { CharacterProfile, Faction, TbcClass, TbcRace, TbcSpec } from '../src/domain/character/characterTypes'
 import { calculateStats } from '../src/features/stats/calculateStats'
 import { sampleSignatureAbilities } from '../src/domain/abilities/sampleSignatureAbilities'
@@ -7681,19 +7680,28 @@ test('raid coverage is exact, and an empty roster covers nothing', () => {
   }
   const total = computeCoverage(full)
 
-  // Anything still missing must be blocked by exclusivity, never by having no provider at all.
-  for (const entry of total.raidWide.missing) {
-    expect(
-      exclusiveGroupFor(entry.entry.id),
-      `${entry.entry.name} is missing but is not in an exclusive group — nobody can provide it`,
-    ).toBeDefined()
-    expect(entry.needs, 'and it must say the provider exists rather than "any X"').toMatch(/another /)
-  }
-  expect(total.debuffs.missing, 'no debuff is exclusive, so all six must be covered').toEqual([])
+  /*
+   * **A roster holding every spec in the game is missing nothing**, and that assertion got stronger
+   * when the exclusivity capping came out on 2026-09-12.
+   *
+   * It used to allow a tail of "missing because the Paladins are holding other Blessings", which
+   * meant the check could only ever say *why* something was absent, not that nothing was. Now the
+   * whole point is reachable: if any buff or debuff has no provider among all 27 specs, either the
+   * roster construction above is wrong or a buff names a class that cannot cast it.
+   */
+  expect(
+    total.raidWide.missing.map((entry) => `${entry.entry.name} — ${entry.needs}`),
+    'every raid-wide buff has a provider somewhere in a roster of every spec',
+  ).toEqual([])
+  expect(
+    total.partyScoped.missing.map((entry) => entry.entry.name),
+    'and so does every party buff',
+  ).toEqual([])
+  expect(total.debuffs.missing, 'and every debuff').toEqual([])
 
-  // The three Paladins hold three of the five blessings — the cap, not a coincidence.
+  // All five Greater Blessings, from three Paladins — the Wowhead count, not the in-game one.
   const blessings = total.raidWide.covered.filter((entry) => entry.entry.name.startsWith('Greater Blessing'))
-  expect(blessings).toHaveLength(3)
+  expect(blessings.length, 'a Paladin lights up every Blessing under this model').toBeGreaterThanOrEqual(5)
 })
 
 test('a missing buff names who would bring it, at the right specificity', () => {
@@ -7913,16 +7921,16 @@ test('a seat can be named through the UI, and the name survives a reload', async
   await expect(page.getByText('Dave')).toBeVisible()
 })
 
-test('a roster saved with a single blessingId still loads, keyed by its group', async ({ page }) => {
+test('a roster saved with the old per-seat buff assignments still loads', async ({ page }) => {
   /*
-   * The stored seat changed from one `blessingId` to one assignment per exclusive group. A raid
-   * leader who saved a 25-person roster the evening before must not open it to find their Paladin
-   * back on the default, so the old field is migrated on read.
+   * Two generations of a field that no longer exists: `blessingId` on a seat, then `assignments`
+   * keyed by exclusive group. Both went on 2026-09-12 with the capping they served — see
+   * `buffCoverage.sectionFor` — and this test changed with them.
    *
-   * The group is **looked up from the buff** rather than assumed, which is what makes the migration
-   * safe: there is no branch that can file a stored id under the wrong group, because nothing names
-   * a group. And the same validation applies to the new shape — a pair whose key is not the group
-   * its buff belongs to is dropped rather than trusted.
+   * It used to assert the stored value reappeared in a picker. There are no pickers, so what matters
+   * now is the thing that would actually hurt a user: **a roster saved by an older build must still
+   * open.** A validator that rejects an unknown field would throw away a raid leader's seating over a
+   * key nobody reads any more.
    */
   await openApp(page, 'raidcomp')
 
@@ -7945,21 +7953,16 @@ test('a roster saved with a single blessingId still loads, keyed by its group', 
   await page.reload()
   await page.getByTestId('section-raidcomp').click()
 
+  // Every seat survives, names included.
   await expect(page.getByText('Dave')).toBeVisible()
-  await expect(
-    page.getByTestId('raidcomp-assign-paladin-blessings-1-1'),
-    'the v1 field arrives under the group its buff belongs to',
-  ).toHaveValue('blessing-of-salvation')
+  await expect(page.getByTestId('raidcomp-filled')).toContainText('3')
+  await expect(page.getByTestId('raidcomp-group-1')).toContainText('Enhancement Shaman')
+  await expect(page.getByTestId('raidcomp-group-1')).toContainText('Fury Warrior')
 
-  // The new shape round-trips untouched.
-  await expect(page.getByTestId('raidcomp-assign-shaman-air-totem-1-2')).toHaveValue('wrath-of-air-totem')
-
-  // And a mis-keyed pair is dropped on read: Battle Shout is a Warrior shout, not a Blessing.
-  await expect(
-    page.getByTestId('raidcomp-assign-warrior-shouts-1-3'),
-    'a key that does not match its buff is not honoured',
-  ).toHaveValue('')
+  // And the dead field does not come back as a control.
+  await expect(page.locator('[data-testid^="raidcomp-assign-"]')).toHaveCount(0)
 })
+
 
 test('raid builds split Feral and add Dreamstate without touching the spec union', () => {
   /*
@@ -8247,75 +8250,48 @@ test('the seat contribution card is present and hidden until hover', async ({ pa
   await expect(card).toContainText('Gift of the Wild')
 })
 
-test('one provider supplies one buff from an exclusive group', () => {
+test('the exclusivity rule still holds, even though raid coverage no longer applies it', () => {
   /*
-   * The largest over-credit this tool ever had. One Paladin used to credit a raid with **all five**
-   * Greater Blessings and **all three** auras — the difference between bringing one Paladin and
-   * bringing four, reported as "you are fine".
+   * **This is the sourced game rule, kept under test after the screen that used it stopped calling
+   * it.** One Paladin holds one Greater Blessing and one aura; one Shaman drops one totem per
+   * element; one Warrior runs one shout. Spell tooltips and the reasoning are quoted in
+   * `buffExclusivity.ts`, and none of that stopped being true on 2026-09-12 — what changed is that
+   * the raid-composition screen moved to Wowhead's model, which counts what a roster *could* cast.
    *
-   * Both constraints are game rules with tooltip evidence, quoted in `buffExclusivity.ts`: spell
-   * 27141 says "Players may only have one Blessing on them per Paladin at any one time", and rank 8
-   * Devotion Aura says "Only one Paladin aura can be active per Paladin".
+   * Two tests used to assert the cap through `computeCoverage`. They were deleted rather than
+   * adjusted, because coverage is now the wrong place to ask: it would be asserting the absence of a
+   * behaviour instead of the presence of a rule. This asks `applyExclusivity` directly, so the
+   * knowledge is still defended and is ready the day anything wants to apply it again.
    */
-  const seat = (className: TbcClass, spec: TbcSpec) => ({ className, spec })
-  const rosterOf = (seats: readonly { className: TbcClass; spec: TbcSpec }[]) =>
-    seats.reduce((roster, entry, index) => addToGroup(roster, Math.floor(index / 5), entry), emptyRoster(25))
+  for (const group of exclusiveGroups) {
+    const everyBuff = [...group.buffIds]
 
-  const onePaladin = computeCoverage(rosterOf([seat('Paladin', 'Holy')]))
-  expect(onePaladin.raidWide.covered.map((entry) => entry.entry.name)).toEqual(['Greater Blessing of Kings'])
-  expect(onePaladin.partyScoped.covered.map((entry) => entry.entry.name)).toEqual(['Devotion Aura'])
+    // One provider: one buff out of the group, whichever the priority order names first.
+    const one = applyExclusivity(everyBuff, () => 1)
+    const keptByOne = everyBuff.filter((id) => one.has(id))
+    expect(keptByOne, `one provider covers one of ${group.label}`).toHaveLength(1)
 
-  // Three Paladins maintain three of each — the budget is providers, not buffs.
-  const threePaladins = computeCoverage(
-    rosterOf([seat('Paladin', 'Holy'), seat('Paladin', 'Protection'), seat('Paladin', 'Retribution')]),
-  )
-  expect(threePaladins.raidWide.covered).toHaveLength(3)
-  expect(threePaladins.partyScoped.covered).toHaveLength(3)
+    // Two providers: two buffs, so a second Paladin is what puts a second Blessing up.
+    const two = applyExclusivity(everyBuff, () => 2)
+    const keptByTwo = everyBuff.filter((id) => two.has(id))
+    expect(keptByTwo.length, `two providers cover two of ${group.label}`).toBe(Math.min(2, everyBuff.length))
 
-  /*
-   * And the ones they cannot maintain read as a different kind of missing. "needs any Paladin" would
-   * be a lie when the Paladin is sitting right there holding a different Blessing.
-   */
-  const blocked = onePaladin.raidWide.missing.find((entry) => entry.entry.name === 'Greater Blessing of Might')!
-  expect(blocked.needs).toMatch(/another Paladin/)
-  expect(blocked.needs).not.toMatch(/^any /)
-})
+    // Enough providers: the cap stops binding rather than capping at some invented ceiling.
+    const many = applyExclusivity(everyBuff, () => everyBuff.length)
+    expect(everyBuff.filter((id) => many.has(id)), `${group.label} uncaps at its own size`).toEqual(everyBuff)
 
-test('a warrior runs one shout, and a second warrior is what adds the other', () => {
-  /*
-   * Modelled as a **raid convention** rather than a game rule, and the distinction is recorded rather
-   * than blurred: neither tooltip states exclusivity and wowsims applies both shouts independently,
-   * so one warrior *could* maintain both. Raids do not — each shout costs rage and a global, and
-   * Commanding Shout is the lower priority — so the planner follows what rosters actually run.
-   *
-   * Battle Shout is first in the group's priority order, which is why a lone DPS warrior shows it.
-   */
-  const rosterOf = (specs: readonly TbcSpec[]) =>
-    specs.reduce((roster, spec) => addToGroup(roster, 0, { className: 'Warrior', spec }), emptyRoster(25))
-
-  const shoutsIn = (specs: readonly TbcSpec[]) =>
-    computeCoverage(rosterOf(specs))
-      .groups[0].partyBuffs.map((buff) => buff.name)
-      .filter((name) => name.includes('Shout'))
-
-  expect(shoutsIn(['Fury']), 'one warrior, one shout').toEqual(['Battle Shout'])
-  expect(shoutsIn(['Arms']), 'and it is Battle Shout by default').toEqual(['Battle Shout'])
-  expect(shoutsIn(['Fury', 'Arms']).sort()).toEqual(['Battle Shout', 'Commanding Shout'])
-  expect(shoutsIn(['Protection', 'Fury']).sort()).toEqual(['Battle Shout', 'Commanding Shout'])
-
-  /*
-   * Exclusivity is per **group**, not per raid — two warriors split across two groups give each group
-   * one shout, which is exactly the seating decision the planner exists to make visible.
-   */
-  let split = emptyRoster(25)
-  split = addToGroup(split, 0, { className: 'Warrior', spec: 'Fury' })
-  split = addToGroup(split, 1, { className: 'Warrior', spec: 'Protection' })
-  const report = computeCoverage(split)
-  for (const index of [0, 1]) {
-    const shouts = report.groups[index].partyBuffs.map((buff) => buff.name).filter((name) => name.includes('Shout'))
-    expect(shouts, `group ${index + 1} has one warrior, so one shout`).toEqual(['Battle Shout'])
+    // And none: a group with nobody to cast it contributes nothing.
+    const none = applyExclusivity(everyBuff, () => 0)
+    expect(everyBuff.filter((id) => none.has(id)), `no provider covers none of ${group.label}`).toEqual([])
   }
+
+  // The Warrior shouts specifically, because that group is a raid convention rather than a tooltip
+  // rule and is the one most likely to be "corrected" by someone reading only the spell data.
+  const shouts = exclusiveGroups.find((group) => group.id === 'warrior-shouts')!
+  expect(shouts.buffIds.sort()).toEqual(['battle-shout', 'commanding-shout'])
+  expect(shouts.basis).toBe('raid convention')
 })
+
 
 test('every exclusive group names real buffs and states its basis', () => {
   /*
@@ -10115,82 +10091,72 @@ test('every profession has vendored artwork and a guide to send you to', async (
   expect([...withSpecializations].sort()).toEqual(['Alchemy', 'Blacksmithing', 'Engineering', 'Leatherworking', 'Tailoring'])
 })
 
-test('a raid leader picks which Blessing each Paladin brings, and the default still holds', async () => {
+test('raid coverage counts who could cast a buff, not what will be up at once', async ({ page }) => {
   /*
-   * Reported from the walkthrough: three Paladins never covered Salvation or Sanctuary. The cap was
-   * right — a Paladin brings one Blessing, and listing five for one Paladin was this tool's largest
-   * over-credit — but the *order* filling it was a guess standing in for a decision. Raids assign
-   * blessings by what they need.
+   * **This test asserts the opposite of what four tests here used to assert, on purpose.**
    *
-   * So assignment wins where it is given, and the fixed order still fills the rest. Both halves are
-   * asserted, because a change that made assignment work by abandoning the cap would be the old
-   * over-credit wearing a new interface.
+   * Coverage capped every exclusive group: one Paladin covered one Greater Blessing, one Shaman one
+   * air totem, one Warrior one shout. That is what a raid actually gets, and those caps were right
+   * about the game. The owner asked on 2026-09-12 for this screen to follow Wowhead's
+   * raid-composition tool instead, and Wowhead counts a lone Holy Paladin as providing all six
+   * Blessings at 1 each — checked against the live page, not assumed. So the cap is gone and the
+   * per-seat assignment pickers that existed to resolve it went with it.
+   *
+   * What that costs is real: a thin roster now reads better here than it will play. The cost is paid
+   * by saying so on the screen rather than by hiding it, and the last assertion below is what keeps
+   * that sentence from quietly disappearing later.
+   *
+   * `buffExclusivity.ts` still holds the sourced constraint and is still tested — the game rule did
+   * not stop being true, this screen stopped applying it.
    */
-  const coveredBlessings = (roster: Roster) =>
-    computeCoverage(roster)
-      .raidWide.covered.map((entry) => entry.entry.id)
-      .filter((id) => id.startsWith('blessing-of-'))
-      .sort()
+  const oneOfEach = (className: TbcClass, spec: TbcSpec) => {
+    let roster = emptyRoster(25)
+    roster = addToGroup(roster, 0, { className, spec })
+    return computeCoverage(roster)
+  }
 
-  let roster = emptyRoster(25)
-  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Holy' })
-  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Protection' })
-  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Retribution' })
+  const coveredIds = (section: { covered: readonly { entry: { id: string } }[] }) =>
+    section.covered.map((row) => row.entry.id)
 
-  // Untouched, the priority order fills it exactly as before.
-  expect(coveredBlessings(roster), 'three Paladins default to Kings, Might, Wisdom').toEqual([
-    'blessing-of-kings',
-    'blessing-of-might',
-    'blessing-of-wisdom',
-  ])
+  // One Paladin, every Greater Blessing. In the game they hold exactly one.
+  const paladin = oneOfEach('Paladin', 'Holy')
+  const blessings = coveredIds(paladin.raidWide).filter((id) => id.startsWith('blessing-of-'))
+  expect(blessings.length, 'one Paladin lights up every Greater Blessing').toBeGreaterThan(3)
 
-  // Assigning two moves them in, and the third seat still falls back to the top of the order.
-  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-salvation')
-  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 1 }, 'paladin-blessings', 'blessing-of-sanctuary')
-  expect(coveredBlessings(roster), 'the two assigned, plus Kings for the seat that said nothing').toEqual([
-    'blessing-of-kings',
-    'blessing-of-salvation',
-    'blessing-of-sanctuary',
-  ])
+  // One Shaman, every air totem — the case a previous test pinned the other way round.
+  const shaman = oneOfEach('Shaman', 'Enhancement')
+  const airTotems = coveredIds(shaman.partyScoped).filter((id) => id.includes('air-totem'))
+  expect(airTotems.length, 'one Shaman lists every air totem').toBeGreaterThan(1)
 
-  // The cap is unchanged: three Paladins still cover three, never five.
-  expect(coveredBlessings(roster)).toHaveLength(3)
-
-  // Clearing one puts it back to the default for that seat.
-  roster = assignBuff(roster, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', undefined)
-  expect(coveredBlessings(roster)).toEqual(['blessing-of-kings', 'blessing-of-might', 'blessing-of-sanctuary'])
-})
-
-test('an assignment cannot buy coverage the roster has no provider for', async () => {
-  /*
-   * The failure mode of "assignment wins" is that it wins over reality too. A single Paladin assigned
-   * a blessing must still cover exactly one, and an assignment carried on a seat that cannot cast it
-   * — a stale id left behind when the class changed — must count for nothing rather than holding a
-   * slot open.
-   */
-  let one = emptyRoster(25)
-  one = addToGroup(one, 0, { className: 'Paladin', spec: 'Holy' })
-  one = assignBuff(one, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-sanctuary')
-
-  const covered = computeCoverage(one)
-    .raidWide.covered.map((entry) => entry.entry.id)
-    .filter((id) => id.startsWith('blessing-of-'))
-  expect(covered, 'one Paladin, one Blessing — the one they were assigned').toEqual(['blessing-of-sanctuary'])
+  // One Warrior, both shouts.
+  const warrior = oneOfEach('Warrior', 'Fury')
+  const shouts = coveredIds(warrior.partyScoped).filter((id) => id.includes('shout'))
+  expect(shouts.sort(), 'one Warrior lists both shouts').toEqual(['battle-shout', 'commanding-shout'])
 
   /*
-   * A Shaman carrying a Paladin's blessing id. `assignBuff` will write it, because the seat model
-   * does not police class — the coverage calculation is what has to, and this is where that is pinned.
-   * The group key is not what makes it real either: coverage checks that the seat provides the buff.
+   * And the group row agrees with the raid-wide list. These are computed by different code paths —
+   * `coverageForGroup` and `sectionFor` — and they disagreed once before, when one applied the cap
+   * and the other did not: a lone Fury Warrior showed both shouts in the group row and one in the
+   * checklist. Same model or it is the same bug again.
    */
-  let stale = emptyRoster(25)
-  stale = addToGroup(stale, 0, { className: 'Shaman', spec: 'Restoration' })
-  stale = assignBuff(stale, { groupIndex: 0, seatIndex: 0 }, 'paladin-blessings', 'blessing-of-kings')
+  const groupShouts = warrior.groups[0].partyBuffs.map((buff) => buff.id).filter((id) => id.includes('shout'))
+  expect(groupShouts.sort(), 'the group row counts the same way the checklist does').toEqual(shouts.sort())
 
-  const fromStale = computeCoverage(stale)
-    .raidWide.covered.map((entry) => entry.entry.id)
-    .filter((id) => id.startsWith('blessing-of-'))
-  expect(fromStale, 'a Shaman cannot bring a Blessing, however the seat is labelled').toEqual([])
+  /*
+   * The caveat has to be on the screen. Without it the app states, in its own voice, that a roster is
+   * covered when it is not — which is the one thing this project says it will never do.
+   */
+  await openApp(page, 'raidcomp')
+  const note = page.getByTestId('raidcomp-counting-note')
+  await expect(note).toBeVisible()
+  await expect(note).toContainText(/could cast/i)
+  await expect(note).toContainText(/not what will be up/i)
+
+  // Nothing is assignable any more, which is what the owner asked for.
+  await page.getByTestId('raidcomp-add-paladin-holy').click()
+  await expect(page.locator('[data-testid^="raidcomp-assign-"]')).toHaveCount(0)
 })
+
 
 test('hovering a party buff says what it does, not just what it is called', async ({ page }) => {
   /*
@@ -10326,108 +10292,6 @@ test('every seatable build has vendored artwork, so an exported chart is never h
   // Non-vacuous: these are the 29 builds the picker offers, not an empty list.
   const total = raidBuildsByClass.reduce((count, entry) => count + entry.builds.length, 0)
   expect(total, 'all 29 raid builds were checked').toBe(29)
-})
-
-test('one Shaman drops one air totem, not four', async () => {
-  /*
-   * Reported from the walkthrough, and the cause was the same over-credit the Blessings had: a
-   * Shaman may have **one totem of each element** active at a time, and Windfury, Wrath of Air,
-   * Grace of Air and Tranquil Air are all Air. With no group for them, one Shaman credited the raid
-   * with all four — so a raid leader read "we have Wrath of Air" off a roster of Enhancement Shamans
-   * who were all dropping Windfury.
-   *
-   * Sourced rather than assumed: wowsims encodes the slot as a single-valued `AirTotem` enum at the
-   * pinned commit, which is what makes this a game rule rather than a convention about what a raid
-   * usually does.
-   */
-  const AIR = ['windfury-totem', 'wrath-of-air-totem', 'grace-of-air-totem', 'tranquil-air-totem']
-  const airCovered = (roster: Roster) =>
-    computeCoverage(roster)
-      .partyScoped.covered.map((entry) => entry.entry.id)
-      .filter((id) => AIR.includes(id))
-
-  const one = addToGroup(emptyRoster(25), 0, { className: 'Shaman', spec: 'Enhancement' })
-  expect(airCovered(one), 'one Shaman, one air totem').toEqual(['windfury-totem'])
-
-  const two = addToGroup(one, 0, { className: 'Shaman', spec: 'Elemental' })
-  expect(airCovered(two), 'a second Shaman buys a second slot, not the remaining three').toHaveLength(2)
-
-  // The same override that serves the Blessings serves this, because coverage matches an assignment
-  // against any buff the seat can actually provide rather than against a hard-coded Paladin list.
-  const assigned = assignBuff(one, { groupIndex: 0, seatIndex: 0 }, 'shaman-air-totem', 'wrath-of-air-totem')
-  expect(airCovered(assigned), 'the raid leader can say which totem goes down').toEqual(['wrath-of-air-totem'])
-})
-
-test('a seat holds one assignment per exclusive group, not one in total', async () => {
-  /*
-   * The shape this replaced was a single `blessingId` per seat, and it could not express the thing a
-   * Paladin actually does: bring a Blessing **and** an aura. Two decisions competed for one field, so
-   * assigning the aura would have silently cleared the Blessing.
-   *
-   * Keyed by group, both are held at once and neither touches the other.
-   */
-  let roster = emptyRoster(25)
-  roster = addToGroup(roster, 0, { className: 'Paladin', spec: 'Holy' })
-  const seat = { groupIndex: 0, seatIndex: 0 }
-
-  roster = assignBuff(roster, seat, 'paladin-blessings', 'blessing-of-salvation')
-  roster = assignBuff(roster, seat, 'paladin-auras', 'sanctity-aura')
-
-  expect(seatAt(roster, seat)?.assignments).toEqual({
-    'paladin-blessings': 'blessing-of-salvation',
-    'paladin-auras': 'sanctity-aura',
-  })
-
-  const covered = computeCoverage(roster)
-  const coveredIds = [...covered.raidWide.covered, ...covered.partyScoped.covered].map((entry) => entry.entry.id)
-  expect(coveredIds, 'both halves of what one Paladin brings').toContain('blessing-of-salvation')
-  expect(coveredIds).toContain('sanctity-aura')
-
-  // Clearing one group leaves the other alone — the failure the single field made unavoidable.
-  roster = assignBuff(roster, seat, 'paladin-blessings', undefined)
-  expect(seatAt(roster, seat)?.assignments).toEqual({ 'paladin-auras': 'sanctity-aura' })
-
-  /*
-   * And clearing the last one leaves no empty object behind. Same reason `renameSeat` rebuilds rather
-   * than assigning undefined: a serialised `assignments: {}` is a difference that reads as a change.
-   */
-  roster = assignBuff(roster, seat, 'paladin-auras', undefined)
-  expect(seatAt(roster, seat)).not.toHaveProperty('assignments')
-})
-
-test('every exclusive group a seat competes in is reachable from the interface', async ({ page }) => {
-  /*
-   * The domain has assigned any exclusive buff since totems got a group, and the test above proves
-   * it. The **picker** was still gated on `className === 'Paladin'`, so three of the four groups were
-   * decided by the priority order with no way to say otherwise. This walks the interface itself.
-   */
-  await openApp(page, 'raidcomp')
-
-  const pickerFor = (groupId: string) => page.getByTestId(`raidcomp-assign-${groupId}-1-1`)
-
-  // A Shaman competes in one group, and it is now on screen.
-  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
-  await expect(pickerFor('shaman-air-totem'), 'a Shaman can be told which air totem to drop').toBeVisible()
-  await expect(pickerFor('paladin-blessings'), 'and is offered nothing they cannot cast').toHaveCount(0)
-
-  // The option labels drop the noun the group's own label already carries.
-  await expect(pickerFor('shaman-air-totem')).toContainText('Windfury')
-  await expect(pickerFor('shaman-air-totem'), 'the group label says "totem" once, not four times').not.toContainText(
-    'Windfury Totem',
-  )
-
-  // Choosing one moves coverage, which is the whole point of the control existing.
-  await pickerFor('shaman-air-totem').selectOption('wrath-of-air-totem')
-  await expect(pickerFor('shaman-air-totem')).toHaveValue('wrath-of-air-totem')
-
-  // A Paladin competes in two, and gets a picker for each rather than one that has to choose.
-  await page.getByTestId('raidcomp-add-paladin-holy').click()
-  await expect(page.getByTestId('raidcomp-assign-paladin-blessings-1-2')).toBeVisible()
-  await expect(page.getByTestId('raidcomp-assign-paladin-auras-1-2')).toBeVisible()
-
-  // A Mage competes in none, so nothing is offered at all.
-  await page.getByTestId('raidcomp-add-mage-fire').click()
-  await expect(page.locator('[data-testid^="raidcomp-assign-"][data-testid$="-1-3"]')).toHaveCount(0)
 })
 
 test('a buff that comes from a talent comes from one spec', async () => {
@@ -10609,6 +10473,19 @@ test('no image in the app is painted larger than the file it comes from', async 
         // are cards now and the drops are behind a click on each.
         const cards = page.locator('.raid-boss-card')
         for (let index = 0; index < (await cards.count()); index += 1) await cards.nth(index).click()
+        await walkThePage()
+      },
+    },
+    {
+      // 120 images on one screen — every spec in the palette, every seat, and an icon per buff and
+      // debuff in both the group rows and the three lists. Nothing was checking any of them.
+      name: 'raid composition',
+      needs: { icons: 60 },
+      open: async () => {
+        await openApp(page, 'raidcomp')
+        for (const build of ['druid-balance', 'paladin-holy', 'shaman-enhancement', 'warrior-fury', 'priest-shadow']) {
+          await page.getByTestId(`raidcomp-add-${build}`).click()
+        }
         await walkThePage()
       },
     },

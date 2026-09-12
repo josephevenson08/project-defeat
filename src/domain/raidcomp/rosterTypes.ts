@@ -29,26 +29,17 @@ export type RosterSlot = {
    * roster-management database for other people's details.
    */
   playerName?: string
-  /**
-   * Which buff this seat is assigned out of each exclusive group it competes in, keyed by
-   * `ExclusiveGroup.id`.
-   *
-   * **Coverage used to decide this by a fixed priority order**, capping each exclusive group at the
-   * number of providers and filling Kings, then Might, then Wisdom. Three Paladins therefore could
-   * never reach Salvation or Sanctuary, whatever the raid actually intended — the cap was right and
-   * the order was a guess standing in for a decision only the raid leader can make.
-   *
-   * **Keyed by group rather than held as one id**, which is what a single `blessingId` could not
-   * express: a Paladin competes in two groups at once and brings a Blessing *and* an aura, so one
-   * slot for one answer forced a raid leader to give up one decision to make the other. A Shaman has
-   * one air totem, a Warrior one shout, and both were unreachable from the interface entirely.
-   *
-   * Optional at every level, and an unassigned group still falls back to the priority order, so an
-   * untouched roster reads exactly as it did. An entry naming a group the seat does not compete in,
-   * or a buff it cannot cast, is ignored by coverage rather than trusted — see `sectionFor`.
-   */
-  assignments?: Readonly<Record<string, string>>
 }
+
+/*
+ * A seat used to carry `assignments` — which Blessing this Paladin was holding, which totem this
+ * Shaman was dropping — because coverage capped each exclusive group and something had to decide
+ * who held what.
+ *
+ * Both went on 2026-09-12, when the screen moved to Wowhead's model at the owner's request: nothing
+ * is capped, so there is nothing to assign. Rosters saved with the old field still load; see
+ * `rosterStorage`, which drops it rather than failing on it.
+ */
 
 /** A seat's address. Drag-and-drop moves between two of these, so it is worth naming. */
 export type SeatRef = {
@@ -209,28 +200,6 @@ export function renameSeat(roster: Roster, ref: SeatRef, playerName: string): Ro
   return writeSeat(roster, ref, trimmed ? { ...rest, playerName: trimmed } : rest)
 }
 
-/**
- * Assigns one seat's pick out of a single exclusive group, or clears it when passed nothing.
- *
- * Shaped like `renameSeat` — rebuild without the field, then add it back — so that clearing the last
- * assignment leaves no empty `assignments: {}` key behind to be serialised, and clearing one group
- * leaves the others alone.
- *
- * Takes the group id rather than deriving it from the buff, so that clearing has something to name:
- * "this Paladin has no assigned Blessing" is a statement about a group, and there is no buff id to
- * look one up from.
- */
-export function assignBuff(roster: Roster, ref: SeatRef, groupId: string, buffId: string | undefined): Roster {
-  const slot = seatAt(roster, ref)
-  if (!slot) return roster
-
-  const { assignments: previous, ...rest } = slot
-  const next = { ...previous }
-  if (buffId) next[groupId] = buffId
-  else delete next[groupId]
-
-  return writeSeat(roster, ref, Object.keys(next).length > 0 ? { ...rest, assignments: next } : rest)
-}
 
 /** Karazhan is the only 10-player raid in Phase 2; everything else is 25. */
 export const RAID_SIZES: readonly RaidPlayerSize[] = [10, 25]

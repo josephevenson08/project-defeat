@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raidcomp/rosterTypes.ts
-lines: 245
+lines: 214
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raidcomp.rosterTypes
 
-`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 245 lines
+`src/domain/raidcomp/rosterTypes.ts` · **domain** layer · 214 lines
 
 From the top of the file:
 
@@ -21,7 +21,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `addToGroup`, `assignBuff`, `clearSeat`, `emptyRoster`, `filledSlots`, `moveSeat`, `renameSeat`, `resizeRoster`, `seatAt`, `setRosterMeta`
+**function** — `addToGroup`, `clearSeat`, `emptyRoster`, `filledSlots`, `moveSeat`, `renameSeat`, `resizeRoster`, `seatAt`, `setRosterMeta`
 
 **const** — `groupCountFor`, `PARTY_SIZE`, `RAID_SIZES`
 

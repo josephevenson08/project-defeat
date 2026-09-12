@@ -6,7 +6,6 @@ import {
   PARTY_SIZE,
   RAID_SIZES,
   addToGroup,
-  assignBuff,
   clearSeat,
   computeCoverage,
   emptyRoster,
@@ -18,12 +17,9 @@ import {
   seatContributions,
   setRosterMeta,
   resizeRoster,
-  slotProvides,
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
-import { exclusiveGroups } from '../../domain/buffs/buffExclusivity'
 import { describeProvider } from '../../domain/buffs/buffTypes'
-import { getBuffById } from '../../domain/buffs/sampleBuffs'
 import { describeStats } from '../../domain/stats/describeStats'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
@@ -76,62 +72,11 @@ const TIMEZONES: readonly string[] = (() => {
   return [...new Set([LOCAL_TIMEZONE, 'UTC', ...supported])].sort()
 })()
 
-/**
- * Strips whatever leading and trailing words every option in a group shares.
- *
- * "Greater Blessing of Kings" alongside four siblings becomes "Kings"; "Windfury Totem" becomes
- * "Windfury"; "Battle Shout" becomes "Battle". The group's own label already says which noun was
- * removed, so repeating it in every option only costs width in a control that has none to spare.
- *
- * Derived rather than listed, because the version this replaced was a literal
- * `.replace(/^Greater Blessing of /, '')` — correct for the one group the picker could reach and
- * silently wrong for the three it could not.
+/*
+ * `assignableGroupsFor` lived here and drove a picker per seat — which Blessing this Paladin holds,
+ * which totem this Shaman drops. It went on 2026-09-12 with the exclusivity capping that made the
+ * choice necessary; there is nothing to assign when nothing is capped. See `buffCoverage.sectionFor`.
  */
-function trimSharedWords(names: readonly string[]): string[] {
-  if (names.length < 2) return [...names]
-
-  const split = names.map((name) => name.split(' '))
-  const shortest = Math.min(...split.map((words) => words.length))
-
-  // Never strip a name down to nothing: both loops stop one word short of consuming the shortest
-  // option entirely, so a group whose names differ only by a shared affix still reads.
-  let lead = 0
-  while (lead < shortest - 1 && split.every((words) => words[lead] === split[0][lead])) lead += 1
-
-  let tail = 0
-  while (
-    tail < shortest - lead - 1 &&
-    split.every((words) => words[words.length - 1 - tail] === split[0][split[0].length - 1 - tail])
-  )
-    tail += 1
-
-  return split.map((words) => words.slice(lead, words.length - tail).join(' '))
-}
-
-/**
- * The exclusive groups this seat competes in, with the buffs it can actually cast in each.
- *
- * **This used to be a hardcoded Paladin list.** The domain has assigned any exclusive buff since
- * totems were given a group — coverage matches an assignment against whatever the seat provides —
- * but the interface only ever offered Blessings, so a raid leader could not tell one Shaman to drop
- * Wrath of Air, or a second Warrior to run Commanding Shout, and the priority order decided both.
- *
- * A group is offered only where the seat has **more than one** option in it. One option is not a
- * decision, and a control whose only choice is what would have happened anyway is noise.
- */
-function assignableGroupsFor(slot: RosterSlot) {
-  return exclusiveGroups
-    .map((group) => {
-      const buffs = group.buffIds.map((id) => getBuffById(id)).filter((buff): buff is Buff => Boolean(buff))
-      const provided = buffs.filter((buff) => slotProvides(slot, buff))
-      const labels = trimSharedWords(provided.map((buff) => buff.name))
-      return {
-        group,
-        options: provided.map((buff, index) => ({ id: buff.id, label: labels[index] || buff.name })),
-      }
-    })
-    .filter((entry) => entry.options.length > 1)
-}
 
 /**
  * What one seated player brings, revealed on hover or keyboard focus.
@@ -326,10 +271,23 @@ export function RaidCompositionPanel() {
       <header className="panel-head">
         <h2>Raid Composition</h2>
         <p className="panel-copy">
-          Seat a raid and see what each group actually receives. <strong>24 of the 33 raid buffs are
-          party-scoped in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so
-          where someone sits matters as much as whether they are in the raid. Drag to move a player; click a
+          Seat a raid and see what each group receives. <strong>24 of the 33 raid buffs are party-scoped
+          in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so where
+          someone sits matters as much as whether they are in the raid. Drag to move a player; click a
           name to label the seat.
+        </p>
+        {/*
+          **The counts say who can cast a buff, not what will be up, and that has to be on the screen.**
+
+          This screen follows Wowhead's raid-composition model by request, and Wowhead counts a lone
+          Holy Paladin as providing all six Greater Blessings. In the game they hold one. Saying so
+          costs a sentence and stops the tool quietly telling a thin roster it is covered — which is
+          this project's whole standard for anything it cannot model exactly.
+        */}
+        <p className="panel-copy raidcomp-caveat" data-testid="raidcomp-counting-note">
+          Counts are <strong>who could cast it</strong>, not what will be up at once. One Paladin lights
+          up every Greater Blessing here and holds one in the game; the same goes for a Shaman's totems
+          and a Warrior's shouts.
         </p>
       </header>
 
@@ -520,7 +478,6 @@ export function RaidCompositionPanel() {
                 {group.map((slot, seatIndex) => {
                   const ref: SeatRef = { groupIndex: groupCoverage.groupIndex, seatIndex }
                   const isNaming = sameSeat(naming, ref)
-                  const assignable = slot ? assignableGroupsFor(slot) : []
 
                   return (
                     <li
@@ -603,38 +560,6 @@ export function RaidCompositionPanel() {
                               </button>
                             )}
 
-                            {/*
-                              One picker per exclusive group this seat competes in. A Paladin brings a
-                              Blessing *and* an aura, which is why these are keyed by group rather than
-                              held as a single choice — one answer per seat made the two decisions
-                              compete for the same control.
-
-                              Left unset, each group still falls back to its priority order, so these
-                              are overrides rather than a form to complete.
-                            */}
-                            {assignable.length > 0 && (
-                              <span className="raidcomp-seat-assignments">
-                                {assignable.map(({ group: exclusive, options }) => (
-                                  <select
-                                    key={exclusive.id}
-                                    className="raidcomp-seat-assignment"
-                                    value={slot.assignments?.[exclusive.id] ?? ''}
-                                    aria-label={`${exclusive.label} for the ${slot.spec} ${slot.className} in group ${groupCoverage.groupIndex + 1}`}
-                                    data-testid={`raidcomp-assign-${exclusive.id}-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
-                                    onChange={(event) =>
-                                      setRoster((current) => assignBuff(current, ref, exclusive.id, event.target.value || undefined))
-                                    }
-                                  >
-                                    <option value="">{exclusive.label}: auto</option>
-                                    {options.map((option) => (
-                                      <option key={option.id} value={option.id}>
-                                        {option.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                ))}
-                              </span>
-                            )}
                           </span>
 
                           <button

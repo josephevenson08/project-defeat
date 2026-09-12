@@ -78,14 +78,13 @@ behind every claim of its that quotes a number.
   spec and buff, **drag-and-drop** to move players between groups (occupied seats swap rather than
   overwrite), an optional player name per seat, and a hover card on each seat listing everything that
   player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
-  that group actually receives. **Buff exclusivity is modelled**: one Paladin holds one Greater
-  Blessing and one aura, one Shaman drops one air totem, one Warrior runs one shout, so coverage
-  reflects what a roster can actually maintain rather than everything its classes could theoretically
-  cast. **The raid leader overrides any of it per seat** — every exclusive group a seat competes in
-  gets its own picker, so a Paladin can be told which Blessing *and* which aura to bring, and a
-  Shaman which totem to drop. Left alone, each group falls back to its priority order, so these are
-  overrides rather than a form to fill in. A fillable header (title,
-  date, start time, description) is drawn onto the exported chart
+  that group actually receives. **Counts follow Wowhead's raid-composition tool**: they say who
+  *could* cast a buff rather than what will be up at once, so one Paladin lights up every Greater
+  Blessing where in the game they hold one. That is stated on the screen rather than left to be
+  discovered — the app should never tell a thin roster it is covered. The exclusivity rule itself
+  (one Blessing and one aura per Paladin, one totem per element, one shout per Warrior) is still
+  sourced and still tested in `buffExclusivity.ts`; this screen just does not apply it. A fillable
+  header (title, date, start time, description) is drawn onto the exported chart
 - Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
   than one ~15-screen scroll column, with the stat rail persisting across all five
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
