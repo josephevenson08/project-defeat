@@ -58,10 +58,24 @@ jump across a 1.7x gap goes soft) and then unsharp-masks with a threshold, becau
 block boundary is an edge as far as a sharpening filter is concerned. It skips anything already at
 1180px, so it is safe to re-run. Browser canvas, not `sharp` — same reasoning as `split-raid-art.mjs`.
 
-**The guard is `no raid panel is painted larger than the file it is drawn from`**, at 1920px and
-390px. It measures the `cover` scale factor per card against that card's own `naturalWidth`, so it
-protects the outcome rather than the constant — a later change that makes cards bigger by some other
-route still trips it. Verified to fail on the old layout before being left passing.
+**The guard is `no image in the app is painted larger than the file it comes from`**, plus a narrow
+companion, `the raid picker fits a phone, and still never magnifies its art`. They measure the scale
+factor between each painted box and its own file — every `<img>` and every `background-image`,
+`::before` and `::after` included, which is where this app keeps most of its artwork. That protects
+the outcome rather than the constant: a later change that re-magnifies the art by some other route
+still trips it. Both were verified to fail against the old layout before being left passing.
+
+**It started as a raid-only test and was widened after an audit of the rest of the app**, which found
+nothing — the zone maps are already capped at 718px against 772px files, at every width up to 3440px.
+A clean sweep is worth having as a standing check rather than a one-off.
+
+**The coverage assertions inside it are load-bearing, and the reason is embarrassing.** The first
+version reached the zone maps by clicking the first profession card. The first card is Alchemy, which
+is a crafting profession and draws no maps, so it reported "nothing magnified" over **zero maps** and
+would have gone on reporting it. Each screen now declares what it must have actually measured before
+its silence counts. The same pass also flagged four Karazhan icons as undecodable when they were
+merely `loading="lazy"` and below the fold; the walk-the-page step and an `img.complete` check are
+what make "did not decode" mean what it says.
 
 ---
 

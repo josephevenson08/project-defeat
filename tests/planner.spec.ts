@@ -10401,74 +10401,210 @@ test('a buff that comes from a talent comes from one spec', async () => {
   expect(impossible, 'every restricted buff names a real spec of its class').toEqual([])
 })
 
-test('no raid panel is painted larger than the file it is drawn from', async ({ page }) => {
-  /*
-   * The raid picker's cards are capped at a width the artwork can actually fill.
-   *
-   * Two of the five panels only exist at 1180px, and the reel used to paint them across 1353 CSS
-   * pixels — 2706 on a 2x display. That showed up twice: those two raids looked soft beside the
-   * three that ship at 1536px, and scrolling the page dropped roughly a fifth of its frames
-   * repainting five magnified images. Both went away by making the card smaller than its art.
-   *
-   * So this measures the thing the cap exists to protect rather than the cap itself: for every card,
-   * the `cover` scale factor against its own image. At or below 1 the browser is downsampling. Above
-   * it, it is inventing pixels, and the blur and the jank are both back.
-   *
-   * Checked at two viewports because the failure is width-dependent — a wide window is where the
-   * cards have room to outgrow the art, and the narrow one catches a card overflowing its column,
-   * which an `aspect-ratio` and a `min-height` together once caused.
-   */
-  for (const viewport of [
-    { width: 1920, height: 1080 },
-    { width: 390, height: 844 },
-  ]) {
-    await page.setViewportSize(viewport)
-    await openApp(page, 'raids')
 
-    const measured = await page.locator('.raid-picker-card').evaluateAll((cards) =>
-      Promise.all(
-        cards.map(async (card) => {
-          const box = card.getBoundingClientRect()
-          const source = getComputedStyle(card)
-            .getPropertyValue('--raid-art')
-            .trim()
-            .replace(/^url\(["']?/, '')
-            .replace(/["']?\)$/, '')
+/**
+ * Every image the app paints, measured against the file it comes from.
+ *
+ * Returns one row per painted image: `<img>` elements and every `background-image`, including the
+ * ones on `::before` and `::after`, where this app keeps most of its artwork. `scale` is how much
+ * the browser had to stretch the file to fill the box — above 1 it is inventing pixels.
+ */
+async function paintedImages(page: Page) {
+  return page.evaluate(async () => {
+    const measure = (url: string) =>
+      new Promise<{ width: number; height: number } | null>((done) => {
+        const image = new Image()
+        image.onload = () => done({ width: image.naturalWidth, height: image.naturalHeight })
+        image.onerror = () => done(null)
+        image.src = url
+      })
 
-          const art = await new Promise<{ width: number; height: number } | null>((done) => {
-            const image = new Image()
-            image.onload = () => done({ width: image.naturalWidth, height: image.naturalHeight })
-            image.onerror = () => done(null)
-            image.src = source
+    const name = (el: Element) => {
+      const classes = typeof el.className === 'string' ? el.className.trim().split(/\s+/).slice(0, 2).join('.') : ''
+      return el.tagName.toLowerCase() + (classes ? `.${classes}` : '')
+    }
+
+    type Row = { what: string; src: string; box: [number, number]; nat: [number, number] | null; scale: number | null }
+    const rows: Row[] = []
+
+    for (const img of document.querySelectorAll('img')) {
+      const box = img.getBoundingClientRect()
+      if (!box.width || !box.height) continue
+      /*
+       * An image that has not finished loading cannot be judged either way, and nearly every icon in
+       * this app is `loading="lazy"`. The first version of this reported four perfectly good Karazhan
+       * icons as undecodable because they were below the fold — so "not loaded" is skipped, and only
+       * `complete` with no intrinsic size is a real failure.
+       */
+      if (!img.complete) continue
+      rows.push({
+        what: name(img),
+        src: (img.currentSrc || img.src).replace(location.origin, ''),
+        box: [box.width, box.height],
+        nat: img.naturalWidth ? [img.naturalWidth, img.naturalHeight] : null,
+        scale: img.naturalWidth ? Math.max(box.width / img.naturalWidth, box.height / img.naturalHeight) : null,
+      })
+    }
+
+    for (const el of document.querySelectorAll('*')) {
+      const box = el.getBoundingClientRect()
+      if (!box.width || !box.height) continue
+      for (const pseudo of [null, '::before', '::after']) {
+        const style = getComputedStyle(el, pseudo)
+        if (!style.backgroundImage.includes('url(')) continue
+        for (const match of style.backgroundImage.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+          const url = match[1]
+          // Gradients and inlined data carry no resolution to be magnified past.
+          if (url.startsWith('data:')) continue
+          const nat = await measure(url)
+          rows.push({
+            what: name(el) + (pseudo ?? ''),
+            src: url.replace(location.origin, ''),
+            box: [box.width, box.height],
+            nat: nat ? [nat.width, nat.height] : null,
+            // `contain` fits the smaller axis; everything else here covers.
+            scale: nat
+              ? style.backgroundSize === 'contain'
+                ? Math.min(box.width / nat.width, box.height / nat.height)
+                : Math.max(box.width / nat.width, box.height / nat.height)
+              : null,
           })
+        }
+      }
+    }
 
-          return {
-            raid: (card as HTMLElement).dataset.testid ?? '(unnamed)',
-            art,
-            // `background-size: cover` scales by whichever axis needs more.
-            scale: art ? Math.max(box.width / art.width, box.height / art.height) : null,
-            overflows: box.width > document.documentElement.clientWidth + 1,
-          }
-        }),
-      ),
-    )
+    return rows
+  })
+}
 
-    expect(measured, 'every raid still has a card').toHaveLength(5)
+test('no image in the app is painted larger than the file it comes from', async ({ page }) => {
+  /*
+   * **The raid reel taught this, and the lesson was not about raids.** Two of the five boss panels
+   * only exist at 1180px, and the picker painted them across 1353 CSS pixels — 2706 on a 2x
+   * display. It showed up as two complaints that turned out to be one fact: those raids looked soft
+   * beside the three that ship at 1536px, and scrolling the page dropped 24 of 108 frames repainting
+   * five magnified images. Nothing in the CSS knew how big the files were, so the cards were sized
+   * by the room available — the normal way to lay a page out, and the wrong way when the content is
+   * a fixed-resolution asset.
+   *
+   * So this measures the invariant rather than the constant that currently satisfies it: for every
+   * painted image anywhere in the app, the scale between the box and the file. A test pinned to
+   * `1180px` would pass while someone reintroduced the magnification by another route — and there
+   * were two routes available on that page alone, the width cap and the two-up grid.
+   *
+   * **The coverage assertions below are not decoration.** The first version of this walked to the
+   * first profession card to reach the zone maps. The first card is Alchemy, which is a crafting
+   * profession and draws no maps at all, so it reported "nothing magnified" over zero maps — and
+   * would have gone on reporting it forever. An audit that cannot say what it looked at cannot say
+   * it found nothing, which is this repo's own reachability rule pointed at itself.
+   */
+  const familyOf = (src: string) => src.match(/\/(raids|maps|icons)\//)?.[1] ?? 'other'
 
-    // A panel that failed to load would make the scale unmeasurable, which is not a pass.
-    expect(
-      measured.filter((card) => !card.art).map((card) => card.raid),
-      `every raid panel decodes at ${viewport.width}px`,
-    ).toEqual([])
-
-    expect(
-      measured.filter((card) => card.scale! > 1).map((card) => `${card.raid} at ${card.scale!.toFixed(2)}x`),
-      `no raid panel is magnified at ${viewport.width}px`,
-    ).toEqual([])
-
-    expect(
-      measured.filter((card) => card.overflows).map((card) => card.raid),
-      `no raid card is wider than the window at ${viewport.width}px`,
-    ).toEqual([])
+  /*
+   * Everything on these pages is `loading="lazy"`, so nothing below the fold exists to be measured
+   * until something has scrolled past it. Walking the page start to finish is what turns a handful
+   * of visible icons into the whole screen's worth.
+   */
+  const walkThePage = async () => {
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 600) {
+        scrollTo(0, y)
+        await new Promise((settle) => setTimeout(settle, 60))
+      }
+      scrollTo(0, 0)
+    })
+    await page.waitForLoadState('networkidle')
   }
+
+  /** What each screen has to have actually measured before its "nothing magnified" means anything. */
+  const screens = [
+    { name: 'raid picker', needs: { raids: 5 }, open: async () => await openApp(page, 'raids') },
+    {
+      name: 'raid loot',
+      needs: { icons: 30 },
+      open: async () => {
+        await openApp(page, 'raids')
+        await page.getByTestId('raid-pick-karazhan').click()
+        await expect(page.getByTestId('raid-detail')).toBeVisible()
+        await walkThePage()
+      },
+    },
+    {
+      name: 'gathering route',
+      needs: { maps: 3 },
+      open: async () => {
+        await openApp(page, 'professions')
+        // Mining rather than the first card, which is Alchemy and has no maps to draw.
+        await page.getByTestId('profession-pick-mining').click()
+        await expect(page.locator('img.farming-route-art').first()).toBeVisible()
+        await walkThePage()
+      },
+    },
+  ]
+
+  const magnified: string[] = []
+  const undecodable: string[] = []
+  const thin: string[] = []
+
+  for (const screen of screens) {
+    await screen.open()
+    const painted = await paintedImages(page)
+
+    const counted = new Map<string, Set<string>>()
+    for (const row of painted) {
+      const family = familyOf(row.src)
+      if (!counted.has(family)) counted.set(family, new Set())
+      counted.get(family)!.add(row.src)
+
+      if (!row.nat) {
+        undecodable.push(`${screen.name}: ${row.what} — ${row.src}`)
+        continue
+      }
+      // A hair over 1 is subpixel rounding on a box that was sized to the file, not a stretch.
+      if (row.scale! > 1.01) {
+        magnified.push(
+          `${screen.name}: ${row.what} at ${row.scale!.toFixed(2)}x — ` +
+            `${Math.round(row.box[0])}x${Math.round(row.box[1])} from ${row.nat[0]}x${row.nat[1]} (${row.src})`,
+        )
+      }
+    }
+
+    for (const [family, least] of Object.entries(screen.needs)) {
+      const found = counted.get(family)?.size ?? 0
+      if (found < least) thin.push(`${screen.name}: expected at least ${least} ${family} images, measured ${found}`)
+    }
+  }
+
+  expect(thin, 'each screen measured the images it exists to show').toEqual([])
+  expect(undecodable, 'every painted image decodes').toEqual([])
+  expect(magnified, 'no image is drawn larger than its own file').toEqual([])
+})
+
+test('the raid picker fits a phone, and still never magnifies its art', async ({ page }) => {
+  /*
+   * The narrow half of the rule above, kept separate because the failure is a different shape.
+   *
+   * `aspect-ratio` on the card plus a `min-height` floor is secretly a `min-width`: the ratio reads
+   * the height and works backwards, so a 240px floor meant a 444px minimum width and a 390px phone
+   * got a card hanging off the side of the screen. The grid track inherited the same phantom minimum
+   * before the card did. Neither shows up as magnification — the art was fine, the layout was not —
+   * so overflow is asserted here rather than folded into the scale check.
+   */
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openApp(page, 'raids')
+
+  const painted = (await paintedImages(page)).filter((row) => row.src.includes('/raids/'))
+  expect(painted, 'every raid still has a card on a phone').toHaveLength(5)
+  expect(
+    painted.filter((row) => !row.nat || row.scale! > 1.01).map((row) => `${row.what} at ${row.scale?.toFixed(2)}x`),
+    'no raid panel is magnified at 390px',
+  ).toEqual([])
+
+  const overflows = await page.evaluate(() => {
+    const room = document.documentElement.clientWidth
+    return [...document.querySelectorAll('.raid-picker-card')]
+      .filter((card) => card.getBoundingClientRect().width > room + 1)
+      .map((card) => (card as HTMLElement).dataset.testid ?? '(unnamed)')
+  })
+  expect(overflows, 'no raid card is wider than the phone it is on').toEqual([])
 })

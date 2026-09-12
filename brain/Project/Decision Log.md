@@ -287,3 +287,30 @@ the magnification by a different route; two of them were available here, the wid
 two-up grid, and only one of them is the number. This is the same lesson as
 *[[Decision Log#A display label is not a join key, and the test has to be about reachability|the gathering-node join]]*, aimed at CSS:
 assert the thing you actually care about, at the surface where it can go wrong.
+
+## An audit that cannot say what it looked at cannot say it found nothing
+
+Recorded 2026-09-12, after a clean sweep of every image in the app turned out to have measured
+**zero** of the things it was written to check.
+
+The raid-art fix above generalised into a standing test: for every painted image anywhere in the app,
+the scale between the box and the file. Its first run reported "nothing magnified" across 345 paints
+and three viewports. It had walked to the zone maps by clicking the first profession card — and the
+first card is Alchemy, a crafting profession that draws no maps at all. Zero maps measured, zero
+magnified, green.
+
+The same pass then flagged four Karazhan item icons as failing to decode. The files were there; the
+icons are `loading="lazy"` and were below the fold. So the audit was simultaneously **blind where it
+claimed coverage and wrong where it claimed a defect** — the two failure modes of a sweep that
+reports on absence.
+
+**A test that asserts an absence owes a second assertion that it was looking.** Every screen in that
+test now declares a floor for what it must have measured — five raid panels, thirty icons, three zone
+maps — and the floor fails before the absence claim is allowed to pass. This is the same shape as
+*[[Decision Log#A caveat needs something that fails when it stops being true|a caveat needs something
+that fails]]* and *[[Decision Log#A display label is not a join key, and the test has to be about
+reachability|the gathering-node join]]*: this repo keeps rediscovering that **nothing fails when
+nothing is checked**, and the fix is always to make the checking itself checkable.
+
+The corollary for lazy-loaded content: "not loaded yet" and "failed to load" are different states and
+only one of them is a defect. Scroll the page first, then judge only what reports `complete`.
