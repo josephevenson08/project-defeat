@@ -25,7 +25,9 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`

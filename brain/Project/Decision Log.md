@@ -314,3 +314,36 @@ nothing is checked**, and the fix is always to make the checking itself checkabl
 
 The corollary for lazy-loaded content: "not loaded yet" and "failed to load" are different states and
 only one of them is a defect. Scroll the page first, then judge only what reports `complete`.
+
+## Look for the data in the repo before going to source it
+
+Recorded 2026-09-12, after "source and cost planning" — a roadmap item filed as unstarted — turned
+out to be **a parse of data that had been sitting in the repo since the guides were first ingested**.
+
+The roadmap said gear comparison, source/cost planning and a mobile layout were unstarted, and a
+first measurement seemed to agree: 182 of 557 BiS-recommended items could say where they came from,
+because only the hand-curated slice of the catalogue carried provenance. Joining the raid loot tables
+lifted that to 42%. On those numbers the feature reads as a data-gathering job — an ingest against
+Wowhead for 300-odd items, or a panel that says "unknown" more often than not.
+
+Then `ingest-bis.mjs` turned out to capture a `source` column, and every one of the 1,430 ranked rows
+carries it: `Drop: (Serpentshrine Cavern)`, `Profession: Tailoring - BoP only`, `Vendor: (41 Badges
+of Justice)`. `bisLists` was folding it into the free-text `notes` field. **The panel's own
+`sourceDetails` had been reading the structured `entry.source` and finding it empty since the day it
+was written.** Parsing the column took 90.1% of items to a named source; no new data was fetched.
+
+**The rule: before sourcing data, check what the ingest already captured and what the loaders throw
+away.** Coverage measured on the *typed* surface says what the app can use, not what the repo holds —
+those were 32.7% and 100% of the same fact. This is [[Decision Log#Plumbing before data, because data
+wired to nothing is this project's signature failure|plumbing before data]] seen from the other end:
+that entry is about building a surface for data that has not arrived, and this one is about data that
+arrived and reached no surface. Both come from the join between the two going unexamined.
+
+**And the corollary that cost the most to learn here.** The first parse also filled `boss` from
+whatever text sat beside the instance in that column. That text is usually the tier token the item is
+exchanged for, so the panel announced that Karazhan drops a boss called "Helm of the Fallen Hero".
+The fix was not a better regex — the column does not contain an encounter at all. The boss comes from
+the raid loot tables, and the resolver takes the place and the encounter **from the same dataset**,
+because mixing the guide's instance with the catalogue's boss put Kael'thas Sunstrider in
+Magtheridon's Lair across 52 rows. A join that draws each field from whichever source has one reads
+as the richest answer and is the easiest way to state something no source ever claimed.

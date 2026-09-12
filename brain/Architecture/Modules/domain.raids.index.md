@@ -26,6 +26,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[features.raids.RaidAttunementChain]] — `src/features/raids/RaidAttunementChain.tsx`
 - [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
 - [[features.raids.RaidPicker]] — `src/features/raids/RaidPicker.tsx`

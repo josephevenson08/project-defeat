@@ -101,7 +101,14 @@ import {
   getItemsForSlot,
   isWithinDefaultPhase,
 } from '../src/domain/gear/itemCatalogue'
-import { excludedByPhase } from '../src/domain/bis'
+import {
+  excludedByPhase,
+  parseRankedSource,
+  raidDropIndexSize,
+  resolveAcquisition,
+  UNCLASSIFIED_INSTANCES,
+} from '../src/domain/bis'
+import rawRankings from '../src/domain/bis/bisRankings.json' with { type: 'json' }
 import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
 import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
 import {
@@ -9834,6 +9841,21 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   const bisEntries = bisLists.reduce((total, list) => total + list.entries.length, 0)
   const withWowId = allItems.filter((item) => item.wowItemId !== undefined).length
 
+  // The source-planning figures. These are the numbers that justify the feature, so they are the
+  // ones most worth pinning — a regression in the parse reads as a percentage quietly falling.
+  const rankedEntries = bisLists.flatMap((list) => list.entries)
+  const acquisitions = rankedEntries.map((entry) => resolveAcquisition(entry, getItemById(entry.itemId)))
+  const recommendedItems = new Set(rankedEntries.map((entry) => entry.itemId)).size
+  const locatedItems = new Set(
+    rankedEntries
+      .filter((_, index) => {
+        const found = acquisitions[index]
+        return !!(found.instance || found.craftedBy || found.vendor || found.reputation)
+      })
+      .map((entry) => entry.itemId),
+  ).size
+  const rowsNamingAnEncounter = acquisitions.filter((found) => found.boss).length
+
   /*
    * The raid picker's width cap is a derived number wearing a constant's clothes: it is the width of
    * the *narrowest* raid panel, so that two cards to a row are each served at 1:1 on a 2x display.
@@ -9861,6 +9883,27 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   )
 
   const claims: { where: string; pattern: RegExp; actual: number; tolerance?: number }[] = [
+    {
+      where: 'README: recommended items with a resolved source',
+      pattern: /\*\*([\d,]+) of the [\d,]+ recommended items/,
+      actual: locatedItems,
+    },
+    {
+      where: 'README: recommended items in total',
+      pattern: /\*\*[\d,]+ of the ([\d,]+) recommended items/,
+      actual: recommendedItems,
+    },
+    {
+      where: 'README: share of recommended items located',
+      pattern: /\*\*[\d,]+ of the [\d,]+ recommended items \(([\d.]+)%\)\*\*/,
+      actual: Number(((100 * locatedItems) / recommendedItems).toFixed(1)),
+      tolerance: 0.05,
+    },
+    {
+      where: 'README: ranked rows naming an encounter',
+      pattern: /and ([\d,]+) of the [\d,]+ rows name an encounter/,
+      actual: rowsNamingAnEncounter,
+    },
     {
       where: 'README: vendored icon count',
       pattern: /`public\/icons\/` \(([\d,]+) files/,
@@ -10607,4 +10650,146 @@ test('the raid picker fits a phone, and still never magnifies its art', async ({
       .map((card) => (card as HTMLElement).dataset.testid ?? '(unnamed)')
   })
   expect(overflows, 'no raid card is wider than the phone it is on').toEqual([])
+})
+
+test('the guide’s source column is parsed rather than left as prose, and never guessed at', () => {
+  /*
+   * **This data was in the repo the whole time and nothing could ask a question of it.** Every one of
+   * the 1,427 ranked rows carries Wowhead's own Source cell — `Drop: (Serpentshrine Cavern)`,
+   * `Profession: Tailoring - BoP only`, `Vendor: (41 Badges of Justice)` — and `bisLists` folded it
+   * into the free-text `notes` field. A reader could see it; a filter could not. "Which of my BiS
+   * pieces drop in SSC" was unanswerable against data that already held the answer, and the panel's
+   * own `sourceDetails` had been reading `entry.source` and finding it empty since it was written.
+   *
+   * So the assertions here are about the *parse*, which is the only new thing. Coverage is pinned
+   * because it is the number that justifies the feature, and the unparsed tail is named rather than
+   * counted — a count passes when one failure is swapped for another.
+   */
+  const rawSources: string[] = []
+  for (const spec of Object.values(rawRankings.specs) as { slots: Record<string, { source?: string }[]> }[]) {
+    for (const rows of Object.values(spec.slots)) {
+      for (const row of rows) if (row.source) rawSources.push(row.source.replace(/\s+/g, ' ').trim())
+    }
+  }
+  const distinct = [...new Set(rawSources)].filter(Boolean)
+  expect(distinct.length, 'the pinned scrape still holds the source column').toBeGreaterThan(200)
+
+  /*
+   * **Every instance name must be one this repo recognises.** `UNCLASSIFIED_INSTANCES` fills as a
+   * side effect of parsing, and it is the guard on the spelling map: Wowhead spells Serpentshrine
+   * Cavern five wrong ways across the 24 guides and writes Magtheridon's Lair as "Liar", so without
+   * normalisation a filter for a raid silently misses a third of its own drops. A guide revision
+   * that introduces a new instance lands here rather than in the unknown pile.
+   */
+  for (const source of distinct) parseRankedSource(source)
+  expect([...UNCLASSIFIED_INSTANCES], 'every instance the guides name is recognised').toEqual([])
+
+  /*
+   * The tail that yields no type, listed rather than counted so that fixing one and breaking another
+   * cannot cancel out. Two kinds live here and both are correct:
+   *
+   *   * cells that lost their content upstream — a lone dash, a bare `41x`, `Drops from` and nothing
+   *     after it;
+   *   * rows that say an item drops but never say where — `Drop: Trash Mobs`, `Drop: Chess Event`.
+   *
+   * The second kind used to be typed `'World Drop'`, inferred from the *absence* of an instance. That
+   * was wrong in a way the join then made visible: `Drop: Trash Mobs` is Serpentshrine trash, and the
+   * panel rendered it "World Drop · Serpentshrine Cavern" once the loot table supplied the place. An
+   * absence is not a claim, so these stay untyped here and `resolveAcquisition` recovers them.
+   */
+  const untyped = distinct.filter((source) => {
+    const parsed = parseRankedSource(source)
+    return parsed && !parsed.type
+  })
+  expect(untyped.sort(), 'nothing is typed from an absence').toEqual(
+    [
+      ', Shattrath City - 25',
+      '25x',
+      '41x',
+      'Conjured:',
+      'Drop from -',
+      'Drop:',
+      'Drop: -',
+      'Drop: Chess Event',
+      'Drop: Opera Event -',
+      'Drop: Trash Mobs',
+      'Drop: Trash Mobs)',
+      'Drops from',
+      'Trash drop - Mobs',
+      'from',
+    ].sort(),
+  )
+
+  /*
+   * **Nothing is forced into a category.** `ItemSource` has an `'Other'` member and this parser must
+   * not reach for it to avoid saying "unknown" — the catalogue's own `source` field is documented as
+   * absent-means-unknown for exactly this reason, and a wrong classification is worse than a blank
+   * one because it sends a player somewhere the item is not.
+   */
+  const guessed = distinct.filter((source) => parseRankedSource(source)?.type === 'Other')
+  expect(guessed, "'Other' is not used as a shrug").toEqual(['Drop: (Brewfest Seasonal Event)'])
+})
+
+test('where a BiS item comes from is answered by joining three datasets, and the join is measured', () => {
+  /*
+   * The guide names an instance, the raid loot tables name an encounter inside one, and the catalogue
+   * carries crafting reagents. Each holds part of "where do I get this" and none holds all of it.
+   *
+   * Coverage is pinned because it is the claim the feature rests on: before the parse, 182 of 557
+   * recommended items could say where they came from, because only the hand-curated slice of the
+   * catalogue carried provenance. A regression in the parse shows up here as a number falling, which
+   * a spot check of one item would never catch.
+   */
+  const entries = bisLists.flatMap((list) => list.entries)
+  const located = entries.filter((entry) => {
+    const acquired = resolveAcquisition(entry, getItemById(entry.itemId))
+    return !!(acquired.instance || acquired.craftedBy || acquired.vendor || acquired.reputation)
+  })
+
+  const distinctItems = new Set(entries.map((entry) => entry.itemId))
+  const locatedItems = new Set(located.map((entry) => entry.itemId))
+  const share = (100 * locatedItems.size) / distinctItems.size
+
+  expect(share, 'most recommended items can say where they come from').toBeGreaterThan(85)
+  expect(locatedItems.size, 'and far more than the catalogue alone ever could').toBeGreaterThan(400)
+
+  /*
+   * **A boss is only ever claimed from a real loot table.** An earlier version took whatever text sat
+   * beside the instance in the guide's cell, which is usually the tier token the item is exchanged
+   * for — so the panel announced that Karazhan drops a boss called "Helm of the Fallen Hero". Every
+   * boss this resolves must be an encounter that exists.
+   */
+  const raidBosses = new Set(sampleRaids.flatMap((raid) => getBossesForRaid(raid.id).map((boss) => boss.name)))
+  /*
+   * The catalogue's own `boss` field is curated and legitimately names five-man encounters the raid
+   * data has never heard of — Aeonus, The Maker, Keli'dan the Breaker. Those are fine. What must not
+   * appear is a name from neither dataset, which is what a boss derived from guide prose would be.
+   */
+  const curatedBosses = new Set(allItems.map((item) => item.boss).filter((boss): boss is string => !!boss))
+  const invented = [
+    ...new Set(
+      entries
+        .map((entry) => resolveAcquisition(entry, getItemById(entry.itemId)).boss)
+        .filter((boss): boss is string => !!boss)
+        .filter((boss) => !raidBosses.has(boss) && !curatedBosses.has(boss)),
+    ),
+  ]
+  expect(invented, 'every named boss comes from real data, never from the guide’s prose').toEqual([])
+
+  /*
+   * And the other half of that: a boss is only attached when its raid is the instance the guide
+   * named, so an item that drops in two places cannot be labelled with the wrong encounter.
+   */
+  const mismatched = entries
+    .map((entry) => resolveAcquisition(entry, getItemById(entry.itemId)))
+    .filter((acquired) => acquired.boss && acquired.instance)
+    .filter((acquired) => {
+      const raid = sampleRaids.find((candidate) => candidate.name === acquired.instance)
+      if (!raid) return false
+      return !getBossesForRaid(raid.id).some((boss) => boss.name === acquired.boss)
+    })
+  expect(mismatched, 'no boss is attached to a raid it does not belong to').toEqual([])
+
+  // The index the join runs on, asserted so a raid-data change that empties it is visible.
+  expect(raidDropIndexSize.byItemId, 'the raid loot index is populated').toBeGreaterThan(200)
 })

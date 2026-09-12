@@ -56,6 +56,12 @@ behind every claim of its that quotes a number.
   Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
   callouts are still in the domain data but are deliberately not rendered: the tab answers "what
   drops here", and a fight guide is a different question asked at a different time
+- Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
+  profession that crafts it, or the vendor and currency. **502 of the 557 recommended items (90.1%)**
+  can say, and 625 of the 1,427 rows name an encounter. This is a join across the guides' own Source
+  column, the raid loot tables and the item catalogue rather than a new dataset — and it stops at
+  *where*: reagent lists exist for 14 crafted items, and nothing prices a badge, an arena point or a
+  reputation grind, so the cost half of "source and cost planning" is still open
 - Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.

@@ -28,7 +28,7 @@ tags: [brain/domain, domain/spec, role/Tank]
 
 
 
-Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]]
 
 ## Where this lives in the code
 

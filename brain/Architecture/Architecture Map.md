@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-181 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+183 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -17,7 +17,7 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 The modules everything else leans on — change these carefully.
 
 - [[domain.character.characterTypes]] — 46 importers
-- [[domain.gear.itemTypes]] — 26 importers
+- [[domain.gear.itemTypes]] — 28 importers
 - [[domain.stats.statTypes]] — 18 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[features.character.characterTypes]] — 15 importers
@@ -107,7 +107,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (119)
+### domain (121)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -123,11 +123,13 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.abilities.signatureAbilitiesShaman]] · 1 importers
 - [[domain.abilities.signatureAbilitiesWarlock]] · 1 importers
 - [[domain.abilities.signatureAbilitiesWarrior]] · 1 importers
+- [[domain.bis.acquisition]] · 1 importers
 - [[domain.bis.bisLists]] · 1 importers
 - [[domain.bis.bisRankingsJson.d]] · 0 importers
 - [[domain.bis.bisRecommendationsJson.d]] · 0 importers
-- [[domain.bis.bisTypes]] · 2 importers
+- [[domain.bis.bisTypes]] · 4 importers
 - [[domain.bis.index]] · 2 importers
+- [[domain.bis.rankedSource]] · 2 importers
 - [[domain.buffs.buffExclusivity]] · 3 importers
 - [[domain.buffs.buffScope]] · 1 importers
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
@@ -163,7 +165,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.itemCatalogue]] · 5 importers
 - [[domain.gear.itemEffectsJson.d]] · 0 importers
 - [[domain.gear.itemSets]] · 2 importers
-- [[domain.gear.itemTypes]] · 26 importers
+- [[domain.gear.itemTypes]] · 28 importers
 - [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 5 importers
 - [[domain.gear.sampleItems]] · 1 importers
@@ -192,7 +194,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raidcomp.raidcompIconsJson.d]] · 0 importers
 - [[domain.raidcomp.rosterTypes]] · 2 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
-- [[domain.raids.index]] · 5 importers
+- [[domain.raids.index]] · 6 importers
 - [[domain.raids.karazhanBosses]] · 1 importers
 - [[domain.raids.magtheridonsLairBosses]] · 1 importers
 - [[domain.raids.raidTypes]] · 11 importers

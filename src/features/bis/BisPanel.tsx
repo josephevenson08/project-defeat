@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
-import { getBisListForSpec, type RankedGearEntry } from '../../domain/bis'
+import { getBisListForSpec, resolveAcquisition, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import type { GearSlot } from '../../domain/gear/gearSlots'
 import { getQualityColor } from '../../domain/gear/qualityColors'
@@ -58,16 +58,25 @@ function itemLocation(item: GearItem) {
     .join(' / ')
 }
 
+/**
+ * Where the item comes from, from every dataset that knows part of the answer.
+ *
+ * The merge used to live here as a chain of `??` across the entry and the catalogue, which was fine
+ * while `entry.source` was always empty. Now that the guide's own source column is parsed, the join
+ * has real decisions in it — whether a loot table's encounter belongs to the instance the guide
+ * named, chiefly — so it moved to `resolveAcquisition` in the domain where it can be tested.
+ */
 function sourceDetails(entry: RankedGearEntry, item: GearItem | undefined) {
-  const source = entry.source
+  const acquired = resolveAcquisition(entry, item)
 
   return {
-    sourceType: source?.type ?? item?.source,
-    instance: source?.instance ?? item?.instance ?? item?.zone,
-    bossOrVendor: source?.boss ?? source?.vendor ?? source?.reputation ?? source?.craftedBy ?? item?.boss ?? item?.vendor ?? item?.reputation ?? item?.craftedBy,
-    phase: source?.phase ?? item?.phase,
-    notes: source?.notes,
-    needsVerification: source?.needsVerification === true || entry.needsVerification === true || item?.needsVerification === true,
+    sourceType: acquired.type,
+    instance: acquired.instance,
+    bossOrVendor: acquired.boss ?? acquired.vendor ?? acquired.reputation ?? acquired.craftedBy,
+    phase: entry.source?.phase ?? item?.phase,
+    notes: acquired.notes,
+    needsVerification:
+      entry.source?.needsVerification === true || entry.needsVerification === true || item?.needsVerification === true,
   }
 }
 

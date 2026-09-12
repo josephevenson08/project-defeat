@@ -10,7 +10,7 @@ tags: [brain/project, project/phase, status/partial]
 
 **Status: partial**
 
-Upgrade planning, build save/load and import/export all work. Comparison and cost planning do not.
+Upgrade planning, build save/load, import/export and source planning all work. Comparison and cost planning do not.
 
 ## Done
 
@@ -21,12 +21,13 @@ Upgrade planning, build save/load and import/export all work. Comparison and cos
 - Named build slots stored separately from the autosave, so switching character cannot destroy a saved build
 - Planner split into four sub-tabs instead of one ~15-screen column, with the stat rail persisting across all four
 - Stat rail scoped to the spec — 12 rows rather than 26 on a Fury Warrior — with a toggle that restores every stat
+- Source planning: the guide Source column parsed into structured data and joined to raid loot and the catalogue, so 90.1% of recommended items say where they come from against 32.7% before
 
 ## Remaining
 
 - Cloud/shareable builds — slots are browser-local, so they do not follow you to another machine
 - Side-by-side gear comparison
-- Source and cost planning
+- Cost planning — 167 of the 181 crafted rows name a profession and not a price, and nothing prices a badge, an arena point or a reputation grind
 - Better responsive/mobile layout
 - The ranked-gear panel is still 9.4 screens on its own — sub-tabs fixed navigation, not that panel's length
 

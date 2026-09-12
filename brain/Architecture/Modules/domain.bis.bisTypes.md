@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisTypes.ts
-lines: 44
+lines: 52
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisTypes
 
-`src/domain/bis/bisTypes.ts` · **domain** layer · 44 lines
+`src/domain/bis/bisTypes.ts` · **domain** layer · 52 lines
 
 _No doc comment at the top of this file._
 
@@ -25,8 +25,10 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
 
 ## Concepts & phases
 

@@ -27,7 +27,7 @@ tags: [brain/domain, domain/spec, role/Physical-DPS]
 
 
 
-Sends you to: [[Gruul's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Serpentshrine Cavern]]
 
 ## Where this lives in the code
 

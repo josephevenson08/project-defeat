@@ -27,7 +27,7 @@ tags: [brain/domain, domain/spec, role/Caster-DPS]
 
 
 
-Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]], [[Tempest Keep - The Eye]]
+Sends you to: [[Gruul's Lair]], [[Karazhan]], [[Magtheridon's Lair]], [[Serpentshrine Cavern]]
 
 ## Where this lives in the code
 

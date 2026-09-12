@@ -306,8 +306,24 @@ touched by it, so switching character no longer destroys anything. Slots are val
 catalog change drops the affected slot from the list rather than breaking the panel.
 
 They are still browser-local — clearing site data loses them, and they do not follow you to another
-machine; export/import covers that. Gear comparison, source/cost planning, and a real mobile layout
-are unstarted.
+machine; export/import covers that. Gear comparison and a real mobile layout are unstarted.
+
+**Source planning landed 2026-09-12**, and it was a parse rather than an ingest. Every one of the
+1,427 ranked rows has carried Wowhead's own Source cell since the guides were first ingested —
+`Drop: (Serpentshrine Cavern)`, `Profession: Tailoring - BoP only`, `Vendor: (41 Badges of Justice)`
+— and `bisLists` was folding it into the free-text `notes` field, where a reader could see it and no
+filter could reach it. `parseRankedSource` now lifts it into the structured `RankedGearSource` the
+panel had been reading and finding empty since it was written.
+
+`resolveAcquisition` then joins that to the raid loot tables for the encounter and to the catalogue
+for crafting reagents. **502 of the 557 recommended items can now say where they come from, against
+182 before — 90.1%** — and 625 of 1,427 rows name the actual boss. 12 rows resolve to nothing, all of
+them guide cells that lost their content upstream.
+
+What is still missing is the **cost** half. Reagent lists exist for 14 crafted items; the other 167
+crafted rows name the profession and not the price. Nothing in the app prices a badge, an arena
+point, or a reputation grind either, so a "Vendor: 41 Badges of Justice" row tells you the currency
+and not how many runs that is.
 
 **Raid Composition landed here** (2026-08-19), as a fifth section rather than a planner panel: pick
 10 or 25, add specs, and see which of the 33 raid buffs and 8 target debuffs the roster brings, with

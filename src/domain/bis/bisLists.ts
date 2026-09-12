@@ -6,6 +6,7 @@ import { getItemByWowItemId, isWithinDefaultPhase } from '../gear/itemCatalogue'
 import { isItemCompatibleWithGearSlot } from '../gear/slotCompatibility'
 import { getVisibleGearSlotsForSpec } from '../gear/slotVisibility'
 import type { BisList, RankedGearEntry } from './bisTypes'
+import { parseRankedSource } from './rankedSource'
 
 /**
  * Phase 2 BiS rankings, generated from the Wowhead class guides by `tools/ingest/ingest-bis.mjs`.
@@ -68,7 +69,22 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
 
   // The guide's own label ("Best Overall", "Threat Alternative") is kept verbatim: it carries the
   // reason a pick sits where it does, which a bare rank number throws away.
+  //
+  // **The source text stays in the note as well as being parsed, and that is deliberate.** The
+  // structured `source` below is what the app can filter and group on, but it is an interpretation —
+  // the note keeps the guide's own words, so a placement can always be checked against what Wowhead
+  // actually wrote rather than against what this repo made of it.
   const notes = [raw.note, raw.source].filter(Boolean).join(' — ') || undefined
+
+  /*
+   * Where the item comes from, lifted out of that same string into something queryable.
+   *
+   * Every ranked row has carried this text since the guides were first ingested, and until now it
+   * only ever reached the screen as prose — which meant "which of my BiS pieces drop in Serpentshrine"
+   * and "what do I need to craft" were unanswerable against data that already held both answers. The
+   * panel's `sourceDetails` has been reading `entry.source` the whole time and finding it empty.
+   */
+  const source = parseRankedSource(raw.source)
 
   return {
     className: spec.className as TbcClass,
@@ -81,6 +97,7 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
     sourceName: spec.sourceName,
     sourceUrl: spec.sourceUrl,
     notes,
+    ...(source ? { source } : {}),
     ...(enchantId ? { recommendedEnchantId: enchantId } : {}),
     ...(gemIds?.some(Boolean) ? { recommendedGemIds: gemIds } : {}),
   }

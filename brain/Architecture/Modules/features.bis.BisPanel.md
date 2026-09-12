@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/bis/BisPanel.tsx
-lines: 281
+lines: 290
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.bis.BisPanel
 
-`src/features/bis/BisPanel.tsx` · **features** layer · 281 lines
+`src/features/bis/BisPanel.tsx` · **features** layer · 290 lines
 
 _No doc comment at the top of this file._
 

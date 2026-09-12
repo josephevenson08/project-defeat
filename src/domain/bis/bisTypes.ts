@@ -3,7 +3,15 @@ import type { ItemSource } from '../gear/itemTypes'
 import type { GearSlot } from '../gear/gearSlots'
 
 export type RankedGearSource = {
-  type: ItemSource
+  /**
+   * Optional because the guide's source column does not always settle it.
+   *
+   * `parseRankedSource` never guesses: a string that names where an item comes from without saying
+   * what kind of content that is keeps its `instance` and leaves this absent. Stamping those with
+   * `'Other'` would read as a classification the data does not support, which is the same invented
+   * value the catalogue's `source` field is documented to avoid.
+   */
+  type?: ItemSource
   instance?: string
   boss?: string
   vendor?: string
