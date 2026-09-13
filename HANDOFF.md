@@ -1,11 +1,107 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-11.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-13.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 ---
 
-## Boss cards, and one decision deliberately reversed (2026-09-12, latest)
+## Where this is right now (2026-09-13, latest — READ THIS FIRST)
+
+`main` is green and pushed: **238 tests, lint and build clean.** The working tree carries only the
+owner's own `.obsidian/graph.json` and `Untitled.canvas`.
+
+### The last five commits, newest first
+
+| | |
+|---|---|
+| `1989284` | Cost planning — 117 of 119 crafted/bought BiS picks priced |
+| `603446a` | The other four raids' loot tables completed |
+| `57cb273` | Karazhan's loot table completed |
+| `18b5114` | Raid Composition rebuilt on Wowhead's counting model |
+| `3f098b1` | One boss card per row; scrim-over-text bug fixed |
+
+### What the app can now say, with the numbers that back it
+
+- **Raid loot is complete.** 467 drops across all 24 encounters, against 272 curated ones before.
+  344 resolve to a catalogue item; the other 123 are 80 recipes, 30 tier tokens and 13 quest items
+  and mounts — real drops that are not equippable gear.
+- **Where a BiS pick comes from**: 503 of 557 items (90.3%), and 719 of the 1,427 ranked rows name
+  the actual encounter.
+- **What it costs**: 117 priced (69 crafted, 48 vendor). Only the two Violet Signet rings are
+  unpriced, and no vendor sells those.
+
+### The three ingest scripts this rests on, and why they are worth keeping
+
+`tools/ingest/ingest-raid-loot.mjs`, `apply-raid-loot.mts`, `ingest-acquisition-cost.mts`. All three
+read the JSON Wowhead renders its *own* pages from, so nothing here is a reading of rendered HTML and
+nothing is remembered. Three hard-won details live in them:
+
+1. **The loot merge is a union, never a replace.** A boss's drop table cannot see the tier set pieces
+   its token is traded for, the quest rewards it hands out, or Kael'thas's seven encounter weapons.
+   Replacing would have deleted 32 curated Tempest Keep rows.
+2. **NPC ids are pinned by zone, not by name or drop count.** Kael'thas has a second entry in Sunwell
+   Plateau whose table is *larger*; a name search for Al'ar returns Void Reaver first. Both would
+   have imported the wrong raid silently.
+3. **The cost ingest refuses to write a smaller dataset than the one on disk.** It once wrote a file
+   of zero costs over 109 good ones at exit code 0 — Wowhead throttled the run and every page came
+   back HTTP 200 without its JSON. It now also checks for a `WH.Gatherer` block as proof it got what
+   it came for, since the status code was useless.
+
+### Open, ranked, as of this writing
+
+1. **Gear comparison** — verified unstarted. Side-by-side of two items or two builds with the stat
+   and DPS delta. `findUpgrades` already does the scoring; this is the view on top of it. The
+   smallest and most self-contained of what is left.
+2. **A real mobile layout** — the app does not overflow at 375px and was never *designed* for a
+   phone, which is where the owner reads it.
+3. **Boss art for 11 of 24 encounters** — the owner's own job; they make the images. Missing:
+   Nightbane, and all of Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+4. **Five-design boards for the remaining tabs** — the owner asked for tier lists and then redirected
+   ("lets not implement the pictures on every tab"), so this thread is **cold, not pending**. Do not
+   restart it without asking.
+5. **Deprioritised by the owner and not to be picked up unasked** — rotations (5 of 27 specs press
+   more than one button), tank score weighting, multi-iteration variance. The README says the
+   simulation model is explicitly not the focus this round.
+
+### How the owner works, from this session
+
+They give short directives and expect the work finished end to end, with docs and tests, then pushed.
+They answer a focused multiple-choice question readily and find repeated questions annoying — ask
+only when the answer changes what gets built, and otherwise decide and say what you decided. They
+will say "continue" and mean "pick the next thing yourself".
+
+**When they choose a design that is less accurate than what it replaces, build it and say so on the
+screen.** That happened twice here; see the raid-composition entry below.
+
+---
+
+## Raid Composition follows Wowhead now, deliberately less accurately (2026-09-12)
+
+Rebuilt against `wowhead.com/tbc/raid-composition` at the owner's request, in this app's theme. Most
+of the layout already matched — spec palette by class, groups as columns, a party-buff icon row under
+each, count-led lists that dim to grey at zero. Two things changed.
+
+**Per-seat buff assignment is gone** — the pickers, `assignments` on a seat, and `assignBuff`. Nothing
+is capped, so there is nothing to assign.
+
+**Coverage counts who *could* cast a buff, not what will be up.** One Paladin lights up all six
+Greater Blessings. That is Wowhead's model, verified against the live page, and it is **less truthful
+about TBC than the capped version it replaced** — in the game a Paladin holds one Blessing and one
+aura. The owner chose it knowingly when asked.
+
+Three things pay for that, and they are the pattern to repeat:
+
+- The screen states that counts are "who could cast it, not what will be up", and **a test asserts
+  that line is present**, so the app never claims coverage in its own voice that it cannot stand behind.
+- `buffExclusivity.ts` still holds the sourced rule and is still tested — against `applyExclusivity`
+  directly now, since coverage became the wrong place to ask.
+- The reversal is written down in the code, the Decision Log and here, because a later session
+  reading only the old comments would "fix" it straight back.
+
+---
+
+## Boss cards, and one decision deliberately reversed (2026-09-12)
 
 Inside a raid, the encounters are **cards with their own artwork**, and each one's loot table opens
 behind a click on it. The owner made the art; `tools/ingest/prepare-boss-art.mjs` places it.
@@ -240,8 +336,11 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Open, in the order it was left
 
-1. **Five-design boards for the remaining tabs** — tier lists, raid composition, simulation. The
-   owner was asked which to do next and had not answered. This is the active thread.
+*(Superseded — the current list is at the top of this file. Kept for the reasoning, not the ranking.)*
+
+1. ~~Five-design boards for the remaining tabs.~~ **Cold as of 2026-09-12.** Tier lists was chosen and
+   then the owner redirected — "lets not implement the pictures on every tab" — and Raid Composition
+   was rebuilt directly from Wowhead instead. Do not restart this without asking.
 2. ~~Serpentshrine Cavern and Tempest Keep art is still ~690px.~~ **Closed 2026-09-11** — the cards
    were shrunk to fit the art rather than the art stretched to fit the cards, and those two files
    were resampled to 1180px offline. Still the smallest panels, and still the number that sets the
@@ -254,14 +353,17 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-238 tests, **~4.5 minutes when the machine is free**. Two failure modes seen this session, neither a
-real defect:
+238 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+none a real defect:
 
-- A second dev server running (the Browser pane preview) takes it to ~15 minutes and produces
-  spurious `locator.click` timeouts. Stop the preview before a full run.
+- A second dev server running (the Browser pane preview) slows it badly and produces spurious
+  `locator.click` timeouts. **Stop the preview before a full run** — on 2026-09-13 this produced a
+  single image-guard failure that passed in isolation and passed again with the preview stopped.
 - A browser crash mid-run reports a *contiguous block* of failures with `browserContext.newPage`
   timeouts and "browser has been closed". Those are lifecycle errors, not assertion errors. Re-run
   the named tests in isolation before believing them.
+- Any test that walks a page for lazy images needs the page scrolled first; "not loaded yet" and
+  "failed to load" are different states and only one is a defect.
 
 ---
 
