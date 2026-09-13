@@ -317,7 +317,7 @@ panel had been reading and finding empty since it was written.
 
 `resolveAcquisition` then joins that to the raid loot tables for the encounter and to the catalogue
 for crafting reagents. **502 of the 557 recommended items can now say where they come from, against
-182 before — 90.1%** — and 625 of 1,427 rows name the actual boss. 12 rows resolve to nothing, all of
+182 before — 90.3%** — and 719 of 1,427 rows name the actual boss. 12 rows resolve to nothing, all of
 them guide cells that lost their content upstream.
 
 What is still missing is the **cost** half. Reagent lists exist for 14 crafted items; the other 167

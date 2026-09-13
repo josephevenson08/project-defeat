@@ -19,12 +19,23 @@ No threat table — Aran attacks whoever he likes, so there is no tank. Flame Wr
 - [[Caster DPS]] — Do not move during Flame Wreath, not even to dodge Blizzard — take the Blizzard damage instead.
 - [[Healer]] — Keep a mana potion or Innervate for the 40% Drain Mana; healing after it is otherwise impossible.
 
-## Notable drops (3)
+## Notable drops (13)
 
+- **Aran's Soothing Sapphire** (Boss)
+- **Boots of the Incorrupt** (Boss)
+- **Boots of the Infernal Coven** (Boss)
 - **Drape of the Dark Reavers** (Boss) — [[Caster DPS]]
   Holds Phase 2 best-in-slot status for several caster specs.
-- **Pendant of the Violet Eye** (Boss) — [[Healer]]
+- **Formula: Enchant Weapon - Sunfire** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
 - **Mantle of the Mind Flayer** (Boss) — [[Caster DPS]]
+- **Pauldrons of the Justice-Seeker** (Boss)
+- **Pendant of the Violet Eye** (Boss) — [[Healer]]
+- **Rapscallion Boots** (Boss)
+- **Saberclaw Talisman** (Boss)
+- **Shermanar Great-Ring** (Boss)
+- **Steelspine Faceguard** (Boss)
+- **Tirisfal Wand of Ascendancy** (Boss)
 
 
 

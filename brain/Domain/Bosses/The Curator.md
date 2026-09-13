@@ -19,8 +19,10 @@ The Curator summons Astral Flares that must be killed on sight — they explode 
 - [[Tank]] — Bring an off-tank into melee range to soak Hateful Bolt off the healers and DPS.
 - [[Caster DPS]] — Save burst cooldowns for the Evocation window — he takes 200% damage during it.
 
-## Notable drops (6)
+## Notable drops (10)
 
+- **Dragon-Quake Shoulderguards** (Boss)
+- **Forest Wind Shoulderpads** (Boss)
 - **Garona's Signet Ring** (Boss) — [[Physical DPS]]
 - **Gloves of the Fallen Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 gloves token — Paladin, Priest, Warlock.
@@ -28,10 +30,12 @@ The Curator summons Astral Flares that must be killed on sight — they explode 
   T4 gloves token — Warrior, Priest, Druid.
 - **Gloves of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 gloves token — Hunter, Mage, Rogue, Shaman.
-- **Voidheart Gloves** (Tier Token) — [[Caster DPS]]
-  Warlock T4 gloves, redeemed from Gloves of the Fallen Champion.
+- **Pauldrons of the Solace-Giver** (Boss)
 - **Staff of Infinite Mysteries** (Boss) — [[Tank]]
   Feral druid tanking staff.
+- **Wrynn Dynasty Greaves** (Boss)
+- **Voidheart Gloves** (Tier Token) — [[Caster DPS]]
+  Warlock T4 gloves, redeemed from Gloves of the Fallen Champion.
 
 
 

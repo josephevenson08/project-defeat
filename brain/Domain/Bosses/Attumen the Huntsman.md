@@ -19,12 +19,24 @@ Starts as the horse Midnight; Attumen joins at 95% and the two merge into one mo
 - [[Tank]] — Face Attumen away from the raid; his cleave hits everything in front.
 - [[Healer]] — Expect a mortal-strike style healing reduction on the tank for most of the merged phase.
 
-## Notable drops (3)
+## Notable drops (14)
 
-- **Gloves of Dexterous Manipulation** (Boss) — [[Physical DPS]]
-- **Steelhawk Crossbow** (Boss) — [[Physical DPS]]
+- **Bracers of the White Stag** (Boss)
 - **Fiery Warhorse's Reins** (Boss) _(not in item catalog — [[Needs Verification]])_
   Mount, very low drop rate. Not in the item catalog.
+- **Gauntlets of Renewed Hope** (Boss)
+- **Gloves of Dexterous Manipulation** (Boss) — [[Physical DPS]]
+- **Gloves of Saintly Blessings** (Boss)
+- **Handwraps of Flowing Thought** (Boss)
+- **Harbinger Bands** (Boss)
+- **Schematic: Stabilized Eternium Scope** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Spectral Band of Innervation** (Boss)
+- **Stalker's War Bands** (Boss)
+- **Steelhawk Crossbow** (Boss) — [[Physical DPS]]
+- **Vambraces of Courage** (Boss)
+- **Whirlwind Bracers** (Boss)
+- **Worgen Claw Necklace** (Boss)
 
 
 

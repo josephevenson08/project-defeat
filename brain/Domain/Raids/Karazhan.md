@@ -27,17 +27,17 @@ Full chain: [[The Master's Key]] (8 steps) · [[Attunement]]
 
 ## Bosses (11)
 
-- [[Attumen the Huntsman]] — encounter 1 · 3 notable drops
-- [[Moroes]] — encounter 2 · 3 notable drops
-- [[Maiden of Virtue]] — encounter 3 · 3 notable drops
-- [[Opera Event]] — encounter 4 · 4 notable drops
-- [[The Curator]] — encounter 5 · 6 notable drops
-- [[Terestian Illhoof]] _(optional)_ · 3 notable drops
-- [[Shade of Aran]] — encounter 7 · 3 notable drops
-- [[Netherspite]] _(optional)_ · 2 notable drops
-- [[Chess Event]] — encounter 9 · 3 notable drops
-- [[Prince Malchezaar]] — encounter 10 · 9 notable drops
-- [[Nightbane]] _(optional)_ · 4 notable drops
+- [[Attumen the Huntsman]] — encounter 1 · 14 notable drops
+- [[Moroes]] — encounter 2 · 14 notable drops
+- [[Maiden of Virtue]] — encounter 3 · 12 notable drops
+- [[Opera Event]] — encounter 4 · 18 notable drops
+- [[The Curator]] — encounter 5 · 10 notable drops
+- [[Terestian Illhoof]] _(optional)_ · 13 notable drops
+- [[Shade of Aran]] — encounter 7 · 13 notable drops
+- [[Netherspite]] _(optional)_ · 13 notable drops
+- [[Chess Event]] — encounter 9 · 12 notable drops
+- [[Prince Malchezaar]] — encounter 10 · 15 notable drops
+- [[Nightbane]] _(optional)_ · 13 notable drops
 
 ## Notable trash drops
 

@@ -20,10 +20,21 @@ Three coloured beams shine from portals and each must be intercepted by a specif
 - [[Tank]] — Hold the red beam and rotate out before the stacking debuff outpaces your healers.
 - [[Healer]] — The green beam holder rotates on a timer; going too long converts a mana boost into a mana problem.
 
-## Notable drops (2)
+## Notable drops (13)
 
 - **Cowl of Defiance** (Boss) — [[Physical DPS]]
+- **Earthblood Chestguard** (Boss)
+- **Girdle of Truth** (Boss)
 - **Jewel of Infinite Possibilities** (Boss) — [[Physical DPS]]
+- **Mantle of Abrahmis** (Boss)
+- **Mithril Band of the Unscarred** (Boss)
+- **Pantaloons of Repentance** (Boss)
+- **Rip-Flayer Leggings** (Boss)
+- **Shining Chain of the Afterworld** (Boss)
+- **Skulker's Greaves** (Boss)
+- **Spiteblade** (Boss)
+- **The Night Watchman** (Boss)
+- **Uni-Mind Headdress** (Boss)
 
 
 

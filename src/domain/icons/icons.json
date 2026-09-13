@@ -8,8 +8,8 @@
     "note": "Icon names only. The icon artwork is Blizzard's and is not vendored here; see the header of tools/ingest/ingest-icons.mjs."
   },
   "generatedBy": "tools/ingest/ingest-icons.mjs",
-  "mappedCount": 4779,
-  "distinctIconCount": 1245,
+  "mappedCount": 4781,
+  "distinctIconCount": 1246,
   "icons": {
     "6360": "inv_misc_fish_04",
     "8345": "inv_helmet_04",
@@ -476,6 +476,7 @@
     "22518": "inv_belt_08",
     "22519": "inv_bracer_13",
     "22559": "inv_misc_note_01",
+    "22560": "inv_misc_note_01",
     "22561": "inv_misc_note_01",
     "22589": "inv_staff_medivh",
     "22630": "inv_staff_medivh",
@@ -718,6 +719,7 @@
     "23748": "inv_weapon_rifle_03",
     "23762": "inv_gizmo_newgoggles",
     "23763": "inv_gizmo_newgoggles",
+    "23809": "inv_scroll_05",
     "23824": "inv_gizmo_rocketboot_01",
     "23825": "inv_belt_27",
     "23828": "inv_helmet_47",

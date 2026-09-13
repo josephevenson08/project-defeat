@@ -18,14 +18,28 @@ One of three randomised encounters per lockout. The Wizard of Oz is a five-targe
 
 - [[Physical DPS]] — On Romulo and Julianne, hold damage to keep the pair within ten seconds of each other at the end.
 
-## Notable drops (4)
+## Notable drops (18)
 
+- **Beastmaw Pauldrons** (Boss)
+- **Big Bad Wolf's Head** (Boss)
+- **Big Bad Wolf's Paw** (Boss)
+- **Blade of the Unrequited** (Boss)
+- **Blue Diamond Witchwand** (Boss)
+- **Despair** (Boss)
 - **Earthsoul Leggings** (Boss) — [[Healer]]
-- **Ribbon of Sacrifice** (Boss) — [[Healer]]
-- **Wicked Witch's Hat** (Boss) — [[Caster DPS]]
-  Wizard of Oz variant only.
+- **Eternium Greathelm** (Boss)
+- **Legacy** (Boss)
+- **Libram of Souls Redeemed** (Boss)
 - **Masquerade Gown** (Boss) — [[Caster DPS]], [[Healer]]
   Romulo and Julianne variant only.
+- **Red Riding Hood's Cloak** (Boss)
+- **Ribbon of Sacrifice** (Boss) — [[Healer]]
+- **Romulo's Poison Vial** (Boss)
+- **Ruby Slippers** (Boss)
+- **Trial-Fire Trousers** (Boss)
+- **Wicked Witch's Hat** (Boss) — [[Caster DPS]]
+  Wizard of Oz variant only.
+- **Wolfslayer Sniper Rifle** (Boss)
 
 > The variant is rerolled each lockout, so a specific drop cannot be farmed on demand.
 

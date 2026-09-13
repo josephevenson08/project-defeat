@@ -2780,13 +2780,47 @@ test('the item catalog and the raid data agree on where every drop comes from', 
       }
 
       // Only boss drops pin a boss. A tier token or trash drop legitimately doesn't.
-      if (loot.dropType === 'Boss' && item.boss && item.boss !== boss.name) {
-        disagreements.push(`${item.id}: catalog boss "${item.boss}" but raid data says "${boss.name}"`)
+      if (loot.dropType === 'Boss' && item.boss) {
+        /*
+         * **An item can drop from more than one encounter, and this used to assume it could not.**
+         *
+         * Earthsoul Leggings drops off Moroes *and* the Opera Event — Wowhead's own item page lists
+         * both, 2,869 of 21,907 kills for Moroes and a separate count for the Big Bad Wolf. The
+         * assumption held only because the hand-curated tables listed each item once; completing
+         * Karazhan from the real drop data on 2026-09-13 surfaced it immediately.
+         *
+         * So the catalogue's single `boss` field has to be *one of* the encounters that drop it,
+         * rather than the only one. That is still a real check — it catches a catalogue entry naming
+         * an encounter the raid data has never associated with the item, which is the drift this
+         * test was written for — without asserting something TBC does not do.
+         */
+        const dropsFromThisItem = sampleRaidBosses.filter((candidate) =>
+          candidate.loot.some((row) => row.itemId === loot.itemId && row.dropType === 'Boss'),
+        )
+        if (!dropsFromThisItem.some((candidate) => candidate.name === item.boss)) {
+          disagreements.push(
+            `${item.id}: catalog boss "${item.boss}" is not among the encounters that drop it (${dropsFromThisItem
+              .map((candidate) => candidate.name)
+              .join(', ')})`,
+          )
+        }
       }
     }
   }
 
   expect(disagreements, `item catalog disagrees with raid data: ${disagreements.join(' | ')}`).toEqual([])
+
+  /*
+   * The falsification: an item genuinely on two tables, so the loosened rule above is not vacuous.
+   * If this ever becomes a single entry, either the data lost a row or the game changed.
+   */
+  const multiDrop = sampleRaidBosses.filter((boss) =>
+    boss.loot.some((row) => row.itemId === 'earthsoul-leggings' && row.dropType === 'Boss'),
+  )
+  expect(
+    multiDrop.map((boss) => boss.name).sort(),
+    'Earthsoul Leggings is on two encounters’ tables, which is why the check allows it',
+  ).toEqual(['Moroes', 'Opera Event'])
 })
 
 test('racial traits apply to stats, and weapon-conditional ones follow the equipped weapon', async ({ page }) => {

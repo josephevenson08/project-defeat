@@ -1,0 +1,1044 @@
+{
+  "raidId": "karazhan",
+  "fetchedAt": "2026-09-13",
+  "source": "wowhead.com/tbc",
+  "bosses": {
+    "attumen-the-huntsman": [
+      {
+        "wowItemId": 28453,
+        "name": "Bracers of the White Stag",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 30480,
+        "name": "Fiery Warhorse's Reins",
+        "quality": 4,
+        "dropChance": 1,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28505,
+        "name": "Gauntlets of Renewed Hope",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28506,
+        "name": "Gloves of Dexterous Manipulation",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28508,
+        "name": "Gloves of Saintly Blessings",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28507,
+        "name": "Handwraps of Flowing Thought",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28477,
+        "name": "Harbinger Bands",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 23809,
+        "name": "Schematic: Stabilized Eternium Scope",
+        "quality": 3,
+        "dropChance": 7.6,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28510,
+        "name": "Spectral Band of Innervation",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28454,
+        "name": "Stalker's War Bands",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28504,
+        "name": "Steelhawk Crossbow",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28502,
+        "name": "Vambraces of Courage",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28503,
+        "name": "Whirlwind Bracers",
+        "quality": 4,
+        "dropChance": 17.1,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      },
+      {
+        "wowItemId": 28509,
+        "name": "Worgen Claw Necklace",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=16152/attumen-the-huntsman"
+      }
+    ],
+    "moroes": [
+      {
+        "wowItemId": 28567,
+        "name": "Belt of Gale Force",
+        "quality": 4,
+        "dropChance": 15.6,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28569,
+        "name": "Boots of Valiance",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28530,
+        "name": "Brooch of Unquenchable Fury",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28566,
+        "name": "Crimson Girdle of the Indomitable",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28591,
+        "name": "Earthsoul Leggings",
+        "quality": 4,
+        "dropChance": 13.1,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28545,
+        "name": "Edgewalker Longboots",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28524,
+        "name": "Emerald Ripper",
+        "quality": 4,
+        "dropChance": 16.6,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 22559,
+        "name": "Formula: Enchant Weapon - Mongoose",
+        "quality": 3,
+        "dropChance": 4.3,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28568,
+        "name": "Idol of the Avian Heart",
+        "quality": 4,
+        "dropChance": 15.7,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28528,
+        "name": "Moroes' Lucky Pocket Watch",
+        "quality": 4,
+        "dropChance": 16.9,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28565,
+        "name": "Nethershard Girdle",
+        "quality": 4,
+        "dropChance": 16.8,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28529,
+        "name": "Royal Cloak of Arathi Kings",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28570,
+        "name": "Shadow-Cloak of Dalaran",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      },
+      {
+        "wowItemId": 28525,
+        "name": "Signet of Unshakable Faith",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15687/moroes"
+      }
+    ],
+    "maiden-of-virtue": [
+      {
+        "wowItemId": 28511,
+        "name": "Bands of Indwelling",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28515,
+        "name": "Bands of Nefarious Deeds",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28516,
+        "name": "Barbed Choker of Discipline",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28517,
+        "name": "Boots of Foretelling",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28512,
+        "name": "Bracers of Justice",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28514,
+        "name": "Bracers of Maliciousness",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28520,
+        "name": "Gloves of Centering",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28519,
+        "name": "Gloves of Quickening",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28518,
+        "name": "Iron Gauntlets of the Maiden",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28521,
+        "name": "Mitts of the Treemender",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28522,
+        "name": "Shard of the Virtuous",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      },
+      {
+        "wowItemId": 28523,
+        "name": "Totem of Healing Rains",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=16457/maiden-of-virtue"
+      }
+    ],
+    "opera-event": [
+      {
+        "wowItemId": 28589,
+        "name": "Beastmaw Pauldrons",
+        "quality": 4,
+        "dropChance": 15.5,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28583,
+        "name": "Big Bad Wolf's Head",
+        "quality": 4,
+        "dropChance": 24,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28584,
+        "name": "Big Bad Wolf's Paw",
+        "quality": 4,
+        "dropChance": 24.4,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28572,
+        "name": "Blade of the Unrequited",
+        "quality": 4,
+        "dropChance": 14.6,
+        "source": "https://www.wowhead.com/tbc/npc=17534/julianne"
+      },
+      {
+        "wowItemId": 28588,
+        "name": "Blue Diamond Witchwand",
+        "quality": 4,
+        "dropChance": 24.7,
+        "source": "https://www.wowhead.com/tbc/npc=18168/the-crone"
+      },
+      {
+        "wowItemId": 28573,
+        "name": "Despair",
+        "quality": 4,
+        "dropChance": 27.9,
+        "source": "https://www.wowhead.com/tbc/npc=17534/julianne"
+      },
+      {
+        "wowItemId": 28591,
+        "name": "Earthsoul Leggings",
+        "quality": 4,
+        "dropChance": 15.5,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28593,
+        "name": "Eternium Greathelm",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28587,
+        "name": "Legacy",
+        "quality": 4,
+        "dropChance": 25.3,
+        "source": "https://www.wowhead.com/tbc/npc=18168/the-crone"
+      },
+      {
+        "wowItemId": 28592,
+        "name": "Libram of Souls Redeemed",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28578,
+        "name": "Masquerade Gown",
+        "quality": 4,
+        "dropChance": 28.2,
+        "source": "https://www.wowhead.com/tbc/npc=17534/julianne"
+      },
+      {
+        "wowItemId": 28582,
+        "name": "Red Riding Hood's Cloak",
+        "quality": 4,
+        "dropChance": 25,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28590,
+        "name": "Ribbon of Sacrifice",
+        "quality": 4,
+        "dropChance": 16.9,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28579,
+        "name": "Romulo's Poison Vial",
+        "quality": 4,
+        "dropChance": 28.4,
+        "source": "https://www.wowhead.com/tbc/npc=17534/julianne"
+      },
+      {
+        "wowItemId": 28585,
+        "name": "Ruby Slippers",
+        "quality": 4,
+        "dropChance": 24.1,
+        "source": "https://www.wowhead.com/tbc/npc=18168/the-crone"
+      },
+      {
+        "wowItemId": 28594,
+        "name": "Trial-Fire Trousers",
+        "quality": 4,
+        "dropChance": 16.9,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      },
+      {
+        "wowItemId": 28586,
+        "name": "Wicked Witch's Hat",
+        "quality": 4,
+        "dropChance": 24.3,
+        "source": "https://www.wowhead.com/tbc/npc=18168/the-crone"
+      },
+      {
+        "wowItemId": 28581,
+        "name": "Wolfslayer Sniper Rifle",
+        "quality": 4,
+        "dropChance": 24.9,
+        "source": "https://www.wowhead.com/tbc/npc=17521/the-big-bad-wolf"
+      }
+    ],
+    "the-curator": [
+      {
+        "wowItemId": 28631,
+        "name": "Dragon-Quake Shoulderguards",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 28647,
+        "name": "Forest Wind Shoulderpads",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 28649,
+        "name": "Garona's Signet Ring",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 29757,
+        "name": "Gloves of the Fallen Champion",
+        "quality": 4,
+        "dropChance": 32.7,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 29758,
+        "name": "Gloves of the Fallen Defender",
+        "quality": 4,
+        "dropChance": 32.9,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 29756,
+        "name": "Gloves of the Fallen Hero",
+        "quality": 4,
+        "dropChance": 32.5,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 28612,
+        "name": "Pauldrons of the Solace-Giver",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 28633,
+        "name": "Staff of Infinite Mysteries",
+        "quality": 4,
+        "dropChance": 16.6,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      },
+      {
+        "wowItemId": 28621,
+        "name": "Wrynn Dynasty Greaves",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=15691/the-curator"
+      }
+    ],
+    "terestian-illhoof": [
+      {
+        "wowItemId": 28662,
+        "name": "Breastplate of the Lightbinder",
+        "quality": 4,
+        "dropChance": 15.6,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28652,
+        "name": "Cincture of Will",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28655,
+        "name": "Cord of Nature's Sustenance",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28657,
+        "name": "Fool's Bane",
+        "quality": 4,
+        "dropChance": 16.9,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 22561,
+        "name": "Formula: Enchant Weapon - Soulfrost",
+        "quality": 3,
+        "dropChance": 4.7,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28660,
+        "name": "Gilded Thorium Cloak",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28656,
+        "name": "Girdle of the Prowler",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28654,
+        "name": "Malefic Girdle",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28661,
+        "name": "Mender's Heart-Ring",
+        "quality": 4,
+        "dropChance": 16.6,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28653,
+        "name": "Shadowvine Cloak of Infusion",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28658,
+        "name": "Terestian's Stranglestaff",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28785,
+        "name": "The Lightning Capacitor",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      },
+      {
+        "wowItemId": 28659,
+        "name": "Xavian Stiletto",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=15688/terestian-illhoof"
+      }
+    ],
+    "shade-of-aran": [
+      {
+        "wowItemId": 28728,
+        "name": "Aran's Soothing Sapphire",
+        "quality": 4,
+        "dropChance": 15.7,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28663,
+        "name": "Boots of the Incorrupt",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28670,
+        "name": "Boots of the Infernal Coven",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28672,
+        "name": "Drape of the Dark Reavers",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 22560,
+        "name": "Formula: Enchant Weapon - Sunfire",
+        "quality": 3,
+        "dropChance": 4.3,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28726,
+        "name": "Mantle of the Mind Flayer",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28666,
+        "name": "Pauldrons of the Justice-Seeker",
+        "quality": 4,
+        "dropChance": 15.7,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28727,
+        "name": "Pendant of the Violet Eye",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28669,
+        "name": "Rapscallion Boots",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28674,
+        "name": "Saberclaw Talisman",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28675,
+        "name": "Shermanar Great-Ring",
+        "quality": 4,
+        "dropChance": 15.5,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28671,
+        "name": "Steelspine Faceguard",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      },
+      {
+        "wowItemId": 28673,
+        "name": "Tirisfal Wand of Ascendancy",
+        "quality": 4,
+        "dropChance": 15.6,
+        "source": "https://www.wowhead.com/tbc/npc=16524/shade-of-aran"
+      }
+    ],
+    "netherspite": [
+      {
+        "wowItemId": 28732,
+        "name": "Cowl of Defiance",
+        "quality": 4,
+        "dropChance": 17.8,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28735,
+        "name": "Earthblood Chestguard",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28733,
+        "name": "Girdle of Truth",
+        "quality": 4,
+        "dropChance": 17.9,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28734,
+        "name": "Jewel of Infinite Possibilities",
+        "quality": 4,
+        "dropChance": 17.8,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28743,
+        "name": "Mantle of Abrahmis",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28730,
+        "name": "Mithril Band of the Unscarred",
+        "quality": 4,
+        "dropChance": 18.3,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28742,
+        "name": "Pantaloons of Repentance",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28740,
+        "name": "Rip-Flayer Leggings",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28731,
+        "name": "Shining Chain of the Afterworld",
+        "quality": 4,
+        "dropChance": 17.6,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28741,
+        "name": "Skulker's Greaves",
+        "quality": 4,
+        "dropChance": 15.4,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28729,
+        "name": "Spiteblade",
+        "quality": 4,
+        "dropChance": 8.8,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 31333,
+        "name": "The Night Watchman",
+        "quality": 4,
+        "dropChance": 0.2,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      },
+      {
+        "wowItemId": 28744,
+        "name": "Uni-Mind Headdress",
+        "quality": 4,
+        "dropChance": 16.8,
+        "source": "https://www.wowhead.com/tbc/npc=15689/netherspite"
+      }
+    ],
+    "chess-event": [
+      {
+        "wowItemId": 28747,
+        "name": "Battlescar Boots",
+        "quality": 4,
+        "dropChance": 15.3,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28755,
+        "name": "Bladed Shoulderpads of the Merciless",
+        "quality": 4,
+        "dropChance": 15.3,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28746,
+        "name": "Fiend Slayer Boots",
+        "quality": 4,
+        "dropChance": 17.1,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28752,
+        "name": "Forestlord Striders",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28750,
+        "name": "Girdle of Treachery",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28756,
+        "name": "Headdress of the High Potentate",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28751,
+        "name": "Heart-Flame Leggings",
+        "quality": 4,
+        "dropChance": 17.6,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28749,
+        "name": "King's Defender",
+        "quality": 4,
+        "dropChance": 16.7,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28748,
+        "name": "Legplates of the Innocent",
+        "quality": 4,
+        "dropChance": 15.7,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28745,
+        "name": "Mithril Chain of Heroism",
+        "quality": 4,
+        "dropChance": 16.5,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28753,
+        "name": "Ring of Recurrence",
+        "quality": 4,
+        "dropChance": 14.3,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      },
+      {
+        "wowItemId": 28754,
+        "name": "Triptych Shield of the Ancients",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/object=185119/dust-covered-chest"
+      }
+    ],
+    "prince-malchezaar": [
+      {
+        "wowItemId": 28762,
+        "name": "Adornment of Stolen Souls",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28764,
+        "name": "Farstrider Wildercloak",
+        "quality": 4,
+        "dropChance": 16.8,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28773,
+        "name": "Gorehowl",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 29760,
+        "name": "Helm of the Fallen Champion",
+        "quality": 4,
+        "dropChance": 31.2,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 29761,
+        "name": "Helm of the Fallen Defender",
+        "quality": 4,
+        "dropChance": 31.9,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 29759,
+        "name": "Helm of the Fallen Hero",
+        "quality": 4,
+        "dropChance": 33.2,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28763,
+        "name": "Jade Ring of the Everliving",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28771,
+        "name": "Light's Justice",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28768,
+        "name": "Malchazeen",
+        "quality": 4,
+        "dropChance": 16.4,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28770,
+        "name": "Nathrezim Mindblade",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28757,
+        "name": "Ring of a Thousand Marks",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28766,
+        "name": "Ruby Drape of the Mysticant",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28765,
+        "name": "Stainless Cloak of the Pure Hearted",
+        "quality": 4,
+        "dropChance": 15.7,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28772,
+        "name": "Sunfury Bow of the Phoenix",
+        "quality": 4,
+        "dropChance": 15.5,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      },
+      {
+        "wowItemId": 28767,
+        "name": "The Decapitator",
+        "quality": 4,
+        "dropChance": 16.3,
+        "source": "https://www.wowhead.com/tbc/npc=15690/prince-malchezaar"
+      }
+    ],
+    "nightbane": [
+      {
+        "wowItemId": 28601,
+        "name": "Chestguard of the Conniver",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28611,
+        "name": "Dragonheart Flameshield",
+        "quality": 4,
+        "dropChance": 17.1,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28609,
+        "name": "Emberspur Talisman",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28610,
+        "name": "Ferocious Swift-Kickers",
+        "quality": 4,
+        "dropChance": 15.6,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28608,
+        "name": "Ironstriders of Urgency",
+        "quality": 4,
+        "dropChance": 16.1,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28604,
+        "name": "Nightstaff of the Everliving",
+        "quality": 4,
+        "dropChance": 15.8,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28597,
+        "name": "Panzar'Thar Breastplate",
+        "quality": 4,
+        "dropChance": 15.4,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28602,
+        "name": "Robe of the Elder Scribes",
+        "quality": 4,
+        "dropChance": 16,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28599,
+        "name": "Scaled Breastplate of Carnage",
+        "quality": 4,
+        "dropChance": 16.2,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28606,
+        "name": "Shield of Impenetrable Darkness",
+        "quality": 4,
+        "dropChance": 15.4,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28600,
+        "name": "Stonebough Jerkin",
+        "quality": 4,
+        "dropChance": 16.9,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      },
+      {
+        "wowItemId": 28603,
+        "name": "Talisman of Nightbane",
+        "quality": 4,
+        "dropChance": 15.9,
+        "source": "https://www.wowhead.com/tbc/npc=17225/nightbane"
+      }
+    ]
+  }
+}

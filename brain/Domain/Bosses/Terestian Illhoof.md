@@ -19,13 +19,23 @@ Kil'rek, the imp pet, applies a stacking armour debuff to the tank and must be k
 
 - [[Physical DPS]] — Swap instantly to the Demon Chains when a player is sacrificed; that player dies otherwise.
 
-## Notable drops (3)
+## Notable drops (13)
 
-- **The Lightning Capacitor** (Boss) — [[Caster DPS]]
-  Still a Phase 2 best-in-slot caster trinket for several specs, which is why Phase 2 groups keep killing this optional boss.
-- **Terestian's Stranglestaff** (Boss) — [[Tank]]
+- **Breastplate of the Lightbinder** (Boss)
+- **Cincture of Will** (Boss)
+- **Cord of Nature's Sustenance** (Boss)
+- **Fool's Bane** (Boss)
 - **Formula: Enchant Weapon - Soulfrost** (Boss) _(not in item catalog — [[Needs Verification]])_
   Enchanting formula. Not in the item catalog.
+- **Gilded Thorium Cloak** (Boss)
+- **Girdle of the Prowler** (Boss)
+- **Malefic Girdle** (Boss)
+- **Mender's Heart-Ring** (Boss)
+- **Shadowvine Cloak of Infusion** (Boss)
+- **Terestian's Stranglestaff** (Boss) — [[Tank]]
+- **The Lightning Capacitor** (Boss) — [[Caster DPS]]
+  Still a Phase 2 best-in-slot caster trinket for several specs, which is why Phase 2 groups keep killing this optional boss.
+- **Xavian Stiletto** (Boss)
 
 
 

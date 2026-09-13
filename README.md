@@ -52,16 +52,20 @@ behind every claim of its that quotes a number.
   - Tank
 - Result breakdown panel
 - Raids tab: all five Phase 1/2 raids, **a card per encounter with its own artwork**, and that
-  encounter's notable drops behind a click on it — colour-coded by item quality where the drop
-  exists in the catalog. Thirteen of the twenty-four encounters have art so far (Karazhan bar
+  encounter's drops behind a click on it — colour-coded by item quality where the drop exists in the
+  catalog. **Karazhan's tables are complete**: 147 drops across eleven encounters, read from Wowhead's
+  own drop data by `tools/ingest/ingest-raid-loot.mjs` rather than curated by hand, so every row
+  carries a real item id and the ingest re-runs. 135 of the 147 resolve to a catalogued item; the rest
+  are tier tokens, formulas, a schematic, a quest reward and the mount, each flagged as a real drop
+  with no stat block here. Thirteen of the twenty-four encounters have art so far (Karazhan bar
   Nightbane, Gruul's Lair, Magtheridon); the rest keep their card and simply have no picture, so a
   raid without art reads as unfinished rather than broken. Step-by-step attunement chains for
   Karazhan, Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
   callouts are still in the domain data but are deliberately not rendered: the tab answers "what
   drops here", and a fight guide is a different question asked at a different time
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
-  profession that crafts it, or the vendor and currency. **502 of the 557 recommended items (90.1%)**
-  can say, and 625 of the 1,427 rows name an encounter. This is a join across the guides' own Source
+  profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
+  can say, and 719 of the 1,427 rows name an encounter. This is a join across the guides' own Source
   column, the raid loot tables and the item catalogue rather than a new dataset — and it stops at
   *where*: reagent lists exist for 14 crafted items, and nothing prices a badge, an arena point or a
   reputation grind, so the cost half of "source and cost planning" is still open
@@ -93,7 +97,7 @@ behind every claim of its that quotes a number.
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,963 files, 3.4 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,968 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
   and each one opens on its own progression: a skill range, what you gather or craft in it, and the

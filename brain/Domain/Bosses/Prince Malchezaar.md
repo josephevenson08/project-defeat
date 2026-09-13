@@ -19,21 +19,27 @@ Three phases. Phase 1 is a tank-and-spank with Enfeeble, which drops five random
 - [[Tank]] — Move the boss out of Infernal fire early; the room shrinks all fight and there is no space left at the end.
 - [[Healer]] — Do not heal Enfeebled players — heal the tank, and let the eight seconds run out.
 
-## Notable drops (9)
+## Notable drops (15)
 
-- **Nathrezim Mindblade** (Boss) — [[Caster DPS]]
-  Remains a Phase 2 best-in-slot caster main hand for several specs.
-- **Ring of a Thousand Marks** (Boss) — [[Physical DPS]]
-- **Jade Ring of the Everliving** (Boss) — [[Healer]]
-- **Sunfury Bow of the Phoenix** (Boss) — [[Physical DPS]]
-  Sources place this on Prince Malchezaar in Karazhan, but the item catalog currently records it as Tempest Keep / Kael'thas Sunstrider. The catalog entry needs correcting.
+- **Adornment of Stolen Souls** (Boss)
+- **Farstrider Wildercloak** (Boss)
+- **Gorehowl** (Boss) — [[Physical DPS]]
 - **Helm of the Fallen Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 helm token — Paladin, Priest, Warlock.
 - **Helm of the Fallen Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 helm token — Warrior, Priest, Druid.
 - **Helm of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 helm token — Hunter, Mage, Rogue, Shaman.
-- **Gorehowl** (Boss) — [[Physical DPS]]
+- **Jade Ring of the Everliving** (Boss) — [[Healer]]
+- **Light's Justice** (Boss)
+- **Malchazeen** (Boss)
+- **Nathrezim Mindblade** (Boss) — [[Caster DPS]]
+  Remains a Phase 2 best-in-slot caster main hand for several specs.
+- **Ring of a Thousand Marks** (Boss) — [[Physical DPS]]
+- **Ruby Drape of the Mysticant** (Boss)
+- **Stainless Cloak of the Pure Hearted** (Boss)
+- **Sunfury Bow of the Phoenix** (Boss) — [[Physical DPS]]
+  Sources place this on Prince Malchezaar in Karazhan, but the item catalog currently records it as Tempest Keep / Kael'thas Sunstrider. The catalog entry needs correcting.
 - **The Decapitator** (Boss) — [[Physical DPS]]
 
 

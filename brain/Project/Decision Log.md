@@ -407,3 +407,33 @@ requested design is less truthful than the one it replaces:
 The general rule: *[[Decision Log#The biggest gap and the next piece of work are different claims|a
 gap ranking is not a plan]]*, and neither is a correctness ranking. What the app asserts is a
 correctness question and stays non-negotiable; which model it presents is the owner's.
+
+## Completing a dataset is how you find the assumption it was hiding
+
+Recorded 2026-09-13, after Karazhan's loot tables went from 45 hand-curated rows to 147 sourced ones
+and immediately broke a test that had been passing for months.
+
+The test asserted that the item catalogue and the raid data **agree on which boss drops an item**. It
+held because the hand-written tables listed each item once. The real tables do not: Earthsoul
+Leggings drops from Moroes *and* the Opera Event, and Wowhead's own item page carries separate kill
+counts for each. The assumption was never TBC's, it was an artifact of the curation, and no amount of
+reading the old data would have revealed it — only completing it did.
+
+**A curated subset can encode a rule the full set does not obey, and every check written against the
+subset inherits it.** That is a different failure from stale data: the test was correct about what it
+measured, and wrong about the world. The fix was to loosen it to "the catalogue's boss is *one of* the
+encounters that drop it" and add a falsification naming the two-boss item, so the looser rule cannot
+quietly become vacuous.
+
+Two smaller things the same pass turned up, both worth the same shape of attention:
+
+**Two encounters do not drop their own loot.** The Chess Event rewards a chest object rather than the
+boss, and the Opera Event is three fights whose Wizard of Oz loot sits on The Crone rather than
+Dorothee. Both return an empty table if you assume boss-drops-loot, and an empty table looks like a
+boss with nothing worth having rather than like a bug. `ingest-raid-loot.mjs` records where each
+encounter's loot actually lives for exactly that reason.
+
+**The icon map is generated from what the data references**, so adding rows silently created two
+iconless entries until `ingest-icons.mjs` was re-run. Any ingest that adds item ids has that
+downstream step; the test that catches it is *[[Decision Log#A display label is not a join key, and
+the test has to be about reachability|the reachability check]]* doing its job.

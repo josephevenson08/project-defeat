@@ -19,12 +19,23 @@ Moroes brings four of six possible dinner-guest adds, randomised per lockout, an
 - [[Tank]] — Pick up Moroes immediately and hold the uncontrolled adds off the healers.
 - [[Healer]] — The Garrote bleed lands on a random player and cannot be dispelled — heal it, do not wait it out.
 
-## Notable drops (3)
+## Notable drops (14)
 
+- **Belt of Gale Force** (Boss)
+- **Boots of Valiance** (Boss)
+- **Brooch of Unquenchable Fury** (Boss)
+- **Crimson Girdle of the Indomitable** (Boss)
+- **Earthsoul Leggings** (Boss)
 - **Edgewalker Longboots** (Boss) — [[Physical DPS]]
+- **Emerald Ripper** (Boss)
 - **Formula: Enchant Weapon - Mongoose** (Boss) _(not in item catalog — [[Needs Verification]])_
   Enchanting formula, still one of the top Phase 2 weapon enchants. Not in the item catalog.
+- **Idol of the Avian Heart** (Boss)
 - **Moroes' Lucky Pocket Watch** (Boss) — [[Tank]]
+- **Nethershard Girdle** (Boss)
+- **Royal Cloak of Arathi Kings** (Boss)
+- **Shadow-Cloak of Dalaran** (Boss)
+- **Signet of Unshakable Faith** (Boss)
 
 
 

@@ -16,10 +16,19 @@ A scripted game of chess where each raider controls a piece by standing on it. T
 
 
 
-## Notable drops (3)
+## Notable drops (12)
 
-- **Ring of Recurrence** (Boss) — [[Caster DPS]]
+- **Battlescar Boots** (Boss)
+- **Bladed Shoulderpads of the Merciless** (Boss)
+- **Fiend Slayer Boots** (Boss)
+- **Forestlord Striders** (Boss)
+- **Girdle of Treachery** (Boss)
+- **Headdress of the High Potentate** (Boss)
+- **Heart-Flame Leggings** (Boss)
 - **King's Defender** (Boss) — [[Tank]]
+- **Legplates of the Innocent** (Boss)
+- **Mithril Chain of Heroism** (Boss)
+- **Ring of Recurrence** (Boss) — [[Caster DPS]]
 - **Triptych Shield of the Ancients** (Boss) — [[Tank]]
 
 
