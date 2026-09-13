@@ -27,7 +27,7 @@ None for entry. Killing Magtheridon completes the final step of the Tempest Keep
 
 ## Bosses (1)
 
-- [[Magtheridon]] — encounter 1 · 18 notable drops
+- [[Magtheridon]] — encounter 1 · 20 notable drops
 
 
 

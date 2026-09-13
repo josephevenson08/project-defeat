@@ -19,21 +19,37 @@ Earthquake damages everyone within 50 yards and spawns two packs of six murlocs 
 - [[Tank]] — Two extra tanks hold the murloc packs at the doorways; paladins handle this best because of consecration threat.
 - [[Healer]] — Players in Watery Grave are teleported away and take fall damage — watch the raid frame, not the room.
 
-## Notable drops (13)
+## Notable drops (21)
 
-- **Talon of Azshara** (Boss) — [[Caster DPS]]
-- **Serpent-Coil Braid** (Boss) — [[Caster DPS]]
-- **Luminescent Rod of the Naaru** (Boss) — [[Healer]]
-- **Ring of Sundered Souls** (Boss) — [[Physical DPS]]
-- **Razor-Scale Battlecloak** (Boss) — [[Tank]]
-- **Warboots of Obliteration** (Boss) — [[Physical DPS]]
-- **Pendant of the Lost Ages** (Boss) — [[Healer]]
 - **Band of the Vigilant** (Boss) — [[Tank]]
-- **Pauldrons of the Argent Sentinel** (Boss) — [[Healer]]
-- **Mantle of the Tireless Tracker** (Boss) — [[Physical DPS]]
 - **Girdle of the Tidal Call** (Boss) — [[Healer]]
 - **Gnarled Chestpiece of the Ancients** (Boss) — Hybrid
 - **Illidari Shoulderpads** (Boss) — [[Physical DPS]]
+- **Luminescent Rod of the Naaru** (Boss) — [[Healer]]
+- **Mantle of the Tireless Tracker** (Boss) — [[Physical DPS]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pauldrons of the Argent Sentinel** (Boss) — [[Healer]]
+- **Pendant of the Lost Ages** (Boss) — [[Healer]]
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Razor-Scale Battlecloak** (Boss) — [[Tank]]
+- **Ring of Sundered Souls** (Boss) — [[Physical DPS]]
+- **Serpent-Coil Braid** (Boss) — [[Caster DPS]]
+- **Talon of Azshara** (Boss) — [[Caster DPS]]
+- **Warboots of Obliteration** (Boss) — [[Physical DPS]]
 
 
 

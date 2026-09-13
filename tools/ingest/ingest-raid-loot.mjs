@@ -29,6 +29,23 @@ const REPO = resolve(HERE, '../..')
 const OUT = resolve(HERE, 'data')
 
 /**
+ * The zone each raid's encounters must sit in, asserted per fetch.
+ *
+ * **This is not belt-and-braces, it caught a real mistake.** Kael'thas Sunstrider has two NPC entries
+ * — 19622 in Tempest Keep and 24664 in Sunwell Plateau — and the Sunwell one has the *larger* loot
+ * table, so "pick the id with the most drops" would have filled Tempest Keep with Phase 5 gear.
+ * Al'ar was worse: a search for the name surfaced 19516, which is Void Reaver. A name match and a
+ * drop count are both satisfiable by the wrong NPC; the zone is what actually pins it.
+ */
+const RAID_ZONES = {
+  karazhan: 3457,
+  'gruuls-lair': 3923,
+  'magtheridons-lair': 3836,
+  'serpentshrine-cavern': 3607,
+  'tempest-keep': 3845,
+}
+
+/**
  * Where each encounter's loot actually lives, which is not always the boss.
  *
  * Two cases in Karazhan alone, and both are the kind of thing that silently yields an empty table:
@@ -39,7 +56,32 @@ const OUT = resolve(HERE, 'data')
  * Every id here came from Wowhead's own search rather than from memory — see the `npc=` and
  * `object=` ids, each of which was confirmed against the page title before being written down.
  */
+
 const RAIDS = {
+  'gruuls-lair': {
+    'high-king-maulgar': [['npc', 18831, 'high-king-maulgar']],
+    'gruul-the-dragonkiller': [['npc', 19044, 'gruul-the-dragonkiller']],
+  },
+  'magtheridons-lair': {
+    // 21174 is a second Magtheridon entry with no zone; 17257 is the one standing in the Lair.
+    magtheridon: [['npc', 17257, 'magtheridon']],
+  },
+  'serpentshrine-cavern': {
+    'hydross-the-unstable': [['npc', 21216, 'hydross-the-unstable']],
+    'the-lurker-below': [['npc', 21217, 'the-lurker-below']],
+    'leotheras-the-blind': [['npc', 21215, 'leotheras-the-blind']],
+    'fathom-lord-karathress': [['npc', 21214, 'fathom-lord-karathress']],
+    'morogrim-tidewalker': [['npc', 21213, 'morogrim-tidewalker']],
+    'lady-vashj': [['npc', 21212, 'lady-vashj']],
+  },
+  'tempest-keep': {
+    // 19514, not the 19516 a name search offers first — that one is Void Reaver.
+    alar: [['npc', 19514, 'alar']],
+    'void-reaver': [['npc', 19516, 'void-reaver']],
+    'high-astromancer-solarian': [['npc', 18805, 'high-astromancer-solarian']],
+    // 19622, not 24664: the latter is the Sunwell Plateau Kael'thas and drops Phase 5 gear.
+    'kaelthas-sunstrider': [['npc', 19622, 'kaelthas-sunstrider']],
+  },
   karazhan: {
     'attumen-the-huntsman': [['npc', 16152, 'attumen-the-huntsman']],
     moroes: [['npc', 15687, 'moroes']],
@@ -95,11 +137,23 @@ function listviewData(html, listId) {
   return undefined
 }
 
-async function dropsFor(kind, id, slug) {
+async function dropsFor(kind, id, slug, expectedZone) {
   const url = `https://www.wowhead.com/tbc/${kind}=${id}/${slug}`
   const response = await fetch(url, { headers: { 'user-agent': 'project-defeat ingest' } })
   if (!response.ok) throw new Error(`${url} → HTTP ${response.status}`)
   const html = await response.text()
+
+  /*
+   * Refuse an NPC standing somewhere else, rather than quietly importing its loot. Objects carry no
+   * zone on the page, so they are trusted on their id — a chest is not a name that repeats.
+   */
+  if (kind === 'npc' && expectedZone !== undefined) {
+    const zones = (html.match(/"location":\[([\d,]+)\]/) || [])[1]
+    const found = zones ? zones.split(',').map(Number) : []
+    if (!found.includes(expectedZone)) {
+      throw new Error(`${url} → sits in zone ${found.join('/') || 'none'}, expected ${expectedZone}. Wrong NPC id.`)
+    }
+  }
 
   // An NPC lists `drops`; a chest lists what it `contains`.
   const rows = listviewData(html, 'drops') ?? listviewData(html, 'contains')
@@ -132,7 +186,7 @@ let total = 0
 for (const [bossId, sources] of Object.entries(raid)) {
   const merged = new Map()
   for (const [kind, id, slug] of sources) {
-    for (const drop of await dropsFor(kind, id, slug)) {
+    for (const drop of await dropsFor(kind, id, slug, RAID_ZONES[raidId])) {
       // First sighting wins, so an item shared by two Opera variants is listed once.
       if (!merged.has(drop.wowItemId)) merged.set(drop.wowItemId, drop)
     }

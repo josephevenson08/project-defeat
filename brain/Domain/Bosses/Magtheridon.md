@@ -20,32 +20,36 @@ The fight opens against five Hellfire Channelers keeping Magtheridon banished; t
 - [[Caster DPS]] — Warlocks banish the Burning Abyssals during the Channeler phase; interrupt Dark Mending on the Channelers.
 - [[Healer]] — Cube clickers take heavy damage while channelling and are the most likely deaths in the fight.
 
-## Notable drops (18)
+## Notable drops (20)
 
-- **Soul-Eater's Handwraps** (Boss) — [[Caster DPS]]
 - **Aegis of the Vindicator** (Boss) — [[Tank]]
-- **Eredar Wand of Obliteration** (Boss) — [[Caster DPS]]
 - **Chestguard of the Fallen Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 chest token — Paladin, Priest, Warlock.
 - **Chestguard of the Fallen Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 chest token — Warrior, Priest, Druid.
 - **Chestguard of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 chest token — Hunter, Mage, Rogue, Shaman.
+- **Cloak of the Pit Stalker** (Boss) — [[Physical DPS]]
+- **Crystalheart Pulse-Staff** (Boss) — [[Healer]]
+- **Eredar Wand of Obliteration** (Boss) — [[Caster DPS]]
+- **Eye of Magtheridon** (Boss) — [[Caster DPS]]
+- **Girdle of the Endless Pit** (Boss) — [[Tank]]
+- **Glaive of the Pit** (Boss) — [[Physical DPS]]
+- **Karaborian Talisman** (Boss) — [[Physical DPS]]
+- **Liar's Tongue Gloves** (Boss) — [[Physical DPS]]
+- **Magtheridon's Head** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
+  Raid-wide quest item turned in for a reputation reward and a necklace choice. Alliance turn-in is 32385, Horde 32386.
+- **Magtheridon's Head** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
+  Raid-wide quest item turned in for a reputation reward and a necklace choice. Alliance turn-in is 32385, Horde 32386.
+- **Pit Lord's Satchel** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Soul-Eater's Handwraps** (Boss) — [[Caster DPS]]
+- **Terror Pit Girdle** (Boss) — [[Physical DPS]]
+- **Thundering Greathelm** (Boss) — [[Tank]]
 - **Breastplate of Malorne** (Tier Token) — [[Tank]], [[Physical DPS]]
   Druid T4 chest, redeemed from Chestguard of the Fallen Defender.
 - **Justicar Chestguard** (Tier Token) — [[Tank]]
   Paladin T4 chest, redeemed from Chestguard of the Fallen Champion.
-- **Eye of Magtheridon** (Boss) — [[Caster DPS]]
-- **Karaborian Talisman** (Boss) — [[Physical DPS]]
-- **Thundering Greathelm** (Boss) — [[Tank]]
-- **Cloak of the Pit Stalker** (Boss) — [[Physical DPS]]
-- **Liar's Tongue Gloves** (Boss) — [[Physical DPS]]
-- **Terror Pit Girdle** (Boss) — [[Physical DPS]]
-- **Girdle of the Endless Pit** (Boss) — [[Tank]]
-- **Crystalheart Pulse-Staff** (Boss) — [[Healer]]
-- **Glaive of the Pit** (Boss) — [[Physical DPS]]
-- **Magtheridon's Head** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
-  Raid-wide quest item turned in for a reputation reward and a necklace choice. Alliance turn-in is 32385, Horde 32386.
 
 
 

@@ -21,14 +21,50 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
 - [[Caster DPS]] — A warlock tanks Capernian at range; everyone else stays spread through Gravity Lapse.
 - [[Healer]] — Gravity Lapse removes your ability to stand still and cast — plan instant heals and pre-hots for it.
 
-## Notable drops (37)
+## Notable drops (49)
 
+- **Ashes of Al'ar** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Flying mount with a drop rate around 1-2%. Not in the item catalog.
+- **Band of the Ranger-General** (Boss) — [[Physical DPS]]
 - **Chestguard of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 chest token — Paladin, Priest, Warlock.
 - **Chestguard of the Vanquished Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 chest token — Warrior, Priest, Druid.
 - **Chestguard of the Vanquished Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 chest token — Hunter, Mage, Rogue, Shaman.
+- **Crown of the Sun** (Boss) — [[Caster DPS]]
+- **Gauntlets of the Sun King** (Boss) — [[Caster DPS]]
+- **Leggings of Murderous Intent** (Boss) — [[Physical DPS]]
+- **Nether Vortex** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Rod of the Sun King** (Boss) — [[Physical DPS]]
+- **Royal Cloak of the Sunstriders** (Boss) — [[Caster DPS]]
+- **Royal Gauntlets of Silvermoon** (Boss)
+- **Scroll of the Sun** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Sunhawk Leggings** (Boss) — [[Caster DPS]]
+- **Sunshower Light Cloak** (Boss) — [[Healer]]
+- **Thalassian Wildercloak** (Boss) — [[Caster DPS]]
+- **The Nexus Key** (Boss) — [[Caster DPS]]
+- **Twinblade of the Phoenix** (Boss) — [[Physical DPS]]
+- **Verdant Sphere** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
 - **Destroyer Breastplate** (Tier Token) — [[Physical DPS]]
   Warrior T5 chest, redeemed from Chestguard of the Vanquished Defender.
 - **Destroyer Chestguard** (Tier Token) — [[Tank]]
@@ -51,16 +87,6 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
   Shaman T5 chest, redeemed from Chestguard of the Vanquished Hero.
 - **Voidheart Robe** (Tier Token) — [[Caster DPS]]
   Warlock Tier 5 chest redeemed from Chestguard of the Vanquished Champion. The catalog records this as a Serpentshrine Cavern / Lady Vashj drop under the Tier 4 "Voidheart" name; the T5 chest token comes from Kael'thas, so both the boss and the set name on that entry need auditing.
-- **The Nexus-Key** (Boss) — [[Caster DPS]]
-- **Rod of the Sun King** (Boss) — [[Physical DPS]]
-- **Twinblade of the Phoenix** (Boss) — [[Physical DPS]]
-- **Band of the Ranger-General** (Boss) — [[Physical DPS]]
-- **Gauntlets of the Sun King** (Boss) — [[Caster DPS]]
-- **Leggings of Murderous Intent** (Boss) — [[Physical DPS]]
-- **Sunhawk Leggings** (Boss) — [[Caster DPS]]
-- **Thalassian Wildercloak** (Boss) — [[Caster DPS]]
-- **Royal Cloak of the Sunstriders** (Boss) — [[Caster DPS]]
-- **Sunshower Light Cloak** (Boss) — [[Healer]]
 - **Warp Slicer** (Boss) — [[Physical DPS]]
   One of the seven Sunstrider weapons; Kael'thas drops one of the set per kill. The item catalog records it as a Void Reaver drop, which needs correcting.
 - **Cosmic Infuser** (Boss) — [[Healer]]
@@ -82,9 +108,6 @@ A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2. Phase 1
 - **The Sun King's Talisman** (Quest Reward) — [[Caster DPS]]
   Alternative choice from 'Kael'thas and the Verdant Sphere'.
 - **The Darkener's Grasp** (Quest Reward)
-- **Crown of the Sun** (Boss) — [[Caster DPS]]
-- **Ashes of Al'ar** (Boss) _(not in item catalog — [[Needs Verification]])_
-  Flying mount with a drop rate around 1-2%. Not in the item catalog.
 
 
 

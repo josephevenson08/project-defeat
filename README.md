@@ -53,11 +53,14 @@ behind every claim of its that quotes a number.
 - Result breakdown panel
 - Raids tab: all five Phase 1/2 raids, **a card per encounter with its own artwork**, and that
   encounter's drops behind a click on it — colour-coded by item quality where the drop exists in the
-  catalog. **Karazhan's tables are complete**: 147 drops across eleven encounters, read from Wowhead's
-  own drop data by `tools/ingest/ingest-raid-loot.mjs` rather than curated by hand, so every row
-  carries a real item id and the ingest re-runs. 135 of the 147 resolve to a catalogued item; the rest
-  are tier tokens, formulas, a schematic, a quest reward and the mount, each flagged as a real drop
-  with no stat block here. Thirteen of the twenty-four encounters have art so far (Karazhan bar
+  catalog. **All five raids' tables are complete**: 467 drops across twenty-four encounters, read from
+  Wowhead's own drop data by `tools/ingest/ingest-raid-loot.mjs` rather than curated by hand, so every
+  row carries a real item id and the ingest re-runs. 344 resolve to a catalogued item; the other 123
+  are 80 recipes, 30 tier tokens, and a handful of quest items and mounts — real drops that are not
+  equippable gear, each flagged and saying so rather than rendering as an item with nothing on it.
+  The merge is a **union**, because a boss's drop table cannot see the tier set pieces a token is
+  traded for, the quest rewards an encounter hands out, or Kael'thas's seven encounter weapons — 32
+  curated Tempest Keep rows a replace would have deleted. Thirteen of the twenty-four encounters have art so far (Karazhan bar
   Nightbane, Gruul's Lair, Magtheridon); the rest keep their card and simply have no picture, so a
   raid without art reads as unfinished rather than broken. Step-by-step attunement chains for
   Karazhan, Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
@@ -97,7 +100,7 @@ behind every claim of its that quotes a number.
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
 - Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,968 files, 3.4 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
   and each one opens on its own progression: a skill range, what you gather or craft in it, and the

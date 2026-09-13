@@ -20,14 +20,46 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
 - [[Physical DPS]] — Phase 2 is entirely about the Tainted Core relay; assign core runners in advance and do not improvise.
 - [[Healer]] — Phase 3 spore bat poison stacks on everyone; dispel priority is the tank, then core runners.
 
-## Notable drops (26)
+## Notable drops (36)
 
+- **Belt of One-Hundred Deaths** (Boss) — [[Physical DPS]]
+- **Cobra-Lash Boots** (Boss) — [[Physical DPS]]
+- **Coral Band of the Revived** (Boss) — [[Healer]]
+- **Fang of Vashj** (Boss) — [[Physical DPS]]
+- **Glorious Gauntlets of Crestfall** (Boss) — [[Healer]]
 - **Helm of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 helm token — Paladin, Priest, Warlock.
 - **Helm of the Vanquished Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 helm token — Warrior, Priest, Druid.
 - **Helm of the Vanquished Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 helm token — Hunter, Mage, Rogue, Shaman.
+- **Krakken-Heart Breastplate** (Boss) — [[Tank]]
+- **Lightfathom Scepter** (Boss) — [[Healer]]
+- **Nether Vortex** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Prism of Inner Calm** (Boss) — [[Healer]]
+- **Ring of Endless Coils** (Boss) — [[Tank]]
+- **Runetotem's Mantle** (Boss) — [[Healer]]
+- **Scroll of the Maelstrom** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Serpent Spine Longbow** (Boss) — [[Physical DPS]]
+- **Vestments of the Sea-Witch** (Boss) — [[Caster DPS]]
 - **Destroyer Greathelm** (Tier Token) — [[Physical DPS]]
   Warrior T5 helm, redeemed from Helm of the Vanquished Defender.
 - **Crystalforge Greathelm** (Tier Token) — [[Physical DPS]]
@@ -48,18 +80,6 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
   Rogue T5 helm, redeemed from Helm of the Vanquished Hero.
 - **Hood of the Corruptor** (Tier Token) — [[Caster DPS]]
   Warlock Tier 5 helm, redeemed from Helm of the Vanquished Champion.
-- **Fang of Vashj** (Boss) — [[Physical DPS]]
-- **Lightfathom Scepter** (Boss) — [[Healer]]
-- **Belt of One-Hundred Deaths** (Boss) — [[Physical DPS]]
-- **Glorious Gauntlets of Crestfall** (Boss) — [[Healer]]
-- **Cobra-Lash Boots** (Boss) — [[Physical DPS]]
-- **Ring of Endless Coils** (Boss) — [[Tank]]
-- **Coral Band of the Revived** (Boss) — [[Healer]]
-- **Vestments of the Sea-Witch** (Boss) — [[Caster DPS]]
-- **Serpent Spine Longbow** (Boss) — [[Physical DPS]]
-- **Prism of Inner Calm** (Boss) — [[Healer]]
-- **Krakken-Heart Breastplate** (Boss) — [[Tank]]
-- **Runetotem's Mantle** (Boss) — [[Healer]]
 - **Vashj's Vial Remnant** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
   Quest item for the Mount Hyjal attunement chain, which becomes relevant in Phase 3 rather than Phase 2.
 

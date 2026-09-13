@@ -20,14 +20,36 @@ Four separate targets, each on its own tank. Karathress absorbs the abilities of
 - [[Caster DPS]] — Caribdis is a caster-group kill and her heals must be interrupted on a rotation.
 - [[Physical DPS]] — Melee sit on Karathress but swap instantly to every Spitfire Totem that Tidalvess drops.
 
-## Notable drops (18)
+## Notable drops (26)
 
+- **Bloodsea Brigand's Vest** (Boss) — [[Physical DPS]]
+- **Fathom-Brooch of the Tidewalker** (Boss) — [[Healer]]
+- **Frayed Tether of the Drowned** (Boss) — [[Healer]]
 - **Leggings of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 leg token — Paladin, Priest, Warlock.
 - **Leggings of the Vanquished Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 leg token — Warrior, Priest, Druid.
 - **Leggings of the Vanquished Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 leg token — Hunter, Mage, Rogue, Shaman.
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Sextant of Unstable Currents** (Boss) — [[Caster DPS]]
+- **Soul-Strider Boots** (Boss) — [[Healer]]
+- **World Breaker** (Boss) — [[Physical DPS]]
 - **Destroyer Greaves** (Tier Token) — [[Physical DPS]]
   Warrior T5 legs, redeemed from Leggings of the Vanquished Defender.
 - **Destroyer Legguards** (Tier Token) — [[Tank]]
@@ -46,12 +68,6 @@ Four separate targets, each on its own tank. Karathress absorbs the abilities of
   Shaman T5 legs, redeemed from Leggings of the Vanquished Hero.
 - **Voidheart Leggings** (Tier Token) — [[Caster DPS]]
   Warlock Tier 5 legs redeemed from Leggings of the Vanquished Champion. The catalog records this under the Tier 4 "Voidheart" name; Warlock Tier 5 is the Corruptor Raiment set, so the catalog name needs auditing.
-- **Sextant of Unstable Currents** (Boss) — [[Caster DPS]]
-- **Bloodsea Brigand's Vest** (Boss) — [[Physical DPS]]
-- **Soul-Strider Boots** (Boss) — [[Healer]]
-- **World Breaker** (Boss) — [[Physical DPS]]
-- **Fathom-Brooch of the Tidewalker** (Boss) — [[Healer]]
-- **Frayed Tether of the Drowned** (Boss) — [[Healer]]
 
 
 

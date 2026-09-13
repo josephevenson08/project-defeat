@@ -20,29 +20,30 @@ Growth stacks every 30 seconds and permanently raises his damage and size, which
 - [[Physical DPS]] — Spread out permanently. Shatter damage scales with how many people are near you.
 - [[Healer]] — Growth makes every tank hit bigger than the last; the fight has no plateau, it only gets worse.
 
-## Notable drops (16)
+## Notable drops (17)
 
-- **Earthen Signet** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
-  Quest item for 'The Cudgel of Kar'desh'. Half of the Serpentshrine Cavern attunement, and the main reason Phase 2 raids still clear Gruul's Lair.
+- **Aldori Legacy Defender** (Boss) — [[Tank]]
+- **Axe of the Gronn Lords** (Boss) — [[Physical DPS]]
+- **Bloodmaw Magus-Blade** (Boss) — [[Caster DPS]]
+- **Collar of Cho'gall** (Boss) — [[Caster DPS]]
+- **Cowl of Nature's Breath** (Boss) — [[Caster DPS]]
 - **Dragonspine Trophy** (Boss) — [[Physical DPS]]
   Holds Phase 2 best-in-slot status for most physical DPS specs — this T4 trinket outlives most of T5.
-- **Aldori Legacy Defender** (Boss) — [[Tank]]
+- **Eye of Gruul** (Boss) — [[Healer]]
+- **Gauntlets of Martial Perfection** (Boss) — [[Physical DPS]]
+- **Gauntlets of the Dragonslayer** (Boss) — [[Tank]]
+- **Gronn-Stitched Girdle** (Boss) — [[Physical DPS]]
 - **Leggings of the Fallen Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 leg token — Paladin, Priest, Warlock.
 - **Leggings of the Fallen Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 leg token — Warrior, Priest, Druid.
 - **Leggings of the Fallen Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 leg token — Hunter, Mage, Rogue, Shaman.
+- **Shuriken of Negation** (Boss)
 - **Teeth of Gruul** (Boss) — [[Physical DPS]]
-- **Eye of Gruul** (Boss) — [[Healer]]
-- **Axe of the Gronn Lords** (Boss) — [[Physical DPS]]
-- **Bloodmaw Magus-Blade** (Boss) — [[Caster DPS]]
-- **Collar of Cho'gall** (Boss) — [[Caster DPS]]
-- **Cowl of Nature's Breath** (Boss) — [[Caster DPS]]
-- **Gauntlets of Martial Perfection** (Boss) — [[Physical DPS]]
-- **Gauntlets of the Dragonslayer** (Boss) — [[Tank]]
 - **Windshear Boots** (Boss) — [[Physical DPS]]
-- **Gronn-Stitched Girdle** (Boss) — [[Physical DPS]]
+- **Earthen Signet** (Quest Reward) _(not in item catalog — [[Needs Verification]])_
+  Quest item for 'The Cudgel of Kar'desh'. Half of the Serpentshrine Cavern attunement, and the main reason Phase 2 raids still clear Gruul's Lair.
 
 
 

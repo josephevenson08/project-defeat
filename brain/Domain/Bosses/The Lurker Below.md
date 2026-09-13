@@ -19,21 +19,29 @@ Summoned by fishing the strange pool in the middle of the platform ring, which n
 - [[Tank]] — Three tanks: one on the boss, two on the add packs during each submerge phase.
 - [[Physical DPS]] — Melee must keep someone in range at all times or Water Bolt goes out on the raid.
 
-## Notable drops (13)
+## Notable drops (17)
 
-- **Earring of Soulful Meditation** (Boss) — [[Healer]]
-- **Choker of Animalistic Fury** (Boss) — [[Physical DPS]]
 - **Ancestral Ring of Conquest** (Boss) — [[Healer]]
-- **The Seal of Danzalar** (Boss) — [[Tank]]
-- **Bracers of Eradication** (Boss) — [[Physical DPS]]
-- **Grove-Bands of Remulos** (Boss) — [[Healer]]
-- **Velvet Boots of the Guardian** (Boss) — [[Caster DPS]]
-- **Mallet of the Tides** (Boss) — [[Healer]]
-- **Libram of Absolute Truth** (Boss) — [[Healer]]
-- **Glowing Breastplate of Truth** (Boss) — [[Healer]]
-- **Tempest-Strider Boots** (Boss) — [[Caster DPS]]
 - **Boots of Effortless Striking** (Boss) — [[Physical DPS]]
+- **Bracers of Eradication** (Boss) — [[Physical DPS]]
+- **Choker of Animalistic Fury** (Boss) — [[Physical DPS]]
 - **Cord of Screaming Terrors** (Boss) — [[Caster DPS]]
+- **Earring of Soulful Meditation** (Boss) — [[Healer]]
+- **Glowing Breastplate of Truth** (Boss) — [[Healer]]
+- **Grove-Bands of Remulos** (Boss) — [[Healer]]
+- **Libram of Absolute Truth** (Boss) — [[Healer]]
+- **Mallet of the Tides** (Boss) — [[Healer]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Tempest-Strider Boots** (Boss) — [[Caster DPS]]
+- **The Seal of Danzalar** (Boss) — [[Tank]]
+- **Velvet Boots of the Guardian** (Boss) — [[Caster DPS]]
 
 
 

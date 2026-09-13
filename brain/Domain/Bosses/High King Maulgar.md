@@ -22,8 +22,12 @@ A five-target pull: Maulgar plus four ogre lieutenants, each of which needs its 
 
 ## Notable drops (13)
 
+- **Belt of Divine Inspiration** (Boss) — [[Healer]]
 - **Bladespire Warbands** (Boss) — [[Physical DPS]]
 - **Brute Cloak of the Ogre-Magi** (Boss) — [[Caster DPS]]
+- **Hammer of the Naaru** (Boss) — [[Healer]]
+- **Malefic Mask of the Shadows** (Boss) — [[Physical DPS]]
+- **Maulgar's Warhelm** (Boss) — [[Physical DPS]]
 - **Pauldrons of the Fallen Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T4 shoulder token — Paladin, Priest, Warlock.
 - **Pauldrons of the Fallen Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
@@ -38,10 +42,6 @@ A five-target pull: Maulgar plus four ogre lieutenants, each of which needs its 
   Druid T4 shoulders, redeemed from Pauldrons of the Fallen Defender.
 - **Voidheart Mantle** (Tier Token) — [[Caster DPS]]
   Warlock T4 shoulders, redeemed from Pauldrons of the Fallen Champion.
-- **Belt of Divine Inspiration** (Boss) — [[Healer]]
-- **Malefic Mask of the Shadows** (Boss) — [[Physical DPS]]
-- **Maulgar's Warhelm** (Boss) — [[Physical DPS]]
-- **Hammer of the Naaru** (Boss) — [[Healer]]
 
 
 

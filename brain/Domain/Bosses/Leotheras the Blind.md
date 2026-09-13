@@ -20,14 +20,37 @@ Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes th
 - [[Caster DPS]] — Kill your own Inner Demon fast — nobody else can help, and a survivor mind-controls you for the rest of the fight.
 - [[Physical DPS]] — Stop damage entirely during Whirlwind; the threat wipe afterwards kills whoever pushed through it.
 
-## Notable drops (16)
+## Notable drops (24)
 
+- **Coral-Barbed Shoulderpads** (Boss) — [[Physical DPS]]
+- **Fang of the Leviathan** (Boss) — [[Physical DPS]]
+- **Girdle of the Invulnerable** (Boss) — [[Tank]]
 - **Gloves of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 gloves token — Paladin, Priest, Warlock.
 - **Gloves of the Vanquished Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 gloves token — Warrior, Priest, Druid.
 - **Gloves of the Vanquished Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 gloves token — Hunter, Mage, Rogue, Shaman.
+- **Orca-Hide Boots** (Boss) — [[Physical DPS]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **True-Aim Stalker Bands** (Boss) — [[Physical DPS]]
+- **Tsunami Talisman** (Boss) — [[Physical DPS]]
+  One of the strongest Phase 2 physical DPS trinkets.
 - **Destroyer Gauntlets** (Tier Token) — [[Physical DPS]]
   Warrior T5 gloves, redeemed from Gloves of the Vanquished Defender.
 - **Crystalforge Handguards** (Tier Token) — [[Healer]]
@@ -42,13 +65,6 @@ Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes th
   Rogue T5 gloves, redeemed from Gloves of the Vanquished Hero.
 - **Cataclysm Gauntlets** (Tier Token) — [[Physical DPS]], [[Caster DPS]], [[Healer]]
   Shaman T5 gloves, redeemed from Gloves of the Vanquished Hero.
-- **Tsunami Talisman** (Boss) — [[Physical DPS]]
-  One of the strongest Phase 2 physical DPS trinkets.
-- **Fang of the Leviathan** (Boss) — [[Physical DPS]]
-- **True-Aim Stalker Bands** (Boss) — [[Physical DPS]]
-- **Orca-Hide Boots** (Boss) — [[Physical DPS]]
-- **Girdle of the Invulnerable** (Boss) — [[Tank]]
-- **Coral-Barbed Shoulderpads** (Boss) — [[Physical DPS]]
 
 
 

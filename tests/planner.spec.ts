@@ -3310,17 +3310,68 @@ test('every raid loot entry that names a catalogued item is linked to it', () =>
   expect(unlinked, 'these loot entries name a catalogued item but carry no itemId').toEqual([])
   expect(staleNotes, 'these are linked but still say they are not in the catalogue').toEqual([])
 
-  // The entries that remain unresolved should be the ones that genuinely are not gear — mounts,
-  // enchanting formulas and tier tokens. A floor rather than an exact count, because supplementing
-  // the catalogue should lower it.
   const stillUnresolved = sampleRaids.flatMap((raid) => {
     const bosses = sampleRaidBosses.filter((boss) => boss.raidId === raid.id)
     return [...bosses.flatMap((boss) => boss.loot), ...(raid.notableTrashLoot ?? [])].filter((entry) => !entry.itemId)
   })
-  expect(stillUnresolved.length).toBeLessThan(60)
+
+  /*
+   * **What the unresolved entries are, rather than how many there are.**
+   *
+   * This was `toBeLessThan(60)` and it broke the day the loot tables were completed from Wowhead's
+   * real drop data — 272 rows became 467, and the unresolved tail grew with them to 123. The ceiling
+   * was measuring the size of the dataset, not its health, so it failed on an improvement.
+   *
+   * The thing actually worth protecting is that nothing *equippable* goes unlinked: the gear
+   * catalogue holds gear, so a piece of gear with no `itemId` means a real join failure, while a
+   * recipe or a tier token having none is simply what those are. Classifying each one says that
+   * directly and keeps saying it however far the tables grow.
+   */
+  const RECIPE = /^(Formula|Pattern|Plans|Schematic|Design|Recipe):/
+  const TIER_TOKEN = /of the (Fallen|Vanquished) (Champion|Defender|Hero|Protector|Conqueror)$/
+  /** Quest items, crafting reagents and mounts an encounter hands out. None of these is gear. */
+  const NOT_GEAR = new Set([
+    'Blazing Signet',
+    'Earthen Signet',
+    "Magtheridon's Head",
+    "Pit Lord's Satchel",
+    'Nether Vortex',
+    'Scroll of the Maelstrom',
+    "Vashj's Vial Remnant",
+    'Ashes of Al’ar',
+    "Ashes of Al'ar",
+    'Scroll of the Sun',
+    'Verdant Sphere',
+    "Fiery Warhorse's Reins",
+  ])
+
+  const unexplained = stillUnresolved
+    .filter((entry) => !RECIPE.test(entry.name) && !TIER_TOKEN.test(entry.name) && !NOT_GEAR.has(entry.name))
+    .map((entry) => entry.name)
+  expect(
+    [...new Set(unexplained)],
+    'an unlinked loot row must be a recipe, a tier token, or a named non-gear item — anything else is a real join failure',
+  ).toEqual([])
+
+  // And every one still has to say why it has no stats, because a blank stat line otherwise reads
+  // as "this item has none".
   for (const entry of stillUnresolved) {
     expect(entry.notes, `"${entry.name}" is unresolved and should say why`).toBeTruthy()
   }
+
+  /*
+   * The falsification: this would pass just as well over an empty list. The tables are complete now,
+   * so the resolved majority is the number worth pinning as a floor.
+   */
+  const allRows = sampleRaids.flatMap((raid) => {
+    const bosses = sampleRaidBosses.filter((boss) => boss.raidId === raid.id)
+    return [...bosses.flatMap((boss) => boss.loot), ...(raid.notableTrashLoot ?? [])]
+  })
+  expect(allRows.length, 'every raid loot table is the full one, not a curated sample').toBeGreaterThan(450)
+  expect(
+    allRows.filter((entry) => entry.itemId).length,
+    'and most rows resolve to a catalogued item',
+  ).toBeGreaterThan(330)
 })
 
 test('all nine classes have three ingested talent trees, and every icon is vendored', () => {

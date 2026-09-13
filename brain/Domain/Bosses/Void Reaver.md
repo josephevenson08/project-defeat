@@ -20,14 +20,37 @@ Mechanically the simplest boss in Tier 5 and famous for gearing raids fast. Knoc
 - [[Caster DPS]] — Stay at least 18 yards out and side-step Arcane Orbs; a silence at the wrong moment is the usual cause of deaths.
 - [[Healer]] — Pounding is predictable raid damage on melee — pre-cast into it rather than reacting.
 
-## Notable drops (20)
+## Notable drops (28)
 
+- **Cowl of the Grand Engineer** (Boss) — [[Caster DPS]]
+- **Fel Reaver's Piston** (Boss) — [[Physical DPS]]
+- **Fel-Steel Warhelm** (Boss) — [[Tank]]
+- **Girdle of Zaetar** (Boss) — [[Healer]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
 - **Pauldrons of the Vanquished Champion** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 shoulder token — Paladin, Priest, Warlock.
 - **Pauldrons of the Vanquished Defender** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 shoulder token — Warrior, Priest, Druid.
 - **Pauldrons of the Vanquished Hero** (Tier Token) _(not in item catalog — [[Needs Verification]])_
   T5 shoulder token — Hunter, Mage, Rogue, Shaman.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Void Reaver Greaves** (Boss) — [[Physical DPS]]
+- **Warp-Spring Coil** (Boss) — [[Physical DPS]]
+- **Wristguards of Determination** (Boss) — [[Tank]]
 - **Destroyer Shoulderblades** (Tier Token) — [[Physical DPS]]
   Warrior T5 shoulders, redeemed from Pauldrons of the Vanquished Defender.
 - **Destroyer Shoulderguards** (Tier Token) — [[Tank]]
@@ -48,13 +71,6 @@ Mechanically the simplest boss in Tier 5 and famous for gearing raids fast. Knoc
   Rogue T5 shoulders, redeemed from Pauldrons of the Vanquished Hero.
 - **Cataclysm Shoulderplates** (Tier Token) — [[Physical DPS]], [[Caster DPS]], [[Healer]]
   Shaman T5 shoulders, redeemed from Pauldrons of the Vanquished Hero.
-- **Warp-Spring Coil** (Boss) — [[Physical DPS]]
-- **Cowl of the Grand Engineer** (Boss) — [[Caster DPS]]
-- **Wristguards of Determination** (Boss) — [[Tank]]
-- **Fel Reaver's Piston** (Boss) — [[Physical DPS]]
-- **Girdle of Zaetar** (Boss) — [[Healer]]
-- **Void Reaver Greaves** (Boss) — [[Physical DPS]]
-- **Fel-Steel Warhelm** (Boss) — [[Tank]]
 
 
 

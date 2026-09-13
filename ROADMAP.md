@@ -427,12 +427,23 @@ look like, which is exactly why it was uniformly plausible. Plausibility is not 
 ## Raid Reference Data
 
 A separate raids domain (`src/domain/raids/`) covers all five Phase 1/2 raids — Karazhan, Gruul's Lair,
-Magtheridon's Lair, Serpentshrine Cavern, and Tempest Keep — boss by boss, with notable drops linked to
-the item catalog where the item exists, and full ordered attunement chains for Karazhan, SSC and
-Tempest Keep. Those are the three raids that have one: Gruul's Lair and Magtheridon's Lair open to any
-level 70 raid, and the absence of the tab is how the app says so. Surfaced in its own Raids tab. Drops
-that are real but not yet catalogued are listed by name and flagged `needsVerification` rather than
-given an invented item id.
+Magtheridon's Lair, Serpentshrine Cavern, and Tempest Keep — boss by boss, with drops linked to the
+item catalog where the item exists, and full ordered attunement chains for Karazhan, SSC and Tempest
+Keep. Those are the three raids that have one: Gruul's Lair and Magtheridon's Lair open to any level
+70 raid, and the absence of the tab is how the app says so. Surfaced in its own Raids tab. Drops that
+are real but not catalogued are listed by name and flagged `needsVerification` rather than given an
+invented item id.
+
+**The tables are complete as of 2026-09-13** — 467 drops across twenty-four encounters, against 272
+hand-curated ones before. `tools/ingest/ingest-raid-loot.mjs` reads the JSON array Wowhead renders its
+own drop tables from, and `apply-raid-loot.mts` merges it in as a **union** rather than a replace: a
+boss's drop table cannot see the tier set pieces its token is traded for, the quest rewards it hands
+out, or Kael'thas's seven encounter weapons, and replacing would have deleted 32 curated rows from
+Tempest Keep alone.
+
+The ingest asserts each NPC's **zone** before trusting its loot, which is not ceremony: Kael'thas has
+a second entry in Sunwell Plateau whose table is *larger*, so picking by drop count would have filled
+Tempest Keep with Phase 5 gear, and a name search for Al'ar returns Void Reaver first.
 
 The domain also holds boss mechanics and per-role callouts, and the Raids tab **does not render
 them** — the loot-only rework took that out deliberately, because the tab answers "what drops here"

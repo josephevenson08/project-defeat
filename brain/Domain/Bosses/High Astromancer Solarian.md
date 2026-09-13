@@ -19,22 +19,38 @@ Three phases on a fixed timer. In Phase 1 she has no threat table and fires Arca
 - [[Tank]] — Fear in the final phase will drag you into the room; keep Fear Ward or a Tremor Totem covering you.
 - [[Caster DPS]] — Wrath of the Astromancer means run out, immediately, every time — the knockback wipes clumped raids.
 
-## Notable drops (13)
+## Notable drops (21)
 
-- **Wand of the Forgotten Star** (Boss) — [[Caster DPS]]
-- **Heartrazor** (Boss) — [[Physical DPS]]
-- **Trousers of the Astromancer** (Boss) — [[Caster DPS]]
-- **Worldstorm Gauntlets** (Boss) — [[Physical DPS]]
 - **Boots of the Resilient** (Boss) — [[Healer]]
+- **Ethereum Life-Staff** (Boss) — [[Healer]]
+- **Girdle of the Righteous Path** (Boss) — [[Healer]]
+- **Greaves of the Bloodwarder** (Boss) — [[Tank]]
+- **Heartrazor** (Boss) — [[Physical DPS]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Solarian's Sapphire** (Boss) — [[Healer]]
+- **Star-Soul Breeches** (Boss) — [[Healer]]
+- **Star-Strider Boots** (Boss) — [[Physical DPS]]
+- **Trousers of the Astromancer** (Boss) — [[Caster DPS]]
 - **Vambraces of Ending** (Boss) — [[Physical DPS]]
   Sources place this on High Astromancer Solarian as item 29966, but the item catalog records it as a Phase 1 Karazhan drop with wowItemId 28514. The catalog entry needs correcting.
 - **Void Star Talisman** (Boss) — [[Caster DPS]]
-- **Solarian's Sapphire** (Boss) — [[Healer]]
-- **Ethereum Life-Staff** (Boss) — [[Healer]]
-- **Star-Soul Breeches** (Boss) — [[Healer]]
-- **Star-Strider Boots** (Boss) — [[Physical DPS]]
-- **Greaves of the Bloodwarder** (Boss) — [[Tank]]
-- **Girdle of the Righteous Path** (Boss) — [[Healer]]
+- **Wand of the Forgotten Star** (Boss) — [[Caster DPS]]
+- **Worldstorm Gauntlets** (Boss) — [[Physical DPS]]
 
 
 

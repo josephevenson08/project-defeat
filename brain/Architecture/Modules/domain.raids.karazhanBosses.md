@@ -13,7 +13,7 @@ tags: [brain/architecture, layer/domain]
 
 From the top of the file:
 
-> Karazhan, complete — 147 drops across eleven encounters.
+> Karazhan, complete — 147 drops across eleven encounters, plus the raid's notable trash.
 > 
 > **This file used to say it listed "only the drops that still matter to a Phase 2 raider".** It held
 > 45 rows, which was a defensible trim while Karazhan was old content nobody opened in this app, and

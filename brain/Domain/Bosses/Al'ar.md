@@ -19,22 +19,39 @@ Phase 1 has Al'ar cycling clockwise between four platforms every 30 seconds, dro
 - [[Tank]] — Four platform tanks in Phase 1, then a two-tank Melt Armor swap in Phase 2.
 - [[Physical DPS]] — Melee handle the Phoenix Hawks in Phase 1; someone must stay in melee range or Flame Buffet hits the raid.
 
-## Notable drops (12)
+## Notable drops (21)
 
-- **Phoenix-Wing Cloak** (Boss) — [[Physical DPS]]
-- **Phoenix-Ring of Rebirth** (Boss) — [[Healer]]
-- **Band of Al'ar** (Boss) — [[Caster DPS]]
-- **Tome of Fiery Redemption** (Boss) — [[Caster DPS]]
-- **Gloves of the Searing Grip** (Boss) — [[Caster DPS]]
-- **Mindstorm Wristbands** (Boss) — [[Caster DPS]]
-- **Claw of the Phoenix** (Boss) — [[Physical DPS]]
-- **Talon of the Phoenix** (Boss) — [[Physical DPS]]
-  Sources place this on Al'ar, but the item catalog records it as a Kael'thas Sunstrider drop with wowItemId 32944. Both the boss and the item id on the catalog entry need re-checking.
 - **Arcanite Steam-Pistol** (Boss) — [[Physical DPS]]
   Sources place this on Al'ar in The Eye, but the item catalog records it as a Serpentshrine Cavern drop. The catalog entry needs correcting.
-- **Talon of Al'ar** (Boss) — [[Caster DPS]]
+- **Band of Al'ar** (Boss) — [[Caster DPS]]
+- **Claw of the Phoenix** (Boss) — [[Physical DPS]]
 - **Fire Crest Breastplate** (Boss) — [[Physical DPS]]
+- **Gloves of the Searing Grip** (Boss) — [[Caster DPS]]
+- **Mindstorm Wristbands** (Boss) — [[Caster DPS]]
 - **Netherbane** (Boss) — [[Tank]]
+- **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of Natural Power** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Black Eagle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Belt of the Long Road** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Pattern: Monsoon Belt** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Phoenix-Ring of Rebirth** (Boss) — [[Healer]]
+- **Phoenix-Wing Cloak** (Boss) — [[Physical DPS]]
+- **Plans: Belt of the Guardian** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Plans: Red Belt of Battle** (Boss) _(not in item catalog — [[Needs Verification]])_
+  Real drop; not in the item catalogue, so it is listed by name only.
+- **Talisman of the Sun King** (Boss)
+- **Talon of Al'ar** (Boss) — [[Caster DPS]]
+- **Talon of the Phoenix** (Boss) — [[Physical DPS]]
+  Sources place this on Al'ar, but the item catalog records it as a Kael'thas Sunstrider drop with wowItemId 32944. Both the boss and the item id on the catalog entry need re-checking.
+- **Tome of Fiery Redemption** (Boss) — [[Caster DPS]]
 
 
 

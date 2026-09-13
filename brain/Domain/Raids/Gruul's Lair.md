@@ -28,7 +28,7 @@ None. Any level 70 can walk in.
 ## Bosses (2)
 
 - [[High King Maulgar]] — encounter 1 · 13 notable drops
-- [[Gruul the Dragonkiller]] — encounter 2 · 16 notable drops
+- [[Gruul the Dragonkiller]] — encounter 2 · 17 notable drops
 
 
 
