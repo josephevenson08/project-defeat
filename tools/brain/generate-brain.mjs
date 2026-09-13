@@ -587,7 +587,7 @@ const PHASES = [
     number: 5,
     title: 'Phase 5 - Planner Workflows',
     status: 'partial',
-    summary: 'Upgrade planning, build save/load, import/export and source planning all work. Comparison and cost planning do not.',
+    summary: 'Upgrade planning, build save/load, import/export and source-and-cost planning all work. Side-by-side comparison does not.',
     done: [
       'Upgrade finder: per-slot candidate scan scored against the live sim',
       'Build serialization foundation (types + encode/decode)',
@@ -601,7 +601,6 @@ const PHASES = [
     remaining: [
       'Cloud/shareable builds — slots are browser-local, so they do not follow you to another machine',
       'Side-by-side gear comparison',
-      'Cost planning — 167 of the 181 crafted rows name a profession and not a price, and nothing prices a badge, an arena point or a reputation grind',
       'Better responsive/mobile layout',
       'The ranked-gear panel is still 9.4 screens on its own — sub-tabs fixed navigation, not that panel\'s length',
     ],

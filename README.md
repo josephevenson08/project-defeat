@@ -70,8 +70,10 @@ behind every claim of its that quotes a number.
   profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
   can say, and 719 of the 1,427 rows name an encounter. This is a join across the guides' own Source
   column, the raid loot tables and the item catalogue rather than a new dataset — and it stops at
-  *where*: reagent lists exist for 14 crafted items, and nothing prices a badge, an arena point or a
-  reputation grind, so the cost half of "source and cost planning" is still open
+  *where*. **The cost half landed 2026-09-13**: 117 of the 119 crafted and bought picks now carry a
+  price — reagents from Wowhead's `created-by-spell` data, vendor prices from `sold-by`, so a robe
+  reads "15x Primal Fire" and a trinket reads "41x Badge of Justice" on the row that recommends it.
+  The two that do not are the Violet Signet rings, which no vendor sells
 - Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
   27 specs, with the current character's spec marked on every list it appears on. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.

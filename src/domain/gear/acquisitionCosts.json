@@ -1,0 +1,2718 @@
+{
+  "fetchedAt": "2026-09-13",
+  "source": "wowhead.com/tbc",
+  "costs": [
+    {
+      "wowItemId": 29172,
+      "name": "Ashyen's Gift",
+      "type": "Vendor",
+      "vendor": "Fedryen Swiftspear",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 63
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29172"
+    },
+    {
+      "wowItemId": 30038,
+      "name": "Belt of Blasting",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21842,
+          "name": "Bolt of Imbued Netherweave",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 15
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30038"
+    },
+    {
+      "wowItemId": 30040,
+      "name": "Belt of Deep Shadow",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 10
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30040"
+    },
+    {
+      "wowItemId": 30046,
+      "name": "Belt of the Black Eagle",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 29547,
+          "name": "Wind Scales",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30046"
+    },
+    {
+      "wowItemId": 30034,
+      "name": "Belt of the Guardian",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 22452,
+          "name": "Primal Earth",
+          "quantity": 5
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30034"
+    },
+    {
+      "wowItemId": 30036,
+      "name": "Belt of the Long Road",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21842,
+          "name": "Bolt of Imbued Netherweave",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 10
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30036"
+    },
+    {
+      "wowItemId": 29183,
+      "name": "Bindings of the Timewalker",
+      "type": "Vendor",
+      "vendor": "Alurmi",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 37
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29183"
+    },
+    {
+      "wowItemId": 23539,
+      "name": "Blessed Bracers",
+      "type": "Crafted",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 15
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=23539"
+    },
+    {
+      "wowItemId": 29382,
+      "name": "Blood Knight War Cloak",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29382"
+    },
+    {
+      "wowItemId": 29383,
+      "name": "Bloodlust Brooch",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 41,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29383"
+    },
+    {
+      "wowItemId": 30037,
+      "name": "Boots of Blasting",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30037"
+    },
+    {
+      "wowItemId": 30041,
+      "name": "Boots of Natural Grace",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30041"
+    },
+    {
+      "wowItemId": 30035,
+      "name": "Boots of the Long Road",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21845,
+          "name": "Primal Mooncloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30035"
+    },
+    {
+      "wowItemId": 30033,
+      "name": "Boots of the Protector",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 12
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30033"
+    },
+    {
+      "wowItemId": 30039,
+      "name": "Boots of Utter Darkness",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30039"
+    },
+    {
+      "wowItemId": 24250,
+      "name": "Bracers of Havok",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 21842,
+          "name": "Bolt of Imbued Netherweave",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 22452,
+          "name": "Primal Earth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24250"
+    },
+    {
+      "wowItemId": 23538,
+      "name": "Bracers of the Green Fortress",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 20
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=23538"
+    },
+    {
+      "wowItemId": 24114,
+      "name": "Braided Eternium Chain",
+      "type": "Crafted",
+      "profession": "Jewelcrafting",
+      "requiredSkill": 360,
+      "reagents": [
+        {
+          "wowItemId": 23447,
+          "name": "Eternium Bar",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 31079,
+          "name": "Mercurial Adamantite",
+          "quantity": 3
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24114"
+    },
+    {
+      "wowItemId": 28485,
+      "name": "Bulwark of the Ancient Kings",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28484,
+          "name": "Bulwark of Kings",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28485"
+    },
+    {
+      "wowItemId": 24121,
+      "name": "Chain of the Twilight Owl",
+      "type": "Crafted",
+      "profession": "Jewelcrafting",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 23449,
+          "name": "Khorium Bar",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 31079,
+          "name": "Mercurial Adamantite",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23117,
+          "name": "Azure Moonstone",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24121"
+    },
+    {
+      "wowItemId": 29381,
+      "name": "Choker of Vile Intent",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29381"
+    },
+    {
+      "wowItemId": 29503,
+      "name": "Cobrascale Gloves",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 29539,
+          "name": "Cobra Scales",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29503"
+    },
+    {
+      "wowItemId": 29176,
+      "name": "Crest of the Sha'tar",
+      "type": "Vendor",
+      "vendor": "Almaador",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 114
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29176"
+    },
+    {
+      "wowItemId": 32494,
+      "name": "Destruction Holo-gogs",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23438,
+          "name": "Star of Elune",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32494"
+    },
+    {
+      "wowItemId": 28438,
+      "name": "Dragonmaw",
+      "type": "Crafted",
+      "profession": "Master Hammersmith Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28437,
+          "name": "Drakefist Hammer",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28438"
+    },
+    {
+      "wowItemId": 28439,
+      "name": "Dragonstrike",
+      "type": "Crafted",
+      "profession": "Master Hammersmith Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28438,
+          "name": "Dragonmaw",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 5
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28439"
+    },
+    {
+      "wowItemId": 29516,
+      "name": "Ebon Netherscale Belt",
+      "type": "Crafted",
+      "profession": "Dragonscale Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 29548,
+          "name": "Nether Dragonscales",
+          "quantity": 24
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29516"
+    },
+    {
+      "wowItemId": 29376,
+      "name": "Essence of the Martyr",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 41,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29376"
+    },
+    {
+      "wowItemId": 29390,
+      "name": "Everbloom Idol",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 15,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29390"
+    },
+    {
+      "wowItemId": 24116,
+      "name": "Eye of the Night",
+      "type": "Crafted",
+      "profession": "Jewelcrafting",
+      "requiredSkill": 360,
+      "reagents": [
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 31079,
+          "name": "Mercurial Adamantite",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23441,
+          "name": "Nightseye",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24116"
+    },
+    {
+      "wowItemId": 32083,
+      "name": "Faceguard of Determination",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 50,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32083"
+    },
+    {
+      "wowItemId": 25686,
+      "name": "Fel Leather Boots",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 25707,
+          "name": "Fel Hide",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 3
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=25686"
+    },
+    {
+      "wowItemId": 25685,
+      "name": "Fel Leather Gloves",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 340,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 25707,
+          "name": "Fel Hide",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 22456,
+          "name": "Primal Shadow",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 3
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=25685"
+    },
+    {
+      "wowItemId": 25697,
+      "name": "Felstalker Bracers",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 360,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 25707,
+          "name": "Fel Hide",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 25699,
+          "name": "Crystal Infused Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=25697"
+    },
+    {
+      "wowItemId": 29270,
+      "name": "Flametongue Seal",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29270"
+    },
+    {
+      "wowItemId": 21870,
+      "name": "Frozen Shadoweave Boots",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21870"
+    },
+    {
+      "wowItemId": 21871,
+      "name": "Frozen Shadoweave Robe",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 14
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21871"
+    },
+    {
+      "wowItemId": 21869,
+      "name": "Frozen Shadoweave Shoulders",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 355,
+      "reagents": [
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21869"
+    },
+    {
+      "wowItemId": 32461,
+      "name": "Furious Gizmatic Goggles",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23436,
+          "name": "Living Ruby",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32461"
+    },
+    {
+      "wowItemId": 32476,
+      "name": "Gadgetstorm Goggles",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23436,
+          "name": "Living Ruby",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32476"
+    },
+    {
+      "wowItemId": 28411,
+      "name": "General's Silk Cuffs",
+      "type": "Vendor",
+      "vendor": "Lady Palanseer",
+      "price": [
+        {
+          "name": "Honor Points",
+          "quantity": 9785
+        },
+        {
+          "name": "Warsong Gulch Mark of Honor",
+          "quantity": 10,
+          "wowItemId": 20558
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28411"
+    },
+    {
+      "wowItemId": 24256,
+      "name": "Girdle of Ruination",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24256"
+    },
+    {
+      "wowItemId": 32450,
+      "name": "Gladiator's Gavel",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1030
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32450"
+    },
+    {
+      "wowItemId": 28476,
+      "name": "Gladiator's Maul",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1245
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28476"
+    },
+    {
+      "wowItemId": 32451,
+      "name": "Gladiator's Salvation",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1030
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32451"
+    },
+    {
+      "wowItemId": 28297,
+      "name": "Gladiator's Spellblade",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1030
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28297"
+    },
+    {
+      "wowItemId": 29387,
+      "name": "Gnomeregan Auto-Blocker 600",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 41,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29387"
+    },
+    {
+      "wowItemId": 23836,
+      "name": "Goblin Rocket Launcher",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 22452,
+          "name": "Primal Earth",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 16006,
+          "name": "Delicate Arcanite Converter",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=23836"
+    },
+    {
+      "wowItemId": 32756,
+      "name": "Gyro-Balanced Khorium Destroyer",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23449,
+          "name": "Khorium Bar",
+          "quantity": 20
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32756"
+    },
+    {
+      "wowItemId": 23556,
+      "name": "Hand of Eternity",
+      "type": "Crafted",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 23449,
+          "name": "Khorium Bar",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23447,
+          "name": "Eternium Bar",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=23556"
+    },
+    {
+      "wowItemId": 30043,
+      "name": "Hurricane Boots",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21885,
+          "name": "Primal Water",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 29547,
+          "name": "Wind Scales",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 14341,
+          "name": "Rune Thread",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30043"
+    },
+    {
+      "wowItemId": 29370,
+      "name": "Icon of the Silver Crescent",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 41,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29370"
+    },
+    {
+      "wowItemId": 20966,
+      "name": "Jade Pendant of Blasting",
+      "type": "Crafted",
+      "profession": "Jewelcrafting",
+      "requiredSkill": 160,
+      "reagents": [
+        {
+          "wowItemId": 1529,
+          "name": "Jade",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 20963,
+          "name": "Mithril Filigree",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=20966"
+    },
+    {
+      "wowItemId": 32472,
+      "name": "Justicebringer 2000 Specs",
+      "type": "Crafted",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23440,
+          "name": "Dawnstone",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32472"
+    },
+    {
+      "wowItemId": 29273,
+      "name": "Khadgar's Knapsack",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29273"
+    },
+    {
+      "wowItemId": 29388,
+      "name": "Libram of Repentance",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 15,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29388"
+    },
+    {
+      "wowItemId": 29267,
+      "name": "Light-Bearer's Faith Shield",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 33,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29267"
+    },
+    {
+      "wowItemId": 28430,
+      "name": "Lionheart Executioner",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28429,
+          "name": "Lionheart Champion",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 5
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28430"
+    },
+    {
+      "wowItemId": 32475,
+      "name": "Living Replicator Specs",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23439,
+          "name": "Noble Topaz",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32475"
+    },
+    {
+      "wowItemId": 30841,
+      "name": "Lower City Prayerbook",
+      "type": "Vendor",
+      "vendor": "Nakodu",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 15
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30841"
+    },
+    {
+      "wowItemId": 32480,
+      "name": "Magnified Moon Specs",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23437,
+          "name": "Talasite",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32480"
+    },
+    {
+      "wowItemId": 32089,
+      "name": "Mana-Binders Cowl",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 50,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32089"
+    },
+    {
+      "wowItemId": 29268,
+      "name": "Mazthoril Honor Shield",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 33,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29268"
+    },
+    {
+      "wowItemId": 32963,
+      "name": "Merciless Gladiator's Gavel",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 2610
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32963"
+    },
+    {
+      "wowItemId": 31988,
+      "name": "Merciless Gladiator's Kodohide Helm",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 900
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=31988"
+    },
+    {
+      "wowItemId": 32014,
+      "name": "Merciless Gladiator's Maul",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1550
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32014"
+    },
+    {
+      "wowItemId": 32027,
+      "name": "Merciless Gladiator's Quickblade",
+      "type": "Vendor",
+      "vendor": "Leeni \"Smiley\" Smalls",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 370
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32027"
+    },
+    {
+      "wowItemId": 33309,
+      "name": "Merciless Gladiator's Redoubt",
+      "type": "Vendor",
+      "vendor": "Vixton Pinchwhistle",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 900
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=33309"
+    },
+    {
+      "wowItemId": 32961,
+      "name": "Merciless Gladiator's Reprieve",
+      "type": "Vendor",
+      "vendor": "Leeni \"Smiley\" Smalls",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 370
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32961"
+    },
+    {
+      "wowItemId": 32964,
+      "name": "Merciless Gladiator's Salvation",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 2610
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32964"
+    },
+    {
+      "wowItemId": 32053,
+      "name": "Merciless Gladiator's Spellblade",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 2610
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32053"
+    },
+    {
+      "wowItemId": 32055,
+      "name": "Merciless Gladiator's War Staff",
+      "type": "Vendor",
+      "vendor": "Explodyne Fizzlespurt",
+      "price": [
+        {
+          "name": "Arena Points",
+          "quantity": 1550
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32055"
+    },
+    {
+      "wowItemId": 29374,
+      "name": "Necklace of Eternal Hope",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29374"
+    },
+    {
+      "wowItemId": 32508,
+      "name": "Necklace of the Deep",
+      "type": "Crafted",
+      "profession": "Jewelcrafting",
+      "requiredSkill": 340,
+      "reagents": [
+        {
+          "wowItemId": 22578,
+          "name": "Mote of Water",
+          "quantity": 3
+        },
+        {
+          "wowItemId": 24478,
+          "name": "Jaggal Pearl",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 24479,
+          "name": "Shadow Pearl",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32508"
+    },
+    {
+      "wowItemId": 29520,
+      "name": "Netherstrike Belt",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 29548,
+          "name": "Nether Dragonscales",
+          "quantity": 24
+        },
+        {
+          "wowItemId": 22457,
+          "name": "Primal Mana",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29520"
+    },
+    {
+      "wowItemId": 29521,
+      "name": "Netherstrike Bracers",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 29548,
+          "name": "Nether Dragonscales",
+          "quantity": 18
+        },
+        {
+          "wowItemId": 22457,
+          "name": "Primal Mana",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 8
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29521"
+    },
+    {
+      "wowItemId": 29519,
+      "name": "Netherstrike Breastplate",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 29548,
+          "name": "Nether Dragonscales",
+          "quantity": 30
+        },
+        {
+          "wowItemId": 22457,
+          "name": "Primal Mana",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29519"
+    },
+    {
+      "wowItemId": 29272,
+      "name": "Orb of the Soul-Eater",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29272"
+    },
+    {
+      "wowItemId": 32495,
+      "name": "Powerheal 4000 Lens",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23439,
+          "name": "Noble Topaz",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32495"
+    },
+    {
+      "wowItemId": 21873,
+      "name": "Primal Mooncloth Belt",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 355,
+      "reagents": [
+        {
+          "wowItemId": 21845,
+          "name": "Primal Mooncloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 8
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21873"
+    },
+    {
+      "wowItemId": 21875,
+      "name": "Primal Mooncloth Robe",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 21845,
+          "name": "Primal Mooncloth",
+          "quantity": 14
+        },
+        {
+          "wowItemId": 22457,
+          "name": "Primal Mana",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21875"
+    },
+    {
+      "wowItemId": 21874,
+      "name": "Primal Mooncloth Shoulders",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 21845,
+          "name": "Primal Mooncloth",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 8
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21874"
+    },
+    {
+      "wowItemId": 29526,
+      "name": "Primalstrike Belt",
+      "type": "Crafted",
+      "profession": "Elemental Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29526"
+    },
+    {
+      "wowItemId": 29527,
+      "name": "Primalstrike Bracers",
+      "type": "Crafted",
+      "profession": "Elemental Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 3
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29527"
+    },
+    {
+      "wowItemId": 29525,
+      "name": "Primalstrike Vest",
+      "type": "Crafted",
+      "profession": "Elemental Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29525"
+    },
+    {
+      "wowItemId": 30032,
+      "name": "Red Belt of Battle",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23573,
+          "name": "Hardened Adamantite Bar",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 10
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30032"
+    },
+    {
+      "wowItemId": 29269,
+      "name": "Sapphiron's Wing Bone",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29269"
+    },
+    {
+      "wowItemId": 29132,
+      "name": "Scryer's Bloodgem",
+      "type": "Vendor",
+      "vendor": "Quartermaster Enuril",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 15
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29132"
+    },
+    {
+      "wowItemId": 30834,
+      "name": "Shapeshifter's Signet",
+      "type": "Vendor",
+      "vendor": "Nakodu",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 17
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=30834"
+    },
+    {
+      "wowItemId": 32647,
+      "name": "Shard-bound Bracers",
+      "type": "Vendor",
+      "vendor": "Jho'nass",
+      "price": [
+        {
+          "name": "Apexis Crystal",
+          "quantity": 4,
+          "wowItemId": 32572
+        },
+        {
+          "name": "Apexis Shard",
+          "quantity": 100,
+          "wowItemId": 32569
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32647"
+    },
+    {
+      "wowItemId": 21846,
+      "name": "Spellfire Belt",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 355,
+      "reagents": [
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21846"
+    },
+    {
+      "wowItemId": 21847,
+      "name": "Spellfire Gloves",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21847"
+    },
+    {
+      "wowItemId": 21848,
+      "name": "Spellfire Robe",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 14
+        },
+        {
+          "wowItemId": 21884,
+          "name": "Primal Fire",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 21881,
+          "name": "Netherweb Spider Silk",
+          "quantity": 4
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=21848"
+    },
+    {
+      "wowItemId": 24266,
+      "name": "Spellstrike Hood",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24266"
+    },
+    {
+      "wowItemId": 24262,
+      "name": "Spellstrike Pants",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 24271,
+          "name": "Spellcloth",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24262"
+    },
+    {
+      "wowItemId": 32086,
+      "name": "Storm Master's Helmet",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 50,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32086"
+    },
+    {
+      "wowItemId": 28442,
+      "name": "Stormherald",
+      "type": "Crafted",
+      "profession": "Blacksmithing",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28441,
+          "name": "Deep Thunder",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 5
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28442"
+    },
+    {
+      "wowItemId": 32474,
+      "name": "Surestrike Goggles v2.0",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23441,
+          "name": "Nightseye",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32474"
+    },
+    {
+      "wowItemId": 29271,
+      "name": "Talisman of Kalecgos",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29271"
+    },
+    {
+      "wowItemId": 32473,
+      "name": "Tankatronic Goggles",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23437,
+          "name": "Talasite",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32473"
+    },
+    {
+      "wowItemId": 29274,
+      "name": "Tears of Heaven",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 25,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29274"
+    },
+    {
+      "wowItemId": 29184,
+      "name": "Timewarden's Leggings",
+      "type": "Vendor",
+      "vendor": "Alurmi",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 26
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29184"
+    },
+    {
+      "wowItemId": 29389,
+      "name": "Totem of the Pulsing Earth",
+      "type": "Vendor",
+      "vendor": "G'eras",
+      "price": [
+        {
+          "name": "Badge of Justice",
+          "quantity": 15,
+          "wowItemId": 29434
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29389"
+    },
+    {
+      "wowItemId": 24259,
+      "name": "Vengeance Wrap",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 365,
+      "reagents": [
+        {
+          "wowItemId": 24272,
+          "name": "Shadowcloth",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 14
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24259"
+    },
+    {
+      "wowItemId": 32980,
+      "name": "Veteran's Mooncloth Cuffs",
+      "type": "Vendor",
+      "vendor": "Captain Dirgehammer",
+      "price": [
+        {
+          "name": "Honor Points",
+          "quantity": 9785
+        },
+        {
+          "name": "Warsong Gulch Mark of Honor",
+          "quantity": 10,
+          "wowItemId": 20558
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32980"
+    },
+    {
+      "wowItemId": 33067,
+      "name": "Veteran's Pendant of Conquest",
+      "type": "Vendor",
+      "vendor": "Master Sergeant Biggins",
+      "price": [
+        {
+          "name": "Honor Points",
+          "quantity": 6345
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=33067"
+    },
+    {
+      "wowItemId": 32820,
+      "name": "Veteran's Silk Cuffs",
+      "type": "Vendor",
+      "vendor": "Captain Dirgehammer",
+      "price": [
+        {
+          "name": "Honor Points",
+          "quantity": 9785
+        },
+        {
+          "name": "Warsong Gulch Mark of Honor",
+          "quantity": 10,
+          "wowItemId": 20558
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32820"
+    },
+    {
+      "wowItemId": 32795,
+      "name": "Veteran's Silk Footguards",
+      "type": "Vendor",
+      "vendor": "Captain Dirgehammer",
+      "price": [
+        {
+          "name": "Honor Points",
+          "quantity": 14815
+        },
+        {
+          "name": "Eye of the Storm Mark of Honor",
+          "quantity": 20,
+          "wowItemId": 29024
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32795"
+    },
+    {
+      "wowItemId": 24254,
+      "name": "White Remedy Cape",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 21842,
+          "name": "Bolt of Imbued Netherweave",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 21886,
+          "name": "Primal Life",
+          "quantity": 6
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24254"
+    },
+    {
+      "wowItemId": 24261,
+      "name": "Whitemend Pants",
+      "type": "Crafted",
+      "profession": "Tailoring",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 21845,
+          "name": "Primal Mooncloth",
+          "quantity": 10
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 5
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=24261"
+    },
+    {
+      "wowItemId": 28433,
+      "name": "Wicked Edge of the Planes",
+      "type": "Crafted",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 28432,
+          "name": "Black Planar Edge",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 30183,
+          "name": "Nether Vortex",
+          "quantity": 5
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=28433"
+    },
+    {
+      "wowItemId": 29170,
+      "name": "Windcaller's Orb",
+      "type": "Vendor",
+      "vendor": "Fedryen Swiftspear",
+      "price": [
+        {
+          "name": "gold",
+          "quantity": 63
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29170"
+    },
+    {
+      "wowItemId": 29524,
+      "name": "Windhawk Belt",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 29547,
+          "name": "Wind Scales",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29524"
+    },
+    {
+      "wowItemId": 29523,
+      "name": "Windhawk Bracers",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 29547,
+          "name": "Wind Scales",
+          "quantity": 12
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 1
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29523"
+    },
+    {
+      "wowItemId": 29522,
+      "name": "Windhawk Hauberk",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 375,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 29547,
+          "name": "Wind Scales",
+          "quantity": 20
+        },
+        {
+          "wowItemId": 22451,
+          "name": "Primal Air",
+          "quantity": 16
+        },
+        {
+          "wowItemId": 23571,
+          "name": "Primal Might",
+          "quantity": 3
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=29522"
+    },
+    {
+      "wowItemId": 8345,
+      "name": "Wolfshead Helm",
+      "type": "Crafted",
+      "profession": "Leatherworking",
+      "requiredSkill": 225,
+      "reagents": [
+        {
+          "wowItemId": 4304,
+          "name": "Thick Leather",
+          "quantity": 18
+        },
+        {
+          "wowItemId": 8368,
+          "name": "Thick Wolfhide",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 8146,
+          "name": "Wicked Claw",
+          "quantity": 8
+        },
+        {
+          "wowItemId": 8343,
+          "name": "Heavy Silken Thread",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 8172,
+          "name": "Cured Thick Hide",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=8345"
+    },
+    {
+      "wowItemId": 32479,
+      "name": "Wonderheal XT40 Shades",
+      "type": "Crafted",
+      "profession": "Engineering",
+      "requiredSkill": 350,
+      "reagents": [
+        {
+          "wowItemId": 23793,
+          "name": "Heavy Knothide Leather",
+          "quantity": 6
+        },
+        {
+          "wowItemId": 23786,
+          "name": "Khorium Power Core",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23785,
+          "name": "Hardened Adamantite Tube",
+          "quantity": 2
+        },
+        {
+          "wowItemId": 23787,
+          "name": "Felsteel Stabilizer",
+          "quantity": 4
+        },
+        {
+          "wowItemId": 23572,
+          "name": "Primal Nether",
+          "quantity": 1
+        },
+        {
+          "wowItemId": 23440,
+          "name": "Dawnstone",
+          "quantity": 2
+        }
+      ],
+      "source": "https://www.wowhead.com/tbc/item=32479"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button'
 import { getBisListForSpec, resolveAcquisition, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import type { GearSlot } from '../../domain/gear/gearSlots'
+import { describeCost, getAcquisitionCost } from '../../domain/gear/acquisitionCost'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getPairedGearSlots, isItemBlockedByUniqueInGear, isPairedGearSlot } from '../../domain/gear/slotCompatibility'
 import { getGemById } from '../../domain/gems/sampleGems'
@@ -159,6 +160,7 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                     const isPairedItem = isPairedGearSlot(entry.slot)
                     const wowItemId = entry.wowItemId ?? item?.wowItemId
                     const source = sourceDetails(entry, item)
+                    const cost = getAcquisitionCost(entry.wowItemId ?? item?.wowItemId)
 
                     return (
                       <article className="bis-entry" key={`${entry.slot}-${entry.rank}-${entry.itemId}`}>
@@ -200,7 +202,16 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                           {/* Crafting stays: knowing an item is crafted is useless without knowing
                               what it costs, which is the one thing you cannot look up in-game while
                               standing at a vendor. */}
-                          {item?.crafting && (
+                          {/*
+                            **The curated crafting block wins where it exists, because it says more.**
+
+                            14 items carry a hand-written `crafting` record with a recipe source and a
+                            farm source per reagent — "Primal Fire: Elemental Plateau, Nagrand" is
+                            worth more than "14x Primal Fire". The ingested cost below covers the
+                            other 55 and every bought item, with the quantities and nothing else.
+                            Showing both would print the reagent list twice.
+                          */}
+                          {item?.crafting ? (
                             <div className="bis-crafting">
                               <p className="crafting-headline">
                                 {item.craftedBy}
@@ -219,6 +230,19 @@ export function BisPanel({ character, gear, onEquip }: BisPanelProps) {
                                 ))}
                               </ul>
                             </div>
+                          ) : (
+                            cost && (
+                              <p className="bis-entry-cost" data-testid={`bis-cost-${entry.itemId}`}>
+                                <span className="bis-entry-tag">
+                                  {cost.type === 'Crafted' ? 'Costs' : 'Price'}
+                                </span>
+                                {cost.type === 'Crafted' && cost.profession
+                                  ? `${cost.profession}${cost.requiredSkill ? ` ${cost.requiredSkill}` : ''} — `
+                                  : ''}
+                                {describeCost(cost)}
+                                {cost.type === 'Vendor' && cost.vendor ? ` · from ${cost.vendor}` : ''}
+                              </p>
+                            )
                           )}
 
                           {source.needsVerification && (

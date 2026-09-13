@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/bis/BisPanel.tsx
-lines: 290
+lines: 314
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.bis.BisPanel
 
-`src/features/bis/BisPanel.tsx` · **features** layer · 290 lines
+`src/features/bis/BisPanel.tsx` · **features** layer · 314 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 - [[components.ui.Button]] — `src/components/ui/Button.tsx`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.gear.acquisitionCost]] — `src/domain/gear/acquisitionCost.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`

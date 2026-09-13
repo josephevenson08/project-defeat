@@ -437,3 +437,32 @@ encounter's loot actually lives for exactly that reason.
 iconless entries until `ingest-icons.mjs` was re-run. Any ingest that adds item ids has that
 downstream step; the test that catches it is *[[Decision Log#A display label is not a join key, and
 the test has to be about reachability|the reachability check]]* doing its job.
+
+## A scrape that fails soft will eventually delete its own dataset
+
+Recorded 2026-09-13, after an ingest wrote a file containing **zero** priced items over 109 good ones
+and exited 0.
+
+The cost ingest had already run successfully. Re-running it minutes later, Wowhead throttled the
+burst: every page still returned **HTTP 200**, just without the JSON the listviews render from. Every
+item parsed to "no cost found", the script collected an empty array, and `writeFileSync` did exactly
+what it was told. No error, no non-zero exit, no sign anything was wrong except a dataset that had
+quietly become nothing.
+
+**Two defences, and the second is the one that generalises.**
+
+The first is a better failure signal. The HTTP status was useless here — the tell was that the page
+carried no `WH.Gatherer` block at all, which every real item page has. A scraper needs a positive
+check that it got *the thing it came for*, not just bytes; absence of the payload is a failure even
+when the transport says success.
+
+The second is that **an ingest must refuse to shrink its own output.** Fewer rows than last time is
+either throttling or an upstream shape change, and both want a person looking rather than a silent
+overwrite. The guard is three lines and it is the difference between "re-run it" and "restore it from
+git, if you noticed". Every generated dataset in this repo should have it.
+
+This is *[[Decision Log#An audit that cannot say what it looked at cannot say it found nothing|the
+audit that measured zero maps]]* again, and worth noticing that it is: that one reported a clean
+sweep over an empty set, this one reported a successful write over an empty set. Both are the same
+bug — **treating "I found nothing" as a result rather than as a question** — and both were invisible
+until something downstream happened to need the data.

@@ -1,15 +1,15 @@
 ---
 type: module
-layer: app
-source: src/styles/global.css
-lines: 6394
+layer: domain
+source: src/domain/gear/acquisitionCostsJson.d.ts
+lines: 19
 generated: true
-tags: [brain/architecture, layer/app]
+tags: [brain/architecture, layer/domain]
 ---
 
-# styles.global
+# domain.gear.acquisitionCostsJson.d
 
-`src/styles/global.css` · **app** layer · 6394 lines
+`src/domain/gear/acquisitionCostsJson.d.ts` · **domain** layer · 19 lines
 
 _No doc comment at the top of this file._
 
@@ -19,11 +19,11 @@ _Nothing exported (side-effect or style module)._
 
 ## Imports
 
-- [[styles.fonts]] — `src/styles/fonts.css`
+_None._
 
 ## Imported by
 
-- [[main]] — `src/main.tsx`
+_None._
 
 ## Concepts & phases
 

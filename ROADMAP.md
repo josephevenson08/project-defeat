@@ -320,10 +320,15 @@ for crafting reagents. **502 of the 557 recommended items can now say where they
 182 before — 90.3%** — and 719 of 1,427 rows name the actual boss. 12 rows resolve to nothing, all of
 them guide cells that lost their content upstream.
 
-What is still missing is the **cost** half. Reagent lists exist for 14 crafted items; the other 167
-crafted rows name the profession and not the price. Nothing in the app prices a badge, an arena
-point, or a reputation grind either, so a "Vendor: 41 Badges of Justice" row tells you the currency
-and not how many runs that is.
+**Cost planning landed 2026-09-13.** 117 of the 119 crafted and bought picks carry a price:
+reagents from Wowhead's `created-by-spell` data, vendor prices from `sold-by`. A crafted robe reads
+"15x Primal Fire", a badge trinket reads "41x Badge of Justice", and a reputation vendor's gold price
+is recorded beside the standing that gates it. The two exceptions are the Violet Signet rings, which
+no vendor sells. See `tools/ingest/ingest-acquisition-cost.mts`.
+
+The ingest refuses to write a smaller dataset than the one on disk, which is not caution: an earlier
+run was throttled by Wowhead, every page came back without its data, and the script wrote a file
+containing zero costs over 109 good ones at exit code 0.
 
 **Raid Composition landed here** (2026-08-19), as a fifth section rather than a planner panel: pick
 10 or 25, add specs, and see which of the 33 raid buffs and 8 target debuffs the roster brings, with

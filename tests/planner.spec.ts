@@ -108,6 +108,7 @@ import {
   UNCLASSIFIED_INSTANCES,
 } from '../src/domain/bis'
 import rawRankings from '../src/domain/bis/bisRankings.json' with { type: 'json' }
+import { acquisitionCostCounts, getAcquisitionCost } from '../src/domain/gear/acquisitionCost'
 import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
 import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
 import {
@@ -10803,4 +10804,71 @@ test('where a BiS item comes from is answered by joining three datasets, and the
 
   // The index the join runs on, asserted so a raid-data change that empties it is visible.
   expect(raidDropIndexSize.byItemId, 'the raid loot index is populated').toBeGreaterThan(200)
+})
+
+test('a crafted or bought BiS pick says what it costs, and the price is never invented', async ({ page }) => {
+  /*
+   * The second half of "source and cost planning". `resolveAcquisition` answers *where* — this is
+   * what you hand over when you get there, which for a crafted robe is 14 Primal Fire and for a
+   * trinket is 41 Badges of Justice. Both read as "go and get it" without the number.
+   *
+   * Everything here comes off Wowhead's own item pages: reagents from the `created-by-spell`
+   * listview, prices from `sold-by`. Nothing is estimated, which is why there is no
+   * `needsVerification` on this dataset — an item with no entry is absent rather than free, and the
+   * panel simply shows no cost line for it.
+   */
+  expect(acquisitionCostCounts.crafted, 'most crafted picks are priced').toBeGreaterThan(55)
+  expect(acquisitionCostCounts.vendor, 'and most bought ones').toBeGreaterThan(35)
+
+  const entries = bisLists.flatMap((list) => list.entries)
+  const priced = new Set(
+    entries
+      .map((entry) => getAcquisitionCost(entry.wowItemId ?? getItemById(entry.itemId)?.wowItemId))
+      .filter((cost): cost is NonNullable<typeof cost> => !!cost)
+      .map((cost) => cost.wowItemId),
+  )
+  expect(priced.size, 'and they are reachable from the ranked lists, not an orphaned dataset').toBeGreaterThan(100)
+
+  /*
+   * **No placeholder names.** The ingest writes `item-<id>` or `currency-<id>` when it cannot resolve
+   * a name, deliberately, so an unresolved id shows up as something to fix rather than vanishing.
+   * None must survive into the shipped data — a row reading "41x item-29434" is worse than no row.
+   */
+  const placeholders: string[] = []
+  for (const wowItemId of priced) {
+    const cost = getAcquisitionCost(wowItemId)!
+    for (const line of [...(cost.reagents ?? []), ...(cost.price ?? [])]) {
+      if (/^(item|currency)-\d+$/.test(line.name)) placeholders.push(`${cost.name}: ${line.name}`)
+      expect(line.quantity, `${cost.name} lists "${line.name}" with a non-positive quantity`).toBeGreaterThan(0)
+    }
+    // Every entry must actually carry a price; a shape with neither is a silent parse failure.
+    const lines = cost.type === 'Crafted' ? cost.reagents : cost.price
+    expect(lines?.length, `${cost.name} has a cost record with nothing in it`).toBeGreaterThan(0)
+    expect(cost.source, `${cost.name} must say where its price came from`).toMatch(/wowhead\.com/)
+  }
+  expect(placeholders, 'every reagent and currency resolved to a real name').toEqual([])
+
+  /*
+   * And it reaches the screen. The suite's default character is a Fury Warrior, whose ranked list
+   * carries badge-bought trinkets and rings like every other spec's, so no spec switch is needed to
+   * find a priced row.
+   */
+  await openApp(page)
+  await openPlannerView(page, 'Ranked Gear')
+
+  const costLines = page.locator('[data-testid^="bis-cost-"]')
+  expect(await costLines.count(), 'the default spec shows at least one priced pick').toBeGreaterThan(0)
+  await expect(costLines.first()).toContainText(/\d+x /)
+
+  /*
+   * The two cost surfaces are mutually exclusive by construction: the 14 curated crafting records say
+   * more (a farm source per reagent) and win, and the ingested line covers everything else. Both
+   * rendering would print the reagent list twice on the same row.
+   */
+  const doubled = await page.evaluate(() =>
+    [...document.querySelectorAll('.bis-entry')].filter(
+      (row) => row.querySelector('.bis-crafting') && row.querySelector('.bis-entry-cost'),
+    ).length,
+  )
+  expect(doubled, 'no row shows both the curated recipe and the ingested cost').toBe(0)
 })
