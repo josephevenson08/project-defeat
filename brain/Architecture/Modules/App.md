@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 380
+lines: 399
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 380 lines
+`src/App.tsx` · **app** layer · 399 lines
 
 From the top of the file:
 
@@ -47,6 +47,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`

@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

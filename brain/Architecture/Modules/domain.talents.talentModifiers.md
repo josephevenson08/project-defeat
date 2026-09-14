@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 
 - [[App]] — `src/App.tsx`
 - [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

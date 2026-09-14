@@ -36,8 +36,12 @@ const SOCKET_COLORS: readonly SocketColor[] = ['Meta', 'Red', 'Yellow', 'Blue']
  * comparison rather than one map built per report, which is a different cost class.
  *
  * This costs one simulation run per gem, once per report, not once per candidate item.
+ *
+ * **Exported for the comparison panel**, which has to price sockets exactly the way this list
+ * does. Two surfaces answering "what is this item worth?" with different gem assumptions would
+ * read as a bug in whichever one the player checked second.
  */
-function pickBestGemPerColor(
+export function pickBestGemPerColor(
   character: CharacterProfile,
   gear: EquippedGear,
   role: CharacterRole,

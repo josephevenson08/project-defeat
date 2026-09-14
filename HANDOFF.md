@@ -1,11 +1,101 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-13.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-14.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 ---
 
-## Where this is right now (2026-09-13, latest — READ THIS FIRST)
+## Where this is right now (2026-09-14, latest — READ THIS FIRST)
+
+`main` is green and pushed: **242 tests, lint and build clean.** The working tree carries only the
+owner's own `.obsidian/graph.json` and `Untitled.canvas`.
+
+**Gear comparison landed**, which was the top of the open list and is now off it. It is the sixth
+planner sub-tab: pick a slot and two items, and each is swapped into the set you are actually wearing
+so set bonuses, socket bonuses and the talent scaling of primary stats all count. It reports the
+stat-by-stat difference and the change in the role's headline number.
+
+### Why this is item-against-item and not build-against-build
+
+The handoff described it as "two items **or** two builds", which are different features, so the owner
+was asked and chose items. That is the question the upgrade finder structurally cannot answer: the
+finder ranks what beats your current kit, so it cannot show a pair where one side is a downgrade,
+cannot compare two items you do not own, and reports one score where what you want is the stat line
+underneath it. Build-against-build is now written down as a *remaining* Phase 5 item rather than as
+part of this one.
+
+### Three decisions to know before touching it
+
+**Both sides are gemmed alike, and that deliberately diverges from `findUpgrades`.** The finder scores
+its baseline with the gems actually socketed and its candidates with the best ones, because it is
+answering "what should I chase from here?". This panel asks "which of these two items is better", so
+giving one side its real gemming and the other an ideal one would fold "you have not gemmed yet" into
+an answer about the items. The consequence is real and worth expecting: **the same pair can read
+differently in the two panels.** Both numbers are right for their own question, the panel says on
+screen which one it is answering, and a test pins the divergence — otherwise a later session finds the
+discrepancy and "fixes" it. `pickBestGemPerColor` is exported from `findUpgrades.ts` and shared, so
+the two surfaces cannot drift on what a socket is worth even though they disagree on what to gem.
+
+**The score is a DPS surface; the stat table is not.** Same call `featureFlags.ts` records for the
+Simulation tab, same reason — a headline number a Healer would read as authoritative, out of a model
+this project does not aim at them. The stat comparison is shown to every spec, because those totals
+are the ones already on the rail beside the panel. It is the simulated score, not the arithmetic, that
+the role rule is about. `?simulation=1` still forces it on, and the test asserts the gate *without*
+the flag, since asserting it through `openApp` would assert nothing.
+
+**Catalogue order is not a usable default.** `getItemsForSlotAndCharacter` spans all of Classic as
+well as TBC, so the first two Head entries are a pair of vanilla tier-2 helms — the panel opened on
+exactly that until `defaultComparisonPair` was written. It is the same trap `getDefaultItemForSlot`
+documents, reached by a different route, and the fix is the same: highest item level is not a claim
+about what is best, it just keeps the pair in roughly the right era. Left defaults to what you are
+wearing whenever that is a real item; a newly created character wears nothing, so it falls through.
+
+### The defect worth retelling: three true numbers that do not add up
+
+This shipped twice inside one session, in both halves of the panel. The stat table printed **56 and
+66 beside a difference of +9.9**. The score row printed **35.0 → 42.0 beside +7.1**. Every figure was
+individually correct, and not one of the rows added up.
+
+The cause both times was rounding each side independently and then showing the *exact* delta. The
+fix is to derive the shown delta from the shown pair, and the rule generalises: **anything a reader
+can check by eye has to be self-consistent, even at the cost of a tenth of a point of precision.**
+It also decides which rows exist at all — stat rows are filtered on the *rounded* values, so a pair
+differing by less than half a point does not occupy a row reading "8 8 +0".
+
+Both are now asserted. The first version of this feature was verified in the browser and *looked*
+right in a screenshot; the arithmetic was wrong in the DOM behind it. Reading the rendered numbers
+back and checking they add up is what caught it.
+
+### Open, ranked, as of this writing
+
+1. **A real mobile layout** — the app does not overflow at 375px and was never *designed* for a
+   phone, which is where the owner reads it. Now the top of the list. The comparison panel's own
+   pickers and columns do collapse to one column under 720px, but that is one panel, not a layout.
+2. **Boss art for 11 of 24 encounters** — the owner's own job; they make the images. Missing:
+   Nightbane, and all of Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+3. **Build-against-build comparison** — newly written down rather than newly open. The panel answers
+   the item question by choice; "was my old build better?" is a different surface.
+4. **Five-design boards for the remaining tabs** — the owner asked for tier lists and then redirected
+   ("lets not implement the pictures on every tab"), so this thread is **cold, not pending**. Do not
+   restart it without asking.
+5. **Deprioritised by the owner and not to be picked up unasked** — rotations (5 of 27 specs press
+   more than one button), tank score weighting, multi-iteration variance. The README says the
+   simulation model is explicitly not the focus this round.
+
+### How the owner works, from this session
+
+They give short directives — "sure" is a full go-ahead — and expect the work finished end to end, with
+docs and tests, then pushed. They answer a focused multiple-choice question readily and find repeated
+questions annoying: ask only when the answer changes what gets built, and otherwise decide and say
+what you decided. They will say "continue" and mean "pick the next thing yourself".
+
+**When they choose a design that is less accurate than what it replaces, build it and say so on the
+screen.** See the raid-composition entry below.
+
+---
+
+## Where this was on 2026-09-13 (the raid data went complete)
 
 `main` is green and pushed: **238 tests, lint and build clean.** The working tree carries only the
 owner's own `.obsidian/graph.json` and `Untitled.canvas`.
@@ -353,7 +443,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-238 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+242 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3026,7 +3116,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 221 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 242 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```

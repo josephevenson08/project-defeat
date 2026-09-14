@@ -174,6 +174,18 @@ The pet focus economy sat unmodelled for a pass because a search of `sim/core/en
 
 A search of the wrong place returns the same empty result as a search for something that is not there. When the conclusion is going to be "this cannot be sourced", the search itself is the thing to check first.
 
+## Two surfaces may answer the same question differently, if each says which question it asked
+
+The upgrade finder scores its baseline with the gems actually socketed and its candidates with the best ones, because it asks "what should I chase from here?". The comparison panel gems **both** sides alike, because it asks "which of these two items is better" — giving one side real gemming and the other an ideal one would fold "you have not gemmed yet" into an answer about the items.
+
+So the same pair of items can show different deltas in the two panels, which looks exactly like a bug. It is resolved by disclosure rather than by forcing agreement: each panel states the question it is answering, a test pins the divergence so it reads as a decision, and `pickBestGemPerColor` is shared so they cannot drift on what a socket is *worth* even while they disagree on what to gem. Reconciling them would make one of the two answers wrong.
+
+## Round before differencing, so the arithmetic on screen adds up
+
+The comparison panel shipped twice, in one session, showing three true numbers that did not add up: a stat table printing 56 and 66 beside a difference of +9.9, and a score row printing 35.0 → 42.0 beside +7.1. Both came from rounding each side independently and then displaying the *exact* delta.
+
+The delta a reader sees is derived from the pair they see, at the cost of up to a tenth of a point. It also decides which rows exist: stat rows are filtered on the rounded values, so a pair differing by less than half a point does not occupy a row reading "8 8 +0" — a difference the table asserts and then cannot show. Anything checkable by eye has to survive being checked.
+
 ## Related
 
 - [[Architecture Map]]

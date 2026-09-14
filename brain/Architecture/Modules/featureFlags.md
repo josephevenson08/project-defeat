@@ -31,6 +31,7 @@ From the top of the file:
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 
 ## Concepts & phases
 

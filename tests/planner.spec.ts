@@ -303,7 +303,7 @@ async function openPlannerTab(page: Page) {
  * Idempotent by design — the helpers below call it freely, and clicking the tab you are already on
  * is a no-op rather than something a test has to track.
  */
-async function openPlannerView(page: Page, view: 'Gear' | 'Talents' | 'Buffs' | 'Ranked Gear' | 'Build') {
+async function openPlannerView(page: Page, view: 'Gear' | 'Compare' | 'Talents' | 'Buffs' | 'Ranked Gear' | 'Build') {
   await page.getByRole('navigation', { name: 'Planner sections' }).getByRole('button', { name: view, exact: true }).click()
 }
 
@@ -3468,7 +3468,7 @@ test('the planner shows one panel at a time instead of a single long column', as
   // three talent trees.
   const nav = page.getByRole('navigation', { name: 'Planner sections' })
   await expect(nav).toBeVisible()
-  await expect(nav.getByRole('button')).toHaveText(['Gear', 'Talents', 'Buffs', 'Ranked Gear', 'Build'])
+  await expect(nav.getByRole('button')).toHaveText(['Gear', 'Compare', 'Talents', 'Buffs', 'Ranked Gear', 'Build'])
 
   // Gear is where you land, so the many gear-only tests need no navigation at all.
   await expect(page.getByRole('region', { name: 'Gear', exact: true })).toBeVisible()
@@ -3478,7 +3478,8 @@ test('the planner shows one panel at a time instead of a single long column', as
   // Each view renders its own panel and *only* its own — the point is the other three are not in the
   // document, not merely scrolled past.
   const views = [
-    { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
+    { view: 'Compare' as const, present: page.getByRole('region', { name: 'Gear Comparison' }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
+    { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Gear Comparison' }) },
     { view: 'Buffs' as const, present: page.getByTestId('buffs-panel'), absent: page.getByRole('region', { name: 'Talents', exact: true }) },
     { view: 'Ranked Gear' as const, present: page.getByTestId('bis-panel'), absent: page.getByTestId('buffs-panel') },
     // The Build panel's region, not its export textarea — that lives inside a collapsed <details>,
@@ -3495,7 +3496,7 @@ test('the planner shows one panel at a time instead of a single long column', as
 
   // The rail is what makes splitting these affordable: the stat totals stay on screen throughout, so
   // moving between the four does not cost you the numbers you were reading.
-  for (const view of ['Gear', 'Talents', 'Buffs', 'Ranked Gear', 'Build'] as const) {
+  for (const view of ['Gear', 'Compare', 'Talents', 'Buffs', 'Ranked Gear', 'Build'] as const) {
     await openPlannerView(page, view)
     await expect(page.getByRole('region', { name: 'Stats' }), `the stat rail should survive ${view}`).toBeVisible()
   }
@@ -10871,4 +10872,163 @@ test('a crafted or bought BiS pick says what it costs, and the price is never in
     ).length,
   )
   expect(doubled, 'no row shows both the curated recipe and the ingested cost').toBe(0)
+})
+
+/*
+ * Gear comparison — two items for one slot, with the stat difference and the change in the role's
+ * headline number. The question the upgrade finder cannot answer: that list ranks what beats your
+ * current kit, so it cannot show a pair where one side is a downgrade, cannot compare two items you
+ * do not own, and gives a score where what you want is the stat line behind it.
+ */
+
+/** The label showing in a picker, read off the select rather than guessed from option order. */
+function selectedLabel(page: Page, name: string) {
+  return page
+    .getByRole('combobox', { name })
+    .evaluate((element) => (element as HTMLSelectElement).selectedOptions[0]?.text.trim() ?? '')
+}
+
+test('the gear comparison puts two items side by side and its numbers add up on screen', async ({ page }) => {
+  await openApp(page)
+  await openPlannerView(page, 'Compare')
+
+  await expect(page.getByRole('region', { name: 'Gear Comparison' })).toBeVisible()
+
+  // Two named items rather than an empty frame waiting on pickers nobody has touched.
+  const names = page.locator('.compare-side-header h4')
+  await expect(names).toHaveCount(2)
+  const [leftName, rightName] = await names.allInnerTexts()
+  expect(leftName.trim(), 'the two sides open on different items').not.toBe(rightName.trim())
+
+  /*
+   * **The arithmetic a reader can check by eye has to be self-consistent, and this is what pins it.**
+   * Both halves of this panel got it wrong on the first pass, the same way: the stat table printed
+   * 56 and 66 beside a difference of +9.9, and the score row printed 35.0 -> 42.0 beside +7.1. Every
+   * figure was individually true and not one of them added up, because each side was rounded on its
+   * own and then differenced against the exact values. Both deltas are derived from the rounded pair
+   * now, and this assertion fails if either reverts.
+   */
+  const values = page.locator('.compare-score-values strong')
+  const left = Number(await values.nth(0).innerText())
+  const right = Number(await values.nth(1).innerText())
+  const delta = Number((await page.getByTestId('compare-score-delta').innerText()).split(' ')[0])
+  expect(Number.isFinite(left) && Number.isFinite(right) && Number.isFinite(delta), 'all three are numbers').toBe(true)
+  expect(Math.abs(left + delta - right), `the score row: ${left} + ${delta} should reach ${right}`).toBeLessThan(0.051)
+
+  const rows = await page
+    .locator('.compare-table tbody tr')
+    .evaluateAll((trs) => trs.map((tr) => [...tr.children].map((cell) => (cell as HTMLElement).innerText.trim())))
+  expect(rows.length, 'two different items differ on at least one modelled stat').toBeGreaterThan(0)
+  for (const [label, leftCell, rightCell, deltaCell] of rows) {
+    expect(Number(leftCell) + Number(deltaCell), `${label}: ${leftCell} + ${deltaCell} should reach ${rightCell}`).toBe(
+      Number(rightCell),
+    )
+  }
+})
+
+test('the comparison opens on an era-appropriate pair rather than catalogue order', async ({ page }) => {
+  await openApp(page)
+  await openPlannerView(page, 'Compare')
+
+  const leftPicker = page.getByRole('combobox', { name: 'Left item' })
+
+  /*
+   * **Catalogue order is not usable as a default here, and that is why `defaultComparisonPair`
+   * exists.** `getItemsForSlotAndCharacter` spans all of Classic as well as TBC, so the first two
+   * Head entries are a pair of vanilla tier-2 helms — the same trap `getDefaultItemForSlot` was
+   * written for, arriving at a Phase 2 planner by a different route. Landing on the first two options
+   * again is the regression this catches.
+   */
+  const options = await leftPicker.locator('option').allInnerTexts()
+  expect(options.length, 'the Head slot offers plenty to choose between').toBeGreaterThan(2)
+  expect(await selectedLabel(page, 'Left item'), 'the left default is not the first catalogue entry').not.toBe(
+    options[0].trim(),
+  )
+  expect(await selectedLabel(page, 'Right item'), 'the right default is not the second catalogue entry').not.toBe(
+    options[1].trim(),
+  )
+
+  /*
+   * **A new character wears nothing, and the panel still has to open on two real items.**
+   *
+   * This asserted "no empty-slot placeholder is offered" first, which was vacuous: the catalogue does
+   * not contain the placeholders at all — `emptyItemForSlot` builds them on demand for `emptyGear` —
+   * so that assertion would have held however broken the filtering became, which is this repo's
+   * documented worst kind of passing test. The live risk is the opposite end: the left side defaults
+   * to what you are wearing, and on a fresh character that is nothing. Both sides resolving to a real
+   * catalogue item is the thing that would actually break.
+   */
+  const shownNames = await page.locator('.compare-side-header h4').allInnerTexts()
+  expect(shownNames, 'both sides name an item').toHaveLength(2)
+  for (const name of shownNames) {
+    expect(name.trim(), 'a side never falls back to the empty placeholder').not.toBe('Empty')
+    expect(options.map((option) => option.trim()), `${name.trim()} is a real option for this slot`).toContain(name.trim())
+  }
+
+  // Changing slot has to re-default both sides. Carrying either id across would fall through to a
+  // default anyway and look like the picker ignored the change.
+  await page.getByRole('combobox', { name: 'Comparison slot' }).selectOption('Main Hand')
+  await expect(page.getByTestId('compare-table')).toBeVisible()
+  const mainHandLeft = await selectedLabel(page, 'Left item')
+  const mainHandRight = await selectedLabel(page, 'Right item')
+  expect(mainHandLeft, 'the new slot picks its own left item').not.toBe('')
+  expect(mainHandLeft, 'the new slot still opens on two different items').not.toBe(mainHandRight)
+})
+
+test('both sides of a comparison are gemmed the same way, unlike the upgrade finder', async ({ page }) => {
+  await openApp(page)
+  await openPlannerView(page, 'Compare')
+
+  /*
+   * **A deliberate divergence from `findUpgrades`, written down so it is not "fixed" back.** The
+   * finder scores its baseline with the gems actually socketed and its candidates with the best
+   * ones, because its question is "what should I chase from here?". This panel asks "which of these
+   * two items is better", so giving one side its real gemming and the other an ideal one would fold
+   * "you have not gemmed yet" into an answer about the items. Both get the best colour-matched gems,
+   * and the panel says so rather than leaving the reader to assume either convention.
+   */
+  const copy = page.getByRole('region', { name: 'Gear Comparison' }).locator('.panel-copy')
+  await expect(copy).toContainText(/both sides are scored the same way/i)
+  await expect(copy, 'the panel names the surface it can disagree with').toContainText(/upgrade finder/i)
+
+  // Whenever the note appears at all it has to speak for both sides, since that is the claim.
+  const note = page.getByTestId('compare-gem-note')
+  if (await note.count()) {
+    await expect(note).toContainText(/on the left/i)
+    await expect(note).toContainText(/on the right/i)
+    await expect(note).toContainText(/once gemmed/i)
+  }
+})
+
+test('the comparison score is a DPS surface, but the stat table is for every spec', async ({ page }) => {
+  /*
+   * The same call `featureFlags.ts` records for the Simulation tab, and made for the same reason: a
+   * headline number a Healer would read as authoritative, out of a model this project does not aim
+   * at them. **The stat comparison stays**, because those totals are the ones already on the rail
+   * beside this panel — it is the simulated score, not the arithmetic, that the role rule is about.
+   *
+   * This loads without `?simulation=1` deliberately. `openApp` carries the flag, which forces the
+   * score on for every role, so asserting the gate through it would assert nothing.
+   */
+  await page.goto('/')
+  await page.getByTestId('section-planner').click()
+  await completeCharacterCreation(page)
+
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Priest')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await openPlannerView(page, 'Compare')
+
+  await expect(page.getByTestId('compare-score')).toHaveCount(0)
+  await expect(page.getByTestId('compare-score-hidden')).toContainText(/damage specs only/i)
+  await expect(page.getByTestId('compare-table'), 'a healer still gets the stat comparison').toBeVisible()
+
+  /*
+   * And a damage spec does get the number, from the same page load, so this pins the gate rather than
+   * a load that simply never shows a score whatever the role.
+   */
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Warrior')
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fury')
+  await openPlannerView(page, 'Compare')
+  await expect(page.getByTestId('compare-score')).toBeVisible()
+  await expect(page.getByTestId('compare-score-hidden')).toHaveCount(0)
 })

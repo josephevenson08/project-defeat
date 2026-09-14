@@ -1,44 +1,42 @@
 ---
 type: module
 layer: features
-source: src/features/simulator/findUpgrades.ts
-lines: 248
+source: src/features/gear/compareItems.ts
+lines: 292
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.simulator.findUpgrades
+# features.gear.compareItems
 
-`src/features/simulator/findUpgrades.ts` · **features** layer · 248 lines
+`src/features/gear/compareItems.ts` · **features** layer · 292 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `findUpgrades`, `pickBestGemPerColor`
+**function** — `comparableItemsFor`, `comparableSlotsFor`, `compareItems`, `defaultComparisonPair`
 
-**type** — `UpgradeCandidate`, `UpgradeReport`
+**type** — `ComparisonContext`, `ComparisonSide`, `ComparisonStatRow`, `ItemComparison`
 
 ## Imports
 
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
-- [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
-- [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`
+- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Imported by
 
-- [[App]] — `src/App.tsx`
-- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 
 ## Concepts & phases
 

@@ -306,7 +306,37 @@ touched by it, so switching character no longer destroys anything. Slots are val
 catalog change drops the affected slot from the list rather than breaking the panel.
 
 They are still browser-local — clearing site data loses them, and they do not follow you to another
-machine; export/import covers that. Gear comparison and a real mobile layout are unstarted.
+machine; export/import covers that. A real mobile layout is unstarted.
+
+**Gear comparison landed 2026-09-14**, as a sixth planner sub-tab. Pick a slot and two items and the
+panel swaps each into the set you are actually wearing, so set bonuses, socket bonuses and the talent
+scaling of primary stats all count — an item's worth genuinely depends on the rest of your kit, and a
+tooltip-against-tooltip comparison can see none of it. It reports the stat-by-stat difference and the
+change in the role's headline number.
+
+It is **item against item, not build against build**, chosen deliberately: it answers "two things
+dropped, which do I take?", which is the question the upgrade finder structurally cannot. That list
+ranks what beats your current kit, so it cannot show a pair where one side is a downgrade, cannot
+compare two items you do not own, and reports one score where what you want is the stat line under it.
+
+Three decisions worth knowing before changing it:
+
+- **Both sides are scored with the best colour-matched gems**, which diverges from `findUpgrades` on
+  purpose. The finder scores its baseline with the gems actually socketed, because its question is
+  "what should I chase from here?". Giving one side real gemming and the other an ideal one would fold
+  "you have not gemmed yet" into an answer about the items. The consequence is that the same pair can
+  read differently in the two panels; both numbers are right for their own question, the panel says
+  which it is answering, and a test pins the divergence so it is not quietly reconciled.
+- **The simulated score is shown for damage specs only**, the same call `featureFlags.ts` records for
+  the Simulation tab and made for the same reason. The stat comparison is shown to every spec, because
+  those totals are the ones already on the rail beside the panel — it is the score, not the
+  arithmetic, that the role rule is about.
+- **Every figure on screen is rounded before it is differenced.** Rounding each side independently and
+  showing an exact delta prints three true numbers that visibly fail to add up — it shipped that way
+  twice during the build, as `56 / 66 / +9.9` in the stat table and `35.0 → 42.0 / +7.1` in the score
+  row. A test now asserts both add up.
+
+What it does not do: compare two *builds*, or more than two items at once.
 
 **Source planning landed 2026-09-12**, and it was a parse rather than an ingest. Every one of the
 1,427 ranked rows has carried Wowhead's own Source cell since the guides were first ingested —

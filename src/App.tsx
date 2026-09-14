@@ -14,6 +14,7 @@ import { deriveTalentModifiers } from './domain/talents/talentModifiers'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
 import { applyWeaponSlotRules, defaultGear, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
+import { ComparePanel } from './features/gear/ComparePanel'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
@@ -91,7 +92,7 @@ function visibleTabs(simulationEnabled: boolean) {
   return APP_TABS.filter((tab) => tab.id !== 'simulation' || simulationEnabled)
 }
 
-type PlannerView = 'gear' | 'talents' | 'buffs' | 'bis' | 'build'
+type PlannerView = 'gear' | 'compare' | 'talents' | 'buffs' | 'bis' | 'build'
 
 /**
  * The planner's four panels, as a second level of tabs rather than one column.
@@ -113,9 +114,15 @@ type PlannerView = 'gear' | 'talents' | 'buffs' | 'bis' | 'build'
  * one of those defaulted off and could not be turned on, so a sourced dataset reached no number in
  * the app. It sits next to Talents because both are "what you bring", ahead of the rankings you
  * check against.
+ *
+ * **Compare sits directly after Gear because it is part of gearing**, not a separate activity the way
+ * talents and rankings are — you equip something, then ask whether the other drop was better. It is
+ * deliberately not folded into the Gear panel itself: the paperdoll is about what you are wearing,
+ * and a comparison is about two things you are not.
  */
 const PLANNER_VIEWS: readonly TabDefinition<PlannerView>[] = [
   { id: 'gear', label: 'Gear' },
+  { id: 'compare', label: 'Compare' },
   { id: 'talents', label: 'Talents' },
   { id: 'buffs', label: 'Buffs' },
   { id: 'bis', label: 'Ranked Gear' },
@@ -340,6 +347,18 @@ function App() {
           />
           {plannerView === 'gear' && (
             <GearPanel character={character} gear={gear} onChange={updateGear} stats={stats} role={role} />
+          )}
+          {plannerView === 'compare' && (
+            <ComparePanel
+              character={character}
+              gear={gear}
+              role={role}
+              activeBuffIds={activeBuffIds}
+              activeConsumableIds={activeConsumableIds}
+              activeTargetDebuffIds={activeTargetDebuffIds}
+              target={target}
+              talentPoints={talentPoints}
+            />
           )}
           {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}
           {plannerView === 'buffs' && (

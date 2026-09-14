@@ -38,6 +38,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 

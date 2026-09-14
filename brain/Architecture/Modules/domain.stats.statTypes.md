@@ -40,6 +40,7 @@ _None._
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`

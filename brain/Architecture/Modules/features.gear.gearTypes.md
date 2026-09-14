@@ -26,6 +26,8 @@ _No doc comment at the top of this file._
 
 - [[App]] — `src/App.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`

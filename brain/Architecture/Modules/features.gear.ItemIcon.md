@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
 

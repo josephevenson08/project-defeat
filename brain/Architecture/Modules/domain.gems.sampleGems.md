@@ -32,6 +32,7 @@ From the top of the file:
 ## Imported by
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`

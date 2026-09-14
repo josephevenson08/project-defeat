@@ -94,8 +94,8 @@ behind every claim of its that quotes a number.
   (one Blessing and one aura per Paladin, one totem per element, one shout per Warrior) is still
   sourced and still tested in `buffExclusivity.ts`; this screen just does not apply it. A fillable
   header (title, date, start time, description) is drawn onto the exported chart
-- Planner split into five sub-tabs (Gear / Talents / Buffs & Consumables / Ranked Gear / Build) rather
-  than one ~15-screen scroll column, with the stat rail persisting across all five
+- Planner split into six sub-tabs (Gear / Compare / Talents / Buffs & Consumables / Ranked Gear /
+  Build) rather than one ~15-screen scroll column, with the stat rail persisting across all six
 - Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
   that restores every stat — attributes and armor are never hidden
 - Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
@@ -143,6 +143,16 @@ behind every claim of its that quotes a number.
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
+- **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
+  actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip
+  comparison cannot see them. Shows the stat-by-stat difference and the change in the role's headline
+  number. It answers what the upgrade finder cannot: that list ranks what beats your current kit, so
+  it cannot show a pair where one side is a downgrade, or compare two items you do not own yet.
+  **Both sides are scored with the best colour-matched gems**, deliberately unlike the upgrade
+  finder, which scores your baseline as-is — the question here is which *item* is better, not whether
+  you have gemmed yet, and the panel states which question it is answering. The simulated score is
+  shown for damage specs only, the same call the Simulation tab makes and for the same reason; the
+  stat comparison is shown to every spec
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
 - Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
 - Reduced-motion aware animation helpers
