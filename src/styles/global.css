@@ -6696,3 +6696,79 @@ body {
     grid-column: 1 / -1;
   }
 }
+
+/* --- Profession picker in the rail ------------------------------------------------------------ */
+
+.rail-professions {
+  display: grid;
+  gap: 7px;
+}
+
+.rail-professions-head {
+  align-items: baseline;
+  color: var(--text);
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.rail-professions-head em {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail-profession-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.rail-profession {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  padding: 5px 8px;
+}
+
+.rail-profession:hover {
+  color: var(--text);
+}
+
+/* Selection is carried by the accent the rail already uses for role, not by a new hue — the palette
+   spends saturated colour on item quality alone. */
+.rail-profession-on {
+  border-color: var(--rail-accent, var(--text));
+  color: var(--text);
+}
+
+.rail-professions-note {
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 2px 0 0;
+}
+
+@media (max-width: 900px) {
+  /* The selects go two-up on a phone; this block is a list and wants the full width. */
+  .rail-professions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Names the profession a slot's missing enchants need, so an absent picker is a state rather than
+   a gap. See professionsGatingEnchantsForSlot. */
+.popup-enchant-locked {
+  color: var(--text-faint);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 10px 0 0;
+}

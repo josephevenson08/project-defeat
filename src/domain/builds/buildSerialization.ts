@@ -6,6 +6,8 @@ import { defaultMaxPhase, getItemById, isWithinDefaultPhase } from '../gear/item
 import { isItemAllowedForCharacter } from '../gear/characterItemRules'
 import type { EquippedGear } from '../gear/itemTypes'
 import { isClassLegalForRace, racesByFaction } from '../character/races'
+import { PRIMARY_PROFESSION_LIMIT, primaryProfessions } from '../professions/characterProfessions'
+import type { Profession } from '../professions/professionTypes'
 import { defaultSimulationTarget } from '../simulation/sampleEncounters'
 import { BUILD_FORMAT_VERSION, type BuildImportIssue, type BuildImportResult, type SavedBuild } from './buildTypes'
 
@@ -70,7 +72,29 @@ function validateCharacter(value: unknown): CharacterProfile | undefined {
   if (!isClassLegalForRace(className, race)) return undefined
   if (typeof spec !== 'string' || !getClassDefinition(className).specs.includes(spec)) return undefined
 
-  return { faction, race, className, spec }
+  /*
+   * Professions are **dropped when wrong rather than rejecting the build**, unlike everything above.
+   * The fields above decide who the character is, and a build naming an illegal race/class pair
+   * describes nobody. Professions decide which profession-locked enchant they may carry: a build
+   * from before this field existed simply has none, and one carrying junk is a build whose gear and
+   * talents are still perfectly good. Refusing it outright would throw away far more than it
+   * protects.
+   *
+   * Over-long lists are truncated rather than dropped whole, for the same reason. The enchant filter
+   * reads membership, so a third profession would otherwise widen what the character can take.
+   */
+  const professions = validateProfessions(candidate.professions)
+
+  return professions ? { faction, race, className, spec, professions } : { faction, race, className, spec }
+}
+
+function validateProfessions(value: unknown): readonly Profession[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const valid = value.filter(
+    (entry): entry is Profession => typeof entry === 'string' && primaryProfessions.includes(entry as Profession),
+  )
+  const unique = [...new Set(valid)].slice(0, PRIMARY_PROFESSION_LIMIT)
+  return unique.length > 0 ? unique : undefined
 }
 
 /**

@@ -14,6 +14,7 @@ import { deriveTalentModifiers } from './domain/talents/talentModifiers'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
 import { applyWeaponSlotRules, defaultGear, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
+import { dropIllegalEnchants } from './domain/enchants/sampleEnchants'
 import { ComparePanel } from './features/gear/ComparePanel'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
@@ -132,7 +133,10 @@ const PLANNER_VIEWS: readonly TabDefinition<PlannerView>[] = [
 /** Rebuilds a full gear set from a saved build, normalized against the character it was saved for. */
 function gearFromBuild(build: SavedBuild): EquippedGear {
   const baseline = normalizeGearForCharacter(defaultGear, build.character.className, build.character.spec)
-  return normalizeGearForCharacter(applySavedGear(baseline, build.gear), build.character.className, build.character.spec)
+  const normalized = normalizeGearForCharacter(applySavedGear(baseline, build.gear), build.character.className, build.character.spec)
+  // A saved `enchantId` is carried across on a type check alone, so a build from before professions
+  // existed can arrive holding a ring enchant its character is not entitled to.
+  return dropIllegalEnchants(normalized, build.character)
 }
 
 function App() {
@@ -244,7 +248,11 @@ function App() {
     // talent ids that the new class's trees do not contain.
     if (nextCharacter.className !== character.className) setTalentPoints({})
     setCharacter(nextCharacter)
-    setGear((current) => normalizeGearForCharacter(current, nextCharacter.className, nextCharacter.spec))
+    setGear((current) =>
+      // Enchants as well as items: dropping Enchanting has to take the ring enchant with it, or the
+      // picker stops offering something the stat rail is still counting.
+      dropIllegalEnchants(normalizeGearForCharacter(current, nextCharacter.className, nextCharacter.spec), nextCharacter),
+    )
     setSimulationResult(undefined)
   }
 

@@ -20,10 +20,10 @@ Buffs, debuffs, and consumables are wired into the stat pipeline. Talents are no
 - All 13 professions: skill tiers, trainer requirements, material farm locations, leveling paths
 - Wowhead Phase 2 spec tier lists (DPS, healer, tank) as their own section — 28 placements covering all 27 specs
 - Talent trees for all nine classes: 579 talents across 27 trees, with icons, per-rank descriptions and prerequisite gating
+- Professions on the character: a two-slot picker in the rail, gating TBC's one always-on profession stat bonus. Enchanting's ring enchants are Enchanter-only and now reach both fingers rather than neither being gated and only one being offered
 
 ## Remaining
 
-- Profession stat bonuses in the *simulator* — the payoff data is done and says what each profession is worth at 70, but CharacterProfile carries no professions, so Enchanting's ring enchants (the only always-on stat bonus in TBC) do not reach calculateStats
 - Race/class-specific assumptions beyond legality checks
 - Feral bear/cat mode split
 
@@ -32,6 +32,8 @@ Buffs, debuffs, and consumables are wired into the stat pipeline. Talents are no
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
+- [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
+- [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`

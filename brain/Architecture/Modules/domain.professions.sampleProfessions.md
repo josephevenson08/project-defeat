@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 
 ## Concepts & phases

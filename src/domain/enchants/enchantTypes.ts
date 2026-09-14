@@ -1,6 +1,7 @@
 import type { CharacterRole, TbcClass, TbcSpec } from '../character/characterTypes'
 import type { GearSlot } from '../gear/gearSlots'
 import type { BuildRole, ItemSource, WeaponType } from '../gear/itemTypes'
+import type { Profession } from '../professions/professionTypes'
 import type { StatBlock } from '../stats/statTypes'
 
 export type Enchant = {
@@ -24,6 +25,14 @@ export type Enchant = {
   roles?: Array<CharacterRole | BuildRole>
   allowedSlots?: GearSlot[]
   allowedWeaponTypes?: WeaponType[]
+  /**
+   * A profession the character must carry to have this enchant at all.
+   *
+   * TBC's ring enchants are the only ones: Wowhead's spell 27927 carries the flag "target must be
+   * own item", so no one can apply them for you. Everything else in the catalogue can be bought from
+   * another player and is available to anybody.
+   */
+  profession?: Profession
   /** Shield-only weapon enchants (e.g. "Shield - Intellect"). */
   requiresShield?: boolean
   /** Two-hand-only weapon enchants (e.g. "Savagery"). */

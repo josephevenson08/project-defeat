@@ -147,6 +147,13 @@ behind every claim of its that quotes a number.
   the first screen, and the character selects go two-up. Measured at 375px: every section has zero
   horizontal overflow. What this is *not* yet is a layout designed for a phone — tap targets are
   33-38px against the 44px guideline and the tab bars wrap to three rows
+- **Professions on the character** — a two-slot picker in the rail, gating the one always-on stat
+  bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
+  Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**
+  rings, for +8 to every attribute. The app previously had this wrong in both directions at once —
+  offering them to every character, and only ever on Finger 1. Dropping the profession removes the
+  enchant rather than leaving it applied. Everything else a profession gives in TBC is access, not
+  stats, and the picker says so rather than implying a bonus that is really Wrath's
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
   actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip

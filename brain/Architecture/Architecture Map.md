@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-188 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+189 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,18 +16,18 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 47 importers
+- [[domain.character.characterTypes]] — 48 importers
 - [[domain.gear.itemTypes]] — 28 importers
 - [[domain.stats.statTypes]] — 19 importers
 - [[domain.gear.gearSlots]] — 17 importers
 - [[features.character.characterTypes]] — 17 importers
+- [[domain.professions.professionTypes]] — 14 importers
 - [[components.layout.Panel]] — 13 importers
 - [[domain.abilities.abilityTypes]] — 13 importers
 - [[features.gear.gearTypes]] — 12 importers
 - [[domain.raids.raidTypes]] — 11 importers
 - [[domain.character.roleTheme]] — 10 importers
 - [[domain.gear.slotCompatibility]] — 10 importers
-- [[domain.professions.index]] — 10 importers
 
 ## By layer
 
@@ -109,7 +109,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (123)
+### domain (124)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -143,7 +143,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
-- [[domain.character.characterTypes]] · 47 importers
+- [[domain.character.characterTypes]] · 48 importers
 - [[domain.character.classColors]] · 4 importers
 - [[domain.character.factionColors]] · 1 importers
 - [[domain.character.races]] · 3 importers
@@ -157,7 +157,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.enchants.enchantCatalogueJson.d]] · 0 importers
 - [[domain.enchants.enchantSupplementJson.d]] · 0 importers
 - [[domain.enchants.enchantTypes]] · 1 importers
-- [[domain.enchants.sampleEnchants]] · 6 importers
+- [[domain.enchants.sampleEnchants]] · 7 importers
 - [[domain.gear.acquisitionCost]] · 1 importers
 - [[domain.gear.acquisitionCostsJson.d]] · 0 importers
 - [[domain.gear.armorValues]] · 1 importers
@@ -180,6 +180,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gems.sampleGems]] · 6 importers
 - [[domain.icons.icons]] · 1 importers
 - [[domain.icons.iconsJson.d]] · 0 importers
+- [[domain.professions.characterProfessions]] · 2 importers
 - [[domain.professions.craftingPaths]] · 1 importers
 - [[domain.professions.farmingRoutes]] · 2 importers
 - [[domain.professions.gatheringGuides]] · 2 importers
@@ -187,9 +188,9 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.gatheringRangeTypes]] · 3 importers
 - [[domain.professions.index]] · 10 importers
 - [[domain.professions.professionPayoffs]] · 1 importers
-- [[domain.professions.professionTypes]] · 9 importers
+- [[domain.professions.professionTypes]] · 14 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
-- [[domain.professions.sampleProfessions]] · 1 importers
+- [[domain.professions.sampleProfessions]] · 2 importers
 - [[domain.professions.sampleProfessionTiers]] · 4 importers
 - [[domain.raidcomp.buffCoverage]] · 1 importers
 - [[domain.raidcomp.index]] · 3 importers

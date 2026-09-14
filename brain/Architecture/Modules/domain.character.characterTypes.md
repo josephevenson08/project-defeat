@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/character/characterTypes.ts
-lines: 66
+lines: 81
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.character.characterTypes
 
-`src/domain/character/characterTypes.ts` · **domain** layer · 66 lines
+`src/domain/character/characterTypes.ts` · **domain** layer · 81 lines
 
 _No doc comment at the top of this file._
 
@@ -19,7 +19,7 @@ _No doc comment at the top of this file._
 
 ## Imports
 
-_None._
+- [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 
 ## Imported by
 
@@ -46,6 +46,7 @@ _None._
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
+- [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`

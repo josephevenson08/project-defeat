@@ -11162,3 +11162,152 @@ test('the stat readout collapses behind a disclosure on a phone, and only on a p
   await expect(page.locator('.rail-stats h2'), 'the desktop rail keeps its heading').toBeVisible()
   expect(await page.locator('.rail-stat').count(), 'and shows its rows without being asked').toBeGreaterThan(0)
 })
+
+/*
+ * Professions, which exist for exactly one reason: TBC's ring enchants are Enchanter-only, and they
+ * are the single always-on stat bonus any profession gives a level 70 character. Everything else a
+ * profession provides is access — gear nobody else can wear, recipes nobody else can make — and
+ * `professionPayoffs.ts` carries that with its sourcing.
+ */
+
+/** The rail's own number for a stat, which is what a player actually reads. */
+function railStat(page: Page, stat: string) {
+  return page.getByTestId(`stat-${stat}`).locator('.rail-stat-value')
+}
+
+function professionChip(page: Page, profession: string) {
+  return page.getByTestId(`profession-${profession.toLowerCase().replaceAll(' ', '-')}`)
+}
+
+test('ring enchants need Enchanting, and an Enchanter gets one on each hand', async ({ page }) => {
+  await openApp(page)
+
+  /*
+   * **Two bugs pointing opposite ways, which is why neither showed up as an obviously wrong total.**
+   *
+   * Every ring enchant was filed `slot: 'Finger 1'` with no `allowedSlots`, and `enchantFitsSlot`
+   * falls back to `[enchant.slot]` — so Finger 2 was offered nothing at all, on every character. And
+   * none carried a profession restriction, so Finger 1's four were offered to everybody, including a
+   * Fury Warrior who has never had a profession. The app understated an Enchanter by a ring and
+   * overstated everyone else by one.
+   */
+  await openSlot(page, 'Finger 1')
+  await expect(page.getByLabel('Finger 1 enchant'), 'a character with no professions is offered none').toHaveCount(0)
+  await expect(page.getByTestId('popup-enchant-locked'), 'and is told why, rather than just shown nothing').toContainText(
+    /Enchanting/,
+  )
+  await closeSlot(page)
+
+  const strength = railStat(page, 'strength')
+  const before = Number(await strength.innerText())
+
+  await professionChip(page, 'Enchanting').click()
+  await expect(professionChip(page, 'Enchanting')).toHaveAttribute('aria-pressed', 'true')
+
+  // Both hands, which is the half the app was losing. `professionPayoffs.ts` says it in its own copy:
+  // "+4 all stats per ring, so +8 across both".
+  for (const slot of ['Finger 1', 'Finger 2'] as const) {
+    await openSlot(page, slot)
+    await expect(page.getByLabel(`${slot} enchant`)).toBeVisible()
+    await closeSlot(page)
+    await selectSlotEnchant(page, slot, 'ring-stats')
+  }
+
+  await expect(strength, 'two rings at +4 Strength each').toHaveText(String(before + 8))
+})
+
+test('dropping a profession takes the enchant it unlocked with it', async ({ page }) => {
+  await openApp(page)
+
+  /*
+   * **A restriction that only filters the picker is not a restriction.** The equipped `enchantId`
+   * lives on the gear, and nothing re-examined it when the character changed —
+   * `normalizeGearForCharacter` solves exactly this problem for items and had never looked at
+   * enchants. So taking Enchanting, enchanting both rings and dropping it again left +8 to five
+   * stats applied by a character who could no longer be offered it anywhere.
+   */
+  await professionChip(page, 'Enchanting').click()
+  const strength = railStat(page, 'strength')
+  const unenchanted = Number(await strength.innerText())
+
+  await selectSlotEnchant(page, 'Finger 1', 'ring-stats')
+  await selectSlotEnchant(page, 'Finger 2', 'ring-stats')
+  await expect(strength).toHaveText(String(unenchanted + 8))
+
+  await professionChip(page, 'Enchanting').click()
+  await expect(strength, 'the bonus goes when the profession does').toHaveText(String(unenchanted))
+
+  // And it is genuinely gone from the slot, not merely uncounted — an enchant shown as equipped but
+  // contributing nothing would be its own kind of lie.
+  await openSlot(page, 'Finger 1')
+  await expect(page.getByLabel('Finger 1 enchant')).toHaveCount(0)
+  await closeSlot(page)
+})
+
+test('the rail holds two professions, and a third replaces the oldest', async ({ page }) => {
+  await openApp(page)
+
+  const picker = page.getByTestId('rail-professions')
+  await expect(picker).toBeVisible()
+
+  // Primary professions only. Cooking, First Aid and Fishing are not a choice — everyone can take all
+  // three — and none of them touches a stat, so they would lengthen the list for nothing.
+  await expect(page.locator('.rail-profession'), 'ten primaries, no secondaries').toHaveCount(10)
+  await expect(professionChip(page, 'Cooking')).toHaveCount(0)
+
+  await professionChip(page, 'Enchanting').click()
+  await professionChip(page, 'Mining').click()
+  await expect(picker).toContainText('2/2')
+
+  /*
+   * A third **replaces** rather than being refused. On a ten-option control where changing your mind
+   * is the whole point, refusing the click leaves the player to work out which existing choice is in
+   * the way; dropping a profession is destructive in the game and free in a planner.
+   */
+  await professionChip(page, 'Tailoring').click()
+  await expect(picker).toContainText('2/2')
+  await expect(professionChip(page, 'Enchanting'), 'the oldest gave way').toHaveAttribute('aria-pressed', 'false')
+  await expect(professionChip(page, 'Mining')).toHaveAttribute('aria-pressed', 'true')
+  await expect(professionChip(page, 'Tailoring')).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('a build carries professions, and one saved before they existed still loads', () => {
+  const base = {
+    version: BUILD_FORMAT_VERSION,
+    savedAt: new Date().toISOString(),
+    gear: {},
+    activeBuffIds: [],
+    activeConsumableIds: [],
+    activeTargetDebuffIds: [],
+    talentPoints: {},
+    target: { level: 73, armor: 7700 },
+  }
+  const character = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+
+  const carried = validateBuild({ ...base, character: { ...character, professions: ['Enchanting', 'Mining'] } })
+  expect(carried.ok).toBe(true)
+  if (carried.ok) expect(carried.build.character.professions).toEqual(['Enchanting', 'Mining'])
+
+  /*
+   * **Professions are dropped when wrong rather than rejecting the build**, unlike faction/race/class,
+   * which decide who the character is. A build from before this field existed simply has none, and
+   * one carrying junk is still a build whose gear and talents are perfectly good — refusing it
+   * outright would throw away far more than it protects.
+   */
+  const legacy = validateBuild({ ...base, character })
+  expect(legacy.ok, 'a build with no professions field is not rejected').toBe(true)
+  if (legacy.ok) expect(legacy.build.character.professions).toBeUndefined()
+
+  const junk = validateBuild({ ...base, character: { ...character, professions: ['Bartending', 7, 'Mining'] } })
+  expect(junk.ok).toBe(true)
+  if (junk.ok) expect(junk.build.character.professions, 'the real one survives, the rest are dropped').toEqual(['Mining'])
+
+  // Over-long lists are truncated rather than dropped whole: the enchant filter reads membership, so
+  // a third profession would otherwise widen what the character can take.
+  const tooMany = validateBuild({
+    ...base,
+    character: { ...character, professions: ['Enchanting', 'Mining', 'Tailoring'] },
+  })
+  expect(tooMany.ok).toBe(true)
+  if (tooMany.ok) expect(tooMany.build.character.professions).toHaveLength(2)
+})

@@ -85,10 +85,34 @@ damage taken), and consumables (flasks/elixirs/food with Alchemy/Cooking craftin
 implemented and wired into `calculateStats`/`calculateSimulation`, with a Buffs & Consumables panel
 in the UI. A separate Professions domain (`src/domain/professions/`) covers all 13 TBC professions'
 skill tiers/trainer requirements, gathering levelling ranges with routes, and crafting levelling
-paths, surfaced in its own Professions tab — this is leveling/farming reference data, distinct from the still-unstarted
-"profession bonuses to stats" item above (e.g. extra sockets from Blacksmithing). Talent trees,
-race/class-specific assumptions beyond legality checks, and the Feral bear/cat mode split remain
-unstarted.
+paths, surfaced in its own Professions tab — levelling and farming reference data.
+
+**Profession bonuses landed 2026-09-14, and the item as originally written described the wrong
+expansion.** It said "profession bonuses to stats (e.g. extra sockets from Blacksmithing)", which is
+Wrath; so are Herbalism's Lifeblood, Mining's Toughness and Leatherworking's Fur Lining.
+`professionPayoffs.ts` established the real position when it was written: **in TBC exactly one
+profession puts an always-on stat bonus on a level 70 character, and it is Enchanting.** Everything
+else is access — bind-on-pickup gear, or a consumable only you can make.
+
+So `CharacterProfile` now carries up to two professions, picked in the rail, and the only thing they
+gate is Enchanting's ring enchants. That turned out to be a bug fix rather than a feature, and the
+app had it wrong in **both directions at once**:
+
+- Ring enchants carried no profession restriction, so every character was offered them — a Fury
+  Warrior who had never had a profession could take +4 to five stats.
+- Every one was filed `slot: 'Finger 1'` with no `allowedSlots`, and `enchantFitsSlot` falls back to
+  `[enchant.slot]`, so **Finger 2 was offered nothing at all**, on every character. The payoff data
+  says it plainly in its own copy: "+4 all stats per ring, so +8 across both".
+
+The two errors pointed opposite ways, which is why neither read as an obviously wrong total, and why
+fixing the slot half alone would have made the other half worse. A profession restriction also had to
+reach further than the picker: the equipped `enchantId` lives on the gear, so `dropIllegalEnchants`
+runs wherever the character changes — dropping Enchanting takes the ring enchant with it rather than
+leaving +8 applied to someone who can no longer be offered it.
+
+Talent trees are done — 579 talents across 27 trees, with icons, per-rank descriptions and
+prerequisite gating. Race/class-specific assumptions beyond legality checks and the Feral bear/cat
+mode split remain unstarted.
 
 ## Phase 4: Simulation
 

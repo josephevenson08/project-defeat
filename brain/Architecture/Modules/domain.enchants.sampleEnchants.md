@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/enchants/sampleEnchants.ts
-lines: 79
+lines: 203
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.enchants.sampleEnchants
 
-`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 79 lines
+`src/domain/enchants/sampleEnchants.ts` · **domain** layer · 203 lines
 
 From the top of the file:
 
@@ -30,7 +30,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `getEnchantById`, `getEnchantsForSlot`
+**function** — `dropIllegalEnchants`, `getEnchantById`, `getEnchantsForSlot`, `professionsGatingEnchantsForSlot`
 
 **const** — `sampleEnchants`
 
@@ -40,9 +40,11 @@ From the top of the file:
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 
 ## Imported by
 
+- [[App]] — `src/App.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
@@ -54,6 +56,7 @@ From the top of the file:
 
 - [[Enchants]]
 - [[Phase 2 - Gear Gems Enchants]]
+- [[Phase 3 - Character Systems]]
 
 Up: [[Architecture Map]]
 

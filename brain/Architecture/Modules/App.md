@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 399
+lines: 407
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 399 lines
+`src/App.tsx` · **app** layer · 407 lines
 
 From the top of the file:
 
@@ -36,6 +36,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
+- [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`

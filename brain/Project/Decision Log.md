@@ -198,6 +198,18 @@ A test named "the layout reflows to phone width without overflowing" passed thro
 
 Neither the viewport nor the assertion was wrong. The coverage was: one section stood in for an app whose layout differs by section. A test at a breakpoint should name which surfaces it swept, and a layout bug that only appears in one shell variant is exactly what a single-surface check cannot see.
 
+## Two errors pointing opposite ways hide each other
+
+TBC's ring enchants were filed `slot: 'Finger 1'` with no `allowedSlots`, so the second ring could never be enchanted — and they carried no profession restriction, so the first ring's four were offered to every character alive. The app understated an Enchanter by a ring and overstated everyone else by one.
+
+Neither surfaced as an obviously wrong number, because a total that is too low for one player and too high for another looks merely unfamiliar rather than broken. The practical consequence is a rule about sequencing: **fixing the slot half alone would have made the profession half worse**, handing every non-Enchanter two free ring enchants instead of one. When a defect has two sides, check whether closing one widens the other before shipping either.
+
+## A restriction that only filters the picker is not a restriction
+
+Gating ring enchants behind Enchanting filtered what the gear popup offered — and nothing else. The equipped `enchantId` lives on the gear, so taking Enchanting, enchanting both rings and dropping the profession again left +8 to five stats applied to a character the app would no longer offer it to anywhere. A saved build was the same story: `enchantId` came back on a `typeof === "string"` check with no legality test at all.
+
+`normalizeGearForCharacter` had solved exactly this problem for *items* since early on, and had never looked at enchants. The fix is `dropIllegalEnchants` beside it on the same choke point. The general form: when you add a rule about what a character may have, find every place the old answer is already stored, because the picker is only where it is chosen — not where it lives.
+
 ## Related
 
 - [[Architecture Map]]

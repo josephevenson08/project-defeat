@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
+import { getEnchantsForSlot, professionsGatingEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById, getGemsForSocket, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { metaGemIsActive } from '../../domain/gems/gemTypes'
@@ -48,6 +48,7 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
     return list?.entries.find((entry) => entry.itemId === equipped.item.id && getPairedGearSlots(entry.slot).includes(slot))
   }, [character.className, character.spec, equipped.item.id, slot])
   const enchants = getEnchantsForSlot(slot, character, equipped.item)
+  const gatingProfessions = professionsGatingEnchantsForSlot(slot, character, equipped.item)
 
   /**
    * Highest item level first, then alphabetical.
@@ -198,6 +199,18 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
               </p>
             )}
           </div>
+
+          {/*
+            Names the profession rather than leaving the slot silently without a control. An absent
+            enchant picker is indistinguishable from "this app does not model ring enchants", which is
+            the same silence that let them be handed to every character for months.
+          */}
+          {gatingProfessions.length > 0 && (
+            <p className="popup-enchant-locked" data-testid="popup-enchant-locked">
+              {gatingProfessions.join(' or ')} unlocks {enchants.length > 0 ? 'more enchants for this slot' : 'this slot’s enchants'} — pick it
+              in the rail.
+            </p>
+          )}
 
           {enchants.length > 0 && (
             <label className="popup-field">

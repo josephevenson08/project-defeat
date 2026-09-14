@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/enchants/enchantTypes.ts
-lines: 42
+lines: 51
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.enchants.enchantTypes
 
-`src/domain/enchants/enchantTypes.ts` · **domain** layer · 42 lines
+`src/domain/enchants/enchantTypes.ts` · **domain** layer · 51 lines
 
 _No doc comment at the top of this file._
 
@@ -22,6 +22,7 @@ _No doc comment at the top of this file._
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 
 ## Imported by

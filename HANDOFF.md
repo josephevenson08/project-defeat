@@ -7,9 +7,104 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Where this is right now (2026-09-14, latest — READ THIS FIRST)
 
-**The phone layout was never running.**
+**Ring enchants were wrong in both directions at once.**
 
-`main` is green and pushed: **245 tests, lint and build clean.** Two features landed today — gear
+`main` is green and pushed: **249 tests, lint and build clean.** Three things landed today — gear
+comparison, the phone layout, and professions on the character.
+
+### The finding, which is not what the roadmap item said
+
+Phase 3 carried "Profession stat bonuses in the *simulator* — ... `CharacterProfile` carries no
+professions, so Enchanting's ring enchants do not reach `calculateStats`". Measured, that framing was
+wrong: the ring enchants are ordinary catalogue entries with real stats and they **already reached
+`calculateStats`**. The defect was the opposite, and it was two-sided:
+
+- **They carried no profession restriction at all**, so every character was offered them. A Fury
+  Warrior who had never had a profession could take Ring - Stats for +4 to five stats. Wowhead's
+  spell 27927 is flagged "target must be own item" — nobody can apply these for you.
+- **Every one was filed `slot: 'Finger 1'` with no `allowedSlots`**, and `enchantFitsSlot` falls back
+  to `[enchant.slot]` — so **Finger 2 was offered nothing at all**, on every character, forever.
+  Verified by loading the module: `Finger 1: 4 enchants, Finger 2: 0`.
+
+`professionPayoffs.ts` has said the right thing in its own copy the whole time: "+4 all stats per
+ring, **so +8 across both**". The app was reading its own sourced data and delivering half of it to
+the wrong people.
+
+**The two errors pointed opposite ways, which is why neither ever read as an obviously wrong total** —
+it understated an Enchanter by a ring and overstated everyone else by one. It also means **fixing the
+slot half alone would have made the other half worse**, handing every non-Enchanter two free ring
+enchants instead of one. They had to move together.
+
+### What the roadmap item got right, and what it got wrong
+
+Right: professions belong on `CharacterProfile`. Wrong: the original wording was "profession *bonuses
+to stats* (e.g. extra sockets from Blacksmithing)" — **that is Wrath.** So are Herbalism's Lifeblood,
+Mining's Toughness and Leatherworking's Fur Lining. `professionPayoffs.ts` settled this when it was
+written: in TBC exactly **one** profession puts an always-on stat bonus on a level 70 character, and
+it is Enchanting. Everything else is access. So the whole feature only has to reach the enchant
+filter, which is why it is as small as it is.
+
+### What was built
+
+- `CharacterProfile.professions` — **optional**, up to two, so every build saved before today loads
+  unchanged and correctly has none.
+- A **two-slot picker in the rail**, ten primary professions. Secondary ones (Cooking, First Aid,
+  Fishing) are excluded: everyone can take all three, so they are not a choice, and none touches a
+  stat. Picking a third **replaces the oldest** rather than being refused.
+- An **overlay** in `sampleEnchants.ts` giving the four ring enchants `profession: 'Enchanting'` and
+  both finger slots. An overlay because both JSON files are *generated* — a hand-edited field would
+  survive until the next ingest and then vanish silently. **It throws at import if an id stops
+  matching**, because a rename would otherwise quietly restore the original bug.
+- `dropIllegalEnchants`, run wherever the character changes.
+
+### The part that is easy to miss: a picker filter is not a restriction
+
+Gating the picker changes what you can *choose*. The equipped `enchantId` lives on the gear, and
+nothing re-examined it — so taking Enchanting, enchanting both rings and dropping the profession left
+**+8 to five stats applied to a character the app would no longer offer it to anywhere**. A saved
+build was the same: `enchantId` came back on a `typeof === "string"` check with no legality test.
+
+`normalizeGearForCharacter` has solved exactly this problem for *items* since early on and had never
+looked at enchants. `dropIllegalEnchants` sits beside it on the same choke point and closes one
+pre-existing hole as a side effect — one enchant in the catalogue is class-restricted and survived a
+class switch the same way.
+
+**The general rule, now in the Decision Log: when you add a rule about what a character may have,
+find every place the old answer is already stored.** The picker is where it is chosen, not where it
+lives.
+
+### Measured, end to end in the browser
+
+| | Finger 1 | Finger 2 |
+|---|---|---|
+| before | 4 enchants, any character | **0**, any character |
+| no professions | 0, with a line naming Enchanting | 0 |
+| Enchanter | 4 | 4 |
+
+Ring - Stats on both hands moves Strength 145 → 153, Stamina 133 → 141, Agility 96 → 104 — +8 each,
+exactly what the sourced data says. Dropping Enchanting reverts all three and clears both slots.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job; they make the images. Missing:
+   Nightbane, and all of Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **A phone-*designed* layout** — the app fits a phone now but was not designed for one. Tap targets
+   are 33-38px against the 44px guideline and the tab bars wrap to three rows. Both trade against the
+   density this app is built on, so they are worth asking about rather than guessing.
+3. **Build-against-build comparison** — the comparison panel answers the item question by choice.
+4. **Five-design boards for the remaining tabs** — **cold, not pending.** Do not restart without asking.
+5. **Deprioritised and not to be picked up unasked** — rotations, tank score weighting,
+   multi-iteration variance.
+
+Phase 3's remaining items are now just race/class-specific assumptions beyond legality checks, and
+the Feral bear/cat mode split.
+
+---
+
+## Where this was on 2026-09-14 (the phone layout was never running)
+
+`main` is green and pushed: **245 tests, lint and build clean.** Two features landed by this point today — gear
 comparison (below) and the phone layout.
 
 ### The finding: a dead CSS rule, and four months of a broken phone layout
@@ -537,7 +632,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-245 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+249 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3210,7 +3305,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 245 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 249 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```

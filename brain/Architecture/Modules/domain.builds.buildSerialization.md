@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/builds/buildSerialization.ts
-lines: 209
+lines: 233
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.builds.buildSerialization
 
-`src/domain/builds/buildSerialization.ts` · **domain** layer · 209 lines
+`src/domain/builds/buildSerialization.ts` · **domain** layer · 233 lines
 
 _No doc comment at the top of this file._
 
@@ -29,6 +29,8 @@ _No doc comment at the top of this file._
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
+- [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 
 ## Imported by
