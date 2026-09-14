@@ -10,7 +10,7 @@ tags: [brain/project, project/phase, status/partial]
 
 **Status: partial**
 
-Upgrade planning, side-by-side gear comparison, build save/load, import/export and source-and-cost planning all work. Shareable builds and a real mobile layout do not.
+Upgrade planning, side-by-side gear comparison, build save/load, import/export, source-and-cost planning and a phone layout that fits all work. Shareable builds do not, and fitting a phone is not the same as being designed for one.
 
 ## Done
 
@@ -23,12 +23,13 @@ Upgrade planning, side-by-side gear comparison, build save/load, import/export a
 - Planner split into six sub-tabs instead of one ~15-screen column, with the stat rail persisting across all six
 - Stat rail scoped to the spec — 12 rows rather than 26 on a Fury Warrior — with a toggle that restores every stat
 - Source planning: the guide Source column parsed into structured data and joined to raid loot and the catalogue, so 90.1% of recommended items say where they come from against 32.7% before
+- Phone layout repaired: the shell collapses to one column below 900px, the rail unpins and its stat readout collapses behind a disclosure, and all eleven surfaces measure zero horizontal overflow at 375px
 
 ## Remaining
 
 - Cloud/shareable builds — slots are browser-local, so they do not follow you to another machine
 - Build-against-build comparison — the comparison panel is item against item, by choice; comparing two whole builds is a separate question it does not answer
-- Better responsive/mobile layout
+- A layout designed for a phone rather than one that fits it — tap targets are 33-38px against the 44px guideline, and the tab bars wrap to three rows at 375px
 - The ranked-gear panel is still 9.4 screens on its own — sub-tabs fixed navigation, not that panel's length
 
 ## Key modules

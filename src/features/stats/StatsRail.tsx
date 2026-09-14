@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { animateStatUpdate } from '../../lib/animations'
+import { useMediaQuery } from '../../lib/useMediaQuery'
 import { relevantStats } from '../../domain/stats/statRelevance'
 import type { CharacterRole, TbcClass, TbcSpec } from '../../domain/character/characterTypes'
 import { statLabels, type StatBlock } from './statsTypes'
@@ -27,6 +28,16 @@ type StatsRailProps = {
  *
  * Zero-valued stats that *are* relevant stay visible but dimmed rather than being hidden: a rail you
  * glance at while swapping gear should not reflow every time a stat crosses zero.
+ *
+ * **Below 900px the whole readout collapses behind a disclosure, and that is a concession the desktop
+ * rail does not make.** The rail's premise is that the totals stay on screen while you move between
+ * panels — but under 900px the shell stops being two columns, so the rail becomes a band *above* the
+ * content and nothing about it is "always visible" any more. Measured on a 375px phone it was exactly
+ * one full screen tall, which put the gear panel a whole swipe below the fold on every arrival. So on
+ * a phone the trade runs the other way: one tap to read the stats, in exchange for the thing you came
+ * to do being on the first screen.
+ *
+ * Collapsed means *absent*, not `display: none` — see `useMediaQuery` for why.
  */
 
 const GROUPS: ReadonlyArray<{ title: string; keys: ReadonlyArray<keyof StatBlock> }> = [
@@ -55,8 +66,20 @@ export function StatsRail({ stats, role, className, spec }: StatsRailProps) {
    */
   const [showAll, setShowAll] = useState(false)
 
+  /*
+   * 900px is the shell's own breakpoint, not a second opinion about what counts as narrow — this
+   * collapse exists *because* the shell stops being two columns there, so the two have to agree.
+   */
+  const isNarrow = useMediaQuery('(max-width: 900px)')
+  const [expandedWhenNarrow, setExpandedWhenNarrow] = useState(false)
+  const readoutVisible = !isNarrow || expandedWhenNarrow
+
   useEffect(() => {
-    animateStatUpdate(ref.current?.querySelectorAll('.rail-stat-value') ?? null)
+    const values = ref.current?.querySelectorAll('.rail-stat-value')
+    // Nothing to animate while the readout is collapsed on a phone, and handing anime an empty list
+    // makes it warn "No target found" on every stat change.
+    if (!values?.length) return
+    animateStatUpdate(values)
   }, [stats])
 
   const visibleGroups = GROUPS.map((group) => ({
@@ -70,9 +93,24 @@ export function StatsRail({ stats, role, className, spec }: StatsRailProps) {
 
   return (
     <section className="rail-stats" ref={ref} aria-label="Stats">
-      <h2 className="rail-heading">Stats</h2>
+      {isNarrow ? (
+        <button
+          type="button"
+          className="rail-stats-disclosure"
+          aria-expanded={expandedWhenNarrow}
+          onClick={() => setExpandedWhenNarrow((current) => !current)}
+          data-testid="rail-stats-disclosure"
+        >
+          <span className="rail-heading">Stats</span>
+          {/* Names what is behind the button rather than just "Show", so a collapsed rail never reads
+              as a section that has nothing in it. */}
+          <span className="rail-stats-disclosure-hint">{expandedWhenNarrow ? 'Hide' : `${shownCount} stats`}</span>
+        </button>
+      ) : (
+        <h2 className="rail-heading">Stats</h2>
+      )}
 
-      {visibleGroups.map((group) => (
+      {readoutVisible && visibleGroups.map((group) => (
         <section className="rail-stat-group" key={group.title}>
           <p className="rail-stat-group-title">{group.title}</p>
           {group.keys.map((key) => {
@@ -93,7 +131,7 @@ export function StatsRail({ stats, role, className, spec }: StatsRailProps) {
         like it is simply missing stats. Nothing is removed — this is the escape hatch for any spec
         where the relevance call is arguable.
       */}
-      {hiddenCount > 0 || showAll ? (
+      {readoutVisible && (hiddenCount > 0 || showAll) ? (
         <button type="button" className="rail-stat-toggle" onClick={() => setShowAll((current) => !current)} data-testid="rail-show-all-stats">
           {showAll ? `Show only ${spec} stats` : `Show ${hiddenCount} more`}
         </button>

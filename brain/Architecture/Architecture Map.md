@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-187 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+188 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -237,11 +237,12 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.tierlists.tierListsJson.d]] · 0 importers
 - [[domain.tierlists.tierListTypes]] · 2 importers
 
-### lib (1)
+### lib (2)
 
 Cross-cutting helpers with no domain meaning.
 
 - [[lib.animations]] · 7 importers
+- [[lib.useMediaQuery]] · 1 importers
 
 Up: [[Project Defeat Brain]]
 

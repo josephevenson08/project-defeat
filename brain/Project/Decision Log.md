@@ -186,6 +186,18 @@ The comparison panel shipped twice, in one session, showing three true numbers t
 
 The delta a reader sees is derived from the pair they see, at the cost of up to a tenth of a point. It also decides which rows exist: stat rows are filtered on the rounded values, so a pair differing by less than half a point does not occupy a row reading "8 8 +0" — a difference the table asserts and then cannot show. Anything checkable by eye has to survive being checked.
 
+## A scoped selector raises the bar for every later rule, media queries included
+
+`.app-shell:not(.app-shell-no-rail)` was written to stop the rail column being reinstated on the sections that have no rail. It fixed that — and silently killed the rule that collapses the same grid to one column below 900px, which was a bare `.app-shell`. **A media query contributes no specificity**, so the collapse matched, its query applied, and it lost the cascade at every width.
+
+The cost was the whole phone layout: the rail held a fixed 288px on a 375px screen, the app was laid out in the 87px left over, the gear paperdoll computed to 1px wide, and the mobile rules written for panels *below* the shell had never run at all. The lesson is not "avoid `:not()`" — it is that raising a selector's specificity is a change to every other rule targeting that element, and the ones inside media queries are the easiest to forget because they read as though they win by context.
+
+## A responsive test proves only the width and the surface it actually opened
+
+A test named "the layout reflows to phone width without overflowing" passed throughout the period the planner was unusable on a phone. It sets a 375px viewport and asserts no horizontal scroll, which is the right property — but it opens Raid Composition, and that section carries `app-shell-no-rail`, the one shell variant the bug could not affect. The two sections with a rail were the broken ones and nothing ever looked at them.
+
+Neither the viewport nor the assertion was wrong. The coverage was: one section stood in for an app whose layout differs by section. A test at a breakpoint should name which surfaces it swept, and a layout bug that only appears in one shell variant is exactly what a single-surface check cannot see.
+
 ## Related
 
 - [[Architecture Map]]

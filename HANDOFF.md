@@ -7,7 +7,101 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Where this is right now (2026-09-14, latest — READ THIS FIRST)
 
-`main` is green and pushed: **242 tests, lint and build clean.** The working tree carries only the
+**The phone layout was never running.**
+
+`main` is green and pushed: **245 tests, lint and build clean.** Two features landed today — gear
+comparison (below) and the phone layout.
+
+### The finding: a dead CSS rule, and four months of a broken phone layout
+
+The app "was never designed for a phone" was the standing description, and the open item said it
+**did not overflow at 375px**. Both were wrong in the same direction. Measured rather than assumed:
+
+- `.app-shell` collapses its two grid tracks to one below 900px. That rule was written as a bare
+  `.app-shell` — **one class against the two of `.app-shell:not(.app-shell-no-rail)`**, which sets the
+  desktop tracks. A media query contributes no specificity, so the collapse matched, its query
+  applied, and it lost the cascade at every width from the moment that `:not()` scoping landed.
+- So on a 375px phone the rail kept a **fixed 288px** and the entire app was laid out in the **87px**
+  that remained. The gear paperdoll computed to **1px wide**. 128 elements sat past the right edge,
+  and the window could not scroll horizontally, so none of it was reachable.
+- Every mobile rule written for anything *below* the shell had therefore never run — the paperdoll's
+  single-column layout and its reordered summary among them. They were correct and dead.
+
+**A phone-overflow test existed the whole time and passed.** `the layout reflows to phone width
+without overflowing` sets a 375px viewport and asserts no horizontal scroll, which is the right
+property. It opens **Raid Composition**, which carries `app-shell-no-rail` — the one shell variant
+the bug could not touch, because nothing outranks its single-column rule. The planner and Simulation
+are the sections with a rail and nothing had ever looked at them at that width.
+
+That is the reusable lesson and it is now in the Decision Log twice over: a scoped selector raises
+the bar for every later rule targeting that element, and a responsive test proves only the surface it
+actually opened.
+
+### What was fixed, in the order the fixes became visible
+
+Each of these was only measurable once the one before it was done, which is why they are listed as a
+sequence rather than a checklist.
+
+1. **The shell collapse, by matching the specificity it had to beat.** Overflow at 375px went
+   **213px → 0**, wide elements **128 → 0**.
+2. **The rail stopped being sticky and full-height when stacked.** `height: 100vh` with
+   `position: sticky` is right beside the page and wrong on top of it: it pinned the rail to a full
+   screen whatever it held, so content began exactly one swipe down. Rail 812px → 612px.
+3. **The stat readout collapses behind a disclosure below 900px, and the character selects go
+   two-up.** Rail 612px → **457px**, so the gear panel now starts on the first screen with 352px of it
+   visible. The selects were 378px on their own — more than the stats above them.
+4. **The upgrade row stacks its controls.** Three columns could not shrink below 336px of content
+   inside a 289px parent: the last real overflow, at 4px.
+
+All **eleven surfaces measure zero horizontal overflow at 375px**, and the desktop layout is
+unchanged (`288px 1152px` at 1440, rail sticky, stats always visible, no disclosure).
+
+### Two things worth knowing before touching it
+
+**The rail gives up "always visible" on a phone, deliberately.** The rail's premise is that the stat
+totals stay on screen while you move between panels. Below 900px it is a band *above* the content, so
+nothing about it was visible alongside anything anyway — the trade is one tap to read the stats in
+exchange for the thing you came to do being above the fold. `StatsRail` says so; it is not an
+oversight to be "restored".
+
+**`useMediaQuery` uses `useSyncExternalStore`, and the reason is a measurement.** The first version
+kept the answer in state and updated it from the `MediaQueryList` `change` event — the documented
+API, and genuinely reliable in a real browser. Under **CDP viewport emulation**, which is how this app
+gets checked at 375px, changing the emulated viewport from 1425px to 375px delivered **zero** `resize`
+and **zero** `change` events while `matchMedia(...).matches` flipped correctly. An event-only hook
+therefore renders a mobile rail on a desktop viewport indefinitely, which is what happened. Reading
+the snapshot on every render means a missed event costs a stale frame that the next render repairs —
+verified by switching planner sub-tab and watching the desktop rail come back with no event having
+fired.
+
+### What is still not done on the phone
+
+Fitting a phone is not the same as being designed for one, and the README and ROADMAP both say so
+rather than claiming the item is closed:
+
+- **Tap targets are 33-38px** against the usual 44px guideline. The stats disclosure is the only
+  control built to 44px.
+- **The tab bars wrap to three rows** at 375px — six sections, then six planner sub-tabs.
+- Neither was touched, because both are design decisions about a phone rather than defects.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job; they make the images. Missing:
+   Nightbane, and all of Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **A phone-*designed* layout** — the two items above. Worth asking what they want rather than
+   guessing: bigger targets cost density, and this app is deliberately dense.
+3. **Build-against-build comparison** — the panel answers the item question by choice.
+4. **Five-design boards for the remaining tabs** — **cold, not pending.** Do not restart it without
+   asking.
+5. **Deprioritised and not to be picked up unasked** — rotations, tank score weighting,
+   multi-iteration variance.
+
+---
+
+## Where this was earlier on 2026-09-14 (gear comparison landed)
+
+`main` is green and pushed: **245 tests, lint and build clean.** The working tree carries only the
 owner's own `.obsidian/graph.json` and `Untitled.canvas`.
 
 **Gear comparison landed**, which was the top of the open list and is now off it. It is the sixth
@@ -443,7 +537,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-242 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+245 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3116,7 +3210,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 242 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 245 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```

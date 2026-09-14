@@ -142,6 +142,11 @@ behind every claim of its that quotes a number.
   no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
+- **Works on a phone.** Below 900px the shell stops being a rail beside the content and becomes a
+  band above it, the stat readout collapses behind a disclosure so the panel you came for starts on
+  the first screen, and the character selects go two-up. Measured at 375px: every section has zero
+  horizontal overflow. What this is *not* yet is a layout designed for a phone — tap targets are
+  33-38px against the 44px guideline and the tab bars wrap to three rows
 - Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
   actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip

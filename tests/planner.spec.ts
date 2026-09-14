@@ -11032,3 +11032,133 @@ test('the comparison score is a DPS surface, but the stat table is for every spe
   await expect(page.getByTestId('compare-score')).toBeVisible()
   await expect(page.getByTestId('compare-score-hidden')).toHaveCount(0)
 })
+
+/*
+ * Phone layout. These run at 375x812 rather than the suite's default 1280 — every other test in this
+ * file describes the desktop layout, and none of them could have caught what these do.
+ */
+
+const PHONE = { width: 375, height: 812 } as const
+
+/** How far the page extends past its own viewport. Zero is the only acceptable answer. */
+function horizontalOverflow(page: Page) {
+  return page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+}
+
+test('the shell collapses to one column on a phone, and nothing lands past the viewport', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * **This is the assertion the whole mobile pass exists for.** `.app-shell` carries a rail track and
+   * a content track, and the rule that collapses them below 900px was written as a bare `.app-shell`
+   * — one class against the two of `.app-shell:not(.app-shell-no-rail)`, which sets the desktop
+   * tracks. A media query contributes no specificity, so the collapse matched, its query applied, and
+   * it lost the cascade at every width from the day the `:not()` scoping landed.
+   *
+   * What that cost is not subtle. The rail kept a fixed 288px on a 375px phone, the whole app was
+   * laid out in the 87px left over, the gear paperdoll computed to **1px wide**, and 128 elements
+   * were pushed past the right edge — where nothing could scroll to reach them, because the window
+   * was not scrollable horizontally either. Measured, not inferred.
+   *
+   * One track is the claim. Counting tracks rather than matching a string keeps this readable however
+   * the widths are later expressed.
+   */
+  const trackCount = await page.evaluate(() => {
+    const shell = document.querySelector('.app-shell')
+    if (!shell) throw new Error('no .app-shell')
+    return getComputedStyle(shell).gridTemplateColumns.trim().split(/\s+/).length
+  })
+  expect(trackCount, 'the rail and the content stack instead of sharing a row').toBe(1)
+
+  expect(await horizontalOverflow(page), 'the planner fits its viewport').toBe(0)
+
+  /*
+   * A sweep rather than one screen, because the collapse being dead meant *every* panel was being
+   * laid out in 87px — so no surface in the app had ever actually been seen at this width, and the
+   * mobile rules written for several of them had never run. The upgrade row is here specifically: it
+   * was the one real overflow left once the shell was fixed, at 4px, from three columns of controls
+   * that could not shrink below 336px inside a 289px parent.
+   */
+  for (const view of ['Compare', 'Ranked Gear', 'Build'] as const) {
+    await openPlannerView(page, view)
+    expect(await horizontalOverflow(page), `planner/${view} fits its viewport`).toBe(0)
+  }
+
+  await page.getByRole('button', { name: 'Simulation', exact: true }).click()
+  await expect(page.getByRole('region', { name: 'Upgrade Finder' })).toBeVisible()
+  expect(await horizontalOverflow(page), 'Simulation fits its viewport').toBe(0)
+
+  await page.getByRole('button', { name: 'Professions', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Professions', exact: true })).toBeVisible()
+  expect(await horizontalOverflow(page), 'Professions fits its viewport').toBe(0)
+})
+
+test('the rail stops being a sticky full-height column once it sits above the content', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * `height: 100vh` with `position: sticky` is right for a column beside the page and wrong stacked
+   * on top of one: it pinned the rail to a full screen whatever was in it, so the content below began
+   * exactly one swipe down. Repairing the shell's collapse was what made this visible at all.
+   */
+  const rail = await page.evaluate(() => {
+    const el = document.querySelector('aside.rail')
+    if (!el) throw new Error('no rail')
+    const cs = getComputedStyle(el)
+    const main = document.querySelector('main.app-main')
+    return {
+      position: cs.position,
+      height: Math.round(el.getBoundingClientRect().height),
+      mainStartsAt: Math.round((main as HTMLElement).getBoundingClientRect().y + window.scrollY),
+      viewportHeight: window.innerHeight,
+    }
+  })
+
+  expect(rail.position, 'a stacked rail does not stick').toBe('static')
+  expect(rail.height, 'the rail is as tall as its contents, not as tall as the screen').toBeLessThan(
+    rail.viewportHeight,
+  )
+  expect(rail.mainStartsAt, 'the panel you came for starts on the first screen').toBeLessThan(rail.viewportHeight)
+})
+
+test('the stat readout collapses behind a disclosure on a phone, and only on a phone', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * The rail's premise is that the totals stay on screen while you move between panels — which stops
+   * being true below 900px, where it is a band above the content rather than a column beside it.
+   * Measured at 375px it was one full screen tall on its own. So on a phone the trade runs the other
+   * way: a tap to read the stats, in exchange for the gear panel being above the fold.
+   *
+   * Collapsed means **absent**, not `display: none`: a hidden readout would leave a screen reader
+   * announcing a heading with nothing under it.
+   */
+  const disclosure = page.getByTestId('rail-stats-disclosure')
+  await expect(disclosure).toBeVisible()
+  await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.locator('.rail-stat'), 'collapsed rows are out of the document').toHaveCount(0)
+  // Names what is behind it, so a collapsed section never reads as an empty one.
+  await expect(disclosure).toContainText(/\d+ stats/i)
+
+  await disclosure.click()
+  await expect(disclosure).toHaveAttribute('aria-expanded', 'true')
+  const expanded = await page.locator('.rail-stat').count()
+  expect(expanded, 'tapping it brings the readout back').toBeGreaterThan(0)
+
+  /*
+   * And the desktop rail is untouched — no control, no collapse, the heading it always had. Asserted
+   * from the same page rather than a fresh load, because the bug this pins was a *stale* one: the
+   * first version of `useMediaQuery` wrote its answer to state from a media event and never re-read
+   * it, so a viewport that crossed the breakpoint kept rendering the layout for the width it started
+   * at. Reading the snapshot on every render is what fixes that, and only a resize in a live page
+   * exercises it.
+   */
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await openPlannerView(page, 'Talents')
+  await expect(page.getByTestId('rail-stats-disclosure')).toHaveCount(0)
+  await expect(page.locator('.rail-stats h2'), 'the desktop rail keeps its heading').toBeVisible()
+  expect(await page.locator('.rail-stat').count(), 'and shows its rows without being asked').toBeGreaterThan(0)
+})

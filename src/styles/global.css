@@ -4817,8 +4817,21 @@ input[type='text']:focus {
 }
 
 @media (max-width: 900px) {
-  /* The rail stops being a column and becomes a band above the content. */
-  .app-shell {
+  /*
+   * The rail stops being a column and becomes a band above the content.
+   *
+   * **Scoped with the same `:not()` as the rule it has to beat, and that is the whole point.** This
+   * was written as a bare `.app-shell`, which is one class against that rule's two, and a media query
+   * adds no specificity — so it matched, its query applied, and it lost the cascade at every width.
+   * The rail kept its fixed 288px track on a 375px phone and the entire app was laid out in the 87px
+   * that remained: the gear paperdoll computed to **1px wide** and 128 elements were pushed past the
+   * viewport, where nothing could scroll to reach them.
+   *
+   * This is the second time this exact trap has been sprung in this file — the comment on
+   * `.app-shell:not(.app-shell-no-rail)` above describes the first. A scoped selector raises the bar
+   * for every later rule that targets the same element, including ones inside media queries.
+   */
+  .app-shell:not(.app-shell-no-rail) {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -6578,5 +6591,108 @@ body {
 
   .compare-score-delta {
     text-align: left;
+  }
+}
+
+/*
+ * The upgrade row stops being three columns on a phone.
+ *
+ * Measured at 375px: the row's three tracks come to 336px of minimum content — the item text at
+ * 106, the delta's 74px floor, and a nowrap Equip button at 98 — inside a 289px parent, so it hung
+ * 4px past the viewport and gave the whole page a horizontal scroll. This was invisible until the
+ * shell's mobile collapse was repaired, because before that every panel was being laid out in an
+ * 87px column and nothing below it could be measured meaningfully.
+ *
+ * The item text takes the full width and the two controls share the line beneath it, which fits in
+ * 214px. The delta's end-alignment is dropped with it: on its own row it would sit against the
+ * button rather than reading as the row's own figure.
+ */
+@media (max-width: 560px) {
+  .upgrade-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .upgrade-main {
+    grid-column: 1 / -1;
+  }
+
+  .upgrade-delta {
+    justify-items: start;
+    min-width: 0;
+  }
+}
+
+/*
+ * The stat readout's mobile disclosure. Only rendered below 900px — see StatsRail for why the rail
+ * gives up "always visible" on a phone rather than keeping a full screen of stats above the content.
+ */
+.rail-stats-disclosure {
+  align-items: baseline;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.rail-stats-disclosure-hint {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rail-stats-disclosure:hover .rail-stats-disclosure-hint,
+.rail-stats-disclosure:focus-visible .rail-stats-disclosure-hint {
+  color: var(--text);
+}
+
+/*
+ * The rail stops being a sticky full-height sidebar once it is a band above the content.
+ *
+ * `height: 100vh` with `position: sticky` is exactly right for a column beside the page and exactly
+ * wrong stacked on top of one: it pinned the rail to a full screen regardless of what was in it, so
+ * the content below started precisely one swipe down even after the stat readout collapsed to 464px
+ * of actual content. The border moves with it — a right edge divides two columns, a bottom edge
+ * divides two bands.
+ *
+ * This is the last of the mobile rules that had never actually run. The paperdoll's single-column
+ * layout and its reordered summary above were written for this breakpoint and were dead until the
+ * shell's own collapse was repaired, which is why none of them had been seen to be incomplete.
+ */
+@media (max-width: 900px) {
+  .rail {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+    height: auto;
+    overflow-y: visible;
+    position: static;
+  }
+}
+
+/*
+ * The four character selects go two-up once the rail is a band rather than a column.
+ *
+ * Stacked single-file they were 378px of the rail on their own — more than the stat readout they sit
+ * above, and the reason the content still began three quarters of the way down a 375px screen after
+ * the stats collapsed. Two columns halve that without shrinking anything: at 375px each select still
+ * gets about 160px, which fits the longest value any of them holds ("Specialization" over
+ * "Protection"). The head keeps the full width so "Start over" stays at the far edge where it is on
+ * desktop.
+ */
+@media (max-width: 900px) {
+  .rail-character {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rail-character-head {
+    grid-column: 1 / -1;
   }
 }

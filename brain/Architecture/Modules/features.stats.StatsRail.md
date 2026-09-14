@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/stats/StatsRail.tsx
-lines: 104
+lines: 142
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.stats.StatsRail
 
-`src/features/stats/StatsRail.tsx` · **features** layer · 104 lines
+`src/features/stats/StatsRail.tsx` · **features** layer · 142 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`
 - [[lib.animations]] — `src/lib/animations.ts`
+- [[lib.useMediaQuery]] — `src/lib/useMediaQuery.ts`
 
 ## Imported by
 

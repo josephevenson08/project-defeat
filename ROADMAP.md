@@ -306,7 +306,40 @@ touched by it, so switching character no longer destroys anything. Slots are val
 catalog change drops the affected slot from the list rather than breaking the panel.
 
 They are still browser-local — clearing site data loses them, and they do not follow you to another
-machine; export/import covers that. A real mobile layout is unstarted.
+machine; export/import covers that.
+
+**The phone layout was repaired 2026-09-14, and the headline is that most of it already existed and
+had never run.** `.app-shell` collapses its two tracks to one below 900px — a rule written as a bare
+`.app-shell`, which is one class against the two of `.app-shell:not(.app-shell-no-rail)` that sets
+the desktop tracks. A media query contributes no specificity, so the collapse matched, its query
+applied, and it lost the cascade at every width from the moment that `:not()` scoping landed.
+
+What that cost, measured at 375px rather than estimated: the rail kept a fixed 288px, the entire app
+was laid out in the **87px** left over, the gear paperdoll computed to **1px wide**, and 128 elements
+were pushed past the right edge — where nothing could reach them, since the window was not
+horizontally scrollable either. Every mobile rule written for a panel below the shell — the
+paperdoll's single-column layout, its reordered summary — had therefore never been seen to run.
+
+**A phone-overflow test existed the whole time and passed.** It opens Raid Composition, which is an
+`app-shell-no-rail` section, and that is the one shell variant the bug could not touch: nothing
+outranks its single-column rule. The planner and Simulation, the two sections with a rail, were the
+broken ones and were never checked at that width.
+
+Three things followed once the shell was fixed and the rest became measurable:
+
+- **The rail stopped being sticky and full-height when stacked.** `height: 100vh` with
+  `position: sticky` is right beside the page and wrong on top of it — it pinned the rail to a full
+  screen whatever it held, so content began exactly one swipe down.
+- **The stat readout collapses behind a disclosure below 900px**, and the character selects go
+  two-up. The rail went 812px → 457px, so the panel you came for now starts on the first screen. This
+  gives up the rail's "always visible" premise on a phone, which is honest: stacked, it was never
+  visible alongside anything anyway.
+- **The upgrade row stacks its controls.** Three columns could not shrink below 336px of content
+  inside a 289px parent, which was the last real overflow at 4px.
+
+All eleven surfaces now measure zero horizontal overflow at 375px, and the desktop layout is
+unchanged. What is still not done is *designing* for a phone as opposed to fitting one: tap targets
+are 33-38px against the 44px guideline, and the tab bars wrap to three rows.
 
 **Gear comparison landed 2026-09-14**, as a sixth planner sub-tab. Pick a slot and two items and the
 panel swaps each into the set you are actually wearing, so set bonuses, socket bonuses and the talent
