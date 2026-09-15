@@ -120,7 +120,7 @@ behind every claim of its that quotes a number.
   stops at 125, which a five-row tier table at the top of the page is three screens away from. The
   gathering and crafting tables read the same placement function, so they cannot disagree about where
   you stop
-- **A levelling guide for each of the four gathering professions** — written guidance, then that
+- **A levelling guide for each of the four gathering professions** — guidance, then that
   table, then the ranges themselves with a map each. The unit is a skill range rather than a material, which is the change that makes Gold
   read correctly: Gold Veins sit in Iron's zones and you pick them up on the Iron lap, so Gold is one
   of the ores the 125-175 range draws rather than a section describing a trip nobody takes. Which
