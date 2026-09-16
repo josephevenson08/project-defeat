@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**392 commits across 51 days**, from 2026-06-25 to 2026-09-16.
+**393 commits across 51 days**, from 2026-06-25 to 2026-09-16.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,14 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_93 commits_
+_94 commits_
 
-### Wednesday 16 September — 3 commits
+### Wednesday 16 September — 4 commits
 
 - Remove a profession helper nothing calls — [`b1b8785`](https://github.com/josephevenson08/project-defeat/commit/b1b8785fe3c781feb401db63bbbe1d83f8aa738c)
 - Let a Draenei be a Mage — [`d4e6a87`](https://github.com/josephevenson08/project-defeat/commit/d4e6a87a3c2d9500533abdc26709e9032e4fa13f)
 - Close the race/class roadmap item, and say what closing it found — [`87b27d3`](https://github.com/josephevenson08/project-defeat/commit/87b27d30934eaa10c5584b6594a7d8dec5d30459)
+- Add a day-by-day log of what was worked on — [`65a13ec`](https://github.com/josephevenson08/project-defeat/commit/65a13eca37fc88bb24c19c3f3965f399abece91a)
 
 ### Tuesday 15 September — 1 commit
 
