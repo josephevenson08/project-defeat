@@ -222,6 +222,12 @@ Verifying that matrix, the first pass read each class page's race table, whose e
 
 The race pages' patch-history prose and a TBC-specific guide agreed with each other and with the app on every row but one, and those are what the test cites. The rule: when an extraction contradicts well-established history, suspect the extraction first — and when two sources disagree, prefer the one that states the fact in words over the one that encodes it in an image.
 
+## Measure the thing the sentence names
+
+A phone test asserted "the panel you came for starts on the first screen" and measured where `<main>` began. `<main>` opens with both tab bars, 248px of them, so the assertion passed while the gear panel sat at y=937 on an 812px screen with nothing of it showing. The docs repeated the passing number, and the test then stayed green while a new block in the rail pushed the panel another 160px down.
+
+Neither the assertion nor the number was careless in isolation — `<main>` is a reasonable proxy until something is inserted at its top. The rule is to measure the element the claim is about, and to give a layout assertion a floor with meaning (at least 120px of the panel visible) rather than a bare "less than the viewport", which a panel one pixel onto the screen satisfies.
+
 ## Related
 
 - [[Architecture Map]]

@@ -372,15 +372,35 @@ Three things followed once the shell was fixed and the rest became measurable:
   `position: sticky` is right beside the page and wrong on top of it — it pinned the rail to a full
   screen whatever it held, so content began exactly one swipe down.
 - **The stat readout collapses behind a disclosure below 900px**, and the character selects go
-  two-up. The rail went 812px → 457px, so the panel you came for now starts on the first screen. This
-  gives up the rail's "always visible" premise on a phone, which is honest: stacked, it was never
-  visible alongside anything anyway.
+  two-up. The rail went 812px → 457px. This gives up the rail's "always visible" premise on a phone,
+  which is honest: stacked, it was never visible alongside anything anyway.
+
+  **This paragraph used to end "so the panel you came for now starts on the first screen", and it did
+  not.** That figure was the top of `<main>`, which opens with both tab bars; the gear panel itself
+  began at y=937 on an 812px screen. See the second pass below.
 - **The upgrade row stacks its controls.** Three columns could not shrink below 336px of content
   inside a 289px parent, which was the last real overflow at 4px.
 
 All eleven surfaces now measure zero horizontal overflow at 375px, and the desktop layout is
-unchanged. What is still not done is *designing* for a phone as opposed to fitting one: tap targets
-are 33-38px against the 44px guideline, and the tab bars wrap to three rows.
+unchanged.
+
+**Second pass, 2026-09-16: the panel onto the first screen, for real.** Measured properly — the first
+panel, not `<main>` — the gear panel started at **y=937** with nothing of it visible. The 937px was
+the rail at 616 (160 of it the profession picker, added after the first pass was measured) and the
+two tab bars at 248. Four changes, all below 900px:
+
+- **The profession picker collapses** to a one-line summary of what you hold, like the stats.
+- **The rail's spacing tightens**, and the select labels are clipped rather than shown — the values
+  name themselves, and clipping keeps them in each combobox's accessible name, which a test checks.
+- **Both tab bars become a three-column grid.** They were deliberately made to wrap rather than
+  scroll, so a raid leader never has to swipe to find Raids; a grid keeps every tab visible, in two
+  rows instead of the section bar's three, and makes each one a 44px target.
+- **The last small targets grow**: the professions disclosure to 44px, and "Start over" and the gear
+  popup's close button through a pseudo-element, so their rows do not change size.
+
+The panel now starts at y=640 with 172px on the first screen, and the phone test measures the panel
+with a floor that the profession picker alone would have broken. Panels deeper than the planner's
+have not each been reviewed at phone width.
 
 **Gear comparison landed 2026-09-14**, as a sixth planner sub-tab. Pick a slot and two items and the
 panel swaps each into the set you are actually wearing, so set bonuses, socket bonuses and the talent

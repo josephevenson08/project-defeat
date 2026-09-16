@@ -7,7 +7,73 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Where this is right now (2026-09-16, latest — READ THIS FIRST)
 
-**A Draenei could not be a Mage, and the reason was a code comment.**
+**The gear panel was never on a phone's first screen, and the test that said it was measured
+something else.**
+
+`main` is green and pushed: **256 tests, lint and build clean.** There is now a day-by-day log of
+the work in `CHANGELOG.md` — see the rule below about refreshing it — and the GitHub repo has a
+description, the live-site link and topics, which it had none of.
+
+### The finding
+
+The 2026-09-14 phone pass reported the gear panel starting on the first screen with 352px visible.
+**It started at y=937 on an 812px screen, with nothing visible.** The figure was the top of `<main>`,
+and `<main>` opens with both tab bars — 248px of them. The phone test asserted the same wrong thing:
+its message said "the panel you came for starts on the first screen", and its measurement was of
+`<main>`. It stayed green through what came next, which made it worse: the profession picker went
+into the rail after that measurement and added another 160px.
+
+The test now measures the first panel and requires at least 120px of it on the first screen — a floor
+the picker alone would have broken.
+
+### What closed the gap, all below 900px
+
+The 937px was the rail at 616 and the two tab bars at 248.
+
+- **The profession picker collapses** to a one-line summary of what you hold ("Enchanting, Mining" or
+  "None"), the same pattern as the stat readout.
+- **The rail's spacing tightens**, and the four select labels are **clipped, not removed**: the values
+  name themselves, and a test checks each combobox is still announced as Faction, Race, Class and
+  Specialization. (The Browser pane's `find` tool lists comboboxes by their *value* even with labels
+  fully visible, so do not use it to judge this — Playwright's `getByRole` is the check.)
+- **Both tab bars become a three-column grid.** A previous session deliberately made them wrap rather
+  than scroll, so a raid leader never has to swipe to discover Raids, and that reason still holds —
+  the grid keeps every tab visible. What changes is that the section bar's six labels total 611px
+  against 343px of width, so no gap setting got a wrapping row below three; the grid gives two rows,
+  every tab a 44px target.
+- **The last small targets grow**: the professions disclosure to 44px, and "Start over" and the gear
+  popup's close button (drawn at 13px and 28px) through a pseudo-element, so their rows keep their
+  size. Tests check those by hit-testing points outside the visible box, because a bounding box cannot
+  see a pseudo-element.
+
+Result at 375x812: the gear panel starts at **y=640 with 172px visible**; every control in the rail,
+the tab bars and the gear popup is a 44px target; no section scrolls sideways. Desktop is unchanged —
+verified at 1440.
+
+**What is not claimed:** panels deeper than the planner's — raid loot tables, the professions guides,
+raid composition — were checked for sideways overflow and not reviewed for how they read on a phone.
+
+### Remember the emulation artifact
+
+Resizing the Browser pane's viewport delivers no `resize` or `change` events, so after a resize the
+rail can show its phone layout at desktop width until something re-renders. That is the harness, not
+the app — `useMediaQuery` re-reads on every render precisely so a missed event costs one frame. Click
+any tab after a resize before measuring React-rendered state.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job. Missing: Nightbane, and all of
+   Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **The Feral bear/cat mode split** — the last Phase 3 item. It touches the simulator, which the
+   owner has said is not the focus this round, so ask before starting.
+3. **A phone review of the deeper panels** — raid loot, professions guides, raid composition.
+4. **Build-against-build comparison** — declined in favour of item-against-item.
+5. **Five-design boards** — cold. **Rotations, tank weighting, variance** — deprioritised.
+
+---
+
+## Where this was earlier on 2026-09-16 (a Draenei could not be a Mage)
 
 `main` is green and pushed: **251 tests, lint and build clean.** Also pulled in on arrival: the
 owner's one-word README edit (`cada7aa`), made from GitHub's web editor between sessions — so
@@ -219,6 +285,8 @@ sequence rather than a checklist.
 3. **The stat readout collapses behind a disclosure below 900px, and the character selects go
    two-up.** Rail 612px → **457px**, so the gear panel now starts on the first screen with 352px of it
    visible. The selects were 378px on their own — more than the stats above them.
+   **Corrected 2026-09-16: it did not.** The 352px was measured to the top of `<main>`, which opens
+   with both tab bars; the panel itself began at y=937 on an 812px screen. See the 2026-09-16 entry.
 4. **The upgrade row stacks its controls.** Three columns could not shrink below 336px of content
    inside a 289px parent: the last real overflow, at 4px.
 
@@ -706,7 +774,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-251 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+256 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3386,7 +3454,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 251 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 256 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed

@@ -48,6 +48,7 @@ _None._
 
 ## Imported by
 
+- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
 - [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases

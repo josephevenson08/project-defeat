@@ -243,7 +243,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 Cross-cutting helpers with no domain meaning.
 
 - [[lib.animations]] · 7 importers
-- [[lib.useMediaQuery]] · 1 importers
+- [[lib.useMediaQuery]] · 2 importers
 
 Up: [[Project Defeat Brain]]
 

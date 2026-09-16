@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/character/CharacterRail.tsx
-lines: 111
+lines: 141
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.character.CharacterRail
 
-`src/features/character/CharacterRail.tsx` · **features** layer · 111 lines
+`src/features/character/CharacterRail.tsx` · **features** layer · 141 lines
 
 _No doc comment at the top of this file._
 
@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 - [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[lib.useMediaQuery]] — `src/lib/useMediaQuery.ts`
 
 ## Imported by
 

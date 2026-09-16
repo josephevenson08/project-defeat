@@ -147,11 +147,12 @@ behind every claim of its that quotes a number.
   no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
-- **Works on a phone.** Below 900px the shell stops being a rail beside the content and becomes a
-  band above it, the stat readout collapses behind a disclosure so the panel you came for starts on
-  the first screen, and the character selects go two-up. Measured at 375px: every section has zero
-  horizontal overflow. What this is *not* yet is a layout designed for a phone — tap targets are
-  33-38px against the 44px guideline and the tab bars wrap to three rows
+- **Laid out for a phone.** Below 900px the rail becomes a band above the content, with the stat
+  readout and the profession picker each behind a one-line disclosure and the character selects two
+  across. Both tab bars are a three-column grid, so every tab stays visible without swiping, and every
+  control in the rail, the tab bars and the gear popup is a 44px tap target. Measured at 375x812: the
+  gear panel starts on the first screen, and no section scrolls sideways. Panels deeper than the
+  planner's have not each been reviewed at phone width
 - **Professions on the character** — a two-slot picker in the rail, gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**
