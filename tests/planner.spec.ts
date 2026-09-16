@@ -11107,11 +11107,12 @@ test('the rail stops being a sticky full-height column once it sits above the co
     const el = document.querySelector('aside.rail')
     if (!el) throw new Error('no rail')
     const cs = getComputedStyle(el)
-    const main = document.querySelector('main.app-main')
+    const panel = document.querySelector('section.panel')
+    if (!panel) throw new Error('no panel')
     return {
       position: cs.position,
       height: Math.round(el.getBoundingClientRect().height),
-      mainStartsAt: Math.round((main as HTMLElement).getBoundingClientRect().y + window.scrollY),
+      panelStartsAt: Math.round(panel.getBoundingClientRect().y + window.scrollY),
       viewportHeight: window.innerHeight,
     }
   })
@@ -11120,7 +11121,19 @@ test('the rail stops being a sticky full-height column once it sits above the co
   expect(rail.height, 'the rail is as tall as its contents, not as tall as the screen').toBeLessThan(
     rail.viewportHeight,
   )
-  expect(rail.mainStartsAt, 'the panel you came for starts on the first screen').toBeLessThan(rail.viewportHeight)
+
+  /*
+   * **This used to measure `<main>`, and that is how a false claim passed.** `<main>` opens with both
+   * tab bars — 248px of them at the time — so it began on the first screen while the gear panel began
+   * at y=937 on an 812px one, with nothing of it visible. The assertion's own message said "the panel
+   * you came for" and its measurement was of something else. It then stayed green while the profession
+   * picker added another 160px to the rail.
+   *
+   * A floor rather than a point, so tuning the spacing does not break it — but high enough that a
+   * block the size of that picker landing in the rail again fails here.
+   */
+  const visible = rail.viewportHeight - rail.panelStartsAt
+  expect(visible, `the panel you came for shows at least 120px on the first screen (starts at ${rail.panelStartsAt})`).toBeGreaterThanOrEqual(120)
 })
 
 test('the stat readout collapses behind a disclosure on a phone, and only on a phone', async ({ page }) => {
@@ -11373,4 +11386,152 @@ test('a Draenei Mage can be made, and gets the spell-hit racial', async ({ page 
   expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText()), 'the same racial a Draenei Shaman gets').toBe(
     mageSpellHit,
   )
+})
+
+test('on a phone both tab bars show every tab, in two rows of 44px targets', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * These bars wrap rather than scroll, deliberately: a scrolled bar hides the tabs it clips, and a
+   * raid leader should not have to discover that Raids exists by swiping. That reason stands. What
+   * changed is *how* they wrap. A greedy flex wrap put the section bar on three rows — its six labels
+   * total 611px against 343px of width — and left every tab 33-38px tall. A three-column grid keeps
+   * all six visible in two rows, each a 44px target.
+   */
+  const bars = await page.evaluate(() =>
+    [...document.querySelectorAll('.tab-nav')].map((nav) => {
+      const buttons = [...nav.querySelectorAll('button')]
+      return {
+        label: nav.getAttribute('aria-label'),
+        count: buttons.length,
+        rows: new Set(buttons.map((button) => Math.round(button.getBoundingClientRect().y))).size,
+        shortest: Math.min(...buttons.map((button) => button.getBoundingClientRect().height)),
+        allOnScreen: buttons.every((button) => {
+          const rect = button.getBoundingClientRect()
+          return rect.width > 0 && rect.left >= 0 && rect.right <= document.documentElement.clientWidth
+        }),
+      }
+    }),
+  )
+
+  expect(bars, 'the section bar and the planner bar').toHaveLength(2)
+  for (const bar of bars) {
+    expect(bar.allOnScreen, `${bar.label}: every tab is visible without scrolling`).toBe(true)
+    expect(bar.rows, `${bar.label}: ${bar.count} tabs in two rows`).toBe(2)
+    expect(bar.shortest, `${bar.label}: every tab is a 44px target`).toBeGreaterThanOrEqual(44)
+  }
+})
+
+test('on a phone the character selects lose their visible labels but keep their names', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * The label row above each select was 23px, four times over, and the values name themselves —
+   * Alliance, Human, Warrior, Fury. The labels are clipped rather than removed, and this is the check
+   * that clipping is not also hiding them from assistive tech: a combobox announced as "Human" rather
+   * than "Race" would be a regression paid for with 46px.
+   */
+  for (const name of ['Faction', 'Race', 'Class', 'Specialization']) {
+    await expect(page.getByRole('combobox', { name }), `${name} is still announced by its label`).toBeVisible()
+  }
+
+  const labelHeights = await page
+    .locator('.rail-character .field > span')
+    .evaluateAll((spans) => spans.map((span) => span.getBoundingClientRect().height))
+  expect(labelHeights, 'four labels').toHaveLength(4)
+  expect(Math.max(...labelHeights), 'none takes up a row on screen').toBeLessThanOrEqual(1)
+})
+
+test('on a phone the profession picker collapses to what you hold', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  /*
+   * Open, the picker was 160px — ten chips and a note — and it went into the rail after the phone
+   * layout had been measured, which is part of how the gear panel ended up below the first screen. It
+   * is a choice made once, so on a phone it sits behind a disclosure whose summary names what you
+   * hold: the only thing you need from it after the first visit.
+   */
+  const disclosure = page.getByTestId('rail-professions-disclosure')
+  await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
+  await expect(disclosure).toContainText('None')
+  await expect(page.locator('.rail-profession'), 'collapsed chips are out of the document').toHaveCount(0)
+
+  await disclosure.click()
+  await expect(page.locator('.rail-profession')).toHaveCount(10)
+  await professionChip(page, 'Enchanting').click()
+  await professionChip(page, 'Mining').click()
+
+  await disclosure.click()
+  await expect(disclosure, 'the summary names both').toContainText('Enchanting, Mining')
+  await expect(page.locator('.rail-profession')).toHaveCount(0)
+})
+
+test('on a phone the rail controls are all 44px targets', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+
+  const undersized = await page.evaluate(() =>
+    [...document.querySelectorAll('aside.rail button, aside.rail select')]
+      .filter((control) => {
+        const rect = control.getBoundingClientRect()
+        return rect.height > 0 && rect.height < 44
+      })
+      .map((control) => (control as HTMLElement).dataset.testid ?? control.className),
+  )
+
+  /*
+   * "Start over" is the one exception on paper and not in the hand: it is a 13px text link whose target
+   * comes from a pseudo-element, so the heading row does not grow around it. A bounding box cannot see
+   * a pseudo-element, so the target is checked the way a tap finds it — by hit-testing points outside
+   * the visible link.
+   */
+  expect(undersized, 'only the link whose target is a pseudo-element').toEqual(['restart-creator'])
+
+  const tapsLand = await page.evaluate(() => {
+    const link = document.querySelector('[data-testid="restart-creator"]')
+    if (!link) throw new Error('no restart link')
+    const rect = link.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const middle = rect.top + rect.height / 2
+    return [-14, 14].every((offset) => {
+      const hit = document.elementFromPoint(x, middle + offset)
+      return hit !== null && (hit === link || link.contains(hit))
+    })
+  })
+  expect(tapsLand, 'a tap 14px above or below the link still lands on it').toBe(true)
+})
+
+test('on a phone the gear popup fits the screen and its close button is a real target', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+  await openApp(page)
+  await openSlot(page, 'Head')
+
+  // The dialog a phone user opens most. Its two panes stack to one column below 900px.
+  const fit = await page.getByRole('dialog').evaluate((dialog) => {
+    const rect = dialog.getBoundingClientRect()
+    return { left: rect.left, right: rect.right, width: document.documentElement.clientWidth }
+  })
+  expect(fit.left, 'inside the left edge').toBeGreaterThanOrEqual(0)
+  expect(fit.right, 'inside the right edge').toBeLessThanOrEqual(fit.width)
+
+  // The button is drawn at 28px and a pseudo-element makes it a 44px target, so check it the way a
+  // tap finds it rather than by its box, which cannot see the pseudo-element.
+  const tapsLand = await page.getByRole('button', { name: 'Close', exact: true }).evaluate((button) => {
+    const rect = button.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    return [
+      [-20, 0],
+      [20, 0],
+      [0, -20],
+      [0, 20],
+    ].every(([dx, dy]) => {
+      const hit = document.elementFromPoint(x + dx, y + dy)
+      return hit !== null && (hit === button || button.contains(hit))
+    })
+  })
+  expect(tapsLand, 'a tap 20px from the centre in any direction closes it').toBe(true)
 })

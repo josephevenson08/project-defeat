@@ -6772,3 +6772,135 @@ body {
   line-height: 1.45;
   margin: 10px 0 0;
 }
+
+/*
+ * Phone layout, second pass: get the panel you came for onto the first screen.
+ *
+ * The first pass claimed it already was, and it was not. It measured where `<main>` began, and `<main>`
+ * opens with both tab bars — 248px of them — so the gear panel actually started at y=937 on an 812px
+ * screen, with nothing of it visible. The profession picker, added after that measurement, made it
+ * worse by 160px. These rules are what closed the gap, each measured at 375x812.
+ *
+ * Every selector here matches or beats the specificity of the rule it replaces. That is not tidiness:
+ * a bare `.app-shell` inside a media query lost to `.app-shell:not(.app-shell-no-rail)` for months,
+ * and the whole phone layout was dead because of it.
+ */
+@media (max-width: 900px) {
+  /* The rail's spacing was sized for a full-height column with room to breathe. As a band above the
+     content, every pixel of it pushes the panel down. */
+  .rail {
+    gap: 16px;
+    padding: 16px 16px 18px;
+  }
+
+  .rail-character {
+    margin-bottom: 0;
+    padding-bottom: 12px;
+  }
+
+  /*
+   * The four selects keep their labels for assistive tech but not on screen. Their values name
+   * themselves — "Alliance", "Human", "Warrior", "Fury" — and the label row above each was 23px, four
+   * times over. Clipped rather than `display: none`, because a hidden label's text drops out of the
+   * select's accessible name and the combobox would be announced as nothing.
+   */
+  .rail-character .field > span {
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .rail-character select {
+    min-height: 44px;
+  }
+
+  /*
+   * Both tab bars become a three-column grid. **Every tab stays visible**, which is the reason these
+   * bars wrap rather than scroll (see the `.tab-nav` rule above: a raid leader should not have to
+   * discover that Raids exists by swiping). A grid keeps that promise while giving each tab an equal
+   * 44px target and a predictable number of rows — six tabs, two rows — instead of however many a
+   * greedy wrap happens to produce. The section bar was three rows, because its labels total 611px
+   * against 343px of width and no gap setting gets a wrapping row below that.
+   */
+  .tab-nav {
+    column-gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 2px;
+  }
+
+  .tab-nav .tab-nav-button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    line-height: 1.2;
+    min-height: 44px;
+    padding: 4px 2px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 900px) {
+  /* The two rail controls still under 44px once everything else was. The disclosure matches the stat
+     readout's, which already is; "Start over" gets its target from a pseudo-element so a 13px link
+     becomes tappable without the heading row growing around it. */
+  .rail-professions-disclosure {
+    min-height: 44px;
+  }
+
+  .rail-character-restart {
+    position: relative;
+  }
+
+  .rail-character-restart::after {
+    content: '';
+    inset: -16px -10px;
+    position: absolute;
+  }
+}
+
+/* The professions disclosure is a button carrying the heading's look, so it needs the button chrome
+   taken off at every width it renders at. */
+.rail-professions-disclosure {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.rail-professions-disclosure em {
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Both rail disclosures are 44px tall for the tap target, and baseline alignment left their text at
+   the top of that box with an empty band underneath. Centred, the row reads as one control. */
+.rail-stats-disclosure,
+.rail-professions-disclosure {
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  /* The item popup is the dialog a phone user opens most, and its close button was 28px. Extended to
+     44px by a pseudo-element, so the header row keeps its size. */
+  .popup-close {
+    position: relative;
+  }
+
+  .popup-close::after {
+    content: '';
+    inset: -8px;
+    position: absolute;
+  }
+}

@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { SelectField } from '../../components/ui/SelectField'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { PRIMARY_PROFESSION_LIMIT, primaryProfessions, toggleProfession } from '../../domain/professions/characterProfessions'
+import { useMediaQuery } from '../../lib/useMediaQuery'
 import { factions, getClassDefinition, getClassesForRace, isClassLegalForRace, racesByFaction, getRoleForSpec } from './characterData'
 import type { CharacterClass, CharacterProfile, CharacterSpec, Faction, Race } from './characterTypes'
 
@@ -34,6 +36,11 @@ export function CharacterRail({ character, onChange, onRestart }: CharacterRailP
   const classDefinition = getClassDefinition(character.className)
   const role = getRoleForSpec(character.className, character.spec)
   const held = character.professions ?? []
+
+  // The shell's own breakpoint — the same one `StatsRail` collapses at, for the same reason.
+  const isNarrow = useMediaQuery('(max-width: 900px)')
+  const [professionsOpen, setProfessionsOpen] = useState(false)
+  const pickerVisible = !isNarrow || professionsOpen
 
   return (
     <section className="rail-character" aria-label="Character" style={{ '--rail-accent': getRoleAccentColor(role) } as React.CSSProperties}>
@@ -70,40 +77,63 @@ export function CharacterRail({ character, onChange, onRestart }: CharacterRailP
         `toggleProfession` caps the set, replacing the oldest rather than refusing the click.
       */}
       <div className="rail-professions" data-testid="rail-professions">
-        <span className="rail-professions-head">
-          Professions
-          <em>
-            {held.length}/{PRIMARY_PROFESSION_LIMIT}
-          </em>
-        </span>
+        {/*
+          On a phone the picker sits behind a disclosure, like the stat readout below it. It is a
+          choice you make once, and open it was 160px — measured, it was a large part of why the
+          gear panel started below the first screen. The summary names what is held, so a collapsed
+          picker still answers the only question you have about it after the first visit.
+        */}
+        {isNarrow ? (
+          <button
+            type="button"
+            className="rail-professions-head rail-professions-disclosure"
+            aria-expanded={professionsOpen}
+            onClick={() => setProfessionsOpen((current) => !current)}
+            data-testid="rail-professions-disclosure"
+          >
+            Professions
+            <em>{professionsOpen ? 'Hide' : held.length > 0 ? held.join(', ') : 'None'}</em>
+          </button>
+        ) : (
+          <span className="rail-professions-head">
+            Professions
+            <em>
+              {held.length}/{PRIMARY_PROFESSION_LIMIT}
+            </em>
+          </span>
+        )}
 
-        <div className="rail-profession-list">
-          {primaryProfessions.map((profession) => {
-            const active = held.includes(profession)
-            return (
-              <button
-                key={profession}
-                type="button"
-                className={`rail-profession${active ? ' rail-profession-on' : ''}`}
-                aria-pressed={active}
-                data-testid={`profession-${profession.toLowerCase().replaceAll(' ', '-')}`}
-                onClick={() => onChange({ ...character, professions: toggleProfession(character.professions, profession) })}
-              >
-                {profession}
-              </button>
-            )
-          })}
-        </div>
+        {pickerVisible && (
+          <div className="rail-profession-list">
+            {primaryProfessions.map((profession) => {
+              const active = held.includes(profession)
+              return (
+                <button
+                  key={profession}
+                  type="button"
+                  className={`rail-profession${active ? ' rail-profession-on' : ''}`}
+                  aria-pressed={active}
+                  data-testid={`profession-${profession.toLowerCase().replaceAll(' ', '-')}`}
+                  onClick={() => onChange({ ...character, professions: toggleProfession(character.professions, profession) })}
+                >
+                  {profession}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/*
           Says what this control actually does, because the honest answer is "almost nothing" and a
           player who picks Blacksmithing expecting extra sockets is remembering Wrath. The full
           picture — gear access, recipes, what each is worth at 70 — is the Professions tab's job.
         */}
-        <p className="rail-professions-note">
-          Only <strong>Enchanting</strong> moves your stats: its two ring enchants, one per finger.
-          Everything else is gear and recipe access — see the Professions tab.
-        </p>
+        {pickerVisible && (
+          <p className="rail-professions-note">
+            Only <strong>Enchanting</strong> moves your stats: its two ring enchants, one per finger.
+            Everything else is gear and recipe access — see the Professions tab.
+          </p>
+        )}
       </div>
     </section>
   )
