@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**393 commits across 51 days**, from 2026-06-25 to 2026-09-16.
+**395 commits across 51 days**, from 2026-06-25 to 2026-09-16.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,14 +13,16 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_94 commits_
+_96 commits_
 
-### Wednesday 16 September — 4 commits
+### Wednesday 16 September — 6 commits
 
 - Remove a profession helper nothing calls — [`b1b8785`](https://github.com/josephevenson08/project-defeat/commit/b1b8785fe3c781feb401db63bbbe1d83f8aa738c)
 - Let a Draenei be a Mage — [`d4e6a87`](https://github.com/josephevenson08/project-defeat/commit/d4e6a87a3c2d9500533abdc26709e9032e4fa13f)
 - Close the race/class roadmap item, and say what closing it found — [`87b27d3`](https://github.com/josephevenson08/project-defeat/commit/87b27d30934eaa10c5584b6594a7d8dec5d30459)
 - Add a day-by-day log of what was worked on — [`65a13ec`](https://github.com/josephevenson08/project-defeat/commit/65a13eca37fc88bb24c19c3f3965f399abece91a)
+- Put the gear panel on a phone's first screen, and measure it properly — [`3a772bb`](https://github.com/josephevenson08/project-defeat/commit/3a772bbed5349e5add193d2150dc918b448599cf)
+- Correct the phone-layout claims the docs repeated — [`72451fc`](https://github.com/josephevenson08/project-defeat/commit/72451fcc7993955e7dd18f77f7e9e8207f211743)
 
 ### Tuesday 15 September — 1 commit
 
