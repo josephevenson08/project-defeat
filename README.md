@@ -151,8 +151,10 @@ behind every claim of its that quotes a number.
   readout and the profession picker each behind a one-line disclosure and the character selects two
   across. Both tab bars are a three-column grid, so every tab stays visible without swiping, and every
   control in the rail, the tab bars and the gear popup is a 44px tap target. Measured at 375x812: the
-  gear panel starts on the first screen, and no section scrolls sideways. Panels deeper than the
-  planner's have not each been reviewed at phone width
+  gear panel starts on the first screen, and no section scrolls sideways. Raid Composition and the
+  profession guides were reviewed the same way and every control there is a 44px target too; desktop
+  keeps its density, since all of it sits inside the phone breakpoint. Not yet checked on a real phone:
+  moving a player between raid groups is drag-only, and how well touch browsers handle that varies
 - **Professions on the character** — a two-slot picker in the rail, gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**

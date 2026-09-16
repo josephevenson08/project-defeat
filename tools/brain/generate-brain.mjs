@@ -601,12 +601,12 @@ const PHASES = [
       'Planner split into six sub-tabs instead of one ~15-screen column, with the stat rail persisting across all six',
       'Stat rail scoped to the spec — 12 rows rather than 26 on a Fury Warrior — with a toggle that restores every stat',
       'Source planning: the guide Source column parsed into structured data and joined to raid loot and the catalogue, so 90.1% of recommended items say where they come from against 32.7% before',
-      'Laid out for a phone: below 900px the rail becomes a band with the stats and professions behind one-line disclosures, both tab bars are a three-column grid that keeps every tab visible, every rail, tab and popup control is a 44px target, the gear panel starts on the first screen, and no section scrolls sideways at 375px',
+      'Laid out for a phone: below 900px the rail becomes a band with the stats and professions behind one-line disclosures, both tab bars are a three-column grid that keeps every tab visible, every control in the rail, the tab bars, the gear popup, Raid Composition and the profession guides is a 44px target, the gear panel starts on the first screen, and no section scrolls sideways at 375px',
     ],
     remaining: [
       'Cloud/shareable builds — slots are browser-local, so they do not follow you to another machine',
       'Build-against-build comparison — the comparison panel is item against item, by choice; comparing two whole builds is a separate question it does not answer',
-      'Panels deeper than the planner — raid loot tables, the professions guides, raid composition — have each been checked for sideways overflow at 375px but not reviewed for how they read on a phone',
+      'Moving a player between raid groups is drag-only, and HTML5 drag support on touch browsers is uneven — untested on a real phone, and a tap-to-move control is the fix if it fails',
       'The ranked-gear panel is still 9.4 screens on its own — sub-tabs fixed navigation, not that panel\'s length',
     ],
     modules: [

@@ -399,8 +399,19 @@ two tab bars at 248. Four changes, all below 900px:
   popup's close button through a pseudo-element, so their rows do not change size.
 
 The panel now starts at y=640 with 172px on the first screen, and the phone test measures the panel
-with a floor that the profession picker alone would have broken. Panels deeper than the planner's
-have not each been reviewed at phone width.
+with a floor that the profession picker alone would have broken.
+
+**Then the deeper panels.** A sweep of every section at 375px found two never sized for a finger:
+Raid Composition, with 61 of 67 controls under 44px — a seat's remove button was 14px by 19px — and
+each profession's guide, with 35 of 41, including 33 zone tabs at 25px. Raids, the professions grid
+and the tier lists were fine. Both now measure zero. The controls grew in place rather than through
+pseudo-element targets, because a seat's name and remove button sit 8px apart and two enlarged
+targets would overlap. Inline "source" links in the tier lists were left alone: target-size guidance
+exempts links in running text.
+
+Still unverified on a real device: moving a player between raid groups is drag-only, and HTML5 drag
+support on touch browsers is uneven. If it fails on a phone, the fix is a tap-to-move control, which is
+a feature rather than a sizing change.
 
 **Gear comparison landed 2026-09-14**, as a sixth planner sub-tab. Pick a slot and two items and the
 panel swaps each into the set you are actually wearing, so set bonuses, socket bonuses and the talent

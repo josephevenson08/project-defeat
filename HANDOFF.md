@@ -10,7 +10,7 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 **The gear panel was never on a phone's first screen, and the test that said it was measured
 something else.**
 
-`main` is green and pushed: **256 tests, lint and build clean.** There is now a day-by-day log of
+`main` is green and pushed: **257 tests, lint and build clean.** There is now a day-by-day log of
 the work in `CHANGELOG.md` — see the rule below about refreshing it — and the GitHub repo has a
 description, the live-site link and topics, which it had none of.
 
@@ -50,8 +50,19 @@ Result at 375x812: the gear panel starts at **y=640 with 172px visible**; every 
 the tab bars and the gear popup is a 44px target; no section scrolls sideways. Desktop is unchanged —
 verified at 1440.
 
-**What is not claimed:** panels deeper than the planner's — raid loot tables, the professions guides,
-raid composition — were checked for sideways overflow and not reviewed for how they read on a phone.
+**Then the deeper panels, the same day.** A sweep of every section found two never sized for a
+finger: Raid Composition (61 of 67 controls under 44px) and each profession's guide (35 of 41, 33 of
+them zone tabs at 25px). Both now measure zero. They grew in place rather than through pseudo-element
+targets, because a seat's name and remove button sit 8px apart and enlarged targets would overlap —
+a test checks each still takes its own tap. Raids, the professions grid and tier lists were already
+fine; the tier lists' inline source links are exempt, as links in running text.
+
+**Not verified on a real phone:** moving a player between raid groups is drag-only, and HTML5 drag on
+touch browsers is uneven. The owner can check it in seconds; if it fails, a tap-to-move control is
+the fix, and that is a feature rather than a sizing change.
+
+**`elementFromPoint` returns nothing for a point below the viewport.** A hit-test of a seat 2,400px
+down reported its controls as unreachable; scrolled into view, both were fine. Scroll first.
 
 ### Remember the emulation artifact
 
@@ -67,7 +78,7 @@ any tab after a resize before measuring React-rendered state.
    `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
 2. **The Feral bear/cat mode split** — the last Phase 3 item. It touches the simulator, which the
    owner has said is not the focus this round, so ask before starting.
-3. **A phone review of the deeper panels** — raid loot, professions guides, raid composition.
+3. **Raid-group drag on a real phone** — untested on a device; a tap-to-move control if it fails.
 4. **Build-against-build comparison** — declined in favour of item-against-item.
 5. **Five-design boards** — cold. **Rotations, tank weighting, variance** — deprioritised.
 
@@ -774,7 +785,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-256 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+257 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3454,7 +3465,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 256 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 257 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed
