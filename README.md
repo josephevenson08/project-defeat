@@ -14,6 +14,10 @@ imply it had.
 
 **Live: https://josephevenson08.github.io/project-defeat/**
 
+**What was worked on each day: [`CHANGELOG.md`](CHANGELOG.md)** — every day with a commit, newest
+first, one line per commit with a link to it. For *why* each thing was done, see
+[`HANDOFF.md`](HANDOFF.md).
+
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear

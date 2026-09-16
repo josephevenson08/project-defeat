@@ -45,7 +45,10 @@ panel both sat that way. If you build it, wire it in the same change, or say cle
 
 ## Note on `src/styles/global.css`
 
-It uses CRLF line endings. Append with CRLF or the diff shows the whole file as changed.
+Check its line endings with `git ls-files --eol src/styles/global.css` before a scripted append, and
+match what it reports. This note used to say it *is* CRLF; on 2026-09-14 the working tree was LF,
+because `core.autocrlf` is on and a working-tree file's endings are whatever last wrote it. The
+index is LF either way, so match the working tree or the diff shows the whole file as changed.
 
 ## Before you call it done
 
@@ -56,6 +59,11 @@ npm run build
 npm run test      # Playwright; needs a browser (npx playwright install)
 npm run brain     # new modules and domain data flow into the vault automatically
 ```
+
+Then, once the work is committed and before the last push: `npm run changelog` and commit
+`CHANGELOG.md` **on its own**. The owner reads it on GitHub to see what was done each day, and the
+generator only skips commits that touch nothing else — so a refresh bundled with other files lists
+itself, and the next run changes the file again.
 
 `npx tsc -b` failing on an unused import is worth pausing on rather than deleting the import: it
 usually means someone started wiring something up and stopped, and deleting the import throws away

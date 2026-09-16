@@ -3303,6 +3303,13 @@ setting `base` globally sends every test to a path nothing serves.
 ## Rules
 
 - **Push to `origin/main` after each completed feature.** No branches or PRs unless asked.
+- **Refresh the daily log before the last push of a session: `npm run changelog`, then commit
+  `CHANGELOG.md` on its own.** The owner reads it on GitHub to see what was worked on each day.
+  The generator skips commits that touch only `CHANGELOG.md`, which is what lets a refresh commit
+  exist without making the file permanently one commit behind — so commit it *alone*, or the
+  refresh will list itself and the next run will change the file again.
+- **`git fetch` at the start of a session.** The owner edits on GitHub directly (a README fix on
+  2026-09-15 left `origin/main` a commit ahead), so fast-forward before committing.
 - **Gate commits on the real test exit code**, never a piped `tail` — the pipe reports the tail's
   status, and a red commit was pushed that way once.
 - **Do not edit `src/` while the suite is running, and do not read its progress with `tail`.** Two
@@ -3382,6 +3389,7 @@ npm run build                         # exit 0
 npx playwright test --reporter=line   # 251 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
+npm run changelog                     # "unchanged" once the log is committed
 ```
 
 ---
