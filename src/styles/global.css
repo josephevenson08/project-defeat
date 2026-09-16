@@ -6904,3 +6904,60 @@ body {
     position: absolute;
   }
 }
+
+/*
+ * Phone tap targets for the two panels a phone review found wanting: Raid Composition, where 61 of
+ * 67 controls measured under 44px, and each profession's guide, where 35 of 41 did — 33 of them zone
+ * tabs at 25px.
+ *
+ * These grow the controls in place rather than extending them with pseudo-elements. A seat row holds a
+ * name button and a remove button 8px apart, and two pseudo-element targets that size would overlap
+ * each other, so whichever painted last would silently take the other's taps.
+ */
+@media (max-width: 900px) {
+  /* The controls set the row's height, so the row's own vertical padding only made it 56px. */
+  .raidcomp-seat-body {
+    min-height: 44px;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  /* The name sits inside a plain block wrapper, so it cannot stretch to the row — it takes the
+     height itself, and the whole strip beside the icon becomes the target. */
+  .raidcomp-seat-label {
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .raidcomp-seat-remove {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .raidcomp-spec-add,
+  .raidcomp-class-builds .raidcomp-spec-add,
+  .raidcomp-group-head,
+  .raidcomp-export,
+  .raidcomp-size button,
+  .raidcomp-meta-title,
+  .raidcomp-meta-date,
+  .raidcomp-meta-time,
+  .raidcomp-meta-timezone,
+  .raidcomp-meta-description {
+    min-height: 44px;
+  }
+
+  .profession-zone-tab {
+    min-height: 44px;
+  }
+
+  .profession-back,
+  .profession-guide-link {
+    align-items: center;
+    display: inline-flex;
+    min-height: 44px;
+  }
+}

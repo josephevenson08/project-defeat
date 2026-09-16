@@ -11535,3 +11535,63 @@ test('on a phone the gear popup fits the screen and its close button is a real t
   })
   expect(tapsLand, 'a tap 20px from the centre in any direction closes it').toBe(true)
 })
+
+/**
+ * Controls in `<main>` smaller than a 44px target, for the phone review.
+ *
+ * Links inside running text are left out, which is WCAG's own exception for target size: a link in a
+ * sentence is as tall as the line it sits on, and forcing it to 44px would break the sentence. The
+ * tier lists' "source" links are the case that raised it.
+ */
+function undersizedControls(page: Page) {
+  return page.evaluate(() =>
+    [...document.querySelectorAll('main button, main select, main input, main textarea, main a')]
+      .filter((control) => {
+        const rect = control.getBoundingClientRect()
+        if (rect.width === 0 || rect.height === 0 || rect.height >= 44) return false
+        return !(control.tagName === 'A' && getComputedStyle(control).display === 'inline')
+      })
+      .map((control) => `${(control as HTMLElement).dataset.testid ?? control.className} (${Math.round(control.getBoundingClientRect().height)}px)`),
+  )
+}
+
+test('on a phone Raid Composition and the profession guides are all 44px targets', async ({ page }) => {
+  await page.setViewportSize(PHONE)
+
+  /*
+   * A review of the panels deeper than the planner found two that were never sized for a finger:
+   * Raid Composition, with 61 of 67 controls under 44px — its seat's remove button was 14px by 19px,
+   * its name 16px tall — and each profession's guide, with 35 of 41, including 33 zone tabs at 25px.
+   * Raids, the professions grid and the tier lists were already fine. Desktop keeps its density: every
+   * rule is inside the phone breakpoint.
+   */
+  await openApp(page, 'raidcomp')
+  for (const spec of ['druid-dreamstate', 'druid-balance', 'druid-feral-cat']) {
+    await page.getByTestId(`raidcomp-add-${spec}`).click()
+  }
+  await expect(page.locator('.raidcomp-seat-body')).toHaveCount(3)
+  expect(await undersizedControls(page), 'Raid Composition, with seats filled').toEqual([])
+
+  /*
+   * A seat holds its name and its remove button side by side, which is why these grew in place rather
+   * than through overlapping pseudo-element targets: each still has to receive its own tap. Checked on
+   * screen, because `elementFromPoint` finds nothing below the viewport.
+   */
+  const seat = page.locator('.raidcomp-seat-body').first()
+  await seat.scrollIntoViewIfNeeded()
+  const ownTaps = await seat.evaluate((row) =>
+    ['.raidcomp-seat-label', '.raidcomp-seat-remove'].map((selector) => {
+      const control = row.querySelector(selector)
+      if (!control) return `${selector} missing`
+      const rect = control.getBoundingClientRect()
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+      return hit !== null && (hit === control || control.contains(hit))
+    }),
+  )
+  expect(ownTaps, 'the name and the remove button each take their own tap').toEqual([true, true])
+
+  await page.getByRole('button', { name: 'Professions', exact: true }).click()
+  await page.getByTestId('profession-pick-mining').click()
+  await expect(page.locator('.profession-zone-tab').first()).toBeVisible()
+  expect(await undersizedControls(page), 'the Mining guide').toEqual([])
+})
