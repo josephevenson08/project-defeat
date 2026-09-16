@@ -111,8 +111,25 @@ runs wherever the character changes — dropping Enchanting takes the ring encha
 leaving +8 applied to someone who can no longer be offered it.
 
 Talent trees are done — 579 talents across 27 trees, with icons, per-rank descriptions and
-prerequisite gating. Race/class-specific assumptions beyond legality checks and the Feral bear/cat
-mode split remain unstarted.
+prerequisite gating.
+
+**Race/class-specific assumptions were done before this file said so, and one of them was wrong.**
+Racial traits — 28 across all ten races — have reached `calculateStats` since 2026-08-01, including
+the weapon-conditional ones (Sword, Mace, Axe, Gun and Bow specialization) and the class-split
+Draenei hit auras. This file went on listing the item as unstarted.
+
+Checking it on 2026-09-16 found that **the app refused Draenei Mage**, a TBC launch combination. A
+comment in `baseStats.ts` called it "added in Cataclysm" and explained away the pinned upstream for
+modelling it; `racesByClass` was built on the same belief, and the Draenei spell-hit racial listed
+Priest and Shaman only because no Draenei Mage could exist to exercise it. Four sources disagree with
+that comment — warcraft.wiki.gg's draenei and mage pages, Warcraft Tavern's TBC race guide, and
+wowsims/tbc itself.
+
+All ten rows were then checked, not just the wrong one, and are pinned in a test as verified. The
+base-stat guard now throws in both directions, so a future disagreement between the upstream and the
+app is investigated rather than annotated.
+
+The Feral bear/cat mode split is the one Phase 3 item left.
 
 ## Phase 4: Simulation
 

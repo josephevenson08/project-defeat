@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/characterProfessions.ts
-lines: 47
+lines: 42
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.characterProfessions
 
-`src/domain/professions/characterProfessions.ts` · **domain** layer · 47 lines
+`src/domain/professions/characterProfessions.ts` · **domain** layer · 42 lines
 
 From the top of the file:
 
@@ -20,13 +20,12 @@ From the top of the file:
 
 ## Exports
 
-**function** — `characterHasProfession`, `toggleProfession`
+**function** — `toggleProfession`
 
 **const** — `PRIMARY_PROFESSION_LIMIT`, `primaryProfessions`
 
 ## Imports
 
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 

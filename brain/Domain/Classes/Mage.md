@@ -12,10 +12,11 @@ tags: [brain/domain, domain/class]
 - [[Fire Mage]] — [[Caster DPS]]
 - [[Frost Mage]] — [[Caster DPS]]
 
-## Legal races (5)
+## Legal races (6)
 
 - [[Human]] (Alliance)
 - [[Gnome]] (Alliance)
+- [[Draenei]] (Alliance)
 - [[Undead]] (Horde)
 - [[Troll]] (Horde)
 - [[Blood Elf]] (Horde)

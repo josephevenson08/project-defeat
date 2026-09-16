@@ -28,7 +28,8 @@ behind every claim of its that quotes a number.
 ## Current Features
 
 - TBC class/spec selection for all nine TBC classes
-- Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior)
+- Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior), every row checked against sources and pinned in a test. That check found the app refusing **Draenei Mage**, which TBC allowed from launch
+- 28 racial traits applied to your stats, including the weapon-conditional ones and the Draenei hit aura, which is melee hit for Warriors, Paladins and Hunters and spell hit for Mages, Priests and Shamans
 - Full TBC-style gear slot model
 - **The interface is the game's, and it changes with your faction** — framed panels with bevelled
   metal and corner brackets, Cinzel carrying every heading and both navs, and a palette that follows

@@ -210,6 +210,18 @@ Gating ring enchants behind Enchanting filtered what the gear popup offered — 
 
 `normalizeGearForCharacter` had solved exactly this problem for *items* since early on, and had never looked at enchants. The fix is `dropIllegalEnchants` beside it on the same choke point. The general form: when you add a rule about what a character may have, find every place the old answer is already stored, because the picker is only where it is chosen — not where it lives.
 
+## A comment that explains away a disagreement with a source is the bug
+
+`baseStats.ts` noticed that the pinned TBC simulator carried a race/class combination the app refused, and resolved it in prose: upstream models "Draenei Mage, added in Cataclysm", which is harmless because the app never offers it. The combination was a TBC launch one. The upstream was right, the comment was a remembered fact, and `racesByClass` had been built on the same memory — so a legal character could not be made, and the spell-hit racial never listed Mage because no Draenei Mage existed to exercise it.
+
+Two things follow. **When the pinned source and the app disagree, the disagreement is a finding to check against a third source, not an anomaly to annotate.** The guard now throws in that direction too, so the next one gets looked at the day it appears. And **verifying one wrong row is a reason to verify the table**: the other nine were checked the same day and pinned in a test as verified rather than as believed.
+
+## A source that parses badly is not a source
+
+Verifying that matrix, the first pass read each class page's race table, whose expansion markers are icons. The extraction reported Human Hunters, Gnome and Orc Priests and Dwarf Warlocks as TBC — all Cataclysm. Applied as corrections, they would have introduced four bugs to fix one.
+
+The race pages' patch-history prose and a TBC-specific guide agreed with each other and with the app on every row but one, and those are what the test cites. The rule: when an extraction contradicts well-established history, suspect the extraction first — and when two sources disagree, prefer the one that states the fact in words over the one that encodes it in an image.
+
 ## Related
 
 - [[Architecture Map]]

@@ -1,15 +1,89 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-14.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-16.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 ---
 
-## Where this is right now (2026-09-14, latest — READ THIS FIRST)
+## Where this is right now (2026-09-16, latest — READ THIS FIRST)
 
-**Ring enchants were wrong in both directions at once.**
+**A Draenei could not be a Mage, and the reason was a code comment.**
 
-`main` is green and pushed: **249 tests, lint and build clean.** Three things landed today — gear
+`main` is green and pushed: **251 tests, lint and build clean.** Also pulled in on arrival: the
+owner's one-word README edit (`cada7aa`), made from GitHub's web editor between sessions — so
+**`git fetch` before assuming local is current**, because the owner does edit remotely.
+
+### The finding
+
+Phase 3 listed "race/class-specific assumptions beyond legality checks" as unstarted. It was not:
+**28 racial traits have reached `calculateStats` since 2026-08-01**, weapon-conditional ones
+included. The item was stale.
+
+Checking it turned up a real bug. `racesByClass` gave Mage to Human, Gnome, Undead, Troll and Blood
+Elf — **not Draenei**. And `baseStats.ts` carried this comment:
+
+> Upstream carries one combination TBC does not have — Draenei Mage, added in Cataclysm — which is
+> harmless because `racesByClass` never offers it
+
+**Draenei Mage was a TBC launch combination.** The pinned upstream, wowsims/tbc, was right and had
+modelled it all along; the comment was a remembered fact that reclassified correct data as a quirk.
+The racial followed the same belief: Inspiring Presence listed Priest and Shaman only, because no
+Draenei Mage existed to exercise it.
+
+Sources, all agreeing:
+
+- warcraft.wiki.gg's draenei page: "Hunter, Mage, Paladin, Priest, Shaman, Warrior" at patch 2.0.3.
+- warcraft.wiki.gg's mage page: draenei marked with the Burning Crusade icon.
+- Warcraft Tavern's TBC race guide: the same six, and Inspiring Presence as "Mages/Priests/Shaman
+  only".
+- wowsims/tbc @3301fca5: Draenei Mage base stats, 152 Int and 147 Spirit.
+
+### The whole matrix was checked, not just the wrong row
+
+One wrong row is a reason to distrust the table, so all ten races were verified the same day and are
+now **pinned in a test as verified**, with the sources in its comment. Nine were already right.
+
+**Worth knowing if you ever redo this: the class pages' race tables are a trap.** Their expansion
+markers are icons, and extracting them reported Human Hunters, Gnome and Orc Priests and Dwarf
+Warlocks as TBC — every one a Cataclysm addition. Applied as corrections, that would have introduced
+four bugs to fix one. The race pages' patch-history prose and the TBC-specific guide are what agree,
+and a Warcraft Tavern extraction still produced one garbled row (Human copied from Draenei) that the
+human page's patch history corrected. **When an extraction contradicts well-established history,
+suspect the extraction first.**
+
+### What changed
+
+- `races.ts`: Mage gains Draenei, with a comment saying why it was missing.
+- `sampleRacialTraits.ts`: Inspiring Presence gains Mage.
+- `baseStats.ts`: the wrong comment is corrected, and **the guard now throws in both directions**.
+  It used to check only that every legal combination had base stats; a combination the upstream
+  models and the app refuses was annotated away. Now that throws too, so the next disagreement gets
+  looked at against a source on the day it appears. Upstream and app agree exactly today.
+- Two tests: the verified matrix, and a Draenei Mage made in the rail carrying the same spell hit as
+  a Draenei Shaman and more than a Draenei Warrior.
+
+### Also cleaned up
+
+`characterHasProfession`, exported in the previous commit and called by nothing — the enchant gate
+inlines the same check. Removed.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job. Missing: Nightbane, and all of
+   Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **A phone-*designed* layout** — tap targets at 33-38px against a 44px guideline, and tab bars that
+   wrap to three rows. Both trade against the density this app is built on; ask first.
+3. **The Feral bear/cat mode split** — the last Phase 3 item. It touches the simulator, which the
+   owner has said is not the focus this round, so it is worth asking before starting.
+4. **Build-against-build comparison** — declined in favour of item-against-item.
+5. **Five-design boards** — cold. **Rotations, tank weighting, variance** — deprioritised.
+
+---
+
+## Where this was on 2026-09-14 (ring enchants were wrong in both directions)
+
+`main` is green and pushed: **249 tests, lint and build clean.** Three things landed that day — gear
 comparison, the phone layout, and professions on the character.
 
 ### The finding, which is not what the roadmap item said
@@ -632,7 +706,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-249 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+251 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3305,7 +3379,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 249 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 251 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 ```

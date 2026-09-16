@@ -9,13 +9,14 @@ tags: [brain/domain, domain/race]
 
 **Alliance**
 
-## Legal classes (5)
+## Legal classes (6)
 
 - [[Warrior]]
 - [[Paladin]]
 - [[Hunter]]
 - [[Priest]]
 - [[Shaman]]
+- [[Mage]]
 
 ## Where this lives in the code
 
