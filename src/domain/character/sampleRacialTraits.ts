@@ -134,9 +134,9 @@ export const sampleRacialTraits: readonly RacialTrait[] = [
     kind: 'conditional',
     description: '+1% spell hit, as a 30-yard party aura.',
     stats: { spellHitRating: oneHitPercentSpell },
-    requiresClasses: ['Priest', 'Shaman'],
+    requiresClasses: ['Mage', 'Priest', 'Shaman'],
     notes:
-      'Wowhead TBC spell 28878 ("Apply Area Aura: Mod Spell Hit Chance % Value: 1%", 30 yard radius). Draenei casters get this instead of Heroic Presence, not in addition to it.',
+      'Wowhead TBC spell 28878 ("Apply Area Aura: Mod Spell Hit Chance % Value: 1%", 30 yard radius). Draenei casters get this instead of Heroic Presence, not in addition to it. Mage was missing from this list until 2026-09-16, because Draenei Mage was wrongly believed to be a Cataclysm addition and so was never offered; Warcraft Tavern\'s TBC race guide lists this racial as "Mages/Priests/Shaman only".',
   },
   {
     id: 'draenei-gift-of-the-naaru',

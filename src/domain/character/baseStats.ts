@@ -24,15 +24,38 @@ const BASE_STATS = rawBaseStats.baseStats as Partial<Record<TbcClass, Partial<Re
  *
  * The failure this prevents is the quiet one: a race the ingest stopped emitting would otherwise
  * hand that character an all-zero base and simply read low, on the one surface that is always on
- * screen. Upstream carries one combination TBC does not have — Draenei Mage, added in Cataclysm —
- * which is harmless because `racesByClass` never offers it, so this checks coverage in the one
- * direction that matters.
+ * screen.
+ *
+ * **This comment used to say upstream carried "one combination TBC does not have — Draenei Mage,
+ * added in Cataclysm".** That was wrong, and it was the whole reason `racesByClass` refused Draenei
+ * Mage: a launch combination, confirmed by warcraft.wiki.gg's patch history and Warcraft Tavern's TBC
+ * race guide. Upstream was right and this file explained it away. Upstream and `racesByClass` now
+ * agree exactly — every combination one carries, the other offers — so this checks coverage in the
+ * direction that can fail silently, and the reverse direction has nothing left in it to excuse.
  */
 const missing = Object.entries(racesByClass).flatMap(([className, races]) =>
   races.filter((race) => BASE_STATS[className as TbcClass]?.[race] === undefined).map((race) => `${className}/${race}`),
 )
 if (missing.length > 0) {
   throw new Error(`baseStats.json is missing ${missing.length} legal race/class combination(s): ${missing.join(', ')}`)
+}
+
+/*
+ * The reverse direction, which used to be excused rather than checked. A combination the pinned TBC
+ * simulator models but this app refuses is a question for a person, not a comment: the last one was
+ * Draenei Mage, and the comment that excused it was the bug. Throwing here means the next such
+ * disagreement gets looked at against a source the day it appears.
+ */
+const refused = Object.entries(BASE_STATS).flatMap(([className, byRace]) =>
+  Object.keys(byRace ?? {})
+    .filter((race) => !racesByClass[className as TbcClass]?.includes(race as TbcRace))
+    .map((race) => `${className}/${race}`),
+)
+if (refused.length > 0) {
+  throw new Error(
+    `baseStats.json models ${refused.length} race/class combination(s) that racesByClass refuses: ${refused.join(', ')}. ` +
+      'Check each against a TBC source before deciding which side is wrong.',
+  )
 }
 
 /** The source these numbers were read from, for the panel that discloses it. */

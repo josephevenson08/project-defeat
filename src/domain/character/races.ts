@@ -9,6 +9,15 @@ export const factions = Object.keys(racesByFaction) as Faction[]
 
 // TBC-era race/class availability. Cataclysm later added Blood Elf Warrior, Undead Hunter,
 // Dwarf/Gnome/Troll Death Knight, etc; none of those apply to TBC Classic Anniversary.
+//
+// **Draenei Mage is TBC, and this table refused it until 2026-09-16.** A code comment in
+// `baseStats.ts` asserted it was "added in Cataclysm", and the row was built on that. It was a
+// launch combination: warcraft.wiki.gg's draenei page lists "Hunter, Mage, Paladin, Priest, Shaman,
+// Warrior" at patch 2.0.3, its mage page marks draenei with the Burning Crusade icon, Warcraft
+// Tavern's TBC race guide agrees, and wowsims/tbc - the pinned upstream this app's base stats come
+// from - carries Draenei Mage base stats. The other nine rows were checked against the same sources
+// and are unchanged. Verify a combination against a source before excluding it; this one was
+// removed on a remembered fact.
 export const racesByClass: Record<TbcClass, readonly TbcRace[]> = {
   Warrior: ['Human', 'Dwarf', 'Night Elf', 'Gnome', 'Draenei', 'Orc', 'Undead', 'Tauren', 'Troll'],
   Paladin: ['Human', 'Dwarf', 'Draenei', 'Blood Elf'],
@@ -16,7 +25,7 @@ export const racesByClass: Record<TbcClass, readonly TbcRace[]> = {
   Rogue: ['Human', 'Dwarf', 'Night Elf', 'Gnome', 'Orc', 'Undead', 'Troll', 'Blood Elf'],
   Priest: ['Human', 'Dwarf', 'Night Elf', 'Draenei', 'Undead', 'Troll', 'Blood Elf'],
   Shaman: ['Draenei', 'Orc', 'Tauren', 'Troll'],
-  Mage: ['Human', 'Gnome', 'Undead', 'Troll', 'Blood Elf'],
+  Mage: ['Human', 'Gnome', 'Draenei', 'Undead', 'Troll', 'Blood Elf'],
   Warlock: ['Human', 'Gnome', 'Orc', 'Undead', 'Blood Elf'],
   Druid: ['Night Elf', 'Tauren'],
 }

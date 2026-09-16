@@ -11311,3 +11311,66 @@ test('a build carries professions, and one saved before they existed still loads
   expect(tooMany.ok).toBe(true)
   if (tooMany.ok) expect(tooMany.build.character.professions).toHaveLength(2)
 })
+
+test('the race/class matrix is the TBC one, checked against sources rather than remembered', () => {
+  /*
+   * **Draenei Mage was refused until 2026-09-16, on a remembered fact.** A comment in `baseStats.ts`
+   * said it was "added in Cataclysm", and `racesByClass` was built to match. It was a launch
+   * combination. The pinned upstream, wowsims/tbc, had carried Draenei Mage base stats the whole time,
+   * and the comment explained that away as upstream modelling something TBC did not have.
+   *
+   * So every row is pinned here as it was **verified**, not as it was believed:
+   * - Draenei: warcraft.wiki.gg's draenei page, patch 2.0.3 — "Hunter, Mage, Paladin, Priest, Shaman,
+   *   Warrior" — plus its mage page's Burning Crusade marker and Warcraft Tavern's TBC race guide.
+   * - Human: warcraft.wiki.gg's human page, which dates Hunter to patch 4.0.3a.
+   * - The other eight: Warcraft Tavern's TBC race guide, each matching the table unchanged.
+   *
+   * Class-table icon readings were tried first and discarded: they reported Human Hunters, Gnome
+   * Priests and Dwarf Warlocks as TBC, all of which are Cataclysm. A source that parses badly is not a
+   * source, so nothing here rests on those.
+   */
+  const verified: Record<string, readonly string[]> = {
+    Human: ['Mage', 'Paladin', 'Priest', 'Rogue', 'Warlock', 'Warrior'],
+    Dwarf: ['Hunter', 'Paladin', 'Priest', 'Rogue', 'Warrior'],
+    'Night Elf': ['Druid', 'Hunter', 'Priest', 'Rogue', 'Warrior'],
+    Gnome: ['Mage', 'Rogue', 'Warlock', 'Warrior'],
+    Draenei: ['Hunter', 'Mage', 'Paladin', 'Priest', 'Shaman', 'Warrior'],
+    Orc: ['Hunter', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
+    Undead: ['Mage', 'Priest', 'Rogue', 'Warlock', 'Warrior'],
+    Tauren: ['Druid', 'Hunter', 'Shaman', 'Warrior'],
+    Troll: ['Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warrior'],
+    'Blood Elf': ['Hunter', 'Mage', 'Paladin', 'Priest', 'Rogue', 'Warlock'],
+  }
+
+  for (const [race, classes] of Object.entries(verified)) {
+    expect([...getClassesForRace(race as TbcRace)].sort(), `${race} can be exactly the TBC classes`).toEqual([...classes].sort())
+  }
+})
+
+test('a Draenei Mage can be made, and gets the spell-hit racial', async ({ page }) => {
+  await openApp(page)
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+
+  // Offered at all — the half of the bug a player would actually hit. The creator and the rail both
+  // read `getClassesForRace`, so a class missing here was missing everywhere.
+  await expect(page.getByRole('combobox', { name: 'Class' }).locator('option', { hasText: /^Mage$/ })).toHaveCount(1)
+
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Warrior')
+  await page.getByTestId('rail-show-all-stats').click()
+  const warriorSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+
+  /*
+   * **Inspiring Presence listed Priest and Shaman only**, and could not have been noticed: a class the
+   * race could not be never exercised it. Warcraft Tavern's TBC guide gives the racial as
+   * "Mages/Priests/Shaman only". A Draenei Mage now carries the same spell hit a Draenei Shaman does,
+   * and more than a Draenei Warrior, who has Heroic Presence instead.
+   */
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Mage')
+  const mageSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+  expect(mageSpellHit, 'a Draenei Mage gets Inspiring Presence').toBeGreaterThan(warriorSpellHit)
+
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Shaman')
+  expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText()), 'the same racial a Draenei Shaman gets').toBe(
+    mageSpellHit,
+  )
+})
