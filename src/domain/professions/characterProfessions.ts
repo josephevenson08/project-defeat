@@ -1,4 +1,3 @@
-import type { CharacterProfile } from '../character/characterTypes'
 import type { Profession } from './professionTypes'
 import { sampleProfessions } from './sampleProfessions'
 
@@ -23,10 +22,6 @@ export const PRIMARY_PROFESSION_LIMIT = 2
 export const primaryProfessions: readonly Profession[] = sampleProfessions
   .filter((entry) => entry.category !== 'Secondary')
   .map((entry) => entry.profession)
-
-export function characterHasProfession(character: CharacterProfile, profession: Profession): boolean {
-  return character.professions?.includes(profession) === true
-}
 
 /**
  * Adds or removes a profession, keeping the result within the two-profession limit.
