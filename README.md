@@ -1,6 +1,6 @@
 # Project Defeat
 
-Project Defeat is a local-first React + TypeScript + Vite simulator/planner for **TBC World of Warcraft Classic Anniversary**.
+Project Defeat is a local-first React + TypeScript + Vite simulator/planner for **TBC World of Warcraft Classic Anniversary, More specifically, it is for phase 2 until I workout everything**.
 
 It is a working planner rather than an accuracy-complete simulator: gear, gems, enchants, talents,
 buffs, debuffs, consumables and raid composition are all real and sourced, while rotations remain the
