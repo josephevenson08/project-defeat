@@ -526,3 +526,28 @@ audit that measured zero maps]]* again, and worth noticing that it is: that one 
 sweep over an empty set, this one reported a successful write over an empty set. Both are the same
 bug — **treating "I found nothing" as a result rather than as a question** — and both were invisible
 until something downstream happened to need the data.
+
+## A drag is a pointer feature, and a panel that only drags has no phone and no keyboard
+
+Recorded 2026-09-20, when moving a player between raid groups stopped requiring a drag.
+
+The raid chart had shipped with drag-and-drop as the only way to move a seat, and the open question
+was recorded as "unverified on a real device — if drag fails on a phone, add a tap-to-move control".
+That framing was too generous to it. HTML5 drag-and-drop is defined over mouse events; touch browsers
+do not synthesise them, so `dragstart` cannot fire from a finger. It was not a thing that might fail
+on a device, it was a thing that could not work on one — and the same fact made the panel unusable
+from a keyboard, which is WCAG 2.1.1 rather than a nice-to-have.
+
+**The replacement is a two-step pick up and place, not an emulated drag.** Press Move on a seat, then
+press the seat you want them in. It costs one extra press on a desktop, where drag is still there, and
+it is the only version that exists at all on a phone or from a keyboard. Emulating drag from touch
+events was the alternative and it is strictly worse: it reimplements a gesture the platform does not
+want to give you, and it still leaves the keyboard with nothing.
+
+**Two details that are not obvious from the diff.** Every other seat becomes one button covering the
+whole row rather than an overlay on top of the controls already there — the seat's name and remove
+buttons sit 8px apart, and a target laid across that pair would silently take taps meant for either.
+And the seat's contribution card had to be suppressed while a move is armed: it opens on
+`:focus-within`, so pressing Move unfurled a list of eight totems directly over the seats being chosen
+between. That rule has to sit *after* the reveal rule it fights, because the two tie on specificity —
+written beside the other move styles it lost, and the card still opened.

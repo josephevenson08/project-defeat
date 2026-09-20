@@ -89,8 +89,9 @@ behind every claim of its that quotes a number.
   read from the spell's own Wowhead tooltip. Role balance, a ranked list of what one more seat would
   buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
   persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
-  spec and buff, **drag-and-drop** to move players between groups (occupied seats swap rather than
-  overwrite), an optional player name per seat, and a hover card on each seat listing everything that
+  spec and buff, **two ways to move a player between groups** — press Move on their seat and then the
+  seat you want them in, or drag them there — with occupied seats swapping rather than being
+  overwritten, an optional player name per seat, and a hover card on each seat listing everything that
   player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
   that group actually receives. **Counts follow Wowhead's raid-composition tool**: they say who
   *could* cast a buff rather than what will be up at once, so one Paladin lights up every Greater
@@ -153,8 +154,9 @@ behind every claim of its that quotes a number.
   control in the rail, the tab bars and the gear popup is a 44px tap target. Measured at 375x812: the
   gear panel starts on the first screen, and no section scrolls sideways. Raid Composition and the
   profession guides were reviewed the same way and every control there is a 44px target too; desktop
-  keeps its density, since all of it sits inside the phone breakpoint. Not yet checked on a real phone:
-  moving a player between raid groups is drag-only, and how well touch browsers handle that varies
+  keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
+  groups no longer needs a drag**, which a finger cannot start and a keyboard never could: press Move
+  on their seat, then the seat you want them in
 - **Share a build as a link** — the whole build (character, professions, gear, gems, enchants,
   talents, buffs and consumables) packed into the address, so a build made on the desktop opens on a
   phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the

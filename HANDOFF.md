@@ -7,6 +7,94 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ## Where this is right now (2026-09-20, latest — READ THIS FIRST)
 
+**A raid chart that could only be rearranged by dragging could not be rearranged at all on a phone,
+or from a keyboard.**
+
+`main` is green and pushed: **268 tests, lint and build clean.** The owner picked this off the ranked
+list below, where it sat as "raid-group drag on a real phone — untested on a device".
+
+### The finding, which is stronger than the open item said
+
+That item read: *unverified on a real device; if drag fails on a phone, a tap-to-move control is the
+fix.* It could not have worked. **HTML5 drag-and-drop is defined over mouse events, touch browsers do
+not synthesise them, and `dragstart` therefore never fires from a finger.** Not "uneven support" —
+absent. The same fact made the panel unusable from a keyboard, which is WCAG 2.1.1 outright, and that
+half was never written down at all.
+
+So the device test was not worth waiting for, and nothing here is conditional on one.
+
+### What landed
+
+Each filled seat has a **Move** button beside its ×. Pressing it arms that seat; the next press on any
+seat lands the player there, swapping if that seat is taken. Escape or the same button — which reads
+**Cancel** while it is holding somebody — calls it off. Drag is untouched, for the mouse users already
+reaching for it.
+
+Decisions worth knowing before changing it, all in `RaidCompositionPanel.tsx` and the raidcomp CSS:
+
+- **A destination is one button covering the whole seat, not an overlay.** The seat's name and remove
+  buttons sit 8px apart — the reason the phone pass grew them in place rather than with pseudo-element
+  targets — and a target laid across that pair would silently take taps meant for either. One button
+  per seat also gives one 44px target per seat for free, with no nested interactive elements.
+- **The seats stay readable while armed.** A destination renders the same icon and two lines of text
+  the seat already showed, via a shared `SeatIdentity`. A raid leader is reading the chart *while*
+  choosing, so the seats cannot go blank the moment a move starts.
+- **The button reads "Move" and changes to "Cancel"** rather than keeping one label and swapping the
+  `aria-label`. The panel copy tells you to press Move, so that word has to be on screen, and a button
+  whose visible label contradicts its accessible name cannot be driven by voice — WCAG 2.5.3.
+- **Escape is bound to the window**, not to the seats: arming a move moves focus onto buttons that
+  stop existing the moment it ends, so there is no element reliably focused when someone changes
+  their mind.
+- **The armed seat's contribution card is suppressed.** It opens on `:focus-within`, so pressing Move
+  unfurled eight totems directly over the seats being chosen between. **That rule has to sit after the
+  reveal rule it fights** — they tie on specificity, and written beside the other move styles 400
+  lines earlier it lost and the card still opened. Same trap the file already records further down.
+- **Resizing or clearing the roster disarms it**, because 25 → 10 can delete the seat being held.
+
+### The bug it exposed, which is the seat card's twin
+
+Verifying at 375px showed the page scrolling sideways — **456px against a 375px viewport** — armed or
+not, so not this feature's doing. Each icon in a group's buff row carries a 170px hover card that was
+`visibility: hidden`, which suppresses painting but **not scrollable overflow**. That is the exact
+defect already diagnosed and fixed for `.raidcomp-seat-card`, left in place on its neighbour twenty
+lines away.
+
+`display: none` fixes it. The reflow test only ever seated one Druid, whose buff row is too short to
+reach the edge; it now fills a group of five, and **was confirmed to fail without the fix** rather than
+merely pass with it.
+
+### Two harness artifacts that cost time, both worth not rediscovering
+
+- **The Browser pane delivers `key` presses with `e.key` empty.** Enter on a focused button therefore
+  never became a click, and keyboard activation looked broken when it was fine. Verified in Playwright
+  instead, where `page.keyboard.press('Enter')` works — and that is where the assertion belongs anyway.
+- **Reading the DOM in the same `javascript_tool` call that clicked is a lie.** State reads come back
+  pre-render. Clicking and measuring in one call reported "nothing happened" twice, once while the
+  change had in fact applied. Split the click and the read into separate calls.
+
+Also: the pane's `find` returned a `ref` whose click landed on a different seat than its own label
+named. Drive this panel by `data-testid`, which was exact every time.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job. Missing: Nightbane, and all of
+   Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **The Feral bear/cat mode split** — the last Phase 3 item. It touches the simulator, which the
+   owner has said is not the focus this round, so ask first.
+3. **In-game character import** (Phase 6) — the biggest remaining roadmap item, and offered twice
+   now without being chosen. Plumbing before data if it is: design the export format and build the
+   site-side parser first, Lua addon after.
+4. **Phase 2 item verification** — ROADMAP still calls reconciling items against real tooltips the
+   remaining Phase 2 work, on the strength of 48 of 48 audited items being wrong. The catalogue is
+   ingest-backed now, so **check whether that gap still exists before committing to a batch.**
+5. **Build-against-build comparison** — declined. **Five-design boards** — cold. **Rotations, tank
+   weighting, variance** — deprioritised.
+
+---
+
+## Where this was earlier on 2026-09-20 (builds became shareable as links)
+
 **Builds can be shared as links — and building that exposed a save/load bug every build had.**
 
 `main` is green and pushed: **264 tests, lint and build clean.** The owner chose share links as the
@@ -3561,7 +3649,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 264 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 268 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed

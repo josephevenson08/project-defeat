@@ -41,7 +41,7 @@ export type RosterSlot = {
  * `rosterStorage`, which drops it rather than failing on it.
  */
 
-/** A seat's address. Drag-and-drop moves between two of these, so it is worth naming. */
+/** A seat's address. Both ways of moving a player — a drag and the Move button — go between two of these. */
 export type SeatRef = {
   groupIndex: number
   seatIndex: number

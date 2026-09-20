@@ -420,9 +420,19 @@ pseudo-element targets, because a seat's name and remove button sit 8px apart an
 targets would overlap. Inline "source" links in the tier lists were left alone: target-size guidance
 exempts links in running text.
 
-Still unverified on a real device: moving a player between raid groups is drag-only, and HTML5 drag
-support on touch browsers is uneven. If it fails on a phone, the fix is a tap-to-move control, which is
-a feature rather than a sizing change.
+**Moving a player between groups no longer needs a drag (2026-09-20).** This was left as "unverified on
+a real device", with a tap-to-move control as the fix if drag failed there. It could not have worked:
+HTML5 drag-and-drop is built on mouse events, touch browsers do not synthesise them, and `dragstart`
+therefore never fires from a finger — so the group a player sat in was fixed on a phone, and fixed for
+a keyboard user too, which is WCAG 2.1.1 outright. Pressing **Move** on a seat arms it and the next
+press on any seat lands them there, swapping if that seat is taken; Escape or the same button calls it
+off. Drag stays for the mouse. The armed seat's contribution card is suppressed, because it opens on
+`:focus-within` and was unfurling over the seats being chosen between.
+
+**A second phone defect fell out of checking it.** Each icon in a group's buff row carries a 170px
+hover card that was `visibility: hidden` — which suppresses painting but not scrollable overflow, the
+same defect already fixed for the seat card and left on its neighbour. A group of five pushed the page
+to 456px against a 375px viewport. The reflow test now seats enough players to produce that row.
 
 **Gear comparison landed 2026-09-14**, as a sixth planner sub-tab. Pick a slot and two items and the
 panel swaps each into the set you are actually wearing, so set bonuses, socket bonuses and the talent

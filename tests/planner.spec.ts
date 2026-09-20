@@ -7967,6 +7967,150 @@ test('a party buff follows the player when they change group', () => {
   expect(after.groups[3].partyBuffs.length, 'and the new group gains them').toBeGreaterThan(0)
 })
 
+test('a player can be moved by tapping, which is the only way a phone can move one', async ({ page }) => {
+  /*
+   * **Drag is a pointer feature and nothing else.** HTML5 drag-and-drop is built on mouse events,
+   * touch browsers do not synthesise them, and `dragstart` therefore never fires from a finger — so
+   * for as long as moving a player was drag-only, the group someone sat in was fixed on a phone. The
+   * raid leader pasting a chart into Discord is the person most likely to be on one.
+   *
+   * Two steps rather than an emulated drag: press Move, then press the seat. Driven here at phone
+   * width because that is the case it exists for, though nothing about it is width-specific.
+   */
+  await page.setViewportSize(PHONE)
+  await openApp(page, 'raidcomp')
+
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
+  await page.getByTestId('raidcomp-add-warrior-fury').click()
+
+  const group1 = page.getByTestId('raidcomp-group-1')
+  const group2 = page.getByTestId('raidcomp-group-2')
+  const group2Buffs = group2.locator('.raidcomp-group-buffs-label')
+  await expect(group1).toContainText('Enhancement Shaman')
+  await expect(group2Buffs).toHaveText('Party buffs · 0')
+
+  // The panel says how to do this. If the control is ever renamed, this is what notices.
+  await expect(page.getByTestId('raidcomp-panel')).toContainText(
+    'To move a player, press Move on their seat and then the seat you want them in',
+  )
+
+  // Nothing is armed until Move is pressed, so the chart is never covered in destinations it does
+  // not need.
+  await expect(page.getByTestId('raidcomp-moving')).toHaveCount(0)
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.getByTestId('raidcomp-moving')).toContainText('Moving Enhancement Shaman')
+
+  /*
+   * Every seat but the one being held becomes a destination — 24 of them in a 25-player raid — and
+   * each says what pressing it will do. "Seat 3" on its own is not something anyone can act on
+   * without the chart in front of them, and an occupied seat is a swap rather than a move.
+   */
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(24)
+  await expect(
+    page.getByRole('button', { name: 'Swap Enhancement Shaman with Fury Warrior in group 1, seat 2' }),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Move Enhancement Shaman to group 2, seat 1' }).click()
+
+  await expect(group1).not.toContainText('Enhancement Shaman')
+  await expect(group2).toContainText('Enhancement Shaman')
+  // The totems go with them, which is the entire reason a raid leader moves anybody in TBC.
+  await expect(group2Buffs).not.toHaveText('Party buffs · 0')
+
+  // And the chart goes back to being a chart.
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+  await expect(page.getByTestId('raidcomp-moving')).toHaveCount(0)
+
+  /*
+   * Landing on an occupied seat trades the two, the same rule a drop has always followed: refusing
+   * would make reorganising a full raid impossible, and overwriting would delete somebody.
+   */
+  await page.getByTestId('raidcomp-move-2-1').click()
+  await page.getByRole('button', { name: 'Swap Enhancement Shaman with Fury Warrior in group 1, seat 2' }).click()
+
+  await expect(group1).toContainText('Enhancement Shaman')
+  await expect(group2).toContainText('Fury Warrior')
+  await expect(page.getByTestId('raidcomp-filled')).toContainText('2 of 25 seats')
+})
+
+test('the move control works from the keyboard, which the drag never did', async ({ page }) => {
+  /*
+   * The same gap as the phone and for the same reason: `dragstart` comes from a pointer, so a
+   * keyboard user could seat a raid and then never reorganise it. That is WCAG 2.1.1 in its plainest
+   * form, and it was true of this panel from the day it was built.
+   *
+   * Real key presses rather than clicks, because keyboard operation is the whole of the claim.
+   */
+  await openApp(page, 'raidcomp')
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
+
+  await page.getByTestId('raidcomp-move-1-1').focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByTestId('raidcomp-moving')).toContainText('Moving Enhancement Shaman')
+
+  const destination = page.getByRole('button', { name: 'Move Enhancement Shaman to group 4, seat 1' })
+  await destination.focus()
+  await page.keyboard.press('Enter')
+
+  await expect(page.getByTestId('raidcomp-group-4')).toContainText('Enhancement Shaman')
+  await expect(page.getByTestId('raidcomp-group-1')).not.toContainText('Enhancement Shaman')
+})
+
+test('an armed move can be called off two ways, and neither of them moves anybody', async ({ page }) => {
+  await openApp(page, 'raidcomp')
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
+
+  // Escape, bound to the window because arming a move puts focus on a button that then stops
+  // existing the moment the move ends.
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(24)
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+
+  /*
+   * Or the same button again. It reads "Cancel" while it is holding somebody rather than staying
+   * "Move" with a different `aria-label`: a button whose visible label contradicts its accessible
+   * name cannot be operated by voice, which is WCAG 2.5.3.
+   */
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.getByTestId('raidcomp-move-1-1')).toHaveText('Cancel')
+  await expect(page.getByRole('button', { name: 'Cancel moving Enhancement Shaman' })).toBeVisible()
+
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+  await expect(page.getByTestId('raidcomp-move-1-1')).toHaveText('Move')
+
+  await expect(page.getByTestId('raidcomp-group-1')).toContainText('Enhancement Shaman')
+  await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 25 seats')
+})
+
+test('removing the player being moved puts the move down with them', async ({ page }) => {
+  /*
+   * The armed seat keeps its × — it is still an ordinary seat — and `moving` holds a seat *address*
+   * rather than a copy of the player. So the address can outlive the player it named, and the next
+   * person to land in that seat gets picked up silently: destinations across the whole chart, holding
+   * somebody the raid leader never pressed Move on. Reachable in three presses, which is why it is
+   * pinned rather than reasoned about.
+   */
+  await openApp(page, 'raidcomp')
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
+
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(24)
+
+  await page.getByRole('button', { name: 'Remove Enhancement Shaman' }).click()
+  await expect(page.getByTestId('raidcomp-moving')).toHaveCount(0)
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+
+  // The seat is free again, so the next spec added lands in it. Still nothing armed.
+  await page.getByTestId('raidcomp-add-warrior-fury').click()
+  await expect(page.getByTestId('raidcomp-group-1')).toContainText('Fury Warrior')
+  await expect(page.getByTestId('raidcomp-moving')).toHaveCount(0)
+  await expect(page.locator('.raidcomp-seat-place')).toHaveCount(0)
+})
+
 test('naming a seat is optional, clearable, and never changes coverage', () => {
   /*
    * A Shaman brings Strength of Earth whether or not you typed "Dave". Keeping names out of the
@@ -8289,6 +8433,22 @@ test('the layout reflows to phone width without overflowing', async ({ page }) =
 
   const hovered = await overflow()
   expect(hovered.scroll, 'nor when it is open').toBeLessThanOrEqual(hovered.client)
+
+  /*
+   * **And with a group's buff row**, which is the second thing this missed for the same reason.
+   *
+   * Each icon in that row carries its own hover card, absolutely positioned and 170px wide, and those
+   * were still `visibility: hidden` — the exact defect fixed above for the seat card and left in
+   * place on its neighbour. One Druid does not produce enough of a row to reach the edge; a group of
+   * four does, and pushed the page to 410px against 375 with nothing visible out there.
+   */
+  for (const spec of ['shaman-enhancement', 'warrior-fury', 'mage-fire', 'paladin-retribution']) {
+    await page.getByTestId(`raidcomp-add-${spec}`).click()
+  }
+  await expect(page.locator('.raidcomp-buff-icons > li').first()).toBeVisible()
+
+  const buffRow = await overflow()
+  expect(buffRow.scroll, "nor with a group's buff row and its hidden cards").toBeLessThanOrEqual(buffRow.client)
 })
 
 test('a seat shows everything that player brings, including what the group row cannot', () => {
@@ -11592,7 +11752,7 @@ test('on a phone Raid Composition and the profession guides are all 44px targets
   const seat = page.locator('.raidcomp-seat-body').first()
   await seat.scrollIntoViewIfNeeded()
   const ownTaps = await seat.evaluate((row) =>
-    ['.raidcomp-seat-label', '.raidcomp-seat-remove'].map((selector) => {
+    ['.raidcomp-seat-label', '.raidcomp-seat-move', '.raidcomp-seat-remove'].map((selector) => {
       const control = row.querySelector(selector)
       if (!control) return `${selector} missing`
       const rect = control.getBoundingClientRect()
@@ -11600,7 +11760,18 @@ test('on a phone Raid Composition and the profession guides are all 44px targets
       return hit !== null && (hit === control || control.contains(hit))
     }),
   )
-  expect(ownTaps, 'the name and the remove button each take their own tap').toEqual([true, true])
+  expect(ownTaps, 'the name, move and remove buttons each take their own tap').toEqual([true, true, true])
+
+  /*
+   * And mid-move, which is the state the tap-to-move control exists for: the held seat carries a
+   * third control in a row that already held two, and every other seat has become a destination
+   * button of its own. Those are sized by the row rather than by their contents, so an empty seat's
+   * destination is the one worth measuring.
+   */
+  await page.getByTestId('raidcomp-move-1-1').click()
+  await expect(page.locator('.raidcomp-seat-place').first()).toBeVisible()
+  expect(await undersizedControls(page), 'Raid Composition, mid-move').toEqual([])
+  await page.keyboard.press('Escape')
 
   await page.getByRole('button', { name: 'Professions', exact: true }).click()
   await page.getByTestId('profession-pick-mining').click()

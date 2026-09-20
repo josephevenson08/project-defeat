@@ -14,6 +14,7 @@ import {
   moveSeat,
   raidBuildsByClass,
   renameSeat,
+  seatAt,
   seatContributions,
   setRosterMeta,
   resizeRoster,
@@ -45,6 +46,16 @@ const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 
 const iconUrl = (name: string | undefined) => (name ? `${import.meta.env.BASE_URL}icons/${name}.jpg` : undefined)
 
 /**
+ * How a seat is named in the move controls' labels.
+ *
+ * The player's own name when the seat has one, because that is what a raid leader is thinking about,
+ * and the spec and class when it does not — which is what the rename and remove buttons already say.
+ */
+function describeSeat(slot: RosterSlot): string {
+  return slot.playerName ?? `${slot.spec} ${slot.className}`
+}
+
+/**
  * The build a seat represents.
  *
  * Falls back to the first build of that spec when a seat carries no `buildId` — which is every seat
@@ -55,6 +66,34 @@ function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
   return raidBuildsByClass
     .find((entry) => entry.className === slot.className)
     ?.builds.find((build) => build.spec === slot.spec)
+}
+
+/**
+ * A seat's two lines of text — the player's name over their build, or just the build.
+ *
+ * Shared by the seat's own rename button and by the move destination button, which has to show the
+ * same thing: a raid leader choosing where to put someone is reading the chart while they choose, so
+ * the seats cannot go blank the moment a move is armed.
+ */
+function SeatIdentity({ slot }: { slot: RosterSlot }) {
+  const build = `${buildForSlot(slot)?.label ?? slot.spec} ${slot.className}`
+
+  if (!slot.playerName) {
+    return (
+      <span className="raidcomp-seat-name" style={{ color: getClassColor(slot.className) }}>
+        {build}
+      </span>
+    )
+  }
+
+  return (
+    <>
+      <span className="raidcomp-seat-player">{slot.playerName}</span>
+      <span className="raidcomp-seat-spec" style={{ color: getClassColor(slot.className) }}>
+        {build}
+      </span>
+    </>
+  )
 }
 
 /** The reader's own zone, which is the right default for the person filling the chart in. */
@@ -233,6 +272,19 @@ export function RaidCompositionPanel() {
   const [selectedGroup, setSelectedGroup] = useState(0)
   /** The seat currently being dragged. Held in state so the drop target can style itself. */
   const [dragging, setDragging] = useState<SeatRef | undefined>()
+  /**
+   * The seat picked up by the **Move** button, waiting for somewhere to go.
+   *
+   * **Drag is not enough, and on a phone it is nothing at all.** HTML5 drag-and-drop is driven by
+   * mouse events; touch browsers do not synthesise them, so `dragstart` never fires from a finger and
+   * a seated player could not be moved on a phone. The keyboard had the same problem for the same
+   * reason — nothing here was reachable without a pointer, which is WCAG 2.1.1 outright.
+   *
+   * So moving is a two-step *pick up, then place* instead: one press arms this, the next press on any
+   * seat lands the player there. A tap, a click and Enter all do it, and the existing drag is left in
+   * place for the mouse users who already reach for it.
+   */
+  const [moving, setMoving] = useState<SeatRef | undefined>()
   /** Which seat has its name field open. One at a time keeps the chart readable. */
   const [naming, setNaming] = useState<SeatRef | undefined>()
   /**
@@ -251,6 +303,20 @@ export function RaidCompositionPanel() {
     saveRoster(roster)
   }, [roster])
 
+  /*
+   * Escape puts the player back down. Bound to the window rather than to the seats, because arming a
+   * move moves focus onto the destination buttons and there is no one element that is reliably
+   * focused when a raid leader changes their mind.
+   */
+  useEffect(() => {
+    if (!moving) return
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoving(undefined)
+    }
+    window.addEventListener('keydown', cancel)
+    return () => window.removeEventListener('keydown', cancel)
+  }, [moving])
+
   const firstGroupWithRoom = roster.groups.findIndex((group) => group.includes(undefined))
   const targetGroup = roster.groups[selectedGroup]?.includes(undefined) ? selectedGroup : firstGroupWithRoom
 
@@ -266,6 +332,19 @@ export function RaidCompositionPanel() {
   const sameSeat = (a: SeatRef | undefined, b: SeatRef) =>
     a !== undefined && a.groupIndex === b.groupIndex && a.seatIndex === b.seatIndex
 
+  /*
+   * The player in the air, read back out of the roster rather than copied into state — so that
+   * renaming or resizing under an armed move cannot leave the labels describing an older version of
+   * the seat. It also reads `undefined` if the held seat stopped existing, which is what the resize
+   * button relies on.
+   */
+  const movingSlot = moving ? seatAt(roster, moving) : undefined
+
+  const placeInto = (destination: SeatRef) => {
+    if (moving) setRoster((current) => moveSeat(current, moving, destination))
+    setMoving(undefined)
+  }
+
   return (
     <div className="panel raidcomp" data-testid="raidcomp-panel">
       <header className="panel-head">
@@ -273,8 +352,9 @@ export function RaidCompositionPanel() {
         <p className="panel-copy">
           Seat a raid and see what each group receives. <strong>24 of the 33 raid buffs are party-scoped
           in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so where
-          someone sits matters as much as whether they are in the raid. Drag to move a player; click a
-          name to label the seat.
+          someone sits matters as much as whether they are in the raid.{' '}
+          <strong>To move a player, press Move on their seat and then the seat you want them in</strong>
+          {' '}— or drag them there. Click a name to label the seat.
         </p>
         {/*
           **The counts say who can cast a buff, not what will be up, and that has to be on the screen.**
@@ -299,7 +379,11 @@ export function RaidCompositionPanel() {
               type="button"
               className={option === roster.size ? 'is-active' : ''}
               aria-pressed={option === roster.size}
-              onClick={() => setRoster((current) => resizeRoster(current, option))}
+              onClick={() => {
+                // A 25 → 10 resize can delete the seat a move is holding, so put the player down first.
+                setMoving(undefined)
+                setRoster((current) => resizeRoster(current, option))
+              }}
               data-testid={`raidcomp-size-${option}`}
             >
               {option}-player
@@ -328,6 +412,7 @@ export function RaidCompositionPanel() {
               type="button"
               className="raidcomp-clear"
               onClick={() => {
+                setMoving(undefined)
                 setRoster(emptyRoster(roster.size))
                 clearStoredRoster()
               }}
@@ -451,6 +536,18 @@ export function RaidCompositionPanel() {
         </div>
       </section>
 
+      {/*
+        Says what is in the air and how to put it down, for everyone at once: a phone user who cannot
+        see a drag cursor, and a screen reader, which hears it because the region is live. Rendered
+        only while a move is armed, so it is never a standing instruction nobody needs.
+      */}
+      {movingSlot && (
+        <p className="raidcomp-moving" role="status" data-testid="raidcomp-moving">
+          Moving <strong>{describeSeat(movingSlot)}</strong> — choose their seat, or press Escape to
+          leave them where they are.
+        </p>
+      )}
+
       <section className="raidcomp-groups" aria-label="Groups">
         {report.groups.map((groupCoverage) => {
           const group = roster.groups[groupCoverage.groupIndex]
@@ -482,7 +579,7 @@ export function RaidCompositionPanel() {
                   return (
                     <li
                       key={seatIndex}
-                      className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}`}
+                      className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}${sameSeat(moving, ref) ? ' is-moving' : ''}`}
                       /*
                        * Every seat is a drop target, empty ones included — dragging into a gap is the
                        * obvious way to move someone, and `moveSeat` swaps when the destination is
@@ -497,7 +594,44 @@ export function RaidCompositionPanel() {
                         setDragging(undefined)
                       }}
                     >
-                      {slot ? (
+                      {/*
+                        While a move is armed every other seat becomes one button covering the whole
+                        row, rather than an overlay on top of the controls that are already there.
+                        The seat's own name and remove buttons sit 8px apart — the reason the phone
+                        pass grew them in place instead of extending them — and a target laid over
+                        that pair would take taps meant for either of them. One button per seat also
+                        means one 44px target per seat for free, and no nested interactive elements.
+                      */}
+                      {movingSlot && !sameSeat(moving, ref) ? (
+                        <button
+                          type="button"
+                          className="raidcomp-seat-place"
+                          onClick={() => placeInto(ref)}
+                          aria-label={
+                            slot
+                              ? `Swap ${describeSeat(movingSlot)} with ${describeSeat(slot)} in group ${groupCoverage.groupIndex + 1}, seat ${seatIndex + 1}`
+                              : `Move ${describeSeat(movingSlot)} to group ${groupCoverage.groupIndex + 1}, seat ${seatIndex + 1}`
+                          }
+                          data-testid={`raidcomp-place-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
+                          data-role={slot ? buildForSlot(slot)?.role : undefined}
+                        >
+                          {slot ? (
+                            <>
+                              <img
+                                className="raidcomp-seat-icon"
+                                src={iconUrl(buildForSlot(slot)?.icon)}
+                                alt=""
+                                loading="lazy"
+                              />
+                              <span className="raidcomp-seat-text raidcomp-seat-ident">
+                                <SeatIdentity slot={slot} />
+                              </span>
+                            </>
+                          ) : (
+                            <span className="raidcomp-seat-empty">—</span>
+                          )}
+                        </button>
+                      ) : slot ? (
                         <div
                           className="raidcomp-seat-body"
                           draggable
@@ -545,27 +679,48 @@ export function RaidCompositionPanel() {
                                 }}
                                 aria-label={`Name the ${slot.spec} ${slot.className} in group ${groupCoverage.groupIndex + 1}`}
                               >
-                                {slot.playerName ? (
-                                  <>
-                                    <span className="raidcomp-seat-player">{slot.playerName}</span>
-                                    <span className="raidcomp-seat-spec" style={{ color: getClassColor(slot.className) }}>
-                                      {buildForSlot(slot)?.label ?? slot.spec} {slot.className}
-                                    </span>
-                                  </>
-                                ) : (
-                                  <span className="raidcomp-seat-name" style={{ color: getClassColor(slot.className) }}>
-                                    {buildForSlot(slot)?.label ?? slot.spec} {slot.className}
-                                  </span>
-                                )}
+                                <SeatIdentity slot={slot} />
                               </button>
                             )}
 
                           </span>
 
+                          {/*
+                            The word rather than an arrow glyph, and it changes to "Cancel" when armed
+                            rather than staying put with a different `aria-label`. The panel copy tells
+                            a raid leader to press "Move", so that word has to be on the screen — and
+                            a button whose accessible name says Cancel while it reads Move breaks
+                            WCAG 2.5.3 for anyone driving it by voice.
+                          */}
+                          <button
+                            type="button"
+                            className="raidcomp-seat-move"
+                            aria-pressed={sameSeat(moving, ref)}
+                            onClick={() => setMoving(sameSeat(moving, ref) ? undefined : ref)}
+                            aria-label={
+                              sameSeat(moving, ref)
+                                ? `Cancel moving ${describeSeat(slot)}`
+                                : `Move ${describeSeat(slot)} out of group ${groupCoverage.groupIndex + 1}`
+                            }
+                            data-testid={`raidcomp-move-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
+                          >
+                            {sameSeat(moving, ref) ? 'Cancel' : 'Move'}
+                          </button>
+
                           <button
                             type="button"
                             className="raidcomp-seat-remove"
-                            onClick={() => setRoster((current) => clearSeat(current, ref.groupIndex, ref.seatIndex))}
+                            onClick={() => {
+                              /*
+                               * `moving` is a seat address, not a copy of the player, and the held
+                               * seat keeps its × — so removing that player has to put the move down
+                               * with them. Otherwise the address outlives them and the next person
+                               * to land in that seat is picked up silently, filling the chart with
+                               * destinations for somebody nobody chose.
+                               */
+                              setMoving(undefined)
+                              setRoster((current) => clearSeat(current, ref.groupIndex, ref.seatIndex))
+                            }}
                             aria-label={`Remove ${slot.spec} ${slot.className}`}
                           >
                             ×

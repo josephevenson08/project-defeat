@@ -4723,6 +4723,105 @@ input[type='text']:focus {
   color: var(--text-strong);
 }
 
+/* Tap to move -------------------------------------------------------------- */
+
+/*
+ * The two-step move: press Move on a seat, then press the seat you want them in. Drag is still there
+ * for a mouse, but it is the only thing a finger or a keyboard can use — `dragstart` never fires from
+ * either — so these controls carry the feature on a phone.
+ */
+
+/* Quiet until the row is hovered, like the remove button beside it: this chart is read far more often
+   than it is rearranged. */
+.raidcomp-seat-move {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-faint);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--label-tracking);
+  padding: 3px 5px;
+  text-transform: uppercase;
+}
+
+.raidcomp-seat-body:hover .raidcomp-seat-move {
+  border-color: var(--line);
+  color: var(--text-strong);
+}
+
+/* The one seat in the raid whose player is in the air, and the button that puts them back down. */
+.raidcomp-seat-move[aria-pressed='true'] {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+  color: var(--text-strong);
+}
+
+.raidcomp-seat.is-moving {
+  background: var(--surface-2);
+}
+
+/*
+ * A destination, drawn as the whole row. It repeats `.raidcomp-seat-body`'s box so the chart does not
+ * shift by a pixel when a move is armed — a row that jumped as you reached for it would be the one
+ * thing worse than not being able to move anybody.
+ */
+.raidcomp-seat-place {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-left: 3px solid transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  font: inherit;
+  gap: 8px;
+  min-width: 0;
+  outline: 1px dashed var(--line);
+  outline-offset: -3px;
+  padding: 6px 8px 6px 9px;
+  text-align: left;
+}
+
+.raidcomp-seat-place[data-role='Tank'] { border-left-color: #6a7fa8; }
+.raidcomp-seat-place[data-role='Healer'] { border-left-color: #6f8f6a; }
+.raidcomp-seat-place[data-role='Physical DPS'] { border-left-color: #9c7346; }
+.raidcomp-seat-place[data-role='Caster DPS'] { border-left-color: #856a9c; }
+
+.raidcomp-seat-place:hover,
+.raidcomp-seat-place:focus-visible {
+  background: var(--surface-2);
+  outline-color: var(--accent);
+  outline-style: solid;
+}
+
+/* The same two-line stack the rename button draws, minus the button: the destination owns the press,
+   so the text inside it cannot be interactive too. */
+.raidcomp-seat-ident {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+}
+
+/* Says who is in the air and how to put them down. Live, so a screen reader hears it too. */
+.raidcomp-moving {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+}
+
+.raidcomp-moving strong {
+  color: var(--text-strong);
+}
+
 /* Buff icon rows ----------------------------------------------------------- */
 
 .raidcomp-buff-icons {
@@ -5011,16 +5110,33 @@ input[type='text']:focus {
   background: var(--surface-2);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
+  /*
+   * `display: none` rather than `visibility: hidden`, for the reason the seat card carries the same
+   * note: a hidden absolutely-positioned box still extends the document's scroll area. The seat card
+   * was fixed for this and its neighbour here was not, so a group with a full buff row pushed the
+   * page to 410px against a 375px phone — the rightmost icons' cards hanging off the edge, invisible.
+   * The reflow test now fills a roster far enough to produce that row.
+   */
+  display: none;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 100ms ease;
+  transition:
+    opacity 100ms ease,
+    display 100ms allow-discrete;
   pointer-events: none;
 }
 
 .raidcomp-buff-icons > li:hover .raidcomp-buff-card,
 .raidcomp-buff-icons > li:focus-within .raidcomp-buff-card {
+  display: grid;
   opacity: 1;
-  visibility: visible;
+}
+
+/* The fade needs a start value now that the card enters from `display: none`. */
+@starting-style {
+  .raidcomp-buff-icons > li:hover .raidcomp-buff-card,
+  .raidcomp-buff-icons > li:focus-within .raidcomp-buff-card {
+    opacity: 0;
+  }
 }
 
 .raidcomp-buff-card-name {
@@ -5088,6 +5204,25 @@ input[type='text']:focus {
 .raidcomp-seat:focus-within .raidcomp-seat-card {
   display: block;
   opacity: 1;
+}
+
+/*
+ * The armed seat's card stays shut, and this rule has to live *here*.
+ *
+ * The card opens on `:focus-within`, and pressing Move focuses a button inside the seat — so arming a
+ * move unfurled a list of eight totems directly over the seats the raid leader was about to choose
+ * between. It is worth having while reading the chart and worthless while it hides what you are
+ * reaching for.
+ *
+ * `.raidcomp-seat.is-moving .raidcomp-seat-card` ties the reveal rule above on specificity, so order
+ * is the whole of it: written beside the other move styles, 400 lines earlier, it lost and the card
+ * still opened. This is the same trap the breakpoint further down already records.
+ *
+ * Only the armed seat needs it — every other seat is a destination button by then, and the card lives
+ * inside the seat body that button replaces.
+ */
+.raidcomp-seat.is-moving .raidcomp-seat-card {
+  display: none;
 }
 
 /* The fade needs a start value now that the card enters from `display: none`. */
@@ -6935,6 +7070,25 @@ body {
     justify-content: center;
     min-height: 44px;
     min-width: 44px;
+  }
+
+  /*
+   * The move controls, which exist for this width. The destination is the whole row and takes the same
+   * height as the seat body it replaces; the Move button is a third control in a row that already held
+   * two 8px apart, so it grows in place for the same reason they did.
+   */
+  .raidcomp-seat-move {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .raidcomp-seat-place {
+    min-height: 44px;
+    padding-bottom: 0;
+    padding-top: 0;
   }
 
   .raidcomp-spec-add,
