@@ -12,6 +12,23 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 `main` is green and pushed: **264 tests, lint and build clean.** The owner chose share links as the
 next feature.
 
+### What landed, and how it was checked
+
+| | |
+|---|---|
+| `5c98cc1` | Share links, plus the empty-slot save/load fix they exposed |
+| `5078983` | Docs for both, and the autosave claims removed |
+| `ddd6a29` | Daily log refreshed |
+
+Sitting on the owner's own `495ef72`, a README edit made on GitHub on 2026-09-19 — see the fetch
+rule below, which this is the second occurrence of.
+
+**Verified past green, not just green.** The deploy succeeded *and* the live site serves the exact
+asset hashes the local build produced (`index-CDFsegXW.css`, `index-CZh-OdXm.js`), so what is
+deployed is the bundle the suite ran against. Worth repeating for anything user-facing: the CI
+workflow runs `tsc`, lint and build, and **never runs Playwright**, so a green deploy is not a
+statement that the app works.
+
 ### Share links
 
 The Build tab has **Copy share link** (and **Share…** where the browser offers a share sheet). The
@@ -3461,8 +3478,13 @@ setting `base` globally sends every test to a path nothing serves.
   The generator skips commits that touch only `CHANGELOG.md`, which is what lets a refresh commit
   exist without making the file permanently one commit behind — so commit it *alone*, or the
   refresh will list itself and the next run will change the file again.
-- **`git fetch` at the start of a session.** The owner edits on GitHub directly (a README fix on
-  2026-09-15 left `origin/main` a commit ahead), so fast-forward before committing.
+- **`git fetch` at the start of a session, and again before pushing.** The owner edits on GitHub
+  directly and it is not a one-off: README fixes on **2026-09-15** and **2026-09-19** each left
+  `origin/main` a commit ahead. Fast-forward *before* committing — once there is a local commit the
+  branches have diverged and it takes `git pull --rebase` instead, which refuses to run while
+  anything is unstaged. `git -c rebase.autoStash=true pull --rebase origin main` handles that and
+  puts the owner's own files (`.obsidian/graph.json`) back untouched. Their edits are theirs:
+  rebase onto them, never over them.
 - **Gate commits on the real test exit code**, never a piped `tail` — the pipe reports the tail's
   status, and a red commit was pushed that way once.
 - **Do not edit `src/` while the suite is running, and do not read its progress with `tail`.** Two
