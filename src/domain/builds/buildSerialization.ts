@@ -5,6 +5,7 @@ import type { GearSlot } from '../gear/gearSlots'
 import { defaultMaxPhase, getItemById, isWithinDefaultPhase } from '../gear/itemCatalogue'
 import { isItemAllowedForCharacter } from '../gear/characterItemRules'
 import type { EquippedGear } from '../gear/itemTypes'
+import { emptyItemForSlot } from '../gear/slotCompatibility'
 import { isClassLegalForRace, racesByFaction } from '../character/races'
 import { PRIMARY_PROFESSION_LIMIT, primaryProfessions } from '../professions/characterProfessions'
 import type { Profession } from '../professions/professionTypes'
@@ -154,6 +155,22 @@ export function validateBuild(parsed: unknown): BuildImportResult {
       }
 
       const saved = value as { itemId: string; gemIds?: unknown; enchantId?: unknown }
+
+      /*
+       * **An empty slot is a value, not a missing item.** The app starts every character with nothing
+       * equipped, and an empty slot saves as its placeholder id — which the item catalogue has never
+       * contained, because the placeholders are built on demand. So every build with an empty slot came
+       * back reporting that slot's item as "no longer in the catalog", and an untouched character
+       * produced eighteen of those warnings. Worse, the dropped slots were then refilled from the
+       * default gear, so the build loaded wearing seventeen items nobody had equipped.
+       *
+       * Matched per slot, so a placeholder filed under the wrong slot still reads as unknown.
+       */
+      if (saved.itemId === emptyItemForSlot(slot).id) {
+        gear[slot] = { itemId: saved.itemId, gemIds: [] }
+        return
+      }
+
       const item = getItemById(saved.itemId)
       if (!item) {
         issues.push({ slot, message: `${slot}: item "${saved.itemId}" is no longer in the catalog.` })
@@ -219,6 +236,13 @@ export function applySavedGear(baseline: EquippedGear, saved: SavedBuild['gear']
 
   Object.entries(saved).forEach(([slotKey, value]) => {
     if (!value) return
+    const slot = slotKey as GearSlot
+    // The placeholder is not in the catalogue, so it has to be recognised before the lookup below
+    // discards it — see the same check in `validateBuild`.
+    if (value.itemId === emptyItemForSlot(slot).id) {
+      next[slot] = { item: emptyItemForSlot(slot), gemIds: [] }
+      return
+    }
     const item = getItemById(value.itemId)
     if (!item) return
     next[slotKey as GearSlot] = {

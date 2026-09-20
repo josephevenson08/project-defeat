@@ -3,7 +3,8 @@ import { Panel } from '../../components/layout/Panel'
 import { Button } from '../../components/ui/Button'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
-import { parseBuild, type BuildState } from '../../domain/builds/buildSerialization'
+import { parseBuild, serializeBuild, type BuildState } from '../../domain/builds/buildSerialization'
+import { encodeBuildForLink, shareUrlFor } from '../../domain/builds/shareLink'
 import type { BuildImportIssue, SavedBuild } from '../../domain/builds/buildTypes'
 import {
   deleteNamedBuild,
@@ -23,12 +24,33 @@ type BuildPanelProps = {
 type Status =
   | { kind: 'idle' }
   | { kind: 'copied' }
+  | { kind: 'link-copied' }
+  | { kind: 'link-shown' }
   | { kind: 'imported'; issues: BuildImportIssue[] }
   | { kind: 'error'; message: string }
   | { kind: 'saved'; name: string }
 
+/**
+ * The build as a string that changes only when the build does. `savedAt` is a fresh timestamp on every
+ * serialisation, so it is left out — otherwise no two renders would ever match.
+ */
+function buildFingerprint(state: BuildState) {
+  const { savedAt: _savedAt, ...stable } = serializeBuild(state)
+  return JSON.stringify(stable)
+}
+
+const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+
 export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
   const [draft, setDraft] = useState('')
+  /*
+   * The last link made, and the build it was made from. The link is only shown while the build still
+   * matches: change a gem after pressing the button and the link on screen would describe the build as
+   * it was, which is exactly the kind of quiet disagreement this app avoids.
+   */
+  const [sharedLink, setSharedLink] = useState<{ fingerprint: string; url: string }>()
+  const fingerprint = buildFingerprint(state)
+  const visibleLink = sharedLink?.fingerprint === fingerprint ? sharedLink.url : undefined
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [slotName, setSlotName] = useState('')
   const [savedBuilds, setSavedBuilds] = useState<readonly NamedBuild[]>(listNamedBuilds)
@@ -68,6 +90,33 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
     }
   }
 
+  async function makeLink() {
+    const url = shareUrlFor(await encodeBuildForLink(serializeBuild(state)), window.location)
+    setSharedLink({ fingerprint, url })
+    return url
+  }
+
+  async function handleCopyLink() {
+    const url = await makeLink()
+    try {
+      await navigator.clipboard.writeText(url)
+      setStatus({ kind: 'link-copied' })
+    } catch {
+      // The link is on screen regardless, so a blocked clipboard costs a manual copy, not the link.
+      setStatus({ kind: 'link-shown' })
+    }
+  }
+
+  async function handleNativeShare() {
+    const url = await makeLink()
+    try {
+      await navigator.share({ title: 'Project Defeat build', url })
+    } catch (error) {
+      // Closing the share sheet rejects too, and that is not a failure worth reporting.
+      if (!(error instanceof DOMException && error.name === 'AbortError')) setStatus({ kind: 'link-shown' })
+    }
+  }
+
   function handleImport() {
     const result = parseBuild(draft)
     if (!result.ok) {
@@ -81,21 +130,50 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
 
   return (
     <Panel title="Build" eyebrow="Save, export, import" accentColor={getRoleAccentColor(role)} className="build-panel-shell">
-      <p className="panel-copy">
-        Your character, gear, gems, enchants, buffs, consumables, target debuffs and encounter settings are saved to this
-        browser automatically and restored next visit. Export produces a portable snapshot you can keep or hand to
-        someone else.
+      {/*
+        This used to say the build was "saved to this browser automatically and restored next visit",
+        with "encounter settings". Neither has been true since a load started clean and the encounter
+        became fixed — there is no autosave anywhere in the app — so the panel was promising to keep
+        work it would throw away on the next reload.
+      */}
+      <p className="panel-copy" data-testid="build-panel-copy">
+        Nothing is saved automatically — a reload starts with a new character. To keep a build, save it under a name in
+        this browser, or share it as a link: the link carries the whole build — character, professions, gear, gems,
+        enchants, talents, buffs and consumables — and opens it on any device.
       </p>
 
-      <div className="build-actions">
-        <Button onClick={handleCopy}>Copy build to clipboard</Button>
-      </div>
+      <section className="build-share" aria-label="Share this build">
+        <h3>Share</h3>
+        <div className="build-actions">
+          <Button data-testid="build-share-copy" onClick={handleCopyLink}>
+            Copy share link
+          </Button>
+          {canNativeShare && (
+            <Button data-testid="build-share-native" onClick={handleNativeShare}>
+              Share…
+            </Button>
+          )}
+          <Button onClick={handleCopy}>Copy build text</Button>
+        </div>
+        {visibleLink && (
+          <label className="field build-share-link">
+            <span>Link to this build</span>
+            <input
+              aria-label="Link to this build"
+              data-testid="build-share-link"
+              onFocus={(event) => event.currentTarget.select()}
+              readOnly
+              type="text"
+              value={visibleLink}
+            />
+          </label>
+        )}
+      </section>
 
       <section className="build-slots" aria-label="Saved builds">
         <h3>Saved builds</h3>
         <p className="build-slots-hint">
-          The build above autosaves on its own, but there is only one of it — switching character overwrites it. Save a
-          named copy to keep more than one setup.
+          Saved builds stay in this browser. To take one to another device, load it and share it as a link.
         </p>
 
         <div className="build-slot-save">
@@ -176,6 +254,22 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
         <div className="summary-card build-status" data-testid="build-status">
           <span>Copied</span>
           <strong>Build copied to clipboard</strong>
+        </div>
+      )}
+
+      {status.kind === 'link-copied' && (
+        <div className="summary-card build-status" data-testid="build-status">
+          <span>Copied</span>
+          <strong>Share link copied</strong>
+          <p>Anyone who opens it gets this build in their planner. Nothing is uploaded — the build is in the link.</p>
+        </div>
+      )}
+
+      {status.kind === 'link-shown' && (
+        <div className="summary-card build-status" data-testid="build-status">
+          <span>Link ready</span>
+          <strong>Copy the link above</strong>
+          <p>The browser would not put it on the clipboard, so it is shown for you to copy by hand.</p>
         </div>
       )}
 

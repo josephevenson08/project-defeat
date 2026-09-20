@@ -265,8 +265,20 @@ async function completeCharacterCreation(page: Page) {
 async function equipDefaultGear(page: Page) {
   await openPlannerView(page, 'Build')
   const exported = JSON.parse(await page.getByTestId('build-export-output').inputValue())
+
+  /*
+   * **The default set resolved for this character, not `defaultGear` as written.** `defaultGear` is the
+   * highest-item-level item per slot for nobody in particular, so for a Fury Warrior six visible slots
+   * hold things he cannot use — caster wristbands, a caster staff. The import rightly drops those and
+   * says so. This helper used to pass them anyway and rely on the importer quietly refilling each
+   * dropped slot from the default set, which put items on screen that the import report never
+   * mentioned. The importer no longer does that (a dropped slot is left empty, as the report says), so
+   * the helper asks for the legal set directly — which is exactly what that refill used to produce.
+   */
+  const { className, spec } = exported.character as CharacterProfile
+  const resolved = normalizeGearForCharacter(defaultGear, className, spec)
   exported.gear = Object.fromEntries(
-    gearSlots.map((slot) => [slot, { itemId: defaultGear[slot].item.id, gemIds: defaultGear[slot].gemIds.map(() => '') }]),
+    gearSlots.map((slot) => [slot, { itemId: resolved[slot].item.id, gemIds: resolved[slot].gemIds.map(() => '') }]),
   )
   await page.getByTestId('build-import-input').fill(JSON.stringify(exported))
   await page.getByTestId('build-import-button').click()
@@ -11594,4 +11606,221 @@ test('on a phone Raid Composition and the profession guides are all 44px targets
   await page.getByTestId('profession-pick-mining').click()
   await expect(page.locator('.profession-zone-tab').first()).toBeVisible()
   expect(await undersizedControls(page), 'the Mining guide').toEqual([])
+})
+
+import { serializeBuild } from '../src/domain/builds/buildSerialization'
+import { decodeBuildFromLink, encodeBuildForLink, readShareValue, shareUrlFor } from '../src/domain/builds/shareLink'
+import { getEnchantsForSlot } from '../src/domain/enchants/sampleEnchants'
+import { emptyGear } from '../src/domain/gear/slotCompatibility'
+
+/*
+ * Shareable build links: the whole build in the URL fragment, so a build made on one device opens on
+ * another. Nothing is uploaded — the link is the build.
+ */
+
+/** The fullest build a player can realistically make: every slot at its most-socketed legal item. */
+function fullestBuild() {
+  const character: CharacterProfile = {
+    faction: 'Horde',
+    race: 'Blood Elf',
+    className: 'Paladin',
+    spec: 'Retribution',
+    professions: ['Enchanting', 'Jewelcrafting'],
+  }
+  const gear = { ...emptyGear }
+  for (const slot of gearSlots) {
+    const pick = [...getItemsForSlotAndCharacter(slot, character.className, character.spec)].sort(
+      (a, b) => (b.sockets?.length ?? 0) - (a.sockets?.length ?? 0) || (b.itemLevel ?? 0) - (a.itemLevel ?? 0),
+    )[0]
+    if (!pick) continue
+    gear[slot] = {
+      item: pick,
+      gemIds: (pick.sockets ?? []).map((color) => sampleGems.find((gem) => gem.color === color)?.id ?? ''),
+      enchantId: getEnchantsForSlot(slot, character, pick)[0]?.id,
+    }
+  }
+  return serializeBuild({
+    character,
+    gear: normalizeGearForCharacter(gear, character.className, character.spec),
+    activeBuffIds: Array.from({ length: 20 }, (_, index) => `buff-${index}`),
+    activeConsumableIds: ['a-flask', 'an-elixir', 'a-food'],
+    activeTargetDebuffIds: ['sunder-armor', 'faerie-fire', 'curse-of-recklessness'],
+    talentPoints: Object.fromEntries(Array.from({ length: 30 }, (_, index) => [10000 + index, 5])),
+    target: { level: 73, armor: 7700 },
+  })
+}
+
+test('a build link carries the whole build, and fits in a Discord message', async () => {
+  const build = fullestBuild()
+
+  const value = await encodeBuildForLink(build)
+  const back = await decodeBuildFromLink(value)
+  expect(back.ok, 'the link reads back').toBe(true)
+  if (!back.ok) return
+
+  const { savedAt: _before, ...sent } = build
+  const { savedAt: _after, ...received } = back.build
+  expect(received, 'every field survives, professions and talents included').toEqual(sent)
+  expect(back.issues, 'a legal build loads without a single dropped slot').toEqual([])
+
+  // The same build always makes the same link: a timestamp in it would make two shares look different.
+  expect(await encodeBuildForLink({ ...build, savedAt: '1999-01-01T00:00:00.000Z' })).toBe(value)
+
+  /*
+   * **The reason the link is compressed.** The fullest build is about 3,200 bytes of JSON — over 4,200
+   * characters as a plain link — and Discord caps a message at 2,000. Sending a build to a raid leader is
+   * the case this exists for, so the bound is asserted rather than described: if builds grow past it,
+   * this fails before a pasted link gets cut off.
+   */
+  const url = shareUrlFor(value, { origin: 'https://josephevenson08.github.io', pathname: '/project-defeat/' })
+  expect(url.length, 'the fullest build, as a full Pages address').toBeLessThan(2000)
+  expect(readShareValue(new URL(url).hash)).toBe(value)
+})
+
+test('a damaged build link is refused with a sentence, never an exception', async () => {
+  const value = await encodeBuildForLink(fullestBuild())
+
+  /*
+   * A link is text somebody else wrote, or text a chat app mangled on the way. Each of these has to come
+   * back as something the page can show — and the last is the guard against a small link that claims to
+   * inflate into something enormous.
+   */
+  const damaged = {
+    'cut off': value.slice(0, value.length - 40),
+    altered: `${value.slice(0, 30)}zzzz${value.slice(34)}`,
+    'unknown encoding': `9.${value.slice(2)}`,
+    'no encoding at all': 'hello',
+    'not base64': '1.@@@@',
+    'absurdly long': `1.${'A'.repeat(20_000)}`,
+  }
+  for (const [label, text] of Object.entries(damaged)) {
+    const result = await decodeBuildFromLink(text)
+    expect(result.ok, `${label} is refused`).toBe(false)
+    if (!result.ok) expect(result.error, `${label} says why`).toMatch(/^That build link could not be read — /)
+  }
+
+  // And a fragment that is not a build at all is not mistaken for one.
+  expect(readShareValue('')).toBeUndefined()
+  expect(readShareValue('#section=raids')).toBeUndefined()
+})
+
+test('an untouched character saves and loads as itself, empty slots and all', async ({ page }) => {
+  /*
+   * **This was broken for every build with an empty slot, which is every build a new character makes.**
+   * An empty slot saves as a placeholder id the item catalogue has never held, so importing reported it
+   * as "no longer in the catalog" — eighteen times for an untouched character — and then refilled each
+   * dropped slot from the default gear. The build came back wearing seventeen items nobody equipped.
+   * Share links would have inherited it, and made it the common case.
+   */
+  const fresh = serializeBuild({
+    character: { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' },
+    gear: emptyGear,
+    activeBuffIds: [],
+    activeConsumableIds: [],
+    activeTargetDebuffIds: [],
+    talentPoints: {},
+    target: { level: 73, armor: 7700 },
+  })
+  const parsed = validateBuild(fresh)
+  expect(parsed.ok).toBe(true)
+  if (parsed.ok) expect(parsed.issues, 'an empty slot is a value, not a missing item').toEqual([])
+
+  // Through the app, since the refilling happened in how the planner rebuilds imported gear.
+  await openApp(page)
+  await openPlannerView(page, 'Build')
+  await page.getByText('Show build text').click()
+  const exported = await page.getByTestId('build-export-output').inputValue()
+  await page.getByTestId('build-import-input').fill(exported)
+  await page.getByTestId('build-import-button').click()
+  await expect(page.getByTestId('build-status')).toContainText('Every slot resolved cleanly')
+
+  await openPlannerView(page, 'Gear')
+  await expect(slotCell(page, 'Head'), 'the head is still empty, not wearing a default helm').toContainText('Empty')
+})
+
+test('a build link opens straight into the planner wearing the build', async ({ page }) => {
+  await openApp(page)
+  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+  await page.getByRole('combobox', { name: 'Class' }).selectOption('Mage')
+  await professionChip(page, 'Enchanting').click()
+  await selectSlotItem(page, 'Head', 'merciless-gladiators-silk-cowl')
+
+  await openPlannerView(page, 'Build')
+  await page.getByTestId('build-share-copy').click()
+  const link = await page.getByTestId('build-share-link').inputValue()
+  expect(link, 'a fragment, so the build never reaches a server').toContain('#build=')
+
+  /*
+   * A fresh load of the link. Whoever sent it has already chosen the character, so there is no section
+   * picker and no character creation — the planner opens wearing the build, and says why.
+   */
+  await page.goto(link)
+  await expect(page.getByTestId('share-notice')).toContainText('Loaded a shared build')
+  await expect(page.getByTestId('section-planner'), 'the front page is skipped').toHaveCount(0)
+  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Draenei')
+  await expect(page.getByRole('combobox', { name: 'Class' })).toHaveValue('Mage')
+  await expect(professionChip(page, 'Enchanting')).toHaveAttribute('aria-pressed', 'true')
+  await expect(slotCell(page, 'Head')).toContainText("Merciless Gladiator's Silk Cowl")
+
+  // The fragment is consumed: left in place, a reload would re-import it over any changes since.
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('')
+})
+
+test('a broken build link says so on the front page, and loads nothing', async ({ page }) => {
+  await page.goto('/#build=1.this-was-cut-off-by-a-chat-app')
+
+  const notice = page.getByTestId('share-notice')
+  await expect(notice).toHaveAttribute('role', 'alert')
+  await expect(notice).toContainText('could not be read')
+  await expect(notice).toContainText('Nothing was loaded')
+  await expect(page.getByTestId('section-planner'), 'you land where a normal visit does').toBeVisible()
+
+  await page.getByTestId('share-notice-dismiss').click()
+  await expect(notice).toHaveCount(0)
+})
+
+test('a build link pasted into an open tab loads too', async ({ page }) => {
+  const value = await encodeBuildForLink(
+    serializeBuild({
+      character: { faction: 'Horde', race: 'Troll', className: 'Hunter', spec: 'Marksmanship' },
+      gear: emptyGear,
+      activeBuffIds: [],
+      activeConsumableIds: [],
+      activeTargetDebuffIds: [],
+      talentPoints: {},
+      target: { level: 73, armor: 7700 },
+    }),
+  )
+
+  // Already in the app as someone else; only the fragment changes, so this arrives as `hashchange`.
+  await openApp(page)
+  await page.evaluate((hash) => {
+    window.location.hash = hash
+  }, `build=${value}`)
+
+  await expect(page.getByTestId('share-notice')).toContainText('Loaded a shared build')
+  await expect(page.getByRole('combobox', { name: 'Class' })).toHaveValue('Hunter')
+  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Marksmanship')
+})
+
+test('the Build panel shares only the build on screen, and no longer promises an autosave', async ({ page }) => {
+  await openApp(page)
+  await openPlannerView(page, 'Build')
+
+  /*
+   * The panel used to say the build was "saved to this browser automatically and restored next visit".
+   * Nothing in the app autosaves — a load starts clean on purpose — so it was promising to keep work it
+   * would throw away on the next reload.
+   */
+  const copy = page.getByTestId('build-panel-copy')
+  await expect(copy).toContainText('Nothing is saved automatically')
+  await expect(page.getByRole('region', { name: 'Build', exact: true })).not.toContainText('restored next visit')
+
+  await page.getByTestId('build-share-copy').click()
+  await expect(page.getByTestId('build-share-link')).toBeVisible()
+
+  // A link made from the build as it was is withdrawn once the build changes, rather than left on
+  // screen describing a character that no longer exists.
+  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
+  await expect(page.getByTestId('build-share-link')).toHaveCount(0)
 })

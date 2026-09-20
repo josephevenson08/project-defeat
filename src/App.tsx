@@ -5,6 +5,8 @@ import { SectionPicker } from './components/layout/SectionPicker'
 import { BisPanel } from './features/bis/BisPanel'
 import { BuildPanel } from './features/builds/BuildPanel'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
+import { decodeBuildFromLink, readShareValue } from './domain/builds/shareLink'
+import { ShareNotice, type ShareNoticeState } from './features/builds/ShareNotice'
 import type { SavedBuild } from './domain/builds/buildTypes'
 import { CharacterCreator } from './features/character/CharacterCreator'
 import { CharacterRail } from './features/character/CharacterRail'
@@ -13,7 +15,7 @@ import type { TalentPoints } from './domain/talents/talentTypes'
 import { deriveTalentModifiers } from './domain/talents/talentModifiers'
 import { getRoleForSpec } from './features/character/characterData'
 import type { CharacterProfile } from './features/character/characterTypes'
-import { applyWeaponSlotRules, defaultGear, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
+import { applyWeaponSlotRules, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { dropIllegalEnchants } from './domain/enchants/sampleEnchants'
 import { ComparePanel } from './features/gear/ComparePanel'
 import { GearPanel } from './features/gear/GearPanel'
@@ -130,9 +132,16 @@ const PLANNER_VIEWS: readonly TabDefinition<PlannerView>[] = [
   { id: 'build', label: 'Build' },
 ]
 
-/** Rebuilds a full gear set from a saved build, normalized against the character it was saved for. */
+/**
+ * Rebuilds a full gear set from a saved build, normalized against the character it was saved for.
+ *
+ * **The baseline is empty gear, not the default set.** A slot missing from a saved build is one the
+ * import dropped — its item left the catalogue, or is not legal for this character — and the report
+ * says so. Refilling it from `defaultGear` put an item there the player never chose and the report
+ * never mentioned. The app starts every character empty, so a dropped slot returns to that.
+ */
 function gearFromBuild(build: SavedBuild): EquippedGear {
-  const baseline = normalizeGearForCharacter(defaultGear, build.character.className, build.character.spec)
+  const baseline = normalizeGearForCharacter(emptyGear, build.character.className, build.character.spec)
   const normalized = normalizeGearForCharacter(applySavedGear(baseline, build.gear), build.character.className, build.character.spec)
   // A saved `enchantId` is carried across on a type check alone, so a build from before professions
   // existed can arrive holding a ring enchant its character is not entitled to.
@@ -190,7 +199,8 @@ function App() {
 
   const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target }
 
-  function importBuild(build: SavedBuild) {
+  // Stable, because the shared-link loader below depends on it and every call inside is a setter.
+  const importBuild = useCallback((build: SavedBuild) => {
     setCharacter(build.character)
     setGear(gearFromBuild(build))
     setActiveBuffIds(build.activeBuffIds)
@@ -198,7 +208,67 @@ function App() {
     setActiveTargetDebuffIds(build.activeTargetDebuffIds)
     setTalentPoints(build.talentPoints ?? {})
     setSimulationResult(undefined)
-  }
+  }, [])
+
+  /*
+   * **A build link opens straight into the planner, wearing the build.** Whoever sent it has already
+   * chosen the character, so the section picker and character creation are skipped — the same thing
+   * loading a named save does, arrived at from outside.
+   *
+   * The intro stays on screen until the link is decoded, which takes milliseconds against the intro's
+   * seconds; without that hold the section picker could flash before the planner replaced it.
+   *
+   * The fragment is removed once read, whatever the outcome. Left in place, a reload would re-import it
+   * over anything changed since — and this app deliberately forgets on reload, so the link would be
+   * the one thing that did not. `hashchange` is handled too, for a link pasted into a tab that is
+   * already open. The `cancelled` guard is for StrictMode's double-run in development, which would
+   * otherwise apply one link twice.
+   */
+  const [sharePending, setSharePending] = useState(
+    () => typeof window !== 'undefined' && readShareValue(window.location.hash) !== undefined,
+  )
+  const [shareNotice, setShareNotice] = useState<ShareNoticeState>()
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function applySharedBuild(value: string) {
+      const result = await decodeBuildFromLink(value)
+      if (cancelled) return
+
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
+      if (result.ok) {
+        importBuild(result.build)
+        setActiveTab('planner')
+        setPlannerView('gear')
+        setSectionChosen(true)
+        setCharacterChosen(true)
+        setShareNotice({ kind: 'loaded', issues: result.issues })
+      } else {
+        setShareNotice({ kind: 'error', message: result.error })
+      }
+      setSharePending(false)
+    }
+
+    const initial = readShareValue(window.location.hash)
+    if (initial !== undefined) void applySharedBuild(initial)
+
+    // No loading hold here: the player is already in the app, and bringing the intro back mid-session
+    // for a few milliseconds of decoding would be a flash of the wrong screen.
+    function onHashChange() {
+      const value = readShareValue(window.location.hash)
+      if (value !== undefined) void applySharedBuild(value)
+    }
+
+    window.addEventListener('hashchange', onHashChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener('hashchange', onHashChange)
+    }
+  }, [importBuild])
+
+  const dismissShareNotice = useCallback(() => setShareNotice(undefined), [])
+  const shareNoticeBanner = shareNotice ? <ShareNotice notice={shareNotice} onDismiss={dismissShareNotice} /> : null
 
   const role = getRoleForSpec(character.className, character.spec)
 
@@ -290,7 +360,7 @@ function App() {
     setIntroComplete(true)
   }, [])
 
-  if (!introComplete) return <LoadingIntro onComplete={completeIntro} />
+  if (!introComplete || sharePending) return <LoadingIntro onComplete={completeIntro} />
 
   // The way in. Choosing a section is a real decision — gearing a character, reading a loot table and
   // levelling a profession have nothing to do with each other — so it is made once, deliberately,
@@ -298,12 +368,15 @@ function App() {
   // between them afterwards.
   if (!sectionChosen) {
     return (
-      <SectionPicker
-        onSelect={(section) => {
-          setActiveTab(section)
-          setSectionChosen(true)
-        }}
-      />
+      <>
+        {shareNoticeBanner}
+        <SectionPicker
+          onSelect={(section) => {
+            setActiveTab(section)
+            setSectionChosen(true)
+          }}
+        />
+      </>
     )
   }
 
@@ -342,6 +415,7 @@ function App() {
       activeTab={currentTab}
       onTabChange={setActiveTab}
     >
+      {shareNoticeBanner}
       {currentTab === 'planner' && (
         <>
           {/* The character selects live in the rail now — see CharacterRail. This tab is what you
