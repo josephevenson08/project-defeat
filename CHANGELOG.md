@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**397 commits across 51 days**, from 2026-06-25 to 2026-09-16.
+**400 commits across 53 days**, from 2026-06-25 to 2026-09-20.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,16 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_98 commits_
+_101 commits_
+
+### Sunday 20 September — 2 commits
+
+- Share a build as a link, and let an empty slot survive save and load — [`5c98cc1`](https://github.com/josephevenson08/project-defeat/commit/5c98cc1ff67b979ec15dc20b487e779807b4e95a)
+- Document share links, and correct the autosave claims — [`5078983`](https://github.com/josephevenson08/project-defeat/commit/5078983e51b13d66795369914bff2d01f9e0c426)
+
+### Saturday 19 September — 1 commit
+
+- Update README.md — [`495ef72`](https://github.com/josephevenson08/project-defeat/commit/495ef720461ce6a7a020c0972c64b33df03b9ff6)
 
 ### Wednesday 16 September — 8 commits
 
