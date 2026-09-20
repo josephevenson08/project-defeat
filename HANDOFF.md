@@ -1,16 +1,90 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-16.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-20.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 ---
 
-## Where this is right now (2026-09-16, latest — READ THIS FIRST)
+## Where this is right now (2026-09-20, latest — READ THIS FIRST)
 
-**The gear panel was never on a phone's first screen, and the test that said it was measured
-something else.**
+**Builds can be shared as links — and building that exposed a save/load bug every build had.**
 
-`main` is green and pushed: **257 tests, lint and build clean.** There is now a day-by-day log of
+`main` is green and pushed: **264 tests, lint and build clean.** The owner chose share links as the
+next feature.
+
+### Share links
+
+The Build tab has **Copy share link** (and **Share…** where the browser offers a share sheet). The
+link carries the whole build — character, professions, gear, gems, enchants, talents, buffs,
+consumables — and opening it lands straight in the planner wearing the build, skipping the front page
+and character creation, with a notice saying a shared build was loaded.
+
+Decisions worth knowing before changing it, all in `src/domain/builds/shareLink.ts`:
+
+- **The build is in the fragment (`#build=`)**, which browsers never send to a server — GitHub Pages
+  never sees a shared build — and which cannot collide with `?simulation=1`.
+- **Deflate-compressed with the browser's own `CompressionStream`, because it has to be.** The fullest
+  realistic build is 3,171 bytes of JSON: 4,228 characters as a plain link, 1,424 compressed. Discord
+  caps a message at 2,000, and sending a build to a raid leader is the case this is for. A test asserts
+  the fullest build's full Pages address stays under 2,000.
+- **Decoding goes through `validateBuild`**, the same checks a pasted import gets, and never throws:
+  every failure — cut off, altered, unknown format, absurdly long, or a small payload claiming to
+  inflate to megabytes — is a sentence the front page shows.
+- **The fragment is removed once read**, loaded or not. This app forgets on reload by design, and a
+  link left in the address bar would be the one thing that did not — a reload would re-import it over
+  any changes.
+- **The intro holds until the link is decoded** on a fresh load, so the front page never flashes
+  before the planner. Links pasted into an open tab arrive as `hashchange` and load without that hold.
+- **`savedAt` is left out**, so one build always makes one link.
+- **The link shown in the panel is withdrawn when the build changes**, keyed on a fingerprint of the
+  build, rather than left describing a character that no longer exists.
+
+### The bug it exposed
+
+**Saving and reloading any build with an empty slot was broken, and every new character is all empty
+slots.** An empty slot saves as its placeholder id (`empty-slot:Head`), which the item catalogue has
+never held. So `validateBuild` reported each one as "no longer in the catalog" — **eighteen warnings
+for an untouched character** — and `gearFromBuild` rebuilt the gear on `defaultGear`, so every one of
+those slots came back wearing an item nobody had equipped: **seventeen of them**, Crown of the Sun and
+The Darkener's Grasp among them. Named saves and JSON import were both affected; share links would
+have made it the common case.
+
+It dates from the app switching to open with empty gear. The save format was never taught that empty
+is a value, and the importer's baseline still assumed the old default. Fixed in both places, with a
+test that exports an untouched character, imports it, and expects a clean report and an empty head.
+
+**The empty baseline also changed what a dropped slot looks like, and that is deliberate.** Before, an
+item the import dropped — say, caster wristbands on a Fury Warrior — was silently replaced with a legal
+default, while the report said the slot was dropped. Now it is left empty, which is what the report
+says. Two tests failed on this, because the `equipDefaultGear` helper fed the class-agnostic
+`defaultGear` and relied on that silent swap to arm the Warrior; it now imports
+`normalizeGearForCharacter(defaultGear, …)`, the set that swap used to produce. **Do not restore the
+default baseline to make a test pass** — the screen would go back to contradicting the import report.
+
+### Also corrected
+
+The Build panel told players their build was "saved to this browser automatically and restored next
+visit", with "encounter settings". **Nothing in the app autosaves** — that was removed when a load
+started clean on purpose — and the encounter is fixed. ROADMAP and the brain's Phase 5 entry said the
+same. All three now say there is no autosave, and a test checks the panel does not promise one.
+
+### Open, ranked, as of this writing
+
+1. **Boss art for 11 of 24 encounters** — the owner's own job. Missing: Nightbane, and all of
+   Serpentshrine and Tempest Keep. Drop files named after the boss into
+   `images for raid bosses/<Raid>/` and run `node tools/ingest/prepare-boss-art.mjs`.
+2. **Raid-group drag on a real phone** — untested on a device; a tap-to-move control if it fails.
+3. **The Feral bear/cat mode split** — the last Phase 3 item. It touches the simulator, which the
+   owner has said is not the focus this round, so ask first.
+4. **In-game character import** (Phase 6) — offered alongside share links and not chosen this time.
+5. **Build-against-build comparison** — declined. **Five-design boards** — cold. **Rotations, tank
+   weighting, variance** — deprioritised.
+
+---
+
+## Where this was earlier on 2026-09-16 (the phone panel was never on the first screen)
+
+`main` was green and pushed at **257 tests** by this point. There is now a day-by-day log of
 the work in `CHANGELOG.md` — see the rule below about refreshing it — and the GitHub repo has a
 description, the live-site link and topics, which it had none of.
 
@@ -785,7 +859,7 @@ where the text lands — Karazhan's moon and Tempest Keep's violet both sit exac
 
 ### Suite behaviour worth knowing
 
-257 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
+264 tests, **~4.5 minutes when the machine is free** and ~5.5 under load. Three failure modes seen,
 none a real defect:
 
 - A second dev server running (the Browser pane preview) slows it badly and produces spurious
@@ -3465,7 +3539,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 257 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 264 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed

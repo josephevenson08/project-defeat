@@ -228,6 +228,12 @@ A phone test asserted "the panel you came for starts on the first screen" and me
 
 Neither the assertion nor the number was careless in isolation — `<main>` is a reasonable proxy until something is inserted at its top. The rule is to measure the element the claim is about, and to give a layout assertion a floor with meaning (at least 120px of the panel visible) rather than a bare "less than the viewport", which a panel one pixel onto the screen satisfies.
 
+## Changing a default changes every reader of the old one
+
+The planner switched from opening with a full default gear set to opening empty, deliberately. The save format never heard about it. An empty slot serialises as a placeholder id the item catalogue does not hold, so every import reported it as a removed item — eighteen warnings for an untouched character — and the planner rebuilt imported gear on top of the *default* set, so each of those slots came back wearing an item nobody chose.
+
+Nothing failed loudly, because each half was reasonable alone: the catalogue lookup was right to reject unknown ids, and the default baseline was right when the app opened on defaults. It surfaced only when share links made "export a half-geared build" the common case. When a default changes, the code that assumed the old one — baselines, fallbacks, "missing" checks — is where the new state goes wrong.
+
 ## Related
 
 - [[Architecture Map]]

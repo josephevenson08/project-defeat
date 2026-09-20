@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`

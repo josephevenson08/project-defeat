@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 407
+lines: 481
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 407 lines
+`src/App.tsx` · **app** layer · 481 lines
 
 From the top of the file:
 
@@ -36,6 +36,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
+- [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
@@ -44,6 +45,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
+- [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`

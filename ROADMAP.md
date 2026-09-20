@@ -333,21 +333,32 @@ each pinned by an assertion these days.
 Upgrade planning is in: `findUpgrades` scans every candidate item per visible slot, re-scores it against
 the live simulation, and the Upgrades panel offers a one-click equip.
 
-Save/load and import/export are now wired. The full build — character, gear, gems, enchants, buffs,
-consumables, target debuffs and encounter settings — autosaves to `localStorage` and is restored on
-load, and the Build panel exports a portable JSON snapshot that can be pasted back in. Imports are
+Save/load and import/export are wired. The full build — character, professions, gear, gems,
+enchants, talents, buffs, consumables and target debuffs — can be saved under a name, copied as JSON,
+or shared as a link, and pasted or opened back in. **There is no autosave**: it was removed when a load
+started clean on purpose, and until 2026-09-20 this paragraph and the Build panel both went on
+promising one. Imports are
 validated rather than trusted: a structurally invalid payload or an unknown format version is refused
 outright and changes nothing, while a build referencing an item that has since left the catalog still
 loads with the affected slots dropped and listed, so a catalog change can't render an old build
 unusable.
 
-Named build slots sit alongside the autosave: the autosaved working build still exists and still
-overwrites itself on every change, but a build saved under a name is stored separately and is never
-touched by it, so switching character no longer destroys anything. Slots are validated on read, so a
-catalog change drops the affected slot from the list rather than breaking the panel.
+Named build slots are stored in this browser. Slots are validated on read, so a catalog change drops
+the affected slot from the list rather than breaking the panel.
 
-They are still browser-local — clearing site data loses them, and they do not follow you to another
-machine; export/import covers that.
+**Share links landed 2026-09-20**, closing the "builds do not follow you" gap without a server. The
+whole build goes in the URL fragment — never sent to GitHub Pages — deflate-compressed with the
+browser's own `CompressionStream`, because the fullest realistic build is 4,228 characters as a plain
+link and 1,424 compressed, and Discord caps a message at 2,000. Opening a link skips the front page and
+character creation and lands in the planner wearing the build, with a notice saying so; a damaged link
+lands on the front page with a notice saying it could not be read. Links decode through the same
+validation as a pasted import.
+
+**Building them exposed a save/load bug that predates them.** An empty slot saves as a placeholder id
+the item catalogue has never contained, so every import reported empty slots as "no longer in the
+catalog" — eighteen warnings for an untouched character — and the planner then refilled each dropped
+slot from the default gear. A build came back wearing seventeen items nobody had equipped. Empty is now
+read as a value, and imported gear is rebuilt on empty gear rather than the default set.
 
 **The phone layout was repaired 2026-09-14, and the headline is that most of it already existed and
 had never run.** `.app-shell` collapses its two tracks to one below 900px — a rule written as a bare

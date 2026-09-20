@@ -32,8 +32,10 @@ From the top of the file:
 
 - [[App]] — `src/App.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
+- [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
+- [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`
 
 ## Concepts & phases
 

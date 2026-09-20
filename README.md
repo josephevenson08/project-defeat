@@ -155,6 +155,11 @@ behind every claim of its that quotes a number.
   profession guides were reviewed the same way and every control there is a 44px target too; desktop
   keeps its density, since all of it sits inside the phone breakpoint. Not yet checked on a real phone:
   moving a player between raid groups is drag-only, and how well touch browsers handle that varies
+- **Share a build as a link** — the whole build (character, professions, gear, gems, enchants,
+  talents, buffs and consumables) packed into the address, so a build made on the desktop opens on a
+  phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the
+  part of the URL browsers never send to a server. Opening one lands straight in the planner wearing
+  the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean
 - **Professions on the character** — a two-slot picker in the rail, gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**

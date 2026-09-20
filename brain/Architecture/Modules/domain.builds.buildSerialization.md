@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/builds/buildSerialization.ts
-lines: 233
+lines: 257
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.builds.buildSerialization
 
-`src/domain/builds/buildSerialization.ts` · **domain** layer · 233 lines
+`src/domain/builds/buildSerialization.ts` · **domain** layer · 257 lines
 
 _No doc comment at the top of this file._
 
@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.gearSlots]] — `src/domain/gear/gearSlots.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
 - [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
@@ -36,6 +37,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
 
