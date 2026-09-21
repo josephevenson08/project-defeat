@@ -509,6 +509,21 @@ the simulator can price it.
 - No backend is required for this if export/import stays client-side (paste a blob, parse in
   the browser); a small backend only becomes necessary if we want shareable links or account sync.
 
+**Scoped 2026-09-21: see [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md).** It was researched
+against the live 2.5.6 client, and the claims the design leans on hardest were re-checked
+independently. The plan has five stages:
+
+0. Fix the enchant data the import compares against.
+1. A site-side paste box that also reads WoWSims exporter JSON. It works for anyone with that addon
+   before a line of Lua exists.
+2. A one-file addon with no libraries: `/pdexport` produces about 1.2 KB of plain JSON carrying no
+   name, realm or character GUID.
+3. One in-game check session.
+4. Distribution through GitHub Releases first.
+
+Twelve decisions are the owner's, and nothing has been built yet. Share links, the other half of the
+original "backend" question, landed 2026-09-20 without one.
+
 ## How decisions get made here
 
 Seven patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as
