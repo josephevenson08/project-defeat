@@ -5,7 +5,84 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
-## Where this is right now (2026-09-20, latest — READ THIS FIRST)
+## Where this is right now (2026-09-21, latest — READ THIS FIRST)
+
+**Three pieces of work, and no app code changed.** The owner asked for three things: a plan for the
+in-game import, an audit of every source the project uses, and a usability study with 10–15 simulated
+participants. All three are done. The study found real bugs, which are listed below and **not yet
+fixed**, by the owner's choice: they want to walk through the results first.
+
+### 1. The in-game import is scoped: [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md) (committed)
+
+It was researched against the live **2.5.6.69795** client, interface **20506**. The three claims the
+design leans on hardest were re-checked independently. The plan runs in five stages:
+
+0. Enchant data fixes.
+1. A paste box that also reads WoWSims exporter JSON.
+2. A one-file Lua addon with no libraries, whose `/pdexport` produces about 1.2 KB of JSON with no
+   name, realm or GUID.
+3. One in-game `/dump` session.
+4. GitHub Releases.
+
+**Twelve decisions are the owner's; nothing is built.** Two things found along the way are true today:
+
+- **Four enchants exist twice**, and the BiS recommendations point at the duplicates.
+- **The catalogue's upstream, `wowsims/tbc`, is marked outdated** in favour of `wowsims/tbc-new`.
+
+### 2. A source and licence audit: `SOURCES-AND-LICENSES.md` (local only, by choice)
+
+It audits every third-party source the project draws on against that source's own terms. **It lives
+only in the working tree, uncommitted.** Whether to publish it is one of the owner's open decisions,
+so **do not commit it without the owner**. It ends in a **plan of action, to be done eventually**, that
+the owner agreed on:
+
+- **The owner's decisions:** publishing the audit, and choosing a licence (needed before the addon
+  ships).
+- **Mechanical credit and notice fixes,** ready for whenever the owner says go.
+
+**Do not re-run the Wowhead ingest scripts without asking the owner.** The local file says why.
+
+The raid art and front-page backdrop are the owner's own **ChatGPT generations**. That is settled;
+don't re-ask.
+
+### 3. The usability study: [`USABILITY-STUDY.md`](USABILITY-STUDY.md) (committed)
+
+Twelve simulated participants each walked the live site on their own device and access mode, while an
+instrumented harness recorded every action ([`tools/usability-study/`](tools/usability-study/)).
+**Bugs it found and the observer verified — none fixed yet:**
+
+1. **The top item in an empty gear slot cannot be equipped by clicking it.** A controlled `<select>`
+   whose value matches no option has its first option selected by React, so clicking that option
+   fires no `change`. The suggested fix is an explicit "Empty" option, which also gives players a way
+   to unequip.
+2. **The simulator returns a confident DPS for a character with no weapon**, or for the default Fury
+   Warrior when nobody has built a character, with no warning. All five participants who ran it hit
+   this. Its "Not included" line gives Whirlwind the reason "(used on its 10s cooldown)" instead of
+   "no weapon".
+3. **Changing section keeps the old scroll position**, so pages open at their bottom.
+4. **Keyboard access:**
+   - the rail comes before the section tabs in tab order
+   - focus drops to the page body on screen changes
+   - the four character dropdowns have no visible focus ring
+5. **Developer text shown to visitors.** "The rail carries all twenty-six." stopped five of twelve.
+6. **The tier list's source link is stale.** It is labelled Phase 2, but the Wowhead page is now
+   Phase 3.
+
+**Five harness artifacts were caught and discounted, one of them a phantom keyboard trap.** The study
+document lists each, with how it was checked. **When reading the transcripts, trust the observer notes
+over a participant's "the site failed".**
+
+### Open, ranked, as of this writing
+
+1. **Walk through the three documents with the owner.** They asked to; nothing gets built before that.
+2. **The study's verified bugs** (above). Bugs 1 to 3 are small and self-contained.
+3. **Boss art for 11 of 24 encounters**, which is the owner's own job. The study found the empty boss
+   cards read to a visitor as a broken page.
+4. **The Feral bear/cat split** — ask first.
+
+---
+
+## Where this was earlier on 2026-09-20 (tap-to-move for raid groups)
 
 **A raid chart that could only be rearranged by dragging could not be rearranged at all on a phone,
 or from a keyboard.**
