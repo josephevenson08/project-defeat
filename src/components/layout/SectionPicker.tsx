@@ -129,8 +129,8 @@ export function SectionPicker({ onSelect }: SectionPickerProps) {
         */}
         <p className="section-picker-sides">
           <span className="side-alliance">For the Alliance</span>
-          <span className="side-versus">and for the</span>
-          <span className="side-horde">Horde</span>
+          <span className="side-versus">and</span>
+          <span className="side-horde">for the Horde</span>
         </p>
       </div>
 
