@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**404 commits across 54 days**, from 2026-06-25 to 2026-09-21.
+**407 commits across 56 days**, from 2026-06-25 to 2026-09-23.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,16 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_105 commits_
+_108 commits_
+
+### Wednesday 23 September — 1 commit
+
+- Fix what the study caught: a slot that would not fill, and three more — [`18f1bb2`](https://github.com/josephevenson08/project-defeat/commit/18f1bb2cfb2ea13a405f4fd944da6fae641ab48d)
+
+### Tuesday 22 September — 2 commits
+
+- Update text for section picker component — [`4a8c28c`](https://github.com/josephevenson08/project-defeat/commit/4a8c28cfbec80c8611bc3940a031f8e78d462972)
+- Change text for Horde section in SectionPicker — [`ade48f8`](https://github.com/josephevenson08/project-defeat/commit/ade48f8291355cf0b740f69651a3d765c5cd278e)
 
 ### Monday 21 September — 2 commits
 
