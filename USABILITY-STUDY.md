@@ -176,6 +176,12 @@ participant's word for it. Every finding links to the participant pages where it
 
 ### 1. The simulator gives a confident number for a character that cannot fight · critical
 
+> **Fixed 2026-09-23.** The missing weapon is named above the score, in warn amber. Reaching the
+> simulator without a character now opens creation instead of scoring the default Fury Warrior. The
+> dropped-ability line gives the reason ("it scales off weapon damage, and no weapon is equipped")
+> rather than the ability's usage rate. And the oversized heading below turned out to be the score's
+> own 44px rule leaking onto every `strong` in the card, including every figure in the damage table.
+
 **Reached 5 of 5 people who ran it** ([P01](usability-study/participants/P01.md),
 [P02](usability-study/participants/P02.md), [P04](usability-study/participants/P04.md),
 [P08](usability-study/participants/P08.md), [P10](usability-study/participants/P10.md)). **Verified.**

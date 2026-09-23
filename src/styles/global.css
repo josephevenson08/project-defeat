@@ -2348,8 +2348,14 @@ select:focus-visible {
 
 /* The headline figure is instrument output, so it is set in mono and tabular. Without tabular
    figures the number jitters horizontally every time it changes, which is distracting on a value
-   you re-run repeatedly to compare. */
-.simulation-result strong {
+   you re-run repeatedly to compare.
+
+   **The direct child only.** As a descendant selector this caught every `strong` in the card, and it
+   outranks the rules those elements have of their own: measured on the live page, the spec note's
+   "What this estimate misses for your spec:" and every DPS figure in the damage table were also being
+   drawn at 44px mono. The damage table's own 12px rule lost on specificity; the breakdown list's
+   survived only by sitting later in the file, which is luck rather than design. */
+.simulation-result > strong {
   color: var(--text);
   display: block;
   font-family: var(--font-mono);
@@ -3310,6 +3316,25 @@ input[type='number']:focus {
 
 .simulation-spec-note strong {
   color: var(--warn);
+}
+
+/*
+ * The missing input, said before the number it explains.
+ *
+ * Louder than the notes below it — a full border and the warn colour on the text itself — because it
+ * is not a caveat about the model, it is the reason this particular number is small. In the
+ * 2026-09-21 usability study everyone who ran the simulator had no weapon on, and nobody was told.
+ */
+.simulation-missing-weapon {
+  background: rgba(212, 160, 23, 0.1);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius);
+  color: var(--warn);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+  max-width: 72ch;
+  padding: 10px 12px;
 }
 
 .stat-weights-unmodeled {

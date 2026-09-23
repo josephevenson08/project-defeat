@@ -5,11 +5,22 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
-## Where this is right now (2026-09-22, latest — READ THIS FIRST)
+## Where this is right now (2026-09-23, latest — READ THIS FIRST)
 
-**The usability study's small, clear-cut bugs are fixed**, four of the six it verified. Each fix has a
-test, and every test was confirmed to fail without its fix: the `src/` changes were stashed, all four
-tests went red, and the changes were restored.
+**The simulator no longer scores a character it was never given.** This was the study's worst finding:
+all five participants who ran it were handed a confident 28–76 DPS for a character with no weapon, and
+one of them had never made a character at all.
+
+| Fixed | What changed |
+|---|---|
+| **A number with no weapon behind it** | `describeMissingWeapon` sets `missingWeaponNote` on the result, and the panel prints it **above** the score in warn amber. A hunter's damage is read from the ranged slot, a cat-form druid can never be unarmed, and casters are not covered because their damage is not weapon damage. |
+| **"Not included: Whirlwind (used on its 10s cooldown)"** | That was the ability's *usage rate* standing in for the reason it was dropped, and the study's most expert participant read it as the model not having Whirlwind. It now reads "it scales off weapon damage, and no weapon is equipped". The model does have Whirlwind; he had no weapon. |
+| **The simulator ran for a character nobody made** | Reaching Simulation without a character now opens creation, the way the planner always has. |
+| **A stray 44px** | `.simulation-result strong` was a descendant rule, so it drew the spec note's heading **and every DPS figure in the damage table** at display size in mono, outranking their own styles. Measured on the live page, then scoped to `> strong`. This is why that note looked broken on a phone. |
+
+**Before that, on 2026-09-22: the study's other small bugs.** Each fix has a test, and every test was
+confirmed to fail without its fix: the `src/` changes were stashed, the tests went red, and the changes
+were restored.
 
 | Fixed | What changed |
 |---|---|
@@ -20,16 +31,16 @@ tests went red, and the changes were restored.
 
 **Still open from the study, in the order worth doing:**
 
-1. **The simulator on an unarmed character.** It gives a confident DPS without saying the weapon slot
-   is empty, simulates a default Fury Warrior nobody chose, and lists Whirlwind with the reason "(used
-   on its 10s cooldown)" instead of "no weapon". Mostly UI, but it touches the simulator, so walk it
-   through with the owner.
-2. **Keyboard order and focus.** Add a skip link, or put the tabs before the rail in the source order,
-   and move focus to the new screen's heading after navigation.
-3. **The smaller findings** in `USABILITY-STUDY.md`:
+1. **Keyboard order and focus.** Add a skip link, or put the tabs before the rail in the source order,
+   and move focus to the new screen's heading after navigation. This is the one group of participants
+   the site actively fails: the keyboard user spent his whole session without reaching the tab he came
+   for.
+2. **The smaller findings** in [`USABILITY-STUDY.md`](USABILITY-STUDY.md):
    - a placeholder for missing boss art that doesn't read as broken
-   - the stale Phase 2 citation label
-   - per-spec descriptions (these need sourced text)
+   - the tier list's stale Phase 2 citation label
+   - per-spec descriptions in creation (these need sourced text for all 27)
+   - "equip this whole list" on Ranked Gear, asked for by name by two participants
+   - a filter on Raid Composition's spec picker, which is 25 trips through an unfiltered list on a phone
 
 ---
 
@@ -3754,7 +3765,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 272 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 274 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed

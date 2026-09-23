@@ -561,7 +561,20 @@ function resolveRotation(
     }
 
     if (estimate.usesPerSecond <= 0 || estimate.damagePerUse <= 0) {
-      excluded.push({ name: ability.name, explanation: estimate.explanation })
+      /*
+       * Why it was dropped, not how often it would be pressed.
+       *
+       * `estimate.explanation` describes the ability's usage rate — "used on its 10s cooldown" — which
+       * reads as a reason to *include* it. An ability that scales off weapon damage lands here with
+       * zero damage when the weapon slot is empty, and in the 2026-09-21 usability study the study's
+       * most expert participant read "Not included: Whirlwind (used on its 10s cooldown)" as the model
+       * not having Whirlwind at all. It has it; he had no weapon.
+       */
+      const weaponless = estimate.damagePerUse <= 0 && !mainHandProfile?.weaponDamageMax
+      excluded.push({
+        name: ability.name,
+        explanation: weaponless ? 'it scales off weapon damage, and no weapon is equipped' : estimate.explanation,
+      })
       continue
     }
 
@@ -649,6 +662,23 @@ function toDamageSources(sources: readonly { name: string; dps: number }[]): Dam
     .filter((source) => source.dps > 0)
     .map((source) => ({ name: source.name, dps: source.dps, share: source.dps / total }))
     .sort((a, b) => b.dps - a.dps)
+}
+
+/**
+ * Names the weapon this spec's damage is read from, when it is not equipped.
+ *
+ * An empty slot holds a placeholder item rather than nothing, so the test is for damage dice rather
+ * than for the item. A hunter's damage comes from the ranged slot; a cat-form druid swings its own
+ * paws and can never be unarmed. Casters are not covered here because their damage is read from spell
+ * power, not from a weapon.
+ */
+function describeMissingWeapon(character: CharacterProfile, gear: EquippedGear): string | undefined {
+  if (usesCatFormWeapon(character.className, character.spec)) return undefined
+  const usesRanged = character.className === 'Hunter'
+  if (gear[usesRanged ? 'Ranged' : 'Main Hand']?.item.weaponDamageMax) return undefined
+  return usesRanged
+    ? "No ranged weapon is equipped. Weapon damage is most of a hunter's attack, so this number is only what attack power alone produces — equip a bow, gun or crossbow for one worth reading."
+    : 'No main-hand weapon is equipped. Weapon damage is most of a melee attack, so this number is only what attack power alone produces — equip a weapon for one worth reading.'
 }
 
 function calculatePhysicalDps(
@@ -1496,6 +1526,7 @@ function calculatePhysicalDps(
     role: 'Physical DPS',
     specNote: specNoteFor(character),
     unmodelledTalentNote,
+    missingWeaponNote: describeMissingWeapon(character, gear),
     metricLabel: 'Estimated DPS',
     score: round(mitigatedDps),
     scoreExact: mitigatedDps,

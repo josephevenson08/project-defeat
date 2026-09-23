@@ -48,6 +48,16 @@ export type SimulationResult = {
    * half of a decision already made honestly in the data.
    */
   unmodelledTalentNote?: string
+  /**
+   * Set when the weapon this spec's damage is read from is not equipped.
+   *
+   * Every one of the five participants who ran the simulator in the 2026-09-21 usability study was
+   * handed a confident number — 28 to 76 DPS — for a character with no weapon, and nothing on screen
+   * connected the two. One took it for a broken simulator and left; an expert read the caveats
+   * underneath and concluded the model was missing an ability it actually has. The number is right for
+   * what it was given; it is the silence about the input that made it useless.
+   */
+  missingWeaponNote?: string
   breakdown: SimulationBreakdownEntry[]
   /**
    * Every source of damage, its DPS, and its share of the total — the shape a Warcraft Logs damage

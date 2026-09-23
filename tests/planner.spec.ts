@@ -12083,6 +12083,70 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
 
+test('the simulator says when no weapon is equipped, and says why an ability was dropped', async ({ page }) => {
+  /*
+   * All five participants who ran the simulator in the study had an empty weapon slot, and each was
+   * handed a confident number — 28 to 76 DPS — with nothing on screen connecting the two. Two took it
+   * for a broken tool. The number was right for what it was given.
+   *
+   * The dropped-ability reason mattered just as much: "Not included: Whirlwind (used on its 10s
+   * cooldown)" is the ability's usage rate, not the reason it was left out, and the study's most
+   * expert participant read it as the model not having Whirlwind at all.
+   */
+  await openApp(page)
+  await runSimulation(page)
+
+  const warning = page.getByTestId('simulation-missing-weapon')
+  await expect(warning).toContainText('No main-hand weapon is equipped')
+  await expect(page.locator('.simulation-result'), 'and the dropped ability says the weapon is why').toContainText(
+    'it scales off weapon damage, and no weapon is equipped',
+  )
+
+  // Dressed, the warning goes and Whirlwind is in the estimate rather than excluded from it.
+  await openPlannerTab(page)
+  await equipDefaultGear(page)
+  await runSimulation(page)
+  await expect(warning).toHaveCount(0)
+  await expect(page.getByTestId('simulation-damage-sources')).toContainText('Whirlwind')
+
+  /*
+   * The headline figure's 44px mono belongs to the headline figure. Written as a descendant rule it
+   * caught every `strong` in the card and outranked their own styles: measured on the live page, the
+   * spec note's heading and every DPS figure in the damage table were being drawn at display size,
+   * which is what made the note look broken on a phone.
+   */
+  const sizes = await page.evaluate(() => {
+    const px = (selector: string) => {
+      const element = document.querySelector(selector)
+      return element ? Number.parseFloat(getComputedStyle(element).fontSize) : 0
+    }
+    return {
+      score: px('[data-testid="simulation-score"]'),
+      note: px('.simulation-spec-note strong'),
+      damage: px('.damage-source-dps'),
+    }
+  })
+  expect(sizes.score, 'the score is the headline figure').toBeGreaterThan(30)
+  expect(sizes.note, 'the spec note is prose, not a headline figure').toBeLessThan(20)
+  expect(sizes.damage, 'the damage table is a table, not a headline figure').toBeLessThan(20)
+})
+
+test('the simulator will not score a character nobody made', async ({ page }) => {
+  /*
+   * A participant came for the tier list, tapped Simulation out of curiosity without making a
+   * character, and was shown an estimate for the default Fury Warrior — Bloodthirst and Whirlwind
+   * explained to a Warlock player. The planner has always opened creation first; the simulator is
+   * about the same character and now does too.
+   */
+  await page.goto('/?simulation=1')
+  await page.getByTestId('section-tierlists').click()
+  await expect(page.getByRole('heading', { name: 'DPS tier list' })).toBeVisible()
+
+  await page.getByRole('navigation', { name: 'Main sections' }).getByRole('button', { name: 'Simulation', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Faction', exact: true }), 'creation, not a stranger’s DPS').toBeVisible()
+  await expect(page.getByTestId('simulation-score')).toHaveCount(0)
+})
+
 test('the gear totals point at the full stat list in words a visitor knows', async ({ page }) => {
   /*
    * "The rail carries all twenty-six." stopped five of twelve study participants. "Rail" is this

@@ -21,6 +21,31 @@ first, one line per commit with a link to it. For *why* each thing was done, see
 **How first-time visitors actually get on: [`USABILITY-STUDY.md`](USABILITY-STUDY.md)** — twelve
 walkthroughs on phones, tablets, a keyboard and a screen reader, with the full transcript of each.
 
+## Picking this up in a new chat
+
+**Read [`HANDOFF.md`](HANDOFF.md) first** — it opens with where things stand and why, and it is written
+to be read cold. This is the short version of what is left, as of 2026-09-23.
+
+**Waiting on the owner**
+
+- **The in-game import**, scoped in [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md) and researched
+  against the live 2.5.6 client. Twelve decisions are the owner's and **nothing is built yet**.
+- **The credits and licence plan of action**, which lives in a file kept out of the repo by the owner's
+  choice. `HANDOFF.md` says where. Don't publish it, and don't re-run the Wowhead ingest scripts,
+  without asking.
+- **Boss art for 11 of 24 encounters** — the owner's own job. The study found the empty cards read as a
+  broken page, so the placeholder is worth fixing either way.
+
+**Ready to build, in rough order**
+
+- The open findings in [`USABILITY-STUDY.md`](USABILITY-STUDY.md): keyboard tab order and focus on
+  navigation; a placeholder for missing boss art; the tier list's stale Phase 2 citation; per-spec
+  descriptions in character creation; "equip this whole list" on Ranked Gear; a filter on Raid
+  Composition's spec picker.
+- **The Feral bear/cat split**, the last Phase 3 item. Ask first: it touches the simulator.
+- Re-pointing the catalogue's ingest at `wowsims/tbc-new`, since the pinned upstream is now marked
+  outdated.
+
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear

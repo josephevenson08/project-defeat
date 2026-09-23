@@ -405,9 +405,16 @@ function App() {
     )
   }
 
-  // Creation runs before the planner rather than inside it: the whole tab is about a character, so
-  // there is nothing worth showing until there is one. Reachable again from the rail's "Start over".
-  if (currentTab === 'planner' && !characterChosen) {
+  /*
+   * Creation runs before the planner rather than inside it: the whole tab is about a character, so
+   * there is nothing worth showing until there is one. Reachable again from the rail's "Start over".
+   *
+   * **The simulator is gated the same way**, and was not. A participant in the 2026-09-21 usability
+   * study came for the tier list, tapped Simulation out of curiosity, and was shown an estimate for
+   * the default Fury Warrior — Bloodthirst and Whirlwind explained to a Warlock player who had never
+   * made a character. A number nobody's character produced is worse than no number.
+   */
+  if ((currentTab === 'planner' || currentTab === 'simulation') && !characterChosen) {
     return (
       <CharacterCreator
         initial={character}

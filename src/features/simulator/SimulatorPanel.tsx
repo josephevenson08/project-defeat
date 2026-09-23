@@ -68,6 +68,20 @@ export function SimulatorPanel({ result, role, onRun }: SimulatorPanelProps) {
       <Button onClick={onRun}>Run Simulation</Button>
       {result ? (
         <div className="simulation-result" aria-live="polite">
+          {/*
+            Above the number, not below it.
+
+            Every participant who ran the simulator in the 2026-09-21 usability study had no weapon
+            equipped and was shown a confident 28 to 76 DPS anyway. Two took it for a broken tool. The
+            number is right for what it was given, and the reader cannot know that unless the missing
+            input is the first thing on the card — after the number it is just more caveat text, and
+            the study is unambiguous that caveat text below a number does not get read.
+          */}
+          {result.missingWeaponNote && (
+            <p className="simulation-missing-weapon" data-testid="simulation-missing-weapon">
+              {result.missingWeaponNote}
+            </p>
+          )}
           <span>{result.metricLabel}</span>
           <strong data-testid="simulation-score">{result.score}</strong>
           <p>{result.summary}</p>
