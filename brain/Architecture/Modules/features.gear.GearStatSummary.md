@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearStatSummary.tsx
-lines: 73
+lines: 78
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearStatSummary
 
-`src/features/gear/GearStatSummary.tsx` · **features** layer · 73 lines
+`src/features/gear/GearStatSummary.tsx` · **features** layer · 78 lines
 
 From the top of the file:
 

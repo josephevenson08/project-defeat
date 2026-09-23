@@ -551,3 +551,24 @@ And the seat's contribution card had to be suppressed while a move is armed: it 
 `:focus-within`, so pressing Move unfurled a list of eight totems directly over the seats being chosen
 between. That rule has to sit *after* the reveal rule it fights, because the two tie on specificity —
 written beside the other move styles it lost, and the card still opened.
+
+## A controlled select must always have an option for its value
+
+Recorded 2026-09-22, when the gear popup's list gained an explicit "— Empty —" option.
+
+React does not render a `<select>` whose value matches no option as blank. It selects the **first
+enabled option**, silently. The gear popup's list box had exactly that state on every empty slot: the
+empty placeholder's id was never among the options, so the top item — the highest item level, the one
+people reach for — sat highlighted while the slot said Empty. Clicking it changed nothing the browser
+recognised, fired no `change`, and equipped nothing. Two of twelve participants in the usability study
+hit it on their first click.
+
+**The suite could not see it, and that is the more general lesson.** Every gear test drives the list
+with `selectOption`, which sets the value directly and fires `change` regardless. Only a click on the
+pre-selected option reproduces the bug, so the new test clicks, the way a person does. A test helper
+that bypasses the input's real interaction model can hide a whole class of defect behind a green run.
+
+The code already guarded the neighbouring case — the equipped item stays in the list while filtering,
+"so the select never holds a value with no matching option" — but its comment said browsers render that
+as blank, which is not what React does, and the empty slot was never covered. Keep the Empty option: it
+is the fix, and it is also the only way to take an item off.

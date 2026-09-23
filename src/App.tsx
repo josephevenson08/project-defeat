@@ -288,6 +288,29 @@ function App() {
   const simulationEnabled = isSimulationEnabled(role)
   const currentTab: AppTab = activeTab === 'simulation' && !simulationEnabled ? 'planner' : activeTab
 
+  /**
+   * Moving between sections, from the tab bar.
+   *
+   * **A section opens at its top.** The address never changes, so the browser kept the last page's
+   * scroll offset: in the 2026-09-21 usability study three participants landed at the bottom of the
+   * next section with no heading in sight, one on Raids at 522 of 522px.
+   *
+   * **Choosing the section you are already in takes you to its start.** A participant deep in the
+   * Herbalism guide tapped Professions expecting the profession list, stayed exactly where she was,
+   * and thought she had broken something. Professions keeps its choice inside the panel, so bumping
+   * `sectionVisit` remounts it on the grid. Raids keeps its choice here.
+   */
+  const [sectionVisit, setSectionVisit] = useState(0)
+  function changeSection(tab: AppTab) {
+    if (tab === currentTab) {
+      setSectionVisit((visit) => visit + 1)
+      if (tab === 'raids') setSelectedRaidId(undefined)
+    } else {
+      setActiveTab(tab)
+    }
+    window.scrollTo(0, 0)
+  }
+
   /*
    * Talents now reach the stat rail, the gear rankings and the upgrade finder, not the hidden
    * simulator alone. An empty tree is the identity, so an untalented character reads exactly as it
@@ -374,6 +397,8 @@ function App() {
           onSelect={(section) => {
             setActiveTab(section)
             setSectionChosen(true)
+            // The front page can be scrolled on a phone; the section starts at its top all the same.
+            window.scrollTo(0, 0)
           }}
         />
       </>
@@ -389,6 +414,10 @@ function App() {
         onComplete={(chosen) => {
           updateCharacter(chosen)
           setCharacterChosen(true)
+          // The planner starts at its top, like any other screen. Creation is a full-screen step of its
+          // own, and on a phone it left the page scrolled wherever its last step had reached — far
+          // enough down that the rail's own heading and "Start over" sat above the screen.
+          window.scrollTo(0, 0)
         }}
         onCancel={() => setSectionChosen(false)}
       />
@@ -413,7 +442,7 @@ function App() {
       }
       tabs={visibleTabs(simulationEnabled)}
       activeTab={currentTab}
-      onTabChange={setActiveTab}
+      onTabChange={changeSection}
     >
       {shareNoticeBanner}
       {currentTab === 'planner' && (
@@ -472,7 +501,7 @@ function App() {
       {currentTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
       {currentTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
-      {currentTab === 'professions' && <ProfessionsPanel />}
+      {currentTab === 'professions' && <ProfessionsPanel key={sectionVisit} />}
     </AppShell>
   )
 }

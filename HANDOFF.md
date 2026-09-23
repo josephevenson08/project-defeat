@@ -5,7 +5,35 @@ brief for picking this up in a fresh chat. If `git log` disagrees with this file
 
 ---
 
-## Where this is right now (2026-09-21, latest — READ THIS FIRST)
+## Where this is right now (2026-09-22, latest — READ THIS FIRST)
+
+**The usability study's small, clear-cut bugs are fixed**, four of the six it verified. Each fix has a
+test, and every test was confirmed to fail without its fix: the `src/` changes were stashed, all four
+tests went red, and the changes were restored.
+
+| Fixed | What changed |
+|---|---|
+| **The top item in an empty gear slot could not be equipped** | The popup's list gained an explicit "— Empty —" option. The root cause is worth knowing: **a controlled `<select>` whose value matches no option gets its first enabled option selected by React**, so clicking that option fires no `change`. The empty placeholder was never in the list, so every empty slot hit this. The test clicks the option like a person does; `selectOption`, which every other gear test uses, would never have noticed. **Do not remove the Empty option:** it is the fix, and it also gives players a way to unequip, which nothing offered before. |
+| **Section changes kept the old scroll position; re-tapping the active section did nothing** | Tab changes now go through `changeSection` in `App.tsx`, which scrolls to the top every time and, on a re-tap, returns Professions to its grid (`key={sectionVisit}` remounts the panel) and Raids to its picker. |
+| **The character selects had no visible keyboard focus** | `select:focus-visible` draws a 2px accent outline. The global `select` rule sets `outline: none`, and its `:focus` border shift was invisible on the rail's light border. |
+| **"The rail carries all twenty-six."** and the garbled Class-step sentence | Now "The full list is under Stats." and "Only the classes your race can play are shown." The Specialization step also says the spec is "the talent tree with most of your points", which a player can check in game. |
+
+**Still open from the study, in the order worth doing:**
+
+1. **The simulator on an unarmed character.** It gives a confident DPS without saying the weapon slot
+   is empty, simulates a default Fury Warrior nobody chose, and lists Whirlwind with the reason "(used
+   on its 10s cooldown)" instead of "no weapon". Mostly UI, but it touches the simulator, so walk it
+   through with the owner.
+2. **Keyboard order and focus.** Add a skip link, or put the tabs before the rail in the source order,
+   and move focus to the new screen's heading after navigation.
+3. **The smaller findings** in `USABILITY-STUDY.md`:
+   - a placeholder for missing boss art that doesn't read as broken
+   - the stale Phase 2 citation label
+   - per-spec descriptions (these need sourced text)
+
+---
+
+## Where this was on 2026-09-21 (three pieces of work, and no app code changed)
 
 **Three pieces of work, and no app code changed.** The owner asked for three things: a plan for the
 in-game import, an audit of every source the project uses, and a usability study with 10–15 simulated
@@ -3726,7 +3754,7 @@ setting `base` globally sends every test to a path nothing serves.
 npx tsc -b                            # exit 0
 npm run lint                          # exit 0
 npm run build                         # exit 0
-npx playwright test --reporter=line   # 268 passed, 0 skipped, 0 failed
+npx playwright test --reporter=line   # 272 passed, 0 skipped, 0 failed
 npm run brain                         # "all wikilinks resolve"
 npm run brain                         # "0 written" — idempotent
 npm run changelog                     # "unchanged" once the log is committed

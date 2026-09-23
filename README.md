@@ -18,6 +18,9 @@ imply it had.
 first, one line per commit with a link to it. For *why* each thing was done, see
 [`HANDOFF.md`](HANDOFF.md).
 
+**How first-time visitors actually get on: [`USABILITY-STUDY.md`](USABILITY-STUDY.md)** — twelve
+walkthroughs on phones, tablets, a keyboard and a screen reader, with the full transcript of each.
+
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear

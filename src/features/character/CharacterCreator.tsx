@@ -10,8 +10,15 @@ type Step = 'faction' | 'race' | 'class' | 'spec'
 const STEPS: readonly { id: Step; title: string; prompt: string }[] = [
   { id: 'faction', title: 'Faction', prompt: 'Which side of the war are you fighting on?' },
   { id: 'race', title: 'Race', prompt: 'Your race decides which classes you can take, and what you are born good at.' },
-  { id: 'class', title: 'Class', prompt: 'Only the classes your race can actually be are offered.' },
-  { id: 'spec', title: 'Specialization', prompt: 'The tree you commit to. This drives every ranking and recommendation from here on.' },
+  { id: 'class', title: 'Class', prompt: 'Only the classes your race can play are shown.' },
+  {
+    id: 'spec',
+    title: 'Specialization',
+    // "The tree you commit to" told a first-time player nothing she could act on: in the 2026-09-21
+    // usability study a Priest picked Holy because it "sounded like healing". The game has no spec
+    // label to look up, but it does have talent points, and the tree holding most of them is the spec.
+    prompt: 'The talent tree with most of your points. This drives every ranking and recommendation from here on.',
+  },
 ]
 
 type CharacterCreatorProps = {

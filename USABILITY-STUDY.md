@@ -205,6 +205,10 @@ Two of the five left the site over it.
 
 ### 2. The top item in an empty gear slot cannot be equipped · critical bug
 
+> **Fixed 2026-09-22.** The list now carries an explicit "— Empty —" option. An empty slot shows it
+> selected, the top item equips on the first click, and choosing Empty takes an item off again. A test
+> clicks the top item the way a person does, and was confirmed to fail without the fix.
+
 **Reached 2 of 12** ([P08](usability-study/participants/P08.md), [P04](usability-study/participants/P04.md)),
 but it is waiting for everyone: every new character starts with all slots empty. **Verified by the
 observer in isolation.**
@@ -224,6 +228,9 @@ nothing chosen, the top item fires `change` like any other, and players gain a w
 the popup does not offer today.
 
 ### 3. Keyboard users cannot get to the tabs they came for · high (access)
+
+> **Partly fixed 2026-09-22.** Keyboard focus on a select now draws a 2px outline in the faction
+> accent. The rail-before-tabs order and focus on navigation are still open.
 
 **Sam (keyboard only, [P06](usability-study/participants/P06.md)) and Ines (screen reader,
 [P07](usability-study/participants/P07.md)).** Verified in the recording, and the focus ring by eye
@@ -248,6 +255,10 @@ on the screenshot.
 
 ### 4. Text written for the developer, shown to the visitor · high (trust)
 
+> **Partly fixed 2026-09-22.** The Gear note now reads "The full list is under Stats.", and the Class
+> step reads "Only the classes your race can play are shown." The simulator's and Ranked Gear's wording
+> are still open.
+
 These cost trust out of all proportion to their size, and several participants said so directly.
 
 | Text on screen | Where | Who stopped on it |
@@ -268,6 +279,9 @@ These cost trust out of all proportion to their size, and several participants s
   (Marcus, P02) opened things; the others were put off by seeing them first.
 
 ### 5. Section navigation does not take you anywhere new · medium
+
+> **Fixed 2026-09-22.** Every section change starts at the top. Choosing the section you are in returns
+> Professions to its grid and Raids to its picker.
 
 **Reached 4. Verified in the recordings.** There are two related problems.
 
@@ -291,6 +305,10 @@ Discipline, Holy and Shadow, or their equivalents, with no description, and no t
 because it "sounded like healing".
 
 **Change:** one line per spec on that step, saying what the spec does.
+
+> **Helped 2026-09-22.** The step now says that the spec is "the talent tree with most of your points",
+> something a player can check in the game. Describing each spec would need sourced text for all 27,
+> so it is still open.
 
 ### 7. Missing boss art reads as a broken page · medium
 

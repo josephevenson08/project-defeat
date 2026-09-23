@@ -11995,3 +11995,102 @@ test('the Build panel shares only the build on screen, and no longer promises an
   await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
   await expect(page.getByTestId('build-share-link')).toHaveCount(0)
 })
+
+/*
+ * Fixes from the 2026-09-21 usability study (USABILITY-STUDY.md). Each problem was seen by a
+ * participant and reproduced by the observer before it was fixed, and each test here was confirmed to
+ * fail without its fix.
+ */
+
+test('the top item in an empty slot can be equipped by clicking it, and Empty takes it off again', async ({ page }) => {
+  /*
+   * An empty slot's list held a value no option matched, and React answers that by selecting the first
+   * enabled option. So the highest item level sat highlighted while the slot said Empty, and clicking
+   * it — the item most players reach for first — changed nothing and fired no change event. Two of
+   * twelve study participants hit it on their first click.
+   *
+   * Clicked here the way a person clicks it. `selectOption` sets the value directly, which is why the
+   * suite never noticed: every gear test goes through it.
+   */
+  await openApp(page)
+  await openSlot(page, 'Head')
+  const list = page.getByLabel('Head', { exact: true })
+  await expect(list, 'an empty slot shows as empty, with no item pretending to be chosen').toHaveValue('empty-slot:Head')
+
+  const top = list.locator('option').nth(1)
+  const topName = ((await top.textContent()) ?? '').replace(/^\[\d+\]\s*/, '').trim()
+  await top.click()
+  await expect(list).not.toHaveValue('empty-slot:Head')
+  await closeSlot(page)
+  await expect(slotCell(page, 'Head')).toContainText(topName)
+
+  await openSlot(page, 'Head')
+  await page.getByLabel('Head', { exact: true }).locator('option').first().click()
+  await closeSlot(page)
+  await expect(slotCell(page, 'Head'), 'choosing Empty takes the item off again').toContainText('Empty')
+})
+
+test('a section opens at its top, and choosing the section you are in returns to its start', async ({ page }) => {
+  /*
+   * The address never changes, so the browser carried the last page's scroll into the next section:
+   * three study participants landed at the bottom of a page with no heading in sight, one on Raids at
+   * 522 of 522px. And choosing the section you were already in did nothing — a participant deep in the
+   * Herbalism guide tapped Professions expecting the list, and stayed exactly where she was.
+   */
+  await openApp(page, 'tierlists')
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  expect(await page.evaluate(() => window.scrollY), 'the tier lists are long enough to scroll').toBeGreaterThan(200)
+
+  const main = page.getByRole('navigation', { name: 'Main sections' })
+  await main.getByRole('button', { name: 'Raids', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Which raid?' })).toBeVisible()
+  expect(await page.evaluate(() => window.scrollY), 'Raids opens at its top, not where the tier lists were left').toBe(0)
+
+  // Raids keeps its chosen raid in the app; choosing Raids again goes back to the picker.
+  await page.locator('.raid-picker-card').first().click()
+  await expect(page.getByRole('heading', { name: 'Which raid?' })).toHaveCount(0)
+  await main.getByRole('button', { name: 'Raids', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Which raid?' })).toBeVisible()
+
+  // Professions keeps its chosen guide inside the panel; the same tap returns to the grid.
+  await main.getByRole('button', { name: 'Professions', exact: true }).click()
+  await page.getByTestId('profession-pick-herbalism').click()
+  await expect(page.getByRole('heading', { name: 'Herbalism', exact: true })).toBeVisible()
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await main.getByRole('button', { name: 'Professions', exact: true }).click()
+  await expect(page.getByTestId('profession-pick-herbalism'), 'back on the profession list').toBeVisible()
+  expect(await page.evaluate(() => window.scrollY)).toBe(0)
+})
+
+test('keyboard focus on the character selects can be seen', async ({ page }) => {
+  /*
+   * The only mark focus made on a select was a border shift, and on the rail's already-light border it
+   * showed nothing: the keyboard-only study participant tabbed onto all four and could not find focus
+   * on any. Reached here with Tab from the control before them, because `:focus-visible` is a keyboard
+   * question — a programmatic focus would not answer it.
+   */
+  await openApp(page)
+  await page.getByTestId('restart-creator').focus()
+  await page.keyboard.press('Tab')
+
+  const focused = await page.evaluate(() => {
+    const el = document.activeElement as HTMLElement
+    const style = getComputedStyle(el)
+    return { tag: el.tagName, outline: style.outlineStyle, width: Number.parseFloat(style.outlineWidth) }
+  })
+  expect(focused.tag, 'Tab from Start over lands on the Faction select').toBe('SELECT')
+  expect(focused.outline, 'a keyboard-focused select draws an outline').not.toBe('none')
+  expect(focused.width).toBeGreaterThanOrEqual(2)
+})
+
+test('the gear totals point at the full stat list in words a visitor knows', async ({ page }) => {
+  /*
+   * "The rail carries all twenty-six." stopped five of twelve study participants. "Rail" is this
+   * project's own name for the sidebar, and the count would go stale with the first stat added. The
+   * sidebar's heading is "Stats", so the note points there, and the pointer is checked to be true.
+   */
+  await openApp(page)
+  await expect(page.locator('.gear-summary-note')).toHaveText('The full list is under Stats.')
+  await expect(page.getByRole('main')).not.toContainText('The rail carries')
+  await expect(page.getByRole('heading', { name: 'Stats', exact: true })).toBeVisible()
+})

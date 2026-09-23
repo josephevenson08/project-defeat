@@ -1880,6 +1880,20 @@ select:focus,
   box-shadow: none;
 }
 
+/*
+ * A select needs a focus mark it cannot lose.
+ *
+ * The border shift above is the only change focus made to a select, and on the rail, where the
+ * border already renders light, it changed nothing a person could see. In the 2026-09-21 usability
+ * study, the keyboard-only participant tabbed onto Faction, Race, Class and Specialization and could
+ * not find focus on any of them; the screenshot shows the focused box identical to its neighbours.
+ * `:focus-visible` keeps it to keyboard focus, so a mouse click draws nothing new.
+ */
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .summary-card {
   margin-top: 18px;
   padding: 14px;

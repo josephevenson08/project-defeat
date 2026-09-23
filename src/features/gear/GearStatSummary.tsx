@@ -63,10 +63,15 @@ export function GearStatSummary({
       </dl>
 
       {/*
-        Said rather than implied. Six of twenty-six is a deliberate edit, and a reader who cannot see
-        Spirit here should know it is in the rail rather than wonder whether the app forgot it.
+        Said rather than implied: showing a handful of stats is a deliberate edit, and a reader who
+        cannot see Spirit here should know where it went rather than wonder whether the app forgot it.
+
+        It used to read "The rail carries all twenty-six." Five of twelve participants in the
+        2026-09-21 usability study stopped on it. "Rail" is this project's name for the sidebar, which
+        no visitor knows, and the count would have gone stale the first time a stat was added. The
+        sidebar's own heading is "Stats", on a phone as on a desktop, so that is the word to point at.
       */}
-      <p className="gear-summary-note">The rail carries all twenty-six.</p>
+      <p className="gear-summary-note">The full list is under Stats.</p>
     </aside>
   )
 }
