@@ -572,3 +572,28 @@ The code already guarded the neighbouring case — the equipped item stays in th
 "so the select never holds a value with no matching option" — but its comment said browsers render that
 as blank, which is not what React does, and the empty slot was never covered. Keep the Empty option: it
 is the fix, and it is also the only way to take an item off.
+
+## Name the missing input before you name the model's limits
+
+Recorded 2026-09-23, after the usability study watched five people run the simulator without a weapon.
+
+Every one of them was handed a confident number — 28 to 76 DPS — for a character whose weapon slot was
+empty, under a careful, honest paragraph about what the *model* leaves out. The caveats were true and
+well written. They were also the wrong thing to say: the number was small because of the **input**, not
+because of the model, and nothing on screen said so. Two participants concluded the tool was broken.
+
+**A caveat about the model does not cover a hole in the input**, and the two read completely
+differently to someone who does not already know which is which. The missing weapon is now stated above
+the score, where the study showed text still gets read; the model's limits stay below, where they were.
+
+The same mix-up appeared one level down. An ability dropped for having zero damage was listed with its
+*usage rate* — "Not included: Whirlwind (used on its 10s cooldown)" — which describes the ability
+rather than the reason it was dropped. The study's most expert participant read it as proof the model
+has no Whirlwind. It does. He had no weapon. **An exclusion has to give the reason for the exclusion**,
+not a description of the thing excluded.
+
+And a third, in CSS: `.simulation-result strong` was written as a descendant selector for the headline
+figure, so it also drew the spec note's heading and every DPS figure in the damage table at 44px mono,
+outranking the rules those elements had of their own. One of them survived only by sitting later in the
+file. **A style meant for one element gets a selector that can only match that element** — `> strong`,
+here — because the failure is silent and looks like someone else's bug.

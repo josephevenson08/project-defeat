@@ -1,7 +1,11 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-20.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-24.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+
+**Start here:** the section below is where things stand, and ["What is left, in one
+place"](#what-is-left-in-one-place) is everything outstanding. Nothing else in this file is needed to
+begin work; the rest is the record of how each decision was reached, newest first.
 
 ---
 
@@ -29,18 +33,51 @@ were restored.
 | **The character selects had no visible keyboard focus** | `select:focus-visible` draws a 2px accent outline. The global `select` rule sets `outline: none`, and its `:focus` border shift was invisible on the rail's light border. |
 | **"The rail carries all twenty-six."** and the garbled Class-step sentence | Now "The full list is under Stats." and "Only the classes your race can play are shown." The Specialization step also says the spec is "the talent tree with most of your points", which a player can check in game. |
 
-**Still open from the study, in the order worth doing:**
+## What is left, in one place
 
-1. **Keyboard order and focus.** Add a skip link, or put the tabs before the rail in the source order,
-   and move focus to the new screen's heading after navigation. This is the one group of participants
-   the site actively fails: the keyboard user spent his whole session without reaching the tab he came
-   for.
-2. **The smaller findings** in [`USABILITY-STUDY.md`](USABILITY-STUDY.md):
-   - a placeholder for missing boss art that doesn't read as broken
-   - the tier list's stale Phase 2 citation label
-   - per-spec descriptions in creation (these need sourced text for all 27)
+Everything outstanding, as of 2026-09-24. **Read this before starting anything.**
+
+### Waiting on the owner — do not start these alone
+
+1. **The in-game import (Phase 6).** Scoped in [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md),
+   researched against the live 2.5.6 client, and **nothing is built**. Twelve decisions are the
+   owner's; the plan's own table says which are needed before which stage. They asked to walk through
+   it.
+2. **The credits and licence plan of action.** It lives in `SOURCES-AND-LICENSES.md` in the working
+   tree, **deliberately uncommitted** — publishing it is one of the owner's open decisions. Don't
+   commit it, and **don't re-run the Wowhead ingest scripts**, without asking. The file says why.
+3. **Boss art for 11 of 24 encounters** — Nightbane, and all of Serpentshrine and Tempest Keep. The
+   owner's own job: drop files named after the boss into `images for raid bosses/<Raid>/` and run
+   `node tools/ingest/prepare-boss-art.mjs`.
+4. **The Feral bear/cat split**, the last Phase 3 item. It touches the simulator, which the owner has
+   said is not the focus, so ask first.
+
+### Ready to build, in the order worth doing
+
+1. **Keyboard order and focus.** Add a skip link, or put the section tabs before the rail in the source
+   order, and move focus to the new screen's heading after navigation. **This is the one group the site
+   actively fails:** the keyboard participant spent his entire session without reaching the tab he came
+   for, and the screen reader participant heard nothing when the screen changed.
+2. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
+   fixed, partly fixed or open):
+   - a placeholder for missing boss art that doesn't read as a broken page
+   - the tier list's stale "(Phase 2)" citation label, whose Wowhead page now says Phase 3
+   - per-spec descriptions in creation — these need sourced text for all 27, so they are not a quick fix
    - "equip this whole list" on Ranked Gear, asked for by name by two participants
-   - a filter on Raid Composition's spec picker, which is 25 trips through an unfiltered list on a phone
+   - a filter on Raid Composition's spec picker: 25 trips through an unfiltered list to seat a raid
+3. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
+   carried an "outdated" bar since 2026-07-24, so fixes made upstream never reach the catalogue.
+4. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested
+   twins. Today this makes a "missing vs BiS" comparison wrong; it also blocks stage 0 of the import
+   plan. Details in `IN-GAME-IMPORT-SCOPE.md` §B.3.
+
+### Worth knowing before touching anything
+
+- **The full suite is 274 tests and about 6 minutes.** Gate commits on Playwright's own exit code, not
+  on a piped `grep` — that mistake nearly pushed a red tree on 2026-09-22.
+- **Don't run a second dev server while the suite runs**, and don't edit `src/` mid-run.
+- **The owner edits on GitHub between sessions** — three times now. `git fetch` before assuming local
+  is current, and fast-forward before committing.
 
 ---
 
