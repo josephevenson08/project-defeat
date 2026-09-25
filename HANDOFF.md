@@ -35,7 +35,7 @@ were restored.
 
 ## What is left, in one place
 
-Everything outstanding, as of 2026-09-24. **Read this before starting anything.**
+Everything outstanding, as of 2026-09-25. **Read this before starting anything.**
 
 ### Waiting on the owner — do not start these alone
 
@@ -51,6 +51,10 @@ Everything outstanding, as of 2026-09-24. **Read this before starting anything.*
    `node tools/ingest/prepare-boss-art.mjs`.
 4. **The Feral bear/cat split**, the last Phase 3 item. It touches the simulator, which the owner has
    said is not the focus, so ask first.
+5. **The planner redesign from the owner's heuristic evaluation**
+   ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md), 2026-09-25). They rated the post-creation
+   planner's density a **major** problem and would fix it first. Their suggestion includes removing the
+   professions selector from that screen, which changes a feature, so ask before starting.
 
 ### Ready to build, in the order worth doing
 
@@ -65,6 +69,9 @@ Everything outstanding, as of 2026-09-24. **Read this before starting anything.*
    - per-spec descriptions in creation — these need sourced text for all 27, so they are not a quick fix
    - "equip this whole list" on Ranked Gear, asked for by name by two participants
    - a filter on Raid Composition's spec picker: 25 trips through an unfiltered list to seat a raid
+   - **From the owner's heuristic evaluation** ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md)):
+     show which classes each race allows on the Race step; a what-to-do prompt and a "top-ranked item"
+     shortcut in the gear popup; visible confirmation when an item is chosen
 3. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
    carried an "outdated" bar since 2026-07-24, so fixes made upstream never reach the catalogue.
 4. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested

@@ -315,6 +315,10 @@ because it "sounded like healing".
 > **Helped 2026-09-22.** The step now says that the spec is "the talent tree with most of your points",
 > something a player can check in the game. Describing each spec would need sourced text for all 27,
 > so it is still open.
+>
+> **Confirmed 2026-09-25** by the owner's own heuristic evaluation
+> ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md), finding 2), which also found the Race step
+> never shows which classes a race allows.
 
 ### 7. Missing boss art reads as a broken page · medium
 
