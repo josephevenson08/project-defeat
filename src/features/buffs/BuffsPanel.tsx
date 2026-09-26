@@ -30,7 +30,7 @@ function fitsRole(entry: { roles?: BuildRole[] }, role: CharacterRole) {
 
 const statLabelsByKey = new Map<string, string>(statLabels)
 
-/** Shared with the gear popup — see `describeStats`, which is where the rounding is explained. */
+/** Shared with the gear pane — see `describeStats`, which is where the rounding is explained. */
 const statSummary = describeStats
 
 /** A negative contribution is real, and must not read "+-10". */

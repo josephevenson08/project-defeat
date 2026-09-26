@@ -11,7 +11,7 @@ import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
 
-type ItemPopupProps = {
+type SlotPaneProps = {
   slot: GearSlot
   character: CharacterProfile
   gear: EquippedGear
@@ -22,18 +22,24 @@ type ItemPopupProps = {
 }
 
 /**
- * Item, enchant and gem selection in an overlay rather than inline.
+ * Item, enchant and gem selection, beside the gear list rather than over it.
  *
- * The gear list is the one screen a player scans constantly, so the editing controls are not allowed
- * to grow it — expanding a slot inline pushed every other slot down and made the list impossible to
- * read at a glance. Everything editable lives here instead, over the top.
+ * **This was a modal, and two of the owner's five heuristic findings were about that.** Opening a
+ * slot gave you "a window with a lot of information, nothing of which guides them in a direction
+ * they should go", and choosing an item had no confirmation: "the only way for them to know is to
+ * click the × or click outside the window, which closes the window and shows the item has been
+ * selected".
  *
- * The selects keep the same aria-labels the inline controls had, so a slot is still reachable as
- * `getByLabel('Head')` once the popup is open.
+ * A pane answers both by construction. The list stays visible, so the row updating *is* the
+ * confirmation — there is nothing to confirm and nothing covering what you would check. What is
+ * left is saying what to do, which the prompt does.
+ *
+ * Editing still does not happen in the list itself: expanding a row inline would push every other
+ * slot down and make the thing you are scanning unreadable. The pane keeps the same aria-labels the
+ * old overlay had, so a slot is still reachable as `getByLabel('Head')` once it is open.
  */
-export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant, onChangeGem, onClose }: ItemPopupProps) {
-  const dialogRef = useRef<HTMLDivElement>(null)
-  const closeRef = useRef<HTMLButtonElement>(null)
+export function SlotPane({ slot, character, gear, onChangeItem, onChangeEnchant, onChangeGem, onClose }: SlotPaneProps) {
+  const paneRef = useRef<HTMLElement>(null)
 
   const [filter, setFilter] = useState('')
 
@@ -96,42 +102,84 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
     return allOptions.filter((item) => item.name.toLowerCase().includes(needle) || item.id === equipped.item.id)
   }, [allOptions, filter, equipped.item.id])
 
+  /*
+   * Focus follows the slot into the pane.
+   *
+   * A dialog had one real advantage — a keyboard user knew where they had arrived — and giving that
+   * up along with the overlay would trade one finding for another. `preventScroll` because the pane
+   * decides its own scrolling on the next line: beside the list there is nothing to scroll to, and
+   * below it on a phone there is.
+   */
   useEffect(() => {
-    closeRef.current?.focus()
-  }, [])
+    const pane = paneRef.current
+    if (!pane) return
+    pane.focus({ preventScroll: true })
 
+    /*
+     * Scrolled to only when it is not already on screen — which on a desktop it is, because it opens
+     * at the top of the split beside the list. `scrollIntoView({ block: 'nearest' })` on its own
+     * moved the page every time, since the pane is taller than the viewport and the browser
+     * obligingly showed its bottom: the list you had just clicked in jumped under your hand. On a
+     * phone the pane is below the list and genuinely needs finding.
+     *
+     * **And it has to stop short of the stat bar, which is sticky.** Scrolled flush to the top, the
+     * pane's header — its item name and its close button — slid underneath it: a tap 20px above the
+     * × landed on the bar. Measured rather than guessed at, because the bar is one line on a desktop
+     * and three on a phone.
+     */
+    const box = pane.getBoundingClientRect()
+    const offScreen = box.top < 0 || box.top > window.innerHeight - 120
+    if (offScreen) {
+      const stuck = document.querySelector('.stat-bar')?.getBoundingClientRect().height ?? 0
+      window.scrollTo({ top: window.scrollY + box.top - stuck - 8 })
+    }
+  }, [slot])
+
+  /*
+   * Escape still dismisses it, though nothing is trapped here any more.
+   *
+   * Not modal behaviour — it is the habit a keyboard user brings from every other panel that opens,
+   * and the cost of honouring it is three lines. The pane only exists on the gear view, so this
+   * cannot fight another section's Escape.
+   */
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') onClose()
     }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
 
   return (
-    <div className="popup-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <div className="popup" role="dialog" aria-modal="true" aria-label={`${displayName} options`} ref={dialogRef}>
-        <header className="popup-header">
-          <div>
-            <p className="eyebrow">{displayName}</p>
-            <h2 style={{ color: getQualityColor(equipped.item.quality) }}>{equipped.item.name}</h2>
-          </div>
-          <button type="button" className="popup-close" aria-label="Close" ref={closeRef} onClick={onClose}>
-            ×
-          </button>
-        </header>
+    <section className="slot-pane" aria-label={`${displayName} options`} ref={paneRef} tabIndex={-1}>
+      <header className="pane-header">
+        <div>
+          <p className="eyebrow">{displayName}</p>
+          <h2 style={{ color: getQualityColor(equipped.item.quality) }}>{equipped.item.name}</h2>
+        </div>
+        <button type="button" className="pane-close" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
+      </header>
+
+      {/*
+        What to do here, which the owner's heuristic evaluation found nothing on this surface said:
+        "Once a user selects a gear slot to pick an item, they are brought to a window with a lot of
+        information, nothing of which guides them in a direction they should go."
+      */}
+      <p className="pane-prompt">Pick an item, then its enchant and gems. Each choice applies as you make it — the list updates beside you.</p>
 
         {/*
           Two panes: the list you are choosing from on the left, everything about the current choice
           on the right. Stacked, the detail sat below the list and you scrolled past the thing you
           were picking to read about it — so comparing two items meant scrolling between them.
         */}
-        <div className="popup-body popup-body-split">
-          <div className="popup-pane popup-pane-list">
-          <label className="popup-field">
-            <span className="popup-field-label">
+        <div className="pane-body pane-body-split">
+          <div className="pane-pane pane-pane-list">
+          <label className="pane-field">
+            <span className="pane-field-label">
               Item
-              <span className="popup-field-count">
+              <span className="pane-field-count">
                 {options.length === allOptions.length
                   ? `${allOptions.length}`
                   : `${options.length} of ${allOptions.length}`}
@@ -139,7 +187,7 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
             </span>
             <input
               type="search"
-              className="popup-filter"
+              className="pane-filter"
               aria-label={`Filter ${displayName} items`}
               placeholder="Filter by name"
               value={filter}
@@ -193,11 +241,11 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
           </label>
           </div>
 
-          <div className="popup-pane popup-pane-detail">
+          <div className="pane-pane pane-pane-detail">
           {/* What the current choice actually gives you, ahead of where it drops from. */}
-          <div className="popup-item-stats">
-            <p className="popup-pane-title">{equipped.item.name}</p>
-            <p className="popup-item-statline">{describeStats(equipped.item.stats) || 'No stats recorded for this item.'}</p>
+          <div className="pane-item-stats">
+            <p className="pane-pane-title">{equipped.item.name}</p>
+            <p className="pane-item-statline">{describeStats(equipped.item.stats) || 'No stats recorded for this item.'}</p>
 
             {/*
               The ranked list, summarised for this one item instead of laid out in full below the
@@ -205,12 +253,12 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
               the question the guide list exists to answer, and it is answerable in a line.
             */}
             {rankedHere ? (
-              <p className="popup-rank popup-rank-listed" data-testid="popup-rank">
+              <p className="pane-rank pane-rank-listed" data-testid="pane-rank">
                 <strong>#{rankedHere.rank}</strong> for {character.spec} {character.className} in this slot
                 {rankedHere.notes ? ` — ${rankedHere.notes}` : ''}
               </p>
             ) : (
-              <p className="popup-rank" data-testid="popup-rank">
+              <p className="pane-rank" data-testid="pane-rank">
                 Not in the {character.spec} {character.className} ranked list for this slot.
               </p>
             )}
@@ -222,15 +270,15 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
             the same silence that let them be handed to every character for months.
           */}
           {gatingProfessions.length > 0 && (
-            <p className="popup-enchant-locked" data-testid="popup-enchant-locked">
-              {gatingProfessions.join(' or ')} unlocks {enchants.length > 0 ? 'more enchants for this slot' : 'this slot’s enchants'} — pick it
-              in the rail.
+            <p className="pane-enchant-locked" data-testid="pane-enchant-locked">
+              {gatingProfessions.join(' or ')} unlocks {enchants.length > 0 ? 'more enchants for this slot' : 'this slot’s enchants'} — take it
+              on the Professions tab.
             </p>
           )}
 
           {enchants.length > 0 && (
-            <label className="popup-field">
-              <span className="popup-field-label">Enchant</span>
+            <label className="pane-field">
+              <span className="pane-field-label">Enchant</span>
               <select aria-label={`${displayName} enchant`} value={equipped.enchantId ?? ''} onChange={(event) => onChangeEnchant(event.target.value)}>
                 <option value="">No enchant</option>
                 {enchants.map((enchant) => (
@@ -243,13 +291,13 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
           )}
 
           {equipped.item.sockets?.length ? (
-            <div className="popup-sockets" aria-label={`${displayName} sockets`}>
+            <div className="pane-sockets" aria-label={`${displayName} sockets`}>
               {equipped.item.sockets.map((socket, index) => {
                 const gem = getGemById(equipped.gemIds[index])
                 return (
-                  <div className="popup-socket" key={`${slot}-${socket}-${index}`}>
-                    <label className="popup-field">
-                      <span className="popup-field-label">
+                  <div className="pane-socket" key={`${slot}-${socket}-${index}`}>
+                    <label className="pane-field">
+                      <span className="pane-field-label">
                         <i className={`socket-dot socket-${socket.toLowerCase()}`} aria-hidden="true" />
                         {socket} Socket
                       </span>
@@ -338,7 +386,7 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
                  * Whether the bonus is *currently* earned, not just what would earn it. The old copy
                  * ("applies when gem colours match") left you to work out whether yours did.
                  */
-                <p className={`popup-socket-bonus ${socketBonusMet ? 'popup-socket-bonus-active' : ''}`.trim()} data-testid="socket-bonus-status">
+                <p className={`pane-socket-bonus ${socketBonusMet ? 'pane-socket-bonus-active' : ''}`.trim()} data-testid="socket-bonus-status">
                   <strong>Socket bonus</strong> {describeStats(equipped.item.socketBonus)} —{' '}
                   {socketBonusMet ? 'active' : 'not earned: every socket needs a gem whose colour matches it'}
                 </p>
@@ -348,9 +396,8 @@ export function ItemPopup({ slot, character, gear, onChangeItem, onChangeEnchant
 
           <ItemFacts item={equipped.item} slotLabel={displayName} />
           </div>
-        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -359,7 +406,7 @@ function ItemFacts({ item, slotLabel }: { item: GearItem; slotLabel: string }) {
   const location = [item.source, item.zone, item.instance, item.boss, item.vendor, item.reputation].filter(Boolean).join(' · ')
 
   return (
-    <div className="popup-facts">
+    <div className="pane-facts">
       <dl>
         {item.itemLevel ? (
           <div>

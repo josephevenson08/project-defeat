@@ -380,12 +380,13 @@ async function openSlot(page: Page, slot: string) {
   // keeps the tests that interleave gear and rankings from having to track which tab they are on.
   await openPlannerView(page, 'Gear')
   await slotCell(page, slot).click()
-  await expect(page.getByRole('dialog')).toBeVisible()
+  // A pane beside the list rather than a dialog over it, since 2026-09-26.
+  await expect(page.locator('.slot-pane')).toBeVisible()
 }
 
 async function closeSlot(page: Page) {
   await page.getByRole('button', { name: 'Close', exact: true }).click()
-  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.locator('.slot-pane')).toHaveCount(0)
 }
 
 async function selectSlotItem(page: Page, slot: string, value: string) {
@@ -11448,7 +11449,7 @@ test('ring enchants need Enchanting, and an Enchanter gets one on each hand', as
    */
   await openSlot(page, 'Finger 1')
   await expect(page.getByLabel('Finger 1 enchant'), 'a character with no professions is offered none').toHaveCount(0)
-  await expect(page.getByTestId('popup-enchant-locked'), 'and is told why, rather than just shown nothing').toContainText(
+  await expect(page.getByTestId('pane-enchant-locked'), 'and is told why, rather than just shown nothing').toContainText(
     /Enchanting/,
   )
   await closeSlot(page)
@@ -11737,14 +11738,15 @@ test('on a phone every planner control is a 44px target, folded away or not', as
   expect(await undersizedControls(page), 'with the stat table open').toEqual([])
 })
 
-test('on a phone the gear popup fits the screen and its close button is a real target', async ({ page }) => {
+test('on a phone the slot pane fits the screen and its close button is a real target', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
   await openSlot(page, 'Head')
 
-  // The dialog a phone user opens most. Its two panes stack to one column below 900px.
-  const fit = await page.getByRole('dialog').evaluate((dialog) => {
-    const rect = dialog.getBoundingClientRect()
+  // The surface a phone user opens most. Below 1000px it is a full-width band under the list rather
+  // than a column beside it, so "fits" is about the horizontal edges either way.
+  const fit = await page.locator('.slot-pane').evaluate((pane) => {
+    const rect = pane.getBoundingClientRect()
     return { left: rect.left, right: rect.right, width: document.documentElement.clientWidth }
   })
   expect(fit.left, 'inside the left edge').toBeGreaterThanOrEqual(0)
@@ -12145,6 +12147,59 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
 
+test('choosing an item needs no confirmation, because nothing is covering the answer', async ({ page }) => {
+  /*
+   * Two of the owner's five findings were about the overlay this replaced. Choosing an item had no
+   * confirmation — "the only way for them to know is to click the × or click outside the window,
+   * which closes the window and shows the item has been selected" — and opening a slot gave you "a
+   * window with a lot of information, nothing of which guides them in a direction they should go".
+   *
+   * A pane answers the first by construction and the second with a sentence.
+   */
+  await openApp(page)
+  await openSlot(page, 'Head')
+
+  const pane = page.locator('.slot-pane')
+  await expect(pane, 'it says what to do here').toContainText('Pick an item')
+  await expect(pane, 'and that choices land as you make them').toContainText(/applies as you make it/i)
+
+  // The row is readable while the pane is open: that is the whole difference from an overlay.
+  const row = slotCell(page, 'Head')
+  await expect(row).toBeVisible()
+  await expect(row, 'and it is marked as the one being edited').toHaveAttribute('aria-expanded', 'true')
+
+  const clear = await page.evaluate(() => {
+    const list = document.querySelector('.gear-list')!.getBoundingClientRect()
+    const box = document.querySelector('.slot-pane')!.getBoundingClientRect()
+    return list.right <= box.left || box.right <= list.left
+  })
+  expect(clear, 'the pane does not cover the list it belongs to').toBe(true)
+
+  /*
+   * Choose, and read the answer off the list rather than off a confirmation. Taken by position
+   * rather than by item id: which helm tops a Warrior's list is the catalogue's business and moves
+   * when it is re-ingested, and this test is about the answer arriving, not about which one it is.
+   */
+  const picker = page.getByLabel('Head', { exact: true })
+  await picker.selectOption({ index: 1 })
+  const chosen = (await picker.locator('option:checked').innerText()).replace(/^\[\d+\]\s*/, '')
+
+  await expect(row, 'the row answers, with the pane still open').toContainText(chosen)
+  await expect(pane).toBeVisible()
+})
+
+test('opening a slot takes the keyboard with it, and Escape gives it back', async ({ page }) => {
+  // A dialog had one real advantage: a keyboard user knew where they had arrived. Losing the overlay
+  // is not a reason to lose that.
+  await openApp(page)
+  await slotCell(page, 'Head').click()
+
+  await expect(page.locator('.slot-pane')).toBeFocused()
+
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.slot-pane')).toHaveCount(0)
+})
+
 test('an empty planner offers to fill itself, and the offer goes once taken', async ({ page }) => {
   /*
    * The owner's heuristic evaluation asked, at the gear popup, "how do I know what item to select".
@@ -12197,7 +12252,7 @@ test('a recommended set cannot hand you an enchant your character may not wear',
 
   await expect(slotCell(page, 'Finger 1'), 'no ring enchant without Enchanting').not.toContainText('Ring - Stats')
   await openSlot(page, 'Finger 1')
-  await expect(page.getByTestId('popup-enchant-locked')).toContainText(/Enchanting/)
+  await expect(page.getByTestId('pane-enchant-locked')).toContainText(/Enchanting/)
   await closeSlot(page)
 })
 

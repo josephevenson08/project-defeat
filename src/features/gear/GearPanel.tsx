@@ -8,7 +8,7 @@ import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlot
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 import type { RecommendedSet } from './equipRecommendedSet'
 import { ItemIcon } from './ItemIcon'
-import { ItemPopup } from './ItemPopup'
+import { SlotPane } from './SlotPane'
 import { slotGlyph } from './slotGlyphs'
 
 type GearPanelProps = {
@@ -109,7 +109,15 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
     const empty = isEmptySlotItem(equipped.item)
 
     return (
-      <button type="button" className="gear-row" key={slot} aria-label={`${displayName} slot`} onClick={() => setOpenSlot(slot)}>
+      <button
+        type="button"
+        className={`gear-row${openSlot === slot ? ' gear-row-open' : ''}`}
+        key={slot}
+        aria-label={`${displayName} slot`}
+        // Says which row the pane belongs to, for a screen reader as much as for the marker.
+        aria-expanded={openSlot === slot}
+        onClick={() => setOpenSlot(openSlot === slot ? undefined : slot)}
+      >
         <span className="gear-row-icon" aria-hidden="true">
           <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
         </span>
@@ -191,29 +199,39 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
         </p>
       )}
 
-      {/* The row count is the panel's to know: a spec wears 16, 17 or 18 slots, and the two-column
-          layout needs half of *this* character's list, not a constant that is wrong for two of them. */}
-      <div className="gear-list" style={{ '--gear-rows': Math.ceil(shown.length / 2) } as React.CSSProperties}>
-        {shown.map(renderSlot)}
+      {/*
+        The list and the slot you are working on, side by side.
+
+        `data-pane` drops the list to one column while the pane is open, because the pane takes the
+        other half — and the list has to stay readable *while* you choose, which is the whole reason
+        this is not an overlay any more.
+      */}
+      <div className="gear-split" data-pane={openSlot ? '' : undefined}>
+        {/* The row count is the panel's to know: a spec wears 16, 17 or 18 slots, and the two-column
+            layout needs half of *this* character's list, not a constant that is wrong for two of them. */}
+        <div className="gear-list" style={{ '--gear-rows': Math.ceil(shown.length / 2) } as React.CSSProperties}>
+          {shown.map(renderSlot)}
+        </div>
+
+        {openSlot && (
+          <SlotPane
+            slot={openSlot}
+            character={character}
+            gear={gear}
+            onChangeItem={(item) => updateItem(openSlot, item)}
+            onChangeEnchant={(enchantId) => onChange(openSlot, { ...gear[openSlot], enchantId: enchantId || undefined })}
+            onChangeGem={(index, gemId) => {
+              const gemIds = [...gear[openSlot].gemIds]
+              gemIds[index] = gemId
+              onChange(openSlot, { ...gear[openSlot], gemIds })
+            }}
+            onClose={() => setOpenSlot(undefined)}
+          />
+        )}
       </div>
 
       <SetBonuses activeSets={activeSets} />
 
-      {openSlot && (
-        <ItemPopup
-          slot={openSlot}
-          character={character}
-          gear={gear}
-          onChangeItem={(item) => updateItem(openSlot, item)}
-          onChangeEnchant={(enchantId) => onChange(openSlot, { ...gear[openSlot], enchantId: enchantId || undefined })}
-          onChangeGem={(index, gemId) => {
-            const gemIds = [...gear[openSlot].gemIds]
-            gemIds[index] = gemId
-            onChange(openSlot, { ...gear[openSlot], gemIds })
-          }}
-          onClose={() => setOpenSlot(undefined)}
-        />
-      )}
     </section>
   )
 }

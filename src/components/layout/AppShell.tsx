@@ -17,7 +17,7 @@ type AppShellProps<T extends string> = {
 
 /**
  * Discord's skeleton: a persistent left rail that never navigates away, one main pane that swaps
- * content, and popups layered over the top rather than modes you travel between.
+ * content, and detail shown beside what it belongs to rather than as modes you travel between.
  *
  * The rail holds the stat readout deliberately — totals are the thing you keep glancing at while
  * changing gear, so they must not be a tab you have to leave the gear behind to reach.
