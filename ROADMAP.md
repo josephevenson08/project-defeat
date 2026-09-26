@@ -94,7 +94,7 @@ Wrath; so are Herbalism's Lifeblood, Mining's Toughness and Leatherworking's Fur
 profession puts an always-on stat bonus on a level 70 character, and it is Enchanting.** Everything
 else is access — bind-on-pickup gear, or a consumable only you can make.
 
-So `CharacterProfile` now carries up to two professions, picked in the rail, and the only thing they
+So `CharacterProfile` now carries up to two professions, picked on the Professions tab, and the only thing they
 gate is Enchanting's ring enchants. That turned out to be a bug fix rather than a feature, and the
 app had it wrong in **both directions at once**:
 
@@ -335,16 +335,18 @@ which marks every finding fixed, partly fixed or open. The phone and tablet layo
 raid leader moved a player with two taps, and the tier list answered its visitor in two. **Keyboard and
 screen reader access did not**: the keyboard participant spent his whole session without reaching the
 tab he came for, and the screen reader participant heard nothing when the screen changed. That was the
-largest gap in this phase, and it closed on 2026-09-26 — a skip link gets out of the rail in one press,
-and a screen swap now takes focus with it.
+largest gap in this phase, and it closed on 2026-09-26 — a skip link clears the page chrome in one
+press, a screen swap takes focus with it, and closing a gear slot hands focus back to the row it came
+from.
 
 Of the study's eight findings, **four are fixed outright**: a gear slot whose top item could not be
 equipped at all, section changes that kept the previous page's scroll, a simulator that scored a
 character with no weapon without saying so, and keyboard access to the navigation. **Two are partly
 fixed** — two pieces of developer wording are gone and the simulator's jargon is not; the spec step now
 says where to find your spec but does not describe the three. **Two are open**: the bare boss cards and
-the tier list's stale citation. One smaller thing was found while testing the keyboard fix and is open:
-closing a gear popup drops focus to the top of the document instead of returning it to the slot.
+the tier list's stale citation. The smaller thing found while testing the keyboard fix — closing a
+gear slot dropping focus to the top of the document — was fixed on 2026-09-26 along with the pane
+that replaced the popup.
 
 Upgrade planning is in: `findUpgrades` scans every candidate item per visible slot, re-scores it against
 the live simulation, and the Upgrades panel offers a one-click equip.

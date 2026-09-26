@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useScreenFocus } from '../../lib/useScreenFocus'
+import { getSignatureAbility } from '../../domain/abilities'
 import { getClassColor } from '../../domain/character/classColors'
 import { getFactionColor } from '../../domain/character/factionColors'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
@@ -101,7 +102,15 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
    * inventing nine would be this app asserting something the game does not say. The step stays
    * neutral and the frame's metal carries it.
    */
-  type Option = { value: string; label: string; onSelect: () => void; selected: boolean; accent?: string }
+  type Option = {
+    value: string
+    label: string
+    onSelect: () => void
+    selected: boolean
+    accent?: string
+    /** What the option *is*, in terms the game uses. See the Race and Specialization steps. */
+    meta?: ReactNode
+  }
 
   const options: Option[] =
     step.id === 'faction'
@@ -113,7 +122,27 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
           accent: getFactionColor(faction),
         }))
       : step.id === 'race'
-        ? racesByFaction[draft.faction].map((race) => ({ value: race, label: race, onSelect: () => chooseRace(race), selected: draft.race === race }))
+        ? racesByFaction[draft.faction].map((race) => ({
+            value: race,
+            label: race,
+            onSelect: () => chooseRace(race),
+            selected: draft.race === race,
+            /*
+             * The classes this race can play, in their own colours — the answer to the question the
+             * step's own prompt raises and used not to answer. Colour rather than nine plain words
+             * because these are the colours the game has trained every player to read: a Druid
+             * green among them is recognisable before it is legible.
+             */
+            meta: (
+              <span className="creator-option-classes">
+                {getClassesForRace(race).map((className) => (
+                  <span key={className} style={{ color: getClassColor(className) }}>
+                    {className}
+                  </span>
+                ))}
+              </span>
+            ),
+          }))
         : step.id === 'class'
           ? getClassesForRace(draft.race).map((className) => ({
               value: className,
@@ -128,6 +157,23 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
               onSelect: () => setDraft({ ...draft, spec }),
               selected: draft.spec === spec,
               accent: getClassColor(draft.className),
+              /*
+               * **What the spec does, from what this app already knows about it.** A first-time
+               * player in the usability study picked Holy because it "sounded like healing", and
+               * the owner's evaluation found the same gap: "there is no information telling me what
+               * the difference between the specializations are".
+               *
+               * The role and the spec's signature ability are facts this repo already holds and
+               * tests — `getRoleForSpec` and `getSignatureAbility`. Playstyle prose for all 27 specs
+               * needs sourcing and is still open; this is what can be said today without inventing
+               * any of it.
+               */
+              meta: (
+                <span className="creator-option-meta">
+                  {getRoleForSpec(draft.className, spec)}
+                  {getSignatureAbility(draft.className, spec) ? ` · ${getSignatureAbility(draft.className, spec)?.name}` : ''}
+                </span>
+              ),
             }))
 
   return (
@@ -183,6 +229,7 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
                 aria-pressed={option.selected}
               >
                 {option.label}
+                {option.meta}
               </button>
             ))}
           </div>

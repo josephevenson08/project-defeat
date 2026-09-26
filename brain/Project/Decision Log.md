@@ -626,3 +626,56 @@ focused element is removed from the DOM — which is what happens when a gear po
 Close button with it, and that is the real path a user takes to the top of the document, so the test
 takes it too. A test that has to synthesise the state it asserts on is usually asserting on a state the
 app cannot reach.
+
+## Density has to be earned by content
+
+Recorded 2026-09-26, rebuilding the planner after the owner's heuristic evaluation.
+
+The finding was "a whole lot is going on" and the severity was major, but the diagnosis underneath it
+is the useful part: the screen had **46 controls and almost no information**. Seventeen gear cards,
+three lines each, every one reading "Empty / No enchant" on a character created ten seconds ago —
+fifty-one lines of nothing, arranged as a person. Chrome at maximum on the one visit where content is
+at minimum.
+
+Five rules came out of the rebuild, and they are worth applying before the next screen grows:
+
+**One readout per number.** The rail listed all twenty-six stats and "Key totals" repeated six of them
+in the middle of the paperdoll. Two places to read the same figure is two places to read it wrong, and
+the owner spotted it from the outside in one sentence. The stat bar shows the six *or* the table,
+never both.
+
+**One heading per region.** "Character", "Stats" and "Gear" competed on one screen, plus an unlabelled
+"Key totals". The tab above the panel already said Gear and the strip said whose gear it was.
+
+**Two frame levels, never three.** Seventeen bordered cards inside a bordered panel inside the gold
+frame. The middle level carried nothing the row did not already state.
+
+**An empty state is one line, and it carries the one action.** "Head — empty", not three lines of it;
+and the offer to fill the whole list is the biggest thing on the screen until the screen has something
+on it.
+
+**Controls fold until there is data to act on.** Four character selects and ten profession toggles were
+permanently on screen for decisions made once. The fact stays visible — "Human Fury Warrior · Alliance
+· Enchanting" — and the controls are a press away.
+
+**The thing given up, stated plainly:** the paperdoll's arrangement *was* a label, and finding a slot is
+worse now. That was the right trade for this screen and it might not be for another one.
+
+## A modal is a confirmation problem wearing a layout
+
+Recorded 2026-09-26, replacing the gear popup with a pane.
+
+Two of the five heuristic findings were about the same overlay, and only one of them looked like a
+design question. "Nothing guides them in a direction they should go" is answered with a sentence. But
+"the only way for them to know is to click the ×, which closes the window and shows the item has been
+selected" is not a missing confirmation — it is a modal covering the thing that *was* the confirmation.
+
+Adding a "Confirm selection" button, which is what the finding suggested, would have added a step to
+work around a layout. Moving the picker beside the list deleted the question: the row updates while
+you watch. **When a finding asks for feedback, check first whether something is hiding the feedback
+that already exists.**
+
+What the modal was genuinely providing had to be kept deliberately: a keyboard user knew where they
+had arrived, and knew Escape would get them out. Both were re-added to the pane — focus moves in on
+open and back to the row on close — because losing them would have traded one access finding for
+another.

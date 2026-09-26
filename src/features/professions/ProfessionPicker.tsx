@@ -22,7 +22,7 @@ export function ProfessionPicker({ character, onChange }: ProfessionPickerProps)
   const held = character.professions ?? []
 
   return (
-    <section className="profession-picker" aria-label="Your professions" data-testid="rail-professions">
+    <section className="profession-picker" aria-label="Your professions" data-testid="profession-picker">
       <span className="profession-picker-head">
         Your professions
         <em>

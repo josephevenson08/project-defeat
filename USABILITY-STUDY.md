@@ -239,7 +239,9 @@ the popup does not offer today.
 >
 > - **"Skip to the main content"** is the first element in the shell, off-screen until focused. From
 >   the top of the document it is the first Tab stop, and following it lands on the main pane — so the
->   next press is a section tab instead of the first of twenty-odd rail controls.
+>   next press is a section tab instead of a walk through whatever comes first. The planner's rail is
+>   gone entirely as of 2026-09-26; Raids still has one, and that is where the bypass still saves a
+>   walk.
 > - **Focus follows a screen swap.** The front page handing over to the shell, the shell to character
 >   creation, and creation back to the shell each move focus into the screen that arrived. Tab changes
 >   deliberately do not: the strip stays mounted, so the button that was pressed keeps focus.
@@ -324,9 +326,12 @@ because it "sounded like healing".
 
 **Change:** one line per spec on that step, saying what the spec does.
 
-> **Helped 2026-09-22.** The step now says that the spec is "the talent tree with most of your points",
-> something a player can check in the game. Describing each spec would need sourced text for all 27,
-> so it is still open.
+> **Helped 2026-09-22, and again 2026-09-26.** The step says that the spec is "the talent tree with
+> most of your points", something a player can check in the game — and each spec now states its
+> **role** and its **signature ability**: "Physical DPS · Bloodthirst", "Tank · Shield Slam", and for
+> Gloria's case, "Healer · Circle of Healing". Both are facts this repo already holds and tests, so
+> they needed no sourcing. A line of playstyle prose for each of the 27 still does, so this stays
+> open rather than fixed.
 >
 > **Confirmed 2026-09-25** by the owner's own heuristic evaluation
 > ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md), finding 2), which also found the Race step
@@ -357,6 +362,10 @@ Each of these reached one or two people.
 - **Players want "equip this whole list."** Dana and Gloria asked for it in so many words, and Jay
   hinted at it. Ranked Gear takes one click per slot; by their own counts, a full set is 16 to 26
   clicks.
+  > **Fixed 2026-09-26**, arriving from the other direction: an empty planner offers to equip the
+  > whole ranked set in one press, with the enchants and gems the list recommends. The Ranked Gear
+  > panel still equips one row at a time; the same function would give it a button whenever that is
+  > wanted.
 - **Raid Composition's spec picker is one long, unfiltered list,** which hurts on a phone where a full
   roster means 25 trips through it. (Priya, P03)
 - **Mulgore has no map tab.** It is the Tauren starting zone, and the herb guide mentions it only in

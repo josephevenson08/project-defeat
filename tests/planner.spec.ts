@@ -11509,7 +11509,7 @@ test('the professions tab holds two professions, and a third replaces the oldest
   // about what professions do not do, on a screen about gear. It lives with the guides now.
   await sectionTab(page, 'Professions').click()
 
-  const picker = page.getByTestId('rail-professions')
+  const picker = page.getByTestId('profession-picker')
   await expect(picker).toBeVisible()
 
   // Primary professions only. Cooking, First Aid and Fishing are not a choice — everyone can take all
@@ -12147,6 +12147,50 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
 
+test('the Race step says which classes each race can play', async ({ page }) => {
+  /*
+   * The owner's heuristic evaluation, finding 1: the step promises that "your race decides which
+   * classes you can take", and then showed nothing about it — so comparing two races meant going
+   * forward to the Class step and back for each one.
+   *
+   * Checked against the same function the Class step filters by, so the two can never disagree.
+   */
+  await page.goto('/?simulation=1')
+  await page.getByTestId('section-planner').click()
+  await page.getByTestId('creator-next').click()
+
+  const draenei = page.getByTestId('creator-option-draenei')
+  for (const className of getClassesForRace('Draenei')) {
+    await expect(draenei, `Draenei can play ${className}`).toContainText(className)
+  }
+  await expect(draenei, 'and cannot play Warlock').not.toContainText('Warlock')
+  await expect(page.getByTestId('creator-option-human'), 'Alliance Shaman is Draenei only').not.toContainText('Shaman')
+})
+
+test('the Specialization step says what each spec is for', async ({ page }) => {
+  /*
+   * A first-time player in the usability study picked Holy because it "sounded like healing", and
+   * the owner's evaluation found the same gap from the other side: "there is no information telling
+   * me what the difference between the specializations are".
+   *
+   * The role and the spec's signature ability are facts this repo already holds, so the step can
+   * state them without waiting on sourced playstyle prose for all 27 specs.
+   */
+  await page.goto('/?simulation=1')
+  await page.getByTestId('section-planner').click()
+  await page.getByTestId('creator-next').click()
+  await page.getByTestId('creator-next').click()
+  await page.getByTestId('creator-option-priest').click()
+  await page.getByTestId('creator-next').click()
+
+  await expect(page.getByTestId('creator-option-holy'), 'Holy really is the healing one').toContainText('Healer')
+  await expect(page.getByTestId('creator-option-shadow')).toContainText('Caster DPS')
+  // The ability is the other half: it says what the spec actually presses.
+  await expect(page.getByTestId('creator-option-shadow')).toContainText(
+    getSignatureAbility('Priest', 'Shadow')?.name ?? 'no signature ability recorded',
+  )
+})
+
 test('choosing an item needs no confirmation, because nothing is covering the answer', async ({ page }) => {
   /*
    * Two of the owner's five findings were about the overlay this replaced. Choosing an item had no
@@ -12198,6 +12242,14 @@ test('opening a slot takes the keyboard with it, and Escape gives it back', asyn
 
   await page.keyboard.press('Escape')
   await expect(page.locator('.slot-pane')).toHaveCount(0)
+
+  /*
+   * And focus comes back to the row it came from. Without this the browser drops it to the top of
+   * the document when the pane stops existing, which is where the keyboard work of 2026-09-26 left
+   * the last open item in this group: one press of Tab from the skip link, every time you close a
+   * slot.
+   */
+  await expect(slotCell(page, 'Head'), 'focus returns to the slot that opened it').toBeFocused()
 })
 
 test('an empty planner offers to fill itself, and the offer goes once taken', async ({ page }) => {
@@ -12256,13 +12308,20 @@ test('a recommended set cannot hand you an enchant your character may not wear',
   await closeSlot(page)
 })
 
-test('a keyboard reaches the section tabs without walking the rail', async ({ page }) => {
+test('a keyboard reaches the section tabs without walking the page', async ({ page }) => {
   /*
-   * The rail comes before the section tabs in the source: four selects, ten profession toggles, the
-   * stat list and a "show more". The keyboard-only participant in the 2026-09-21 usability study spent
-   * his entire 40-action budget inside it and never reached the Talents tab he came for.
+   * The keyboard-only participant in the 2026-09-21 usability study spent his entire 40-action budget
+   * inside the rail — four selects, ten profession toggles, the stat list, a "show more" — and never
+   * reached the Talents tab he came for. The rail is gone and the skip link stays: it is the bypass
+   * for anyone whose traversal starts at the top of the document, and on Raids there is still a list
+   * of raids in front of the content.
    *
    * Driven with real key presses, because a skip link is only worth anything to the keyboard.
+   *
+   * **This used to reach the top of the document by closing a gear popup**, which dropped focus to
+   * the body when the Close button stopped existing. Closing a slot now hands focus back to the row
+   * it came from, so that route is gone — the fix removed the symptom the test was riding on. Asked
+   * backwards instead: what does the keyboard reach *before* the main pane?
    */
   await openApp(page)
 
@@ -12270,23 +12329,15 @@ test('a keyboard reaches the section tabs without walking the rail', async ({ pa
     .getByRole('navigation', { name: 'Main sections' })
     .getByRole('button', { name: 'Character Planner', exact: true })
 
-  // Arriving in the shell now leaves focus in the main pane, so the tabs are one press away instead
-  // of twenty-odd rail controls away.
+  // Arriving in the shell leaves focus in the main pane, so the tabs are one press away.
   await page.keyboard.press('Tab')
   await expect(plannerTab, 'the first press after arriving is a section tab').toBeFocused()
 
-  /*
-   * And when the browser throws focus back to the top of the document — which it does whenever the
-   * element holding focus is removed, as closing a gear popup removes the Close button that has it —
-   * the first stop is the skip link, not the top of the rail. Before this, that press landed on "Start
-   * over" and the walk began again.
-   */
-  await openSlot(page, 'Head')
-  await closeSlot(page)
-
-  await page.keyboard.press('Tab')
+  // And nothing tabbable sits in front of the main pane except the way past it.
+  await page.locator('#app-main').focus()
+  await page.keyboard.press('Shift+Tab')
   const skip = page.getByRole('link', { name: /skip to the main content/i })
-  await expect(skip, 'the first stop from the top of the document clears the rail').toBeFocused()
+  await expect(skip, 'the skip link is what precedes the content').toBeFocused()
 
   // It is parked off-screen until focused, and a skip link nobody can see is no use to a sighted
   // keyboard user, so check it actually arrives in the viewport rather than merely existing.
@@ -12299,7 +12350,20 @@ test('a keyboard reaches the section tabs without walking the rail', async ({ pa
   await expect(page.locator('#app-main'), 'following it lands in the main pane').toBeFocused()
 
   await page.keyboard.press('Tab')
-  await expect(plannerTab, 'so two presses replace the rail walk').toBeFocused()
+  await expect(plannerTab, 'so two presses reach the navigation').toBeFocused()
+
+  /*
+   * On Raids the bypass still earns its place: that section keeps its rail, so the skip link is what
+   * stands between the top of the document and five raid buttons.
+   */
+  await sectionTab(page, 'Raids').click()
+  await page.getByRole('button', { name: /Karazhan/ }).first().click()
+  await expect(page.locator('aside.rail')).toBeVisible()
+
+  await page.locator('#app-main').focus()
+  await page.keyboard.press('Shift+Tab')
+  await expect(page.locator('aside.rail').getByRole('button').last(), 'the rail is what main follows').toBeFocused()
+  await expect(skip, 'and the skip link is still in front of it all').toHaveCount(1)
 })
 
 test('swapping the whole screen takes focus with it', async ({ page }) => {

@@ -11,6 +11,46 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ## Where this is right now (2026-09-26, latest — READ THIS FIRST)
 
+**The planner was rebuilt around what it is for, and all five of the owner's heuristic findings are
+answered.** They rated the post-creation screen's density a major problem and said to fix that first;
+this is that, plus the two "visibility" findings it made cheap. Full record in
+[`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md).
+
+Measured at 1440×900, a planner with nothing equipped: **46 controls → 32**, page height **980px →
+900px**, two stat readouts → one, and 17 gear cards three lines tall → 17 rows one line tall.
+
+| Fixed | What changed |
+|---|---|
+| **The rail is gone from the planner** | Who you are is one line at the top with the four selects folded behind "Change character" — swapping spec to compare rankings must not mean walking creation again. The stats are one sticky bar: six for the role, the full table on request, and the six are **absent** while the table is open so no number is on screen twice. Professions moved to the Professions tab; the strip names whichever two you hold, because Enchanting's ring enchants move your stats and the cause has to be visible where the effect lands. |
+| **The paperdoll became a list** | One line per slot, two columns filled top-to-bottom. **The trade is real and was made deliberately:** position was the label, so you found the boots by looking where boots go. It is worse at everything else that screen does — 17 three-line cards reading "Empty / No enchant" is 51 lines of nothing arranged as a person — and the two columns keep the whole character on one screen where the body grid needed 1,174px. |
+| **An empty planner has one thing to do** | "Equip the recommended set" fills every slot from the spec's ranked list with the enchants and gems it recommends: 480 attack power to 1,788 in one press for a fresh Fury Warrior. The offer disappears once taken, because density has to be earned by content. |
+| **The gear popup is a pane beside the list** | Nothing covers the list you are choosing for, so the row updating *is* the confirmation and there is nothing to confirm. It says what to do when you arrive, takes focus with it, gives focus back to the row on close, and Escape still dismisses it. |
+| **Creation says what you are choosing between** | Each race lists the classes it can play in the class colours; each spec states its role and signature ability — "Physical DPS · Bloodthirst", "Healer · Circle of Healing". Both come from functions this repo already tests, so nothing was invented. |
+| **454 lines of dead CSS** | The rail's and the paperdoll's rules, swept with a script that checks each class against `src/` first — which is how `RaidRail`'s two borrowed classes survived. |
+
+**Five bugs this work produced or uncovered, none visible in a screenshot:**
+
+- Rings and trinkets were left empty by the first version of the set-equip, because a ranked list
+  names a pair once and both entries are rings. It walks the ranking per pair now.
+- A plain `focus()` scrolls, which sent a phone 385px down its own planner after creation.
+- `scrollIntoView` moved the page on every slot click, because the pane is taller than the viewport.
+- The sticky stat bar covered the pane's close button on a phone: a tap 20px above the × hit the bar.
+- `.gear-row` and `.gear-list` already existed in the stylesheet, orphaned from an in-place gear
+  editor that no longer exists, and silently restyled the new list into cards.
+
+**And one thing about this repo's tooling, worth knowing before trusting a green run:** `tsc --noEmit`
+checks **nothing** here. The root `tsconfig.json` is `{"files": [], "references": [...]}`, so the
+command exits 0 on anything. **`tsc -b` is the real check** — it immediately caught a broken import
+that `--noEmit` had waved through. `npm run build` uses `tsc -b`; nothing else did.
+
+**Test churn was large and deliberate.** 151 call sites now reach the character selects and the stat
+rows through helpers rather than through a rail that no longer exists, and where a test asked about
+something gone, it keeps its question and points at whatever answers it now. Two could not survive
+honestly — the rail's sticky-column geometry and the phone-only stat disclosure — and became "does
+the gear list start on the first screen" and "does the bar read the same at every width".
+
+## The keyboard and focus work (2026-09-26, earlier)
+
 **A keyboard can reach the navigation, and a screen reader is told when the screen changes.** This was
 the study's one outright access failure, and it is the last of its high-severity findings.
 
@@ -71,25 +111,21 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
    `node tools/ingest/prepare-boss-art.mjs`.
 4. **The Feral bear/cat split**, the last Phase 3 item. It touches the simulator, which the owner has
    said is not the focus, so ask first.
-5. **The planner redesign from the owner's heuristic evaluation**
-   ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md), 2026-09-25). They rated the post-creation
-   planner's density a **major** problem and would fix it first. Their suggestion includes removing the
-   professions selector from that screen, which changes a feature, so ask before starting.
 
 ### Ready to build, in the order worth doing
 
-1. **Return focus to the slot when a gear popup closes.** Small, and the only keyboard item left; see
-   the top of this file for why it is worth doing anyway.
-2. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
+1. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
    fixed, partly fixed or open):
    - a placeholder for missing boss art that doesn't read as a broken page
    - the tier list's stale "(Phase 2)" citation label, whose Wowhead page now says Phase 3
-   - per-spec descriptions in creation — these need sourced text for all 27, so they are not a quick fix
-   - "equip this whole list" on Ranked Gear, asked for by name by two participants
+   - **one line of playstyle prose per spec** in creation. The step now states each spec's role and
+     signature ability, which needed no sourcing because the repo already holds both; prose for all
+     27 does need sourcing, and that is what is left
    - a filter on Raid Composition's spec picker: 25 trips through an unfiltered list to seat a raid
-   - **From the owner's heuristic evaluation** ([`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md)):
-     show which classes each race allows on the Race step; a what-to-do prompt and a "top-ranked item"
-     shortcut in the gear popup; visible confirmation when an item is chosen
+2. **A "take the top-ranked item" button inside the slot pane.** The owner chose the whole-set action
+   over the per-slot one when asked, so this is deliberately absent rather than missed;
+   `buildRecommendedSet` already has the logic if it is wanted. The same function would give Ranked
+   Gear an "equip this whole list" button, which two study participants asked for by name.
 3. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
    carried an "outdated" bar since 2026-07-24, so fixes made upstream never reach the catalogue.
 4. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested

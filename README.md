@@ -105,12 +105,15 @@ behind every claim of its that quotes a number.
   sourced and still tested in `buffExclusivity.ts`; this screen just does not apply it. A fillable
   header (title, date, start time, description) is drawn onto the exported chart
 - Planner split into six sub-tabs (Gear / Compare / Talents / Buffs & Consumables / Ranked Gear /
-  Build) rather than one ~15-screen scroll column, with the stat rail persisting across all six
-- Stat rail scoped to the spec: a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle
-  that restores every stat — attributes and armor are never hidden
+  Build) rather than one ~15-screen scroll column, under a character line and a sticky stat bar that
+  stay put across all six
+- **The stat bar is the only place a number appears twice — which is to say, nowhere.** Six totals
+  for the role sit on one line; the full table opens under it and the six are not repeated above it.
+  Scoped to the spec, so a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle that
+  restores every stat — attributes and armor are never hidden
 - Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
-- Real item icons on the gear paperdoll, the ranked-gear rows and the raid loot tables. Icon names are
+- Real item icons on the gear list, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
   `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
@@ -152,17 +155,26 @@ behind every claim of its that quotes a number.
   no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
-- **Laid out for a phone.** Below 900px the rail becomes a band above the content, with the stat
-  readout and the profession picker each behind a one-line disclosure and the character selects two
-  across. Both tab bars are a three-column grid, so every tab stays visible without swiping, and every
-  control in the rail, the tab bars and the gear popup is a 44px tap target. Measured at 375x812: the
-  gear panel starts on the first screen, and no section scrolls sideways. Raid Composition and the
+- **Laid out for a phone.** The character line, the stat bar and the gear list stack without a
+  sidebar to collapse — the rail they replaced was one full screen tall at 375px on its own. Both tab
+  bars are a three-column grid, so every tab stays visible without swiping, and every control on the
+  planner, folded away or not, is a 44px tap target. Measured at 375x812: an empty planner's one
+  action is pressable without scrolling, a filled gear list shows on the first screen, and no section
+  scrolls sideways. Raid Composition and the
   profession guides were reviewed the same way and every control there is a 44px target too; desktop
   keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
   groups no longer needs a drag**, which a finger cannot start and a keyboard never could: press Move
   on their seat, then the seat you want them in
+- **The planner opens with one thing to do.** A character with nothing equipped gets an offer rather
+  than seventeen empty rows: one press fills every slot from the ranked list for the spec, with the
+  enchants and gems that list recommends, and the offer disappears once taken. Rings and trinkets
+  take successive entries, so both hands get filled rather than only the first
+- **Choosing gear happens beside the list, not over it.** Picking a slot opens a pane next to the
+  gear list: the row you are editing stays visible and updates as you click, so there is no
+  confirmation step and nothing to close before you can see what you did. It says what to do when
+  you arrive, and hands focus back to the row you came from when you leave
 - **Usable from the keyboard.** A "Skip to the main content" link opens the shell, so the section tabs
-  are two presses away rather than on the far side of the rail's twenty-odd controls, and when the app
+  are two presses away rather than on the far side of the whole page, and when the app
   swaps one whole screen for another — the front page for the shell, the shell for character creation —
   focus goes with it instead of falling to the page body, which is what a screen reader reads from.
   Every control shows a focus ring, including the character selects. Both behaviours are guarded by
@@ -172,7 +184,7 @@ behind every claim of its that quotes a number.
   phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the
   part of the URL browsers never send to a server. Opening one lands straight in the planner wearing
   the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean
-- **Professions on the character** — a two-slot picker in the rail, gating the one always-on stat
+- **Professions on the character** — a two-slot picker on the Professions tab, gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**
   rings, for +8 to every attribute. The app previously had this wrong in both directions at once —

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { getEnchantById } from '../../domain/enchants/sampleEnchants'
 import { getActiveSets } from '../../domain/gear/itemSets'
 import { getQualityColor } from '../../domain/gear/qualityColors'
@@ -84,6 +84,20 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
    * no longer on the character is worse than none.
    */
   const [lastEquip, setLastEquip] = useState<RecommendedSet>()
+  /*
+   * The rows, so closing the pane can hand focus back to the one that opened it.
+   *
+   * Without this the browser drops focus to the top of the document when the pane's Close button
+   * stops existing, and a keyboard user lands back at the skip link — which the 2026-09-26 keyboard
+   * work noted as the last thing left in that group.
+   */
+  const rowRefs = useRef<Partial<Record<GearSlot, HTMLButtonElement | null>>>({})
+
+  function closePane() {
+    const returning = openSlot
+    setOpenSlot(undefined)
+    if (returning) rowRefs.current[returning]?.focus()
+  }
 
   function updateItem(slot: GearSlot, item: GearItem) {
     if (isItemBlockedByUniqueInGear(item, slot, gear)) return
@@ -113,6 +127,9 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
         type="button"
         className={`gear-row${openSlot === slot ? ' gear-row-open' : ''}`}
         key={slot}
+        ref={(node) => {
+          rowRefs.current[slot] = node
+        }}
         aria-label={`${displayName} slot`}
         // Says which row the pane belongs to, for a screen reader as much as for the marker.
         aria-expanded={openSlot === slot}
@@ -225,7 +242,7 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
               gemIds[index] = gemId
               onChange(openSlot, { ...gear[openSlot], gemIds })
             }}
-            onClose={() => setOpenSlot(undefined)}
+            onClose={closePane}
           />
         )}
       </div>
