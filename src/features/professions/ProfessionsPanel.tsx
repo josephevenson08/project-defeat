@@ -2,7 +2,18 @@ import { useState } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { allProfessions, getProfessionProfile } from '../../domain/professions'
 import type { Profession } from '../../domain/professions'
+import type { CharacterProfile } from '../character/characterTypes'
 import { ProfessionPage } from './ProfessionPage'
+import { ProfessionPicker } from './ProfessionPicker'
+
+type ProfessionsPanelProps = {
+  /**
+   * Present only once a character exists. Arriving here from the front page without making one is a
+   * perfectly good way to read the guides, and there is nothing to hold professions against.
+   */
+  character?: CharacterProfile
+  onChangeCharacter?: (character: CharacterProfile) => void
+}
 
 /**
  * The professions tab, as a way in rather than a wall.
@@ -16,7 +27,7 @@ import { ProfessionPage } from './ProfessionPage'
  * is a number about the page behind the card rather than a reason to open it, and thirteen of them
  * is the clutter the split was made to remove.
  */
-export function ProfessionsPanel() {
+export function ProfessionsPanel({ character, onChangeCharacter }: ProfessionsPanelProps) {
   const [selected, setSelected] = useState<Profession | null>(null)
   const profile = selected ? getProfessionProfile(selected) : undefined
 
@@ -30,6 +41,8 @@ export function ProfessionsPanel() {
         Every TBC profession, with the route or the recipe list that takes it to 375. Approximate or
         unconfirmed details are flagged &quot;needs verification&quot; rather than stated as fact.
       </p>
+
+      {character && onChangeCharacter && <ProfessionPicker character={character} onChange={onChangeCharacter} />}
 
       {/*
         Colour comes from the *category* rather than one hue per profession. Three muted accents carry

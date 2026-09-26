@@ -304,7 +304,9 @@ async function openPlannerTab(page: Page) {
   // Which sub-tab you were last on is session state that survives a trip to Simulation, so coming
   // back does not necessarily land on Gear. Ask for it rather than assuming it.
   await openPlannerView(page, 'Gear')
-  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
+  // The panel used to carry an "Equipped / Gear" header. It does not: the sub-tab says Gear and the
+  // strip says whose. The list is the thing that proves the view is open.
+  await expect(page.locator('.gear-list')).toBeVisible()
 }
 
 /**
@@ -537,10 +539,10 @@ function readStatValue(text: string) {
 test('user can run a basic local physical DPS simulation', async ({ page }) => {
   await openApp(page)
 
-  await expect(page.getByRole('heading', { name: /project defeat/i })).toBeVisible()
-  await expect(page.getByRole('heading', { name: /character/i })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: /stats/i })).toBeVisible()
+  // The site's own name used to head the rail; the planner's heading is the character it is about.
+  await expect(page.getByTestId('character-name')).toHaveText('Human Fury Warrior')
+  await expect(page.getByRole('region', { name: 'Stats' })).toBeVisible()
+  await expect(page.locator('.gear-list')).toBeVisible()
   /*
    * Simulation **is** offered here, and this assertion flipped on 2026-08-21 rather than being
    * dropped. The default character is a Fury Warrior, and the tab is now shown to DPS specs and
@@ -551,8 +553,8 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
    */
   await expect(page.getByRole('button', { name: 'Simulation', exact: true })).toHaveCount(1)
 
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Fury')
   // Deliberately not pinned to a specific item. The default is whichever legal item the catalogue
   // offers first, which legitimately moves whenever the catalogue is re-ingested; what this test
   // actually cares about is that a legal weapon is equipped at all.
@@ -586,19 +588,19 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 test('class, faction, race, gems, and caster simulation flow work', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Orc')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Blood Elf')
-  await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Arcane')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await expect(await characterField(page, 'Race')).toHaveValue('Orc')
+  await (await characterField(page, 'Race')).selectOption('Blood Elf')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Arcane')
+  await (await characterField(page, 'Specialization')).selectOption('Fire')
 
   // The panel used to restate the character as "Blood Elf Fire Mage" under the selects. That summary
   // has been removed, so the selects themselves are the record of what was chosen — and they are the
   // thing the rest of this test depends on being right.
-  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Blood Elf')
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
+  await expect(await characterField(page, 'Race')).toHaveValue('Blood Elf')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Fire')
 
   // Real Phase 2 caster gear, replacing the invented "Spellfire Training Robe" and "Apprentice Focus
   // Staff" fixtures deleted on 2026-09-05 — the same reason Shield of Rehearsal went below. A test
@@ -612,7 +614,7 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
   await selectSlotEnchant(page, 'Head', 'Glyph of Power')
 
   // The rail is always on screen; the simulation result is a tab away.
-  await expect(page.getByTestId('stat-spell-power')).toBeVisible()
+  await expect(await statRow(page, 'spell-power')).toBeVisible()
   await runSimulation(page)
   await expect(page.getByText(/Estimated DPS/i)).toBeVisible()
   await expect(page.getByText(/Spell hit\/crit table/i)).toBeVisible()
@@ -622,9 +624,9 @@ test('class, faction, race, gems, and caster simulation flow work', async ({ pag
 test('healer and tank roles produce role-specific results', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Priest')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Discipline')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Class')).selectOption('Priest')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Discipline')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
   // Real healing gloves, replacing the invented "Healer's Grace Gloves" fixture. The enchant applied
   // below is a healing enchant, so the item under it has to carry healing power for the assertion to
   // mean anything.
@@ -637,8 +639,8 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   await expect(page.getByText(/Heal crit\/haste estimate/i)).toBeVisible()
 
   await openPlannerTab(page)
-  await page.getByLabel('Class').selectOption('Paladin')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
+  await (await characterField(page, 'Class')).selectOption('Paladin')
+  await (await characterField(page, 'Specialization')).selectOption('Protection')
   // Real plate, replacing the invented "Bulwark Chestguard" fixture — 1,825 armour and 56 stamina,
   // which is what a tank assertion needs underneath it.
   await selectSlotItem(page, 'Chest', 'bulwark-of-the-ancient-kings')
@@ -742,12 +744,12 @@ test('Enhancement Shaman Phase 2 starter ranking resolves to catalog items', asy
 test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Enhancement')
 
-  const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  const before = readStatValue(await (await statRow(page, 'attack-power')).innerText())
 
   await selectSlotItem(page, 'Head', 'cataclysm-helm')
   await selectSlotItem(page, 'Wrists', 'true-aim-stalker-bands')
@@ -765,7 +767,7 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
   // Not "greater than": the starting gear is now the highest item level the catalogue offers for each
   // slot, so deliberately equipping a specific Tier 5 set piece can legitimately lower a stat. What
   // has to hold is that the picks reach the stat pipeline at all.
-  const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  const after = readStatValue(await (await statRow(page, 'attack-power')).innerText())
   expect(after).toBeGreaterThan(0)
   expect(after, 'equipping five different items must move attack power').not.toBe(before)
 })
@@ -773,10 +775,10 @@ test('Enhancement Shaman can pick expanded Phase 2 options and still simulate', 
 test('Enhancement Shaman filters gear, relics, enchants, and source details by spec', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Enhancement')
 
   await withSlotOpen(page, 'Off Hand', async () => {
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Rod of the Sun King' })).toHaveCount(1)
@@ -830,10 +832,10 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
 
   await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Enhancement')
 
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expectRankedList(page, 'Enhancement Shaman Phase 2 Ranked List')
@@ -842,7 +844,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   // The id is now prefixed with # on the compact identity line rather than spelled "Item ID".
   await expect(page.getByTestId('bis-panel').getByText(/#30190/)).toBeVisible()
 
-  const before = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  const before = readStatValue(await (await statRow(page, 'attack-power')).innerText())
   await page.getByRole('button', { name: /Equip Cataclysm Helm/i }).click()
 
   await withSlotOpen(page, 'Head', async () => {
@@ -852,17 +854,17 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await openPlannerView(page, 'Ranked Gear')
   await expect(page.getByRole('button', { name: /Equipped/i }).first()).toBeDisabled()
 
-  const after = readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  const after = readStatValue(await (await statRow(page, 'attack-power')).innerText())
   expect(after).toBeGreaterThan(before)
 })
 
 test('BiS panel can equip paired trinket targets without duplicating unique items', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Enhancement')
 
   // One row per trinket: the ranking is not duplicated across Trinket 1 and Trinket 2, because each
   // row already carries an equip button for both sockets.
@@ -981,25 +983,25 @@ test('race/class selection enforces real TBC legality in the UI', async ({ page 
   await openApp(page)
 
   // Default is Alliance/Human; Human cannot be a Shaman, so Shaman should not be a selectable class yet.
-  await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(0)
+  await expect((await characterField(page, 'Class')).locator('option', { hasText: 'Shaman' })).toHaveCount(0)
 
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
-  await expect(page.getByLabel('Class').locator('option', { hasText: 'Shaman' })).toHaveCount(1)
+  await (await characterField(page, 'Race')).selectOption('Draenei')
+  await expect((await characterField(page, 'Class')).locator('option', { hasText: 'Shaman' })).toHaveCount(1)
 
-  await page.getByLabel('Class').selectOption('Shaman')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Elemental')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Elemental')
 
   // Switching faction should keep the class legal by picking a valid race for it (Draenei -> Horde has no Draenei,
   // so it should land on a Horde race that can still be a Shaman: Orc, Tauren, or Troll).
-  await page.getByLabel('Faction').selectOption('Horde')
-  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue(/Orc|Tauren|Troll/)
-  await expect(page.getByLabel('Class')).toHaveValue('Shaman')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await expect(await characterField(page, 'Race')).toHaveValue(/Orc|Tauren|Troll/)
+  await expect(await characterField(page, 'Class')).toHaveValue('Shaman')
 })
 
 test('crafted items show recipe source, required skill, and material farm locations', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Mage')
+  await (await characterField(page, 'Class')).selectOption('Mage')
 
   /*
    * **Spellfire Gloves, the real set piece, rather than the invented "Spellfire Training Robe" this
@@ -1023,16 +1025,16 @@ test('crafted items show recipe source, required skill, and material farm locati
 test('item quality renders with the standard WoW rarity color', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Enhancement')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Enhancement')
   await selectSlotItem(page, 'Head', 'cataclysm-helm')
 
   // Quality is carried by colour on the item name itself now, rather than spelled out in a caption.
   // That is the whole reason quality is the one chromatic signal left in the interface, so the colour
   // is the assertion that matters.
-  const itemName = page.getByRole('button', { name: 'Head slot', exact: true }).locator('.gear-item-name')
+  const itemName = page.getByRole('button', { name: 'Head slot', exact: true }).locator('.gear-row-item')
   await expect(itemName).toHaveText('Cataclysm Helm')
   await expect(itemName).toHaveCSS('color', 'rgb(163, 53, 238)')
 })
@@ -1046,15 +1048,21 @@ test('character role sets a distinct accent color across Character, Stats, and S
   const physicalDps = 'rgb(156, 115, 70)'
   const healer = 'rgb(77, 138, 128)'
 
-  await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', physicalDps)
+  /*
+   * On the planner the accent is a 3px mark before the character's name — read off the pseudo-element
+   * because that is where it lives. It used to be a border across the top of the rail's Character
+   * panel; the panel went with the rail, and a strip one line tall cannot spend a whole edge on a
+   * colour without becoming the loudest thing on the screen.
+   */
+  const nameAccent = () =>
+    page.getByTestId('character-name').evaluate((el) => getComputedStyle(el, '::before').backgroundColor)
+  expect(await nameAccent()).toBe(physicalDps)
 
-  await page.getByLabel('Class').selectOption('Priest')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Class')).selectOption('Priest')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
 
-  // Holy Priest is a Healer, and the accent carries to the rail and the simulator too.
-  await expect(page.getByRole('region', { name: 'Character' })).toHaveCSS('border-top-color', healer)
-  // The rail is deliberately not accented — it is chrome, not a panel, and an accent bar down the
-  // side of the whole app would be the loudest thing on screen.
+  // Holy Priest is a Healer, and the accent carries to the simulator too.
+  expect(await nameAccent()).toBe(healer)
 
   await openSimulationTab(page)
   await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', healer)
@@ -1063,10 +1071,10 @@ test('character role sets a distinct accent color across Character, Stats, and S
 test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatment and their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Troll')
-  await page.getByLabel('Class').selectOption('Shaman')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Elemental')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Troll')
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  await (await characterField(page, 'Specialization')).selectOption('Elemental')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Totem')
@@ -1075,7 +1083,7 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'The Nexus Key' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
+  await (await characterField(page, 'Specialization')).selectOption('Restoration')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Totem')
@@ -1091,8 +1099,8 @@ test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatmen
 test('Warrior specs hide the Relic slot and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  await (await characterField(page, 'Specialization')).selectOption('Arms')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Arms Warrior Phase 2 Ranked List')
@@ -1100,7 +1108,7 @@ test('Warrior specs hide the Relic slot and each get their own BiS list', async 
     await expect(page.getByLabel('Main Hand', { exact: true }).locator('option', { hasText: 'Twinblade of the Phoenix' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
+  await (await characterField(page, 'Specialization')).selectOption('Protection')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Protection Warrior Phase 2 Ranked List')
@@ -1128,8 +1136,8 @@ test('Holy, Protection, and Retribution Paladin Phase 2 starter rankings resolve
 test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Paladin')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Class')).selectOption('Paladin')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
 
   await expectSlotHidden(page, 'Ranged')
   // Asserted on the gear slot rather than a BiS heading: the Holy Paladin guide publishes no Libram
@@ -1140,13 +1148,13 @@ test('Paladin specs hide the Ranged slot, label Relic as Libram, and each get th
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: 'Aegis of the Vindicator' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
+  await (await characterField(page, 'Specialization')).selectOption('Protection')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Libram')
   await expectRankedList(page, 'Protection Paladin Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Retribution')
+  await (await characterField(page, 'Specialization')).selectOption('Retribution')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Libram')
@@ -1170,8 +1178,8 @@ test('Discipline, Holy, and Shadow Priest Phase 2 starter rankings resolve to ca
 test('Priest specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Priest')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Class')).selectOption('Priest')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Holy Priest Phase 2 Ranked List')
@@ -1179,10 +1187,10 @@ test('Priest specs hide the Relic slot, use a real Ranged wand, and each get the
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Luminescent Rod of the Naaru' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Discipline')
+  await (await characterField(page, 'Specialization')).selectOption('Discipline')
   await expectRankedList(page, 'Discipline Priest Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Shadow')
+  await (await characterField(page, 'Specialization')).selectOption('Shadow')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Shadow Priest Phase 2 Ranked List')
@@ -1209,21 +1217,21 @@ test('Druid specs hide the Ranged slot, label Relic as Idol, and each get their 
   await openApp(page)
 
   // Druid is only legal for Night Elf (Alliance) and Tauren (Horde); pick Night Elf before Class so it's offered.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
-  await page.getByLabel('Class').selectOption('Druid')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Balance')
+  await (await characterField(page, 'Race')).selectOption('Night Elf')
+  await (await characterField(page, 'Class')).selectOption('Druid')
+  await (await characterField(page, 'Specialization')).selectOption('Balance')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Idol')
   await expectRankedList(page, 'Balance Druid Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Feral')
+  await (await characterField(page, 'Specialization')).selectOption('Feral')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Idol')
   await expectRankedList(page, 'Feral Druid Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Restoration')
+  await (await characterField(page, 'Specialization')).selectOption('Restoration')
 
   await expectSlotHidden(page, 'Ranged')
   await expectRankingHeading(page, 'Idol')
@@ -1248,9 +1256,9 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
   await openApp(page)
 
   // Hunter is not legal for the default Human race; pick Dwarf first so Hunter is offered.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
-  await page.getByLabel('Class').selectOption('Hunter')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Beast Mastery')
+  await (await characterField(page, 'Race')).selectOption('Dwarf')
+  await (await characterField(page, 'Class')).selectOption('Hunter')
+  await (await characterField(page, 'Specialization')).selectOption('Beast Mastery')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Beast Mastery Hunter Phase 2 Ranked List')
@@ -1258,10 +1266,10 @@ test('Hunter specs hide the Relic slot, keep Ranged as the primary weapon, and e
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Sunfury Bow of the Phoenix' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Marksmanship')
+  await (await characterField(page, 'Specialization')).selectOption('Marksmanship')
   await expectRankedList(page, 'Marksmanship Hunter Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Survival')
+  await (await characterField(page, 'Specialization')).selectOption('Survival')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Survival Hunter Phase 2 Ranked List')
@@ -1287,8 +1295,8 @@ test('Arcane, Fire, and Frost Mage Phase 2 starter rankings resolve to catalog i
 test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Mage')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arcane')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await (await characterField(page, 'Specialization')).selectOption('Arcane')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Arcane Mage Phase 2 Ranked List')
@@ -1296,10 +1304,10 @@ test('Mage specs hide the Relic slot, use a real Ranged wand, and each get their
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Eredar Wand of Obliteration' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
+  await (await characterField(page, 'Specialization')).selectOption('Fire')
   await expectRankedList(page, 'Fire Mage Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Frost')
+  await (await characterField(page, 'Specialization')).selectOption('Frost')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Frost Mage Phase 2 Ranked List')
@@ -1371,8 +1379,8 @@ test('Assassination, Combat, and Subtlety Rogue Phase 2 starter rankings resolve
 test('Rogue specs hide the Relic slot, support full dual-wield, and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Rogue')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Assassination')
+  await (await characterField(page, 'Class')).selectOption('Rogue')
+  await (await characterField(page, 'Specialization')).selectOption('Assassination')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Assassination Rogue Phase 2 Ranked List')
@@ -1386,7 +1394,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Arcanite Steam-Pistol' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
+  await (await characterField(page, 'Specialization')).selectOption('Combat')
   await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
   await withSlotOpen(page, 'Main Hand', async () => {
     // Was 'Warp Slicer', which is one of Kael'thas's encounter weapons and is no longer offered to
@@ -1398,7 +1406,7 @@ test('Rogue specs hide the Relic slot, support full dual-wield, and each get the
     await expect(page.getByLabel('Off Hand', { exact: true }).locator('option', { hasText: "Latro's Shifting Sword" })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Subtlety')
+  await (await characterField(page, 'Specialization')).selectOption('Subtlety')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Subtlety Rogue Phase 2 Ranked List')
@@ -1424,8 +1432,8 @@ test('Affliction, Demonology, and Destruction Warlock Phase 2 starter rankings r
 test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get their own BiS list', async ({ page }) => {
   await openApp(page)
 
-  await page.getByLabel('Class').selectOption('Warlock')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Affliction')
+  await (await characterField(page, 'Class')).selectOption('Warlock')
+  await (await characterField(page, 'Specialization')).selectOption('Affliction')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Affliction Warlock Phase 2 Ranked List')
@@ -1443,10 +1451,10 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
     await expect(page.getByLabel('Ranged', { exact: true }).locator('option', { hasText: 'Wand of the Forgotten Star' })).toHaveCount(1)
   })
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Demonology')
+  await (await characterField(page, 'Specialization')).selectOption('Demonology')
   await expectRankedList(page, 'Demonology Warlock Phase 2 Ranked List')
 
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Destruction')
+  await (await characterField(page, 'Specialization')).selectOption('Destruction')
 
   await expectSlotHidden(page, 'Relic')
   await expectRankedList(page, 'Destruction Warlock Phase 2 Ranked List')
@@ -1460,7 +1468,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
 test('Professions is a grid you pick from, and each profession opens its own page', async ({ page }) => {
   await openApp(page)
 
-  await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
+  await expect(page.getByTestId('character-name')).toBeVisible()
   await page.getByRole('button', { name: 'Professions', exact: true }).click()
 
   await expect(page.getByRole('heading', { name: 'Professions', exact: true })).toBeVisible()
@@ -1514,7 +1522,7 @@ test('Professions is a grid you pick from, and each profession opens its own pag
   await expect(page.getByText('Copper Ore')).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Character', exact: true })).toBeVisible()
+  await expect(page.getByTestId('character-name')).toBeVisible()
 })
 
 test('stat weights rank stats correctly and separate unmodeled stats from capped ones', async ({ page }) => {
@@ -1559,8 +1567,8 @@ test('stat weights follow the character role and class', async ({ page }) => {
   await openApp(page)
 
   // Hunters run the ranged attack table, so ranged attack power replaces melee AP as the reference.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Dwarf')
-  await page.getByLabel('Class').selectOption('Hunter')
+  await (await characterField(page, 'Race')).selectOption('Dwarf')
+  await (await characterField(page, 'Class')).selectOption('Hunter')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-rangedAttackPower')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-strength')).toHaveCount(0)
@@ -1568,8 +1576,8 @@ test('stat weights follow the character role and class', async ({ page }) => {
 
   // Casters switch to the spell stat set entirely.
   await openPlannerTab(page)
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
-  await page.getByLabel('Class').selectOption('Mage')
+  await (await characterField(page, 'Race')).selectOption('Gnome')
+  await (await characterField(page, 'Class')).selectOption('Mage')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-spellPower')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-spellCritRating')).toBeVisible()
@@ -1578,17 +1586,17 @@ test('stat weights follow the character role and class', async ({ page }) => {
   // Healers normalize against healing power and surface MP5 as not-yet-modeled. Gnomes can't be
   // Priests in TBC, so the race has to move first — the Class dropdown genuinely won't offer it.
   await openPlannerTab(page)
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Human')
-  await page.getByLabel('Class').selectOption('Priest')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Race')).selectOption('Human')
+  await (await characterField(page, 'Class')).selectOption('Priest')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-healingPower')).toContainText('1.00')
   await expect(page.locator('.stat-weights-unmodeled')).toContainText('MP5')
 
   // Tanks normalize against stamina and get the avoidance stat set.
   await openPlannerTab(page)
-  await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Protection')
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  await (await characterField(page, 'Specialization')).selectOption('Protection')
   await openSimulationTab(page)
   await expect(page.getByTestId('stat-weight-stamina')).toContainText('1.00')
   await expect(page.getByTestId('stat-weight-defenseRating')).toBeVisible()
@@ -1702,11 +1710,11 @@ test('a reload starts clean, and a named build is what brings one back', async (
    * ever silently reverts, someone should have to see this fail.
    */
   await openApp(page)
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
 
-  await page.getByLabel('Class').selectOption('Mage')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fire')
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await (await characterField(page, 'Specialization')).selectOption('Fire')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 
   await openPlannerView(page, 'Build')
   await page.getByTestId('build-slot-name').fill('Fire alt')
@@ -1717,13 +1725,13 @@ test('a reload starts clean, and a named build is what brings one back', async (
   await page.reload()
   await page.getByTestId('section-planner').click()
   await completeCharacterCreation(page)
-  await expect(page.getByLabel('Class'), 'a reload does not reopen as the Mage').toHaveValue('Warrior')
+  await expect((await characterField(page, 'Class')), 'a reload does not reopen as the Mage').toHaveValue('Warrior')
 
   // The named slot is what brings it back, and it is deliberate rather than automatic.
   await openPlannerView(page, 'Build')
   await page.getByTestId('build-slot-load-Fire alt').click()
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fire')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Fire')
 })
 test('a build can be exported and imported back', async ({ page }) => {
   await openApp(page)
@@ -1734,14 +1742,14 @@ test('a build can be exported and imported back', async ({ page }) => {
   expect(JSON.parse(exported).version).toBe(1)
   expect(JSON.parse(exported).character.className).toBe('Warrior')
 
-  await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 
   // Pasting the captured build back must restore the original character.
   await page.getByTestId('build-import-input').fill(exported)
   await page.getByTestId('build-import-button').click()
 
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
   await expect(page.getByTestId('build-status')).toContainText(/Build loaded/i)
 })
 
@@ -1749,21 +1757,21 @@ test('an invalid build is rejected without changing the current character', asyn
   await openApp(page)
   await openPlannerView(page, 'Build')
 
-  await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 
   await page.getByTestId('build-import-input').fill('this is not a build')
   await page.getByTestId('build-import-button').click()
 
   await expect(page.getByTestId('build-status')).toContainText(/Nothing was changed/i)
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 
   // A structurally valid build from an unknown format version is refused too, rather than
   // half-applied.
   await page.getByTestId('build-import-input').fill(JSON.stringify({ version: 999, character: {} }))
   await page.getByTestId('build-import-button').click()
   await expect(page.getByTestId('build-status')).toContainText(/Unsupported build version/i)
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 })
 
 test('a build referencing a missing item still loads, reporting the dropped slot', async ({ page }) => {
@@ -1780,7 +1788,7 @@ test('a build referencing a missing item still loads, reporting the dropped slot
   await expect(status).toContainText(/Build loaded/i)
   await expect(status).toContainText(/no longer in the catalog/i)
   // The rest of the build must survive rather than the whole import failing.
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
 })
 
 test('melee specials are layered onto white damage, and unmodelled ones say so', async () => {
@@ -2081,7 +2089,7 @@ test('a hybrid gem earns the socket bonus it satisfies', async () => {
   expect(socketBonusIsActive(['Red', 'Yellow'], [orange!.id, pureRed!.id])).toBe(false)
 })
 
-test('the app opens on a section picker, and the rail follows the character', async ({ page }) => {
+test('the app opens on a section picker, and the planner names its character', async ({ page }) => {
   // The app used to land inside a tab. It now asks which of the four things you came to do, because
   // gearing a character, reading a tier list, reading a loot table and levelling a profession have
   // nothing to do with each other.
@@ -2098,16 +2106,23 @@ test('the app opens on a section picker, and the rail follows the character', as
   await expect(page.locator('.tab-nav')).toBeVisible()
   await expect(page.getByRole('region', { name: 'Character summary' }), 'no character is in play on Raids, so no stat rail').toHaveCount(0)
 
-  // The rail is stats, and stats belong to a character — so it appears on the planner and only there.
-  // Reaching the planner means creating a character first, which is the point of the creator: the
-  // tab is about a character, so there is nothing to show until there is one.
+  /*
+   * Reaching the planner means creating a character first, which is the point of the creator: the
+   * tab is about a character, so there is nothing to show until there is one.
+   *
+   * **And the planner has no rail.** It carried the character and the stats until the 2026-09-26
+   * redesign; both are bands across the top of the pane now, which is what took that screen from
+   * forty-six controls to thirty-two.
+   */
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
   await expect(page.getByTestId('character-creator')).toBeVisible()
   for (let step = 0; step < 3; step++) await page.getByTestId('creator-next').click()
   await page.getByTestId('creator-confirm').click()
 
-  await expect(page.locator('.rail')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Gear', exact: true })).toBeVisible()
+  await expect(page.locator('.rail'), 'no rail on the planner either').toHaveCount(0)
+  await expect(page.getByTestId('character-name')).toHaveText('Human Fury Warrior')
+  await expect(page.getByRole('region', { name: 'Stats' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Head slot', exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Professions', exact: true }).click()
   await expect(page.locator('.rail')).toHaveCount(0)
@@ -2492,8 +2507,8 @@ test('armor comes from the catalogue, and the derivation only fills genuine gaps
 
 test('equipped tier pieces surface their set bonuses, and say they are not scored', async ({ page }) => {
   await openApp(page)
-  await page.getByLabel('Class').selectOption('Warrior')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fury')
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  await (await characterField(page, 'Specialization')).selectOption('Fury')
 
   await selectSlotItem(page, 'Head', 'destroyer-battle-helm')
   await selectSlotItem(page, 'Chest', 'destroyer-breastplate')
@@ -2573,7 +2588,7 @@ test('a set with two bonuses at the same threshold renders both', async ({ page 
   })
 
   await openApp(page)
-  await page.getByLabel('Class').selectOption('Warlock')
+  await (await characterField(page, 'Class')).selectOption('Warlock')
   await selectSlotItem(page, 'Head', 'voidheart-crown')
   await selectSlotItem(page, 'Chest', 'voidheart-robe')
 
@@ -2847,31 +2862,31 @@ test('racial traits apply to stats, and weapon-conditional ones follow the equip
   // anyway: the old version could pass on a correct label while the stats went unchanged.
   await selectSlotItem(page, 'Main Hand', 'iblis-blade-of-the-fallen-seraph')
 
-  const expertiseWithSword = readStatValue(await page.getByTestId('stat-expertise').innerText())
+  const expertiseWithSword = readStatValue(await (await statRow(page, 'expertise')).innerText())
   expect(expertiseWithSword, 'Sword Specialization is +5 Expertise while a sword is equipped').toBeGreaterThan(0)
 
   // Swap to a non-sword main hand: the racial must switch off and the expertise must actually drop.
   // It has to be an axe, not the mace this once used — Humans get Mace Specialization too, so a mace
   // keeps expertise up and hides the very regression this assertion exists to catch.
   await selectSlotItem(page, 'Main Hand', 'crulshorukh-edge-of-chaos')
-  expect(readStatValue(await page.getByTestId('stat-expertise').innerText())).toBeLessThan(expertiseWithSword)
+  expect(readStatValue(await (await statRow(page, 'expertise')).innerText())).toBeLessThan(expertiseWithSword)
 })
 
 test('changing race changes the racial list and the resulting stats', async ({ page }) => {
   await openApp(page)
 
   // Gnome's Expansive Mind is a flat +5% Intellect, so it should move Intellect for any class.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Gnome')
-  await page.getByLabel('Class').selectOption('Mage')
-  const gnomeIntellect = readStatValue(await page.getByTestId('stat-intellect').innerText())
+  await (await characterField(page, 'Race')).selectOption('Gnome')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  const gnomeIntellect = readStatValue(await (await statRow(page, 'intellect')).innerText())
 
   // Undead has no passive stat racial at all, so the same Mage should end up with less Intellect.
   // Asserted through the rail rather than a traits list, which no longer exists on this panel.
-  await page.getByLabel('Faction').selectOption('Horde')
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Undead')
-  await page.getByLabel('Class').selectOption('Mage')
+  await (await characterField(page, 'Faction')).selectOption('Horde')
+  await (await characterField(page, 'Race')).selectOption('Undead')
+  await (await characterField(page, 'Class')).selectOption('Mage')
 
-  expect(readStatValue(await page.getByTestId('stat-intellect').innerText())).toBeLessThan(gnomeIntellect)
+  expect(readStatValue(await (await statRow(page, 'intellect')).innerText())).toBeLessThan(gnomeIntellect)
 })
 
 test('named build slots survive a character switch that would overwrite the autosave', async ({ page }) => {
@@ -2880,7 +2895,7 @@ test('named build slots survive a character switch that would overwrite the auto
   await expect(page.getByTestId('build-slots-empty')).toBeVisible()
 
   // Set up a Fury Warrior and save it under a name.
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
   await page.getByTestId('build-slot-name').fill('Fury main')
   await page.getByTestId('build-slot-save').click()
   await expect(page.getByTestId('build-status')).toContainText(/Saved as/i)
@@ -2888,14 +2903,14 @@ test('named build slots survive a character switch that would overwrite the auto
 
   // Switch to a completely different character. This is exactly what used to destroy the build,
   // because the autosave holds only one and overwrites it on every change.
-  await page.getByLabel('Class').selectOption('Mage')
-  await expect(page.getByLabel('Class')).toHaveValue('Mage')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
 
   // The named slot is untouched, and loading it restores the original character.
   await expect(page.getByTestId('build-slot-list')).toContainText('Fury main')
   await page.getByTestId('build-slot-load-Fury main').click()
-  await expect(page.getByLabel('Class')).toHaveValue('Warrior')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Fury')
+  await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Fury')
 
   // Slots persist across a reload, since they live in storage rather than component state. Neither
   // the section choice nor the planner sub-tab does — both are session state — so re-enter both
@@ -2912,24 +2927,24 @@ test('named build slots survive a character switch that would overwrite the auto
 
 test('Draenei get the hit racial matching their class, not both', async ({ page }) => {
   await openApp(page)
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+  await (await characterField(page, 'Race')).selectOption('Draenei')
 
   // Spell Hit is one of the rows the rail now hides for a physical spec, which is correct and is
   // exactly why this test has to open the full readout: the subject here is a Warrior's *spell* hit,
   // a number a Warrior has no normal reason to look at. The toggle is how you see it.
-  await page.getByTestId('rail-show-all-stats').click()
+  await showAllStats(page)
 
   // Warriors get Heroic Presence (melee/ranged hit) and must NOT also get the caster version, so a
   // Draenei Warrior's spell hit stays where a non-Draenei's would be. Read off the rail: the traits
   // list this used to check is gone from the Character panel, and the stat totals were always the
   // real subject — granting both racials would show up here and nowhere else.
-  await page.getByLabel('Class').selectOption('Warrior')
-  const warriorSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  const warriorSpellHit = readStatValue(await (await statRow(page, 'spell-hit')).innerText())
 
   // Shamans get Inspiring Presence (spell hit) instead — the two are separate racials in TBC, and
   // granting both would hand every Draenei twice the hit they actually have.
-  await page.getByLabel('Class').selectOption('Shaman')
-  expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText())).toBeGreaterThan(warriorSpellHit)
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  expect(readStatValue(await (await statRow(page, 'spell-hit')).innerText())).toBeGreaterThan(warriorSpellHit)
 })
 
 test('every spec appears on a tier list, and a spec can hold two placements at once', () => {
@@ -2980,9 +2995,9 @@ test('the tier list view shows all three lists and marks the current spec on eve
   // Feral Druid is the spec worth driving this with: it is the only one on two lists. Race first —
   // the class list is filtered by race and the default Human cannot be a Druid, which is the app
   // enforcing real TBC legality rather than anything going wrong.
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
-  await page.getByLabel('Class').selectOption('Druid')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Feral')
+  await (await characterField(page, 'Race')).selectOption('Night Elf')
+  await (await characterField(page, 'Class')).selectOption('Druid')
+  await (await characterField(page, 'Specialization')).selectOption('Feral')
   await page.getByRole('button', { name: 'Spec Tier Lists', exact: true }).click()
 
   await expect(page.getByRole('region', { name: 'DPS tier list' })).toBeVisible()
@@ -3129,22 +3144,22 @@ test('every catalogued item with a real item id resolves to a vendored icon file
   )
 })
 
-test('the paperdoll renders real item icons rather than the placeholder glyphs', async ({ page }) => {
+test('the gear list renders real item icons rather than the placeholder glyphs', async ({ page }) => {
   await openApp(page)
   await equipDefaultGear(page)
 
   // The frames were always sized to the icon that would replace the two-letter glyph, so this is the
   // assertion that the swap actually happened rather than the glyph still being there.
-  const icons = page.locator('.gear-glyph img.item-icon')
+  const icons = page.locator('.gear-row-icon img.item-icon')
   expect(await icons.count(), 'every visible slot should carry an icon').toBeGreaterThan(10)
 
   // One fallback is expected and correct: the default Fury Warrior wields a two-hander, so the off
   // hand holds EMPTY_OFF_HAND, which has no item id and therefore no icon. Asserting zero would be
   // asserting that an empty slot draws artwork.
-  const fallbacks = page.locator('.gear-glyph .item-icon-fallback')
+  const fallbacks = page.locator('.gear-row-icon .item-icon-fallback')
   const emptySlots = await page
-    .locator('.gear-cell')
-    .filter({ hasText: 'Empty' })
+    .locator('.gear-row')
+    .filter({ hasText: 'empty' })
     .count()
   expect(await fallbacks.count(), 'only genuinely empty slots may fall back to a glyph').toBe(emptySlots)
 
@@ -3433,8 +3448,8 @@ test('the talent tree renders real icons for a class other than the one built fi
 
   // Night Elf Druid: a class that did not exist in this panel until the nine-way ingest, and whose
   // trees are the ones the payload labels "FeralCombat".
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Night Elf')
-  await page.getByLabel('Class').selectOption('Druid')
+  await (await characterField(page, 'Race')).selectOption('Night Elf')
+  await (await characterField(page, 'Class')).selectOption('Druid')
 
   await expect(page.getByRole('region', { name: 'Balance talents' })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Feral talents' })).toBeVisible()
@@ -3514,13 +3529,16 @@ test('the planner shows one panel at a time instead of a single long column', as
   }
 })
 
-test('the stat rail hides rows the spec cannot use, and the toggle brings them back', async ({ page }) => {
+test('the stat table hides rows the spec cannot use, and the toggle brings them back', async ({ page }) => {
   await openApp(page)
+  // Opened here rather than through `statRow`, because this test asks about rows that are *absent*
+  // and the helper would read that as "collapsed" and press the toggle, closing what it opened.
+  await page.getByTestId('stat-bar-toggle').click()
 
   // A Fury Warrior was shown all 26 rows, of which roughly half carried nothing: the entire Spell
   // group, Feral attack power, and six defensive rows reading 0. Healing Power 411 on a Warrior is
   // the worst of them — it reads as a bug rather than as an irrelevant row.
-  const rows = page.locator('.rail-stat')
+  const rows = page.locator('.stat-row')
   const before = await rows.count()
   expect(before).toBeLessThan(15)
 
@@ -3537,7 +3555,7 @@ test('the stat rail hides rows the spec cannot use, and the toggle brings them b
 
   // Nothing is deleted, only defaulted away. This is the escape hatch for any spec where the
   // relevance call is arguable — Enhancement Shaman does get something from spell power.
-  const toggle = page.getByTestId('rail-show-all-stats')
+  const toggle = page.getByTestId('stat-show-all')
   await expect(toggle).toContainText(`Show ${26 - before} more`)
   await toggle.click()
   await expect(rows).toHaveCount(26)
@@ -4113,8 +4131,8 @@ test('the ranked list opens collapsed per slot, and only offers the control wher
    * control that would reveal nothing — a dead "Show all 2" next to two visible rows is worse than
    * no control, because it implies there is more.
    */
-  await page.getByLabel('Class').selectOption('Rogue')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Combat')
+  await (await characterField(page, 'Class')).selectOption('Rogue')
+  await (await characterField(page, 'Specialization')).selectOption('Combat')
   await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
   await expect(panel.locator('.bis-slot-toggle')).toHaveCount(0)
 })
@@ -4134,7 +4152,7 @@ test('Buffs & Consumables is reachable again, and a toggle moves the totals', as
   // Battle Shout is +306 attack power at rank 8, melee only. Asserting the exact delta rather than
   // "went up" is the point: it proves the sourced value reaches the total intact, and would catch a
   // buff being applied twice or scaled by something it should not be.
-  const readAp = async () => readStatValue(await page.getByTestId('stat-attack-power').innerText())
+  const readAp = async () => readStatValue(await (await statRow(page, 'attack-power')).innerText())
 
   const before = await readAp()
   await page.getByTestId('buff-toggle-battle-shout').click()
@@ -5204,8 +5222,8 @@ test('the emphasis in a spec note renders as emphasis, not as asterisks', async 
    * because Holy damage behaving differently from everything else on the page has to explain itself.
    */
   await openApp(page)
-  await page.getByLabel('Class').selectOption('Paladin')
-  await page.getByLabel('Specialization').selectOption('Retribution')
+  await (await characterField(page, 'Class')).selectOption('Paladin')
+  await (await characterField(page, 'Specialization')).selectOption('Retribution')
 
   await runSimulation(page)
 
@@ -11054,10 +11072,23 @@ test('a crafted or bought BiS pick says what it costs, and the price is never in
  */
 
 /** The label showing in a picker, read off the select rather than guessed from option order. */
-function selectedLabel(page: Page, name: string) {
-  return page
-    .getByRole('combobox', { name })
-    .evaluate((element) => (element as HTMLSelectElement).selectedOptions[0]?.text.trim() ?? '')
+/**
+ * A character select, which now folds behind "Change character" on the planner's strip rather than
+ * sitting open on a rail.
+ *
+ * Opens the strip if it is closed, so a test still says *what* it wants to change rather than how to
+ * reach it. The fold is the point of the redesign — fifteen controls for decisions you make once
+ * were most of what made that screen dense — and hiding it behind a helper keeps that one fact in
+ * one place instead of in sixty-six call sites.
+ */
+async function characterField(page: Page, label: 'Faction' | 'Race' | 'Class' | 'Specialization') {
+  if (!(await page.getByTestId('character-fields').isVisible())) await page.getByTestId('character-edit').click()
+  return page.getByLabel(label)
+}
+
+async function selectedLabel(page: Page, name: string) {
+  const field = await characterField(page, name as 'Faction' | 'Race' | 'Class' | 'Specialization')
+  return field.evaluate((element) => (element as HTMLSelectElement).selectedOptions[0]?.text.trim() ?? '')
 }
 
 test('the gear comparison puts two items side by side and its numbers add up on screen', async ({ page }) => {
@@ -11186,8 +11217,8 @@ test('the comparison score is a DPS surface, but the stat table is for every spe
   await page.getByTestId('section-planner').click()
   await completeCharacterCreation(page)
 
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Priest')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Holy')
+  await (await characterField(page, 'Class')).selectOption('Priest')
+  await (await characterField(page, 'Specialization')).selectOption('Holy')
   await openPlannerView(page, 'Compare')
 
   await expect(page.getByTestId('compare-score')).toHaveCount(0)
@@ -11198,8 +11229,8 @@ test('the comparison score is a DPS surface, but the stat table is for every spe
    * And a damage spec does get the number, from the same page load, so this pins the gate rather than
    * a load that simply never shows a score whatever the role.
    */
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Warrior')
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Fury')
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  await (await characterField(page, 'Specialization')).selectOption('Fury')
   await openPlannerView(page, 'Compare')
   await expect(page.getByTestId('compare-score')).toBeVisible()
   await expect(page.getByTestId('compare-score-hidden')).toHaveCount(0)
@@ -11266,86 +11297,76 @@ test('the shell collapses to one column on a phone, and nothing lands past the v
   expect(await horizontalOverflow(page), 'Professions fits its viewport').toBe(0)
 })
 
-test('the rail stops being a sticky full-height column once it sits above the content', async ({ page }) => {
+test('on a phone the gear list still starts on the first screen', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
   /*
-   * `height: 100vh` with `position: sticky` is right for a column beside the page and wrong stacked
-   * on top of one: it pinned the rail to a full screen whatever was in it, so the content below began
-   * exactly one swipe down. Repairing the shell's collapse was what made this visible at all.
+   * **What this used to measure no longer exists.** The planner's rail stacked above the content on a
+   * phone, and `height: 100vh` with `position: sticky` pinned it to a full screen whatever was in it,
+   * so the gear panel began exactly one swipe down. The rail is gone; the question it was asking is
+   * not, because the strip, the stat bar and two tab bars can just as easily eat the first screen.
+   *
+   * **It also used to measure `<main>`, and that is how a false claim passed.** `<main>` opens with
+   * the tab bars, so it began on the first screen while the gear panel began at y=937 on an 812px
+   * one. A floor rather than a point, so spacing can be tuned — but high enough that a block the size
+   * of the old profession picker landing back on this screen fails here.
    */
-  const rail = await page.evaluate(() => {
-    const el = document.querySelector('aside.rail')
-    if (!el) throw new Error('no rail')
-    const cs = getComputedStyle(el)
-    const panel = document.querySelector('section.panel')
-    if (!panel) throw new Error('no panel')
+  const measured = await page.evaluate(() => {
+    const list = document.querySelector('.gear-list')
+    if (!list) throw new Error('no gear list')
     return {
-      position: cs.position,
-      height: Math.round(el.getBoundingClientRect().height),
-      panelStartsAt: Math.round(panel.getBoundingClientRect().y + window.scrollY),
+      listStartsAt: Math.round(list.getBoundingClientRect().y + window.scrollY),
       viewportHeight: window.innerHeight,
+      scrolled: window.scrollY,
     }
   })
 
-  expect(rail.position, 'a stacked rail does not stick').toBe('static')
-  expect(rail.height, 'the rail is as tall as its contents, not as tall as the screen').toBeLessThan(
-    rail.viewportHeight,
-  )
-
-  /*
-   * **This used to measure `<main>`, and that is how a false claim passed.** `<main>` opens with both
-   * tab bars — 248px of them at the time — so it began on the first screen while the gear panel began
-   * at y=937 on an 812px one, with nothing of it visible. The assertion's own message said "the panel
-   * you came for" and its measurement was of something else. It then stayed green while the profession
-   * picker added another 160px to the rail.
-   *
-   * A floor rather than a point, so tuning the spacing does not break it — but high enough that a
-   * block the size of that picker landing in the rail again fails here.
-   */
-  const visible = rail.viewportHeight - rail.panelStartsAt
-  expect(visible, `the panel you came for shows at least 120px on the first screen (starts at ${rail.panelStartsAt})`).toBeGreaterThanOrEqual(120)
+  expect(measured.scrolled, 'the planner opens at the top').toBe(0)
+  const visible = measured.viewportHeight - measured.listStartsAt
+  expect(
+    visible,
+    `the gear you came for shows at least 120px on the first screen (starts at ${measured.listStartsAt})`,
+  ).toBeGreaterThanOrEqual(120)
 })
 
-test('the stat readout collapses behind a disclosure on a phone, and only on a phone', async ({ page }) => {
+test('the stat bar reads the same at every width, and the table is one press away', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
   /*
-   * The rail's premise is that the totals stay on screen while you move between panels — which stops
-   * being true below 900px, where it is a band above the content rather than a column beside it.
-   * Measured at 375px it was one full screen tall on its own. So on a phone the trade runs the other
-   * way: a tap to read the stats, in exchange for the gear panel being above the fold.
+   * **This replaced a phone-only disclosure, and the special case went with it.** The rail listed all
+   * twenty-six stats, which measured one full screen tall at 375px, so below 900px it collapsed
+   * behind a tap while the desktop showed everything — two behaviours, a media query to choose
+   * between them, and a hook whose staleness on resize had its own bug. Six numbers on one line fit
+   * a phone, so there is one behaviour now and nothing to keep in sync.
    *
-   * Collapsed means **absent**, not `display: none`: a hidden readout would leave a screen reader
-   * announcing a heading with nothing under it.
+   * Collapsed still means **absent**, not `display: none`: a hidden table would leave a screen reader
+   * announcing rows nobody can see.
    */
-  const disclosure = page.getByTestId('rail-stats-disclosure')
-  await expect(disclosure).toBeVisible()
-  await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
-  await expect(page.locator('.rail-stat'), 'collapsed rows are out of the document').toHaveCount(0)
+  const toggle = page.getByTestId('stat-bar-toggle')
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.locator('.stat-row'), 'the table is out of the document until asked for').toHaveCount(0)
+  await expect(page.getByTestId('stat-attack-power'), 'the headline six are on the bar itself').toBeVisible()
   // Names what is behind it, so a collapsed section never reads as an empty one.
-  await expect(disclosure).toContainText(/\d+ stats/i)
+  await expect(toggle).toContainText(/all \d+ stats/i)
 
-  await disclosure.click()
-  await expect(disclosure).toHaveAttribute('aria-expanded', 'true')
-  const expanded = await page.locator('.rail-stat').count()
-  expect(expanded, 'tapping it brings the readout back').toBeGreaterThan(0)
+  await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  expect(await page.locator('.stat-row').count(), 'pressing it brings the table').toBeGreaterThan(0)
 
   /*
-   * And the desktop rail is untouched — no control, no collapse, the heading it always had. Asserted
-   * from the same page rather than a fresh load, because the bug this pins was a *stale* one: the
-   * first version of `useMediaQuery` wrote its answer to state from a media event and never re-read
-   * it, so a viewport that crossed the breakpoint kept rendering the layout for the width it started
-   * at. Reading the snapshot on every render is what fixes that, and only a resize in a live page
-   * exercises it.
+   * And the same at desktop width, from the same page rather than a fresh load: the layout used to be
+   * chosen from the width at mount and never re-read, so a viewport that crossed the breakpoint kept
+   * rendering for the width it started at. Nothing here reads the width at all now, which is what
+   * this asserts.
    */
   await page.setViewportSize({ width: 1280, height: 900 })
-  await openPlannerView(page, 'Talents')
-  await expect(page.getByTestId('rail-stats-disclosure')).toHaveCount(0)
-  await expect(page.locator('.rail-stats h2'), 'the desktop rail keeps its heading').toBeVisible()
-  expect(await page.locator('.rail-stat').count(), 'and shows its rows without being asked').toBeGreaterThan(0)
+  await expect(page.getByTestId('stat-bar-toggle')).toHaveAttribute('aria-expanded', 'true')
+  expect(await page.locator('.stat-row').count(), 'the table stays open across a resize').toBeGreaterThan(0)
+  await page.getByTestId('stat-bar-toggle').click()
+  await expect(page.getByTestId('stat-attack-power'), 'and folds back to the same six').toBeVisible()
+  await expect(page.locator('.stat-row')).toHaveCount(0)
 })
 
 /*
@@ -11356,12 +11377,48 @@ test('the stat readout collapses behind a disclosure on a phone, and only on a p
  */
 
 /** The rail's own number for a stat, which is what a player actually reads. */
-function railStat(page: Page, stat: string) {
-  return page.getByTestId(`stat-${stat}`).locator('.rail-stat-value')
+/**
+ * A stat row, opening the table if the stat is not one of the six on the collapsed bar.
+ *
+ * The bar shows the role's headline stats and folds the rest away, so "is Strength 145" is now two
+ * questions — is the table open, and what does it say. Tests should only have to ask the second.
+ */
+async function statRow(page: Page, stat: string) {
+  const row = page.getByTestId(`stat-${stat}`)
+  if (!(await row.isVisible())) await page.getByTestId('stat-bar-toggle').click()
+  return row
+}
+
+/** Opens the table if it is closed, then asks for every stat rather than the spec's own. */
+async function showAllStats(page: Page) {
+  const toggle = page.getByTestId('stat-show-all')
+  if (!(await toggle.isVisible())) await page.getByTestId('stat-bar-toggle').click()
+  await toggle.click()
+}
+
+async function railStat(page: Page, stat: string) {
+  return (await statRow(page, stat)).locator('.stat-value')
 }
 
 function professionChip(page: Page, profession: string) {
   return page.getByTestId(`profession-${profession.toLowerCase().replaceAll(' ', '-')}`)
+}
+
+function sectionTab(page: Page, label: string) {
+  return page.getByRole('navigation', { name: 'Main sections' }).getByRole('button', { name: label, exact: true })
+}
+
+/**
+ * Takes a profession, from the Professions tab where the picker now lives, and comes back.
+ *
+ * The round trip is the point rather than an inconvenience: Enchanting's ring enchants are the one
+ * profession effect that moves your stats, so the planner has to show the consequence of a choice
+ * made on another screen.
+ */
+async function toggleProfessionOnItsTab(page: Page, profession: string) {
+  await sectionTab(page, 'Professions').click()
+  await professionChip(page, profession).click()
+  await sectionTab(page, 'Character Planner').click()
 }
 
 test('ring enchants need Enchanting, and an Enchanter gets one on each hand', async ({ page }) => {
@@ -11383,11 +11440,14 @@ test('ring enchants need Enchanting, and an Enchanter gets one on each hand', as
   )
   await closeSlot(page)
 
-  const strength = railStat(page, 'strength')
+  const strength = await railStat(page, 'strength')
   const before = Number(await strength.innerText())
 
-  await professionChip(page, 'Enchanting').click()
-  await expect(professionChip(page, 'Enchanting')).toHaveAttribute('aria-pressed', 'true')
+  await toggleProfessionOnItsTab(page, 'Enchanting')
+  await expect(
+    page.getByTestId('character-name').locator('xpath=following-sibling::p'),
+    'the planner names the profession moving its numbers',
+  ).toContainText('Enchanting')
 
   // Both hands, which is the half the app was losing. `professionPayoffs.ts` says it in its own copy:
   // "+4 all stats per ring, so +8 across both".
@@ -11398,7 +11458,7 @@ test('ring enchants need Enchanting, and an Enchanter gets one on each hand', as
     await selectSlotEnchant(page, slot, 'ring-stats')
   }
 
-  await expect(strength, 'two rings at +4 Strength each').toHaveText(String(before + 8))
+  await expect(await railStat(page, 'strength'), 'two rings at +4 Strength each').toHaveText(String(before + 8))
 })
 
 test('dropping a profession takes the enchant it unlocked with it', async ({ page }) => {
@@ -11411,16 +11471,16 @@ test('dropping a profession takes the enchant it unlocked with it', async ({ pag
    * enchants. So taking Enchanting, enchanting both rings and dropping it again left +8 to five
    * stats applied by a character who could no longer be offered it anywhere.
    */
-  await professionChip(page, 'Enchanting').click()
-  const strength = railStat(page, 'strength')
+  await toggleProfessionOnItsTab(page, 'Enchanting')
+  const strength = await railStat(page, 'strength')
   const unenchanted = Number(await strength.innerText())
 
   await selectSlotEnchant(page, 'Finger 1', 'ring-stats')
   await selectSlotEnchant(page, 'Finger 2', 'ring-stats')
-  await expect(strength).toHaveText(String(unenchanted + 8))
+  await expect(await railStat(page, 'strength')).toHaveText(String(unenchanted + 8))
 
-  await professionChip(page, 'Enchanting').click()
-  await expect(strength, 'the bonus goes when the profession does').toHaveText(String(unenchanted))
+  await toggleProfessionOnItsTab(page, 'Enchanting')
+  await expect(await railStat(page, 'strength'), 'the bonus goes when the profession does').toHaveText(String(unenchanted))
 
   // And it is genuinely gone from the slot, not merely uncounted — an enchant shown as equipped but
   // contributing nothing would be its own kind of lie.
@@ -11429,15 +11489,18 @@ test('dropping a profession takes the enchant it unlocked with it', async ({ pag
   await closeSlot(page)
 })
 
-test('the rail holds two professions, and a third replaces the oldest', async ({ page }) => {
+test('the professions tab holds two professions, and a third replaces the oldest', async ({ page }) => {
   await openApp(page)
+  // The picker left the planner's rail in the 2026-09-26 redesign: ten toggles and a three-line note
+  // about what professions do not do, on a screen about gear. It lives with the guides now.
+  await sectionTab(page, 'Professions').click()
 
   const picker = page.getByTestId('rail-professions')
   await expect(picker).toBeVisible()
 
   // Primary professions only. Cooking, First Aid and Fishing are not a choice — everyone can take all
   // three — and none of them touches a stat, so they would lengthen the list for nothing.
-  await expect(page.locator('.rail-profession'), 'ten primaries, no secondaries').toHaveCount(10)
+  await expect(page.locator('.profession-toggle'), 'ten primaries, no secondaries').toHaveCount(10)
   await expect(professionChip(page, 'Cooking')).toHaveCount(0)
 
   await professionChip(page, 'Enchanting').click()
@@ -11534,15 +11597,15 @@ test('the race/class matrix is the TBC one, checked against sources rather than 
 
 test('a Draenei Mage can be made, and gets the spell-hit racial', async ({ page }) => {
   await openApp(page)
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
+  await (await characterField(page, 'Race')).selectOption('Draenei')
 
   // Offered at all — the half of the bug a player would actually hit. The creator and the rail both
   // read `getClassesForRace`, so a class missing here was missing everywhere.
-  await expect(page.getByRole('combobox', { name: 'Class' }).locator('option', { hasText: /^Mage$/ })).toHaveCount(1)
+  await expect((await characterField(page, 'Class')).locator('option', { hasText: /^Mage$/ })).toHaveCount(1)
 
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Warrior')
-  await page.getByTestId('rail-show-all-stats').click()
-  const warriorSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+  await (await characterField(page, 'Class')).selectOption('Warrior')
+  await showAllStats(page)
+  const warriorSpellHit = readStatValue(await (await statRow(page, 'spell-hit')).innerText())
 
   /*
    * **Inspiring Presence listed Priest and Shaman only**, and could not have been noticed: a class the
@@ -11550,12 +11613,12 @@ test('a Draenei Mage can be made, and gets the spell-hit racial', async ({ page 
    * "Mages/Priests/Shaman only". A Draenei Mage now carries the same spell hit a Draenei Shaman does,
    * and more than a Draenei Warrior, who has Heroic Presence instead.
    */
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Mage')
-  const mageSpellHit = readStatValue(await page.getByTestId('stat-spell-hit').innerText())
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  const mageSpellHit = readStatValue(await (await statRow(page, 'spell-hit')).innerText())
   expect(mageSpellHit, 'a Draenei Mage gets Inspiring Presence').toBeGreaterThan(warriorSpellHit)
 
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Shaman')
-  expect(readStatValue(await page.getByTestId('stat-spell-hit').innerText()), 'the same racial a Draenei Shaman gets').toBe(
+  await (await characterField(page, 'Class')).selectOption('Shaman')
+  expect(readStatValue(await (await statRow(page, 'spell-hit')).innerText()), 'the same racial a Draenei Shaman gets').toBe(
     mageSpellHit,
   )
 })
@@ -11595,85 +11658,70 @@ test('on a phone both tab bars show every tab, in two rows of 44px targets', asy
   }
 })
 
-test('on a phone the character selects lose their visible labels but keep their names', async ({ page }) => {
+test('on a phone the character selects keep both their labels and their names', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
   /*
-   * The label row above each select was 23px, four times over, and the values name themselves —
-   * Alliance, Human, Warrior, Fury. The labels are clipped rather than removed, and this is the check
-   * that clipping is not also hiding them from assistive tech: a combobox announced as "Human" rather
-   * than "Race" would be a regression paid for with 46px.
+   * **The labels used to be clipped, and they are not any more.** Four label rows at 23px each were
+   * 92px the rail could not spare, so they were hidden visually and left for assistive tech alone —
+   * a combobox announced as "Human" rather than "Race" would have been a regression paid for with
+   * 46px. The selects now sit behind "Change character" and cost nothing until asked for, so they
+   * can say what they are to everybody.
    */
+  await page.getByTestId('character-edit').click()
+
   for (const name of ['Faction', 'Race', 'Class', 'Specialization']) {
     await expect(page.getByRole('combobox', { name }), `${name} is still announced by its label`).toBeVisible()
   }
 
   const labelHeights = await page
-    .locator('.rail-character .field > span')
+    .locator('.character-strip-fields .field > span')
     .evaluateAll((spans) => spans.map((span) => span.getBoundingClientRect().height))
   expect(labelHeights, 'four labels').toHaveLength(4)
-  expect(Math.max(...labelHeights), 'none takes up a row on screen').toBeLessThanOrEqual(1)
+  expect(Math.min(...labelHeights), 'and each one is on screen').toBeGreaterThan(1)
 })
 
-test('on a phone the profession picker collapses to what you hold', async ({ page }) => {
+test('on a phone the planner carries no profession controls, only what you hold', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
   /*
-   * Open, the picker was 160px — ten chips and a note — and it went into the rail after the phone
-   * layout had been measured, which is part of how the gear panel ended up below the first screen. It
-   * is a choice made once, so on a phone it sits behind a disclosure whose summary names what you
-   * hold: the only thing you need from it after the first visit.
+   * **The disclosure this used to test is gone, along with the reason for it.** Open, the picker was
+   * 160px of chips and a note in the planner's rail, and on a phone that was a large part of why the
+   * gear panel began below the first screen — so it hid behind a summary of what you hold. It is on
+   * the Professions tab now, so the planner carries none of it.
+   *
+   * What a phone still needs is the *fact*: Enchanting moves your stats, so the screen showing the
+   * stats has to say you took it.
    */
-  const disclosure = page.getByTestId('rail-professions-disclosure')
-  await expect(disclosure).toHaveAttribute('aria-expanded', 'false')
-  await expect(disclosure).toContainText('None')
-  await expect(page.locator('.rail-profession'), 'collapsed chips are out of the document').toHaveCount(0)
+  await expect(page.locator('.profession-toggle'), 'no picker on the planner at all').toHaveCount(0)
 
-  await disclosure.click()
-  await expect(page.locator('.rail-profession')).toHaveCount(10)
-  await professionChip(page, 'Enchanting').click()
-  await professionChip(page, 'Mining').click()
-
-  await disclosure.click()
-  await expect(disclosure, 'the summary names both').toContainText('Enchanting, Mining')
-  await expect(page.locator('.rail-profession')).toHaveCount(0)
+  await toggleProfessionOnItsTab(page, 'Enchanting')
+  await toggleProfessionOnItsTab(page, 'Mining')
+  await expect(page.locator('.character-strip-meta'), 'the strip names both').toContainText('Enchanting, Mining')
 })
 
-test('on a phone the rail controls are all 44px targets', async ({ page }) => {
+test('on a phone every planner control is a 44px target, folded away or not', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
-  const undersized = await page.evaluate(() =>
-    [...document.querySelectorAll('aside.rail button, aside.rail select')]
-      .filter((control) => {
-        const rect = control.getBoundingClientRect()
-        return rect.height > 0 && rect.height < 44
-      })
-      .map((control) => (control as HTMLElement).dataset.testid ?? control.className),
-  )
-
   /*
-   * "Start over" is the one exception on paper and not in the hand: it is a 13px text link whose target
-   * comes from a pseudo-element, so the heading row does not grow around it. A bounding box cannot see
-   * a pseudo-element, so the target is checked the way a tap finds it — by hit-testing points outside
-   * the visible link.
+   * This used to measure `aside.rail`, and to carry one documented exception: "Start over" was a 13px
+   * text link whose tap target came from a pseudo-element, because the rail's heading row could not
+   * grow around it. There is no rail and no heading row, so the exception is gone — every control
+   * simply asks for 44px.
+   *
+   * The folded surfaces are opened rather than skipped. A control that is only a target once you have
+   * pressed something else is still a control, and both of them are new.
    */
-  expect(undersized, 'only the link whose target is a pseudo-element').toEqual(['restart-creator'])
+  expect(await undersizedControls(page), 'on arrival').toEqual([])
 
-  const tapsLand = await page.evaluate(() => {
-    const link = document.querySelector('[data-testid="restart-creator"]')
-    if (!link) throw new Error('no restart link')
-    const rect = link.getBoundingClientRect()
-    const x = rect.left + rect.width / 2
-    const middle = rect.top + rect.height / 2
-    return [-14, 14].every((offset) => {
-      const hit = document.elementFromPoint(x, middle + offset)
-      return hit !== null && (hit === link || link.contains(hit))
-    })
-  })
-  expect(tapsLand, 'a tap 14px above or below the link still lands on it').toBe(true)
+  await page.getByTestId('character-edit').click()
+  expect(await undersizedControls(page), 'with the character fields open').toEqual([])
+
+  await page.getByTestId('stat-bar-toggle').click()
+  expect(await undersizedControls(page), 'with the stat table open').toEqual([])
 })
 
 test('on a phone the gear popup fits the screen and its close button is a real target', async ({ page }) => {
@@ -11906,14 +11954,14 @@ test('an untouched character saves and loads as itself, empty slots and all', as
   await expect(page.getByTestId('build-status')).toContainText('Every slot resolved cleanly')
 
   await openPlannerView(page, 'Gear')
-  await expect(slotCell(page, 'Head'), 'the head is still empty, not wearing a default helm').toContainText('Empty')
+  await expect(slotCell(page, 'Head'), 'the head is still empty, not wearing a default helm').toContainText('empty')
 })
 
 test('a build link opens straight into the planner wearing the build', async ({ page }) => {
   await openApp(page)
-  await page.getByRole('combobox', { name: 'Race' }).selectOption('Draenei')
-  await page.getByRole('combobox', { name: 'Class' }).selectOption('Mage')
-  await professionChip(page, 'Enchanting').click()
+  await (await characterField(page, 'Race')).selectOption('Draenei')
+  await (await characterField(page, 'Class')).selectOption('Mage')
+  await toggleProfessionOnItsTab(page, 'Enchanting')
   await selectSlotItem(page, 'Head', 'merciless-gladiators-silk-cowl')
 
   await openPlannerView(page, 'Build')
@@ -11928,9 +11976,9 @@ test('a build link opens straight into the planner wearing the build', async ({ 
   await page.goto(link)
   await expect(page.getByTestId('share-notice')).toContainText('Loaded a shared build')
   await expect(page.getByTestId('section-planner'), 'the front page is skipped').toHaveCount(0)
-  await expect(page.getByRole('combobox', { name: 'Race' })).toHaveValue('Draenei')
-  await expect(page.getByRole('combobox', { name: 'Class' })).toHaveValue('Mage')
-  await expect(professionChip(page, 'Enchanting')).toHaveAttribute('aria-pressed', 'true')
+  await expect(await characterField(page, 'Race')).toHaveValue('Draenei')
+  await expect(await characterField(page, 'Class')).toHaveValue('Mage')
+  await expect(page.locator('.character-strip-meta'), 'the build brought its profession').toContainText('Enchanting')
   await expect(slotCell(page, 'Head')).toContainText("Merciless Gladiator's Silk Cowl")
 
   // The fragment is consumed: left in place, a reload would re-import it over any changes since.
@@ -11970,8 +12018,8 @@ test('a build link pasted into an open tab loads too', async ({ page }) => {
   }, `build=${value}`)
 
   await expect(page.getByTestId('share-notice')).toContainText('Loaded a shared build')
-  await expect(page.getByRole('combobox', { name: 'Class' })).toHaveValue('Hunter')
-  await expect(page.getByRole('combobox', { name: 'Specialization' })).toHaveValue('Marksmanship')
+  await expect(await characterField(page, 'Class')).toHaveValue('Hunter')
+  await expect(await characterField(page, 'Specialization')).toHaveValue('Marksmanship')
 })
 
 test('the Build panel shares only the build on screen, and no longer promises an autosave', async ({ page }) => {
@@ -11992,7 +12040,7 @@ test('the Build panel shares only the build on screen, and no longer promises an
 
   // A link made from the build as it was is withdrawn once the build changes, rather than left on
   // screen describing a character that no longer exists.
-  await page.getByRole('combobox', { name: 'Specialization' }).selectOption('Arms')
+  await (await characterField(page, 'Specialization')).selectOption('Arms')
   await expect(page.getByTestId('build-share-link')).toHaveCount(0)
 })
 
@@ -12027,7 +12075,7 @@ test('the top item in an empty slot can be equipped by clicking it, and Empty ta
   await openSlot(page, 'Head')
   await page.getByLabel('Head', { exact: true }).locator('option').first().click()
   await closeSlot(page)
-  await expect(slotCell(page, 'Head'), 'choosing Empty takes the item off again').toContainText('Empty')
+  await expect(slotCell(page, 'Head'), 'choosing Empty takes the item off again').toContainText('empty')
 })
 
 test('a section opens at its top, and choosing the section you are in returns to its start', async ({ page }) => {
@@ -12070,7 +12118,8 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
    * question — a programmatic focus would not answer it.
    */
   await openApp(page)
-  await page.getByTestId('restart-creator').focus()
+  await page.getByTestId('character-edit').click()
+  await page.getByTestId('character-edit').focus()
   await page.keyboard.press('Tab')
 
   const focused = await page.evaluate(() => {
@@ -12078,7 +12127,7 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
     const style = getComputedStyle(el)
     return { tag: el.tagName, outline: style.outlineStyle, width: Number.parseFloat(style.outlineWidth) }
   })
-  expect(focused.tag, 'Tab from Start over lands on the Faction select').toBe('SELECT')
+  expect(focused.tag, 'Tab from "Change character" lands on the Faction select').toBe('SELECT')
   expect(focused.outline, 'a keyboard-focused select draws an outline').not.toBe('none')
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
@@ -12223,14 +12272,20 @@ test('the simulator will not score a character nobody made', async ({ page }) =>
   await expect(page.getByTestId('simulation-score')).toHaveCount(0)
 })
 
-test('the gear totals point at the full stat list in words a visitor knows', async ({ page }) => {
+test('the planner points at the rest of the stats in words a visitor knows', async ({ page }) => {
   /*
-   * "The rail carries all twenty-six." stopped five of twelve study participants. "Rail" is this
-   * project's own name for the sidebar, and the count would go stale with the first stat added. The
-   * sidebar's heading is "Stats", so the note points there, and the pointer is checked to be true.
+   * "The rail carries all twenty-six." stopped five of twelve study participants: "rail" is this
+   * project's own name for the sidebar, and the count would go stale with the first stat added.
+   *
+   * The sentence is gone with the sidebar and the second stat block it belonged to. What replaced it
+   * has the same job — say where the other stats are — so it gets the same check: no house jargon,
+   * and the pointer has to be true.
    */
   await openApp(page)
-  await expect(page.locator('.gear-summary-note')).toHaveText('The full list is under Stats.')
-  await expect(page.getByRole('main')).not.toContainText('The rail carries')
-  await expect(page.getByRole('heading', { name: 'Stats', exact: true })).toBeVisible()
+  const toggle = page.getByTestId('stat-bar-toggle')
+  await expect(toggle).toContainText(/^All \d+ stats$/)
+  await expect(page.getByRole('main'), 'nothing calls anything a rail').not.toContainText(/rail/i)
+
+  await toggle.click()
+  await expect(page.getByTestId('stat-strength'), 'and the stats it promised are there').toBeVisible()
 })

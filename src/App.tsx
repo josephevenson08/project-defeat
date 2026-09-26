@@ -9,7 +9,7 @@ import { decodeBuildFromLink, readShareValue } from './domain/builds/shareLink'
 import { ShareNotice, type ShareNoticeState } from './features/builds/ShareNotice'
 import type { SavedBuild } from './domain/builds/buildTypes'
 import { CharacterCreator } from './features/character/CharacterCreator'
-import { CharacterRail } from './features/character/CharacterRail'
+import { CharacterStrip } from './features/character/CharacterStrip'
 import { TalentsPanel } from './features/talents/TalentsPanel'
 import type { TalentPoints } from './domain/talents/talentTypes'
 import { deriveTalentModifiers } from './domain/talents/talentModifiers'
@@ -30,7 +30,7 @@ import { UpgradesPanel } from './features/simulator/UpgradesPanel'
 import type { SimulationResult } from './features/simulator/simulationTypes'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import { calculateStats } from './features/stats/calculateStats'
-import { StatsRail } from './features/stats/StatsRail'
+import { StatBar } from './features/stats/StatBar'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
 import { RaidCompositionPanel } from './features/raidcomp/RaidCompositionPanel'
 import { TierListsPanel } from './features/tierlists/TierListsPanel'
@@ -433,15 +433,18 @@ function App() {
 
   return (
     <AppShell
-      // Stats belong to a character, and only the planner has one in play. A rail of numbers next to
-      // a raid's loot table would be describing something that is not on screen.
+      /*
+       * **The planner no longer has a rail.** It carried the character as four labelled selects, ten
+       * profession toggles and a twenty-six-row stat list — fifteen controls plus a table, permanently
+       * on screen, on a page whose actual job is choosing gear. The owner's heuristic evaluation rated
+       * that density a major problem; the character is now one line at the top of the pane and the
+       * stats are one sticky bar under it.
+       *
+       * Raids keeps its rail, and for the original reason: the rail holds the thing you keep returning
+       * to while reading the main pane, which there is the list of other raids.
+       */
       rail={
-        currentTab === 'planner' ? (
-          <>
-            <CharacterRail character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
-            <StatsRail stats={stats} role={role} className={character.className} spec={character.spec} />
-          </>
-        ) : currentTab === 'raids' && selectedRaidId ? (
+        currentTab === 'raids' && selectedRaidId ? (
           // Same argument as the planner's stat rail: the rail holds the thing you keep returning to
           // while reading the main pane. Here that is the list of other raids.
           <RaidRail selectedRaidId={selectedRaidId} onSelect={setSelectedRaidId} onBackToPicker={() => setSelectedRaidId(undefined)} />
@@ -454,8 +457,9 @@ function App() {
       {shareNoticeBanner}
       {currentTab === 'planner' && (
         <>
-          {/* The character selects live in the rail now — see CharacterRail. This tab is what you
-              are doing, not who you are. */}
+          {/* Who you are, then what that adds up to, then what you are doing about it. */}
+          <CharacterStrip character={character} onChange={updateCharacter} onRestart={() => setCharacterChosen(false)} />
+          <StatBar stats={stats} role={role} className={character.className} spec={character.spec} />
           <TabNav
             tabs={PLANNER_VIEWS}
             activeTab={plannerView}
@@ -464,7 +468,7 @@ function App() {
             className="tab-nav tab-nav-sub"
           />
           {plannerView === 'gear' && (
-            <GearPanel character={character} gear={gear} onChange={updateGear} stats={stats} role={role} />
+            <GearPanel character={character} gear={gear} onChange={updateGear} />
           )}
           {plannerView === 'compare' && (
             <ComparePanel
@@ -508,7 +512,13 @@ function App() {
       {currentTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
       {currentTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
-      {currentTab === 'professions' && <ProfessionsPanel key={sectionVisit} />}
+      {currentTab === 'professions' && (
+        <ProfessionsPanel
+          key={sectionVisit}
+          character={characterChosen ? character : undefined}
+          onChangeCharacter={updateCharacter}
+        />
+      )}
     </AppShell>
   )
 }

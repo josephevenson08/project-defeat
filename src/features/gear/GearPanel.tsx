@@ -9,22 +9,11 @@ import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes
 import { ItemIcon } from './ItemIcon'
 import { ItemPopup } from './ItemPopup'
 import { slotGlyph } from './slotGlyphs'
-import { GearStatSummary } from './GearStatSummary'
-import type { StatBlock } from '../../domain/stats/statTypes'
-import type { CharacterRole } from '../../domain/character/characterTypes'
 
 type GearPanelProps = {
   character: CharacterProfile
   gear: EquippedGear
   onChange: (slot: GearSlot, equippedSlot: EquippedSlot) => void
-  /**
-   * The same totals the rail shows, computed once in `App` and passed down.
-   *
-   * Passed rather than recomputed here: `calculateStats` already runs for the rail on every gear
-   * change, and a second call would be a second answer to keep in agreement with the first.
-   */
-  stats: StatBlock
-  role: CharacterRole
 }
 
 /**
@@ -39,69 +28,42 @@ type GearPanelProps = {
  * per spec, so a Rogue's Relic and a Druid's Ranged simply do not render.
  */
 /**
- * Where each slot sits on the body.
+ * The order the slots are listed in: down the body, then the weapons.
  *
- * **This replaced two flat columns, and the arrangement is the label.** The old layout listed Head
- * through Wrists down the left and Hands through Trinket 2 down the right, which is how WoWSims does
- * it — but it means finding your boots is reading fourteen slot names, because nothing about a
- * slot's position tells you what it is. The game's own character sheet does not work that way, and
- * neither does anyone's mental model of armour.
+ * **This replaced a paperdoll, and the trade is worth stating.** The slots used to be arranged on a
+ * grid shaped like a body — head at the top centre, feet at the bottom centre, armour down either
+ * side — so you found the boots by looking where boots go, and the arrangement did the work of a
+ * label. That is genuinely better at *finding a slot*.
  *
- * So: head at the top centre, feet at the bottom centre, and the body slots down either side in
- * roughly the order you would meet them going down a person. You find the boots by looking where
- * boots go.
+ * It is worse at everything else this screen does. Seventeen cards three lines tall, each reading
+ * "Empty / No enchant" on a character that has just been created, is what the owner's heuristic
+ * evaluation rated a major density problem: fifty-one lines of nothing arranged as a person. A list
+ * is one line per slot, so the same screen is readable when it is empty and scannable when it is
+ * full, and the item names — which is what you actually read once there are any — line up in a
+ * column instead of being scattered around a silhouette.
  *
- * The names are CSS grid areas, which is what makes the layout declarative rather than a stack of
- * columns that have to be kept balanced by hand. A slot a spec cannot use is simply not rendered and
- * its area stays empty — no reflow, no re-balancing, and the rest of the body stays where it was.
+ * The order still follows the body, so the spatial habit is not thrown away entirely.
  */
-const SLOT_AREA: Partial<Record<GearSlot, string>> = {
-  Head: 'head',
-  Shoulders: 'shoulders',
-  Chest: 'chest',
-  Wrists: 'wrists',
-  Waist: 'waist',
-  Legs: 'legs',
-  Neck: 'neck',
-  Back: 'back',
-  Hands: 'hands',
-  'Finger 1': 'f1',
-  'Finger 2': 'f2',
-  Feet: 'feet',
-  'Trinket 1': 't1',
-  'Trinket 2': 't2',
-  Relic: 'relic',
-  'Main Hand': 'mh',
-  'Off Hand': 'oh',
-  Ranged: 'rg',
-}
-
-/**
- * Which side of the body a slot sits on.
- *
- * Only used for presentation: the right-hand slots are mirrored so their glyphs sit on the outside
- * edge pointing in at the figure, and the equipped item's quality hairline moves to whichever edge
- * is outermost. That was keyed off two wrapper elements before the paperdoll became a single grid,
- * and the mirroring is worth keeping — it is what makes the two sides read as flanking something
- * rather than as two lists.
- *
- * A visual reversal only. DOM order is unchanged, so tab order and screen-reader order still run
- * top to bottom down the body.
- */
-const SLOT_SIDE: Partial<Record<GearSlot, 'left' | 'right'>> = {
-  Shoulders: 'left',
-  Chest: 'left',
-  Wrists: 'left',
-  Waist: 'left',
-  Legs: 'left',
-  Neck: 'right',
-  Back: 'right',
-  Hands: 'right',
-  'Finger 1': 'right',
-  'Finger 2': 'right',
-}
-
-const PAPERDOLL_SLOTS: readonly GearSlot[] = Object.keys(SLOT_AREA) as GearSlot[]
+const SLOT_ORDER: readonly GearSlot[] = [
+  'Head',
+  'Neck',
+  'Shoulders',
+  'Back',
+  'Chest',
+  'Wrists',
+  'Hands',
+  'Waist',
+  'Legs',
+  'Feet',
+  'Finger 1',
+  'Finger 2',
+  'Trinket 1',
+  'Trinket 2',
+  'Main Hand',
+  'Off Hand',
+  'Ranged',
+  'Relic',
+]
 
 /**
  * The equipped-gear list, laid out like the WoWSims gear panel the user pointed at: two columns of
@@ -111,7 +73,7 @@ const PAPERDOLL_SLOTS: readonly GearSlot[] = Object.keys(SLOT_AREA) as GearSlot[
  * Nothing here edits in place. Clicking a slot opens `ItemPopup`, so the list keeps its height and
  * stays scannable no matter what is being changed.
  */
-export function GearPanel({ character, gear, onChange, stats, role }: GearPanelProps) {
+export function GearPanel({ character, gear, onChange }: GearPanelProps) {
   const [openSlot, setOpenSlot] = useState<GearSlot>()
 
   function updateItem(slot: GearSlot, item: GearItem) {
@@ -123,7 +85,7 @@ export function GearPanel({ character, gear, onChange, stats, role }: GearPanelP
   const activeSets = useMemo(() => getActiveSets(Object.values(gear).map((slot) => slot.item)), [gear])
 
   /** Slots this spec actually wears — Rogues have no Relic, Druids no Ranged, and so on. */
-  const visible = (slot: GearSlot) => slots.includes(slot)
+  const shown = SLOT_ORDER.filter((slot) => slots.includes(slot))
 
   function renderSlot(slot: GearSlot) {
     const equipped = gear[slot]
@@ -134,49 +96,33 @@ export function GearPanel({ character, gear, onChange, stats, role }: GearPanelP
     const isValid = isEmptySlotItem(equipped.item) || options.some((option) => option.id === equipped.item.id)
     const enchant = equipped.enchantId ? getEnchantById(equipped.enchantId) : undefined
 
+    const empty = isEmptySlotItem(equipped.item)
+
     return (
-      <button
-        type="button"
-        className="gear-cell"
-        key={slot}
-        data-side={SLOT_SIDE[slot]}
-        aria-label={`${displayName} slot`}
-        onClick={() => setOpenSlot(slot)}
-        /*
-         * Two things in one style object, and they have to be one: JSX takes the *last* `style` prop
-         * and silently drops any earlier one. This was two props for one render cycle and the grid
-         * placement vanished without a type error or a lint warning — `react/jsx-no-duplicate-props`
-         * is switched on now so the next one fails the build instead of the layout.
-         *
-         * `gridArea` puts the slot where that body part is. `--slot-quality` is the equipped item's
-         * quality as a hairline down the slot's outer edge: quality is already the one colour this
-         * interface lets carry meaning, and repeating it on the frame means which slots hold epics is
-         * answerable without reading a name.
-         */
-        style={
-          {
-            gridArea: SLOT_AREA[slot],
-            '--slot-quality': getQualityColor(equipped.item.quality),
-          } as React.CSSProperties
-        }
-      >
-        <span className="gear-glyph" aria-hidden="true">
+      <button type="button" className="gear-row" key={slot} aria-label={`${displayName} slot`} onClick={() => setOpenSlot(slot)}>
+        <span className="gear-row-icon" aria-hidden="true">
           <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
-          {equipped.item.itemLevel ? <span className="gear-ilvl">{equipped.item.itemLevel}</span> : null}
         </span>
 
-        <span className="gear-cell-text">
-          <span className="gear-slot-name">{displayName}</span>
-          <span className="gear-item-name" style={{ color: getQualityColor(equipped.item.quality) }}>
-            {equipped.item.name}
-          </span>
-          {enchant ? <span className="gear-enchant">{enchant.name}</span> : <span className="gear-enchant gear-enchant-empty">No enchant</span>}
-          {/*
-            Sockets sit under the name rather than on top of the icon. They used to be 7px dots
-            overlaying the artwork, where they competed with it and were too small to read a colour
-            from — which is the whole job of a socket dot. Off the icon they can be twice the size
-            and still cost less attention.
-          */}
+        <span className="gear-row-slot">{displayName}</span>
+
+        {/*
+          Quality is the one colour this interface lets carry meaning, so it goes on the name and
+          nowhere else. The cell used to repeat it as a hairline down the card's outer edge; a list
+          has no outer edge to spare, and one signal for one fact is the rule this layout follows.
+        */}
+        <span
+          className={`gear-row-item${empty ? ' gear-row-empty' : ''}`}
+          style={empty ? undefined : { color: getQualityColor(equipped.item.quality) }}
+        >
+          {empty ? 'empty' : equipped.item.name}
+        </span>
+
+        <span className="gear-row-trail">
+          {/* "No enchant" is not printed. An empty slot said it seventeen times over on a new
+              character, which is the noise this list was made to remove; what is *there* is worth a
+              line, what is missing is not. */}
+          {enchant ? <span className="gear-row-enchant">{enchant.name}</span> : null}
           {equipped.item.sockets?.length ? (
             <span className="gear-gems" aria-hidden="true">
               {equipped.item.sockets.map((socket, index) => (
@@ -194,24 +140,16 @@ export function GearPanel({ character, gear, onChange, stats, role }: GearPanelP
   }
 
   return (
+    /*
+      No heading of its own. The section tab above already says Gear, and the character strip names
+      whose gear it is — a third "Gear" in the same column is a heading spent on something nobody was
+      going to ask.
+    */
     <section className="panel gear-panel" aria-label="Gear">
-      <header className="panel-head">
-        <p className="eyebrow">Equipped</p>
-        <h2>Gear</h2>
-      </header>
-
-      <div className="gear-paperdoll">
-        {/*
-          **The middle of the body holds the totals, not a drawing.**
-
-          A silhouette was here first and it did one useful thing — it made the arrangement read as a
-          body rather than as three uneven columns. But the job on this page is moving a number, and
-          the number was in the rail on the other side of the screen. Six totals between the two
-          columns of slots puts the effect of a swap next to its cause, which is worth more than the
-          picture was. The anatomy still reads: head is still at the top, feet still at the bottom.
-        */}
-        <GearStatSummary stats={stats} role={role} className={character.className} spec={character.spec} />
-        {PAPERDOLL_SLOTS.filter(visible).map(renderSlot)}
+      {/* The row count is the panel's to know: a spec wears 16, 17 or 18 slots, and the two-column
+          layout needs half of *this* character's list, not a constant that is wrong for two of them. */}
+      <div className="gear-list" style={{ '--gear-rows': Math.ceil(shown.length / 2) } as React.CSSProperties}>
+        {shown.map(renderSlot)}
       </div>
 
       <SetBonuses activeSets={activeSets} />

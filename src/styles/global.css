@@ -1178,6 +1178,395 @@ select {
   margin: 0;
 }
 
+/*
+ * ── The planner landing ───────────────────────────────────────────────────────
+ *
+ * Who you are, what that adds up to, then what you are doing about it — three bands down the top of
+ * the pane, replacing a left rail that carried all three at once. See `CharacterStrip` and `StatBar`
+ * for why, and `HEURISTIC-EVALUATION.md` finding 3 for who asked.
+ */
+.character-strip {
+  border-bottom: 1px solid var(--line);
+  /* A band across the pane, not a cell: `.content` is a two-column auto-fit grid. */
+  grid-column: 1 / -1;
+  padding: 4px 0 14px;
+}
+
+.character-strip-line {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.character-strip-name {
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: 21px;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+/* The role's colour, on the one word-sized mark that can carry it without becoming decoration. */
+.character-strip-name::before {
+  background: var(--strip-accent);
+  border-radius: 1px;
+  content: '';
+  display: inline-block;
+  height: 14px;
+  margin-right: 10px;
+  vertical-align: -1px;
+  width: 3px;
+}
+
+.character-strip-meta {
+  color: var(--text-faint);
+  font-size: 13.5px;
+  margin: 0;
+  margin-right: auto;
+}
+
+.character-strip-edit,
+.character-strip-restart {
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--line-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  min-height: 44px;
+  padding: 0 0 1px;
+}
+
+.character-strip-edit:hover,
+.character-strip-restart:hover {
+  color: var(--text);
+}
+
+/* Four selects in a row, not a column: they are one decision reviewed, not a form to work down. */
+.character-strip-fields {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding-top: 14px;
+}
+
+.character-strip-fields .field {
+  min-width: 132px;
+}
+
+/*
+ * The stat bar. Sticky, because the reason the rail existed at all was that totals must stay on
+ * screen while you change gear — that argument survived the rail it was made for.
+ */
+.stat-bar {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--line);
+  grid-column: 1 / -1;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.stat-bar-line {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  padding: 11px 0 10px;
+}
+
+.stat-bar-title {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stat-inline {
+  align-items: baseline;
+  display: flex;
+  gap: 7px;
+}
+
+.stat-inline .stat-label {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stat-inline .stat-value {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-bar-toggle {
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--line-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  margin-left: auto;
+  min-height: 44px;
+  padding: 0 0 1px;
+}
+
+.stat-bar-toggle:hover {
+  color: var(--text);
+}
+
+.stat-bar-table {
+  display: grid;
+  gap: 4px 28px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  padding: 0 0 16px;
+}
+
+.stat-group-title {
+  color: var(--metal-edge);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  margin: 8px 0 5px;
+  text-transform: uppercase;
+}
+
+.stat-row {
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.stat-row .stat-label {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.stat-row .stat-value {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-zero .stat-label,
+.stat-zero .stat-value {
+  color: var(--text-faint);
+}
+
+.stat-show-all {
+  background: none;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: 44px;
+  padding: 10px 0 0;
+  text-decoration: underline dotted;
+}
+
+.stat-show-all:hover {
+  color: var(--text);
+}
+
+/*
+ * The gear list: one line per slot, one hairline between them.
+ *
+ * Deliberately not cards. Seventeen bordered boxes inside a bordered panel inside the frame was three
+ * levels of enclosure for a list — and the middle level was carrying no information the row itself
+ * did not already state.
+ */
+.gear-list {
+  border-top: 1px solid var(--line);
+}
+
+/*
+ * Two columns once there is room, filled top-to-bottom rather than left-to-right.
+ *
+ * One column of seventeen rows is 1,174px of page where the paperdoll was 980 — a list that reads
+ * better per row but needs a scroll to see the character. `grid-auto-flow: column` against a row
+ * count the panel measures keeps the reading order running down the body, so the second column
+ * continues the first instead of interleaving with it. DOM order is untouched either way.
+ */
+@media (min-width: 1000px) {
+  .gear-list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(var(--gear-rows, 9), auto);
+    column-gap: 28px;
+  }
+}
+
+.gear-row {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font-family: var(--font-sans);
+  gap: 14px;
+  grid-template-columns: 26px 96px minmax(0, 1fr) auto;
+  min-height: 44px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.gear-row:hover,
+.gear-row:focus-visible {
+  background: var(--surface-2);
+}
+
+.gear-row-icon {
+  align-items: center;
+  display: flex;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.gear-row-icon .item-icon {
+  border: 1px solid var(--line);
+  height: 26px;
+  width: 26px;
+}
+
+.gear-row-icon .item-icon-fallback {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.gear-row-slot {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.gear-row-item {
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gear-row-empty {
+  color: #5f666b;
+  font-style: italic;
+}
+
+/* The one warning a row can carry: an item the current spec cannot use. */
+.stale-slot-warning {
+  color: var(--warn);
+}
+
+.gear-row-trail {
+  align-items: center;
+  color: var(--text-faint);
+  display: flex;
+  font-size: 12px;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Under 700px the slot label moves above the item name: one column cannot hold four. */
+@media (max-width: 700px) {
+  .gear-row {
+    grid-template-columns: 26px minmax(0, 1fr);
+    row-gap: 2px;
+  }
+
+  .gear-row-slot,
+  .gear-row-item,
+  .gear-row-trail {
+    grid-column: 2;
+  }
+
+  .gear-row-trail {
+    justify-content: flex-start;
+  }
+}
+
+/* The professions picker, now on the Professions tab next to the guides that explain it. */
+.profession-picker {
+  border: 1px solid var(--line);
+  margin: 0 0 22px;
+  padding: 14px 16px 16px;
+}
+
+.profession-picker-head {
+  align-items: baseline;
+  color: var(--metal-edge);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  gap: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.profession-picker-head em {
+  color: var(--text-faint);
+  font-style: normal;
+  letter-spacing: 0.08em;
+}
+
+.profession-picker-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0 0;
+}
+
+.profession-toggle {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  min-height: 44px;
+  padding: 8px 14px;
+}
+
+.profession-toggle:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.profession-toggle-on {
+  border-color: var(--metal-2);
+  color: var(--accent-2);
+}
+
+.profession-picker-note {
+  color: var(--text-faint);
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin: 14px 0 0;
+  max-width: 62ch;
+}
+
 /* Two columns of slots, as in the WoWSims gear panel this is modelled on. */
 /*
  * The paperdoll: armour down the left, everything else down the right, weapons across the bottom —
@@ -1868,33 +2257,22 @@ select {
   max-width: 72ch;
 }
 
-.form-grid,
-.gear-list {
+.form-grid {
   display: grid;
   gap: 14px;
 }
 
-.field,
-.gear-row {
+.field {
   display: grid;
   gap: 7px;
 }
 
-.gear-row {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 12px;
-}
-
-.gear-row label,
 .socket-list label {
   display: grid;
   gap: 7px;
 }
 
 .field span,
-.gear-row span,
 .socket-list span {
   color: var(--text);
   font-size: 13px;
@@ -1907,7 +2285,9 @@ select {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   color: var(--text);
-  min-height: 42px;
+  /* 44, not 42: every other control in this app asks for a 44px tap target, and the two selects that
+     used to fall short were inside a rail whose own rule topped them up. There is no rail. */
+  min-height: 44px;
   outline: none;
   padding: 0 12px;
 }
@@ -1943,8 +2323,7 @@ select:focus-visible {
   margin-top: 4px;
 }
 
-.summary-card p,
-.gear-row small {
+.summary-card p {
   color: var(--text-dim);
   margin: 0;
 }
@@ -1995,10 +2374,6 @@ select:focus-visible {
 .needs-verification {
   color: var(--warn);
   display: block;
-}
-
-.gear-row .stale-slot-warning {
-  color: var(--warn);
 }
 
 .bis-crafting-details dd {
