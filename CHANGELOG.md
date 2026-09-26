@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**411 commits across 59 days**, from 2026-06-25 to 2026-09-26.
+**415 commits across 59 days**, from 2026-06-25 to 2026-09-26.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,11 +13,15 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_112 commits_
+_116 commits_
 
-### Saturday 26 September — 1 commit
+### Saturday 26 September — 5 commits
 
 - Let a keyboard reach the navigation, and say when the screen changes — [`8da14bd`](https://github.com/josephevenson08/project-defeat/commit/8da14bd55bdd16b7d1ab10098ed7b874461b36d8)
+- Rebuild the planner landing around what it is for — [`7b9a2e2`](https://github.com/josephevenson08/project-defeat/commit/7b9a2e23417fa19653cd88db371a753bbf391c2c)
+- Give the empty planner one thing to do — [`d1eec04`](https://github.com/josephevenson08/project-defeat/commit/d1eec046faf48c39835e65d7e4ce0652912380af)
+- Put the slot you are editing beside the list, not over it — [`9502165`](https://github.com/josephevenson08/project-defeat/commit/9502165f2a8b8c28ef094e63de39896d802359f2)
+- Say what you are choosing between, and sweep up after the rail — [`bf80f80`](https://github.com/josephevenson08/project-defeat/commit/bf80f8010a4e6fcc86e0620dc44381784fc31ff5)
 
 ### Friday 25 September — 1 commit
 
