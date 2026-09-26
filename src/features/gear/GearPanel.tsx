@@ -6,6 +6,7 @@ import type { CharacterProfile } from '../character/characterTypes'
 import { SetBonuses } from './SetBonuses'
 import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isEmptySlotItem, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
+import type { RecommendedSet } from './equipRecommendedSet'
 import { ItemIcon } from './ItemIcon'
 import { ItemPopup } from './ItemPopup'
 import { slotGlyph } from './slotGlyphs'
@@ -14,6 +15,8 @@ type GearPanelProps = {
   character: CharacterProfile
   gear: EquippedGear
   onChange: (slot: GearSlot, equippedSlot: EquippedSlot) => void
+  /** Fills every slot from this spec's ranked list; see `equipRecommendedSet`. */
+  onEquipRecommended: () => RecommendedSet | undefined
 }
 
 /**
@@ -73,8 +76,14 @@ const SLOT_ORDER: readonly GearSlot[] = [
  * Nothing here edits in place. Clicking a slot opens `ItemPopup`, so the list keeps its height and
  * stays scannable no matter what is being changed.
  */
-export function GearPanel({ character, gear, onChange }: GearPanelProps) {
+export function GearPanel({ character, gear, onChange, onEquipRecommended }: GearPanelProps) {
   const [openSlot, setOpenSlot] = useState<GearSlot>()
+  /*
+   * What the last press of "Equip the recommended set" managed, kept so the panel can say when the
+   * list came up short. Cleared when the set is emptied again, because a report about a set that is
+   * no longer on the character is worse than none.
+   */
+  const [lastEquip, setLastEquip] = useState<RecommendedSet>()
 
   function updateItem(slot: GearSlot, item: GearItem) {
     if (isItemBlockedByUniqueInGear(item, slot, gear)) return
@@ -86,6 +95,7 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
 
   /** Slots this spec actually wears — Rogues have no Relic, Druids no Ranged, and so on. */
   const shown = SLOT_ORDER.filter((slot) => slots.includes(slot))
+  const nothingEquipped = shown.every((slot) => isEmptySlotItem(gear[slot].item))
 
   function renderSlot(slot: GearSlot) {
     const equipped = gear[slot]
@@ -146,6 +156,41 @@ export function GearPanel({ character, gear, onChange }: GearPanelProps) {
       going to ask.
     */
     <section className="panel gear-panel" aria-label="Gear">
+      {/*
+        **One thing to do on a screen that has nothing on it yet.**
+
+        Five participants in the usability study ran the simulator on a character wearing nothing,
+        and the owner's evaluation asked the same question at the gear popup: "how do I know what
+        item to select". Seventeen empty rows do not answer it. The ranked list for the spec does,
+        and equipping it is one press — after which this block is gone and the screen is the list.
+      */}
+      {nothingEquipped && (
+        <div className="gear-empty" data-testid="gear-empty">
+          <h3>Nothing equipped yet</h3>
+          <p>Start from the Phase 2 list for {character.spec} {character.className}, then change whatever you like.</p>
+          <button
+            type="button"
+            className="gear-empty-action"
+            data-testid="equip-recommended"
+            onClick={() => setLastEquip(onEquipRecommended())}
+          >
+            Equip the recommended set
+          </button>
+          <p className="gear-empty-alt">or pick a slot below and choose for yourself</p>
+        </div>
+      )}
+
+      {/*
+        Said plainly when the list could not fill something, rather than leaving a gap to be noticed
+        later: an item that has left the catalogue, or a second copy of something unique-equipped.
+      */}
+      {!nothingEquipped && lastEquip && lastEquip.skipped.length > 0 && (
+        <p className="gear-equip-note" data-testid="equip-report">
+          Equipped {lastEquip.filled} slots. {lastEquip.skipped.join(', ')} {lastEquip.skipped.length === 1 ? 'was' : 'were'} left
+          empty — the list names something this catalogue cannot give you twice, or at all.
+        </p>
+      )}
+
       {/* The row count is the panel's to know: a spec wears 16, 17 or 18 slots, and the two-column
           layout needs half of *this* character's list, not a constant that is wrong for two of them. */}
       <div className="gear-list" style={{ '--gear-rows': Math.ceil(shown.length / 2) } as React.CSSProperties}>

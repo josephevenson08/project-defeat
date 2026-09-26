@@ -11297,7 +11297,7 @@ test('the shell collapses to one column on a phone, and nothing lands past the v
   expect(await horizontalOverflow(page), 'Professions fits its viewport').toBe(0)
 })
 
-test('on a phone the gear list still starts on the first screen', async ({ page }) => {
+test('on a phone the first screen carries the offer, then the gear', async ({ page }) => {
   await page.setViewportSize(PHONE)
   await openApp(page)
 
@@ -11312,21 +11312,34 @@ test('on a phone the gear list still starts on the first screen', async ({ page 
    * one. A floor rather than a point, so spacing can be tuned — but high enough that a block the size
    * of the old profession picker landing back on this screen fails here.
    */
-  const measured = await page.evaluate(() => {
-    const list = document.querySelector('.gear-list')
-    if (!list) throw new Error('no gear list')
-    return {
-      listStartsAt: Math.round(list.getBoundingClientRect().y + window.scrollY),
-      viewportHeight: window.innerHeight,
-      scrolled: window.scrollY,
-    }
-  })
+  const topOf = (selector: string) =>
+    page.evaluate((sel) => {
+      const el = document.querySelector(sel)
+      if (!el) throw new Error(`no ${sel}`)
+      return { y: Math.round(el.getBoundingClientRect().y + window.scrollY), viewport: window.innerHeight, scrolled: window.scrollY }
+    }, selector)
 
-  expect(measured.scrolled, 'the planner opens at the top').toBe(0)
-  const visible = measured.viewportHeight - measured.listStartsAt
+  /*
+   * **While the planner is empty, the thing you came for is the offer, not the list.** Seventeen rows
+   * reading "empty" are not worth a screen; the button that fills them is, so that is what has to be
+   * reachable without a swipe. Checked at its bottom edge, because a button half off the screen is
+   * not on it.
+   */
+  const button = await page.evaluate(() => {
+    const el = document.querySelector('[data-testid="equip-recommended"]')
+    if (!el) throw new Error('no offer')
+    return Math.round(el.getBoundingClientRect().bottom)
+  })
+  const empty = await topOf('.gear-empty')
+  expect(empty.scrolled, 'the planner opens at the top').toBe(0)
+  expect(button, `the offer is pressable without scrolling (bottom at ${button})`).toBeLessThanOrEqual(empty.viewport)
+
+  // And once it has been taken, the list is what has to be on the first screen.
+  await page.getByTestId('equip-recommended').click()
+  const list = await topOf('.gear-list')
   expect(
-    visible,
-    `the gear you came for shows at least 120px on the first screen (starts at ${measured.listStartsAt})`,
+    list.viewport - list.y,
+    `the gear shows at least 120px on the first screen (starts at ${list.y})`,
   ).toBeGreaterThanOrEqual(120)
 })
 
@@ -12130,6 +12143,62 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.tag, 'Tab from "Change character" lands on the Faction select').toBe('SELECT')
   expect(focused.outline, 'a keyboard-focused select draws an outline').not.toBe('none')
   expect(focused.width).toBeGreaterThanOrEqual(2)
+})
+
+test('an empty planner offers to fill itself, and the offer goes once taken', async ({ page }) => {
+  /*
+   * The owner's heuristic evaluation asked, at the gear popup, "how do I know what item to select".
+   * Seventeen empty rows do not answer it, and two participants in the usability study asked for
+   * "equip this whole list" by name. This is that, on the screen where the question is asked.
+   */
+  await openApp(page)
+
+  const offer = page.getByTestId('gear-empty')
+  await expect(offer).toBeVisible()
+  await expect(offer, 'it names the list it would use').toContainText('Fury Warrior')
+
+  await page.getByTestId('equip-recommended').click()
+
+  await expect(offer, 'and is gone once the screen has something on it').toHaveCount(0)
+  await expect(slotCell(page, 'Head')).toContainText('Destroyer Battle-Helm')
+  // The enchant the ranked list recommends comes with the item, exactly as the per-item Equip button
+  // on Ranked Gear applies it.
+  await expect(slotCell(page, 'Head')).toContainText('Glyph of Ferocity')
+  await expect(await railStat(page, 'attack-power'), 'the totals move with it').not.toHaveText('480')
+})
+
+test('a recommended set fills both rings and both trinkets, not just the first of each', async ({ page }) => {
+  /*
+   * **Rings and trinkets are named once and worn twice.** A ranked list gives "Finger 1" a rank 1 and
+   * a rank 2; both are rings, and the second hand takes the second ring. Keying the set off the slot
+   * as written left Finger 2 and Trinket 2 empty with nothing on screen saying why, which reads as
+   * the button half working.
+   */
+  await openApp(page)
+  await page.getByTestId('equip-recommended').click()
+
+  const names = await page.locator('.gear-row-item').allInnerTexts()
+  expect(names.filter((name) => name === 'empty'), 'every slot the list names is filled').toEqual([])
+
+  const finger1 = await slotCell(page, 'Finger 1').locator('.gear-row-item').innerText()
+  const finger2 = await slotCell(page, 'Finger 2').locator('.gear-row-item').innerText()
+  expect(finger2, 'the second hand takes the next ring down, not the same one').not.toBe(finger1)
+
+  const trinket1 = await slotCell(page, 'Trinket 1').locator('.gear-row-item').innerText()
+  const trinket2 = await slotCell(page, 'Trinket 2').locator('.gear-row-item').innerText()
+  expect(trinket2).not.toBe(trinket1)
+})
+
+test('a recommended set cannot hand you an enchant your character may not wear', async ({ page }) => {
+  // The list recommends ring enchants, which only an Enchanter may wear. Equipping a whole set is no
+  // more allowed to apply one than choosing the enchant by hand is.
+  await openApp(page)
+  await page.getByTestId('equip-recommended').click()
+
+  await expect(slotCell(page, 'Finger 1'), 'no ring enchant without Enchanting').not.toContainText('Ring - Stats')
+  await openSlot(page, 'Finger 1')
+  await expect(page.getByTestId('popup-enchant-locked')).toContainText(/Enchanting/)
+  await closeSlot(page)
 })
 
 test('a keyboard reaches the section tabs without walking the rail', async ({ page }) => {

@@ -18,6 +18,7 @@ import type { CharacterProfile } from './features/character/characterTypes'
 import { applyWeaponSlotRules, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { dropIllegalEnchants } from './domain/enchants/sampleEnchants'
 import { ComparePanel } from './features/gear/ComparePanel'
+import { buildRecommendedSet } from './features/gear/equipRecommendedSet'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
 import { calculateSimulation } from './features/simulator/calculateSimulation'
@@ -336,6 +337,21 @@ function App() {
     setSimulationResult(undefined)
   }
 
+  /**
+   * Fills every slot from the spec's ranked list, in one press.
+   *
+   * Enchants are re-examined on the way in for the same reason a character change does it: the list
+   * recommends ring enchants that only an Enchanter may wear, and equipping a set is no more allowed
+   * to apply one than picking an item by hand is.
+   */
+  function equipRecommendedSet() {
+    const recommended = buildRecommendedSet(character, gear)
+    if (!recommended) return undefined
+    setGear(dropIllegalEnchants(recommended.gear, character))
+    setSimulationResult(undefined)
+    return recommended
+  }
+
   function updateCharacter(nextCharacter: CharacterProfile) {
     // Talents belong to a class. Keeping them across a class change would leave points sitting on
     // talent ids that the new class's trees do not contain.
@@ -468,7 +484,7 @@ function App() {
             className="tab-nav tab-nav-sub"
           />
           {plannerView === 'gear' && (
-            <GearPanel character={character} gear={gear} onChange={updateGear} />
+            <GearPanel character={character} gear={gear} onChange={updateGear} onEquipRecommended={equipRecommendedSet} />
           )}
           {plannerView === 'compare' && (
             <ComparePanel
