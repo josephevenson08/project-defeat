@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useScreenFocus } from '../../lib/useScreenFocus'
 import { getClassColor } from '../../domain/character/classColors'
 import { getFactionColor } from '../../domain/character/factionColors'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
@@ -64,6 +65,9 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
     }
   }, [draft.faction, committedFaction])
 
+  const screenRef = useRef<HTMLDivElement>(null)
+  useScreenFocus(screenRef)
+
   const step = STEPS[stepIndex]
   const isLast = stepIndex === STEPS.length - 1
   const accent = getRoleAccentColor(getRoleForSpec(draft.className, draft.spec))
@@ -127,7 +131,15 @@ export function CharacterCreator({ initial, onComplete, onCancel }: CharacterCre
             }))
 
   return (
-    <div className="creator" style={{ '--creator-accent': accent } as React.CSSProperties} data-testid="character-creator">
+    <div
+      className="creator"
+      style={{ '--creator-accent': accent } as React.CSSProperties}
+      data-testid="character-creator"
+      // Creation replaces the whole screen, so focus has to come with it: the keyboard-only
+      // participant in the usability study opened it and found focus on the page body.
+      ref={screenRef}
+      tabIndex={-1}
+    >
       <div className="creator-inner">
         <ol className="creator-progress" aria-label="Character creation steps">
           {STEPS.map((entry, index) => (

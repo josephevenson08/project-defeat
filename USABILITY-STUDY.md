@@ -235,8 +235,20 @@ the popup does not offer today.
 
 ### 3. Keyboard users cannot get to the tabs they came for · high (access)
 
-> **Partly fixed 2026-09-22.** Keyboard focus on a select now draws a 2px outline in the faction
-> accent. The rail-before-tabs order and focus on navigation are still open.
+> **Fixed 2026-09-26**, after the selects got their focus ring on 2026-09-22.
+>
+> - **"Skip to the main content"** is the first element in the shell, off-screen until focused. From
+>   the top of the document it is the first Tab stop, and following it lands on the main pane — so the
+>   next press is a section tab instead of the first of twenty-odd rail controls.
+> - **Focus follows a screen swap.** The front page handing over to the shell, the shell to character
+>   creation, and creation back to the shell each move focus into the screen that arrived. Tab changes
+>   deliberately do not: the strip stays mounted, so the button that was pressed keeps focus.
+> - Both are guarded by tests driven with real key presses, and both tests were confirmed to fail
+>   without the change.
+>
+> Still open, and smaller: **closing a gear popup drops focus to the top of the document** rather than
+> returning it to the slot that opened it. The skip link means that costs one press rather than a walk
+> through the rail, but the dialog pattern is to put focus back where it came from.
 
 **Sam (keyboard only, [P06](usability-study/participants/P06.md)) and Ines (screen reader,
 [P07](usability-study/participants/P07.md)).** Verified in the recording, and the focus ring by eye

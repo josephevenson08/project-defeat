@@ -597,3 +597,32 @@ figure, so it also drew the spec note's heading and every DPS figure in the dama
 outranking the rules those elements had of their own. One of them survived only by sitting later in the
 file. **A style meant for one element gets a selector that can only match that element** — `> strong`,
 here — because the failure is silent and looks like someone else's bug.
+
+## Focus is a separate question from scroll, and a swap is a separate question from a tab change
+
+Recorded 2026-09-26, fixing the study's one outright access failure.
+
+Moving focus into a screen when the app swaps one for another needed three distinctions that each looked
+like a detail and each decided whether the fix worked.
+
+**`focus()` scrolls its target into view, and that is not what was being asked for.** On a phone the main
+pane starts below the rail, so focusing it after character creation scrolled the page 385px down and put
+the rail's own heading and its "Start over" link off the top. The existing 44px tap-target test caught
+it. `focus({ preventScroll: true })`: where the page should sit is already decided in one place, in
+`App`, which scrolls to the top on every section change. Two things deciding the scroll position means
+neither of them is in charge.
+
+**Move focus on a screen swap, never on a tab change.** The test is whether the control that was pressed
+still exists afterwards. A swap destroys it, so focus falls to the body and a screen reader says nothing;
+a tab change keeps the strip mounted, so the pressed button keeps focus, and dragging focus into the
+panel would cost a keyboard user their place in the strip. The flag that tells a swap from a first paint
+lives at module scope rather than in state, because the screens are different components mounting one
+after another and no component can hold the answer.
+
+**`blur()` does not move the sequential focus navigation starting point.** The first version of the skip
+link test blurred the active element and pressed Tab, expecting the top of the document; Chromium
+continued from where focus had been and landed in the tab strip. The starting point *does* reset when the
+focused element is removed from the DOM — which is what happens when a gear popup closes and takes its
+Close button with it, and that is the real path a user takes to the top of the document, so the test
+takes it too. A test that has to synthesise the state it asserts on is usually asserting on a state the
+app cannot reach.

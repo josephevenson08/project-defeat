@@ -12083,6 +12083,82 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
 
+test('a keyboard reaches the section tabs without walking the rail', async ({ page }) => {
+  /*
+   * The rail comes before the section tabs in the source: four selects, ten profession toggles, the
+   * stat list and a "show more". The keyboard-only participant in the 2026-09-21 usability study spent
+   * his entire 40-action budget inside it and never reached the Talents tab he came for.
+   *
+   * Driven with real key presses, because a skip link is only worth anything to the keyboard.
+   */
+  await openApp(page)
+
+  const plannerTab = page
+    .getByRole('navigation', { name: 'Main sections' })
+    .getByRole('button', { name: 'Character Planner', exact: true })
+
+  // Arriving in the shell now leaves focus in the main pane, so the tabs are one press away instead
+  // of twenty-odd rail controls away.
+  await page.keyboard.press('Tab')
+  await expect(plannerTab, 'the first press after arriving is a section tab').toBeFocused()
+
+  /*
+   * And when the browser throws focus back to the top of the document — which it does whenever the
+   * element holding focus is removed, as closing a gear popup removes the Close button that has it —
+   * the first stop is the skip link, not the top of the rail. Before this, that press landed on "Start
+   * over" and the walk began again.
+   */
+  await openSlot(page, 'Head')
+  await closeSlot(page)
+
+  await page.keyboard.press('Tab')
+  const skip = page.getByRole('link', { name: /skip to the main content/i })
+  await expect(skip, 'the first stop from the top of the document clears the rail').toBeFocused()
+
+  // It is parked off-screen until focused, and a skip link nobody can see is no use to a sighted
+  // keyboard user, so check it actually arrives in the viewport rather than merely existing.
+  const box = await skip.boundingBox()
+  expect(box, 'the skip link has a box to show').toBeTruthy()
+  expect(box!.x, 'focusing it brings it on screen horizontally').toBeGreaterThanOrEqual(0)
+  expect(box!.y, 'and vertically').toBeGreaterThanOrEqual(0)
+
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#app-main'), 'following it lands in the main pane').toBeFocused()
+
+  await page.keyboard.press('Tab')
+  await expect(plannerTab, 'so two presses replace the rail walk').toBeFocused()
+})
+
+test('swapping the whole screen takes focus with it', async ({ page }) => {
+  /*
+   * The app replaces the entire view three times — front page to shell, shell to creation, creation
+   * back to shell — and each time the control that was pressed stops existing, so focus fell to the
+   * page body. The screen reader participant pressed Enter on a section and heard nothing at all, with
+   * no way to know the page had changed.
+   */
+  await page.goto('/?simulation=1')
+
+  // Front page to a section: focus lands in the new screen, not on the body.
+  await page.getByTestId('section-raidcomp').click()
+  await expect(page.locator('#app-main')).toBeFocused()
+
+  // Into creation, which is a screen of its own rather than a panel.
+  await page.getByRole('navigation', { name: 'Main sections' }).getByRole('button', { name: 'Character Planner', exact: true }).click()
+  await expect(page.getByTestId('character-creator')).toBeFocused()
+
+  // And back out of it once the character exists.
+  await completeCharacterCreation(page)
+  await expect(page.locator('#app-main')).toBeFocused()
+
+  /*
+   * Not on a tab change, though. The tab strip stays mounted, so the button keeps focus, and dragging
+   * focus into the panel would cost a keyboard user their place in the strip.
+   */
+  const tabs = page.getByRole('navigation', { name: 'Main sections' })
+  await tabs.getByRole('button', { name: 'Raids', exact: true }).click()
+  await expect(tabs.getByRole('button', { name: 'Raids', exact: true })).toBeFocused()
+})
+
 test('the simulator says when no weapon is equipped, and says why an ability was dropped', async ({ page }) => {
   /*
    * All five participants who ran the simulator in the study had an empty weapon slot, and each was

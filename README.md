@@ -161,6 +161,12 @@ behind every claim of its that quotes a number.
   keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
   groups no longer needs a drag**, which a finger cannot start and a keyboard never could: press Move
   on their seat, then the seat you want them in
+- **Usable from the keyboard.** A "Skip to the main content" link opens the shell, so the section tabs
+  are two presses away rather than on the far side of the rail's twenty-odd controls, and when the app
+  swaps one whole screen for another — the front page for the shell, the shell for character creation —
+  focus goes with it instead of falling to the page body, which is what a screen reader reads from.
+  Every control shows a focus ring, including the character selects. Both behaviours are guarded by
+  tests driven with real key presses
 - **Share a build as a link** — the whole build (character, professions, gear, gems, enchants,
   talents, buffs and consumables) packed into the address, so a build made on the desktop opens on a
   phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the

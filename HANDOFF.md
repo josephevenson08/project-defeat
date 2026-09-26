@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-24.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-26.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** the section below is where things stand, and ["What is left, in one
@@ -9,7 +9,27 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ---
 
-## Where this is right now (2026-09-23, latest — READ THIS FIRST)
+## Where this is right now (2026-09-26, latest — READ THIS FIRST)
+
+**A keyboard can reach the navigation, and a screen reader is told when the screen changes.** This was
+the study's one outright access failure, and it is the last of its high-severity findings.
+
+| Fixed | What changed |
+|---|---|
+| **The rail buried the section tabs** | `AppShell` opens with a **"Skip to the main content"** link, off-screen until focused, pointing at `#app-main` (which carries `tabIndex={-1}` so it can receive focus without joining the tab order). From the top of the document it is the first Tab stop, and following it puts the next press on a section tab instead of the first of twenty-odd rail controls. |
+| **Focus fell to the page body on every screen change** | `src/lib/useScreenFocus.ts` moves focus into a screen when the app swaps one whole screen for another — front page to shell, shell to creation, creation back to shell. **Only on a swap:** a module-level flag skips the first screen of a page load, so nothing drags a visitor off the top of the document on arrival. **Never on tab changes:** the strip stays mounted, so the pressed button keeps focus, which is where a keyboard user wants to be. |
+| **A phone scrolled 385px on finishing creation** | My own regression, caught by the existing 44px tap-target test: a plain `focus()` scrolls its target into view, and on a phone the main pane starts below the rail, so the rail's heading and its "Start over" link went off the top. `focus({ preventScroll: true })` — where the page sits is `App`'s decision, and it already scrolls to the top. |
+
+Both behaviours have tests driven by real key presses, and both were confirmed to fail without the
+change (`git stash push -u -- src/`, red, restored). Full suite: **276 passing**.
+
+**One smaller thing turned up while testing and is open:** closing a gear popup removes the focused
+Close button, so the browser drops focus to the top of the document rather than returning it to the slot
+that opened it. That is how the skip-link test reaches a document-start traversal at all. The skip link
+means this costs one press rather than a rail walk, but the dialog pattern is to restore focus, and the
+popup is a `role="dialog"`.
+
+## Before that (2026-09-23)
 
 **The simulator no longer scores a character it was never given.** This was the study's worst finding:
 all five participants who ran it were handed a confident 28–76 DPS for a character with no weapon, and
@@ -35,7 +55,7 @@ were restored.
 
 ## What is left, in one place
 
-Everything outstanding, as of 2026-09-25. **Read this before starting anything.**
+Everything outstanding, as of 2026-09-26. **Read this before starting anything.**
 
 ### Waiting on the owner — do not start these alone
 
@@ -58,10 +78,8 @@ Everything outstanding, as of 2026-09-25. **Read this before starting anything.*
 
 ### Ready to build, in the order worth doing
 
-1. **Keyboard order and focus.** Add a skip link, or put the section tabs before the rail in the source
-   order, and move focus to the new screen's heading after navigation. **This is the one group the site
-   actively fails:** the keyboard participant spent his entire session without reaching the tab he came
-   for, and the screen reader participant heard nothing when the screen changed.
+1. **Return focus to the slot when a gear popup closes.** Small, and the only keyboard item left; see
+   the top of this file for why it is worth doing anyway.
 2. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
    fixed, partly fixed or open):
    - a placeholder for missing boss art that doesn't read as a broken page

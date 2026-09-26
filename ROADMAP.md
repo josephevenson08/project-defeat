@@ -333,15 +333,18 @@ each pinned by an assertion these days.
 **Watched twelve people meet the site on 2026-09-21** — see [`USABILITY-STUDY.md`](USABILITY-STUDY.md),
 which marks every finding fixed, partly fixed or open. The phone and tablet layouts came out well: the
 raid leader moved a player with two taps, and the tier list answered its visitor in two. **Keyboard and
-screen reader access did not**, and that is the largest remaining gap in this phase — the keyboard
-participant spent his whole session without reaching the tab he came for.
+screen reader access did not**: the keyboard participant spent his whole session without reaching the
+tab he came for, and the screen reader participant heard nothing when the screen changed. That was the
+largest gap in this phase, and it closed on 2026-09-26 — a skip link gets out of the rail in one press,
+and a screen swap now takes focus with it.
 
-Of the study's eight findings, **three are fixed outright**: a gear slot whose top item could not be
-equipped at all, section changes that kept the previous page's scroll, and a simulator that scored a
-character with no weapon without saying so. **Three are partly fixed** — keyboard focus is visible on
-the character selects but the tab order still buries the navigation; two pieces of developer wording
-are gone and the simulator's jargon is not; the spec step now says where to find your spec but does not
-describe the three. **Two are open**: the bare boss cards and the tier list's stale citation.
+Of the study's eight findings, **four are fixed outright**: a gear slot whose top item could not be
+equipped at all, section changes that kept the previous page's scroll, a simulator that scored a
+character with no weapon without saying so, and keyboard access to the navigation. **Two are partly
+fixed** — two pieces of developer wording are gone and the simulator's jargon is not; the spec step now
+says where to find your spec but does not describe the three. **Two are open**: the bare boss cards and
+the tier list's stale citation. One smaller thing was found while testing the keyboard fix and is open:
+closing a gear popup drops focus to the top of the document instead of returning it to the slot.
 
 Upgrade planning is in: `findUpgrades` scans every candidate item per visible slot, re-scores it against
 the live simulation, and the Upgrades panel offers a one-click equip.

@@ -232,6 +232,44 @@ select {
 }
 
 /*
+ * The keyboard's way past the rail.
+ *
+ * Positioned out of the flow rather than hidden, because `display: none` would take it out of the tab
+ * order and it exists only for the tab order. It is the shell's first child but must not become a
+ * grid column, hence `position: absolute` while hidden and `fixed` once focused.
+ *
+ * `.app-main` takes focus from it and carries `outline: none`: the skip link's job is to move the
+ * keyboard, and a ring drawn around the entire main pane says nothing useful. What follows it — the
+ * section tabs — shows its own focus.
+ */
+.skip-link {
+  background: var(--surface-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  font-size: 13px;
+  left: -9999px;
+  padding: 10px 14px;
+  position: absolute;
+  text-decoration: none;
+  top: -9999px;
+  z-index: 100;
+}
+
+.skip-link:focus-visible {
+  left: 12px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  position: fixed;
+  top: 12px;
+}
+
+.app-main:focus,
+.creator:focus {
+  outline: none;
+}
+
+/*
  * Character creation, stepped. Full-bleed like the section picker, because it is a decision you make
  * once with nothing else competing for attention.
  */
