@@ -108,7 +108,9 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
    commit it, and **don't re-run the Wowhead ingest scripts**, without asking. The file says why.
 3. **Boss art for 11 of 24 encounters** — Nightbane, and all of Serpentshrine and Tempest Keep. The
    owner's own job: drop files named after the boss into `images for raid bosses/<Raid>/` and run
-   `node tools/ingest/prepare-boss-art.mjs`.
+   `node tools/ingest/prepare-boss-art.mjs`, which now also writes `src/domain/raids/bossArt.json`
+   so the app knows what arrived. **The gap no longer looks like a fault** — an encounter with no
+   picture renders as a row rather than an empty black panel — so this is a nicety now, not a bug.
 4. **The Feral bear/cat split**, the last Phase 3 item. It touches the simulator, which the owner has
    said is not the focus, so ask first.
 
@@ -116,7 +118,6 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
 
 1. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
    fixed, partly fixed or open):
-   - a placeholder for missing boss art that doesn't read as a broken page
    - the tier list's stale "(Phase 2)" citation label, whose Wowhead page now says Phase 3
    - **one line of playstyle prose per spec** in creation. The step now states each spec's role and
      signature ability, which needed no sourcing because the repo already holds both; prose for all

@@ -1,4 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
+import { hasBossArt } from '../../domain/raids/bossArt'
 import { Panel } from '../../components/layout/Panel'
 import { getAttunementChainForRaid, getBossesForRaid, sampleRaids, type RaidLootEntry } from '../../domain/raids'
 import { getQualityColor } from '../../domain/gear/qualityColors'
@@ -27,8 +28,10 @@ function lootNameColor(entry: RaidLootEntry) {
  * loot rows were built for, and `grid-auto-flow: dense` on the container pulls the next card up into
  * the gap so the row above never breaks.
  *
- * `art` is optional: a boss with no picture keeps its card and simply has no background, the same way
- * the raid picker handles a missing raid panel.
+ * `art` is optional, and **the caller has to mean it.** This comment used to describe a fallback that
+ * could not happen: the panel passed `raids/bosses/<id>.jpg` for every boss whether the file existed
+ * or not, so the eleven encounters still waiting on art rendered a 400px black card with a gradient
+ * over a 404. A boss with no picture now gets a card the size of its own text.
  */
 function BossCard({
   id,
@@ -55,6 +58,9 @@ function BossCard({
         type="button"
         className="raid-boss-card"
         data-open={open || undefined}
+        // Says which shape this card is, so the stylesheet does not have to infer it from a custom
+        // property it cannot see the value of.
+        data-art={art ? undefined : 'none'}
         style={art ? ({ '--boss-art': `url(${art})` } as CSSProperties) : undefined}
         onClick={onToggle}
         aria-expanded={open}
@@ -157,7 +163,7 @@ export function RaidsPanel({ raidId }: RaidsPanelProps) {
               key={boss.id}
               id={boss.id}
               name={boss.name}
-              art={`${import.meta.env.BASE_URL}raids/bosses/${boss.id}.jpg`}
+              art={hasBossArt(boss.id) ? `${import.meta.env.BASE_URL}raids/bosses/${boss.id}.jpg` : undefined}
               dropCount={boss.loot.length}
               open={openBosses.has(boss.id)}
               onToggle={() => toggleBoss(boss.id)}

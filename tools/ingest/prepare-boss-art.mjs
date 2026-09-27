@@ -19,7 +19,7 @@
  * Usage:
  *   node tools/ingest/prepare-boss-art.mjs ["images for raid bosses"]
  *
- * Writes public/raids/bosses/<boss-id>.jpg
+ * Writes public/raids/bosses/<boss-id>.jpg, and src/domain/raids/bossArt.json listing what landed.
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
@@ -231,3 +231,34 @@ for (const [raidId, bossIds] of bossIdsByRaid) {
 }
 console.log(`\nwrote ${jobs.length} boss panels to public/raids/bosses/`)
 if (missing.length) console.log(`still without art (${missing.length}):\n  ` + missing.join('\n  '))
+
+/*
+ * **The manifest, so the app can tell a missing picture from a present one.**
+ *
+ * `RaidsPanel` used to build every card's background from `raids/bosses/<id>.jpg` whether the file
+ * existed or not, which drew a 400px black card over a 404 for each encounter still waiting on art —
+ * read as a broken page by a participant in the 2026-09-21 usability study. The app checks this list
+ * now, so a boss with no panel gets a card the size of its own text.
+ *
+ * Written from what is *on disk* rather than from `jobs`, because a run that adds one picture must
+ * not drop the ones already there. A test pins the list and the directory together.
+ */
+const vendored = readdirSync(OUT)
+  .filter((file) => extname(file).toLowerCase() === '.jpg')
+  .map((file) => file.replace(/\.jpg$/i, ''))
+  .sort()
+
+writeFileSync(
+  resolve(REPO, 'src/domain/raids/bossArt.json'),
+  `${JSON.stringify(
+    {
+      $schema: 'which raid bosses have a panel in public/raids/bosses',
+      generatedBy: 'tools/ingest/prepare-boss-art.mjs',
+      count: vendored.length,
+      bossIds: vendored,
+    },
+    null,
+    2,
+  )}\n`,
+)
+console.log(`manifest: src/domain/raids/bossArt.json now lists ${vendored.length}`)

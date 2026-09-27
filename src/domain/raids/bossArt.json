@@ -1,0 +1,20 @@
+{
+  "$schema": "which raid bosses have a panel in public/raids/bosses",
+  "generatedBy": "tools/ingest/prepare-boss-art.mjs",
+  "count": 13,
+  "bossIds": [
+    "attumen-the-huntsman",
+    "chess-event",
+    "gruul-the-dragonkiller",
+    "high-king-maulgar",
+    "magtheridon",
+    "maiden-of-virtue",
+    "moroes",
+    "netherspite",
+    "opera-event",
+    "prince-malchezaar",
+    "shade-of-aran",
+    "terestian-illhoof",
+    "the-curator"
+  ]
+}

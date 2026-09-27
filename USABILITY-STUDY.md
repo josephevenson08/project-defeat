@@ -339,6 +339,14 @@ because it "sounded like healing".
 
 ### 7. Missing boss art reads as a broken page · medium
 
+> **Fixed 2026-09-27.** The root cause was not the missing art: `RaidsPanel` built every card's
+> background from `raids/bosses/<id>.jpg` **whether the file existed or not**, so each of the eleven
+> encounters still waiting on a picture drew a 400px black card with a gradient over a 404. A boss
+> with no panel now gets a card the size of its own text — name, drop count and "See the loot" — and
+> Serpentshrine went from seven empty black rectangles to seven rows on one screen. Which bosses have
+> art is a generated manifest, written by the same script that writes the pictures, so the list
+> cannot drift from the files; a test pins the two together.
+
 **Rafael ([P12](usability-study/participants/P12.md)).** The Serpentshrine and Tempest Keep boss
 cards are tall, empty black panels: the known missing art (HANDOFF open item 1). A visitor reads that
 as a failed image.

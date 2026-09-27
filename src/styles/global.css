@@ -6730,6 +6730,41 @@ body {
  * line and compared it to the declared colour, which measured a ratio the page never rendered.
  * Measuring the ground is not measuring the text.
  */
+/*
+ * A boss with no picture yet.
+ *
+ * **It used to be the same 400px card with nothing in it**, because the panel handed every boss an
+ * art URL whether the file existed or not: a black rectangle under a gradient, with a 404 behind it.
+ * A participant in the 2026-09-21 usability study read it as a broken page, and they were right to.
+ *
+ * The card keeps everything it says and gives up the space it was holding for a picture. It is the
+ * same rule as the gear list's empty slots: nothing is worth one line, not fifty.
+ */
+.raid-boss-card[data-art='none'] {
+  aspect-ratio: auto;
+  background: var(--surface-2);
+  min-height: 0;
+}
+
+/* No artwork to lift, and no scrim needed over a plain surface. */
+.raid-boss-card[data-art='none']::before,
+.raid-boss-card[data-art='none']::after {
+  content: none;
+}
+
+.raid-boss-card[data-art='none'] .raid-boss-card-plate {
+  background: none;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+/* The name carries no picture behind it, so it needs no shadow to lift off one. */
+.raid-boss-card[data-art='none'] .raid-boss-card-name {
+  font-size: 17px;
+  text-shadow: none;
+}
+
 .raid-boss-card-plate {
   position: relative;
   z-index: 1;

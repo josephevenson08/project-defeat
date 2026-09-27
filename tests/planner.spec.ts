@@ -67,6 +67,8 @@ import { getItemsForSlotAndCharacter } from '../src/domain/gear/characterItemRul
 import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getVisibleGearSlotsForSpec } from '../src/domain/gear/slotVisibility'
 import { getSignatureAbility } from '../src/domain/abilities'
+import { hasBossArt } from '../src/domain/raids/bossArt'
+import bossArtManifest from '../src/domain/raids/bossArt.json' with { type: 'json' }
 import { RATING_PER_PERCENT, effectUptime } from '../src/domain/simulation/combatConstants'
 import { getBuffById, modelledBuffs, sampleBuffs, unmodelledBuffs } from '../src/domain/buffs/sampleBuffs'
 import {
@@ -10734,15 +10736,16 @@ test('no image in the app is painted larger than the file it comes from', async 
       name: 'raid loot',
       needs: { icons: 30, raids: 10 },
       /*
-       * **Nightbane has no artwork, and that is a state rather than a fault.** A boss card whose
-       * panel is absent simply has no background, the same way the raid picker handles a raid without
-       * one — which is what lets Serpentshrine and Tempest Keep read as unfinished rather than broken.
+       * **This used to declare `/raids/bosses/nightbane.jpg` as a tolerated 404**, on the reasoning
+       * that a boss card whose panel is absent "simply has no background" and so reads as unfinished
+       * rather than broken. The study's twelfth participant disagreed with that reasoning in front
+       * of the Serpentshrine page, and he was right: eleven cards were 400px of black over eleven
+       * failed requests.
        *
-       * Named rather than tolerated by count, so this fails in both directions: a newly broken path
-       * appears here, and art arriving for Nightbane fails until the line is removed. A bare
-       * "some images may be missing" would have quietly swallowed both.
+       * The app no longer asks for art it does not have — `hasBossArt` is checked first — so there
+       * is no broken path left to tolerate, and this screen expects none. Which makes the assertion
+       * stronger than the version it replaces: *any* failing image here now fails the test.
        */
-      missingArt: ['/raids/bosses/nightbane.jpg'],
       open: async () => {
         await openApp(page, 'raids')
         await page.getByTestId('raid-pick-karazhan').click()
@@ -12145,6 +12148,77 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.tag, 'Tab from "Change character" lands on the Faction select').toBe('SELECT')
   expect(focused.outline, 'a keyboard-focused select draws an outline').not.toBe('none')
   expect(focused.width).toBeGreaterThanOrEqual(2)
+})
+
+test('a boss with no art gets a row, not an empty black panel', async ({ page }) => {
+  /*
+   * The study's finding 7, from the participant who read the Serpentshrine page as broken: those
+   * cards were 400px of black under a gradient, because `RaidsPanel` built every card's background
+   * from `raids/bosses/<id>.jpg` whether the file existed or not. Eleven encounters are still
+   * waiting on art, and eleven 404s looked exactly like a failed page.
+   */
+  await page.goto('/?simulation=1')
+  await page.getByTestId('section-raids').click()
+  await page.getByRole('button', { name: /Serpentshrine/ }).first().click()
+
+  const cards = page.locator('.raid-boss-card')
+  await expect(cards.first()).toBeVisible()
+
+  const shapes = await cards.evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      art: (node as HTMLElement).dataset.art ?? 'yes',
+      height: Math.round(node.getBoundingClientRect().height),
+    })),
+  )
+  expect(shapes.every((card) => card.art === 'none'), 'no Serpentshrine boss has art yet').toBe(true)
+  expect(Math.max(...shapes.map((card) => card.height)), 'so none of them holds a picture-sized space').toBeLessThan(90)
+
+  // It keeps everything it said. A collapsed card is shorter, not quieter.
+  const lurker = page.getByTestId('boss-card-the-lurker-below')
+  await expect(lurker).toContainText('The Lurker Below')
+  await expect(lurker).toContainText(/\d+ drops/)
+  await expect(lurker).toContainText('See the loot')
+
+  // And nothing is requested for art that does not exist, which is what made this look broken.
+  const requested = await page.evaluate(() =>
+    performance.getEntriesByType('resource').filter((entry) => entry.name.includes('/raids/bosses/')).length,
+  )
+  expect(requested, 'no 404s behind the cards').toBe(0)
+})
+
+test('a raid with some art shows it, and collapses only the bosses without', async ({ page }) => {
+  // Karazhan is the mixed case: ten encounters have panels, Nightbane and Trash do not.
+  await page.goto('/?simulation=1')
+  await page.getByTestId('section-raids').click()
+  await page.getByRole('button', { name: /Karazhan/ }).first().click()
+
+  await expect(page.getByTestId('boss-card-attumen-the-huntsman')).not.toHaveAttribute('data-art', 'none')
+  await expect(page.getByTestId('boss-card-nightbane')).toHaveAttribute('data-art', 'none')
+
+  const heights = await page
+    .locator('.raid-boss-card')
+    .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().height)))
+  expect(Math.max(...heights), 'the ones with art keep their card').toBeGreaterThan(300)
+  expect(Math.min(...heights), 'the ones without do not').toBeLessThan(90)
+})
+
+test('the boss art manifest matches the files on disk', () => {
+  /*
+   * The manifest is what the app checks before pointing at a picture, and it is generated by the
+   * same script that writes the pictures. Art dropped in without a re-run — or a re-run whose files
+   * did not land — would put the two out of step, and the symptom is the black panel this replaced.
+   */
+  const onDisk = new Set(
+    readdirSync(resolve(process.cwd(), 'public/raids/bosses'))
+      .filter((file) => file.endsWith('.jpg'))
+      .map((file) => file.replace(/\.jpg$/, '')),
+  )
+
+  for (const bossId of bossArtManifest.bossIds) {
+    expect(onDisk.has(bossId), `${bossId} is in the manifest but not in public/raids/bosses`).toBe(true)
+  }
+  expect(bossArtManifest.bossIds.length, 'and every vendored panel is listed').toBe(onDisk.size)
+  for (const bossId of onDisk) expect(hasBossArt(bossId), `${bossId} is vendored but not listed`).toBe(true)
 })
 
 test('the Race step says which classes each race can play', async ({ page }) => {

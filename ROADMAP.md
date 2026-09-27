@@ -339,12 +339,13 @@ largest gap in this phase, and it closed on 2026-09-26 — a skip link clears th
 press, a screen swap takes focus with it, and closing a gear slot hands focus back to the row it came
 from.
 
-Of the study's eight findings, **four are fixed outright**: a gear slot whose top item could not be
+Of the study's eight findings, **five are fixed outright**: a gear slot whose top item could not be
 equipped at all, section changes that kept the previous page's scroll, a simulator that scored a
-character with no weapon without saying so, and keyboard access to the navigation. **Two are partly
-fixed** — two pieces of developer wording are gone and the simulator's jargon is not; the spec step now
-says where to find your spec but does not describe the three. **Two are open**: the bare boss cards and
-the tier list's stale citation. The smaller thing found while testing the keyboard fix — closing a
+character with no weapon without saying so, keyboard access to the navigation, and boss cards that
+read as broken images where the art has not been drawn yet. **Two are partly fixed** — two pieces of
+developer wording are gone and the simulator's jargon is not; the spec step now names each spec's role
+and signature ability but does not describe how the three play. **One is open**: the tier list's stale
+citation. The smaller thing found while testing the keyboard fix — closing a
 gear slot dropping focus to the top of the document — was fixed on 2026-09-26 along with the pane
 that replaced the popup.
 
