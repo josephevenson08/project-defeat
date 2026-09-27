@@ -127,9 +127,13 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
    over the per-slot one when asked, so this is deliberately absent rather than missed;
    `buildRecommendedSet` already has the logic if it is wanted. The same function would give Ranked
    Gear an "equip this whole list" button, which two study participants asked for by name.
-3. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
+3. **Act on the payload audit** ([`PAYLOAD-AUDIT.md`](PAYLOAD-AUDIT.md), 2026-09-27). Nothing in it
+   is done yet. Two items are worth doing whatever else happens: **code-splitting the panels**, which
+   an estimate puts at 72% off the landing download, and **using the `backdrop.webp` already sitting
+   in the repo**, which is one line for 190 KB. The rest is ranked there with its costs.
+4. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
    carried an "outdated" bar since 2026-07-24, so fixes made upstream never reach the catalogue.
-4. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested
+5. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested
    twins. Today this makes a "missing vs BiS" comparison wrong; it also blocks stage 0 of the import
    plan. Details in `IN-GAME-IMPORT-SCOPE.md` §B.3.
 

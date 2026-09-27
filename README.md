@@ -18,6 +18,9 @@ imply it had.
 first, one line per commit with a link to it. For *why* each thing was done, see
 [`HANDOFF.md`](HANDOFF.md).
 
+**What the app ships, and what it could stop shipping: [`PAYLOAD-AUDIT.md`](PAYLOAD-AUDIT.md)** —
+measured against a real build, with the comment-stripping the build already does taken into account.
+
 **How first-time visitors actually get on: [`USABILITY-STUDY.md`](USABILITY-STUDY.md)** — twelve
 walkthroughs on phones, tablets, a keyboard and a screen reader, with the full transcript of each.
 
