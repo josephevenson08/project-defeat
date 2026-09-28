@@ -135,6 +135,10 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
    in the repo**, which is one line for 190 KB. The rest is ranked there with its costs.
 4. **Re-point the catalogue's ingest at `wowsims/tbc-new`.** The pinned upstream, `wowsims/tbc`, has
    carried an "outdated" bar since 2026-07-24, so fixes made upstream never reach the catalogue.
+   **Promoted by the first real in-game export (2026-09-28):** a trinket the owner is wearing — Empty
+   Mug of Direbrew, added in patch 2.5.6 itself — cannot be in a catalogue ingested from a pre-2.5.6
+   snapshot, and the owner chose re-pointing over patching it by hand. This now blocks the import's
+   item coverage, so it comes before the site-side importer.
 5. **Four duplicate enchant slugs**, which the BiS recommendations point at rather than their ingested
    twins. Today this makes a "missing vs BiS" comparison wrong; it also blocks stage 0 of the import
    plan. Details in `IN-GAME-IMPORT-SCOPE.md` §B.3.
