@@ -980,6 +980,116 @@ select {
  * two each and start at track two, which centres them under the three above without any margin
  * arithmetic that breaks at a different width.
  */
+/*
+ * "Import your character from the game", on the front page.
+ *
+ * **Below the cards, not among them.** The six cards are places to go; this is a way to arrive
+ * already yourself, and making it a seventh card would say the two are the same kind of choice. It
+ * is also the one thing on this screen that needs no character first — pasting the string *is*
+ * character creation, which is why it cannot live behind the planner's Build tab alone.
+ */
+.section-picker-import {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  margin: 26px auto 0;
+  max-width: 640px;
+  width: 100%;
+}
+
+.section-picker-import-open {
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--line-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  min-height: 44px;
+  padding: 0 0 2px;
+}
+
+.section-picker-import-open:hover {
+  color: var(--text);
+}
+
+.section-picker-import-form {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  width: 100%;
+}
+
+.section-picker-import-form p {
+  color: var(--text-faint);
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.section-picker-import-form code {
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.section-picker-import-form textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-height: 78px;
+  padding: 10px;
+  resize: vertical;
+  width: 100%;
+}
+
+.section-picker-import-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/*
+ * Its own primary rather than `.creator-next`, which paints itself with `--creator-accent` — a
+ * variable the creator sets on its own root and nothing sets out here, so the button rendered as
+ * invisible text on a dark page.
+ */
+.section-picker-import-submit {
+  background: var(--metal-1);
+  border: 1px solid var(--metal-2);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  min-height: 44px;
+  padding: 10px 20px;
+  text-transform: uppercase;
+}
+
+.section-picker-import-submit:hover:not(:disabled) {
+  border-color: var(--metal-edge);
+}
+
+.section-picker-import-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* An error here is the paste being wrong, which is recoverable — said in warn amber, not red. */
+.section-picker-import-error {
+  color: var(--warn);
+  font-size: 12.5px;
+  margin: 0;
+}
+
 .section-picker-grid {
   display: grid;
   gap: 18px;

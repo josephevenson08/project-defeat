@@ -168,6 +168,12 @@ behind every claim of its that quotes a number.
   keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
   groups no longer needs a drag**, which a finger cannot start and a keyboard never could: press Move
   on their seat, then the seat you want them in
+- **Import your character out of the game.** A two-file addon (`addon/`) adds `/pdexport`, which
+  hands you one string carrying race, class, faction, professions, talents and every equipped item
+  with its enchants and gems — and no name, realm or GUID. Paste it on the front page and you land in
+  the planner as that character, without building one first. Gear from a later phase than the
+  rankings cover is worn rather than stripped, and the import says which half of the app stops at
+  Phase 2
 - **The planner opens with one thing to do.** A character with nothing equipped gets an offer rather
   than seventeen empty rows: one press fills every slot from the ranked list for the spec, with the
   enchants and gems that list recommends, and the offer disappears once taken. Rings and trinkets

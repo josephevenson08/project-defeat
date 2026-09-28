@@ -10,9 +10,10 @@ work on it, how to check it without the game, and what CurseForge asks for.
 > from the owner's Troll Enhancement Shaman is committed as
 > [`addon/verify/real-export.json`](verify/real-export.json).
 >
-> **The site still cannot read the string** (stage 1). Until the planner has an importer, the export
-> is a string with nowhere to go — and the real export turned up two things that importer has to
-> answer for.
+> **The site reads the string** as of 2026-09-28. Paste it on the planner's front page — "Already
+> playing? Import your character from the game" — or into the Build tab's import box, and the
+> character arrives wearing its gear, gems, enchants and talents. Stage 1 is done; what remains of
+> the five-stage plan is stage 4, publishing.
 
 ## What it is
 
@@ -180,10 +181,33 @@ Also worth carrying into the importer: rings and trinkets resolve to catalogue e
 says `Finger 1` and `Trinket 1` even when worn in the second slot, so the converter has to match
 through `getPairedGearSlots` rather than on the slot name.
 
+## Where the string goes
+
+Three places take it, all the same parser:
+
+| Where | For |
+|---|---|
+| The front page, under the section cards | Arriving already geared. Pasting **is** character creation, so it skips the picker and the four creation steps. |
+| The planner's Build tab | Replacing the character you are currently planning. |
+| A share link | Someone else's build — a different format, same box. |
+
+What the import does with what it finds, decided 2026-09-28 on the evidence of the first real export:
+
+- **Later-phase gear is worn, not stripped.** Half the owner's shaman is Phase 3, and the old rule
+  did not merely drop those items — `normalizeGearForCharacter` *substituted* different ones, so the
+  character came back in four pieces its owner had never chosen. The planner now wears what you
+  wear; its **rankings** stop at Phase 2 and the import says so in one sentence.
+- **Anything it cannot take is named.** An item missing from the catalogue is reported by id and
+  slot rather than leaving a silently empty slot.
+- **The spec is inferred from the most-pointed tree**, and asked for when the talents cannot answer —
+  a tie, or a character with no points spent.
+
 ## What happens next
 
-Stage 1 of the plan: the site-side importer that reads this string and applies it to the planner.
-Two things are worth fixing first, both recorded in the plan as stage 0 — four enchants exist twice
-in the catalogue with the BiS recommendations pointing at the duplicate, and fifteen enchants carry
-no id the game's item links use. An import compared against that data would report a correctly
-enchanted character as missing enchants.
+Stage 4: publishing. The addon needs a 400×400 avatar and a description before CurseForge will take
+it; everything else on its checklist is satisfied.
+
+Two data problems are still worth fixing and both predate the import — recorded in the plan as stage
+0. Four enchants exist twice in the catalogue with the BiS recommendations pointing at the duplicate,
+and fifteen carry no id the game's item links use. Neither blocks an import today; both make a
+"missing vs BiS" comparison wrong.

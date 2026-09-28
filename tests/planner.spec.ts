@@ -12320,6 +12320,45 @@ test('an export the planner cannot read is refused with a reason', () => {
   })
 })
 
+test('the front page takes an in-game export instead of making you build one first', async ({ page }) => {
+  /*
+   * The arrival that matters: someone who already plays this character should not have to walk four
+   * creation steps to build a character they are about to replace. Pasting the export **is**
+   * creation, so it skips the picker and the creator together.
+   */
+  await page.goto('/?simulation=1')
+
+  await page.getByTestId('front-import-open').click()
+  await page.getByTestId('front-import-input').fill(JSON.stringify(realExport))
+  await page.getByTestId('front-import-submit').click()
+
+  // Straight into the planner, wearing the character — no section picker, no creation steps.
+  await expect(page.getByTestId('character-name')).toHaveText('Troll Enhancement Shaman')
+  await expect(page.getByTestId('section-planner'), 'the front page is behind us').toHaveCount(0)
+  await expect(page.getByTestId('character-creator'), 'and so is creation').toHaveCount(0)
+
+  const notice = page.getByTestId('share-notice')
+  await expect(notice, 'the banner says where it came from').toContainText('Loaded your character from the game')
+  await expect(notice, 'and carries what could not be taken').toContainText('281739')
+
+  await expect(slotCell(page, 'Head')).toContainText('Cataclysm Helm')
+})
+
+test('a bad paste on the front page says so and stays put', async ({ page }) => {
+  await page.goto('/?simulation=1')
+  await page.getByTestId('front-import-open').click()
+
+  await page.getByTestId('front-import-input').fill('not a character')
+  await page.getByTestId('front-import-submit').click()
+  await expect(page.getByTestId('front-import-error')).toContainText(/valid JSON/i)
+  await expect(page.getByTestId('section-planner'), 'and nothing was loaded').toBeVisible()
+
+  // A saved build is not an in-game export, and the message should not pretend otherwise.
+  await page.getByTestId('front-import-input').fill('{"version":1,"character":{}}')
+  await page.getByTestId('front-import-submit').click()
+  await expect(page.getByTestId('front-import-error')).toContainText(/not a Project Defeat character export/i)
+})
+
 test('a character pasted from the addon arrives in the planner', async ({ page }) => {
   /*
    * The whole point of the addon, end to end: the string the owner copied out of the game with

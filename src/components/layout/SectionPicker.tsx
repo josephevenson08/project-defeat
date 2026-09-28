@@ -63,6 +63,11 @@ const SECTIONS: readonly SectionDefinition[] = [
 
 type SectionPickerProps = {
   onSelect: (section: SectionId) => void
+  /**
+   * Takes the string the in-game addon writes. Returns an error to show, or nothing on success —
+   * on success the app has already moved on to the planner, so this component stops existing.
+   */
+  onImportCharacter: (raw: string) => string | undefined
 }
 
 /**
@@ -96,7 +101,10 @@ function useBackdropImage(src: string) {
 
 const BACKDROP_SRC = `${import.meta.env.BASE_URL}backdrop.jpg`
 
-export function SectionPicker({ onSelect }: SectionPickerProps) {
+export function SectionPicker({ onSelect, onImportCharacter }: SectionPickerProps) {
+  const [importing, setImporting] = useState(false)
+  const [pasted, setPasted] = useState('')
+  const [importError, setImportError] = useState<string>()
   const hasImage = useBackdropImage(BACKDROP_SRC)
 
   return (
@@ -150,6 +158,72 @@ export function SectionPicker({ onSelect }: SectionPickerProps) {
           </button>
         ))}
       </nav>
+
+      {/*
+        **Arriving as yourself, before there is a character to overwrite.**
+
+        Below the cards rather than among them: the six are places to go, and this is a way to turn
+        up already geared. It has to be here and not only on the planner's Build tab, because
+        pasting the string *is* character creation — sending someone through four creation steps to
+        build a character they are about to replace is backwards for anyone who already plays one.
+      */}
+      <div className="section-picker-import">
+        {!importing ? (
+          <button
+            type="button"
+            className="section-picker-import-open"
+            onClick={() => setImporting(true)}
+            data-testid="front-import-open"
+          >
+            Already playing? Import your character from the game
+          </button>
+        ) : (
+          <div className="section-picker-import-form">
+            <p>
+              In game, run <code>/pdexport</code>, press Ctrl+C, and paste it here. Nothing is uploaded — the string
+              never leaves your browser, and it carries no character name or realm.
+            </p>
+            <textarea
+              aria-label="Paste your character export"
+              data-testid="front-import-input"
+              value={pasted}
+              onChange={(event) => {
+                setPasted(event.target.value)
+                setImportError(undefined)
+              }}
+              placeholder="{&quot;format&quot;:&quot;project-defeat-character&quot; …"
+              rows={3}
+            />
+            {importError && (
+              <p className="section-picker-import-error" role="alert" data-testid="front-import-error">
+                {importError}
+              </p>
+            )}
+            <div className="section-picker-import-actions">
+              <button
+                type="button"
+                className="section-picker-import-open"
+                onClick={() => {
+                  setImporting(false)
+                  setPasted('')
+                  setImportError(undefined)
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="section-picker-import-submit"
+                disabled={pasted.trim().length === 0}
+                onClick={() => setImportError(onImportCharacter(pasted))}
+                data-testid="front-import-submit"
+              >
+                Load my character
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

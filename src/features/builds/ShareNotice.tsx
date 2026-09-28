@@ -1,6 +1,9 @@
 import type { BuildImportIssue } from '../../domain/builds/buildTypes'
 
-export type ShareNoticeState = { kind: 'loaded'; issues: readonly BuildImportIssue[] } | { kind: 'error'; message: string }
+export type ShareNoticeState =
+  /** `source` because "Loaded a shared build" is the wrong sentence for your own character. */
+  | { kind: 'loaded'; source?: 'link' | 'addon'; issues: readonly BuildImportIssue[] }
+  | { kind: 'error'; message: string }
 
 type ShareNoticeProps = {
   notice: ShareNoticeState
@@ -31,8 +34,12 @@ export function ShareNotice({ notice, onDismiss }: ShareNoticeProps) {
         ) : (
           <>
             <p>
-              <strong>Loaded a shared build.</strong> Save it under a name on the Build tab if you want to keep it — a
-              reload starts clean.
+              {notice.source === 'addon' ? (
+                <strong>Loaded your character from the game.</strong>
+              ) : (
+                <strong>Loaded a shared build.</strong>
+              )}{' '}
+              Save it under a name on the Build tab if you want to keep it — a reload starts clean.
             </p>
             {notice.issues.length > 0 && (
               <ul className="share-notice-issues">

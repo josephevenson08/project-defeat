@@ -6,6 +6,7 @@ import { BisPanel } from './features/bis/BisPanel'
 import { BuildPanel } from './features/builds/BuildPanel'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
 import { decodeBuildFromLink, readShareValue } from './domain/builds/shareLink'
+import { parseAddonExport } from './domain/builds/addonImport'
 import { ShareNotice, type ShareNoticeState } from './features/builds/ShareNotice'
 import type { SavedBuild } from './domain/builds/buildTypes'
 import { CharacterCreator } from './features/character/CharacterCreator'
@@ -415,6 +416,39 @@ function App() {
             setSectionChosen(true)
             // The front page can be scrolled on a phone; the section starts at its top all the same.
             window.scrollTo(0, 0)
+          }}
+          /*
+           * Pasting an in-game export **is** character creation, so it skips the four steps and the
+           * section picker together and lands in the planner wearing the character — the same
+           * arrival a shared build link produces, for the same reason: whoever sent it, or exported
+           * it, has already made every choice those screens would ask for.
+           */
+          onImportCharacter={(raw) => {
+            const result = parseAddonExport(raw)
+            if (!result.ok) return result.error
+
+            importBuild(result.build)
+            setActiveTab('planner')
+            setPlannerView('gear')
+            setSectionChosen(true)
+            setCharacterChosen(true)
+            setShareNotice({
+              kind: 'loaded',
+              source: 'addon',
+              issues: result.specChoice
+                ? [
+                    ...result.issues,
+                    {
+                      // No prompt on this path, deliberately: the planner is one press away from
+                      // "Change character", and a modal on the way in would be a worse first screen
+                      // than a sentence and a wrong-but-stated spec.
+                      message: `The talents do not name a spec, so ${result.build.character.spec} was assumed. Change character to correct it.`,
+                    },
+                  ]
+                : result.issues,
+            })
+            window.scrollTo(0, 0)
+            return undefined
           }}
         />
       </>
