@@ -5,12 +5,14 @@ it produces, and the research behind every API call in it, are in
 [`IN-GAME-IMPORT-SCOPE.md`](../IN-GAME-IMPORT-SCOPE.md); this file is the practical half — how to
 work on it, how to check it without the game, and what CurseForge asks for.
 
-> **Status: written and machine-verified, not yet run in the game.** Stage 2 of the five-stage plan.
-> Two things are still outstanding, and neither is optional:
-> 1. **One in-game session** (stage 3) to confirm the handful of API behaviours nobody can check from
->    outside the client. The checklist is at the bottom of this file.
-> 2. **The site cannot read the string yet** (stage 1). Until the planner has an importer, the export
->    is a string with nowhere to go.
+> **Status: written, machine-verified, and run in the game.** Stages 2 and 3 of the five-stage plan
+> are done — see [What the first real export proved](#what-the-first-real-export-proved). The export
+> from the owner's Troll Enhancement Shaman is committed as
+> [`addon/verify/real-export.json`](verify/real-export.json).
+>
+> **The site still cannot read the string** (stage 1). Until the planner has an importer, the export
+> is a string with nowhere to go — and the real export turned up two things that importer has to
+> answer for.
 
 ## What it is
 
@@ -139,9 +141,44 @@ confirm the addon's assumptions rather than to admire the output.
 5. `/pdexport` on a character with an empty off hand, and on one with a two-hander.
 6. Paste the result into a JSON validator.
 
-Then commit the real export as a test fixture next to `addon/verify/fixture-export.json`, replacing
-the machine-generated one. A real string from a real character is the thing the site-side importer
-should be built against.
+**Done 2026-09-28.** The real export is committed as `addon/verify/real-export.json`;
+`fixture-export.json` is still the harness's synthetic output and is regenerated on every run.
+
+## What the first real export proved
+
+Run 2026-09-28 on a level 70 Troll Enhancement Shaman, client 2.5.6.69795. The string was 1,165
+characters and carried no identifying fields. Checked against the planner's own data:
+
+**The assumption the whole design was hedging against turned out to be true.**
+
+| Check | Result |
+|---|---|
+| **Client `talentID` == the planner's talent ids** | **21 of 21 resolved**, and all 21 in the same tier and column the planner has them in |
+| Spec inference from the most-pointed tree | 2 / 45 / 14 → **Enhancement**, which is what the character is |
+| Enchants resolved by `effectId` | 8 of 8 — Glyph of Ferocity, Greater Inscription of the Blade, Nethercobra Leg Armor … |
+| Gems resolved by `wowItemId` | 7 of 7 |
+| Professions, read through the skill list | Blacksmithing 375, Leatherworking 375 |
+| Identifying fields | none |
+
+The tier-and-column redundancy in the talent format cost about 115 characters and, on this evidence,
+is insurance rather than necessity. **Keep it anyway** — one character on one client is not proof for
+nine classes, and the cost is small.
+
+**Two things the import has to answer for, neither of which was visible before a real character:**
+
+1. **Half the gear is Phase 3.** Eight of the sixteen resolved items — Choker of Serrated Blades,
+   both Vengeful Gladiator's weapons, Madness of the Betrayer, Band of the Eternal Champion and the
+   Lightning Reflexes pieces — are phase 3 in the catalogue. The planner is Phase 2 and `validateBuild`
+   drops anything past the gate, so **importing this character today would strip half of it**. This is
+   open question Q7, and it is no longer hypothetical.
+2. **One item is not in the catalogue at all: 281739, Empty Mug of Direbrew.** A trinket *added in
+   patch 2.5.6 itself* ("The Gods of Zul'Aman"). The catalogue is ingested from `wowsims/tbc`, pinned
+   before that patch, so no amount of searching would find it — this is a different gap from "phase 3",
+   and it is the clearest argument yet for re-pointing the ingest at `wowsims/tbc-new`.
+
+Also worth carrying into the importer: rings and trinkets resolve to catalogue entries whose slot
+says `Finger 1` and `Trinket 1` even when worn in the second slot, so the converter has to match
+through `getPairedGearSlots` rather than on the slot name.
 
 ## What happens next
 

@@ -5,6 +5,14 @@ The research it rests on follows in full, with every claim labelled by how it wa
 
 > **Progress, 2026-09-28.** Stage 2 is built: the addon is written and verified in a Lua VM against
 > stubbed APIs, and [`addon/README.md`](addon/README.md) covers installing, testing and publishing it.
+> **Stage 3 is done too (2026-09-28).** A real export from the owner's Troll Enhancement Shaman
+> confirmed the design's largest unverified assumption: **the client's `talentID` is the planner's
+> talent id** — 21 of 21 resolved, every one in the same tier and column. Enchants, gems and
+> professions all resolved as well. It also found two things nothing outside the game could:
+> **half the character's gear is Phase 3**, which the import gate would strip today (Q7), and one
+> trinket — Empty Mug of Direbrew, 281739 — was **added in patch 2.5.6 itself** and cannot be in a
+> catalogue ingested from a pre-2.5.6 snapshot.
+>
 > The owner settled four of the open questions — **MIT** licence (Q2), **`/pdexport` only** and the
 > name "Project Defeat Export" (Q10), **talent ids plus tree position** (Q12), and **most-pointed tree,
 > ask on a tie or an empty build** for spec inference (Q4). Stage 3 (one in-game session) and stage 1
