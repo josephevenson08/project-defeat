@@ -68,6 +68,8 @@ import { gearSlots } from '../src/domain/gear/gearSlots'
 import { getVisibleGearSlotsForSpec } from '../src/domain/gear/slotVisibility'
 import { getSignatureAbility } from '../src/domain/abilities'
 import { hasBossArt } from '../src/domain/raids/bossArt'
+import { parseAddonExport } from '../src/domain/builds/addonImport'
+import realExport from '../addon/verify/real-export.json' with { type: 'json' }
 import bossArtManifest from '../src/domain/raids/bossArt.json' with { type: 'json' }
 import { RATING_PER_PERCENT, effectUptime } from '../src/domain/simulation/combatConstants'
 import { getBuffById, modelledBuffs, sampleBuffs, unmodelledBuffs } from '../src/domain/buffs/sampleBuffs'
@@ -4258,13 +4260,16 @@ test('main-hand and off-hand picks are separate rankings, not one collided list'
   }
 })
 
-test('nothing reachable offers gear from a later phase than this planner covers', () => {
+test('nothing the planner recommends comes from a later phase than it covers', () => {
   /*
-   * The app targets Phase 2 and `getItemsForSlot` enforces that — so the picker, the default set and
-   * the upgrade finder were always correct. The leak was everything that resolves an item by **id**
-   * and therefore never passes through a slot query: the Ranked Gear panel's Equip button, restoring
-   * a saved build, and importing someone else's. All three could seat Phase 3+ gear that the Gear
-   * panel would then refuse to list, counted in every stat total.
+   * **This test used to assert that later-phase gear could never be equipped. That reversed on
+   * 2026-09-28** — see parts 3 and 4 — when the first real in-game export turned out to be half
+   * Phase 3 and the old rule produced a gutted copy of the owner's own character. The line moved:
+   * the planner *wears* what a player wears, and stops its **recommendations** at Phase 2.
+   *
+   * Parts 1 and 2 are unchanged and now carry the whole promise. The picker, the default set and the
+   * upgrade finder were always correct because `getItemsForSlot` filters them; what these check is
+   * everything that resolves an item by **id** and never passes through a slot query.
    *
    * Verified against real sources rather than trusting the phase number, because getting this
    * backwards would have deleted legitimate rankings: Band of Eternity rewards *Champion's Pledge*,
@@ -4302,7 +4307,13 @@ test('nothing reachable offers gear from a later phase than this planner covers'
     }
   }
 
-  // 3. Normalisation strips one that somehow got equipped — the saved-build and Equip-button path.
+  /*
+   * 3. **Normalisation keeps one, and this is the assertion that flipped.**
+   *
+   * It used to require that normalisation *replaced* out-of-phase gear. It did — not by emptying the
+   * slot but by substituting a different item, so an imported Phase 3 character came back wearing
+   * four things its owner had never chosen. Keeping it is what lets a spec change survive an import.
+   */
   const bandOfEternity = getItemByWowItemId(29298)!
   expect(bandOfEternity.phase, 'the fixture must still be out of phase, or this proves nothing').toBe(3)
 
@@ -4314,20 +4325,33 @@ test('nothing reachable offers gear from a later phase than this planner covers'
     'Finger 1': { item: bandOfEternity, gemIds: [] },
   }
   const cleaned = normalizeGearForCharacter(smuggled, 'Hunter', 'Beast Mastery')
-  expect(cleaned['Finger 1'].item.id, 'normalisation must replace out-of-phase gear').not.toBe(bandOfEternity.id)
-  expect(isWithinDefaultPhase(cleaned['Finger 1'].item), 'and what replaces it must be in phase').toBe(true)
+  expect(cleaned['Finger 1'].item.id, 'normalisation leaves a later-phase item where the player put it').toBe(
+    bandOfEternity.id,
+  )
 
-  // 4. Importing one is rejected, and for the *right* stated reason.
+  // But class legality is still enforced, which is the rule normalisation actually exists for.
+  const illegal = { ...smuggled, 'Main Hand': { item: getItemByWowItemId(30120)!, gemIds: [] } }
+  expect(
+    normalizeGearForCharacter(illegal, 'Hunter', 'Beast Mastery')['Main Hand'].item.id,
+    "a plate helm in a hunter's main hand is still replaced",
+  ).not.toBe(getItemByWowItemId(30120)!.id)
+
+  /*
+   * 4. Importing one is **kept and noted**, and the note says which half of the app stops at Phase 2.
+   * A drop here would have meant a build saved after an in-game import lost gear the app had already
+   * accepted — the same item legal through one door and stripped through another.
+   */
   const imported = validateBuild({
     version: BUILD_FORMAT_VERSION,
     character,
     gear: { 'Finger 1': { itemId: bandOfEternity.id, gemIds: [] } },
   })
   expect(imported.ok, 'the build itself must be valid, or the slot issue below is unreachable').toBe(true)
+  expect(imported.ok && imported.build.gear['Finger 1']?.itemId, 'the item is worn').toBe(bandOfEternity.id)
   const phaseIssue = imported.ok ? imported.issues.find((issue) => issue.slot === 'Finger 1') : undefined
-  expect(phaseIssue, 'importing later-phase gear must be reported').toBeDefined()
-  expect(phaseIssue!.message, 'and named as a phase problem, not a class-legality one').toMatch(
-    new RegExp(`Phase 3 gear.*Phase ${defaultMaxPhase}`),
+  expect(phaseIssue, 'and the phase is still reported').toBeDefined()
+  expect(phaseIssue!.message, 'as a note about rankings, not a class-legality problem').toMatch(
+    new RegExp(`Phase 3 gear.*rankings only cover Phase ${defaultMaxPhase}`),
   )
   expect(phaseIssue!.message).not.toMatch(/isn't legal for/)
 })
@@ -12219,6 +12243,132 @@ test('the boss art manifest matches the files on disk', () => {
   }
   expect(bossArtManifest.bossIds.length, 'and every vendored panel is listed').toBe(onDisk.size)
   for (const bossId of onDisk) expect(hasBossArt(bossId), `${bossId} is vendored but not listed`).toBe(true)
+})
+
+test('the in-game export imports as the character it came from', () => {
+  /*
+   * The real export from the owner's level 70 Troll Enhancement Shaman, taken on client 2.5.6.69795
+   * and committed at `addon/verify/real-export.json`. This is the fixture the converter exists for:
+   * a reconstruction proves the code runs, a real string proves the game and the planner agree.
+   */
+  const result = parseAddonExport(JSON.stringify(realExport))
+  if (!result.ok) throw new Error(result.error)
+
+  expect(result.build.character).toMatchObject({
+    faction: 'Horde',
+    race: 'Troll',
+    className: 'Shaman',
+    // The game has no spec in TBC. 2 / 45 / 14 across the trees names this one.
+    spec: 'Enhancement',
+  })
+  expect(result.specChoice, 'the talents name the spec outright, so nothing to ask').toBeUndefined()
+  expect(result.build.character.professions).toEqual(['Blacksmithing', 'Leatherworking'])
+
+  // 21 talents, 61 points — the level-70 budget spent exactly.
+  expect(Object.keys(result.build.talentPoints ?? {})).toHaveLength(21)
+  expect(Object.values(result.build.talentPoints ?? {}).reduce((sum, rank) => sum + rank, 0)).toBe(61)
+
+  // Sixteen of seventeen slots filled. The seventeenth is the trinket below.
+  expect(Object.keys(result.build.gear)).toHaveLength(16)
+  expect(result.build.gear.Head).toMatchObject({ itemId: 'cataclysm-helm', enchantId: 'glyph-of-ferocity' })
+  expect(result.build.gear.Head?.gemIds).toHaveLength(2)
+  // Slot 18 is Relic for a Shaman and Ranged for everyone else; the game gives both the same id.
+  expect(result.build.gear.Relic, 'slot 18 read as a Relic, not a bow').toBeTruthy()
+  expect(result.build.gear.Ranged).toBeUndefined()
+})
+
+test('the import wears later-phase gear and says the rankings do not cover it', () => {
+  /*
+   * Eight of the owner's sixteen items are Phase 3, and `validateBuild` would drop every one of
+   * them — which would hand someone a half-naked copy of their own character. The decision on
+   * 2026-09-28 was to wear them and be honest about which half of the app stops at Phase 2.
+   */
+  const result = parseAddonExport(JSON.stringify(realExport))
+  if (!result.ok) throw new Error(result.error)
+
+  expect(result.build.gear['Main Hand'], "the Vengeful Gladiator's weapon is equipped, not dropped").toBeTruthy()
+  expect(result.build.gear['Trinket 2'], 'Madness of the Betrayer too').toBeTruthy()
+
+  const phaseNote = result.issues.find((issue) => issue.message.includes('later phase'))
+  expect(phaseNote?.message, 'one sentence for all eight').toContain('8 items are from a later phase')
+  expect(phaseNote?.message, 'and it says what still works').toMatch(/equipped and their stats count/)
+})
+
+test('the import names what it could not take, rather than leaving a hole', () => {
+  // Empty Mug of Direbrew was added in patch 2.5.6 itself, so a catalogue ingested from an earlier
+  // snapshot cannot contain it. Reported by id, with the slot, instead of a silently empty trinket.
+  const result = parseAddonExport(JSON.stringify(realExport))
+  if (!result.ok) throw new Error(result.error)
+
+  const missing = result.issues.find((issue) => issue.message.includes('281739'))
+  expect(missing?.slot).toBe('Trinket 1')
+  expect(missing?.message).toContain('not in this planner')
+  expect(result.build.gear['Trinket 1']).toBeUndefined()
+})
+
+test('an export the planner cannot read is refused with a reason', () => {
+  expect(parseAddonExport('not json')).toMatchObject({ ok: false, error: expect.stringContaining('valid JSON') })
+  expect(parseAddonExport('{"format":"something-else"}')).toMatchObject({
+    ok: false,
+    error: expect.stringContaining('not a Project Defeat character export'),
+  })
+  // A newer addon may carry fields this build cannot read; importing the recognised half is how a
+  // character arrives subtly wrong.
+  expect(parseAddonExport('{"format":"project-defeat-character","formatVersion":99}')).toMatchObject({
+    ok: false,
+    error: expect.stringContaining('format version 99'),
+  })
+})
+
+test('a character pasted from the addon arrives in the planner', async ({ page }) => {
+  /*
+   * The whole point of the addon, end to end: the string the owner copied out of the game with
+   * /pdexport, pasted into the same box a saved build goes in, produces their character.
+   *
+   * One box for both formats, because "which of these two boxes does my clipboard belong in" is not
+   * a question a player should have to answer.
+   */
+  await openApp(page)
+  await openPlannerView(page, 'Build')
+
+  await page.getByTestId('build-import-input').fill(JSON.stringify(realExport))
+  await page.getByTestId('build-import-button').click()
+
+  const status = page.getByTestId('build-status')
+  await expect(status).toContainText(/Build loaded/i)
+  await expect(status, 'the notes are notes, not dropped slots').toContainText(/Loaded, with \d+ notes/i)
+  await expect(status, 'and it says which half of the app stops at Phase 2').toContainText(/rankings and the upgrade finder only cover Phase 2/i)
+
+  // The character the string came from, not the Fury Warrior the test started as.
+  await expect(page.getByTestId('character-name')).toHaveText('Troll Enhancement Shaman')
+
+  await openPlannerView(page, 'Gear')
+  await expect(slotCell(page, 'Head')).toContainText('Cataclysm Helm')
+  await expect(slotCell(page, 'Head'), 'the enchant came with it').toContainText('Glyph of Ferocity')
+  await expect(slotCell(page, 'Main Hand'), 'Phase 3 weapons are worn, not stripped').toContainText(
+    "Vengeful Gladiator's Right Ripper",
+  )
+})
+
+test('an addon export with no spec to infer asks instead of guessing', async ({ page }) => {
+  /*
+   * TBC has no spec — only three trees and where the points went — so a character who has spent
+   * nothing has no answer to infer. A silently wrong spec would drive every ranking on every other
+   * screen, which is the class of quiet wrong answer the usability study kept finding.
+   */
+  await openApp(page)
+  await openPlannerView(page, 'Build')
+
+  const untalented = { ...realExport, talents: [] }
+  await page.getByTestId('build-import-input').fill(JSON.stringify(untalented))
+  await page.getByTestId('build-import-button').click()
+
+  const choice = page.getByTestId('build-spec-choice')
+  await expect(choice).toContainText(/spent no talent points/i)
+  await expect(choice.getByRole('button')).toHaveCount(3)
+
+  await page.getByTestId('build-spec-restoration').click()
+  await expect(page.getByTestId('character-name')).toHaveText('Troll Restoration Shaman')
 })
 
 test('the Race step says which classes each race can play', async ({ page }) => {

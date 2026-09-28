@@ -4,6 +4,8 @@ import { Button } from '../../components/ui/Button'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getRoleAccentColor } from '../../domain/character/roleTheme'
 import { parseBuild, serializeBuild, type BuildState } from '../../domain/builds/buildSerialization'
+import { ADDON_EXPORT_FORMAT, parseAddonExport } from '../../domain/builds/addonImport'
+import type { TbcSpec } from '../../domain/character/characterTypes'
 import { encodeBuildForLink, shareUrlFor } from '../../domain/builds/shareLink'
 import type { BuildImportIssue, SavedBuild } from '../../domain/builds/buildTypes'
 import {
@@ -26,7 +28,17 @@ type Status =
   | { kind: 'copied' }
   | { kind: 'link-copied' }
   | { kind: 'link-shown' }
-  | { kind: 'imported'; issues: BuildImportIssue[] }
+  | {
+      kind: 'imported'
+      issues: BuildImportIssue[]
+      /**
+       * Set only for an in-game export whose talents do not name a spec — an even split, or a
+       * character with no points spent. The build is already loaded on the first tree; this is the
+       * question that lets the player correct it in one press.
+       */
+      specChoice?: { reason: 'tie' | 'no-points'; candidates: readonly TbcSpec[] }
+      build?: SavedBuild
+    }
   | { kind: 'error'; message: string }
   | { kind: 'saved'; name: string }
 
@@ -117,7 +129,33 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
     }
   }
 
+  /**
+   * One box, two formats.
+   *
+   * A build this app exported, and the string the in-game addon writes, are both things a player
+   * pastes to load a character — so they go in the same box and the discriminator decides, rather
+   * than asking somebody to know which of two boxes their clipboard belongs in. The addon's format
+   * field is the tell; anything else is treated as a saved build and gets that parser's errors.
+   */
   function handleImport() {
+    // Split rather than merged, so each parser's result keeps its own type and the spec question —
+    // which only an in-game export can raise — cannot be lost to a widened union.
+    if (draft.includes(ADDON_EXPORT_FORMAT)) {
+      const result = parseAddonExport(draft)
+      if (!result.ok) {
+        setStatus({ kind: 'error', message: result.error })
+        return
+      }
+      onImport(result.build)
+      setStatus({
+        kind: 'imported',
+        issues: result.issues,
+        ...(result.specChoice ? { specChoice: result.specChoice, build: result.build } : {}),
+      })
+      setDraft('')
+      return
+    }
+
     const result = parseBuild(draft)
     if (!result.ok) {
       setStatus({ kind: 'error', message: result.error })
@@ -126,6 +164,12 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
     onImport(result.build)
     setStatus({ kind: 'imported', issues: result.issues })
     setDraft('')
+  }
+
+  /** Re-applies the imported build under the spec the player picked. */
+  function chooseSpec(build: SavedBuild, spec: TbcSpec) {
+    onImport({ ...build, character: { ...build.character, spec } })
+    setStatus({ kind: 'imported', issues: [] })
   }
 
   return (
@@ -231,7 +275,7 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
           aria-label="Import a build"
           data-testid="build-import-input"
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Paste an exported build here"
+          placeholder="Paste an exported build, or the string from the addon's /pdexport"
           rows={4}
           value={draft}
         />
@@ -285,11 +329,37 @@ export function BuildPanel({ state, role, onImport }: BuildPanelProps) {
         <div className="summary-card build-status" data-testid="build-status">
           <span>Imported</span>
           <strong>Build loaded</strong>
+          {status.specChoice && status.build && (
+            /*
+             * TBC has no spec, only three trees and where the points went — so an even split, or a
+             * character who has spent nothing, genuinely has no answer to infer. Asked rather than
+             * guessed at, because a silently wrong spec drives every ranking on every other screen.
+             */
+            <div className="build-spec-choice" data-testid="build-spec-choice">
+              <p>
+                {status.specChoice.reason === 'no-points'
+                  ? 'This character has spent no talent points, so the export cannot say which spec it is.'
+                  : 'The talent points are evenly split, so the export cannot say which spec this is.'}{' '}
+                Which is it?
+              </p>
+              <div className="build-spec-choice-options">
+                {status.specChoice.candidates.map((candidate) => (
+                  <Button
+                    key={candidate}
+                    data-testid={`build-spec-${candidate.toLowerCase().replaceAll(' ', '-')}`}
+                    onClick={() => chooseSpec(status.build as SavedBuild, candidate)}
+                  >
+                    {candidate}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {status.issues.length > 0 ? (
             <>
               <p>
-                Loaded, but {status.issues.length} {status.issues.length === 1 ? 'slot was' : 'slots were'} dropped —
-                the rest of the build came through:
+                Loaded, with {status.issues.length} {status.issues.length === 1 ? 'note' : 'notes'}:
               </p>
               <ul className="build-issue-list">
                 {status.issues.map((issue) => (

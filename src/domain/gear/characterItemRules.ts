@@ -3,7 +3,7 @@ import { getRoleForSpec } from '../character/tbcClasses'
 import type { GearSlot } from './gearSlots'
 import type { EquippedGear, GearItem, WeaponType } from './itemTypes'
 
-import { getItemsForSlot, isWithinDefaultPhase } from './itemCatalogue'
+import { getItemsForSlot } from './itemCatalogue'
 import { isObtainable } from './obtainability'
 import {
   EMPTY_OFF_HAND,
@@ -166,10 +166,20 @@ export function applyWeaponSlotRules(gear: EquippedGear): EquippedGear {
  * below is what decides its fate.
  */
 function isKeepable(item: GearItem, className: TbcClass, spec: TbcSpec): boolean {
-  if (!isItemAllowedForCharacter(item, className, spec)) return false
-  // Any empty placeholder is exempt, not just the off hand's: a newly created character starts with
-  // every slot empty, and a placeholder has no phase to be within.
-  return isEmptySlotItem(item) || isWithinDefaultPhase(item)
+  /*
+   * **Class legality only. The phase is no longer a reason to take something off a character.**
+   *
+   * This used to also require `isWithinDefaultPhase`, and the substitution below meant a later-phase
+   * item was not merely dropped but *replaced* — the player ended up wearing something they never
+   * chose. The first real in-game export (2026-09-28) made the cost obvious: half the owner's shaman
+   * was Phase 3, and importing it produced a character in four items they had never seen.
+   *
+   * The decision that day was to wear what the player wears and stop the *rankings* at Phase 2
+   * instead. The picker still refuses to offer later-phase gear — `getItemsForSlotAndCharacter`
+   * filters it — so nobody can put it on by hand; this only stops the app taking off something that
+   * arrived from the game, including on the next spec change.
+   */
+  return isItemAllowedForCharacter(item, className, spec)
 }
 
 export function normalizeGearForCharacter(gear: EquippedGear, className: TbcClass, spec: TbcSpec): EquippedGear {

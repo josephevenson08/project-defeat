@@ -181,18 +181,23 @@ export function validateBuild(parsed: unknown): BuildImportResult {
         return
       }
       /*
-       * A separate rejection from the one above, and it needs its own sentence. An imported build can
-       * legitimately come from someone playing further into the expansion, so the item is real, it is
-       * legal for the class, and it still cannot be worn here — the reason is the phase, not the
-       * character, and saying "isn't legal for a Fury Warrior" about a Black Temple sword would send
-       * the reader looking for a class restriction that does not exist.
+       * **Later-phase gear is worn and noted, not dropped.** This used to reject it: the item is
+       * real and legal for the class, but past the phase the planner covers, so the slot was emptied
+       * and the reason reported.
+       *
+       * The first real in-game export (2026-09-28) showed what that costs. Half the owner's shaman
+       * was Phase 3, and a rule meant to keep the app honest instead handed them a gutted copy of
+       * their own character. Wearing it is the honest answer, because the stats are real; what
+       * genuinely stops at Phase 2 is the *ranking* half — BiS lists, the upgrade finder, "missing
+       * vs BiS" — and saying so is this note's job.
+       *
+       * The player still cannot pick one by hand: `getItemsForSlotAndCharacter` filters the picker.
        */
       if (!isWithinDefaultPhase(item)) {
         issues.push({
           slot,
-          message: `${slot}: ${item.name} is Phase ${item.phase} gear, and this planner covers Phase ${defaultMaxPhase}.`,
+          message: `${slot}: ${item.name} is Phase ${item.phase} gear. It is equipped and its stats count, but rankings only cover Phase ${defaultMaxPhase}.`,
         })
-        return
       }
 
       gear[slot] = {
