@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**419 commits across 61 days**, from 2026-06-25 to 2026-09-28.
+**423 commits across 61 days**, from 2026-06-25 to 2026-09-28.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,16 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_120 commits_
+_124 commits_
 
-### Monday 28 September — 2 commits
+### Monday 28 September — 6 commits
 
 - Write the in-game exporter, and verify it without the game — [`ac687e2`](https://github.com/josephevenson08/project-defeat/commit/ac687e288e20213b81b8b041d77e584739159674)
 - Run the exporter in the game, and learn three things from it — [`4665b3c`](https://github.com/josephevenson08/project-defeat/commit/4665b3c485d33fa0fbabc8efdc16ad062bd33ad9)
+- Record the two decisions the real export forced — [`6c575a0`](https://github.com/josephevenson08/project-defeat/commit/6c575a0d6e0baf4912e614ccf656ba8fef1fb0a6)
+- Note in the handoff why the ingest re-point moved up the list — [`6ff8f86`](https://github.com/josephevenson08/project-defeat/commit/6ff8f86637c57f2422977d285ed67c7f90586d92)
+- Read the in-game export, and stop taking gear off the player — [`2d707b6`](https://github.com/josephevenson08/project-defeat/commit/2d707b6b9d69c0e690aadf529fb95170047ff188)
+- Let someone arrive as the character they already play — [`8ef865a`](https://github.com/josephevenson08/project-defeat/commit/8ef865a5252dc59cc3b00f09712940844008f104)
 
 ### Sunday 27 September — 2 commits
 
