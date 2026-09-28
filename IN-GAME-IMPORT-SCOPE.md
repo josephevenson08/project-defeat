@@ -3,6 +3,13 @@
 **Written 2026-09-21, for the owner to walk through before anything is built.** The plan comes first.
 The research it rests on follows in full, with every claim labelled by how it was checked.
 
+> **Progress, 2026-09-28.** Stage 2 is built: the addon is written and verified in a Lua VM against
+> stubbed APIs, and [`addon/README.md`](addon/README.md) covers installing, testing and publishing it.
+> The owner settled four of the open questions — **MIT** licence (Q2), **`/pdexport` only** and the
+> name "Project Defeat Export" (Q10), **talent ids plus tree position** (Q12), and **most-pointed tree,
+> ask on a tie or an empty build** for spec inference (Q4). Stage 3 (one in-game session) and stage 1
+> (the site-side importer, which stage 0's data fixes should precede) are what remain.
+
 ## What the owner asked for
 
 A **very basic** in-game addon, plus one export string that carries the whole character — gear, gems,

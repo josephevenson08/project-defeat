@@ -1,0 +1,9 @@
+## Interface: 20506
+## Title: Project Defeat Export
+## Notes: Exports your gear, gems, enchants and talents as one string for the Project Defeat planner.
+## Author: Joseph Evenson
+## Version: 1.0.0
+## X-License: MIT
+## AllowLoadGameType: tbc
+
+ProjectDefeatExport.lua

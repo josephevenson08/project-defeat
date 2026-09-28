@@ -100,9 +100,11 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
 ### Waiting on the owner — do not start these alone
 
 1. **The in-game import (Phase 6).** Scoped in [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md),
-   researched against the live 2.5.6 client, and **nothing is built**. Twelve decisions are the
-   owner's; the plan's own table says which are needed before which stage. They asked to walk through
-   it.
+   researched against the live 2.5.6 client. **The addon is built** (2026-09-28) — see
+   [`addon/README.md`](addon/README.md) — and four of the twelve decisions are settled: MIT licence,
+   `/pdexport` only, talents as ids plus tree position, spec from the most-pointed tree. What is left
+   needs the owner: **one in-game session** to confirm the API assumptions (checklist in the addon
+   README), and then the site-side importer, which the plan's stage 0 data fixes should precede.
 2. **The credits and licence plan of action.** It lives in `SOURCES-AND-LICENSES.md` in the working
    tree, **deliberately uncommitted** — publishing it is one of the owner's open decisions. Don't
    commit it, and **don't re-run the Wowhead ingest scripts**, without asking. The file says why.
