@@ -13,6 +13,15 @@ The research it rests on follows in full, with every claim labelled by how it wa
 > trinket — Empty Mug of Direbrew, 281739 — was **added in patch 2.5.6 itself** and cannot be in a
 > catalogue ingested from a pre-2.5.6 snapshot.
 >
+> **Two more decisions, 2026-09-28, taken on the evidence of that export.**
+> **Q7 (the Phase 3+ gate on imports): equip them, and say the rankings stop at Phase 2.** The items
+> are already in the catalogue with real stats — only `validateBuild`'s gate removes them — so an
+> import will wear what the player wears and the stat totals will be right. What stays Phase 2 is the
+> *rankings*: BiS lists, the upgrade finder and "missing vs BiS" must say so rather than call a Phase
+> 3 weapon missing.
+> **The 2.5.6 catalogue gap: re-point the ingest at `wowsims/tbc-new` before patching items by hand.**
+> One trinket is the symptom; a catalogue pinned to a pre-2.5.6 snapshot is the cause.
+>
 > The owner settled four of the open questions — **MIT** licence (Q2), **`/pdexport` only** and the
 > name "Project Defeat Export" (Q10), **talent ids plus tree position** (Q12), and **most-pointed tree,
 > ask on a tie or an empty build** for spec inference (Q4). Stage 3 (one in-game session) and stage 1
