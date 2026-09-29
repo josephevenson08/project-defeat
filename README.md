@@ -26,8 +26,8 @@ walkthroughs on phones, tablets, a keyboard and a screen reader, with the full t
 
 ## Current Status
 
-Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5) and only Phase 2. The gear
-catalogue, BiS rankings, talents, buffs, raids and professions are all real and sourced.
+Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5, with all of P1 raids/gear available) and only Phase 2. The gear
+catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. Current profession maps need to be reworked to show current layout rather than retail zones with the same names.
 
 **This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
 neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab
