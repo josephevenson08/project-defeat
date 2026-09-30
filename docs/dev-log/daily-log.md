@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**424 commits across 62 days**, from 2026-06-25 to 2026-09-29.
+**425 commits across 63 days**, from 2026-06-25 to 2026-09-30.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,11 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_125 commits_
+_126 commits_
+
+### Wednesday 30 September — 1 commit
+
+- Move the docs into docs/, and cut the README to what a visitor needs — [`ace4e72`](https://github.com/josephevenson08/project-defeat/commit/ace4e72450bbabf06e414f6a228aaa0d7181f892)
 
 ### Tuesday 29 September — 1 commit
 
