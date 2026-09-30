@@ -137,7 +137,7 @@ some interest in World of Warcraft, and none had seen the site. Full description
 ### What was recorded, and why it outranks the reports
 
 Each participant drove a real browser through
-[`tools/usability-study/walk-server.mjs`](tools/usability-study/walk-server.mjs):
+[`tools/usability-study/walk-server.mjs`](../../tools/usability-study/walk-server.mjs):
 
 - **Real WebKit, Safari's engine, for the iPhone and iPad.** A phone participant on Chromium would be
   testing a browser no iPhone runs.
@@ -148,7 +148,7 @@ Each participant drove a real browser through
   scroll position, the focus state, and a screenshot. It works like the screen recording in a lab.
 
 Findings about *what people did* come from that recording, via
-[`analyze.mjs`](tools/usability-study/analyze.mjs), not from the reports. In human studies,
+[`analyze.mjs`](../../tools/usability-study/analyze.mjs), not from the reports. In human studies,
 self-report and behaviour diverge often enough that the recording is the source of truth, and the
 reports are read against it.
 
@@ -480,7 +480,7 @@ participant's plan, and their report, unedited.
 
 ## Running it again
 
-The harness lives in [`tools/usability-study/`](tools/usability-study/), and needs nothing the project
+The harness lives in [`tools/usability-study/`](../../tools/usability-study), and needs nothing the project
 does not already install.
 
 ```bash

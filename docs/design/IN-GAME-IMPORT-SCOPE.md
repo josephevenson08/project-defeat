@@ -4,7 +4,7 @@
 The research it rests on follows in full, with every claim labelled by how it was checked.
 
 > **Progress, 2026-09-28.** Stage 2 is built: the addon is written and verified in a Lua VM against
-> stubbed APIs, and [`addon/README.md`](addon/README.md) covers installing, testing and publishing it.
+> stubbed APIs, and [`addon/README.md`](../../addon/README.md) covers installing, testing and publishing it.
 > **Stage 3 is done too (2026-09-28).** A real export from the owner's Troll Enhancement Shaman
 > confirmed the design's largest unverified assumption: **the client's `talentID` is the planner's
 > talent id** — 21 of 21 resolved, every one in the same tier and column. Enchants, gems and

@@ -14,7 +14,7 @@ import { BUILD_FORMAT_VERSION, type BuildImportIssue, type SavedBuild, type Save
 /**
  * Reads the string the in-game addon produces and turns it into a build the planner can wear.
  *
- * The format, and the research behind every field in it, are in `IN-GAME-IMPORT-SCOPE.md`; the addon
+ * The format, and the research behind every field in it, are in `docs/design/IN-GAME-IMPORT-SCOPE.md`; the addon
  * that writes it is in `addon/`. A real export from a level 70 Troll Enhancement Shaman is committed
  * at `addon/verify/real-export.json` and is what the tests run against.
  *

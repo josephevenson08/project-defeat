@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`

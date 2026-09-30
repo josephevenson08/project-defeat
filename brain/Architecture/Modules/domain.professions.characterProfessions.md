@@ -32,7 +32,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
-- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
+- [[features.professions.ProfessionPicker]] — `src/features/professions/ProfessionPicker.tsx`
 
 ## Concepts & phases
 

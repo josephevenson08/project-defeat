@@ -18,8 +18,8 @@ NN/g's method depends on 3–5 evaluators working **separately**, because each o
 others catch, and seeing someone else's notes pulls you toward theirs. So:
 
 - **Do not read** anything in the repository except the harness (`tools/usability-study/`) and your
-  own screenshots. In particular, do not open `USABILITY-STUDY.md`, `HEURISTIC-EVALUATION.md`,
-  `HANDOFF.md`, `README.md`, `ROADMAP.md`, `brain/`, `usability-study/` or `src/`. Those hold earlier
+  own screenshots. In particular, do not open anything under `docs/` (the study, the heuristic evaluation,
+  the handoff, the roadmap), `README.md`, `brain/` or `src/`. Those hold earlier
   findings and the developer's intent, and either one would bias you.
 - Evaluate what the interface shows. If you catch yourself explaining away a problem because you can
   guess why it was built that way, record the problem anyway.

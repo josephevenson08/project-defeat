@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearPanel.tsx
-lines: 237
+lines: 255
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearPanel
 
-`src/features/gear/GearPanel.tsx` · **features** layer · 237 lines
+`src/features/gear/GearPanel.tsx` · **features** layer · 255 lines
 
 _No doc comment at the top of this file._
 
@@ -19,19 +19,17 @@ _No doc comment at the top of this file._
 
 ## Imports
 
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
-- [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
-- [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.gear.SetBonuses]] — `src/features/gear/SetBonuses.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 
 ## Imported by
 

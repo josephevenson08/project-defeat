@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-191 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+195 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -16,18 +16,18 @@ The one architectural invariant worth protecting: **`domain/` never imports from
 
 The modules everything else leans on — change these carefully.
 
-- [[domain.character.characterTypes]] — 47 importers
+- [[domain.character.characterTypes]] — 46 importers
 - [[domain.gear.itemTypes]] — 28 importers
-- [[domain.stats.statTypes]] — 19 importers
-- [[domain.gear.gearSlots]] — 17 importers
-- [[features.character.characterTypes]] — 17 importers
-- [[domain.professions.professionTypes]] — 14 importers
+- [[features.character.characterTypes]] — 20 importers
+- [[domain.gear.gearSlots]] — 18 importers
+- [[domain.stats.statTypes]] — 17 importers
+- [[domain.professions.professionTypes]] — 15 importers
 - [[components.layout.Panel]] — 13 importers
 - [[domain.abilities.abilityTypes]] — 13 importers
-- [[features.gear.gearTypes]] — 12 importers
-- [[domain.gear.slotCompatibility]] — 11 importers
+- [[features.gear.gearTypes]] — 13 importers
+- [[domain.gear.slotCompatibility]] — 12 importers
 - [[domain.raids.raidTypes]] — 11 importers
-- [[domain.character.roleTheme]] — 10 importers
+- [[features.gear.gearData]] — 11 importers
 
 ## By layer
 
@@ -54,7 +54,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 5 importers
 - [[components.ui.SelectField]] · 1 importers
 
-### features (51)
+### features (52)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -65,18 +65,18 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.builds.ShareNotice]] · 1 importers
 - [[features.character.CharacterCreator]] · 1 importers
 - [[features.character.characterData]] · 5 importers
-- [[features.character.CharacterRail]] · 1 importers
-- [[features.character.characterTypes]] · 17 importers
+- [[features.character.CharacterStrip]] · 1 importers
+- [[features.character.characterTypes]] · 20 importers
 - [[features.gear.compareItems]] · 1 importers
 - [[features.gear.ComparePanel]] · 1 importers
-- [[features.gear.gearData]] · 10 importers
+- [[features.gear.equipRecommendedSet]] · 2 importers
+- [[features.gear.gearData]] · 11 importers
 - [[features.gear.GearPanel]] · 1 importers
-- [[features.gear.GearStatSummary]] · 1 importers
-- [[features.gear.gearTypes]] · 12 importers
+- [[features.gear.gearTypes]] · 13 importers
 - [[features.gear.ItemIcon]] · 4 importers
-- [[features.gear.ItemPopup]] · 1 importers
 - [[features.gear.SetBonuses]] · 1 importers
 - [[features.gear.slotGlyphs]] · 4 importers
+- [[features.gear.SlotPane]] · 1 importers
 - [[features.professions.CraftingPlanTable]] · 1 importers
 - [[features.professions.CraftingProgression]] · 1 importers
 - [[features.professions.FarmingRouteMap]] · 1 importers
@@ -85,6 +85,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.professions.MaterialChip]] · 2 importers
 - [[features.professions.ProfessionPage]] · 1 importers
 - [[features.professions.ProfessionPayoff]] · 1 importers
+- [[features.professions.ProfessionPicker]] · 1 importers
 - [[features.professions.ProfessionsPanel]] · 1 importers
 - [[features.professions.TrainingMarker]] · 2 importers
 - [[features.professions.ZoneRoutes]] · 1 importers
@@ -104,18 +105,18 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.simulator.StatWeightsPanel]] · 1 importers
 - [[features.simulator.UpgradesPanel]] · 1 importers
 - [[features.stats.calculateStats]] · 4 importers
+- [[features.stats.StatBar]] · 1 importers
 - [[features.stats.StatsPanel]] · 0 importers
-- [[features.stats.StatsRail]] · 1 importers
 - [[features.stats.statsTypes]] · 5 importers
 - [[features.talents.TalentsPanel]] · 1 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (125)
+### domain (128)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
 - [[domain.abilities.abilityTypes]] · 13 importers
-- [[domain.abilities.index]] · 3 importers
+- [[domain.abilities.index]] · 4 importers
 - [[domain.abilities.sampleSignatureAbilities]] · 1 importers
 - [[domain.abilities.signatureAbilitiesDruid]] · 1 importers
 - [[domain.abilities.signatureAbilitiesHunter]] · 1 importers
@@ -130,8 +131,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.bisLists]] · 1 importers
 - [[domain.bis.bisRankingsJson.d]] · 0 importers
 - [[domain.bis.bisRecommendationsJson.d]] · 0 importers
-- [[domain.bis.bisTypes]] · 4 importers
-- [[domain.bis.index]] · 2 importers
+- [[domain.bis.bisTypes]] · 5 importers
+- [[domain.bis.index]] · 3 importers
 - [[domain.bis.rankedSource]] · 2 importers
 - [[domain.buffs.buffExclusivity]] · 1 importers
 - [[domain.buffs.buffScope]] · 1 importers
@@ -139,27 +140,28 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.buffs.buffTypes]] · 5 importers
 - [[domain.buffs.sampleBuffs]] · 4 importers
 - [[domain.buffs.sampleTargetDebuffs]] · 3 importers
+- [[domain.builds.addonImport]] · 2 importers
 - [[domain.builds.buildSerialization]] · 4 importers
-- [[domain.builds.buildTypes]] · 6 importers
+- [[domain.builds.buildTypes]] · 7 importers
 - [[domain.builds.shareLink]] · 2 importers
 - [[domain.character.applyRacialTraits]] · 1 importers
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
-- [[domain.character.characterTypes]] · 47 importers
+- [[domain.character.characterTypes]] · 46 importers
 - [[domain.character.classColors]] · 4 importers
 - [[domain.character.factionColors]] · 1 importers
-- [[domain.character.races]] · 3 importers
+- [[domain.character.races]] · 4 importers
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 10 importers
 - [[domain.character.sampleRacialTraits]] · 1 importers
-- [[domain.character.tbcClasses]] · 8 importers
+- [[domain.character.tbcClasses]] · 9 importers
 - [[domain.consumables.consumableCatalogueJson.d]] · 0 importers
 - [[domain.consumables.consumableTypes]] · 2 importers
 - [[domain.consumables.sampleConsumables]] · 2 importers
 - [[domain.enchants.enchantCatalogueJson.d]] · 0 importers
 - [[domain.enchants.enchantSupplementJson.d]] · 0 importers
 - [[domain.enchants.enchantTypes]] · 1 importers
-- [[domain.enchants.sampleEnchants]] · 7 importers
+- [[domain.enchants.sampleEnchants]] · 8 importers
 - [[domain.gear.acquisitionCost]] · 1 importers
 - [[domain.gear.acquisitionCostsJson.d]] · 0 importers
 - [[domain.gear.armorValues]] · 1 importers
@@ -167,19 +169,19 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.catalogueTypes]] · 1 importers
 - [[domain.gear.characterItemRules]] · 2 importers
 - [[domain.gear.defaultGear]] · 1 importers
-- [[domain.gear.gearSlots]] · 17 importers
-- [[domain.gear.itemCatalogue]] · 5 importers
+- [[domain.gear.gearSlots]] · 18 importers
+- [[domain.gear.itemCatalogue]] · 6 importers
 - [[domain.gear.itemEffectsJson.d]] · 0 importers
 - [[domain.gear.itemSets]] · 2 importers
 - [[domain.gear.itemTypes]] · 28 importers
 - [[domain.gear.obtainability]] · 2 importers
 - [[domain.gear.qualityColors]] · 6 importers
 - [[domain.gear.sampleItems]] · 1 importers
-- [[domain.gear.slotCompatibility]] · 11 importers
+- [[domain.gear.slotCompatibility]] · 12 importers
 - [[domain.gear.slotVisibility]] · 2 importers
 - [[domain.gems.gemCatalogueJson.d]] · 0 importers
 - [[domain.gems.gemTypes]] · 3 importers
-- [[domain.gems.sampleGems]] · 6 importers
+- [[domain.gems.sampleGems]] · 7 importers
 - [[domain.icons.icons]] · 1 importers
 - [[domain.icons.iconsJson.d]] · 0 importers
 - [[domain.professions.characterProfessions]] · 2 importers
@@ -190,7 +192,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.gatheringRangeTypes]] · 3 importers
 - [[domain.professions.index]] · 10 importers
 - [[domain.professions.professionPayoffs]] · 1 importers
-- [[domain.professions.professionTypes]] · 14 importers
+- [[domain.professions.professionTypes]] · 15 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 2 importers
 - [[domain.professions.sampleProfessionTiers]] · 4 importers
@@ -200,6 +202,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raidcomp.raidcompIcons]] · 2 importers
 - [[domain.raidcomp.raidcompIconsJson.d]] · 0 importers
 - [[domain.raidcomp.rosterTypes]] · 2 importers
+- [[domain.raids.bossArt]] · 1 importers
+- [[domain.raids.bossArtJson.d]] · 0 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
 - [[domain.raids.index]] · 6 importers
 - [[domain.raids.karazhanBosses]] · 1 importers
@@ -221,17 +225,17 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.paladinSeals]] · 1 importers
 - [[domain.simulation.rageModel]] · 1 importers
 - [[domain.simulation.roguePoisons]] · 1 importers
-- [[domain.simulation.sampleEncounters]] · 3 importers
+- [[domain.simulation.sampleEncounters]] · 4 importers
 - [[domain.simulation.sliceAndDice]] · 1 importers
 - [[domain.simulation.specialAttacks]] · 1 importers
 - [[domain.simulation.spellTable]] · 1 importers
 - [[domain.simulation.warlockPet]] · 1 importers
 - [[domain.simulation.weaponImbues]] · 1 importers
 - [[domain.stats.describeStats]] · 4 importers
-- [[domain.stats.statRelevance]] · 2 importers
-- [[domain.stats.statTypes]] · 19 importers
+- [[domain.stats.statRelevance]] · 1 importers
+- [[domain.stats.statTypes]] · 17 importers
 - [[domain.stats.statUtils]] · 3 importers
-- [[domain.talents.sampleTalents]] · 2 importers
+- [[domain.talents.sampleTalents]] · 3 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers
 - [[domain.talents.talentModifiers]] · 7 importers
 - [[domain.talents.talentTypes]] · 9 importers
@@ -245,7 +249,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 Cross-cutting helpers with no domain meaning.
 
 - [[lib.animations]] · 7 importers
-- [[lib.useMediaQuery]] · 2 importers
+- [[lib.useScreenFocus]] · 2 importers
 
 Up: [[Project Defeat Brain]]
 

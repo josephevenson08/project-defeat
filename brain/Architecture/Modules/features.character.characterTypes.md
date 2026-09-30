@@ -27,11 +27,14 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
-- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
+- [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.professions.ProfessionPicker]] — `src/features/professions/ProfessionPicker.tsx`
+- [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

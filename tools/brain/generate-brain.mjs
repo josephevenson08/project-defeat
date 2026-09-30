@@ -1749,7 +1749,7 @@ async function writeHome(modules, counts) {
     '',
     '## Repo entry points',
     '',
-    `- [[README]] and [[ROADMAP]] at the repo root are part of this vault too, so they show up in the graph.`,
+    `- [[README]] at the repo root and [[ROADMAP]] in \`docs/\` are part of this vault too, so they show up in the graph.`,
     `- ${link('App')} is the root composition: three tabs (Character Planner, Raids, Professions) over shared planner state.`,
     '',
     '## Start reading here',
@@ -1764,7 +1764,7 @@ async function writeHome(modules, counts) {
 
 /**
  * The Obsidian vault root is the repo root, not `brain/` — that is what lets notes link out to
- * README.md and ROADMAP.md. The cost is that Obsidian would otherwise index the entire working tree:
+ * README.md and docs/ROADMAP.md. The cost is that Obsidian would otherwise index the entire working tree:
  * `node_modules` alone carries over a hundred package READMEs, which drown real notes in search and
  * add a cloud of orphan nodes to the graph.
  *
@@ -1826,9 +1826,9 @@ async function updateGraphConfig() {
 async function checkLinks() {
   const files = (await walk(VAULT_ROOT)).filter((file) => file.endsWith('.md'))
   const titles = new Set(files.map((file) => path.basename(file, '.md')))
-  // README.md and ROADMAP.md live at the repo root but are inside the Obsidian vault.
-  for (const rootNote of ['README', 'ROADMAP']) {
-    if (existsSync(path.join(REPO_ROOT, `${rootNote}.md`))) titles.add(rootNote)
+  // README.md and docs/ROADMAP.md live outside brain/ but are inside the Obsidian vault.
+  for (const rootNote of ['README.md', 'docs/ROADMAP.md']) {
+    if (existsSync(path.join(REPO_ROOT, rootNote))) titles.add(path.basename(rootNote, '.md'))
   }
 
   for (const file of files) {

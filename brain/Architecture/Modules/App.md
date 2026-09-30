@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 517
+lines: 577
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 517 lines
+`src/App.tsx` · **app** layer · 577 lines
 
 From the top of the file:
 
@@ -34,6 +34,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
@@ -48,9 +49,10 @@ _Nothing exported (side-effect or style module)._
 - [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
-- [[features.character.CharacterRail]] — `src/features/character/CharacterRail.tsx`
+- [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
@@ -67,7 +69,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
-- [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
+- [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 

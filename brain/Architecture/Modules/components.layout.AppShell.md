@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/AppShell.tsx
-lines: 45
+lines: 62
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.AppShell
 
-`src/components/layout/AppShell.tsx` · **components** layer · 45 lines
+`src/components/layout/AppShell.tsx` · **components** layer · 62 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+- [[lib.useScreenFocus]] — `src/lib/useScreenFocus.ts`
 
 ## Imported by
 

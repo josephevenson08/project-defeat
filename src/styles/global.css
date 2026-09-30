@@ -1282,7 +1282,7 @@ select {
  *
  * Who you are, what that adds up to, then what you are doing about it — three bands down the top of
  * the pane, replacing a left rail that carried all three at once. See `CharacterStrip` and `StatBar`
- * for why, and `HEURISTIC-EVALUATION.md` finding 3 for who asked.
+ * for why, and `docs/research/HEURISTIC-EVALUATION.md` finding 3 for who asked.
  */
 .character-strip {
   border-bottom: 1px solid var(--line);

@@ -3,7 +3,7 @@ import type { Profession, RecipeLeveling } from './professionTypes'
 /**
  * Concise leveling-path guides for the 9 crafting/secondary professions.
  *
- * **Every 300-375 tail is sourced** against wow-professions.com's TBC guides (see HANDOFF.md for the
+ * **Every 300-375 tail is sourced** against wow-professions.com's TBC guides (see docs/dev-log/HANDOFF.md for the
  * URL pattern — the slugs are inconsistent). Skill ranges, craft counts and material quantities are
  * transcribed as facts; the wording here is this repo's own, and none of their prose is copied.
  *

@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
@@ -34,7 +35,7 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 

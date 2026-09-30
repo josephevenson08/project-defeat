@@ -1,4 +1,4 @@
-## Known Limitations so far 
+# Known limitations
 
 - The physical DPS path models white damage plus **one** signature special per spec, and only when
   that special's sustained rate is defensible: a cooldown, an energy cost against energy's fixed

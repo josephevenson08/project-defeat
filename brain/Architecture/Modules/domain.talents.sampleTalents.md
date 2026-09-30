@@ -40,6 +40,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 

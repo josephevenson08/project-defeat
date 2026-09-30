@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Writes CHANGELOG.md: what was worked on, day by day, straight from `git log`.
+ * Writes docs/dev-log/daily-log.md: what was worked on, day by day, straight from `git log`.
  *
  * Usage:  npm run changelog
  *
@@ -9,7 +9,7 @@
  * given day. `HANDOFF.md` is the narrative — why things were done and what was learned — and it is
  * long by design; this is the index into it, one line per commit.
  *
- * **Commits that change nothing but CHANGELOG.md are left out**, and that is what makes the file able
+ * **Commits that change nothing but the log itself are left out**, and that is what makes the file able
  * to be current at all. Without it the commit that refreshes the log would always be missing from it,
  * so a second run would always find something new and the file would never settle. With it, a refresh
  * commit is invisible and a second run writes nothing — the same idempotency `npm run brain` keeps,
@@ -30,8 +30,11 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUTPUT = join(ROOT, 'CHANGELOG.md')
-const OUTPUT_NAME = 'CHANGELOG.md'
+const OUTPUT_NAME = 'docs/dev-log/daily-log.md'
+const OUTPUT = join(ROOT, OUTPUT_NAME)
+// The log lived at the repo root as CHANGELOG.md until 2026-09-30. Refresh commits from before the
+// move touched only that path, so it is excluded too or every old refresh would reappear as a line.
+const LEGACY_OUTPUT_NAME = 'CHANGELOG.md'
 
 const FIELD = '\x1f'
 const RECORD = '\x1e'
@@ -65,6 +68,7 @@ function readCommits() {
     '--',
     '.',
     `:(exclude)${OUTPUT_NAME}`,
+    `:(exclude)${LEGACY_OUTPUT_NAME}`,
   ])
 
   return raw

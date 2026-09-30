@@ -1,0 +1,200 @@
+# Features
+
+The full, detailed feature list for Project Defeat. The [README](../README.md) has the short version.
+
+Figures quoted here (item counts, icon counts, spawn coordinates) are checked against the live data by
+a test in `tests/planner.spec.ts`, so if one drifts the suite fails.
+
+## Current Status
+
+Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5, with all of P1 raids/gear available) and only Phase 2. The gear
+catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. Current profession maps need to be reworked to show current layout rather than retail zones with the same names.
+
+**This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
+neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab
+is shown for the **20 DPS specs** and hidden for the 5 Healer and 2 Tank ones — see
+`src/featureFlags.ts`, which states exactly what is and is not modelled, and carries an assertion
+behind every claim of its that quotes a number.
+
+## Current Features
+
+- TBC class/spec selection for all nine TBC classes
+- Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior), every row checked against sources and pinned in a test. That check found the app refusing **Draenei Mage**, which TBC allowed from launch
+- 28 racial traits applied to your stats, including the weapon-conditional ones and the Draenei hit aura, which is melee hit for Warriors, Paladins and Hunters and spell hit for Mages, Priests and Shamans
+- Full TBC-style gear slot model
+- **The interface is the game's, and it changes with your faction** — framed panels with bevelled
+  metal and corner brackets, Cinzel carrying every heading and both navs, and a palette that follows
+  the character you built: brass and steel with royal blue and gold for Alliance, iron and blood for
+  Horde. It is one construction with two token sets, so the app reads as one product either way, and
+  the switch is driven by the faction you already picked rather than a second control. Item quality
+  is still the only colour the app assigns to data it did not choose, and every theme colour was
+  measured against WCAG AA on every ground it lands on before it was written. The two typefaces are
+  vendored latin-subset in `public/fonts` — 104 KB, no third-party request, so the app still loads
+  with no external dependency
+- **Phase 2 and only Phase 2.** 
+- Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
+- Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location
+- Spec-aware starter filtering for gear, relics, and enchants across every class (legal weapon types per class, dual-wield vs. single-weapon rules, class-appropriate relic type)
+- Spec-aware gear slot visibility for every class, including the Totem/Libram/Idol relic display for Shaman/Paladin/Druid and the hidden Ranged-vs-Relic slot swap
+- 212 gems and 91 enchants, ingested and validated, with per-spec gem and enchant recommendations from Wowhead
+- Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
+- Role-aware prototype simulation outputs:
+  - DPS (separation between melee, ranged and caster)
+  - Healer
+  - Tank
+- Result breakdown panel
+- Raids tab: all five Phase 1/2 raids, **a card per encounter** — with its own artwork where that art
+  exists; Nightbane, Serpentshrine Cavern and Tempest Keep are still waiting on theirs, and their cards
+  are bare until it arrives — and that encounter's drops behind a click on it — colour-coded by item quality where the drop exists in the
+  catalog. **All five raids' tables are complete**: 467 drops across twenty-four encounters, read from
+  Wowhead's own drop data by `tools/ingest/ingest-raid-loot.mjs` rather than curated by hand, so every
+  row carries a real item id and the ingest re-runs. 344 resolve to a catalogued item; the other 123
+  are 80 recipes, 30 tier tokens, and a handful of quest items and mounts — real drops that are not
+  equippable gear, each flagged and saying so rather than rendering as an item with nothing on it.
+  The merge is a **union**, because a boss's drop table cannot see the tier set pieces a token is
+  traded for, the quest rewards an encounter hands out, or Kael'thas's seven encounter weapons — 32
+  curated Tempest Keep rows a replace would have deleted. Thirteen of the twenty-four encounters have art so far (Karazhan bar
+  Nightbane, Gruul's Lair, Magtheridon); the rest keep their card and simply have no picture, so a
+  raid without art reads as unfinished rather than broken. Step-by-step attunement chains for
+  Karazhan, Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
+  callouts are still in the domain data but are deliberately not rendered: the tab answers "what
+  drops here", and a fight guide is a different question asked at a different time
+- Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
+  profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
+  can say, and 719 of the 1,427 rows name an encounter. This is a join across the guides' own Source
+  column, the raid loot tables and the item catalogue rather than a new dataset — and it stops at
+  *where*. **The cost half landed 2026-09-13**: 117 of the 119 crafted and bought picks now carry a
+  price — reagents from Wowhead's `created-by-spell` data, vendor prices from `sold-by`, so a robe
+  reads "15x Primal Fire" and a trinket reads "41x Badge of Justice" on the row that recommends it.
+  The two that do not are the Violet Signet rings, which no vendor sells
+- Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
+  27 specs, with the current character's spec marked on every list it appears on. Tier letters and
+  membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
+  These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
+- **Raid Composition section**: a seating chart for a 10 or 25-player raid — five groups of five,
+  with the buffs each group actually receives listed underneath it. **24 of the 33 raid buffs are
+  party-scoped in TBC**, so totems, auras and shouts reach only the caster's group; every scope is
+  read from the spell's own Wowhead tooltip. Role balance, a ranked list of what one more seat would
+  buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
+  persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
+  spec and buff, **two ways to move a player between groups** — press Move on their seat and then the
+  seat you want them in, or drag them there — with occupied seats swapping rather than being
+  overwritten, an optional player name per seat, and a hover card on each seat listing everything that
+  player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
+  that group actually receives. **Counts follow Wowhead's raid-composition tool**: they say who
+  *could* cast a buff rather than what will be up at once, so one Paladin lights up every Greater
+  Blessing where in the game they hold one. That is stated on the screen rather than left to be
+  discovered — the app should never tell a thin roster it is covered. The exclusivity rule itself
+  (one Blessing and one aura per Paladin, one totem per element, one shout per Warrior) is still
+  sourced and still tested in `buffExclusivity.ts`; this screen just does not apply it. A fillable
+  header (title, date, start time, description) is drawn onto the exported chart
+- Planner split into six sub-tabs (Gear / Compare / Talents / Buffs & Consumables / Ranked Gear /
+  Build) rather than one ~15-screen scroll column, under a character line and a sticky stat bar that
+  stay put across all six
+- **The stat bar is the only place a number appears twice — which is to say, nowhere.** Six totals
+  for the role sit on one line; the full table opens under it and the six are not repeated above it.
+  Scoped to the spec, so a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle that
+  restores every stat — attributes and armor are never hidden
+- Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
+  descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
+- Real item icons on the gear list, the ranked-gear rows and the raid loot tables. Icon names are
+  ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
+  `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network
+  calls. Entries with no catalogued item fall back to the two-letter slot glyph
+- **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
+  and each one opens on its own progression: a skill range, what you gather or craft in it, and the
+  trainer visit that gates the next one. There is no skill-tier table; training requirements are
+  markers placed at the skill where the bar stops moving
+- **Crafting paths that are computed rather than copied** — 2,079 TBC recipes ingested for their
+  reagents and their orange/yellow/green/grey breakpoints, from which all nine crafting professions
+  get a path from their first recipe to 375: what to make, how many, and the shopping list. The craft
+  counts are derived from the skill-up curve, not taken from anyone's guide, and the page prints the
+  model it used. Reagents a vendor is the only source for — thread, dye, vials, flux — are counted as
+  bought rather than farmed and priced at their fixed vendor cost, so a step separates its shopping
+  list from its farming list
+- **Every profession page opens with a table of the whole climb**, with each trainer stop written into
+  the row it falls in — the moment a player needs "Expert is trainable at 125" is the moment their bar
+  stops at 125, which a five-row tier table at the top of the page is three screens away from. The
+  gathering and crafting tables read the same placement function, so they cannot disagree about where
+  you stop
+- **A levelling guide for each of the four gathering professions** — guidance, then that
+  table, then the ranges themselves with a map each. The unit is a skill range rather than a material, which is the change that makes Gold
+  read correctly: Gold Veins sit in Iron's zones and you pick them up on the Iron lap, so Gold is one
+  of the ores the 125-175 range draws rather than a section describing a trip nobody takes. Which
+  nodes a range covers is derived from each node's skill requirement, so no range can offer an ore you
+  cannot mine yet and a re-ingest moves a node to the right section on its own. Every claim in the
+  prose was checked against at least two published guides plus our own ingest, and each range prints
+  what it was checked against
+- **Farming route maps for Herbalism and Mining** — 45 gathering nodes and 14,091 real spawn
+  coordinates from Wowhead, covering the whole 1-375 climb. A skill range gets one map per zone,
+  merging every material farmed in that range, because that is how a range is farmed — at 1-70 you
+  are picking Peacebloom, Silverleaf and Earthroot on the same lap. Zones are tabs rather than stacked
+  maps, ordered by the range's recommendation rather than by spawn count — Silver's busiest zones are
+  level 30-40 and a player mining Silver is around level 20. Every recorded spawn is plotted over the
+  zone's own map art, which registers with no transform because coordinates are percentages of the
+  zone's extent and that is exactly the space the art covers. The circuit is computed here rather than
+  copied from anyone's guide — density, snapped onto nodes that actually exist, then 2-opt to uncross
+  it — and the caption says it is a strong starting line rather than a proven optimum. Zone maps are
+  Blizzard artwork used under the Game Content Usage Rules, credited on every map; the one zone with
+  no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
+  for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
+  maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
+- **Laid out for a phone.** The character line, the stat bar and the gear list stack without a
+  sidebar to collapse — the rail they replaced was one full screen tall at 375px on its own. Both tab
+  bars are a three-column grid, so every tab stays visible without swiping, and every control on the
+  planner, folded away or not, is a 44px tap target. Measured at 375x812: an empty planner's one
+  action is pressable without scrolling, a filled gear list shows on the first screen, and no section
+  scrolls sideways. Raid Composition and the
+  profession guides were reviewed the same way and every control there is a 44px target too; desktop
+  keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
+  groups no longer needs a drag**, which a finger cannot start and a keyboard never could: press Move
+  on their seat, then the seat you want them in
+- **Import your character out of the game.** A two-file addon (`addon/`) adds `/pdexport`, which
+  hands you one string carrying race, class, faction, professions, talents and every equipped item
+  with its enchants and gems — and no name, realm or GUID. Paste it on the front page and you land in
+  the planner as that character, without building one first. Gear from a later phase than the
+  rankings cover is worn rather than stripped, and the import says which half of the app stops at
+  Phase 2
+- **The planner opens with one thing to do.** A character with nothing equipped gets an offer rather
+  than seventeen empty rows: one press fills every slot from the ranked list for the spec, with the
+  enchants and gems that list recommends, and the offer disappears once taken. Rings and trinkets
+  take successive entries, so both hands get filled rather than only the first
+- **Choosing gear happens beside the list, not over it.** Picking a slot opens a pane next to the
+  gear list: the row you are editing stays visible and updates as you click, so there is no
+  confirmation step and nothing to close before you can see what you did. It says what to do when
+  you arrive, and hands focus back to the row you came from when you leave
+- **Usable from the keyboard.** A "Skip to the main content" link opens the shell, so the section tabs
+  are two presses away rather than on the far side of the whole page, and when the app
+  swaps one whole screen for another — the front page for the shell, the shell for character creation —
+  focus goes with it instead of falling to the page body, which is what a screen reader reads from.
+  Every control shows a focus ring, including the character selects. Both behaviours are guarded by
+  tests driven with real key presses
+- **Share a build as a link** — the whole build (character, professions, gear, gems, enchants,
+  talents, buffs and consumables) packed into the address, so a build made on the desktop opens on a
+  phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the
+  part of the URL browsers never send to a server. Opening one lands straight in the planner wearing
+  the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean
+- **Professions on the character** — a two-slot picker on the Professions tab, gating the one always-on stat
+  bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
+  Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**
+  rings, for +8 to every attribute. The app previously had this wrong in both directions at once —
+  offering them to every character, and only ever on Finger 1. Dropping the profession removes the
+  enchant rather than leaving it applied. Everything else a profession gives in TBC is access, not
+  stats, and the picker says so rather than implying a bonus that is really Wrath's
+- Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
+- **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
+  actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip
+  comparison cannot see them. Shows the stat-by-stat difference and the change in the role's headline
+  number. It answers what the upgrade finder cannot: that list ranks what beats your current kit, so
+  it cannot show a pair where one side is a downgrade, or compare two items you do not own yet.
+  **Both sides are scored with the best colour-matched gems**, deliberately unlike the upgrade
+  finder, which scores your baseline as-is — the question here is which *item* is better, not whether
+  you have gemmed yet, and the panel states which question it is answering. The simulated score is
+  shown for damage specs only, the same call the Simulation tab makes and for the same reason; the
+  stat comparison is shown to every spec
+- A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
+- Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
+- Reduced-motion aware animation helpers
+- Playwright tests for physical, caster, healer, and tank flows
+- Playwright regression coverage for expanded slot options and every class/spec's Phase 2 sample gear selection, plus a full-coverage check that every class/spec resolves to a BiS list
+

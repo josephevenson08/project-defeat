@@ -23,6 +23,7 @@ _None._
 
 ## Imported by
 
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`

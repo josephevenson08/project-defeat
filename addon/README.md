@@ -2,7 +2,7 @@
 
 **Written 2026-09-28.** The addon that carries a character out of the game in one string. The format
 it produces, and the research behind every API call in it, are in
-[`IN-GAME-IMPORT-SCOPE.md`](../IN-GAME-IMPORT-SCOPE.md); this file is the practical half — how to
+[`IN-GAME-IMPORT-SCOPE.md`](../docs/design/IN-GAME-IMPORT-SCOPE.md); this file is the practical half — how to
 work on it, how to check it without the game, and what CurseForge asks for.
 
 > **Status: written, machine-verified, and run in the game.** Stages 2 and 3 of the five-stage plan

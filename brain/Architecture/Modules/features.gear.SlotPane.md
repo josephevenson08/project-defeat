@@ -1,0 +1,48 @@
+---
+type: module
+layer: features
+source: src/features/gear/SlotPane.tsx
+lines: 470
+generated: true
+tags: [brain/architecture, layer/features]
+---
+
+# features.gear.SlotPane
+
+`src/features/gear/SlotPane.tsx` · **features** layer · 470 lines
+
+_No doc comment at the top of this file._
+
+## Exports
+
+**function** — `SlotPane`
+
+## Imports
+
+- [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
+- [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
+- [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
+- [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
+- [[domain.simulation.combatConstants]] — `src/domain/simulation/combatConstants.ts`
+- [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
+- [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
+
+## Imported by
+
+- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+
+## Concepts & phases
+
+_None._
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

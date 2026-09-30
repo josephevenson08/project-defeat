@@ -101,7 +101,7 @@ export type FeralBleedEstimate = {
  * is modelled at one cast per its own duration, and the ceilings decide whether even that is
  * affordable — which for Rip means combo points as well as energy, since it is a finisher.
  *
- * **They compete with Shred for the same energy**, and that is the warning `ROTATION-SCOPE.md` already
+ * **They compete with Shred for the same energy**, and that is the warning `docs/design/ROTATION-SCOPE.md` already
  * records about second abilities: energy spent here is energy the filler does not get. What makes
  * these worth it where Mangle was not is the armour split — Shred's damage is reduced by roughly a
  * quarter against a raid boss and the bleed ticks are not, so a bleed's effective return per energy

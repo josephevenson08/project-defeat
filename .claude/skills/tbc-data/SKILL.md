@@ -83,5 +83,5 @@ npm run test        # Playwright — includes a full-coverage check that every c
 npm run brain       # domain notes and counts pick up new data automatically
 ```
 
-Then update `README.md` and `ROADMAP.md` if coverage changed, and re-read what you wrote there: those
+Then update `docs/features.md` and `docs/ROADMAP.md` if coverage changed, and re-read what you wrote there: those
 two files are the project's own honesty statement and they go stale fastest.

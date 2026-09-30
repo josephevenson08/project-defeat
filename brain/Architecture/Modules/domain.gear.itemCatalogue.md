@@ -49,6 +49,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`

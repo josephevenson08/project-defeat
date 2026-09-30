@@ -14,7 +14,7 @@ begin work; the rest is the record of how each decision was reached, newest firs
 **The planner was rebuilt around what it is for, and all five of the owner's heuristic findings are
 answered.** They rated the post-creation screen's density a major problem and said to fix that first;
 this is that, plus the two "visibility" findings it made cheap. Full record in
-[`HEURISTIC-EVALUATION.md`](HEURISTIC-EVALUATION.md).
+[`HEURISTIC-EVALUATION.md`](../research/HEURISTIC-EVALUATION.md).
 
 Measured at 1440×900, a planner with nothing equipped: **46 controls → 32**, page height **980px →
 900px**, two stat readouts → one, and 17 gear cards three lines tall → 17 rows one line tall.
@@ -99,9 +99,9 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
 
 ### Waiting on the owner — do not start these alone
 
-1. **The in-game import (Phase 6).** Scoped in [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md),
+1. **The in-game import (Phase 6).** Scoped in [`IN-GAME-IMPORT-SCOPE.md`](../design/IN-GAME-IMPORT-SCOPE.md),
    researched against the live 2.5.6 client. **The addon is built** (2026-09-28) — see
-   [`addon/README.md`](addon/README.md) — and four of the twelve decisions are settled: MIT licence,
+   [`addon/README.md`](../../addon/README.md) — and four of the twelve decisions are settled: MIT licence,
    `/pdexport` only, talents as ids plus tree position, spec from the most-pointed tree. What is left
    needs the owner: **one in-game session** to confirm the API assumptions (checklist in the addon
    README), and then the site-side importer, which the plan's stage 0 data fixes should precede.
@@ -118,7 +118,7 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
 
 ### Ready to build, in the order worth doing
 
-1. **The rest of the study's findings** ([`USABILITY-STUDY.md`](USABILITY-STUDY.md) marks each one
+1. **The rest of the study's findings** ([`USABILITY-STUDY.md`](../research/USABILITY-STUDY.md) marks each one
    fixed, partly fixed or open):
    - the tier list's stale "(Phase 2)" citation label, whose Wowhead page now says Phase 3
    - **one line of playstyle prose per spec** in creation. The step now states each spec's role and
@@ -129,7 +129,7 @@ Everything outstanding, as of 2026-09-26. **Read this before starting anything.*
    over the per-slot one when asked, so this is deliberately absent rather than missed;
    `buildRecommendedSet` already has the logic if it is wanted. The same function would give Ranked
    Gear an "equip this whole list" button, which two study participants asked for by name.
-3. **Act on the payload audit** ([`PAYLOAD-AUDIT.md`](PAYLOAD-AUDIT.md), 2026-09-27). Nothing in it
+3. **Act on the payload audit** ([`PAYLOAD-AUDIT.md`](../architecture/PAYLOAD-AUDIT.md), 2026-09-27). Nothing in it
    is done yet. Two items are worth doing whatever else happens: **code-splitting the panels**, which
    an estimate puts at 72% off the landing download, and **using the `backdrop.webp` already sitting
    in the repo**, which is one line for 190 KB. The rest is ranked there with its costs.
@@ -160,7 +160,7 @@ in-game import, an audit of every source the project uses, and a usability study
 participants. All three are done. The study found real bugs, which are listed below and **not yet
 fixed**, by the owner's choice: they want to walk through the results first.
 
-### 1. The in-game import is scoped: [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md) (committed)
+### 1. The in-game import is scoped: [`IN-GAME-IMPORT-SCOPE.md`](../design/IN-GAME-IMPORT-SCOPE.md) (committed)
 
 It was researched against the live **2.5.6.69795** client, interface **20506**. The three claims the
 design leans on hardest were re-checked independently. The plan runs in five stages:
@@ -193,10 +193,10 @@ the owner agreed on:
 The raid art and front-page backdrop are the owner's own **ChatGPT generations**. That is settled;
 don't re-ask.
 
-### 3. The usability study: [`USABILITY-STUDY.md`](USABILITY-STUDY.md) (committed)
+### 3. The usability study: [`USABILITY-STUDY.md`](../research/USABILITY-STUDY.md) (committed)
 
 Twelve simulated participants each walked the live site on their own device and access mode, while an
-instrumented harness recorded every action ([`tools/usability-study/`](tools/usability-study/)).
+instrumented harness recorded every action ([`tools/usability-study/`](../../tools/usability-study)).
 **Bugs it found and the observer verified — none fixed yet:**
 
 1. **The top item in an empty gear slot cannot be equipped by clicking it.** A controlled `<select>`

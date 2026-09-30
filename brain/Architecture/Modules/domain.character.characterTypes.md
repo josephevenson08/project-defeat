@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
@@ -61,15 +62,13 @@ _No doc comment at the top of this file._
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
-- [[features.gear.GearStatSummary]] — `src/features/gear/GearStatSummary.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 - [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
-- [[features.stats.StatsRail]] — `src/features/stats/StatsRail.tsx`
 
 ## Concepts & phases
 

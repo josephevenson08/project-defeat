@@ -1,7 +1,7 @@
 // Reads spell and item facts off Wowhead so they can be transcribed by hand. Prints; writes nothing.
 //
 // This exists because the buff and set-bonus data in this repo is deliberately *not* ingested.
-// Automated parsing of these two datasets was tried three ways and abandoned (see HANDOFF.md): the
+// Automated parsing of these two datasets was tried three ways and abandoned (see docs/dev-log/HANDOFF.md): the
 // tooltips are prose, written 33 different ways, and a parser that widens enough to catch them all
 // starts matching the wrong number — "Summons a Mana Spring Totem with 5 health ... that restores 20
 // mana every 2 seconds" hands a regex the 5. A human reads 20-per-2s and writes 50 mp5.

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/builds/BuildPanel.tsx
-lines: 313
+lines: 383
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.builds.BuildPanel
 
-`src/features/builds/BuildPanel.tsx` · **features** layer · 313 lines
+`src/features/builds/BuildPanel.tsx` · **features** layer · 383 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,7 @@ _No doc comment at the top of this file._
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[components.ui.Button]] — `src/components/ui/Button.tsx`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`

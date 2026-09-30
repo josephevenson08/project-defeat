@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/builds/ShareNotice.tsx
-lines: 53
+lines: 60
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.builds.ShareNotice
 
-`src/features/builds/ShareNotice.tsx` · **features** layer · 53 lines
+`src/features/builds/ShareNotice.tsx` · **features** layer · 60 lines
 
 _No doc comment at the top of this file._
 

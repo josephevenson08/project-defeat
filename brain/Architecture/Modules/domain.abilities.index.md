@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
+- [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
 

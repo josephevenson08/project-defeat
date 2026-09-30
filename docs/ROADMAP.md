@@ -330,7 +330,7 @@ each pinned by an assertion these days.
 - Source and cost planning
 - Better responsive/mobile layout
 
-**Watched twelve people meet the site on 2026-09-21** — see [`USABILITY-STUDY.md`](USABILITY-STUDY.md),
+**Watched twelve people meet the site on 2026-09-21** — see [`USABILITY-STUDY.md`](research/USABILITY-STUDY.md),
 which marks every finding fixed, partly fixed or open. The phone and tablet layouts came out well: the
 raid leader moved a player with two taps, and the tier list answered its visitor in two. **Keyboard and
 screen reader access did not**: the keyboard participant spent his whole session without reaching the
@@ -528,7 +528,7 @@ the simulator can price it.
 - No backend is required for this if export/import stays client-side (paste a blob, parse in
   the browser); a small backend only becomes necessary if we want shareable links or account sync.
 
-**Scoped 2026-09-21: see [`IN-GAME-IMPORT-SCOPE.md`](IN-GAME-IMPORT-SCOPE.md).** It was researched
+**Scoped 2026-09-21: see [`IN-GAME-IMPORT-SCOPE.md`](design/IN-GAME-IMPORT-SCOPE.md).** It was researched
 against the live 2.5.6 client, and the claims the design leans on hardest were re-checked
 independently. The plan has five stages:
 

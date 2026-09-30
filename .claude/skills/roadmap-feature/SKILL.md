@@ -61,7 +61,7 @@ npm run brain     # new modules and domain data flow into the vault automaticall
 ```
 
 Then, once the work is committed and before the last push: `npm run changelog` and commit
-`CHANGELOG.md` **on its own**. The owner reads it on GitHub to see what was done each day, and the
+`docs/dev-log/daily-log.md` **on its own**. The owner reads it on GitHub to see what was done each day, and the
 generator only skips commits that touch nothing else — so a refresh bundled with other files lists
 itself, and the next run changes the file again.
 
@@ -71,8 +71,8 @@ the intent. Find out what it was for.
 
 ## Then update the honest docs
 
-- `README.md` current features and known limitations
-- `ROADMAP.md` phase status
+- `docs/features.md` current features and `docs/known-limitations.md`; the README only if a headline feature changed
+- `docs/ROADMAP.md` phase status
 - The `PHASES` array in `tools/brain/generate-brain.mjs` — status text is authored there, and the
   roadmap board reads from it
 

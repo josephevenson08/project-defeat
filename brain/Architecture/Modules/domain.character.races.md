@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`

@@ -10,7 +10,7 @@ import type { Buff } from './buffTypes'
  * that were all flagged `needsVerification`, and rightly so: five of them were materially wrong.
  *
  * **Why this was done by hand.** Three automated routes were tried and abandoned before this
- * (recorded in HANDOFF.md), and the tooltips show exactly why: Mana Spring Totem reads "Summons a
+ * (recorded in docs/dev-log/HANDOFF.md), and the tooltips show exactly why: Mana Spring Totem reads "Summons a
  * Mana Spring Totem with 5 health ... that restores 20 mana every 2 seconds", so a parser takes 5,
  * a careful reader takes 20-per-2s and converts it to 50 mp5. The ambiguity is only ambiguous to a
  * regex. What made the by-hand pass tractable was resolving each spell through Wowhead's *listing*

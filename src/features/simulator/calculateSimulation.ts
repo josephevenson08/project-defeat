@@ -1011,7 +1011,7 @@ function calculatePhysicalDps(
      *
      * They are maintained rather than spammed — one cast per duration, because refreshing a bleed
      * early throws the remainder away — and the energy they take is subtracted from the filler's
-     * budget rather than assumed free. That is the trade `ROTATION-SCOPE.md` warns about made
+     * budget rather than assumed free. That is the trade `docs/design/ROTATION-SCOPE.md` warns about made
      * explicit: what makes these worth it where Mangle was not is that Shred loses a quarter to
      * armour and a bleed tick loses none.
      */
@@ -1539,7 +1539,7 @@ function calculatePhysicalDps(
 /**
  * A caster spec that maintains several damage-over-time effects and fills the gaps with a nuke.
  *
- * **This is the multi-DoT shape `ROTATION-SCOPE.md` filed under stage 3, and it turned out not to
+ * **This is the multi-DoT shape `docs/design/ROTATION-SCOPE.md` filed under stage 3, and it turned out not to
  * need a timeline.** DoTs do not compete for a resource the way energy abilities do — they compete
  * for *globals*. A DoT refreshed on its own duration costs `gcd / duration` of every second and
  * returns `damagePerApplication / duration` of damage, both of which are closed-form. Whatever

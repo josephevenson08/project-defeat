@@ -5722,7 +5722,7 @@ test('buff effects that are not stats reach the simulator, and only through the 
 
 test('a multi-DoT caster is scored as a rotation, and its DoTs do not crit', () => {
   /*
-   * `ROTATION-SCOPE.md` filed this under stage 3 and expected it to need a timeline. It does not.
+   * `docs/design/ROTATION-SCOPE.md` filed this under stage 3 and expected it to need a timeline. It does not.
    * **DoTs compete for globals, not for a resource** — a DoT refreshed on its own duration costs
    * `gcd / duration` of every second and returns `damagePerApplication / duration` of damage, both
    * closed form, and the filler takes whatever fraction of the second is left.
@@ -5858,7 +5858,7 @@ test('the damage breakdown is complete, and adds up to the answer', () => {
    *
    * That invariant is the whole value. "The total is 3.3x low" and "white damage is 3.2x low while
    * Windfury is 5.7x low" are different pieces of information and only the second says what to fix —
-   * the reference parse in `ROTATION-SCOPE.md` is exactly that comparison, worked out by hand. A
+   * the reference parse in `docs/design/ROTATION-SCOPE.md` is exactly that comparison, worked out by hand. A
    * source dropped, double-counted, or mitigated on the wrong side of the armour term shows up here
    * as a sum that stops matching, rather than as a plausible row nobody checks.
    */
@@ -7629,7 +7629,7 @@ test('every Physical DPS spec has talent effects, and three classes share a tale
    * this session kept finding. The estimate tells those players so directly.
    *
    * That figure is asserted rather than written down because it was wrong in prose for a while: this
-   * comment, HANDOFF.md and featureFlags.ts all said "7 caster and 2 healer", which is 9 specs
+   * comment, docs/dev-log/HANDOFF.md and featureFlags.ts all said "7 caster and 2 healer", which is 9 specs
    * against the real 16. Counting from `getRoleForSpec` is the only method that cannot drift.
    */
   const physical: string[] = []
@@ -10188,45 +10188,45 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
 
   const claims: { where: string; pattern: RegExp; actual: number; tolerance?: number }[] = [
     {
-      where: 'README: recommended items with a resolved source',
+      where: 'features.md: recommended items with a resolved source',
       pattern: /\*\*([\d,]+) of the [\d,]+ recommended items/,
       actual: locatedItems,
     },
     {
-      where: 'README: recommended items in total',
+      where: 'features.md: recommended items in total',
       pattern: /\*\*[\d,]+ of the ([\d,]+) recommended items/,
       actual: recommendedItems,
     },
     {
-      where: 'README: share of recommended items located',
+      where: 'features.md: share of recommended items located',
       pattern: /\*\*[\d,]+ of the [\d,]+ recommended items \(([\d.]+)%\)\*\*/,
       actual: Number(((100 * locatedItems) / recommendedItems).toFixed(1)),
       tolerance: 0.05,
     },
     {
-      where: 'README: ranked rows naming an encounter',
+      where: 'features.md: ranked rows naming an encounter',
       pattern: /and ([\d,]+) of the [\d,]+ rows name an encounter/,
       actual: rowsNamingAnEncounter,
     },
     {
-      where: 'README: vendored icon count',
+      where: 'features.md: vendored icon count',
       pattern: /`public\/icons\/` \(([\d,]+) files/,
       actual: iconCount,
     },
     {
-      where: 'README: vendored icon size in MB',
+      where: 'features.md: vendored icon size in MB',
       pattern: /`public\/icons\/` \([\d,]+ files, ([\d.]+) MB\)/,
       actual: Number((iconBytes / 1024 / 1024).toFixed(1)),
       // Rounded to one decimal in prose, so a tenth either way is the same claim.
       tolerance: 0.05,
     },
     {
-      where: 'README: gathering nodes',
+      where: 'features.md: gathering nodes',
       pattern: /([\d,]+) gathering nodes/,
       actual: gatheringNodes.length,
     },
     {
-      where: 'README: spawn coordinates',
+      where: 'features.md: spawn coordinates',
       pattern: /([\d,]+) real spawn coordinates/,
       actual: gatheringNodes.reduce(
         (total, node) => total + node.zones.reduce((sum, zone) => sum + zone.coords.length, 0),
@@ -10248,7 +10248,7 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
   ]
 
   /*
-   * `knownlimitations` is the file that matters most here and the one that rots worst, because a
+   * `docs/known-limitations.md` is the file that matters most here and the one that rots worst, because a
    * limitation is a claim about *absence* and nothing fails when an absence quietly fills in. Two of
    * its bullets were false on 2026-09-10: multi-ability rotations still said "only Fury and Arms
    * Warrior" after three more specs gained one, and Feral Attack Power said a single weapon carried
@@ -10273,12 +10273,12 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
 
   const limitationClaims: typeof claims = [
     {
-      where: 'knownlimitations: specs with a multi-ability rotation',
+      where: 'known-limitations.md: specs with a multi-ability rotation',
       pattern: /\*\*Multi-ability rotations cover ([\d,]+) specs of 27\*\*/,
       actual: multiAbilitySpecs,
     },
     {
-      where: 'knownlimitations: weapons carrying Feral Attack Power',
+      where: 'known-limitations.md: weapons carrying Feral Attack Power',
       pattern: /\*\*([\d,]+) catalogued weapons now carry a real value\*\*/,
       actual: feralWeapons,
     },
@@ -10321,10 +10321,10 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
     },
   ]
 
-  const readme = read('README.md')
-  const roadmap = read('ROADMAP.md')
-  const handoff = read('HANDOFF.md')
-  const limitations = read('knownlimitations')
+  const features = read('docs/features.md')
+  const roadmap = read('docs/ROADMAP.md')
+  const handoff = read('docs/dev-log/HANDOFF.md')
+  const limitations = read('docs/known-limitations.md')
   const sourceComments =
     read('src/domain/gear/sampleItems.ts') +
     ' ' +
@@ -10334,7 +10334,7 @@ test('the numbers the hand-written docs quote are the numbers the data holds', (
 
   const wrong: string[] = []
   for (const [text, rows] of [
-    [readme, claims],
+    [features, claims],
     [roadmap, roadmapClaims],
     [handoff, handoffClaims],
     [limitations, limitationClaims],
@@ -12087,7 +12087,7 @@ test('the Build panel shares only the build on screen, and no longer promises an
 })
 
 /*
- * Fixes from the 2026-09-21 usability study (USABILITY-STUDY.md). Each problem was seen by a
+ * Fixes from the 2026-09-21 usability study (docs/research/USABILITY-STUDY.md). Each problem was seen by a
  * participant and reproduced by the observer before it was fixed, and each test here was confirmed to
  * fail without its fix.
  */

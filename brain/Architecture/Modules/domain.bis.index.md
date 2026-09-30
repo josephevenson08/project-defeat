@@ -29,7 +29,8 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 
 ## Concepts & phases
 

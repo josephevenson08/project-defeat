@@ -26,6 +26,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 

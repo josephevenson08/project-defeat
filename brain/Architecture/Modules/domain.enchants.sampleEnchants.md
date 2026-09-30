@@ -45,10 +45,11 @@ From the top of the file:
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 

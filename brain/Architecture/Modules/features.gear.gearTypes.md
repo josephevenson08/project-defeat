@@ -28,9 +28,10 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

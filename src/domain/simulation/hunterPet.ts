@@ -335,7 +335,7 @@ export function estimateHunterPetKillCommand(input: HunterPetKillCommandInput): 
  * `λ` counts the pet's crits, and the pet's crits come partly from auto attacks, whose rate Frenzy
  * itself raises. Faster swings mean more crits mean more uptime mean faster swings. Substituting
  * gives a transcendental equation, so it is iterated instead — it converges to four decimal places in
- * three passes, which is the same treatment `SIMULATION-ARCHITECTURE.md` recommends for the Rogue
+ * three passes, which is the same treatment `docs/architecture/SIMULATION-ARCHITECTURE.md` recommends for the Rogue
  * energy loop.
  *
  * **Ability crits are counted and do not compound.** Bite, Claw and Kill Command all crit and all

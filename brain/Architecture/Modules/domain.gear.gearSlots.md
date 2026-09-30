@@ -27,6 +27,7 @@ _None._
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`

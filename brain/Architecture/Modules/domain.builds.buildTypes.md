@@ -31,6 +31,7 @@ From the top of the file:
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`

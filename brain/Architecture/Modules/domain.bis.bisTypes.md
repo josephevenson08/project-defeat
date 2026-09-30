@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
+- [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 
 ## Concepts & phases
 

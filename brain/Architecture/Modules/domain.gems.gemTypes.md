@@ -34,7 +34,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

@@ -31,9 +31,10 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.gear.ItemPopup]] — `src/features/gear/ItemPopup.tsx`
+- [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`

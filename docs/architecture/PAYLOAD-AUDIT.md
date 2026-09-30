@@ -190,7 +190,7 @@ Ids matching no entry in any catalogue. Real, negligible, listed for completenes
 
 ## How these numbers were arrived at
 
-The audit was run by a `payload-auditor` subagent ([`.claude/agents/payload-auditor.md`](.claude/agents/payload-auditor.md))
+The audit was run by a `payload-auditor` subagent ([`.claude/agents/payload-auditor.md`](../../.claude/agents/payload-auditor.md))
 and then checked. Independently re-measured before publishing:
 
 - the full baseline table — **matches byte for byte**;

@@ -21,7 +21,7 @@ From the top of the file:
 > 
 > **A weapon imbue is not a rotational ability**, which is why this is not a `SignatureAbility`.
 > There is no button and no usage rate to defend — the rate falls out of how often the main hand
-> swings and lands. `ROTATION-SCOPE.md` originally filed Enhancement under "gets its second and
+> swings and lands. `docs/design/ROTATION-SCOPE.md` originally filed Enhancement under "gets its second and
 > third buttons"; it does not need one, it needs this.
 > 
 > Every constant below is read from wowsims/tbc `sim/shaman/weapon_imbues.go` at the pinned commit

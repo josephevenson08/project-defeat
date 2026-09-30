@@ -69,7 +69,7 @@ export type SimulationResult = {
    *
    * That invariant is the point of it. "The total is 3.3x low" and "white damage is 3.2x low while
    * Windfury is 5.7x low" are completely different pieces of information, and only the second tells
-   * anyone what to fix — the reference parse in `ROTATION-SCOPE.md` is exactly that comparison, done
+   * anyone what to fix — the reference parse in `docs/design/ROTATION-SCOPE.md` is exactly that comparison, done
    * by hand. This makes it something the app produces rather than something a person reconstructs.
    *
    * Absent on the healer and tank paths, which score healing and effective health rather than damage.

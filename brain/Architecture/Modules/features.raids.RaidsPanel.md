@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidsPanel.tsx
-lines: 193
+lines: 199
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidsPanel
 
-`src/features/raids/RaidsPanel.tsx` · **features** layer · 193 lines
+`src/features/raids/RaidsPanel.tsx` · **features** layer · 199 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,7 @@ _No doc comment at the top of this file._
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
+- [[domain.raids.bossArt]] — `src/domain/raids/bossArt.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.raids.RaidAttunementChain]] — `src/features/raids/RaidAttunementChain.tsx`
