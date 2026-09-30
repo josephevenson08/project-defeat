@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**426 commits across 63 days**, from 2026-06-25 to 2026-09-30.
+**427 commits across 63 days**, from 2026-06-25 to 2026-09-30.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## September 2026
 
-_127 commits_
+_128 commits_
 
-### Wednesday 30 September — 2 commits
+### Wednesday 30 September — 3 commits
 
 - Move the docs into docs/, and cut the README to what a visitor needs — [`ace4e72`](https://github.com/josephevenson08/project-defeat/commit/ace4e72450bbabf06e414f6a228aaa0d7181f892)
 - Plan a Discord bot that answers from the app's own data — [`edaa414`](https://github.com/josephevenson08/project-defeat/commit/edaa41473beb220b23af23a6264d33ffbb4e3660)
+- Read the weapon enchants the guides were already recommending — [`ff9d632`](https://github.com/josephevenson08/project-defeat/commit/ff9d632a8afc45fe4784c3bf0ded6bace1d7c76d)
 
 ### Tuesday 29 September — 1 commit
 
