@@ -543,6 +543,15 @@ independently. The plan has five stages:
 Twelve decisions are the owner's, and nothing has been built yet. Share links, the other half of the
 original "backend" question, landed 2026-09-20 without one.
 
+## Phase 7: Discord Bot
+
+**Planned 2026-09-30, not started: see [`discord-bot/PLAN.md`](../discord-bot/PLAN.md).** A bot on
+the owner's Raspberry Pi that answers from the same `src/domain` data as the app: `/bis <spec>`
+(weapon enchants yes, ring enchants and gems no), `/whodrops <item>`, `/loot <raid or boss>`,
+`/attune <raid>`, `/farm <skill or material>`, and `/import <string>` for upgrades from the addon
+export. Two data fixes come first: weapon enchants for Arms and Fury Warrior and Rogue off-hands,
+and re-checking the three attunement chains for Anniversary realms.
+
 ## How decisions get made here
 
 Seven patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as

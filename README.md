@@ -56,13 +56,14 @@ npm run dev
 ## Project layout
 
 ```
-src/        the app (domain data and rules, features, components)
-tests/      Playwright tests
-tools/      scripts that fetch and prepare game data
-public/     icons, maps, raid art and fonts the app ships
-addon/      the in-game export addon
-docs/       everything else: features, roadmap, design notes, research, dev log
-brain/      generated Obsidian notes that map the codebase
+src/          the app (domain data and rules, features, components)
+tests/        Playwright tests
+tools/        scripts that fetch and prepare game data
+public/       icons, maps, raid art and fonts the app ships
+addon/        the in-game export addon
+discord-bot/  plan for a Discord bot (not built yet)
+docs/         everything else: features, roadmap, design notes, research, dev log
+brain/        generated Obsidian notes that map the codebase
 ```
 
 ## Docs
@@ -71,6 +72,13 @@ brain/      generated Obsidian notes that map the codebase
 - [Roadmap](docs/ROADMAP.md)
 - [Known limitations](docs/known-limitations.md)
 - [All docs](docs/README.md): architecture, design scopes, a usability study, and the dev log
+
+## Coming next: a Discord bot
+
+A bot that answers questions in Discord from the same data as the app: `/bis fury warrior` for a
+spec's BiS list, `/whodrops`, `/loot karazhan`, `/attune`, `/farm fel iron`, and `/import` to list
+upgrades from your in-game export. It will run on a Raspberry Pi. See the
+[plan](discord-bot/PLAN.md).
 
 ## Status
 
