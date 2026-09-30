@@ -43,6 +43,15 @@ const SOCKET_BY_LABEL = {
   blue: 'Blue',
 }
 
+/**
+ * Classes whose off hand is a second melee weapon rather than a shield or a held item.
+ *
+ * The Rogue guide's table has a single "Weapon" row and means both hands; mapping it to the main hand
+ * alone left every Rogue off hand bare. For these classes a generic "Weapon" row also fills the off
+ * hand, **unless the guide names the off hand itself**, as the Warrior and Shaman guides do.
+ */
+const DUAL_WIELD_CLASSES = new Set(['Rogue', 'Warrior', 'Hunter', 'Shaman'])
+
 /** Guide's enchant slot label -> this repo's GearSlot. */
 const SLOT_BY_LABEL = {
   head: 'Head',
@@ -63,11 +72,16 @@ const SLOT_BY_LABEL = {
   feet: 'Feet',
   weapon: 'Main Hand',
   'main hand': 'Main Hand',
+  'main hand weapon': 'Main Hand',
   'two-hand': 'Main Hand',
   '2h weapon': 'Main Hand',
   shield: 'Off Hand',
   'off hand': 'Off Hand',
+  'off hand weapon': 'Off Hand',
   offhand: 'Off Hand',
+  // Scopes. Only the physical guides have this row; a caster's wand takes no enchant.
+  ranged: 'Ranged',
+  'ranged weapon': 'Ranged',
   ring: 'Finger 1',
   rings: 'Finger 1',
 }
@@ -195,6 +209,7 @@ for (const guide of BIS_GUIDES) {
 
   const gems = {}
   const enchants = {}
+  let genericWeaponEnchant
 
   for (const rows of tables) {
     for (const row of rows) {
@@ -223,10 +238,16 @@ for (const guide of BIS_GUIDES) {
         }
       }
 
-      if (enchant) enchants[slot] = enchant.id
-      else problems.push(`${path}: enchant ${row.itemId ?? `spell ${row.spellId}`} (${row.label}) unresolved`)
+      if (enchant) {
+        enchants[slot] = enchant.id
+        if (label.replace(/\s*enchant$/, '') === 'weapon' && DUAL_WIELD_CLASSES.has(guide.className)) {
+          genericWeaponEnchant = enchant.id
+        }
+      } else problems.push(`${path}: enchant ${row.itemId ?? `spell ${row.spellId}`} (${row.label}) unresolved`)
     }
   }
+
+  if (genericWeaponEnchant && !enchants['Off Hand']) enchants['Off Hand'] = genericWeaponEnchant
 
   for (const spec of guide.specs) {
     bySpec[`${guide.className}|${spec}`] = {

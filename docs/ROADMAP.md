@@ -549,8 +549,8 @@ original "backend" question, landed 2026-09-20 without one.
 the owner's Raspberry Pi that answers from the same `src/domain` data as the app: `/bis <spec>`
 (weapon enchants yes, ring enchants and gems no), `/whodrops <item>`, `/loot <raid or boss>`,
 `/attune <raid>`, `/farm <skill or material>`, and `/import <string>` for upgrades from the addon
-export. Two data fixes come first: weapon enchants for Arms and Fury Warrior and Rogue off-hands,
-and re-checking the three attunement chains for Anniversary realms.
+export. Weapon enchants for Arms and Fury Warrior and Rogue off hands were fixed on 2026-09-30.
+Re-checking the three attunement chains for Anniversary realms still comes first.
 
 ## How decisions get made here
 

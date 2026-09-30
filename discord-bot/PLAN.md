@@ -65,17 +65,13 @@ Open in Project Defeat: <link>
 - The link at the bottom is a build link, which the app already supports. It opens the planner
   wearing this set.
 
-**Data to fix first: weapon enchants.** Checked 2026-09-30 against every spec's list:
-
-| Gap | Specs |
-| --- | --- |
-| No main-hand or off-hand enchant | Arms Warrior, Fury Warrior |
-| No off-hand enchant | Assassination, Combat and Subtlety Rogue |
-| No ranged scope | All three Hunter specs (decide whether scopes count) |
-
-The other 25 specs already have a recommended main-hand enchant. Caster off-hands (orbs, books,
-shields) correctly have none. Fix this in `src/domain/bis/` with sources, so the website gets it
-too.
+**Weapon enchants: fixed 2026-09-30.** Arms and Fury Warrior had none and Rogue off hands were bare.
+The Wowhead guides did list them, but the ingest didn't recognize the Warrior guide's "Main Hand
+Weapon" / "Off Hand Weapon" labels, and it read the Rogue guide's single "Weapon" row as main hand
+only. Both are fixed in `tools/ingest/ingest-bis-recommendations.mjs`, which also picked up the
+guides' ranged scopes. Every physical DPS spec now has a main-hand enchant, and dual-wielders have one
+on the off hand when it is their #1 pick. The one remaining gap: Hunter off hands are a #2 pick, and
+only #1 picks carry enchants, the same rule that leaves Ring 2 bare.
 
 ### 2. `/whodrops <item>`
 
@@ -240,7 +236,7 @@ Open your character in Project Defeat: <link>
 
 ## Build order
 
-1. **Data fixes:** weapon enchants for the specs listed above, and re-check the attunements.
+1. **Data fixes:** ~~weapon enchants~~ (done 2026-09-30), and re-check the attunements.
 2. **Set up the bot:** project skeleton, Discord app, running on the Pi, updating itself.
 3. **`/bis`**
 4. **`/whodrops`** and **`/loot`**

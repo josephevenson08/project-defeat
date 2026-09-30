@@ -91,7 +91,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-agility",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-agility"
       }
     },
     "Hunter|Marksmanship": {
@@ -114,7 +116,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-agility",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-agility"
       }
     },
     "Hunter|Survival": {
@@ -137,7 +141,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-agility",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-agility"
       }
     },
     "Mage|Arcane": {
@@ -369,7 +375,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-mongoose",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-mongoose"
       }
     },
     "Rogue|Combat": {
@@ -392,7 +400,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-mongoose",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-mongoose"
       }
     },
     "Rogue|Subtlety": {
@@ -415,7 +425,9 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-mongoose",
-        "Finger 1": "ring-stats"
+        "Ranged": "stabilized-eternium-scope",
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-mongoose"
       }
     },
     "Shaman|Elemental": {
@@ -462,7 +474,8 @@
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
         "Main Hand": "weapon-mongoose",
-        "Finger 1": "ring-stats"
+        "Finger 1": "ring-stats",
+        "Off Hand": "weapon-mongoose"
       }
     },
     "Shaman|Restoration": {
@@ -577,6 +590,9 @@
         "Hands": "gloves-major-strength",
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Off Hand": "weapon-mongoose",
+        "Ranged": "khorium-scope",
         "Finger 1": "ring-stats"
       }
     },
@@ -599,6 +615,9 @@
         "Hands": "gloves-major-strength",
         "Legs": "nethercobra-leg-armor",
         "Feet": "enchant-boots-cats-swiftness",
+        "Main Hand": "weapon-mongoose",
+        "Off Hand": "weapon-mongoose",
+        "Ranged": "khorium-scope",
         "Finger 1": "ring-stats"
       }
     },
@@ -623,6 +642,7 @@
         "Feet": "enchant-boots-boars-speed",
         "Main Hand": "weapon-mongoose",
         "Off Hand": "shield-major-stamina",
+        "Ranged": "khorium-scope",
         "Finger 1": "ring-stats"
       }
     }
