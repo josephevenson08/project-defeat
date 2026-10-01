@@ -35,6 +35,7 @@ Research written before a feature was built. Each one says what was planned and 
 | [Usability study](research/USABILITY-STUDY.md) | Twelve first visits on phones, tablets, keyboard and screen reader, run with simulated AI participants |
 | [Heuristic evaluation](research/HEURISTIC-EVALUATION.md) | A Nielsen-style heuristic evaluation of the live site, done by the owner |
 | [Study materials](research/usability-study/) | The brief, personas, per-participant transcripts and screenshots |
+| [Gaming UI research](research/gaming-ui/) | How big gaming companies and player tools design their sites in 2024–2026, and what to borrow |
 
 ## Dev log
 
