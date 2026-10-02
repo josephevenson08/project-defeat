@@ -27,6 +27,7 @@ Research written before a feature was built. Each one says what was planned and 
 | [Rotations](design/ROTATION-SCOPE.md) | Modelling multi-ability rotations per spec |
 | [Talent scaling](design/TALENT-SCALING-SCOPE.md) | Getting talents into the stat and damage math for all 27 specs |
 | [In-game import](design/IN-GAME-IMPORT-SCOPE.md) | The addon export format and the research behind it |
+| [UI refresh plan](design/UI-REFRESH-PLAN.md) | Planned UI changes from the gaming UI research, in three phases (not started) |
 
 ## Research
 

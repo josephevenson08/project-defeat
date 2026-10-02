@@ -552,6 +552,21 @@ the owner's Raspberry Pi that answers from the same `src/domain` data as the app
 export. Weapon enchants for Arms and Fury Warrior and Rogue off hands were fixed on 2026-09-30.
 Re-checking the three attunement chains for Anniversary realms still comes first.
 
+## Phase 8: UI Refresh
+
+**Planned 2026-10-02, not started: see [`UI-REFRESH-PLAN.md`](design/UI-REFRESH-PLAN.md).** Drawn from
+the [gaming UI research](research/gaming-ui/README.md), which covers 25 platforms with a cited source
+for every claim. Three phases:
+
+1. Small wins: tab title and Discord link previews, preload the heading font, section colors as
+   tokens, and "Import your character" in the empty planner.
+2. Show where the data comes from: a provenance chip (source, phase, "updated" date), a
+   "TBC Classic · Phase 2" chip on every screen, counts in tab labels, and cap status in words.
+3. Global search with Ctrl K.
+
+Phase presets (Pre-raid, Phase 1) wait on ingesting those BiS lists, since the data holds Phase 2
+only.
+
 ## How decisions get made here
 
 Seven patterns have now paid for themselves repeatedly. They are recorded as *process* rather than as

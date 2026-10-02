@@ -80,6 +80,13 @@ spec's BiS list, `/whodrops`, `/loot karazhan`, `/attune`, `/farm fel iron`, and
 upgrades from your in-game export. It will run on a Raspberry Pi. See the
 [plan](discord-bot/PLAN.md).
 
+## Coming next: a UI refresh
+
+Research into how 25 gaming companies and player tools design their sites in 2024–2026
+([findings](docs/research/gaming-ui/README.md)) is turned into a three-phase
+[plan](docs/design/UI-REFRESH-PLAN.md): small fixes first, then showing the source, phase and age of
+the data beside the numbers, then search across the whole app.
+
 ## Status
 
 A working planner, focused on Phase 2 and on DPS specs. Healer and tank math still runs but isn't the focus. Every dataset comes from a pinned source, and wherever the app can't model something, it says so on screen. This is my biggest project so far and it's still growing.

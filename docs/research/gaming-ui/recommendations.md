@@ -1,5 +1,7 @@
 # Recommendations for Project Defeat
 
+> **Turned into a plan:** [`docs/design/UI-REFRESH-PLAN.md`](../../design/UI-REFRESH-PLAN.md) (2026-10-02, not started).
+
 Prioritized, revised 2026-10-01 against 25 platforms. Each item names the trend(s) in
 [trends.md](trends.md) it comes from, the platforms and sources behind it, what in this app it would
 change, and what to leave alone. Nothing here has been implemented; these are suggestions for a
