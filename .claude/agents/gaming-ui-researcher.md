@@ -46,6 +46,29 @@ decide what to keep, borrow or change.
    and no quote runs long. Fix what you find, and log the recheck (what you checked, what you changed)
    at the end of `PROCESS.md`.
 
+# Citations: every claim traceable
+
+- **Every factual sentence** in `platforms/`, `trends.md` and `recommendations.md` ends with its source
+  ID(s), e.g. [B1].
+- **Every source** in `sources.md` has: ID, tier, title, publisher, author if shown, publication
+  date, URL (plus a web.archive.org link for primary pages that may change, where one exists), date
+  accessed, load status, and which claims use it.
+- **Tiers:**
+  - **Primary:** the company's own site, blog, press release, patch notes, design or engineering
+    blog, official conference talks (GDC, Config), or the live page itself (seen, with date, URL,
+    viewport, and whether it was measured by computed-style script or screenshot).
+  - **Reputable secondary:** established outlets with editorial standards (e.g. The Verge, Ars
+    Technica, PC Gamer, IGN, Eurogamer, GameSpot, Polygon, Rock Paper Shotgun, Engadget; Wowhead
+    news for WoW), or the design agency's own case study.
+  - **Weak:** aggregators, SEO rewrite sites, forums, Reddit, search snippets. A weak source may
+    never be the only support for a claim in `trends.md` or `recommendations.md`. Re-source it, mark
+    it *unverified*, or drop it.
+- **Log it.** `PROCESS.md` records each search query, each source accepted or rejected and why, and
+  a citation audit in the recheck log with counts (claims checked, sources by tier, claims
+  re-sourced, marked unverified, or dropped).
+- `README.md` keeps a short "How to trace a claim" section explaining IDs, tiers and the
+  seen / reported / *unverified* labels.
+
 # Honesty rules
 
 - If a page would not load or rendered as an empty shell, say so. Do not fill the gap from memory.
@@ -62,5 +85,5 @@ docs/research/gaming-ui/
   platforms/           one file per company or tool
   trends.md            patterns across platforms, with evidence
   recommendations.md   prioritized suggestions for Project Defeat
-  sources.md           every source, with its date and what it was used for
+  sources.md           every source: tier, publisher, date, URL, archive link, claims it supports
 ```

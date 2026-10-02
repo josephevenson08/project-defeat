@@ -1,84 +1,233 @@
 # Sources
 
-Every source used, with its date and what it supported. "Seen" sources are live pages I opened on
-**2026-10-01** in a browser (computed styles read by script, plus screenshots); their date is the
-date I looked. Article dates are the publication dates shown on the page when it loaded, or, where
-marked, the date in the URL. Status notes say when a page did not load fully.
+Every source cited in this folder, merged on 2026-10-01 from session 1 (IDs such as B1, R1, V1),
+the three session-2 batches (NA = batch A, NB = batch B, NC = batch C) and the merge step itself
+(new IDs B11-B13, R6-R8, E4, WL4, WL5, K1, NB27). IDs were never renumbered, so an ID means the
+same source in every file. Gaps in a series (E3, X3, NB8) are IDs that were removed or never used;
+retired sources are listed at the end and are not cited anywhere.
 
-## Live pages (seen 2026-10-01)
+**Columns.** Tier, title, publisher, author (if shown; "not recorded" where session 1 did not note
+it), publication date, URL, archive link, date accessed, load status, and which claims use it.
+Every source was accessed on **2026-10-01**.
 
-| ID | Page | Used for |
-|---|---|---|
-| B1 | https://worldofwarcraft.blizzard.com/en-us/ | WoW site structure, `blz-*` elements, fonts, buttons, version switcher |
-| B2 | https://overwatch.blizzard.com/en-us/ | Overwatch fonts, buttons, title |
-| B3 | https://diablo4.blizzard.com/en-us/ | Diablo IV fonts, buttons, components |
-| B4 | https://www.blizzard.com/en-us/ | Publisher hub: pill buttons, game grid, fonts |
-| B10 | https://worldofwarcraft.blizzard.com/en-us/worldsoul/us/armory | Armory controls and Game Version options |
-| R1 | https://www.leagueoflegends.com/en-us/ | League template, fonts, buttons, news cards |
-| R2 | https://playvalorant.com/en-us/ | VALORANT template, fonts, buttons |
-| V1 | https://store.steampowered.com/ | Single store menu with search, Motiva Sans, max widths |
-| E1 | https://store.epicgames.com/en-US/ | Store nav, Inter, button radius |
-| X1 | https://www.xbox.com/en-US (redirected to `/en-US/home_alt/light/home`) | Fonts, pill CTA, skip link, reduced-motion and color-scheme rules |
-| P1 | https://www.playstation.com/en-us/ | SST, skip link, per-banner theme classes, campaign tokens |
-| U1 | https://www.bungie.net/7/en/Destiny (from destinythegame.com) | **Empty shell**: spinner only |
-| U2 | https://www.marathonthegame.com/ | Marathon fonts, button, news lines, reduced-motion rules (hero not seen) |
-| W1 | https://www.wowhead.com/tbc/item=28830/dragonspine-trophy | Version strip, hub tiles, item page, tabs with counts, tooltip, a11y |
-| RI1 | https://raider.io/ | Version strip, Ctrl K search, nav, fonts |
-| WL1 | https://www.warcraftlogs.com/ and https://www.archon.gg/wow | **Blocked** by a human-verification page; not bypassed |
-| M1 | https://u.gg/lol/champions/ahri/build | Cross-game strip, patch chip, stat strip, sample sizes, Auto-Import, fonts |
-| M2 | https://mobalytics.gg/ and https://mobalytics.gg/diablo-4/builds | Shell, cross-game tabs, fonts |
-| A1 | https://josephevenson08.github.io/project-defeat/ | The app as deployed: front door, wizard, planner shell |
-| A2 | Repo files `src/styles/*`, `src/components/*`, `src/lib/animations.ts`, `src/features/tierlists/TierListsPanel.tsx`, `src/features/bis/BisPanel.tsx`, `index.html` (read 2026-10-01) | Current tokens, fonts, shell, a11y, provenance |
+**Tiers** (from `.claude/agents/gaming-ui-researcher.md`):
+- **Primary**: the company's own site, blog, support page, changelog or repository, or the live
+  page itself ("seen"). For seen pages the row says the viewport and how it was measured.
+- **Reputable secondary**: established outlets with editorial standards, Wowhead news for WoW, or
+  a design agency's own case study.
+- **Weak**: aggregators, SEO rewrite sites, fan blogs, forums, search snippets. Never the only
+  support for a claim in `trends.md` or `recommendations.md`.
 
-## Articles and announcements
+**How seen pages were measured.**
+- Session 1: Claude browser pane, **1280 x 720 CSS px**, computed-style / DOM script plus a
+  screenshot (downscaled in capture).
+- Session 2 (NA, NB, NC): Claude browser pane, **1024 x 768 CSS px**, computed-style / DOM script
+  only; **no screenshots** (the pane was hidden and captures timed out).
+- Merge step (K1): Claude browser pane, 1280 px, script only.
+- Width-dependent figures (nav collapse, viewport-scaled type, content widths) are therefore not
+  comparable between session 1 and session 2.
+- Probe limits: cross-origin stylesheets are unreadable; shadow DOM was read only where stated.
+  A zero count of a CSS rule is a floor, not proof of absence.
 
-| ID | Date | Source | Used for | Status |
+**Archive links.** Session-1 live pages and batch A pages: resolved by requesting
+`https://web.archive.org/web/2026/<URL>` and recording the snapshot it redirected to. Batch B could
+not confirm snapshots (Wayback API HTTP 429) and gives the lookup form only. Batch C used the
+availability API ("None returned" means the API returned nothing, not that no copy exists).
+
+---
+
+## Live pages and the app (Primary, seen)
+
+| ID | Tier | Page (publisher) | Archive | Load status / measurement | Claims it supports |
+|---|---|---|---|---|---|
+| B1 | Primary | https://worldofwarcraft.blizzard.com/en-us/ (Blizzard) | https://web.archive.org/web/20261001192639/https://worldofwarcraft.blizzard.com/en-us/ | Loaded; 1280 px, script + screenshot; nav in shadow DOM | `blz-*` elements, nav `theme` and `search-url`, Montserrat / Open Sans, gold-bordered 0-2 px buttons, product switcher, one-page home structure, dark theme |
+| B2 | Primary | https://overwatch.blizzard.com/en-us/ (Blizzard) | https://web.archive.org/web/20260929154012/https://overwatch.blizzard.com/en-us/ | Loaded; 1280 px, script + screenshot | Big Noodle Too / Config faces, orange 2 px button, "Overwatch" title |
+| B3 | Primary | https://diablo4.blizzard.com/en-us/ (Blizzard) | https://web.archive.org/web/20260927232842/https://diablo4.blizzard.com/en-us | Loaded; 1280 px, script + screenshot | Old Fenris / Poppins, dark-red 4 px button, `forge-icon` |
+| B4 | Primary | https://www.blizzard.com/en-us/ (Blizzard) | https://web.archive.org/web/20260930113130/https://www.blizzard.com/en-us/ | Loaded; 1280 px, script + screenshot | Publisher hub: Poppins / Archivo, 100 px pills, game grid with platform filter |
+| B10 | Primary | https://worldofwarcraft.blizzard.com/en-us/worldsoul/us/armory (Blizzard) | https://web.archive.org/web/20261001051716/https://worldofwarcraft.blizzard.com/en-us/worldsoul/us/armory | Loaded; 1280 px, script + screenshot | Armory: Game Version select (incl. Burning Crusade Classic), Region, Search, log-in prompt, collapsed nav |
+| R1 | Primary | https://www.leagueoflegends.com/en-us/ (Riot Games) | https://web.archive.org/web/20260930114526/https://www.leagueoflegends.com/en-us/ | Loaded; 1280 px, script + screenshot | Next.js template, Riot top bar, Beaufort / Spiegel, gold 0 px button, news cards with category + date, light reading sections |
+| R2 | Primary | https://playvalorant.com/en-us/ (Riot Games) | https://web.archive.org/web/20260929154107/https://playvalorant.com/en-us/ | Loaded; 1280 px, script + screenshot | Same template, Tungsten / DIN Next, red 0 px button, news cards, light sections |
+| V1 | Primary | https://store.steampowered.com/ (Valve) | https://web.archive.org/web/20261001130744/https://store.steampowered.com/ | Loaded; 1280 px, script + screenshot | Single store menu with search, Motiva Sans only, 1200/1300 px max widths, sale takeover, dark slate surface |
+| E1 | Primary | https://store.epicgames.com/en-US/ (Epic Games) | https://web.archive.org/web/20260925073311/https://store.epicgames.com/en-US/ | Loaded; 1280 px, script + screenshot | Search + Discover / Browse / News, Inter, 10 px button, near-black hero |
+| X1 | Primary | https://www.xbox.com/en-US (redirected to `/en-US/home_alt/light/home`) (Microsoft) | https://web.archive.org/web/20261001025126/https://www.xbox.com/en-US/ | Loaded; 1280 px, script + screenshot | Light route, Segoe / Bahnschrift, 999 px green pill, skip link, 9 reduced-motion and 6 color-scheme rules |
+| P1 | Primary | https://www.playstation.com/en-us/ (Sony Interactive) | https://web.archive.org/web/20261001181234/https://www.playstation.com/en-us/ | First probe empty (client-rendered), second probe full; 1280 px, script + screenshot | SST faces, skip link, white body, `theme--dark/light` blocks, inline campaign tokens, pill-looking button (from screenshot, radius not measured) |
+| U1 | Primary | https://www.bungie.net/7/en/Destiny (from destinythegame.com) (Bungie) | https://web.archive.org/web/20260928223952/https://www.bungie.net/7/en/Destiny | **Empty shell** (spinner only); 1280 px | No layout observed; fonts loaded |
+| U2 | Primary | https://www.marathonthegame.com/ (Bungie) | https://web.archive.org/web/20260929111026/https://www.marathonthegame.com/ | DOM loaded; screenshot black apart from logo; 1280 px | Acid-green 0 px button, custom faces, source + date news lines, 2 reduced-motion rules |
+| W1 | Primary | https://www.wowhead.com/tbc/item=28830/dragonspine-trophy (Wowhead) | https://web.archive.org/web/20260304054400/https://www.wowhead.com/tbc/item=28830/dragonspine-trophy | Loaded; 1280 px, script + screenshot | Version strip, header search, TBC hub tiles, item page actions, Phase tag, tabs with counts, tooltip fidelity, quality colors, skip link, 1 reduced-motion rule, ads |
+| RI1 | Primary | https://raider.io/ (Raider.IO) | https://web.archive.org/web/20260926112143/https://raider.io/ | Loaded; 1280 px, script + screenshot | Version strip, Ctrl K search, nav, "Get App & AddOn", streams, fonts, NEW badge, no skip link |
+| WL1 | Primary | https://www.warcraftlogs.com/ and https://www.archon.gg/wow (Archon) | https://web.archive.org/web/20260916215518/http://www.warcraftlogs.com/ | **Blocked** by a human-verification page; not bypassed | Only that the site could not be inspected |
+| M1 | Primary | https://u.gg/lol/champions/ahri/build (U.GG) | https://web.archive.org/web/20260904112340/https://u.gg/lol/champions/ahri/build | Loaded; 1280 px, script + screenshot | Cross-game strip, patch chip, stat strip, sample sizes, Auto-Import, Barlow / Inter, NEW tag |
+| M2 | Primary | https://mobalytics.gg/ and https://mobalytics.gg/diablo-4/builds (Mobalytics) | https://web.archive.org/web/20260926134526/https://mobalytics.gg/ | Loaded; cookie banner not accepted; 1280 px, script + screenshot | Icon rail, cross-game tabs, Oswald / Roboto, rounded cards, desktop app, Build Tracker, [New] tag |
+| K1 | Primary | Merge-step re-probe of skip controls (any `<a>` or `<button>` whose text, label or class contains "skip", including open shadow roots) and of reduced-motion rules inside shadow-root style sheets, on B1-B4, R1, R2, V1, E1, X1, U2, RI1, M1, M2 | as per page rows | Loaded; **1280 px**, script only, 2026-10-01 | Skip links in shadow DOM on blizzard.com, Overwatch, Diablo IV (none on WoW); 1 reduced-motion rule in shadow sheets on each Blizzard site; skip link on Epic store; none on League, VALORANT, Steam, Marathon, Raider.IO, U.GG, Mobalytics; X1 control positive |
+| A1 | Primary | https://josephevenson08.github.io/project-defeat/ (this project) | none (own site) | Loaded; 1280 px, wizard walked through | The app as deployed: front door, wizard, planner shell, empty gear state |
+| A2 | Primary | Repo files `src/styles/*`, `src/components/*`, `src/lib/animations.ts`, `src/features/tierlists/TierListsPanel.tsx`, `src/features/bis/BisPanel.tsx`, `src/features/gear/GearPanel.tsx`, `src/components/layout/SectionPicker.tsx`, `index.html` | n/a | Read 2026-10-01 | Tokens, fonts, shell, a11y, provenance, empty state text, `/pdexport` import flow |
+| NA1 | Primary | https://www.nintendo.com/us/ (Nintendo of America) | https://web.archive.org/web/20261001091558/https://www.nintendo.com/us/ | Loaded; 1 sheet unreadable; 1024 px, script | Geologica everywhere, grey on white, red 6 px CTAs, 8 px cards, header, one search box, section order, skip link, 11 reduced-motion rules, Next.js |
+| NA2 | Primary | https://www.nintendo.com/us/store/products/fire-emblem-fortunes-weave-switch-2/ (Nintendo of America) | https://web.archive.org/web/20260929215529/https://www.nintendo.com/us/store/products/fire-emblem-fortunes-weave-switch-2/ | Loaded; 1024 px, script | Game page uses store template; breadcrumbs, Version and edition pickers; skip link; 11 reduced-motion rules |
+| NA8 | Primary | https://www.ubisoft.com/en-us/ (Ubisoft) | https://web.archive.org/web/20261001050844/https://www.ubisoft.com/en-us | First load unstyled, reload loaded; 7 sheets unreadable; nav read via `shadowRoot`; 1024 px | Near-black hub, Open Sans + Ubisoft Sans, blue pill CTAs, `<global-navigation>`, skip link in shadow root, search |
+| NA9 | Primary | https://www.ubisoft.com/en-us/game/assassins-creed/shadows (Ubisoft) | https://web.archive.org/web/20260929003631/https://www.ubisoft.com/en-us/game/assassins-creed/shadows | Loaded; 1024 px | "portrait" serif uppercase tracked, Avenir, 0 px buttons, edition tabs, series sub-menu, update-numbered news |
+| NA13 | Primary | https://www.ea.com/ (Electronic Arts) | https://web.archive.org/web/20260930013742/https://www.ea.com/ | Loaded; cookie banner not accepted; all 16 sheets readable; 1024 px | Navy surfaces, EA display/text faces, blue 6 px CTAs, two nav bars, no skip link, no search, 0 reduced-motion rules |
+| NA14 | Primary | https://www.ea.com/games/battlefield/battlefield-6 (Electronic Arts) | https://web.archive.org/web/20260929024338/https://www.ea.com/games/battlefield/battlefield-6 | Loaded; 1024 px | bf* faces with EA fallback chain, 64 px uppercase heads, square cyan BUY NOW, gunmetal surfaces, no skip link |
+| NA19 | Primary | https://na.finalfantasyxiv.com/lodestone/ (Square Enix) | https://web.archive.org/web/20260930182222/https://na.finalfantasyxiv.com/lodestone/ | Loaded; 11 of 12 sheets unreadable; 1024 px | 12 px Arial, charcoal frame, pale panels, square nav tabs, news-type tabs and tags, local-time dates, patch-named headlines, no viewport meta, no skip link, search |
+| NA20 | Primary | https://na.finalfantasyxiv.com/ (Square Enix) | https://web.archive.org/web/20260930113831/https://na.finalfantasyxiv.com/ | Loaded; 3 of 4 sheets unreadable; 1024 px | Noto Serif headings, asymmetric 24/8 px CTAs, light band, viewport meta |
+| NA23 | Primary | https://www.gog.com/en/ (GOG sp. z o.o.) | https://web.archive.org/web/20261001130004/https://www.gog.com/en/ | Loaded; cookie banner not accepted; 27 shadow roots not searched; 1024 px | Dark store, Lato GOG only, 4-6 px buttons, programme links, "Search games", labels, Angular, no skip link |
+| NA24 | Primary | https://www.gog.com/en/game/dungeon_keeper_2 (GOG) | https://web.archive.org/web/20260929223300/https://www.gog.com/en/game/dungeon_keeper_2 | Loaded behind an age overlay (not clicked); 1024 px | Rating with review count, time-zoned sale end, 30-day low, Preservation strip, version changelog link, "Windows 11 verified" |
+| NB1 | Primary | https://genshin.hoyoverse.com/en/ (HoYoverse) | lookup: https://web.archive.org/web/*/genshin.hoyoverse.com/en/ (unchecked) | Loaded; cookie banner unanswered; 3 of 65 sheets unreadable; 1024 px | `pz-` blocks, no h1-h3, empty alts, viewport-scaled root font, slide layout, "PC Download (HoYoPlay)", Version 7.1, no skip link |
+| NB2 | Primary | https://hsr.hoyoverse.com/en-us/ (HoYoverse) | lookup: https://web.archive.org/web/*/hsr.hoyoverse.com/en-us/ (unchecked) | Loaded; 1 of 53 sheets unreadable; 1024 px | `pz-` blocks from `act.hoyoverse.com/puzzle`, no headings, 101 images without alt, "Download via HoYoPlay", Version 4.6 |
+| NB3 | Primary | https://www.hoyolab.com/home (HoYoverse) | lookup: https://web.archive.org/web/*/www.hoyolab.com/home (unchecked) | Empty Nuxt shell ~4 s, then loaded; interest dialog left open; 1024 px | Game picker, search, feed tabs, tools rail, card metadata, navy palette, opacity steps, 14-18 px radii, no skip link |
+| NB4 | Primary | https://hoyoplay.hoyoverse.com/ (HoYoverse) | lookup: https://web.archive.org/web/*/hoyoplay.hoyoverse.com/ (unchecked) | Loaded in browser (WebFetch title only); 1024 px | "One-Stop Game Platform" title, single Download Now |
+| NB9 | Primary | https://pathofexile2.com/ (redirected to /early-access) (Grinding Gear Games) | lookup: https://web.archive.org/web/*/pathofexile2.com/early-access (unchecked) | Loaded; 48 of 51 sheets unreadable; 1024 px | Fontin / Cinzel / Optimus Princeps, `border-image` 0 px buttons, off-site arrows, `darkreader-lock`, alt count, no skip link |
+| NB10 | Primary | https://pathofexile2.com/home (GGG) | lookup: https://web.archive.org/web/*/pathofexile2.com/home (unchecked) | Loaded; 1024 px | "Switch games" account bar, full-release banner, timestamped news, livestreams with viewer counts |
+| NB13 | Primary | https://www.newworld.com/en-us (Amazon Games) | lookup: https://web.archive.org/web/*/www.newworld.com/en-us (unchecked) | Loaded; 1 sheet unreadable; 1024 px | `ags-` classes, skip `<button>`, IM Fell DW Pica + Amazon Ember, 0 px buttons, undated news cards, raw i18n key, alt count |
+| NB14 | Primary | https://www.playthroneandliberty.com/en-us (Amazon Games) | lookup: https://web.archive.org/web/*/www.playthroneandliberty.com/en-us (unchecked) | Loaded; 1 sheet unreadable; 1024 px | `ags-` classes, skip `<button>`, TL faces, 0 px buttons, Amazon Games iD block, link-blue titles, NC footer link |
+| NB19 | Primary | https://www.curseforge.com/wow (Overwolf) | lookup: https://web.archive.org/web/*/www.curseforge.com/wow (unchecked) | Loaded; 18 of 19 sheets unreadable; 1024 px | 128-game Browse menu, Get CurseForge App, scoped search, Install buttons, Montserrat / Lato, orange accent, 0 px, heading hierarchy, app version note, no skip link |
+| NB20 | Primary | https://www.curseforge.com/wow/search?class=addons&page=1&pageSize=20&sortBy=relevancy (Overwolf) | lookup: https://web.archive.org/web/*/www.curseforge.com/wow/search* (unchecked) | Loaded; 1024 px | Flavor filter incl. Classic TBC, Game Version filter, sort, row fields |
+| NB24 | Primary | https://tracker.gg/ (Tracker Network) | lookup: https://web.archive.org/web/*/tracker.gg/ (unchecked) | Loaded; 4 of 10 sheets unreadable; 1024 px | Cross-game strip, Apps / Overlays / Twitch Bot, network figures, green/red deltas, Saira + Roboto, empty h1, 5 reduced-motion rules |
+| NB25 | Primary | https://tracker.gg/valorant (Tracker Network) | lookup: https://web.archive.org/web/*/tracker.gg/valorant (unchecked) | Loaded; 5 sheets unreadable; 1024 px | Search hero with format placeholder, Riot ID sign-in, context strip, 482 root tokens, 8-16 px radii, container queries, overlay blocks, 5 reduced-motion rules |
+| NC1 | Primary | https://wowsims.github.io/tbc/ (WoWSims team; old 2021 landing) | None returned | Loaded; 1024 px, script | Gold 56 px heading, 16 spec links, Plus Jakarta Sans, no skip link |
+| NC2 | Primary | https://wowsims.github.io/tbc/elemental_shaman/ (WoWSims; old sim) | None returned | Loaded; 1024 px, script | Deprecation modal, export path, 250 px sidebar, Bootstrap 3 stack, P1-P5 presets, `power.js` tooltips |
+| NC3 | Primary | https://www.wowsims.com/ (WoWSims; footer "© 2021-2026") | None returned | Empty on first read, full after ~3 s; 1024 px | Version-card grid, 12 px cards, Exporter link, fan-made disclaimer, 32 reduced-motion rules, no skip link |
+| NC4 | Primary | https://www.wowsims.com/tbc/ (WoWSims; new landing) | https://web.archive.org/web/20260331080743/https://www.wowsims.com/tbc/ | Loaded; 1024 px | "Alpha" / "Gear Planner" labels per spec; page existed by 2026-03-31 |
+| NC5 | Primary | https://www.wowsims.com/tbc/shaman/elemental/ and https://www.wowsims.com/tbc/warrior/dps/ (WoWSims) | None returned | Loaded after ~4 s; Results and Settings tabs opened by script; 1024 px | 282 px sidebar, phase + Alpha status line, bracketed % and cap status, tabs, ilvl badges, Gem Summary, phase gear sets, assumption note, class-color and game-semantic tokens, Wowhead tooltips, 3 reduced-motion rules, no skip link |
+| NC10 | Primary | https://maxroll.gg/ (Maxroll, IGN Entertainment) | None returned | Loaded; 1024 px | Game list with genre tags, "Search Maxroll", season countdown, news with author + date, Source Sans 3, 6 px buttons, no skip link |
+| NC11 | Primary | https://maxroll.gg/d4/planner/ (Maxroll) | https://web.archive.org/web/20260915095721/https://maxroll.gg/d4/planner | Loaded after ~4 s; 1024 px | Left game rail, season + game build in header, Variants, per-section Notes, point counters, stats panel at end, planner ~1,000 px down |
+| NC12 | Primary | https://maxroll.gg/d4/build-guides/heartseeker-rogue-specialized-guide (Maxroll; author DiEoxidE; Last Updated 2026-09-27) | None returned | Loaded; 1024 px | Byline with season + Last Updated, TOC mirroring planner, embedded planner blocks, 7-set switcher, dated changelog, 26 iframes |
+| NC16 | Primary | https://www.icy-veins.com/tbc-classic/ (Icy Veins, Vedatis S.A.S.) | None returned | Loaded; 4 sheets unreadable; 1024 px | Hub layout, relative-dated news with authors, Inter, skip link, 1 reduced-motion rule, 40 iframes, Vedatis / U.GG footer |
+| NC17 | Primary | https://www.icy-veins.com/tbc-classic/elemental-shaman-dps-pve-gear-best-in-slot (Icy Veins; author Seksixeny; Last Updated 2026-01-12) | https://web.archive.org/web/20260617161144/https://www.icy-veins.com/tbc-classic/elemental-shaman-dps-pve-gear-best-in-slot | Loaded; 1024 px | Absolute + relative Last Updated, phase tabs newest first, Item / Source tables, alternatives, `q4` quality links, prose per phase, changelog |
+| NC18 | Primary | https://www.icy-veins.com/wow/elemental-shaman-pve-dps-guide (Icy Veins; author Stormy; Last Updated 2026-08-26) | not checked | Loaded; 1024 px | Patch chip "12.1", rating strip, sub-nav, app + Class Codex addon, shared `guide-header` |
+| NC20 | Primary | https://blitz.gg/ (Blitz) | https://web.archive.org/web/20260930185131/https://blitz.gg/ | Loaded; 1024 px | Game strip, "Search... Ctrl K", counters, relative-dated news with patch names, Inter, 8 px buttons, 2 reduced-motion rules, no skip link |
+| NC21 | Primary | https://blitz.gg/lol/champions/Ahri/build/mid (Blitz; "Data updated 1 minute ago") | None returned | Loaded; readable component CSS read; 1024 px | Patch + bracket in H1, data age, mode tabs + "New" badges, summary strip with WR change, per-block samples, generated summary, `--game-color`, game-semantic tokens, container queries, overlay class |
+| NC22 | Primary | https://blitz.gg/changelog (Blitz) | not checked | Returned the site's 404 page | No public changelog at that path; build hash on 404 |
+
+## Archive captures used as evidence (Primary, company pages as archived)
+
+| ID | Tier | What was compared | Snapshots | Claims it supports |
 |---|---|---|---|---|
-| B5 | 2021-01-15 | Engadget, "Blizzard's Battle.net launcher is getting a much-needed redesign", https://www.engadget.com/battle-net-client-blizzard-front-end-upgrade-redesign-101045426.html | Background: last dated Battle.net app overhaul | Loaded |
-| B6 | 2019-11-01 | MMO-Champion, "New Battle.net App Beta", https://www.mmo-champion.com/content/8810-New-Battle-net-App-Beta (Blizzard's own post https://news.blizzard.com/en-us/article/23189672/new-battle-net-app-beta showed no date) | Background: 2019 beta | Loaded |
-| B7 | 2026-02-04 | Insider Gaming, "Overwatch Drops '2'...", https://insider-gaming.com/overwatch-2-to-be-renamed-overwatch-with-next-update/ (also Nintendo Soup, same date, https://nintendosoup.com/overwatch-2-renamed-to-just-overwatch-coming-to-switch-2-spring-2026/) | Overwatch rename | Loaded |
-| B8 | 2026-08-31 | Aroged, "Blizzard updates official World of Warcraft website ahead of BlizzCon 2026", https://www.aroged.com/2026/08/31/blizzard-updates-official-world-of-warcraft-website-ahead-of-blizzcon-2026/ | WoW site refresh | Loaded |
-| B9 | 2026-08-29 | Bolverk Games, "WoW Armory Finally Adds Classic, TBC and Mists of Pandaria Support", https://bolverkgames.com/wow/wow-armory-finally-adds-classic-tbc-and-mists-of-pandaria-support/ | Classic Armory, unannounced release | Loaded |
-| R3 | 2026-04-11 | spilled.gg, "Riot Games confirms League of Legends launcher change is an intentional test...", https://spilled.gg/riot-games-league-legends-launcher-change-test-client-overhaul/ | Riot Client as hub | Loaded |
-| R4 | 2025-12-18 (URL date) | Bloomberg, "Riot Has a Secret Plan to Remake Its 'League of Legends' Game", https://www.bloomberg.com/news/articles/2025-12-18/riot-has-a-secret-plan-to-remake-its-league-of-legends-game | League Next exists, timing | **Not opened** (paywall); title and URL date only |
-| R5 | 2025-12-19 (URL date) | BigGo Finance, "Riot Games Announces 'League Next'...", https://finance.biggo.com/news/202512192220_League-of-Legends-League-Next-Overhaul-2027 | League Next: new client, 2027 target | **Not opened**; search-result summary only |
-| V2 | 2025-07-26 | GamingOnLinux, "Valve reveal new Steam store menu and enhanced search, now in Beta", https://www.gamingonlinux.com/2025/07/valve-reveal-new-steam-store-menu-and-enhanced-search-now-in-beta/ | Merged menu, search suggestions, Valve aim | Loaded |
-| V3 | 2025-11-07 | GamingOnLinux, "Steam's wider store page refresh is live...", https://www.gamingonlinux.com/2025/11/steams-wider-store-page-refresh-is-live-with-plans-to-improve-the-home-page-on-the-way/ | 1200 px pages, theater mode, home page later | Loaded |
-| V4 | 2025-11-11 | HotHardware, "Steam Store Gets A Redesign With Wider Pages...", https://hothardware.com/news/steam-store-redesign-with-wider-pages | Valve's reasoning for 1200 px | Loaded |
-| V5 | 2026-09-10 | PCGamesN, "Steam beta update brings UI overhaul to Steam Deck and Steam Machine", https://www.pcgamesn.com/steam/big-picture-mode-beta-update-2026 | Big Art Mode, screensaver, calendar | Loaded |
-| V6 | 2023-06-14 | Engadget, "Steam overhauls notifications, UI elements and the in-game overlay", https://www.engadget.com/steam-overhauls-notifications-ui-elements-and-the-in-game-overlay-000839366.html | Background: overlay, notes, shared codebase | Loaded |
-| E2 | 2026-06-19 | Tbreak, "Epic Games Launcher V2 is a ground-up rebuild that boots 5x faster", https://tbreak.com/epic-games-launcher-v2-faster-rebuild/ | Launcher V2 claims and planned features | Loaded |
-| X2 | 2025-06-23 | Xbox Wire, "Xbox Insiders: Aggregated Gaming Library is coming to the Xbox PC app", https://news.xbox.com/en-us/2025/06/23/xbox-insiders-aggregated-gaming-library-is-coming-to-the-xbox-pc-app/ | Aggregated library, store badges | Loaded |
-| X4 | 2025-09-29 | Xbox Wire, "Xbox September Update", https://news.xbox.com/en-us/2025/09/29/xbox-september-update-2025/ | My apps, Game Bar widgets, Rewards hub, Ally launch 16 Oct | Loaded |
-| P2 | 2026-02-06 | PlayStation LifeStyle, "PS Store Finally Gets Feature Inexplicably Removed Years Ago", https://www.playstationlifestyle.net/2026/02/06/ps-store-feature-web-version-images-return/ | Web store screenshots restored | Loaded |
-| P3 | 2026-04-12 | Push Square, "PS5's PS Store Is Getting a Netflix-Style Makeover Soon", https://www.pushsquare.com/news/2026/04/ps5s-ps-store-is-getting-a-netflix-style-makeover-soon | Beta store layout, tags (unconfirmed by Sony) | Loaded |
-| U3 | 2025-04-28 (updated 2025-05-19) | Brace Design, "Bungie's Marathon: An Eye for Design", https://www.brace.design/single-post/bungie-s-marathon-an-eye-for-design | Marathon visual language | Loaded |
-| U4 | 2026-06-19 | Shacknews, "Unpacking Destiny 2's final update and what comes next", https://www.shacknews.com/article/149684/destiny-2-the-final-update-panel-june-2026 | Director / Portal change | Loaded |
-| U5 | 2026-09-21 | Game Informer, "Bungie Announces Plans To Restore Vaulted Destiny 2 Content...", https://gameinformer.com/2026/09/21/bungie-announces-plans-to-restore-vaulted-destiny-2-content-and-substantial-reworks-to | Bungie status; no UI details | Loaded |
-| W2 | 2026-07-09 | Wowhead, "New Features on Wowhead: News Filters, Pinned Pages & More", https://www.wowhead.com/news/new-features-on-wowhead-news-filters-pinned-pages-and-more-382068 | News filters, pinned pages | Date and title loaded; **body did not** |
-| W3 | 2026-06-24 | Wowhead, "[Updated] Wowhead in 2026 and Beyond - AI, Ads, and Performance Issues", https://www.wowhead.com/news/wowhead-in-2026-and-beyond-ai-ads-and-performance-issues-381993 | Statement on AI, ads, performance | Date and title loaded; **body did not** |
-| W5 | 2010-05-07 | Wowhead, "Find Upgrades Button Now on Item Pages", https://www.wowhead.com/news/find-upgrades-button-now-on-item-pages-155492 | Background: age of the Find upgrades button | Date loaded |
-| W4 | 2019-10-30 | Wowhead, "Upcoming Site Navigation Improvements - Design Preview", https://www.wowhead.com/news/upcoming-site-navigation-improvements-design-preview-295903 | Background only | Date loaded; body did not |
-| WL2 | 2026-06-07 | Master of Warcraft, "Warcraft Logs Is Moving to Archon...", https://www.masterofwarcraft.net/2026/06/warcraft-logs-archon-app-june-29.html | Archon app, Lite mode, June 29 cutover | Loaded |
-| WL3 | 2023-10-03 | Wowhead, "Introducing Archon - Warcraft Logs Parent Company Rebranded", https://www.wowhead.com/news/introducing-archon-warcraft-logs-parent-company-rebranded-335303 | Background: rebrand date | Date loaded; body did not |
+| B11 | Primary (archived) | Armory page HTML searched for "Burning Crusade Classic" (merge step, curl) | Requests for 2026-06-01 and 2026-08-25 both redirect to the earliest capture, https://web.archive.org/web/20260827204739/https://worldofwarcraft.blizzard.com/en-us/worldsoul/us/armory , which lists Burning Crusade Classic and Mists of Pandaria Classic; later captures 2026-08-28 and 2026-09-07 do too | Classic options were on the Armory by 2026-08-27; no earlier capture of that URL was returned, so the start date is *unverified* |
+| B12 | Primary (archived) | WoW home HTML searched for "system requirements" (merge step, curl) | Absent in https://web.archive.org/web/20260702012639/https://worldofwarcraft.blizzard.com/en-us , .../20260815220358/... , .../20260825162724/... ; present in .../20260904194848/... and .../20261001192639/... | A home-page change landed between 2026-08-25 and 2026-09-04, consistent with the reported refresh; scope not established |
+| NA3 | Primary (archived) | nintendo.com/us declared font family | Museo Sans in captures 2024-03-01 to 2025-10-15 (e.g. https://web.archive.org/web/20240301235030/https://www.nintendo.com/us/ , .../20251015220733/...); Geologica in .../20251201234400/... , .../20260302002528/... , .../20260602002235/... | Typeface switch between 2025-10-15 and 2025-12-01 |
+| NA10 | Primary (archived) | ubisoft.com/en-us Next.js markers and `global-navigation` | No Next.js in .../20240301225611/https://www.ubisoft.com/en-us/ , .../20250301163757/... , .../20250415192345/... ; Next.js in .../20250501225356/https://www.ubisoft.com/en-us and later | Rebuild on Next.js between 2025-04-15 and 2025-05-01; shared nav kept |
+| NA15 | Primary (archived) | ea.com `<ea-*>` custom elements vs Next.js | `ea-*` elements up to https://web.archive.org/web/20260801220212/https://www.ea.com/ ; Next.js + `NetworkNav_` in .../20260902094529/https://www.ea.com/ and .../20260930013742/... | Rebuild from custom elements to Next.js between 2026-08-01 and 2026-09-02 |
+| NA22 | Primary (archived) | FFXIV promo site title and free-trial links | https://web.archive.org/web/20240301071808/https://na.finalfantasyxiv.com/ ; https://web.archive.org/web/20250307052509/https://na.finalfantasyxiv.com/ | Same title and links in 2024 and 2025 (no sign of a redesign) |
+
+## Company publications, support pages, repositories (Primary)
+
+| ID | Tier | Title | Publisher / author | Published | URL | Archive | Load status | Claims it supports |
+|---|---|---|---|---|---|---|---|---|
+| X2 | Primary | "Xbox Insiders: Aggregated Gaming Library is coming to the Xbox PC app" | Xbox Wire / not recorded | 2025-06-23 | https://news.xbox.com/en-us/2025/06/23/xbox-insiders-aggregated-gaming-library-is-coming-to-the-xbox-pc-app/ | not checked | Loaded | Aggregated library, store badges, handheld full-screen plan |
+| X4 | Primary | "Xbox September Update" | Xbox Wire / not recorded | 2025-09-29 | https://news.xbox.com/en-us/2025/09/29/xbox-september-update-2025/ | not checked | Loaded | My apps, Game Bar widgets, Rewards hub Goal Cards, Ally launch 2025-10-16 |
+| R6 | Primary | "7 lessons we learned while building a modular web design platform" | Riot Games UX Design (Medium) / not shown | **not shown** (background) | https://medium.com/riot-games-ux-design/7-lessons-we-learned-while-building-a-modular-web-design-platform-5d867c81c9dd | not checked | **HTTP 403**; title and URL only | Background, *unverified*: Riot wrote about a modular web platform |
+| R8 | Primary | "Riot Client FAQ" | Riot Games Support / not shown | 2026-05-27 (date on page) | https://support.riotgames.com/en-us/riot/client/riot-client-faq | not checked | Loaded (WebFetch, merge step) | From 2026 every Riot PC game launches through the Riot Client, rolled out by groups; Riot Client as hub for patch notes, news, social, esports; TFT standalone client and League's 2027 client update |
+| W2 | Primary | "New Features on Wowhead: News Filters, Pinned Pages & More" | Wowhead / not recorded | 2026-07-09 | https://www.wowhead.com/news/new-features-on-wowhead-news-filters-pinned-pages-and-more-382068 | not checked | Date and title loaded; **body did not** | Wowhead announced news filters and pinned pages (title-level only) |
+| W3 | Primary | "[Updated] Wowhead in 2026 and Beyond - AI, Ads, and Performance Issues" | Wowhead / not recorded | 2026-06-24 | https://www.wowhead.com/news/wowhead-in-2026-and-beyond-ai-ads-and-performance-issues-381993 | not checked | Date and title loaded; **body did not** | A public statement on AI, ads and performance exists (title-level only) |
+| W4 | Primary | "Upcoming Site Navigation Improvements - Design Preview" | Wowhead / not recorded | **2019-10-30 (background)** | https://www.wowhead.com/news/upcoming-site-navigation-improvements-design-preview-295903 | not checked | Date loaded; body did not | Background only |
+| W5 | Primary | "Find Upgrades Button Now on Item Pages" | Wowhead / not recorded | **2010-05-07 (background)** | https://www.wowhead.com/news/find-upgrades-button-now-on-item-pages-155492 | not checked | Date loaded | Background: age of the Find upgrades button |
+| NA7 | Primary | "Personalise your Nintendo experience" | Nintendo UK | 2025-12-12 | https://www.nintendo.com/en-gb/News/2025/December/Personalise-your-Nintendo-experience-2987358.html | none found | Loaded (WebFetch) | Two account opt-ins for Year in Review and recommendations |
+| NA11 | Primary | "The Next Evolution of Ubisoft Connect is Here" | Ubisoft News / Lucy O'Brien | **2023-06-26 (background)** | https://news.ubisoft.com/en-us/article/45npDyJWSNathaIDK3gvLp/the-next-evolution-of-ubisoft-connect-is-here | https://web.archive.org/web/20260510150240/https://news.ubisoft.com/en-us/article/45npDyJWSNathaIDK3gvLp/the-next-evolution-of-ubisoft-connect-is-here | Loaded (WebFetch) | Background only: Connect library redesign, one UI stack |
+| NA21 | Primary | "The Lodestone Update Notes" | Square Enix | Running log; entries 2025-01-21 to 2026-09-08 read | https://na.finalfantasyxiv.com/lodestone/special/update_log/ | https://web.archive.org/web/20260918063810/https://na.finalfantasyxiv.com/lodestone/special/update_log/ | Loaded (WebFetch); no 2024 entries returned | Public dated site changelog; status tracking, Companion App notifications, rankings, profile extensions |
+| NA25 | Primary | "Video Game Preservation: Making games live forever" | GOG blog / Karol Ascot Obrzut | November 2024 (month only) | https://www.gog.com/blog/making-games-live-forever/ | https://web.archive.org/web/20260830031355/https://www.gog.com/blog/making-games-live-forever/ | Loaded (WebFetch) | "Preserved by GOG" programme; 100 games at launch, 267 now |
+| NA26 | Primary | "GOG GALAXY Changelog" | GOG Support Center | Running log; 2.0.81 (2025-04-07) to 2.0.97 Beta (2026-04-08) read | https://support.gog.com/hc/en-us/articles/360003936637-GOG-GALAXY-Changelog | https://web.archive.org/web/20260619000505/https://support.gog.com/hc/en-us/articles/360003936637-GOG-GALAXY-Changelog | WebFetch 403; loaded in browser | Discover default, screen-reader fixes, gamepad navigation, Power Search + Ctrl/Cmd+F, Dreamlist and Patrons in GALAXY |
+| NA28 | Primary | "GOG is getting acquired by its original co-founder: What it means for you" | GOG blog | December 2025 (month only) | https://www.gog.com/blog/gog-is-getting-acquired-by-its-original-co-founder-what-it-means-for-you/ | https://web.archive.org/web/20260901071236/https://www.gog.com/blog/gog-is-getting-acquired-by-its-original-co-founder-what-it-means-for-you/ | Loaded (WebFetch) | Sale to Michał Kiciński; GALAXY optional; libraries unchanged |
+| NB15 | Primary | "An Update on New World" | Amazon Games / not shown | 2025-10-28 | https://www.newworld.com/en-us/news/articles/update-on-new-world | lookup only (unchecked) | Loaded (WebFetch) | Season 10 / Nighthaven final content; servers through 2026 |
+| NB16 | Primary | "The Future of New World: What to Expect" | Amazon Games / not shown | 2026-01-15 | https://www.newworld.com/en-us/news/articles/the-future-of-new-world-aeternum-what-to-expect | lookup only (unchecked) | Loaded (WebFetch) | Delisted; offline 2027-01-31; currency sales end 2026-07-20 |
+| NB17 | Primary | "An Update on Throne and Liberty in the West" | Amazon Games / not shown | 2026-08-12 | https://www.playthroneandliberty.com/en-us/news/articles/throne-and-liberty-in-the-west | lookup only (unchecked) | Loaded (WebFetch) | Publishing returns to NC (FirstSpark Games) from Q4 2026 |
+| NB21 | Primary | "Hytale New Worlds Modding Contest" | Hypixel Studios / Hytale Team | 2026-03-05 | https://hytale.com/news/2026/3/hytale-new-worlds-modding-contest | lookup only (unchecked) | Loaded (WebFetch) | CurseForge runs contest submissions, moderation, logistics |
+| NB26 | Primary | "R6 Changelog 21st June" (TRN Checkpoint) | Tracker Network / Will D | 2024-06-21 | https://tracker.gg/checkpoint/articles/r6-changelog-21st-june-2024 | lookup only (unchecked) | WebFetch nav only; read in browser | 2024 R6 site relaunch: lifetime stats moved to top, counts on tabs, icons removed |
+| NC6 | Primary | wowsims/tbc-new (repository and README) | WoWSims team on GitHub | not shown; live repo | https://github.com/wowsims/tbc-new | not checked | Loaded (WebFetch, summarised) | ~21,932 commits, forked from wowsims/mop, local builds, MIT |
+| NC7 | Primary | wowsims/tbc-new releases | WoWSims team on GitHub | v0.0.137 (Sep 14) to v0.0.146 (Sep 30); year inferred 2026 | https://github.com/wowsims/tbc-new/releases | not checked | Loaded (WebFetch) | Near-daily releases; notes on tooltips, consumables, backgrounds |
+| NC8 | Primary | wowsims/tbc (old repository README) | WoWSims team on GitHub | not shown | https://github.com/wowsims/tbc | not checked | Loaded (WebFetch) | Old sim "not maintained nor monitored"; support moved to tbc-new |
+| NC9 | Primary (project's own listing on a third-party host) | WowSims Exporter | CurseForge listing by WoWSims | last updated 2026-08-05 | https://www.curseforge.com/wow/addons/wowsimsexporter | not checked | Loaded (WebFetch) | `/wse export` string for the sim's Import > Addon; supports Classic, TBC, MoP Classic, SoD |
+| NC13 | Primary | "Maxroll and Community Builds added to the PoE2Planner" | Maxroll / Tenkiei | 2024-12-15 | https://maxroll.gg/poe2/news/maxroll-and-community-builds-added-to-the-poe2planner | not checked | Loaded (WebFetch) | Builds browsable in planner, ratings, notes, richer header, mobile, public/private |
+| NC15 | Primary | World of Warcraft (Maxroll WoW hub) | Maxroll | live page | https://maxroll.gg/wow | not checked | Loaded (WebFetch, text only) | WoW section is retail only; no planner or sim |
+| NC19 | Primary | "This Is What Icy Veins Looks Like Now - WoW Retail Section Redesign Is Live" | Icy Veins / not shown | 2026-05-19 (`article:published_time`) | https://www.icy-veins.com/wow/news/this-is-what-icy-veins-looks-like-now-wow-retail-section-redesign-is-live/ | https://web.archive.org/web/20260609022247/https://www.icy-veins.com/wow/news/this-is-what-icy-veins-looks-like-now-wow-retail-section-redesign-is-live/ | WebFetch 403; read in browser pane | Retail redesign beta: curated side links, more width, interactive tools, dark scheme with fewer side panels, gradual rollout |
+
+## Press and agency case studies (Reputable secondary)
+
+| ID | Tier | Title | Publisher / author | Published | URL | Load status | Claims it supports |
+|---|---|---|---|---|---|---|---|
+| B5 | Reputable secondary | "Blizzard's Battle.net launcher is getting a much-needed redesign" | Engadget / not recorded | **2021-01-15 (background)** | https://www.engadget.com/battle-net-client-blizzard-front-end-upgrade-redesign-101045426.html | Loaded | Background: last dated Battle.net app overhaul and its claims |
+| B13 | Reputable secondary | "Overwatch will drop the '2' as Jetpack Cat and four other heroes arrive on February 10" | Engadget / Kris Holt | 2026-02-04 | https://www.engadget.com/gaming/overwatch-will-drop-the-2-as-jetpack-cat-and-four-other-heroes-arrive-on-february-10-184500327.html | Loaded (WebFetch, merge step) | Overwatch 2 renamed "Overwatch" from the season starting 2026-02-10 (replaces B7) |
+| R4 | Reputable secondary | "Riot Has a Secret Plan to Remake Its 'League of Legends' Game" | Bloomberg / not recorded | 2025-12-18 (URL date) | https://www.bloomberg.com/news/articles/2025-12-18/riot-has-a-secret-plan-to-remake-its-league-of-legends-game | **Not opened** (paywall); title and URL date only | A League remake was reported in December 2025 (title-level) |
+| R7 | Reputable secondary | "New League of Legends Client Coming in 2026" (syndicated from GameDaily) | GameDaily via Yahoo Tech / Peter Tingson | 2026-01-01 | https://tech.yahoo.com/gaming/articles/league-legends-client-coming-2026-021219350.html | Loaded (WebFetch, merge step) | Riot plans a new client fully integrated with the in-game experience, replacing the separate client (replaces R5) |
+| V2 | Reputable secondary | "Valve reveal new Steam store menu and enhanced search, now in Beta" | GamingOnLinux / not recorded | 2025-07-26 | https://www.gamingonlinux.com/2025/07/valve-reveal-new-steam-store-menu-and-enhanced-search-now-in-beta/ | Loaded | Merged menu, search suggestions, Valve's stated aim |
+| V3 | Reputable secondary | "Steam's wider store page refresh is live..." | GamingOnLinux / not recorded | 2025-11-07 | https://www.gamingonlinux.com/2025/11/steams-wider-store-page-refresh-is-live-with-plans-to-improve-the-home-page-on-the-way/ | Loaded | 1200 px pages, theater mode, home page later |
+| V4 | Reputable secondary | "Steam Store Gets A Redesign With Wider Pages..." | HotHardware / not recorded | 2025-11-11 | https://hothardware.com/news/steam-store-redesign-with-wider-pages | Loaded | Valve's reasoning for 1200 px |
+| V5 | Reputable secondary | "Steam beta update brings UI overhaul to Steam Deck and Steam Machine" | PCGamesN / not recorded | 2026-09-10 | https://www.pcgamesn.com/steam/big-picture-mode-beta-update-2026 | Loaded | Big Art Mode, screensaver, release calendar |
+| V6 | Reputable secondary | "Steam overhauls notifications, UI elements and the in-game overlay" | Engadget / not recorded | **2023-06-14 (background)** | https://www.engadget.com/steam-overhauls-notifications-ui-elements-and-the-in-game-overlay-000839366.html | Loaded | Background: overlay, notes, shared codebase |
+| E4 | Reputable secondary | "The Epic Games Launcher is getting a 'ground-up rebuild' which will make it boot five times faster" | Video Games Chronicle / Chris Scullion | 2026-06-19 | https://www.videogameschronicle.com/news/the-epic-games-launcher-is-getting-a-ground-up-rebuild-which-will-make-it-boot-five-times-faster/ | Loaded (WebFetch, merge step) | 5x faster cold start, private beta then public, ~12-month roadmap, planned reviews / patch notes / search / profiles / gifting; no tech-stack detail |
+| P2 | Reputable secondary | "PS Store Finally Gets Feature Inexplicably Removed Years Ago" | PlayStation LifeStyle / not recorded | 2026-02-06 | https://www.playstationlifestyle.net/2026/02/06/ps-store-feature-web-version-images-return/ | Loaded | Web store screenshots restored; videos still missing |
+| P3 | Reputable secondary (reporting an unconfirmed leak) | "PS5's PS Store Is Getting a Netflix-Style Makeover Soon" | Push Square / not recorded | 2026-04-12 | https://www.pushsquare.com/news/2026/04/ps5s-ps-store-is-getting-a-netflix-style-makeover-soon | Loaded | Beta store tiles and tags, sourced to a social post; *unverified* |
+| U4 | Reputable secondary | "Unpacking Destiny 2's final update and what comes next" | Shacknews / not recorded | 2026-06-19 | https://www.shacknews.com/article/149684/destiny-2-the-final-update-panel-june-2026 | Loaded | Director restored; Portal folded into it |
+| U5 | Reputable secondary | "Bungie Announces Plans To Restore Vaulted Destiny 2 Content..." | Game Informer / not recorded | 2026-09-21 | https://gameinformer.com/2026/09/21/bungie-announces-plans-to-restore-vaulted-destiny-2-content-and-substantial-reworks-to | Loaded | Bungie status; no UI details |
+| WL3 | Reputable secondary | "Introducing Archon - Warcraft Logs Parent Company Rebranded" | Wowhead / not recorded | **2023-10-03 (background)** | https://www.wowhead.com/news/introducing-archon-warcraft-logs-parent-company-rebranded-335303 | Date loaded; body did not | Background: rebrand date |
+| WL4 | Reputable secondary | "Record and Review Your Gameplay With the Archon App" | Wowhead / Archimtiros | 2026-03-10 | https://www.wowhead.com/news/record-and-review-your-gameplay-with-the-archon-app-380702 | Title, date, author loaded; body did not (merge step) | The Archon App records gameplay for review (title-level) |
+| WL5 | Reputable secondary | "WarcraftLogs Uploader Transitioning to Archon App on June 29th" | Wowhead / Archimtiros | 2026-06-03 | https://www.wowhead.com/news/warcraftlogs-uploader-transitioning-to-archon-app-on-june-29th-381785 | Title, date, author loaded; body did not (merge step) | The uploader moves to the Archon App on 2026-06-29 (title-level) |
+| NA4 | Reputable secondary | "My Nintendo Store Is Changing Its Name This Month" | Nintendo Life / Jim Norman | 2026-05-11 | https://www.nintendolife.com/news/2026/05/my-nintendo-store-is-changing-its-name-this-month | Loaded (WebFetch) | Rename to "Nintendo Store" from 2026-05-27 |
+| NA5 | Reputable secondary | "Nintendo Store App Launches on iPhone With a Feature Fans Will Love" | MacRumors / Joe Rossignol | 2025-11-05 | https://www.macrumors.com/2025/11/05/nintendo-store-app-iphone-ipad/ | Loaded (WebFetch) | Store app regions, play activity, wishlist alerts, purchases on web |
+| NA6 | Reputable secondary | "New 'Nintendo Today!' app is aimed squarely at Nintendo's biggest fans" | AppleInsider / Amber Neely | 2025-03-27 | https://appleinsider.com/articles/25/03/27/new-nintendo-today-app-is-aimed-squarely-at-nintendos-biggest-fans | Loaded (WebFetch) | Daily calendar, franchise filters, widgets |
+| NA12 | Reputable secondary | "A new Ubisoft Steam tool could lead to a launcher-free future for its games" | PCGamesN / Ken Allsop | 2026-09-10 | https://www.pcgamesn.com/prince-of-persia-the-lost-crown/ubisoft-connect-launcher-removed-steam | Loaded (WebFetch) | Connect Services replaces the client for one Steam game; based on an in-game message |
+| NA16 | Reputable secondary (agency case study) | "Transforming Electronic Arts (EA)" | Instrument | **No date on page** (© 2026) | https://www.instrument.com/work/electronic-arts (archive https://web.archive.org/web/20260727005915/https://www.instrument.com/work/electronic-arts) | Loaded (WebFetch) | Heritage blue kept, wider palette, EA Display family, motion toolkit |
+| NA18 | Reputable secondary | "EA's Origin app for PC gaming will shut down in April" | Engadget / Anna Washenko | 2025-01-21 | https://www.engadget.com/gaming/pc/eas-origin-app-for-pc-gaming-will-shut-down-in-april-191807523.html | Loaded (WebFetch) | Origin closes 2025-04-17; EA app required |
+| NA27 | Reputable secondary | "GOG launches new 'Dreamlist' system to replace Community Wishlist tool" | KitGuru / João Silva | 2025-01-30 | https://www.kitguru.net/gaming/joao-silva/gog-launches-new-dreamlist-system-to-replace-community-wishlist-tool/ | Loaded (WebFetch) | Dreamlist replaces the community wishlist |
+| NB11 | Reputable secondary | "Path of Exile 2 gets 1.0 update on December 11" | Shacknews / Donovan Erskine | 2026-08-25 | https://www.shacknews.com/article/150481/path-of-exile-2-release-date | Loaded (WebFetch) | 1.0 on 2026-12-11, announced at Gamescom ONL |
+| NB12 | Reputable secondary | "Path of Exile 2's early access release date delayed to December" | Video Games Chronicle / Tom Ivan | 2024-10-29 | https://www.videogameschronicle.com/news/path-of-exile-2s-early-access-release-date-delayed-to-december/ | Loaded (WebFetch) | Early access 2024-12-06; delay from merging account systems |
+| NB22 | Reputable secondary (Wowhead news) | "New Standalone CurseForge Client - Manage Addons without the Overwolf App" | Wowhead / Archimtiros | **2022-05-16 (background)** | https://www.wowhead.com/news/new-standalone-curseforge-client-manage-addons-without-the-overwolf-app-327088 | Loaded (WebFetch) | Background: standalone client |
+| NB27 | Reputable secondary | "Amazon is winding down its still-popular New World MMO amid mass layoffs" | Engadget / Kris Holt | 2025-10-30 | https://www.engadget.com/amazon-is-winding-down-its-still-popular-new-world-mmo-amid-mass-layoffs-150500426.html | Loaded (WebFetch, merge step) | End of New World content tied to Amazon's layoffs and MMO cutback (replaces NB18) |
+| NC23 | Reputable secondary (agency case study) | "Blitz.GG" | Báchoo (design studio) | **2023 (project year; background)** | https://bachoodesign.com/portfolio/blitz-gg/ | Loaded (WebFetch) | Background: 2023 brand refresh and website redesign |
+
+## Weak sources still cited (each labelled where used; never sole support in trends or recommendations)
+
+| ID | Tier | Title | Publisher / author | Published | URL | Load status | What it is used for, and how it is labelled |
+|---|---|---|---|---|---|---|---|
+| B6 | Weak (fan news site) | "New Battle.net App Beta" | MMO-Champion / not recorded | **2019-11-01 (background)** | https://www.mmo-champion.com/content/8810-New-Battle-net-App-Beta (Blizzard's own post https://news.blizzard.com/en-us/article/23189672/new-battle-net-app-beta loaded but shows no date) | Loaded | Background date of the 2019 beta, in `platforms/blizzard.md` only |
+| B8 | Weak (SEO rewrite site) | "Blizzard updates official World of Warcraft website ahead of BlizzCon 2026" | Aroged / not recorded | 2026-08-31 | https://www.aroged.com/2026/08/31/blizzard-updates-official-world-of-warcraft-website-ahead-of-blizzcon-2026/ | Loaded | Scope of the WoW site refresh (Token price, cohesive design): marked *unverified*; timing backed by B12, current state by B1 |
+| B9 | Weak (fan site) | "WoW Armory Finally Adds Classic, TBC and Mists of Pandaria Support" | Bolverk Games / not recorded | 2026-08-29 | https://bolverkgames.com/wow/wow-armory-finally-adds-classic-tbc-and-mists-of-pandaria-support/ | Loaded | That the Classic Armory shipped without a news post: *unverified*; date backed by B11, current state by B10 |
+| R3 | Weak (small esports site) | "Riot Games confirms League of Legends launcher change is an intentional test..." | spilled.gg / not recorded | 2026-04-11 | https://spilled.gg/riot-games-league-legends-launcher-change-test-client-overhaul/ | Loaded | April 2026 test and Riot calling launch failures bugs: *unverified*; the launch change itself backed by R8 |
+| E2 | Weak (regional tech site; the only source for some figures) | "Epic Games Launcher V2 is a ground-up rebuild that boots 5x faster" | Tbreak / not recorded | 2026-06-19 | https://tbreak.com/epic-games-launcher-v2-faster-rebuild/ | Loaded | 6.5x tray restore and the VP quote: *unverified*; everything else corroborated by E4 |
+| U3 | Weak (design-studio blog commentary, not the agency that did the work) | "Bungie's Marathon: An Eye for Design" | Brace Design / not recorded | 2025-04-28 (updated 2025-05-19) | https://www.brace.design/single-post/bungie-s-marathon-an-eye-for-design | Loaded | Description of Marathon's visual language, in `platforms/bungie.md` only, labelled |
+| WL2 | Weak (fan blog) | "Warcraft Logs Is Moving to Archon..." | Master of Warcraft / not recorded | 2026-06-07 | https://www.masterofwarcraft.net/2026/06/warcraft-logs-archon-app-june-29.html | Loaded | Lite mode and video synced to logs: *unverified*, in `platforms/warcraft-logs.md` only (removed from `trends.md` in the 2026-10-02 audit, where it was sole support); the move and recording backed by WL4, WL5 |
+| NA17 | Weak (design blog on Substack) | "Electronic Arts 2025 by Instrument" | Brand Archive / Richard Baird | 2025-10-24 | https://brandarchive.substack.com/p/electronic-arts-rebrand-2025 | Loaded (WebFetch) | Only to date NA16; never sole support |
+| NB5 | Weak (fan news) | "HoYoverse Announces HoYoPlay: A Unified PC Launcher For All Its Games" | Enduins / Sai T. | 2024-04-26 | https://www.enduins.com/news/hoyoverse-announces-hoyoplay-a-unified-pc-launcher-for-all-its-games | Loaded (WebFetch) | April 2024 HoYoPlay announcement: *unverified*; current state backed by NB1, NB2, NB4 |
+| NB6 | Weak (fan news) | "HoYoverse announces HoYoPlay, a unified launcher for all its PC games" | PinoyGamer / Carllaen Gonzales | 2024-04-29 | https://pinoygamer.ph/articles/hoyoverse-announces-hoyoplay-a-unified-pc-launcher-for-all-its-games.24208/ | Loaded (WebFetch) | Same as NB5 |
+| NB7 | Weak (search snippets) | Snippets for "HoYoPlay launcher unified HoYoverse launcher 2024" (fan wiki and Genshin news 124130) | Fandom / HoYoverse | not shown | https://genshin.hoyoverse.com/en/news/detail/124130 | Official page an empty shell; wiki HTTP 402 | 17 June 2024 switch date: *unverified* |
+| NB23 | Weak (title and snippet only) | "Switch to the new website announcement 18/4" | Overwolf on Medium | not seen (snippets imply April 2023) | https://medium.com/overwolf/switch-to-the-new-website-announcement-18-4-4fce04336e2d | HTTP 403 | Background, *unverified*: current CurseForge site default since April 2023 |
+| NC14 | Weak (**re-tiered** from Primary: the company's own post, but only a search snippet was read) | maxroll on X: Diablo 4 Planner major updates | Maxroll (@maxrollgg) | 2026-04-30 per snippet (*unverified*) | https://x.com/maxrollgg/status/2049767754362704204 | Not loaded | War Plans etc.: *unverified*, consistent with NC11 |
+
+## Retired sources (no longer cited)
+
+| ID | Was | Why retired | Replaced by |
+|---|---|---|---|
+| B7 | Insider Gaming 2026-02-04 (and Nintendo Soup, same date), Overwatch rename | Insider Gaming re-tiered Weak (leak/rumour-led outlet); Nintendo Soup is a fan aggregator | B13 (Engadget) plus B2 (seen) |
+| R5 | BigGo Finance 2025-12-19, "League Next" summary | Weak aggregator, never opened | R7 (GameDaily) and R8 (Riot Support) |
+| NB18 | Insider Gaming 2025-10-28, New World and Amazon layoffs | Re-tiered Weak, as for B7 | NB27 (Engadget) |
 
 ## Tried and failed (not used as evidence)
 
-| Date tried | URL | Result |
-|---|---|---|
-| 2026-10-01 | https://www.sheepesports.com/en/all/articles/lol-riot-begins-work-on-league-next-a-complete-modernization-set-for-2027/en | HTTP 403 |
-| 2026-10-01 | https://www.gamespot.com/articles/league-of-legends-in-line-for-major-overhaul-here-are-all-of-the-changes-so-far/1100-6537097/ | HTTP 403 |
-| 2026-10-01 | https://www.gamespot.com/articles/new-battlenet-app-launches-in-beta/1100-6471129/ | HTTP 403 |
-| 2026-10-01 | https://medium.com/riot-games-ux-design/7-lessons-we-learned-while-building-a-modular-web-design-platform-5d867c81c9dd | HTTP 403 (cited in riot.md as undated background) |
-| 2026-10-01 | https://hitmarker.net/news/league-of-legends-to-receive-a-total-overhaul-in-2027-riot-games-announces-1602724 | Loaded, no date; not cited |
-| 2026-10-01 | https://techraptor.net/gaming/news/steam-store-refresh-2026 | HTTP 403 |
-| 2026-10-01 | https://www.neowin.net/news/valve-is-redesigning-the-steam-store-menu-and-search-wants-user-feedback/ | HTTP 403 |
-| 2026-10-01 | PC Gamer and two Tom's Hardware articles on Epic Launcher V2 | Only site chrome loaded |
-| 2026-10-01 | Neowin and Guru3D on Epic launcher; https://www.unrealengine.com/news/state-of-unreal-2026-top-news-from-the-show | HTTP 403 |
-| 2026-10-01 | https://videocardz.com/newz/microsoft-shows-new-unified-xbox-ui-direction-across-devices and https://videocardz.com/newz/overwatch-2-is-now-just-overwatch | HTTP 402 |
-| 2026-10-01 | https://esports.gg/news/overwatch/overwatch-drops-the-2-in-major-franchise-turning-point/ | HTTP 403 |
-| 2026-10-01 | https://www.creativebloq.com/3d/video-game-design/bungies-art-director-explains-marathons-controversial-art-style | Only site chrome loaded |
-| 2026-10-01 | https://www.bungie.net/7/en/News/article/d2_may_21_2026 | Header only (client-rendered) |
-| 2026-10-01 | https://fresh.warcraftlogs.com/ | HTTP 403 |
-| 2026-10-01 | https://www.archon.gg/fellowship/articles/news/introducing-archon | HTTP 403 |
-| 2026-10-01 | https://www.icy-veins.com/wow-classic/news/blizzard-quietly-added-an-armory-to-classic-wow-before-blizzcon/ | HTTP 403 |
+Session 1:
+
+| URL | Result |
+|---|---|
+| https://www.sheepesports.com/en/all/articles/lol-riot-begins-work-on-league-next-a-complete-modernization-set-for-2027/en | HTTP 403 |
+| https://www.gamespot.com/articles/league-of-legends-in-line-for-major-overhaul-here-are-all-of-the-changes-so-far/1100-6537097/ | HTTP 403 |
+| https://www.gamespot.com/articles/new-battlenet-app-launches-in-beta/1100-6471129/ | HTTP 403 |
+| https://hitmarker.net/news/league-of-legends-to-receive-a-total-overhaul-in-2027-riot-games-announces-1602724 | Loaded, no date; not cited |
+| https://techraptor.net/gaming/news/steam-store-refresh-2026 | HTTP 403 |
+| https://www.neowin.net/news/valve-is-redesigning-the-steam-store-menu-and-search-wants-user-feedback/ | HTTP 403 |
+| PC Gamer and two Tom's Hardware articles on Epic Launcher V2 | Only site chrome loaded |
+| Neowin and Guru3D on Epic launcher; https://www.unrealengine.com/news/state-of-unreal-2026-top-news-from-the-show | HTTP 403 |
+| https://videocardz.com/newz/microsoft-shows-new-unified-xbox-ui-direction-across-devices and https://videocardz.com/newz/overwatch-2-is-now-just-overwatch | HTTP 402 |
+| https://esports.gg/news/overwatch/overwatch-drops-the-2-in-major-franchise-turning-point/ | HTTP 403 |
+| https://www.creativebloq.com/3d/video-game-design/bungies-art-director-explains-marathons-controversial-art-style | Only site chrome loaded |
+| https://www.bungie.net/7/en/News/article/d2_may_21_2026 | Header only (client-rendered) |
+| https://fresh.warcraftlogs.com/ | HTTP 403 |
+| https://www.archon.gg/fellowship/articles/news/introducing-archon | HTTP 403 |
+| https://www.icy-veins.com/wow-classic/news/blizzard-quietly-added-an-armory-to-classic-wow-before-blizzcon/ | HTTP 403 |
+
+Session 2 batches: listed in `PROCESS.md` ("Research log (session 2)", per batch). Merge step:
+
+| URL | Result |
+|---|---|
+| https://www.archon.gg/classic-fresh/articles/news/older-logging-apps-will-retire-june-29th | WebFetch 403; browser showed a human-verification page (not bypassed) |
+| https://www.gamesradar.com/games/fps/blizzard-renames-overwatch-2-to-overwatch-... | Truncated; no date or byline returned |
+| https://us.forums.blizzard.com/en/wow/t/armory-now-available-for-classic-versions-of-wow/2341918 | Loaded; player post dated 2026-08-27, not staff; forum is Weak, not cited (B11 covers the date) |
+| https://www.hoyolab.com/article_pre/18014398241031625 | "Loading..." only |
+| https://support.hoyoverse.com/hc/en-us/articles/52362516439577-... | HTTP 403 |
