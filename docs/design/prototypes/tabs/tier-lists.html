@@ -201,7 +201,10 @@ nav.sections a:hover{color:var(--ink)}
 .stagehint{font-size:var(--t-xs);color:var(--ink-3);margin:6px 0 0}
 .tierwrap:not(.is3d) .stagehint{display:none}
 .tierwrap.listmode .stagehint{display:none}
-@media (max-width:520px){.rig{scale:.66}.stage{height:330px}}
+/* K7 rune base: the kit's SVG rune ring laid flat under the bottom shelf, drawn before the rig so it sits behind it */
+.runebase{position:absolute;left:50%;top:calc(48% + 150px);width:340px;height:340px;margin:-170px 0 0 -170px;pointer-events:none;opacity:.5;transform:rotateX(74deg)}
+.runebase .tbc-rune,.runebase svg{width:100%;height:100%}
+@media (max-width:520px){.rig{scale:.66}.stage{height:330px}.runebase{top:calc(48% + 99px);scale:.66}}
 .honest{display:grid;gap:10px}
 @media (min-width:760px){.honest{grid-template-columns:repeat(3,1fr)}}
 .honest>div{background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;padding:10px 12px;font-size:var(--t-sm)}
@@ -266,7 +269,7 @@ nav.sections a:hover{color:var(--ink)}
       <div class="in tierwrap">
         <div class="tierctl" id="tierctl" hidden><button class="tbtn" type="button" data-rot="-1" aria-label="Rotate shelves left">◀</button><button class="tbtn" type="button" data-rot="1" aria-label="Rotate shelves right">▶</button><button class="tbtn" type="button" id="listbtn" aria-pressed="false">List view</button></div>
         <div class="chips" id="chips" role="group" aria-label="Filter the DPS list by class" hidden><button type="button" aria-pressed="true" data-c="all">All</button><button type="button" aria-pressed="false" data-c="Mage" class="cm">Mage</button><button type="button" aria-pressed="false" data-c="Warlock" class="cl">Warlock</button><button type="button" aria-pressed="false" data-c="Hunter" class="ch">Hunter</button><button type="button" aria-pressed="false" data-c="Warrior" class="cw">Warrior</button><button type="button" aria-pressed="false" data-c="Shaman" class="cs">Shaman</button><button type="button" aria-pressed="false" data-c="Paladin" class="cp">Paladin</button><button type="button" aria-pressed="false" data-c="Rogue" class="cr">Rogue</button><button type="button" aria-pressed="false" data-c="Priest" class="cpr">Priest</button><button type="button" aria-pressed="false" data-c="Druid" class="cd">Druid</button></div>
-        <div class="stage" id="stage" aria-hidden="true"><div class="rig" id="rig"></div></div>
+        <div class="stage" id="stage" aria-hidden="true"><div class="runebase" id="runebase"></div><div class="rig" id="rig"></div></div>
         <p class="stagehint">Drag or use the arrows to turn the shelves. The list view carries the same placements for screen readers.</p>
         <ul class="tiers" id="dpslist">
           <li data-depth="0"><span class="tl-l" aria-label="Tier S">S</span><ul class="specs"><li class="spec cm" data-c="Mage" data-slug="arcane-mage"><span class="sp">Arcane</span><span class="cn">Mage</span></li><li class="spec cl" data-c="Warlock" data-slug="destruction-warlock"><span class="sp">Destruction</span><span class="cn">Warlock</span></li><li class="spec ch" data-c="Hunter" data-slug="beast-mastery-hunter"><span class="sp">Beast Mastery</span><span class="cn">Hunter</span></li><li class="spec cw me" data-c="Warrior" data-slug="fury-warrior"><span class="sp">Fury</span><span class="cn">Warrior</span><span class="you">Your spec</span></li></ul></li>
@@ -323,9 +326,11 @@ nav.sections a:hover{color:var(--ink)}
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Spec Tier Lists</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
@@ -336,13 +341,21 @@ nav.sections a:hover{color:var(--ink)}
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
 /* Spec Tier Lists tab: Serpentshrine teal, lamp dimmed behind the dense lists; "charge" gives a short pulse when a filter changes */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
-const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+/* speed: the kit's "lift" slows the world */
+const S=window.SCENE={ok:false,speed:1,cam:CAM,mix:MIX,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -414,9 +427,10 @@ function place(){
 }
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
-  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=1.5+MIX.charge*1.6;
+  /* brightness (crystal emissive, halo opacity, lamp) is left to the kit's K3 swell; "charge" only spins the crystal */
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
 function pose(){
@@ -425,28 +439,34 @@ function pose(){
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
+  dt*=S.speed;
   t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
   crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
-  tint();place();R.render(scene,cam);
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>
 (function(){
 "use strict";
@@ -461,6 +481,24 @@ const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
 const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
+   This tab stays calm: K2 sky over K5 Coilfang water; K7 rune base under the shelves; K8 on filter / view changes; no K1 here. */
+const KIT=window.TBCKit||null;
+if(KIT)KIT.theme("ssc",{instant:true});
+/* K7: (re)mount the rune base. Called with motion on it draws in and turns slowly; otherwise it is drawn static at rest. */
+let rune=null;
+function mountRune(){
+  const host=$("#runebase");if(!KIT||!host)return;
+  if(rune)rune.remove();
+  rune=KIT.runeRing(host,{size:340,glyphs:16,seed:5,spin:true,spinDur:60});
+}
+mountRune();
+/* K8: the DPS list or the shelves, whichever is showing, opens through a ring of light */
+function enterTiers(){
+  if(!KIT||!M.on)return;
+  const w=$(".tierwrap"),shelves=w&&w.classList.contains("is3d")&&!w.classList.contains("listmode");
+  const el=shelves?$("#stage"):$("#dpslist");if(el)KIT.enter(el);
+}
 
 /* ---------- rotatable 3D tier shelves for the DPS list, built from the visible specs of the real list ---------- */
 const wrap=$(".tierwrap"),rig=$("#rig"),stage=$("#stage"),dps=$("#dpslist");
@@ -494,7 +532,7 @@ if(wrap&&rig&&stage&&dps){
     rig.style.transition=moving()?"transform .6s cubic-bezier(.2,.8,.2,1)":"none";ry+=(+b.dataset.rot||0)*45;setRy();}));
   const lb=$("#listbtn");
   on(lb,"click",()=>{const v=lb.getAttribute("aria-pressed")!=="true";lb.setAttribute("aria-pressed",v);wrap.classList.toggle("listmode",v);
-    say(v?"DPS list shown as a list.":"DPS list shown as 3D shelves.");});
+    say(v?"DPS list shown as a list.":"DPS list shown as 3D shelves.");enterTiers();});
 }
 /* slow auto-turn only while motion is on */
 function spin(){spinRaf=0;if(!moving()||!rig)return;if(vis&&!hold&&!drag&&!document.hidden){rig.style.transition="none";ry+=.12;setRy();}spinRaf=requestAnimationFrame(spin);}
@@ -523,6 +561,7 @@ if(chips&&dps){
     const fn=()=>{$$("[data-c]",chips).forEach(x=>x.setAttribute("aria-pressed",x===b));applyTiers();};
     if(M.on&&M.flipTiers)M.flipTiers(fn);else fn();
     if(M.on&&M.flash)M.flash();
+    enterTiers();
   }));
 }
 
@@ -553,7 +592,8 @@ if(!G){ /* no GSAP: static page, scene and shelves drift on their own unless red
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
   sync();return;
 }
-gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip].filter(Boolean));
+{const DS=typeof DrawSVGPlugin!=="undefined",SPL=typeof SplitText!=="undefined";
+ gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));}
 let ctx=null, mm=null;
 const A=fn=>ctx?ctx.add(fn):fn();
 function finishAll(){
@@ -578,7 +618,7 @@ function enable(first){
   mm=gsap.matchMedia();
   mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
   if(ST)ScrollTrigger.refresh();
-  label(true);SC.setMotion(true);startSpin();
+  label(true);SC.setMotion(true);startSpin();mountRune();
 }
 function disable(){
   if(!M.on)return;
@@ -587,7 +627,7 @@ function disable(){
   if(ctx){ctx.revert();ctx=null;}
   M.on=false;root.classList.remove("motion");stopSpin();
   restoreStatic();resetParallax();
-  label(false);SC.setMotion(false);
+  label(false);SC.setMotion(false);mountRune(); /* the kit has ended its spin; redraw the ring at rest */
 }
 function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
 function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}

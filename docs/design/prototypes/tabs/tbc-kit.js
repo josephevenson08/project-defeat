@@ -26,6 +26,8 @@
      three         object    { scene, camera, renderer, uniforms, crystal, halo, lamp, water }
                              crystal: Mesh with MeshStandardMaterial (emissive); halo: Mesh with opacity;
                              lamp: PointLight. Missing members just switch the matching effect off.
+   The kit OWNS the crystal's emissiveIntensity, the halo's opacity and the lamp's intensity (K3 swell
+   writes them outright). Hosts must not write those every frame; animate rotation/scale instead.
    The host owns the render loop (rAF, visibilitychange pause, context loss). The kit never starts
    its own WebGL loop; it renders only inside onFrame. A page with no SCENE can still call
    TBCKit.setMotion(on) so the DOM effects (K7–K10, lift) know whether to move.
@@ -175,13 +177,14 @@ function frame(dt){
   const cam=S.three.camera,cr=S.three.crystal;
   updateRocks();
   updateAurora(dt);
-  if(G3.glow&&cr){G3.glow.position.copy(cr.position);if(cam)G3.glow.quaternion.copy(cam.quaternion);}
+  if(G3.glow&&cr){G3.glow.visible=cr.visible!==false;G3.glow.position.copy(cr.position);if(cam)G3.glow.quaternion.copy(cam.quaternion);}
   if(G3.portal&&cam)G3.portal.quaternion.copy(cam.quaternion);
 }
 function onState(){
   const m=motionOn(),g=glOn();
   if(!m||!g)endIgnite();
-  if(!m){finishAll();stopSpins();}
+  /* Motion off ends user-triggered embers (e.g. a Simulate charge); theme embers stay as part of the still frame. */
+  if(!m){finishAll();stopSpins();if(K.emUser){K.emUser=false;syncEmbers({});}}
   if(!m||!g)perf.last=0;
 }
 /* ---------- K2 shattered sky: instanced low-poly rock fragments + a slow nether aurora band ---------- */

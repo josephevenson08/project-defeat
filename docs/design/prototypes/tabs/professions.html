@@ -170,6 +170,9 @@ table.climb tr.sel .rng{background:var(--glow);color:var(--glow-ink);border-colo
 .map .route{fill:none;stroke:var(--amber);stroke-width:.7;stroke-linejoin:round;filter:drop-shadow(0 0 1.2px var(--amber))}
 .map .gridl{stroke:rgba(120,220,215,.08);stroke-width:.2}
 .map text{font:3px var(--f-mono);fill:var(--ink-3)}
+.mapwrap{position:relative}
+.mapring{position:absolute;right:8px;top:8px;pointer-events:none;opacity:.75;line-height:0}
+.mapring .tbc-rune{color:var(--amber)}
 .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--t-xs);color:var(--ink-2);margin:8px 0}
 .maplegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 /* zones list */
@@ -274,8 +277,10 @@ ul.zones li span{font-size:var(--t-xs);color:var(--ink-2)}
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Professions</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Profession data, generated from src/domain/professions (sampleProfessions, sampleProfessionTiers, professionPayoffs, gatheringGuides + gatheringPlan, farmingRoutes over nodeSpawns.json, craftingPaths.json) by running the app's own functions. */
@@ -288,15 +293,23 @@ window.PD={"P":[{"n":"Alchemy","c":"Crafting","g":"https://www.wow-professions.c
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-/* Professions tab: Serpentshrine teal, calm and dim behind dense tables (fewer motes, a softer lamp). "charge" only pulses faintly when a profession opens */
+/* Professions tab: Serpentshrine teal, calm and dim behind dense tables. "charge" only spins the crystal briefly when a profession opens */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
-const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+/* calm: this tab's slow-down (the tables are dense, so the world drifts slowly); speed: the kit's "lift" */
+const S=window.SCENE={ok:false,calm:.3,speed:1,cam:CAM,mix:MIX,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -368,9 +381,10 @@ function place(){
 }
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
-  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=1.8+MIX.charge*2.4;
+  /* brightness (crystal emissive, halo opacity, lamp) is left to the kit's K3 swell; "charge" only spins the crystal */
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
 function pose(){
@@ -379,28 +393,34 @@ function pose(){
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
+  const spin=dt*S.speed;dt*=S.calm*S.speed; /* the open spin keeps full speed so it still reads behind the calm world */
   t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
-  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
-  tint();place();R.render(scene,cam);
+  crystal.rotation.y+=dt*.25+spin*MIX.charge*2.2;halo.rotation.z+=dt*.1+spin*MIX.charge*1.4;pose();
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>
 (function(){
 "use strict";
@@ -416,6 +436,15 @@ const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 const fmt=n=>Math.round(n).toLocaleString("en-US");
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
+   This tab stays calm: K2 sky over K5 Coilfang water; K4 fel embers behind Mining's Fel Iron route,
+   a K7 rune ring that draws with that route, K8 when a profession or a skill range opens. No K1 here. */
+const KIT=window.TBCKit||null;
+if(KIT)KIT.theme("ssc",{instant:true});
+let ring=null,selRange=null;
+const dropRing=()=>{if(ring){ring.remove();ring=null;}};
+/* K4: fel embers only while Mining shows the Fel Iron (Hellfire Peninsula) range */
+const felSync=()=>{if(KIT)KIT.embers(current==="Mining"&&selRange===MAPRANGE&&!!page&&!page.hidden,{preset:"fel"});};
 
 /* ---------- data: window.PD, generated from src/domain/professions by running the app's own functions ---------- */
 const D=window.PD||null;
@@ -504,7 +533,7 @@ function mapBox(){
     <text x="3" y="6">N ↑</text><text x="3" y="97">Hellfire Peninsula · zone % coordinates</text></svg>`;
   return box("b-map","Farming map · 300–325","Fel Iron, Hellfire Peninsula",
     `<p class="note" style="margin:0 0 10px" id="mapnote"><strong>A computed circuit, not a published route.</strong> Nearest-neighbour from the densest cell, each stop snapped to a real spawn, then uncrossed with 2-opt. A heuristic loop through the busy places, not the shortest possible one.</p>
-     ${svg}
+     <div class="mapwrap">${svg}<span class="mapring" id="mapring" aria-hidden="true"></span></div>
      <div class="maplegend"><span><i style="background:var(--glow);opacity:.6"></i>Spawn density (16 × 16)</span><span><i style="background:#d7fff9;border-radius:50%"></i>Recorded node</span><span><i style="background:var(--amber)"></i>Computed loop · ${R.stops.length} stops</span></div>
      <p class="prov" style="margin:0">${R.pts.length} of <b class="num">${R.count}</b> recorded Fel Iron Deposits plotted (thinned for the bundle; the shape is kept, the count is not). Every mining node in Hellfire is Fel Iron at this skill. Loop length about ${(R.len/100).toFixed(1)}× the zone's width. Zone art is not drawn in this prototype. Source: Wowhead object=181555, <code>farmingRoutes.ts</code>.</p>`,6);
 }
@@ -543,8 +572,13 @@ function pathBox(p){
 /* ---------- open a profession: #p=<slug> in the address bar, so Back works ---------- */
 const page=$("#ppage"),pick=$("#pickwrap");
 let current=null;
-function pickRange(key){
+function pickRange(key,user){
   const row=D.MIN.find(r=>r.r.join("-")===key);if(!row)return;
+  const was=selRange;selRange=key;felSync();
+  if(user&&M.on){
+    if(KIT)KIT.enter($("#gd")); /* K8: the range's guidance opens through a ring of light */
+    if(key===MAPRANGE&&was!==MAPRANGE&&M.redraw)M.redraw(); /* back on the Fel Iron range: the loop and its ring draw again */
+  }
   $$("#climbrows tr").forEach(tr=>tr.classList.toggle("sel",tr.dataset.r===key));
   $$("#climbrows .rng").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r===key));
   const gd=$("#gd");if(gd)gd.textContent=`${row.r[0]}–${row.r[1]} · level ${row.lv}. ${row.gd}`+(key===MAPRANGE?" The map below draws this range.":" The map below is drawn for 300–325 only in this prototype.");
@@ -552,6 +586,7 @@ function pickRange(key){
 function render(p){
   if(!page||!D)return;
   let main="",side="";
+  dropRing();selRange=null;
   if(p.n==="Mining"){
     main=climbBox(p)+`<div class="col">${mapBox()}</div><div class="col">${payoffBox(p)}${stopsBox(p)}</div>`+zonesBox();
     page.innerHTML=headBar(p)+`<div class="pgrid">${main}</div>`;
@@ -568,7 +603,7 @@ function render(p){
 }
 function wirePage(p){
   on($("#backbtn"),"click",()=>{if(location.hash)history.pushState(null,"",location.pathname+location.search);show(null);});
-  $$("#climbrows .rng").forEach(b=>on(b,"click",()=>{pickRange(b.dataset.r);say("Range "+b.textContent+" selected.");}));
+  $$("#climbrows .rng").forEach(b=>on(b,"click",()=>{pickRange(b.dataset.r,true);say("Range "+b.textContent+" selected.");}));
   $$(".seg button[data-sc]").forEach(b=>on(b,"click",()=>{
     bsScope=+b.dataset.sc||0;
     $$(".seg button[data-sc]").forEach(x=>x.setAttribute("aria-pressed",x===b));
@@ -580,13 +615,13 @@ function show(name){
   const p=name&&D?D.P.find(x=>slug(x.n)===name||x.n===name):null;
   if(!page||!pick)return;
   if(!p){
-    page.hidden=true;page.innerHTML="";pick.hidden=false;
-    const back=current&&$(`.pcard[data-prof="${current}"]`);current=null;
+    dropRing();page.hidden=true;page.innerHTML="";pick.hidden=false;
+    const back=current&&$(`.pcard[data-prof="${current}"]`);current=null;felSync();
     if(back)back.focus();
     if(M.on&&M.close)M.close();
     return;
   }
-  current=p.n;render(p);pick.hidden=true;page.hidden=false;
+  current=p.n;render(p);pick.hidden=true;page.hidden=false;felSync();
   const h=$("#h-page");if(h)h.focus({preventScroll:true});
   const top=page.getBoundingClientRect().top+scrollY-70;scrollTo({top:Math.max(0,top),behavior:moving()?"smooth":"auto"});
   say(p.n+" opened.");
@@ -624,7 +659,9 @@ if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion *
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
   sync();return;
 }
-if(ST)gsap.registerPlugin(ScrollTrigger);
+const DS=typeof DrawSVGPlugin!=="undefined";
+{const SPL=typeof SplitText!=="undefined";
+ gsap.registerPlugin(...[ST&&ScrollTrigger,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));}
 let ctx=null, mm=null;
 const A=fn=>ctx?ctx.add(fn):fn();
 function finishAll(){
@@ -649,6 +686,7 @@ function enable(first){
   mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
   if(ST)ScrollTrigger.refresh();
   label(true);SC.setMotion(true);
+  felSync(); /* Motion off ended the kit's embers; bring them back if the Fel Iron route is still shown */
 }
 function disable(){
   if(!M.on)return;
@@ -689,31 +727,46 @@ function intro(){
   const boxes=$$("#ppage .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
   if(boxes.length)tl.from(boxes,{y:60,rotationX:-14,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
   safe(tl);
+  if(current==="Mining")drawRoute(); /* opened straight from #p=mining: the loop and its ring still draw */
 }
 /* 2. Scroll: the camera sinks slowly toward the pool as the reader goes down a long table */
 function scrollStory(){
   gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:1.2}});
 }
-/* draw the computed loop along its own length, then light the start */
-function drawRoute(){
+/* draw the computed loop along its own length (DrawSVG when loaded, dash offset otherwise),
+   with a K7 rune ring drawing beside it. The ring is made outside the gsap context so a Motion-off
+   revert leaves it to the kit, which ends it at rest. */
+function drawRoute(now){
   const r=$("#route");if(!r||!r.getTotalLength)return;
-  const L=r.getTotalLength();
-  const go=()=>A(()=>safe(gsap.fromTo(r,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:2.2,ease:"power1.inOut",clearProps:"strokeDasharray,strokeDashoffset"})));
-  if(ST)ScrollTrigger.create({trigger:r.closest("svg")||r,start:"top 85%",once:true,onEnter:go});else go();
+  const go=()=>{
+    if(!M.on||!r.isConnected)return;
+    const slot=$("#mapring");
+    if(KIT&&slot){dropRing();ring=KIT.runeRing(slot,{size:innerWidth<700?44:60,glyphs:10,seed:181555});}
+    A(()=>{
+      if(DS)safe(gsap.fromTo(r,{drawSVG:0},{drawSVG:"100%",duration:2.2,ease:"power1.inOut",clearProps:"strokeDasharray,strokeDashoffset"}));
+      else{const L=r.getTotalLength();safe(gsap.fromTo(r,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:2.2,ease:"power1.inOut",clearProps:"strokeDasharray,strokeDashoffset"}));}
+    });
+  };
+  if(ST&&!now)A(()=>ScrollTrigger.create({trigger:r.closest("svg")||r,start:"top 85%",once:true,onEnter:go}));else go();
 }
+M.redraw=()=>drawRoute(true);
 /* 3. Opening a profession: the camera dips toward the water, its boxes rise in order, the loop draws */
 M.open=name=>A(()=>{
   const tl=gsap.timeline();
   tl.to(SC.cam,{dip:.55,duration:.7,ease:"power2.out",onUpdate:SC.render})
     .to(SC.mix,{charge:.25,duration:.3,onUpdate:SC.render},0).to(SC.mix,{charge:0,duration:.9,ease:"power2.out",onUpdate:SC.render},.3);
-  if($("#ppage .phead"))tl.from("#ppage .phead",{y:-16,autoAlpha:0,duration:.45,ease:"power3.out",clearProps:"all"},0);
+  /* not "all": the kit's K8 clip-path on the header and first box runs alongside */
+  if($("#ppage .phead"))tl.from("#ppage .phead",{y:-16,autoAlpha:0,duration:.45,ease:"power3.out",clearProps:"transform,opacity,visibility"},0);
   const boxes=$$("#ppage .box");
-  if(boxes.length)tl.from(boxes,{y:46,rotationX:-12,transformOrigin:"50% 100%",autoAlpha:0,duration:.7,stagger:.07,ease:"expo.out",clearProps:"all"},.1);
+  if(boxes.length)tl.from(boxes,{y:46,rotationX:-12,transformOrigin:"50% 100%",autoAlpha:0,duration:.7,stagger:.07,ease:"expo.out",clearProps:"transform,opacity,visibility"},.1);
   if($("#ppage .sline .stop"))tl.from("#ppage .sline .stop",{scaleY:0,transformOrigin:"50% 100%",duration:.4,stagger:.08,ease:"back.out(2)"},.5);
   safe(tl);
   if(name==="Mining")drawRoute();
   if(ST)ScrollTrigger.refresh();
 });
+/* K8: the opened profession arrives through a ring of light (kit calls stay outside the gsap context) */
+const open0=M.open;
+M.open=name=>{open0(name);if(KIT){KIT.enter($("#ppage .phead"));KIT.enter($("#ppage .box"),{delay:.12});}};
 M.close=()=>A(()=>{
   safe(gsap.to(SC.cam,{dip:0,duration:.6,ease:"power2.out",onUpdate:SC.render}));
   const cards=$$(".pcard");if(cards.length)safe(gsap.from(cards,{y:16,autoAlpha:0,duration:.45,stagger:.02,ease:"power3.out",clearProps:"all"}));

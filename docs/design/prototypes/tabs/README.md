@@ -20,6 +20,33 @@ Agreed order:
 11. Spec Tier Lists
 12. Professions
 
+## The TBC motion kit (added 2026-10-04)
+
+All seven pages share [`tbc-kit.js`](tbc-kit.js), the motion kit from
+[`docs/research/wow-tbc-motion/recommendations.md`](../../../research/wow-tbc-motion/recommendations.md).
+It is built once and exposed as `window.TBCKit`. Every effect is procedural, with no Blizzard art and no
+sound. Each page connects its Three.js scene through a documented `window.SCENE` contract (the top of
+`tbc-kit.js`), and all pages now load GSAP 3.13.0 with DrawSVG and SplitText.
+
+| Page | How it uses the kit |
+| --- | --- |
+| Home | Portal ignition once per visit (blue to fel green, into the crystal). Shattered sky over Coilfang water. Entry rings on tab cards. A rune ring and naaru swell on import. |
+| Character Planner | Calm Coilfang water. Entry rings between sub-tabs. A swell on equip, share and import. A taint tint on the hit-cap warning. A rebirth burst on "Reset to recommended set". A one-time lift when all 17 slots match. |
+| Simulation | Crystalline fortress (Tempest Keep). On Simulate: fel embers and a rune ring while it charges, then a swell and entry rings when the result lands. |
+| Raid Composition | Calm Coilfang water. Entry rings on swapped seats and on 10/25. A swell when a swap gives a group a buff it was missing. |
+| Spec Tier Lists | Coilfang water. A rune-ring base under the 3D shelves. Entry rings on filter and view changes. |
+| Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on boss cards. A rune ring beside each attunement chain. |
+| Professions | Calm water. On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
+
+**Kit fixes made during the rollout:**
+- Motion off now ends embers that a user action started, while a raid theme's embers stay in the still frame.
+- The naaru glow now hides with the crystal.
+- The contract now states that the kit owns the crystal's, halo's and lamp's brightness.
+
+**Checks:** all seven were checked with Playwright on Edge at 1280px, at 400px, with reduced motion and with WebGL disabled. There were no script errors, failed loads, sideways scroll or invisible content. Screenshots confirm the ignition and the per-raid themes.
+
+The automated browser renders 3D in software, so it always picked the low performance tier. The medium and high tiers haven't been seen yet.
+
 ## The seven pages
 
 | Page | Size | What it shows, all from the app's real data |

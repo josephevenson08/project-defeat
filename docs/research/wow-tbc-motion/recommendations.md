@@ -1,6 +1,6 @@
 # Making the animation feel like The Burning Crusade: the plan
 
-**Status: approved by the owner 2026-10-04.** Being built into the prototypes.
+**Status: approved by the owner and built, 2026-10-04.** Live in all seven [tab prototypes](../../design/prototypes/tabs/) through `tabs/tbc-kit.js`.
 
 This turns the two research tracks into one plan for the chosen Motion + 3D style
 ([`../../design/prototypes/round4/`](../../design/prototypes/round4/)) and the seven

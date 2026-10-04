@@ -83,8 +83,9 @@ select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px 
 .hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
 @media (max-width:640px){.hero-in{background:var(--scrim)}}
 .hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
-.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
-.hero h1 .w>span{display:inline-block}
+/* SplitText masks (wordsClass "w", mask:"words" adds the "-mask" wrappers; the no-SplitText fallback builds the same shape) */
+.hero h1 [class$="-mask"]{display:inline-block;overflow:clip;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w{display:inline-block}
 .hero h1 em{font-style:normal;color:var(--glow)}
 .hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
 /* hit-cap gauge */
@@ -192,6 +193,10 @@ details.more>summary::-webkit-details-marker{display:none}
 details.more>summary::before{content:"+ ";font-family:var(--f-mono)}
 details.more[open]>summary::before{content:"− "}
 .trash{margin-top:16px}
+/* K7 rune ring beside the attunement chain heading (tbc-kit.js fills the slot) */
+#h-att.has-rune{justify-content:flex-start;align-items:center;gap:10px}
+#h-att.has-rune small{margin-left:auto}
+#h-att .rslot{flex:none;display:inline-flex;width:22px;height:22px;line-height:0}
 .static-note{font-size:var(--t-xs);color:var(--ink-3)}
 @media (min-width:900px){.simgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
 </style>
@@ -254,27 +259,38 @@ details.more[open]>summary::before{content:"− "}
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Raids</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
    The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
-   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
+   and setMotion(on); tbc-kit.js attaches through the hooks below. Any failure leaves the CSS fallback backdrop in place. */
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-/* Raids tab: the palette follows the selected raid (Serpentshrine teal water, Tempest Keep gold/violet, Phase 1 warm torchlight).
-   The naaru crystal only rises for Tempest Keep; "charge" pulses it when the raid changes. */
+/* Raids tab: the palette follows the selected raid. With tbc-kit.js the motion script routes it through TBCKit.theme()
+   (ssc / tk / hellfire / bladesedge / karazhan: the kit tweens mix.tk and lerps the other three through onTint);
+   without the kit, mix.tk / mix.warm pick Serpentshrine teal, Tempest Keep gold/violet or Phase 1 warm torchlight.
+   The naaru crystal only rises for Tempest Keep; "charge" pulses it on a raid change when the kit is missing. */
 const sel0=root.dataset.raid, MIX0={tk:sel0==="tk"?1:0,warm:root.dataset.phase==="1"?1:0};
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:MIX0.tk,warm:MIX0.warm,charge:0};
-const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,speed:1,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -344,12 +360,15 @@ function place(){
   cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
   scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
 }
+let charged=0; /* the legacy charge only writes intensities while it moves, so it never fights the kit's K3 swell */
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
   const k=Math.max(0,MIX.tk*(1-MIX.warm));crystal.visible=halo.visible=k>.02;shards.forEach(m=>{m.visible=k>.02;});crystal.scale.set(.8*k,1.5*k,.8*k);halo.scale.setScalar(Math.max(k,.01));
-  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=2.2+MIX.charge*2.4;
+  const ch=MIX.charge||0;
+  if(ch||charged){crystal.material.emissiveIntensity=.18+ch*.9;halo.material.opacity=.45+ch*.5;lamp.intensity=2.2+ch*2.4;charged=ch;}
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
 function pose(){
@@ -358,28 +377,33 @@ function pose(){
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
-  t+=dt;U.uTime.value=t;
+  dt*=S.speed;t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
   crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
-  tint();place();R.render(scene,cam);
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(v);U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>/* generated from src/domain/raids (sampleRaids, five *Bosses.ts, sampleAttunements) + src/domain/gear/itemCatalogue.json qualities.
    T: "name|quality|kind|flags" (quality e/r/u/l or blank = not in the catalogue; kind t token, s set piece from a token, m mount, r recipe, q quest item, x trash;
    flags d = for DPS roles, f = in the Phase 2 Fury Warrior set, v = needsVerification). R: raids, bosses list indices into T. */
@@ -446,24 +470,48 @@ const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
 const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
+   KIT3D: the kit built its 3D extras, so it owns the scene palette (its onTint hook lerps hellfire / bladesedge / karazhan). */
+const KIT=window.TBCKit||null, KIT3D=!!(KIT&&KIT.ok);
 
 /* ---------- raid picker: re-renders the view, re-lights the page and the scene, keeps the choice in the URL hash ---------- */
 const view=$("#raidview"), raidBtns=$$("#rpick button[data-raid]");
 const byId=id=>DATA.R.find(r=>r.id===id);
 const look=r=>r.ph===1?{raid:"p1",phase:"1",tk:0,warm:1}:r.id==="tempest-keep"?{raid:"tk",phase:"2",tk:1,warm:0}:{raid:"ssc",phase:"2",tk:0,warm:0};
+/* scene theme per raid (plan: SSC K5, TK K6, Magtheridon K4 + Hellfire red sky, Gruul K2 rock at Blade's Edge dusk, Karazhan arcane violet) */
+const THEME={"serpentshrine-cavern":"ssc","tempest-keep":"tk","magtheridons-lair":"hellfire","gruuls-lair":"bladesedge","karazhan":"karazhan"};
 let current=null;
-function relight(r){
-  const L=look(r);root.dataset.raid=L.raid;root.dataset.phase=L.phase;
+/* re-light the scene; instant = no crossfade (first paint, Motion off) */
+function sceneTo(r,instant){
+  if(KIT3D){if(SC.mix){SC.mix.warm=0;SC.mix.charge=0;}KIT.theme(THEME[r.id]||"ssc",{instant:!!instant});return;}
+  if(KIT)KIT.theme(THEME[r.id]||"ssc",{instant:true}); /* keeps data-tbc-theme in step; the legacy mix below drives the scene */
   if(!SC.mix)return;
-  if(M.on&&M.relight)M.relight(L);
-  else{SC.mix.tk=L.tk;SC.mix.warm=L.warm;if(SC.render)SC.render();}
+  const L=look(r);
+  if(!instant&&M.on&&M.relight)M.relight(L);
+  else{if(G)gsap.killTweensOf(SC.mix);SC.mix.tk=L.tk;SC.mix.warm=L.warm;SC.mix.charge=0;if(SC.render)SC.render();}
+}
+function relight(r,instant){
+  const L=look(r);root.dataset.raid=L.raid;root.dataset.phase=L.phase;
+  sceneTo(r,instant||!M.on);
+}
+/* K7: a rune ring beside the attunement chain heading (raids with a chain only); re-drawn on each render and when Motion turns on */
+let rune=null;
+function placeRune(){
+  if(rune){rune.remove();rune=null;}
+  const r=byId(current),h=$("#h-att");
+  if(!KIT||!r||!r.ch||!h)return;
+  let slot=$(".rslot",h);
+  if(!slot){slot=document.createElement("span");slot.className="rslot";slot.setAttribute("aria-hidden","true");h.insertBefore(slot,h.firstChild);h.classList.add("has-rune");}
+  let seed=0;for(const c of r.id)seed=(seed*31+c.charCodeAt(0))>>>0;
+  rune=KIT.runeRing(slot,{size:22,glyphs:8,seed,spinDur:30});
 }
 function select(id,opts){
   const r=byId(id);if(!r||!view)return;
   const same=current===id;current=id;
   raidBtns.forEach(b=>b.setAttribute("aria-pressed",b.dataset.raid===id));
   if(!(opts&&opts.keepView)&&!same)view.innerHTML=raidHTML(r);
-  relight(r);
+  if(!same||!rune)placeRune();
+  relight(r,!!(opts&&opts.initial));
   if(opts&&opts.user){
     try{history.replaceState(null,"","#"+id);}catch(e){}
     const drops=r.bosses.reduce((n,b)=>n+b.loot.length,0);
@@ -473,7 +521,7 @@ function select(id,opts){
 }
 raidBtns.forEach(b=>on(b,"click",()=>select(b.dataset.raid,{user:true})));
 /* the static page ships Serpentshrine pre-rendered; only re-render if the hash asks for another raid */
-{const h=decodeURIComponent((location.hash||"").slice(1));select(byId(h)?h:"serpentshrine-cavern",{keepView:!byId(h)||h==="serpentshrine-cavern"});}
+{const h=decodeURIComponent((location.hash||"").slice(1));select(byId(h)?h:"serpentshrine-cavern",{initial:true,keepView:!byId(h)||h==="serpentshrine-cavern"});}
 on(window,"hashchange",()=>{const h=decodeURIComponent(location.hash.slice(1));if(byId(h))select(h);});
 
 
@@ -491,6 +539,7 @@ if(matchMedia("(pointer:fine)").matches){
 /* ================= MOTION LAYER ================= */
 const tog=$("#mtoggle"), mstate=$("#mstate");
 const ST=G&&typeof ScrollTrigger!=="undefined";
+const DS=G&&typeof DrawSVGPlugin!=="undefined", SPL=G&&typeof SplitText!=="undefined";
 if(tog)tog.hidden=false;
 function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
 function safe(a){
@@ -505,7 +554,7 @@ if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion *
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
   sync();return;
 }
-if(ST)gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(...[ST&&ScrollTrigger,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));
 let ctx=null, mm=null;
 const A=fn=>ctx?ctx.add(fn):fn();
 function finishAll(){
@@ -517,11 +566,14 @@ function finishAll(){
 function restoreStatic(){
   const w=$("#wipe");if(w)w.style.display="none";
   Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
-  SC.mix.charge=0;{const r=byId(current);if(r){const L=look(r);SC.mix.tk=L.tk;SC.mix.warm=L.warm;}}SC.render();
+  if(SC.mix)SC.mix.charge=0;
+  {const r=byId(current);if(r)sceneTo(r,true);} /* lands the palette (kit theme or legacy mix) at rest */
+  SC.render();
 }
 function enable(first){
   if(M.on)return;
   M.on=true;root.classList.add("motion");
+  SC.setMotion(true); /* before the intro, so the kit's K8 rings and K7 draw see motion as on */
   ctx=gsap.context(()=>{
     if(first)intro();
     if(ST)scrollStory();
@@ -529,7 +581,9 @@ function enable(first){
   mm=gsap.matchMedia();
   mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
   if(ST)ScrollTrigger.refresh();
-  label(true);SC.setMotion(true);
+  label(true);
+  placeRune(); /* K7: redraw the attunement ring so it draws in and spins */
+  /* no K1 here: the portal ignition plays only on Home */
 }
 function disable(){
   if(!M.on)return;
@@ -548,26 +602,31 @@ function syncRM(){
   else{if(tog)tog.disabled=false;label(M.on);}
 }
 if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
-/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+/* split the hero headline into masked words: SplitText when loaded (keeps the sentence for screen readers and is
+   reverted with the context when motion turns off); otherwise a hand split into the same .w-mask > .w shape */
 function splitHero(){
-  const h=$("#h-raids");if(!h||h.dataset.split)return false;
+  const h=$("#h-raids");if(!h)return null;
+  if(SPL)return SplitText.create(h,{type:"words",wordsClass:"w",mask:"words",aria:"auto"}).words;
+  if(h.dataset.split)return null;
   h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
-  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
+  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w-mask" aria-hidden="true"><span class="w">${w}</span></span>`).join("");
   h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
-  return true;
+  return $$("#h-raids .w");
 }
 /* 1. Intro: the scene settles from above, words rise out of masks, the target chips land, cards in view rise. ~1.4s */
 function intro(){
-  const split=splitHero();
+  const words=splitHero();
   const inView=$$("#raidview .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
   inView.forEach(b=>b.dataset.introd="1");
   const tl=gsap.timeline({defaults:{ease:"power4.out"}});
   tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
     .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
-  if(split&&$("#h-raids .w>span"))tl.from("#h-raids .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  if(words&&words.length)tl.from(words,{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
   if($("#rpick button"))tl.from("#rpick button",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
   if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
   if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  /* K8: boss cards already in view open through a small ring of light */
+  if(KIT)inView.filter(b=>b.classList.contains("boss")).forEach((b,i)=>KIT.enter(b,{delay:.35+i*.08}));
   safe(tl);
 }
 /* 2. Scroll: the camera drifts over the water; boss cards rise as they arrive (only the first render; a raid switch uses M.cards) */
@@ -576,7 +635,9 @@ function scrollStory(){
   if($("#raidview"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#raidview",start:"top 85%",end:"top 15%",scrub:.8}});
   $$("#raidview .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>{
     if(!b.isConnected)return;
-    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"}));})}));
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"}));
+    if(KIT&&b.classList.contains("boss"))KIT.enter(b); /* K8 light-portal entry per boss card */
+  })}));
 }
 /* 3. Magnetic primary buttons (fine pointers only) */
 function magnets(){
@@ -590,7 +651,8 @@ function magnets(){
   });
   return ()=>offs.forEach(f=>f());
 }
-/* 4. Changing raid: the scene re-lights toward the new raid's palette with a short pulse; the new cards rise in */
+/* 4. Changing raid: with the kit, TBCKit.theme() crossfades the scene (sceneTo above). Without it, the legacy re-light
+   below tweens the palette mix with a short pulse. Either way the new cards rise in, boss cards through a K8 ring. */
 M.relight=L=>A(()=>safe(gsap.timeline()
   .to(SC.mix,{tk:L.tk,warm:L.warm,duration:.9,ease:"power2.inOut",onUpdate:SC.render},0)
   .to(SC.mix,{charge:.6,duration:.25,ease:"power2.in",onUpdate:SC.render},0)
@@ -599,6 +661,7 @@ M.cards=()=>A(()=>{
   if(ST)ScrollTrigger.refresh();
   const boxes=$$("#raidview .box").filter(b=>b.getBoundingClientRect().top<innerHeight*1.2);
   if(boxes.length)safe(gsap.fromTo(boxes,{y:40,rotationX:-10,autoAlpha:0,transformOrigin:"50% 100%"},{y:0,rotationX:0,autoAlpha:1,duration:.6,stagger:.04,ease:"expo.out",clearProps:"transform,opacity,visibility"}));
+  if(KIT)boxes.forEach((b,i)=>{if(b.classList.contains("boss"))KIT.enter(b,{delay:i*.04});});
 });
 
 M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));

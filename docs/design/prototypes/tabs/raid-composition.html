@@ -358,8 +358,12 @@ nav.sections a:hover{color:var(--ink)}
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Raid Composition</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
@@ -370,13 +374,21 @@ nav.sections a:hover{color:var(--ink)}
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
 /* Raid Composition tab: Serpentshrine teal, kept calm and dim behind the dense roster; "charge" gives a short glow when two seats swap */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
-const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+/* calm: this tab's slow-down (the roster is dense, so the world drifts slowly); speed: the kit's "lift" */
+const S=window.SCENE={ok:false,calm:.3,speed:1,cam:CAM,mix:MIX,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -448,9 +460,10 @@ function place(){
 }
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
-  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=1.6+MIX.charge*2.2;
+  /* brightness (crystal emissive, halo opacity, lamp) is left to the kit's K3 swell; "charge" only spins the crystal */
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
 function pose(){
@@ -459,28 +472,34 @@ function pose(){
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
+  const spin=dt*S.speed;dt*=S.calm*S.speed; /* the swap spin keeps full speed so it still reads behind the calm world */
   t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
-  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
-  tint();place();R.render(scene,cam);
+  crystal.rotation.y+=dt*.25+spin*MIX.charge*2.2;halo.rotation.z+=dt*.1+spin*MIX.charge*1.4;pose();
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>
 (function(){
 "use strict";
@@ -496,7 +515,10 @@ const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 const fmt=n=>Math.round(n).toLocaleString("en-US");
-
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
+   This tab stays calm: K2 sky over K5 Coilfang water behind the dense roster; no K1 ignition here. */
+const KIT=window.TBCKit||null;
+if(KIT)KIT.theme("ssc",{instant:true});
 
 /* ---------- real data: src/domain/buffs/sampleBuffs.ts + sampleTargetDebuffs.ts (who provides),
    src/domain/buffs/buffScope.json (Party / Raid / Single / Target, read from Wowhead tooltips) ---------- */
@@ -652,6 +674,9 @@ on($("#groups"),"click",e=>{
   }
   if(held.g===g&&held.i===i){held=null;renderGroups();focusSeat(g,i);status("Move cancelled.");say("Move cancelled.");return;}
   const a=G_[held.g][held.i],t=G_[g][i],from=held;
+  /* each touched group's party-buff set before the swap, to spot a buff a group was missing and now gets */
+  const touched=g===from.g?[g]:[g,from.g],ids=gi=>new Set(groupGets(G_[gi]).map(b=>b.id));
+  const before=touched.map(ids);
   G_[held.g][held.i]=t;G_[g][i]=a;held=null;
   renderAll();focusSeat(g,i);
   const msg=t?`${nameOf(a)} (now group ${g+1}) and ${nameOf(t)} (now group ${from.g+1}) swapped.`:`${nameOf(a)} moved to group ${g+1}.`;
@@ -659,6 +684,10 @@ on($("#groups"),"click",e=>{
   status(msg+` Group ${g+1} now gets ${gain} party buffs, group ${from.g+1} gets ${gain2}.`);
   say(msg+` Group ${g+1} now gets ${gain} party buffs, group ${from.g+1} gets ${gain2}.`);
   if(M.on&&M.swap)M.swap([[g,i],[from.g,from.i]]);
+  /* K8: both seats re-open through a small ring of light (the second just after the first) */
+  if(M.on&&KIT)[[g,i],[from.g,from.i]].forEach(([sg,si],k)=>{const el=$(`#groups .seat[data-g="${sg}"][data-i="${si}"]`);if(el)KIT.enter(el,{delay:k*.08});});
+  /* K3: one soft naaru swell when a group gains a party buff it was missing */
+  if(KIT&&touched.some((gi,k)=>[...ids(gi)].some(id=>!before[k].has(id))))KIT.swell();
 });
 on(document,"keydown",e=>{
   if(e.key!=="Escape"||!held)return;
@@ -673,6 +702,7 @@ sizeBtns.forEach(b=>on(b,"click",()=>{
   renderAll();status(`Showing the ${n}-player example roster: ${n/5} groups of five.`);
   say(`${n}-player raid, ${n/5} groups.`);
   if(M.on&&M.flash)M.flash();
+  if(M.on&&KIT)KIT.enter($("#groups")); /* K8: the re-seated groups open through a ring of light */
 }));
 
 /* ---------- export (stub) ---------- */
@@ -709,7 +739,8 @@ if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion *
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
   sync();return;
 }
-if(ST)gsap.registerPlugin(ScrollTrigger);
+{const FL=typeof Flip!=="undefined",TX=typeof TextPlugin!=="undefined",DS=typeof DrawSVGPlugin!=="undefined",SPL=typeof SplitText!=="undefined";
+ gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,TX&&TextPlugin,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));}
 let ctx=null, mm=null;
 const A=fn=>ctx?ctx.add(fn):fn();
 function finishAll(){
@@ -798,7 +829,7 @@ M.swap=pairs=>A(()=>{
   const tl=gsap.timeline();
   pairs.forEach(([g,i],k)=>{
     const s=$(`#groups .seat[data-g="${g}"][data-i="${i}"]`),chips=$$(`#groups .grp[data-group="${g}"] .chips li`);
-    if(s)tl.fromTo(s,{scale:.9,y:k?-8:8,autoAlpha:.3},{scale:1,y:0,autoAlpha:1,duration:.45,ease:"back.out(2.2)",clearProps:"all"},k*.06);
+    if(s)tl.fromTo(s,{scale:.9,y:k?-8:8,autoAlpha:.3},{scale:1,y:0,autoAlpha:1,duration:.45,ease:"back.out(2.2)",clearProps:"transform,opacity,visibility"},k*.06); /* not "all": the kit's K8 clip-path runs longer */
     if(chips.length)tl.fromTo(chips,{scale:.7,autoAlpha:0},{scale:1,autoAlpha:1,duration:.3,stagger:.02,ease:"back.out(2.4)",clearProps:"all"},.15);
   });
   if($$("#roles .bar i").length)tl.fromTo("#roles .bar i",{scaleX:.85},{scaleX:1,duration:.4,ease:"power3.out",clearProps:"transform"},0);

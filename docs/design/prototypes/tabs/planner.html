@@ -137,7 +137,7 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
 .statbar{padding:4px 14px 12px}
 .statbar .stats{margin:8px 0}
 @media (min-width:900px){.statbar .stats{grid-template-columns:repeat(6,1fr)}}
-.hitrow{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:var(--t-xs);color:var(--ink-2)}
+.hitrow{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:var(--t-xs);color:var(--ink-2);padding:3px 6px;margin:0 -6px;border-radius:6px}
 .hitrow b{color:var(--warn);font-family:var(--f-mono)}
 .subtabs button:focus-visible{outline-offset:2px}
 .panel{position:relative;padding:12px 14px 16px}
@@ -255,7 +255,7 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
         <div><dt>Attack Power</dt><dd class="tick" data-to="1788">1,788</dd></div><div><dt>Hit Rating</dt><dd class="tick" data-to="140">140</dd></div><div><dt>Crit Rating</dt><dd class="tick" data-to="536">536</dd></div>
         <div><dt>Haste Rating</dt><dd class="tick" data-to="163">163</dd></div><div><dt>Expertise</dt><dd class="tick" data-to="64">64</dd></div><div><dt>Armor Pen</dt><dd>0</dd></div>
       </dl>
-      <div class="hitrow"><span>Hit cap for dual-wield special attacks (9%)</span><span><b>140 / 142</b> rating · 2 under</span></div>
+      <div class="hitrow" id="hitwarn"><span>Hit cap for dual-wield special attacks (9%)</span><span><b>140 / 142</b> rating · 2 under</span></div>
       <div class="gauge" role="img" aria-label="Hit rating 140 of 142"><i></i></div>
       <p class="prov" style="margin:0">Stats from your import, 28 Sep · boss target level 73, 7,700 armor</p>
     </div>
@@ -272,7 +272,7 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
     </div>
 
     <div class="panel" id="p-gear" role="tabpanel" aria-labelledby="t-gear">
-      <div class="toolrow"><button class="btn magnet" type="button" id="equip">Equip the recommended set</button><button class="btn ghost" type="button" data-tab="build">Import your character</button><span class="prov">Wowhead · Phase 2 · updated 12 Sep</span></div>
+      <div class="toolrow"><button class="btn magnet" type="button" id="equip">Equip the recommended set</button><button class="btn ghost" type="button" data-tab="build">Import your character</button><button class="btn ghost" type="button" id="resetset">Reset to recommended set</button><span class="prov">Wowhead · Phase 2 · updated 12 Sep</span></div>
       <p class="okline" id="equipmsg" aria-live="polite"></p>
       <div class="setbar"><span class="q-epic">Destroyer Battlegear</span><span class="pip on" aria-hidden="true"></span><span class="pip on" aria-hidden="true"></span><span class="pip on" aria-hidden="true"></span><span class="pip on" aria-hidden="true"></span><span class="pip" aria-hidden="true"></span><span class="num">4/5</span><span class="prov">Head, Shoulders, Chest, Hands · Legs uses Leggings of Murderous Intent (rank 1 for Legs)</span></div>
       <ol class="gear" id="gear" aria-label="Equipped gear, 17 slots">
@@ -402,7 +402,12 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
 <footer><div class="wrap">Prototype content for design review. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
 </div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
@@ -412,13 +417,21 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0};
-const S=window.SCENE={ok:false,calm:.4,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+/* calm: the planner's own slow-down (dimmer and slower on dense sub-tabs); speed: the kit's "lift" */
+const S=window.SCENE={ok:false,calm:.4,speed:1,cam:CAM,mix:MIX,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -490,6 +503,7 @@ function place(){
 }
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
@@ -499,29 +513,34 @@ function pose(){
   shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
-function frame(dt){dt*=S.calm;
+function frame(dt){dt*=S.calm*S.speed;
   t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
   crystal.rotation.y+=dt*.25;halo.rotation.z+=dt*.1;pose();
-  tint();place();R.render(scene,cam);
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(v);U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>
 /* Planner page script: sub-tabs, compare, talent tree, buffs, ranked gear, build; then the motion layer.
    Every lookup is guarded, so a missing element or library leaves the static page in place. */
@@ -536,6 +555,13 @@ const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
 const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
+   The planner stays calm: K2 sky over K5 Coilfang water, dimmed by the veil; no K1 ignition here. */
+const KIT=window.TBCKit||null;
+if(KIT)KIT.theme("ssc",{instant:true});
+/* K10: the hit-cap warning takes a slow sickly-green tint while hit is under cap (the text stays the cue) */
+const HIT={have:140,cap:142};
+const taintHit=()=>{const el=$("#hitwarn");if(KIT&&el)KIT.taint(el,HIT.have<HIT.cap);};
 /* real data, generated from src/domain: Wowhead Fury Warrior Phase 2 rankings resolved through the
    wowsims/tbc item catalogue (RK), and the Warrior talent trees with the wowsims Fury preset (TAL:
    row, column, name, max rank, points, top-rank text, prerequisite) */
@@ -558,6 +584,7 @@ function selectTab(key,focus){
   if(DENSE[k])root.dataset.dense="1";else delete root.dataset.dense;
   SC.calm=DENSE[k]?.25:.4;SC.render();
   if(M.on&&M.panel&&p)M.panel(p,k);
+  if(M.on&&KIT&&p)KIT.enter(p); /* K8: the panel opens through a small ring of light */
 }
 tabs.forEach((t,i)=>{
   on(t,"click",()=>selectTab(t.id.slice(2)));
@@ -575,9 +602,27 @@ const chbtn=$("#chbtn"),chpick=$("#chpick");
 on(chbtn,"click",()=>{if(!chpick)return;const open=chpick.hidden;chpick.hidden=!open;chbtn.setAttribute("aria-expanded",open);});
 
 /* ---------- equip the recommended set: this set already is Wowhead's list ---------- */
+/* the recommended set is the prototype's default gear, captured once so later checks compare against it */
+const REC=$$("#gear .q-epic").map(e=>e.textContent);
+const allMatch=()=>{const now=$$("#gear .q-epic").map(e=>e.textContent);return now.length===17&&now.every((n,i)=>n===REC[i]);};
+const LIFTKEY="pd-planner-lift";
+const lifted=()=>{try{return sessionStorage.getItem(LIFTKEY)==="1";}catch(e){return false;}};
 on($("#equip"),"click",()=>{
   say($("#equipmsg"),"Already wearing the recommended set: all 17 slots match Wowhead's Fury Phase 2 list (rings and trinkets use its top two).");
   if(M.on&&M.deal)M.deal();
+  if(KIT)KIT.swell(); /* K3: one soft naaru swell */
+  /* the rare "lift": once per browser session, the first time equipping completes with 17/17 matching */
+  if(KIT&&M.on&&allMatch()&&!lifted())setTimeout(()=>{ /* after the 17 rows have dealt in (~1.1s) */
+    if(!M.on||lifted()||!allMatch())return;
+    if(KIT.lift({targets:".plan .box"})){try{sessionStorage.setItem(LIFTKEY,"1");}catch(e){}}
+  },1150);
+});
+/* reset: back to the recommended set (the prototype is already there), with a K9 rebirth burst */
+const resetBtn=$("#resetset");
+on(resetBtn,"click",()=>{
+  say($("#equipmsg"),"Reset to the recommended set: all 17 slots restored to Wowhead's Fury Phase 2 list.");
+  if(M.on&&M.deal)M.deal();
+  if(KIT){const b=resetBtn.getBoundingClientRect();KIT.rebirth(b.left+b.width/2,b.top+b.height/2);}
 });
 
 /* ---------- compare: equipped item vs the next item on the list for that slot ---------- */
@@ -661,7 +706,7 @@ const link=$("#sharelink");
 on(link,"focus",()=>link.select());
 on($("#copylink"),"click",()=>{
   const msg=$("#copymsg");if(!link)return;
-  const done=()=>say(msg,"Link copied.");
+  const done=()=>{say(msg,"Link copied.");if(KIT)KIT.swell();}; /* K3: the build is saved as a link */
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link.value).then(done,()=>{link.select();say(msg,"Press Ctrl+C to copy the selected link.");});
   else{link.select();say(msg,"Press Ctrl+C to copy the selected link.");}
 });
@@ -669,6 +714,7 @@ on($("#importbtn"),"click",()=>{
   const box=$("#importbox"),msg=$("#importmsg"),v=box?box.value.trim():"";
   if(!v){say(msg,"Paste a build or an addon export first.");if(box)box.focus();return;}
   say(msg,/#build=|^\d\./.test(v)?"Prototype: this would load the shared build and show what changed.":"Prototype: this would read the addon export and fill your gear and talents.");
+  if(KIT)KIT.swell(); /* K3: a build or character was read */
 });
 
 /* ---------- pointer parallax on the depth cards + scene drift (motion on, fine pointers) ---------- */
@@ -685,7 +731,7 @@ selectTab("gear");
 
 /* ================= MOTION LAYER (from round4/motion-3d-portal, trimmed to the planner) ================= */
 const tog=$("#mtoggle"),mstate=$("#mstate");
-if(!tog)return;
+if(!tog){taintHit();return;}
 tog.hidden=false;
 function label(v,why){tog.setAttribute("aria-pressed",v);say(mstate,why||(v?"on":"off"));}
 /* safety: any one-shot animation not finished ~1.5s past its planned end is forced to its end state */
@@ -699,8 +745,11 @@ if(!G){ /* no GSAP: static page; the scene drifts slowly unless reduced motion *
   tog.disabled=true;label(false,"unavailable");
   const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
-  sync();return;
+  sync();taintHit();return;
 }
+{const ST=typeof ScrollTrigger!=="undefined",FL=typeof Flip!=="undefined",TX=typeof TextPlugin!=="undefined",
+  DS=typeof DrawSVGPlugin!=="undefined",SPL=typeof SplitText!=="undefined";
+ gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,TX&&TextPlugin,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));}
 let ctx=null,mm=null;
 const fmt=n=>Math.round(n).toLocaleString("en-US");
 const A=fn=>ctx?ctx.add(fn):fn();
@@ -788,6 +837,7 @@ if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addLis
 if(RMQ.matches)syncRM();
 else if(stored()==="0"){label(false);SC.setMotion(false);}
 else enable(true);
+taintHit(); /* after motion is decided, so the K10 tint eases in with motion on and is set still otherwise */
 /* belt and braces: finish anything still mid-flight after 1.5s (throttled tab, slow device) */
 setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
 })();

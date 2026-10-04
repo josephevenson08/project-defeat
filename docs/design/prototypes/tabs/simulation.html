@@ -80,8 +80,9 @@ select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px 
 .hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
 @media (max-width:640px){.hero-in{background:var(--scrim)}}
 .hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
-.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
-.hero h1 .w>span{display:inline-block}
+/* SplitText masks (wordsClass "w", mask:"words" adds the "-mask" wrappers) */
+.hero h1 [class$="-mask"]{display:inline-block;overflow:clip;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w{display:inline-block}
 .hero h1 em{font-style:normal;color:var(--glow)}
 .hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
@@ -166,6 +167,8 @@ nav.sections a:hover{color:var(--ink)}
 .legend .rot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-right:4px;vertical-align:middle}
 /* run + result */
 .runbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:14px 0 0}
+.runbar .simrune{display:inline-flex;color:var(--glow)}
+.runbar .simrune:empty{display:none}
 .result{margin-top:14px;display:grid;gap:12px}
 .score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:14px;border-radius:12px;background:var(--scrim);border:1px solid var(--rim)}
 .score .lbl{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);width:100%}
@@ -286,6 +289,7 @@ dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
           </div>
                     <div class="runbar">
             <button class="btn big magnet" id="runbtn" type="button">Run Simulation</button>
+            <span class="simrune" id="simrune" aria-hidden="true"></span>
             <span class="prov" id="runfor">Human Fury Warrior · Alliance · Phase 2 planner set</span>
           </div>
           <div class="empty" id="simempty" hidden>No run yet. Press Run Simulation to estimate DPS for the planner set.</div>
@@ -422,8 +426,12 @@ dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Simulation</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
@@ -432,15 +440,24 @@ dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-/* Simulation tab: starts fully in Tempest Keep light; "charge" flares the naaru crystal while a run computes */
+/* Simulation tab: starts fully in Tempest Keep light (the kit's K6 theme). "charge" spins the naaru
+   crystal up while a run computes; its brightness belongs to tbc-kit.js (K3 swell), so the host never
+   writes the crystal / halo / lamp intensities itself. */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:1,warm:0,charge:0};
-const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
-const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,speed:1,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},setStone(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
 if(!window.THREE||!cv){off("3D scene: unavailable");return;}
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
-R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
 /* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
@@ -493,10 +510,12 @@ const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBa
 halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
 const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
 const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
-/* The Eye's pillars receding into the violet fog */
+/* The Eye's stone pillars receding into the violet fog; the page hides them once the kit's K6
+   crystal pillars are built ("crystal pillars instead of stone"), so they remain the no-kit fallback */
 const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+const stone=new THREE.Group();scene.add(stone);
 [[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
-  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;stone.add(c);});
 scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
 R.setClearColor(cur.fog);
 /* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
@@ -512,9 +531,9 @@ function place(){
 }
 function tint(){
   ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
   lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
   shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
-  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=2.2+MIX.charge*2.4;
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
 function pose(){
@@ -523,28 +542,34 @@ function pose(){
 }
 function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
-  t+=dt;U.uTime.value=t;
+  dt*=S.speed;t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
   crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
-  tint();place();R.render(scene,cam);
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
-function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
 addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
 document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
 cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
 if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
-  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
-/* hooks used by the page script */
-S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(v);U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.setStone=v=>{stone.visible=!!v;if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
+<script src="tbc-kit.js"></script>
 <script>
 (function(){
 "use strict";
@@ -557,6 +582,12 @@ const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
 if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
 const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
 const G=typeof gsap!=="undefined";
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off */
+const KIT=window.TBCKit||null;
+if(KIT){
+  KIT.theme("tk",{instant:true}); /* K6 crystalline fortress (gold over violet, brighter aurora) over K2 shattered sky */
+  if(KIT.ok&&SC.setStone)SC.setStone(false); /* the kit's crystal pillars replace the stone ones */
+}
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 const fmt=n=>Math.round(n).toLocaleString("en-US");
@@ -634,7 +665,8 @@ if(matchMedia("(pointer:fine)").matches){
 
 /* ================= MOTION LAYER ================= */
 const tog=$("#mtoggle"), mstate=$("#mstate");
-const ST=G&&typeof ScrollTrigger!=="undefined";
+const ST=G&&typeof ScrollTrigger!=="undefined", FL=G&&typeof Flip!=="undefined", TX=G&&typeof TextPlugin!=="undefined";
+const DS=G&&typeof DrawSVGPlugin!=="undefined", SPL=G&&typeof SplitText!=="undefined";
 if(tog)tog.hidden=false;
 function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
 function safe(a){
@@ -649,8 +681,10 @@ if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion *
   if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
   sync();return;
 }
-if(ST)gsap.registerPlugin(ScrollTrigger);
-let ctx=null, mm=null;
+gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,TX&&TextPlugin,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));
+let ctx=null, mm=null, ring=null;
+/* K7: the rune ring shown beside Run Simulation while a run computes */
+function dropRing(){if(ring){ring.remove();ring=null;}}
 const A=fn=>ctx?ctx.add(fn):fn();
 function finishAll(){
   gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
@@ -667,6 +701,7 @@ function restoreStatic(){
 function enable(first){
   if(M.on)return;
   M.on=true;root.classList.add("motion");
+  SC.setMotion(true); /* before the intro, so the kit sees motion as on (no K1 ignition on this tab) */
   ctx=gsap.context(()=>{
     if(first)intro();
     if(ST)scrollStory();
@@ -674,7 +709,7 @@ function enable(first){
   mm=gsap.matchMedia();
   mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
   if(ST)ScrollTrigger.refresh();
-  label(true);SC.setMotion(true);
+  label(true);
 }
 function disable(){
   if(!M.on)return;
@@ -684,6 +719,8 @@ function disable(){
   M.on=false;root.classList.remove("motion");
   restoreStatic();resetParallax();
   label(false);SC.setMotion(false);
+  /* end any kit effect of a run at rest: embers out (instant now that motion is off), ring gone */
+  dropRing();if(KIT)KIT.embers(false);
 }
 function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
 function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
@@ -693,23 +730,19 @@ function syncRM(){
   else{if(tog)tog.disabled=false;label(M.on);}
 }
 if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
-/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
-function splitHero(){
-  const h=$("#h-sim");if(!h||h.dataset.split)return false;
-  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
-  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
-  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
-  return true;
-}
-/* 1. Intro: the scene settles from above, words rise out of masks, the target chips land, cards in view rise. ~1.4s */
+/* 1. Intro: the scene settles from above, words rise out of masks (SplitText, which keeps the sentence
+   for screen readers and is reverted with the context when motion turns off), the target chips land,
+   cards in view rise. ~1.4s */
 function intro(){
-  const split=splitHero();
   const inView=$$(".simgrid .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
   inView.forEach(b=>b.dataset.introd="1");
   const tl=gsap.timeline({defaults:{ease:"power4.out"}});
   tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
     .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
-  if(split&&$("#h-sim .w>span"))tl.from("#h-sim .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  if(SPL&&$("#h-sim")){
+    const sp=SplitText.create("#h-sim",{type:"words",wordsClass:"w",mask:"words",aria:"auto"});
+    tl.from(sp.words,{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  }
   if($(".target span"))tl.from(".target span",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
   if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
   if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
@@ -740,18 +773,37 @@ function magnets(){
   });
   return ()=>offs.forEach(f=>f());
 }
-/* 4. Simulate: the naaru crystal charges, the number counts up, bars fill, the crystal settles. ~1.6s */
-M.run=(done,show)=>A(()=>{
-  const s=$("#score"),to=s?+s.dataset.to||0:0,o={v:0};
-  const tl=gsap.timeline({onComplete:()=>{if(s)s.textContent=fmt(to);done();}});
-  tl.to(SC.mix,{charge:1,duration:.45,ease:"power2.in",onUpdate:SC.render})
-    .add(()=>{show();if(s)s.textContent="0";})
-    .to(o,{v:to,duration:.9,ease:"power2.out",onUpdate:()=>{if(s)s.textContent=fmt(o.v);}});
-  if($("#refbar"))tl.fromTo("#refbar",{scaleX:0},{scaleX:1,duration:.9,ease:"power3.out"},"<");
-  if($("#specnote"))tl.from("#specnote",{y:12,autoAlpha:0,duration:.4,clearProps:"all"},"<.3");
-  tl.to(SC.mix,{charge:0,duration:.9,ease:"power2.out",onUpdate:SC.render},"<.2");
-  safe(tl);
-});
+/* 4. Simulate: K4 fel embers rise and the naaru crystal spins up while the run "charges", with a K7
+   rune ring beside the button as the loading indicator. When the result lands: embers out, ring gone,
+   one K3 naaru swell, and the result panels open through K8 light portals. The number counts up,
+   bars fill, the crystal settles. ~2.2s. Kit calls sit outside the gsap.context so its revert
+   (Motion off) never rewinds the kit's own tweens; disable() ends them at rest instead. */
+M.run=(done,show)=>{
+  if(KIT){
+    KIT.embers(true,{preset:"fel"});
+    const slot=$("#simrune");dropRing();
+    if(slot)ring=KIT.runeRing(slot,{size:28,glyphs:8,spinDur:6});
+  }
+  const land=()=>{
+    dropRing();
+    if(KIT){
+      KIT.embers(false);KIT.swell();
+      ["#result .score","#specnote"].forEach((q,i)=>{const el=$(q);if(el)KIT.enter(el,{delay:i*.12});});
+    }
+  };
+  A(()=>{
+    const s=$("#score"),to=s?+s.dataset.to||0:0,o={v:0};
+    const tl=gsap.timeline({onComplete:()=>{if(s)s.textContent=fmt(to);dropRing();done();}});
+    tl.to(SC.mix,{charge:1,duration:1,ease:"power1.inOut",onUpdate:SC.render})
+      .add(()=>{show();if(s)s.textContent="0";land();})
+      .to(o,{v:to,duration:.9,ease:"power2.out",onUpdate:()=>{if(s)s.textContent=fmt(o.v);}});
+    if($("#refbar"))tl.fromTo("#refbar",{scaleX:0},{scaleX:1,duration:.9,ease:"power3.out"},"<");
+    /* clear only what this tween set, so the K8 clip-path is not cut short */
+    if($("#specnote"))tl.from("#specnote",{y:12,autoAlpha:0,duration:.4,clearProps:"transform,opacity,visibility"},"<.3");
+    tl.to(SC.mix,{charge:0,duration:.9,ease:"power2.out",onUpdate:SC.render},"<.2");
+    safe(tl);
+  });
+};
 /* a short arcane pulse when the spec changes */
 M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));
 /* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
