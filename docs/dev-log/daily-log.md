@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**432 commits across 67 days**, from 2026-06-25 to 2026-10-04.
+**434 commits across 67 days**, from 2026-06-25 to 2026-10-04.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,11 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_5 commits_
+_7 commits_
 
-### Sunday 4 October — 1 commit
+### Sunday 4 October — 3 commits
 
 - Prototype every tab in the chosen style, and research TBC motion — [`5a8e879`](https://github.com/josephevenson08/project-defeat/commit/5a8e879ec4632ecdf21b7304e7fcdefb7eb55c61)
+- Add the TBC motion kit, and the Home tab that uses it — [`eedb476`](https://github.com/josephevenson08/project-defeat/commit/eedb4761ba5ce02ad229f7f03807acb0de292d0c)
+- Roll the TBC motion kit into every tab — [`32b13d4`](https://github.com/josephevenson08/project-defeat/commit/32b13d4b3ff1a4591f3648d846c1bc125d695e2c)
 
 ### Saturday 3 October — 1 commit
 
