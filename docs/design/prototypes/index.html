@@ -1,0 +1,213 @@
+<title>Project Defeat Prototypes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Barlow+Semi+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Layout: a studio contact sheet. One intro block, then a 2-column grid of live thumbnails. */
+  :root {
+    --bg: #f3f1ec;
+    --surface: #fbfaf7;
+    --ink: #1c1b19;
+    --ink-dim: #5b5850;
+    --line: #d9d4c8;
+    --brass: #8a6a2f;
+    --epic: #7b2fb8;
+    --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+    --font-ui: 'Barlow Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121315; --surface: #1a1b1e; --ink: #ebe7de; --ink-dim: #a39e93;
+      --line: #2e2f33; --brass: #c9a35a; --epic: #b77cf0; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121315; --surface: #1a1b1e; --ink: #ebe7de; --ink-dim: #a39e93;
+    --line: #2e2f33; --brass: #c9a35a; --epic: #b77cf0; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink); font: 400 1rem/1.5 var(--font-ui);
+    padding-inline: max(16px, 4vw); padding-block: 40px 64px;
+  }
+  .wrap { max-width: 1240px; margin-inline: auto; display: grid; gap: 40px; }
+  header { display: grid; gap: 12px; max-width: 68ch; }
+  .eyebrow { font: 500 0.78rem/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); }
+  h1 { font: 700 clamp(2rem, 5vw, 3.2rem)/1.05 var(--font-display); margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+  header p { margin: 0; color: var(--ink-dim); font-size: 1.08rem; }
+  header a { color: var(--brass); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 28px; }
+  .card { display: grid; gap: 12px; min-width: 0; }
+  .thumb {
+    position: relative; aspect-ratio: 16 / 10; max-width: 100%; overflow: hidden;
+    border: 1px solid var(--line); background: var(--surface); border-radius: 2px;
+  }
+  .thumb iframe {
+    position: absolute; inset: 0; width: 1280px; height: 800px; border: 0;
+    transform-origin: 0 0; pointer-events: none;
+  }
+  .thumb .fallback {
+    position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-dim);
+    font: 400 0.85rem var(--font-mono);
+  }
+  .meta { display: grid; gap: 4px; }
+  .meta-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .num { font: 400 0.8rem var(--font-mono); color: var(--brass); font-variant-numeric: tabular-nums; }
+  h2 { font: 700 1.25rem/1.2 var(--font-display); margin: 0; }
+  .after { font-size: 0.92rem; color: var(--ink-dim); }
+  .meta p { margin: 0; max-width: 62ch; }
+  .refs { font: 400 0.78rem var(--font-mono); color: var(--ink-dim); }
+  .open {
+    justify-self: start; display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px;
+    border: 1px solid var(--brass); color: var(--ink); text-decoration: none; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.82rem; border-radius: 2px;
+  }
+  .open:hover { background: var(--brass); color: var(--bg); }
+  .open:focus-visible, header a:focus-visible { outline: 2px solid var(--epic); outline-offset: 3px; }
+  header.sub { border-top: 1px solid var(--line); padding-top: 32px; display: grid; gap: 10px; max-width: 72ch; }
+  header.sub.first { border-top: 0; padding-top: 0; }
+  header.sub p { margin: 0; color: var(--ink-dim); }
+  .jump { display: flex; flex-wrap: wrap; gap: 10px; }
+  .jump a { padding: 8px 14px; border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 600; border-radius: 2px; }
+  .jump a:hover { border-color: var(--brass); }
+  .jump a:focus-visible { outline: 2px solid var(--epic); outline-offset: 3px; }
+  .subhead { font: 700 clamp(1.5rem, 3.5vw, 2.2rem)/1.1 var(--font-display); margin: 0; text-wrap: balance; }
+  .group { font: 500 0.85rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); margin: 0 0 14px; }
+  footer { color: var(--ink-dim); font-size: 0.9rem; max-width: 72ch; border-top: 1px solid var(--line); padding-top: 20px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Design study · 31 prototypes · Oct 2026</span>
+    <h1>What Project Defeat could look like</h1>
+    <p>Clickable prototypes of the same planner screen: a Human Fury Warrior in the Phase 2 set, with real items, enchants and sources. Two of the ten starting directions, Launcher and Portal, were picked and each is now shown in six styles. They are mockups, not the live app.</p>
+  </header>
+
+  <nav class="jump" aria-label="Jump to">
+    <a href="#round-3">Round 3: 3D, motion, neumorphism</a>
+    <a href="#launcher">6 Launcher styles</a>
+    <a href="#portal">6 Portal styles</a>
+    <a href="#round-1">10 original directions</a>
+  </nav>
+
+  <header class="sub first" id="round-3">
+    <span class="eyebrow">Round 3 · 9 concepts</span>
+    <h2 class="subhead">Immersive 3D, motion, and neumorphism, pushed hard</h2>
+    <p>Three styles taken as far as they go, each built on the Launcher, on the Portal, and as a Hybrid of the two. The 3D pieces run live WebGL scenes; give them a moment to load.</p>
+  </header>
+  <section aria-label="Round 3 concepts"><div class="grid" id="grid-r3"></div></section>
+
+  <header class="sub" id="round-2">
+    <span class="eyebrow">Round 2 · 12 variants</span>
+    <h2 class="subhead">Launcher and Portal in six styles</h2>
+    <p>Directions 05 and 08 were picked, then each was redone in six visual styles: minimalism, skeuomorphism, glassmorphism, neo-brutalism, Bauhaus, and motion. Same structure and data; only the visual language changes.</p>
+  </header>
+  <section id="launcher" aria-label="Launcher variants"><h3 class="group">05 · Launcher</h3><div class="grid" id="grid-05"></div></section>
+  <section id="portal" aria-label="Portal variants"><h3 class="group">08 · Portal</h3><div class="grid" id="grid-08"></div></section>
+
+  <header class="sub" id="round-1">
+    <span class="eyebrow">Round 1 · 10 directions</span>
+    <h2 class="subhead">The ten starting directions</h2>
+  </header>
+  <section class="grid" id="grid" aria-label="Prototypes"></section>
+
+  <footer>
+    Every prototype uses the same brief and the same data. The research behind them (25 platforms, every claim cited) and the implementation plan are in the project's <code>docs/research/gaming-ui/</code> and <code>docs/design/UI-REFRESH-PLAN.md</code>. World of Warcraft is a trademark of Blizzard Entertainment; this is a fan project, not affiliated with Blizzard.
+  </footer>
+</div>
+
+<script>
+  const prototypes = [
+    ['01', 'refined-current', 'Refined Current', 'The current app', 'Today\'s dark, Cinzel, faction-themed look with the UI refresh plan applied: provenance chips, a phase chip, tab counts, cap status in words and Ctrl K search.', 'R1 R2 R3 R4 R5'],
+    ['02', 'sim-console', 'Sim Console', 'WoWSims, Raider.IO', 'A dense theorycraft workstation: a sidebar of live stats with cap status, tabs for gear through results, one neutral typeface.', 'T5 T15 T16 T18'],
+    ['03', 'field-guide', 'Field Guide', 'Icy Veins, Maxroll', 'The planner as a living guide: a last-updated stamp, phase tabs, a BiS table with sources inline, and a dated changelog.', 'T13 T14 T5 T16'],
+    ['04', 'data-strip', 'Data Strip', 'U.GG, Blitz, Tracker.gg', 'Numbers first: context in the heading, a band of big stats, and a compare view with gain and loss shown by direction.', 'T5 T6 T15'],
+    ['05', 'launcher', 'Launcher', 'Battle.net, Riot Client, GOG GALAXY', 'A desktop launcher: an icon rail for the six sections, a version chip, a home banner and dated update cards.', 'T1 T2 T4 T10'],
+    ['06', 'search-first', 'Search First', 'Raider.IO, Tracker.gg, Wowhead', 'Search is the front door: one large field with live, grouped results you can drive from the keyboard.', 'T3 T2 R1'],
+    ['07', 'paperdoll', 'Paperdoll', 'The in-game character pane, Path of Exile 2', 'Gear slots arranged around a figure like the game\'s character sheet, with game-style tooltips.', 'T7 T8 T15 R3'],
+    ['08', 'portal', 'Portal', 'FFXIV Lodestone, Wowhead, CurseForge', 'A dense community portal: Phase 2 at a glance, a dated feed of data changes, tier lists and shortcuts.', 'T2 T5 T13'],
+    ['09', 'pocket', 'Pocket', 'Xbox app, Nintendo, HoYoLAB', 'A one-thumb phone companion: a bottom tab bar, a character card, and gear rows that open a detail sheet.', 'T10 T2 T5'],
+    ['10', 'command-deck', 'Command Deck', 'GOG GALAXY, Raider.IO, Warcraft Logs', 'Keyboard first: split panes, a working command palette, J/K navigation and a status bar with the data source.', 'T3 T5 T13 R1'],
+  ];
+
+  const grid = document.getElementById('grid');
+  for (const [num, slug, name, after, blurb, refs] of prototypes) {
+    const href = `${num}-${slug}.html`;
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="thumb"><span class="fallback">Loading preview…</span>
+        <iframe src="${href}" title="Preview of ${name}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+      </div>
+      <div class="meta">
+        <div class="meta-top"><span class="num">${num}</span><h2>${name}</h2><span class="after">after ${after}</span></div>
+        <p>${blurb}</p>
+        <span class="refs">Research: ${refs}</span>
+      </div>
+      <a class="open" href="${href}">Open prototype ${num} <span aria-hidden="true">→</span></a>`;
+    grid.appendChild(card);
+  }
+
+  const r3 = [
+    ['3d', 'Immersive 3D', [['launcher','Launcher','A live crystal prism with orbiting shards and pointer-reactive particles; the camera flies around a ring of the 17 slots.'],['portal','Portal','The page floats over a live Serpentshrine pool with shader waves; rotatable 3D tier shelves; phase re-lights the scene.'],['hybrid','Hybrid','A 3D war table with five raid markers that open their loot; an arc of glowing slot plates.']]],
+    ['motion', 'Motion', [['launcher','Launcher','Cinematic intro, self-drawing emblem, page wipes, the Continue card morphs into the planner, rows re-sort with Flip.'],['portal','Portal','Pinned scroll story, a self-drawing timeline, tier filters that re-flow, gear rows dealt like cards.'],['hybrid','Hybrid','A living bento dashboard, a glowing token along the raid route, a fluid rail blob, a swipe carousel.']]],
+    ['neu', 'Neumorphism', [['launcher','Launcher','Soft extruded rail, an inset banner screen, a circular hit gauge and dials, light and dark themes.'],['portal','Portal','A soft control panel that switches phase, a soft timeline, circular gauges for hit cap and mining.'],['hybrid','Hybrid','A control console: rotary phase knob, bezelled hit gauge, LCD-style feed, a paper-doll planner.']]],
+  ];
+  const r3grid = document.getElementById('grid-r3');
+  for (const [slug, styleName, bases] of r3) {
+    for (const [base, baseName, blurb] of bases) {
+      const href = `round3/${slug}-${base}.html`;
+      const label = `${styleName} · ${baseName}`;
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="thumb"><span class="fallback">Loading preview…</span>
+          <iframe src="${href}" title="Preview of ${label}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><span class="num">R3</span><h2>${label}</h2></div>
+          <p>${blurb}</p>
+        </div>
+        <a class="open" href="${href}">Open ${label} <span aria-hidden="true">→</span></a>`;
+      r3grid.appendChild(card);
+    }
+  }
+
+  const styles = [
+    ['minimalism', 'Minimalism', 'Few elements, generous space; hierarchy from size and weight alone.'],
+    ['skeuomorphism', 'Skeuomorphism', 'Real materials: tooled leather, brushed metal, embossed type, physical buttons.'],
+    ['glassmorphism', 'Glassmorphism', 'Frosted translucent panels over a soft, colorful background.'],
+    ['brutalism', 'Neo-Brutalism', 'Thick borders, hard shadows, flat loud blocks, blunt type.'],
+    ['bauhaus', 'Bauhaus', 'Circles, squares and triangles in primary colors on a strict grid.'],
+    ['motion', 'Motion', 'The same layout brought to life with GSAP-driven motion.'],
+  ];
+  const letters = 'ABCDEF';
+  for (const [base, baseName] of [['05', 'launcher'], ['08', 'portal']]) {
+    const target = document.getElementById(`grid-${base}`);
+    styles.forEach(([slug, name, blurb], i) => {
+      const href = `variants/${base}-${baseName}-${slug}.html`;
+      const label = `${baseName[0].toUpperCase()}${baseName.slice(1)} · ${name}`;
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="thumb"><span class="fallback">Loading preview…</span>
+          <iframe src="${href}" title="Preview of ${label}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><span class="num">${base}-${letters[i]}</span><h2>${label}</h2></div>
+          <p>${blurb}</p>
+        </div>
+        <a class="open" href="${href}">Open ${base}-${letters[i]} <span aria-hidden="true">→</span></a>`;
+      target.appendChild(card);
+    });
+  }
+
+  // Scale each 1280×800 preview to its card width.
+  const fit = () => document.querySelectorAll('.thumb').forEach((thumb) => {
+    const frame = thumb.querySelector('iframe');
+    frame.style.transform = `scale(${thumb.clientWidth / 1280})`;
+  });
+  fit();
+  window.addEventListener('resize', fit);
+</script>

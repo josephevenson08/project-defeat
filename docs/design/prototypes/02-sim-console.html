@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sim Console · Project Defeat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  /* surface */
+  --bg:#0e1013; --panel:#15181d; --panel-2:#1b1f25; --line:#272c34; --line-2:#343a44;
+  --text:#e3e6ea; --muted:#9aa3ae; --dim:#7b8590;
+  /* state */
+  --ok:#5fc48a; --warn:#e8b34b; --bad:#ef6f6c; --focus:#ffd479;
+  /* game concepts */
+  --class-warrior:#c79c6e; --class-warrior-ink:#1a1209;
+  --quality-epic:#a335ee; --quality-epic-text:#b964f5;
+  --quality-rare:#0070dd; --quality-uncommon:#1eff00; --quality-legendary:#ff8000;
+  /* type scale */
+  --fs-xs:.75rem; --fs-sm:.8125rem; --fs-md:.9375rem; --fs-lg:1.125rem; --fs-xl:1.5rem; --fs-2xl:2.5rem;
+  --font:"Archivo","Segoe UI","Helvetica Neue",Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:400 var(--fs-md)/1.45 var(--font);font-variant-numeric:tabular-nums;}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+a{color:var(--class-warrior)}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.credit{font-size:var(--fs-xs);color:var(--dim);padding:6px 16px;border-bottom:1px solid var(--line)}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:16px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{font-weight:700;letter-spacing:.02em;white-space:nowrap;padding:12px 0}
+.brand span{color:var(--class-warrior)}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;min-width:0}
+.nav button{background:none;border:0;border-bottom:2px solid transparent;padding:12px 10px;color:var(--muted);font-size:var(--fs-sm);white-space:nowrap;cursor:pointer}
+.nav button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--class-warrior)}
+.nav button:hover{color:var(--text)}
+
+/* workstation */
+.ws{display:grid;grid-template-columns:288px minmax(0,1fr);min-height:calc(100vh - 80px)}
+.side{border-right:1px solid var(--line);background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:16px}
+.char{display:flex;gap:12px;align-items:center}
+.crest{width:44px;height:44px;border:2px solid var(--class-warrior);display:grid;place-items:center;font-weight:700;color:var(--class-warrior)}
+.char h1{font-size:var(--fs-lg);margin:0;line-height:1.2}
+.char p{margin:0;font-size:var(--fs-sm);color:var(--class-warrior)}
+.phase{font-size:var(--fs-xs);color:var(--muted);border:1px solid var(--line-2);padding:6px 8px;display:flex;gap:8px;align-items:center}
+.dot{width:7px;height:7px;background:var(--ok);flex:none}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{border:1px solid var(--line-2);background:var(--panel-2);padding:9px 10px;font-weight:600;font-size:var(--fs-sm);cursor:pointer;text-align:center}
+.btn.primary{background:var(--class-warrior);color:var(--class-warrior-ink);border-color:var(--class-warrior)}
+.btn:hover{filter:brightness(1.1)}
+.h{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:0 0 6px;font-weight:600}
+.stats{list-style:none;margin:0;padding:0;font-size:var(--fs-sm)}
+.stats li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line)}
+.stats b{font-weight:600;text-align:right}
+.cap{font-size:var(--fs-xs);color:var(--dim);min-width:84px;text-align:right}
+.cap.warn{color:var(--warn)} .cap.ok{color:var(--ok)}
+.setline{font-size:var(--fs-sm)} .setline em{font-style:normal;color:var(--quality-epic-text)}
+.assume{font-size:var(--fs-xs);color:var(--muted);border-left:2px solid var(--class-warrior);padding-left:8px;margin:0}
+
+/* main */
+.main{padding:16px 24px;min-width:0}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;font-size:var(--fs-sm);font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--class-warrior)}
+.panel{padding:16px 0}
+.prov{font-size:var(--fs-xs);color:var(--dim);margin:0 0 10px}
+.scroll{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:var(--fs-sm)}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:var(--fs-xs);color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.06em;background:var(--panel)}
+tbody tr:hover{background:var(--panel-2)}
+.slot{color:var(--muted)}
+.ic{display:inline-grid;place-items:center;width:22px;height:22px;border:1px solid var(--quality-epic);font-size:10px;font-weight:700;color:var(--muted);margin-right:8px;vertical-align:middle}
+.epic{color:var(--quality-epic-text);font-weight:600}
+.src{color:var(--muted)} .none{color:var(--dim)}
+.tag{font-size:var(--fs-xs);border:1px solid var(--line-2);padding:1px 5px;margin-left:6px;color:var(--class-warrior)}
+.sketch{color:var(--muted);max-width:60ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{border:1px solid var(--line);background:var(--panel);padding:12px}
+
+/* results */
+.res{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px}
+.big{font-size:var(--fs-2xl);font-weight:700;line-height:1}
+.label{display:inline-block;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--class-warrior-ink);background:var(--warn);padding:2px 6px;margin-bottom:8px}
+.enc{font-size:var(--fs-sm);color:var(--muted)}
+.chart svg{width:100%;height:auto;display:block}
+.tl{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line)}
+.tl b{font-size:var(--fs-lg)}
+
+.fs{margin:0;min-width:0}
+.fs legend{padding:0 4px}
+.fs label{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:var(--fs-sm);cursor:pointer}
+.fs input{accent-color:var(--class-warrior);width:16px;height:16px}
+.prio{margin:0;padding-left:22px;font-size:var(--fs-sm)}
+.prio li{padding:6px 0;border-bottom:1px solid var(--line)}
+.prio li::marker{color:var(--class-warrior);font-weight:700}
+.wt b{font-size:var(--fs-sm)}
+.tree{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tree .card p{margin:4px 0;font-size:var(--fs-sm)}
+.tree .on{border-color:var(--class-warrior)}
+@media (max-width:560px){.tree{grid-template-columns:1fr}}
+@media (max-width:860px){
+  .ws{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:1px solid var(--line)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+  .stats li{grid-template-columns:1fr auto;}
+  .stats .cap{grid-column:1/-1;text-align:left;min-width:0}
+  .main{padding:12px 16px}
+  .res{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<p class="credit">Direction 02 · Sim Console — after WoWSims and Raider.IO (research T5, T15, T16, T18; R11, R12). Static prototype, not the live app.</p>
+
+<header class="top">
+  <div class="brand">Project <span>Defeat</span></div>
+  <nav class="nav" role="tablist" aria-label="Sections" data-group="sec">
+    <button role="tab" aria-selected="true" aria-controls="sec-planner" id="t-planner">Character Planner</button>
+    <button role="tab" aria-selected="false" aria-controls="sec-sim" id="t-sim" tabindex="-1">Simulation</button>
+    <button role="tab" aria-selected="false" aria-controls="sec-raid" id="t-raid" tabindex="-1">Raid Composition</button>
+    <button role="tab" aria-selected="false" aria-controls="sec-tier" id="t-tier" tabindex="-1">Spec Tier Lists</button>
+    <button role="tab" aria-selected="false" aria-controls="sec-raids" id="t-raids" tabindex="-1">Raids</button>
+    <button role="tab" aria-selected="false" aria-controls="sec-prof" id="t-prof" tabindex="-1">Professions</button>
+  </nav>
+</header>
+
+<div class="ws">
+  <aside class="side" aria-label="Character summary">
+    <div class="char">
+      <div class="crest" aria-hidden="true">FW</div>
+      <div><h1>Human Fury Warrior</h1><p>Alliance · Level 70</p></div>
+    </div>
+    <div class="phase"><span class="dot" aria-hidden="true"></span>Phase 2 · Wowhead data · updated 12 Sep</div>
+    <div class="actions">
+      <button class="btn primary" type="button" data-go="results">Simulate</button>
+      <button class="btn" type="button" data-go="weights">Stat Weights</button>
+    </div>
+    <section aria-labelledby="st-h">
+      <h2 class="h" id="st-h">Live stats</h2>
+      <ul class="stats">
+        <li><span>Attack Power</span><b>1,788</b><span class="cap">no cap</span></li>
+        <li><span>Hit Rating</span><b>140</b><span class="cap warn">2 under 142 cap</span></li>
+        <li><span>Crit Rating</span><b>536</b><span class="cap">no cap</span></li>
+        <li><span>Haste Rating</span><b>163</b><span class="cap">no cap</span></li>
+        <li><span>Expertise</span><b>64</b><span class="cap">under dodge cap</span></li>
+        <li><span>Armor Pen</span><b>0</b><span class="cap">vs 7,700 armor</span></li>
+      </ul>
+    </section>
+    <p class="setline">Set bonus: <em>Destroyer Battlegear (4/5)</em></p>
+    <p class="assume">Buffs are assumed to come from other raid members. The boss is fixed: level 73, 7,700 armor.</p>
+  </aside>
+
+  <main class="main">
+    <section id="sec-planner" role="tabpanel" aria-labelledby="t-planner">
+      <div class="tabs" role="tablist" aria-label="Planner" data-group="pl">
+        <button role="tab" aria-selected="true" aria-controls="p-gear" id="pt-gear">Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-compare" id="pt-compare" tabindex="-1">Compare</button>
+        <button role="tab" aria-selected="false" aria-controls="p-talents" id="pt-talents" tabindex="-1">Talents</button>
+        <button role="tab" aria-selected="false" aria-controls="p-buffs" id="pt-buffs" tabindex="-1">Buffs</button>
+        <button role="tab" aria-selected="false" aria-controls="p-ranked" id="pt-ranked" tabindex="-1">Ranked Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-build" id="pt-build" tabindex="-1">Build</button>
+        <button role="tab" aria-selected="false" aria-controls="p-rotation" id="pt-rotation" tabindex="-1">Rotation</button>
+        <button role="tab" aria-selected="false" aria-controls="p-results" id="pt-results" tabindex="-1">Results</button>
+      </div>
+
+      <div class="panel" id="p-gear" role="tabpanel" aria-labelledby="pt-gear" tabindex="0">
+        <p class="prov">17 slots · items and sources from Wowhead · Phase 2 · updated 12 Sep</p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th scope="col">Slot</th><th scope="col">Item</th><th scope="col">Enchant</th><th scope="col">Source</th></tr></thead>
+            <tbody id="gear"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" id="p-compare" role="tabpanel" aria-labelledby="pt-compare" tabindex="0" hidden>
+        <p class="sketch">Pick a slot and a candidate item; the console runs both against the same boss and shows the difference. Sketch only in this prototype.</p>
+      </div>
+      <div class="panel" id="p-talents" role="tabpanel" aria-labelledby="pt-talents" tabindex="0" hidden>
+        <p class="prov">Talent trees · key picks for Fury · full grid not drawn in this prototype</p>
+        <div class="tree">
+          <div class="card"><h3 class="h">Arms</h3><p>Impale</p><p>Deep Wounds</p></div>
+          <div class="card on"><h3 class="h" style="color:var(--class-warrior)">Fury · main tree</h3><p>Flurry</p><p>Bloodthirst</p><p>Rampage</p></div>
+          <div class="card"><h3 class="h">Protection</h3><p class="src">not used</p></div>
+        </div>
+      </div>
+      <div class="panel" id="p-buffs" role="tabpanel" aria-labelledby="pt-buffs" tabindex="0" hidden>
+        <p class="assume" style="margin-bottom:12px">Buffs are assumed to come from other raid members. Untick anything your raid won't bring.</p>
+        <div class="cards">
+          <fieldset class="card fs"><legend class="h">Raid buffs</legend>
+            <label><input type="checkbox" checked> Battle Shout</label><label><input type="checkbox" checked> Blessing of Might</label><label><input type="checkbox" checked> Blessing of Kings</label><label><input type="checkbox" checked> Windfury Totem</label><label><input type="checkbox" checked> Leader of the Pack</label></fieldset>
+          <fieldset class="card fs"><legend class="h">Boss debuffs</legend>
+            <label><input type="checkbox" checked> Sunder Armor</label><label><input type="checkbox" checked> Faerie Fire</label><label><input type="checkbox" checked> Curse of Recklessness</label><label><input type="checkbox"> Blood Frenzy</label></fieldset>
+          <fieldset class="card fs"><legend class="h">Consumables</legend>
+            <label><input type="checkbox" checked> Flask of Relentless Assault</label><label><input type="checkbox" checked> Roasted Clefthoof</label><label><input type="checkbox" checked> Haste Potion</label></fieldset>
+        </div>
+      </div>
+      <div class="panel" id="p-ranked" role="tabpanel" aria-labelledby="pt-ranked" tabindex="0" hidden>
+        <p class="sketch">Every item for the selected slot, ranked by estimated DPS gain. Sketch only in this prototype.</p>
+      </div>
+      <div class="panel" id="p-build" role="tabpanel" aria-labelledby="pt-build" tabindex="0" hidden>
+        <p class="sketch">Save, load and share this set as a link. Sketch only in this prototype.</p>
+      </div>
+      <div class="panel" id="p-rotation" role="tabpanel" aria-labelledby="pt-rotation" tabindex="0" hidden>
+        <p class="prov">Priority list the sim follows, top to bottom</p>
+        <ol class="prio">
+          <li><b>Rampage</b> <span class="src">keep the buff up</span></li>
+          <li><b>Bloodthirst</b> <span class="src">on cooldown</span></li>
+          <li><b>Whirlwind</b> <span class="src">on cooldown</span></li>
+          <li><b>Heroic Strike</b> <span class="src">queue when rage is high</span></li>
+        </ol>
+      </div>
+
+      <div class="panel" id="p-results" role="tabpanel" aria-labelledby="pt-results" tabindex="0" hidden>
+        <div class="res">
+          <div>
+            <span class="label">Example output</span>
+            <div class="big num">1,642 <span style="font-size:var(--fs-lg);color:var(--muted)">DPS</span></div>
+            <p class="enc">Encounter: level 73 boss · 7,700 armor · fixed, not editable.<br>Placeholder number to show the layout; not a real sim result.</p>
+            <h3 class="h" id="weights" tabindex="-1" style="margin-top:16px">Stat weights · example output</h3>
+            <p class="enc" style="margin:0 0 6px">DPS per point, relative to Attack Power. Shape only, not real values.</p>
+            <ul class="stats wt">
+              <li><span>Hit Rating</span><b>highest until 142</b><span class="cap warn">2 rating short</span></li>
+              <li><span>Attack Power</span><b>1.00</b><span class="cap">baseline</span></li>
+              <li><span>Crit / Haste</span><b>run sim</b><span class="cap">gear-dependent</span></li>
+            </ul>
+          </div>
+          <figure class="chart" style="margin:0">
+            <figcaption class="h">DPS distribution · example</figcaption>
+            <svg id="dist" viewBox="0 0 320 120" role="img" aria-label="Example DPS distribution, a bell shape centred on the example figure"></svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-sim" role="tabpanel" aria-labelledby="t-sim" hidden>
+      <p class="sketch">Simulation: estimated DPS against a fixed boss (level 73, 7,700 armor). Use Simulate in the sidebar; results open in the Results tab.</p>
+    </section>
+    <section id="sec-raid" role="tabpanel" aria-labelledby="t-raid" hidden>
+      <p class="sketch">Raid Composition: seat 10 or 25 players and see which buffs each group gets.</p>
+    </section>
+    <section id="sec-tier" role="tabpanel" aria-labelledby="t-tier" hidden>
+      <p class="prov">Wowhead · Phase 2 · DPS rankings</p>
+      <div id="tiers"></div>
+    </section>
+    <section id="sec-raids" role="tabpanel" aria-labelledby="t-raids" hidden>
+      <div class="cards" id="raids"></div>
+    </section>
+    <section id="sec-prof" role="tabpanel" aria-labelledby="t-prof" hidden>
+      <div class="card"><h3 class="h">Mining · example node</h3>
+        <p style="margin:0"><b>Fel Iron Deposit</b> · skill <span class="num">300</span><br><span class="src">Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</span></p></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const G=[
+["Head","HD","Destroyer Battle-Helm","Glyph of Ferocity","T5 token · Lady Vashj, Serpentshrine Cavern",1],
+["Neck","NK","Pendant of the Perilous","","Karazhan"],
+["Shoulders","SH","Destroyer Shoulderblades","Might of the Scourge","T5 token · Kael'thas Sunstrider, Tempest Keep",1],
+["Back","BK","Black-Iron Battlecloak","Greater Agility",""],
+["Chest","CH","Destroyer Breastplate","Exceptional Stats","T5 token · Kael'thas Sunstrider, Tempest Keep",1],
+["Wrists","WR","Bracers of Eradication","Brawn",""],
+["Hands","HA","Destroyer Gauntlets","Major Strength","T5 token · Leotheras the Blind, Serpentshrine Cavern",1],
+["Waist","WA","Belt of One-Hundred Deaths","",""],
+["Legs","LG","Leggings of Murderous Intent","Nethercobra Leg Armor",""],
+["Feet","FT","Warboots of Obliteration","Cat's Swiftness",""],
+["Finger 1","F1","Band of the Ranger-General","","Kael'thas Sunstrider, Tempest Keep"],
+["Finger 2","F2","Ring of Reciprocity","",""],
+["Trinket 1","T1","Dragonspine Trophy","","Gruul the Dragonkiller, Gruul's Lair"],
+["Trinket 2","T2","Badge of the Swarmguard","",""],
+["Main Hand","MH","Dragonstrike","Mongoose",""],
+["Off Hand","OH","Talon of Azshara","Mongoose",""],
+["Ranged","RG","Serpent Spine Longbow","Khorium Scope",""]];
+document.getElementById("gear").innerHTML=G.map(g=>`<tr><td class="slot">${g[0]}</td><td><span class="ic" aria-hidden="true">${g[1]}</span><span class="epic">${g[2]}</span>${g[5]?'<span class="tag">T5</span>':''}</td><td>${g[3]||'<span class="none">—</span>'}</td><td class="src">${g[4]||'<span class="none">source in guide</span>'}</td></tr>`).join("");
+
+/* distribution chart (example shape only) */
+(function(){
+  const s=document.getElementById('dist'),W=320,H=120,b=96,n=24,mu=11.5,sd=4;
+  let h='';const bw=(W-20)/n;
+  for(let i=0;i<n;i++){const v=Math.exp(-((i-mu)**2)/(2*sd*sd));const y=b-v*80;
+    h+=`<rect x="${10+i*bw+1}" y="${y.toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${(b-y).toFixed(1)}" fill="${Math.abs(i-mu)<1?'var(--class-warrior)':'var(--line-2)'}"/>`;}
+  h+=`<line x1="10" x2="${W-10}" y1="${b}" y2="${b}" stroke="var(--dim)"/>`;
+  h+=`<text x="10" y="112" fill="var(--muted)" font-size="10">lower</text><text x="${W/2}" y="112" fill="var(--class-warrior)" font-size="10" text-anchor="middle">1,642 (example)</text><text x="${W-10}" y="112" fill="var(--muted)" font-size="10" text-anchor="end">higher</text>`;
+  s.innerHTML=h;
+})();
+
+/* tier list + raids */
+const T={S:["Arcane Mage","Destruction Warlock","Beast Mastery Hunter","Fury Warrior"],A:["Arms Warrior","Enhancement Shaman","Affliction Warlock","Survival Hunter"],B:["Retribution Paladin","Combat Rogue","Shadow Priest","Elemental Shaman","Balance Druid","Fire Mage"]};
+document.getElementById('tiers').innerHTML=Object.entries(T).map(([k,v])=>`<div class="tl"><b>${k}</b><div>${v.map(x=>x==="Fury Warrior"?`<strong style="color:var(--class-warrior)">${x}</strong>`:x).join(" · ")}</div></div>`).join("");
+const R=[["Karazhan","Phase 1",[["Attumen the Huntsman","Steelhawk Crossbow, Worgen Claw Necklace, Gloves of Saintly Blessings"],["Moroes","Emerald Ripper, Brooch of Unquenchable Fury, Royal Cloak of Arathi Kings"],["Vendor","Necklace of Eternal Hope · 25x Badge of Justice"]]],["Gruul's Lair","Phase 1",[]],["Magtheridon's Lair","Phase 1",[]],["Serpentshrine Cavern","Phase 2",[]],["Tempest Keep","Phase 2",[]]];
+document.getElementById('raids').innerHTML=R.map(([n,p,l])=>`<div class="card"><h3 class="h">${p}</h3><p style="margin:0 0 6px;font-weight:600">${n}</p>${l.length?l.map(([b,i])=>`<p style="margin:4px 0;font-size:var(--fs-sm)"><span class="src">${b}:</span> <span class="epic">${i}</span></p>`).join(""):'<p class="src" style="margin:0;font-size:var(--fs-sm)">Loot per boss and attunement steps.</p>'}</div>`).join("");
+
+/* tabs: click + arrow keys */
+function wire(list){
+  const tabs=[...list.querySelectorAll('[role=tab]')];
+  const pick=t=>{tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});};
+  tabs.forEach((t,i)=>{t.addEventListener('click',()=>pick(t));t.addEventListener('keydown',e=>{let j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:null;if(j===null)return;const n=tabs[(j+tabs.length)%tabs.length];n.focus();pick(n);e.preventDefault();});});
+  return pick;
+}
+const pickSec=wire(document.querySelector('[data-group=sec]'));
+const pickPl=wire(document.querySelector('[data-group=pl]'));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{pickSec(document.getElementById('t-planner'));const t=document.getElementById('pt-results');pickPl(t);
+  if(b.dataset.go==='weights'){const w=document.getElementById('weights');w.focus();w.scrollIntoView({block:'center'});}else t.focus();}));
+</script>
+</body>
+</html>

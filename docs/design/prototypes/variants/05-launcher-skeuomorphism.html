@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Launcher · Skeuomorphism</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Alegreya+Sans:wght@400;500;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  /* materials */
+  --desk:#1a120c; --leather:#3b2416; --leather-2:#4b2e1b; --leather-dk:#26170e; --leather-lt:#5c3a23;
+  --steel-1:#9aa1a8; --steel-2:#5d646b; --steel-3:#2d3237; --steel-dk:#1b1f23;
+  --stone-1:#4a4844; --stone-2:#32302d; --stone-dk:#1f1e1c;
+  --brass-1:#f3d58a; --brass-2:#c99a3e; --brass-3:#7a5418; --brass-ink:#2a1a05;
+  --stitch:#d4b07a; --groove:#0d0805; --hilite:#ffffff2e;
+  /* ink */
+  --ink:#f4ead6; --ink-2:#dccaa8; --ink-3:#c0a982; --ink-steel:#e9eef2;
+  --ok:#8fe0a0; --warn:#ffb661; --lamp:#ffb347;
+  --epic:#cf9bff; --epic-plate:#2a1840; --rare:#7fb8ff; --unc:#6dff5a; --leg:#ffa040;
+  /* type */
+  --f-head:"Cinzel","Trajan Pro",Georgia,"Times New Roman",serif;
+  --f-body:"Alegreya Sans","Gill Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --s-1:.78rem; --s-2:.9rem; --s-3:1rem; --s-4:1.25rem; --s-5:1.6rem; --s-6:2.4rem;
+  --rail-w:84px; --top-h:66px; --r:6px;
+  /* textures: inline SVG noise only */
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='turbulence' baseFrequency='.035 .5' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --stone:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='5' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 -.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{color:var(--ink);font:400 var(--s-3)/1.5 var(--f-body);min-height:100vh;
+  background:var(--noise),radial-gradient(ellipse at 50% 0,#2b1d12,var(--desk) 70%);background-color:var(--desk)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--brass-1)}
+:focus-visible{outline:3px solid var(--lamp);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-head);font-weight:700;letter-spacing:.03em;margin:0;line-height:1.15}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.epic{color:var(--epic)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* embossed / debossed type */
+.emboss{color:var(--ink);text-shadow:0 -1px 0 #000a,0 1px 0 #ffffff1f}
+.deboss{color:var(--ink-3);text-shadow:0 1px 0 #ffffff14,0 -1px 0 #0009}
+.gilt{background:linear-gradient(180deg,var(--brass-1),var(--brass-2) 55%,#e9c470);-webkit-background-clip:text;background-clip:text;color:var(--brass-1);-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 0 #0009)}
+
+/* shared material: tooled leather panel with stitching */
+.leather{position:relative;border-radius:var(--r);
+  background:var(--grain),var(--noise),radial-gradient(ellipse at 30% 0,var(--leather-lt),var(--leather) 55%,var(--leather-dk));
+  box-shadow:0 1px 0 #ffffff12 inset,0 -2px 6px #0007 inset,0 10px 22px #000a,0 2px 0 #000}
+.leather::after{content:"";position:absolute;inset:7px;border:2px dashed #d4b07a73;border-radius:calc(var(--r) - 2px);pointer-events:none}
+/* brushed steel */
+.steel{background:repeating-linear-gradient(90deg,#ffffff0d 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#0000000f 0 2px,transparent 2px 5px),linear-gradient(180deg,var(--steel-2),var(--steel-3) 60%,var(--steel-dk))}
+/* brass physical button */
+.cta{position:relative;display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 24px;border-radius:24px;
+  font:800 var(--s-2) var(--f-head);letter-spacing:.12em;text-transform:uppercase;color:var(--brass-ink);text-shadow:0 1px 0 #fff6;
+  background:linear-gradient(180deg,var(--brass-1),var(--brass-2) 52%,#a87a28 53%,var(--brass-2));
+  border:1px solid var(--brass-3);
+  box-shadow:0 1px 0 #fff8 inset,0 -2px 0 #0003 inset,0 4px 0 var(--brass-3),0 7px 12px #000b;transition:transform .08s,box-shadow .08s}
+.cta:hover{filter:brightness(1.07)}
+.cta:active{transform:translateY(3px);box-shadow:0 1px 0 #fff6 inset,0 2px 4px #0006 inset,0 1px 0 var(--brass-3),0 2px 4px #000b}
+.cta.ghost{color:var(--ink-steel);text-shadow:0 -1px 0 #000;border-color:#000;
+  background:repeating-linear-gradient(90deg,#ffffff0d 0 1px,transparent 1px 3px),linear-gradient(180deg,#7a828a,#454c53 52%,#353b41 53%,#4a5158);
+  box-shadow:0 1px 0 #fff5 inset,0 4px 0 #15181b,0 7px 12px #000b}
+.cta.ghost:active{box-shadow:0 2px 4px #0008 inset,0 1px 0 #15181b,0 2px 4px #000b}
+
+/* shell */
+.app{display:grid;grid-template-columns:var(--rail-w) 1fr;grid-template-rows:var(--top-h) 1fr;min-height:100vh}
+.rail{grid-row:1/3;display:flex;flex-direction:column;align-items:stretch;padding:14px 10px;gap:8px;position:sticky;top:0;height:100vh;
+  border-right:2px solid #000;box-shadow:inset -1px 0 0 #ffffff26,6px 0 18px #0009}
+.rail .rivet{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8ecef,#6b7279 60%,#2a2e32);box-shadow:0 1px 1px #000;flex:none;align-self:center}
+.brand{display:grid;place-items:center;height:52px;margin-bottom:6px}
+.brand b{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;font:800 16px var(--f-head);color:var(--brass-ink);text-shadow:0 1px 0 #fff7;
+  background:radial-gradient(circle at 35% 30%,var(--brass-1),var(--brass-2) 55%,var(--brass-3));box-shadow:0 0 0 3px #1b1f23,0 0 0 4px #ffffff30,0 4px 8px #000c,inset 0 -3px 4px #0005}
+.rail-btn{position:relative;display:flex;align-items:center;gap:12px;height:52px;padding:0 16px;border-radius:var(--r);color:#cfd6dc;text-shadow:0 -1px 0 #000;
+  background:linear-gradient(180deg,#5b636a,#3a4046);border:1px solid #111;
+  box-shadow:0 1px 0 #ffffff40 inset,0 3px 0 #111,0 5px 8px #0008;transition:transform .08s,box-shadow .08s}
+.rail-btn svg{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;filter:drop-shadow(0 -1px 0 #000)}
+.rail-btn:hover{color:#fff}
+.rail-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #ffffff30 inset,0 1px 0 #111}
+.rail-btn[aria-current="page"]{color:var(--brass-1);transform:translateY(3px);background:linear-gradient(180deg,#2a2f34,#363c42);
+  box-shadow:0 3px 6px #000d inset,0 -1px 0 #ffffff1a inset,0 0 0 #111}
+.rail-btn[aria-current="page"]::before{content:"";position:absolute;right:7px;top:7px;width:7px;height:7px;border-radius:50%;background:var(--lamp);box-shadow:0 0 6px 2px #ffb34799,inset 0 -1px 1px #a5600f}
+.rail-btn .lbl{position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);padding:5px 12px;font:700 var(--s-2) var(--f-body);color:var(--ink);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:20;
+  background:var(--leather);border:1px solid #000;border-radius:4px;box-shadow:0 4px 10px #000a}
+.rail-btn:hover .lbl,.rail-btn:focus-visible .lbl{opacity:1}
+.rail .sp{flex:1}
+.lbl .short{display:none}
+.topbar{display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:2px solid #000;box-shadow:inset 0 -1px 0 #ffffff1f,0 4px 12px #0008;position:relative;z-index:5}
+.search{flex:1;max-width:440px;display:flex;align-items:center;gap:8px;padding:0 14px;height:40px;border-radius:20px;
+  background:linear-gradient(180deg,#14100c,#241a12);box-shadow:0 2px 5px #000 inset,0 1px 0 #ffffff26}
+.search svg{width:16px;height:16px;stroke:var(--ink-3);fill:none;stroke-width:2;flex:none}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--ink);font:inherit;font-size:var(--s-2)}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus{outline:none}.search:focus-within{box-shadow:0 2px 5px #000 inset,0 0 0 2px var(--lamp)}
+.chip{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:4px;font:600 var(--s-1) var(--f-num);letter-spacing:.06em;text-transform:uppercase;color:#1b1206;white-space:nowrap;
+  background:linear-gradient(180deg,#e9dcc0,#c8b48c);border:1px solid #5a4325;box-shadow:0 1px 0 #fff8 inset,0 2px 3px #000a}
+.chip i{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d6ffd9,#2fae4f 60%,#145b25);box-shadow:0 0 6px #4fd18b}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:var(--s-2);color:var(--ink-steel)}
+.avatar{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;font:800 13px var(--f-head);color:var(--brass-ink);
+  background:radial-gradient(circle at 35% 30%,var(--brass-1),var(--brass-2) 55%,var(--brass-3));box-shadow:0 0 0 2px #1b1f23,0 3px 6px #000c}
+main{padding:26px;min-width:0}
+.view-title{font-size:var(--s-5);margin-bottom:4px}
+.prov{font-size:var(--s-1);color:var(--ink-3);letter-spacing:.03em}
+.prov b{color:var(--ink-2);font-weight:700}
+/* engraved brass provenance plate */
+.plate{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:3px;font:600 var(--s-1) var(--f-num);letter-spacing:.04em;color:#2a1a05;text-shadow:0 1px 0 #fff6;
+  background:linear-gradient(180deg,#ecd08a,#c39540 60%,#b0832f);border:1px solid #5d3f10;box-shadow:0 1px 0 #fff9 inset,0 2px 4px #000c}
+.plate b{color:#1a0f02;font-weight:700}
+.plate::before,.plate::after{content:"";width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c9,#7a5418);box-shadow:0 1px 0 #fff6}
+.dirline{font-size:var(--s-1);color:var(--ink-3);margin:30px 0 0;padding-top:14px;border-top:1px solid #000;box-shadow:inset 0 1px 0 #ffffff14}
+
+/* home: carved stone tablet */
+.banner{position:relative;overflow:hidden;min-height:300px;border-radius:4px;padding:34px;display:flex;flex-direction:column;justify-content:flex-end;
+  background:var(--stone),var(--noise),linear-gradient(160deg,var(--stone-1),var(--stone-2) 60%,var(--stone-dk));background-color:var(--stone-2);
+  border:10px solid transparent;border-image:linear-gradient(180deg,#6b5a40,#3a2c1a 50%,#20170c) 1;
+  box-shadow:inset 0 0 0 1px #000,inset 0 2px 0 #ffffff1c,inset 0 -30px 60px #0008,0 14px 28px #000c}
+.banner::before{content:"";position:absolute;right:9%;top:14%;width:190px;height:190px;transform:rotate(45deg);border-radius:6px;
+  background:radial-gradient(circle at 40% 35%,#9fe6ff,#2a7fb0 45%,#0d2c47 80%);
+  box-shadow:0 0 0 8px #8a6a2c,0 0 0 10px #2a1c08,0 0 0 11px #d9b86a,0 12px 24px #000c,inset 0 0 0 2px #ffffff55,inset -18px -18px 40px #0009,inset 14px 14px 30px #ffffff40}
+.banner::after{content:"";position:absolute;right:calc(9% + 70px);top:calc(14% + 40px);width:46px;height:24px;border-radius:50%;background:#ffffffb3;filter:blur(6px);transform:rotate(-30deg)}
+.banner>*{position:relative;z-index:1;max-width:600px}
+.eyebrow{font:700 var(--s-1) var(--f-num);letter-spacing:.16em;text-transform:uppercase}
+.banner h1{font-size:var(--s-6);font-weight:800;margin:8px 0 10px;color:#d8d2c6;text-shadow:0 -2px 1px #000,0 1px 0 #ffffff33}
+.banner p{margin:0 0 20px;color:#e6dfd2;text-shadow:0 1px 2px #000}
+.banner .row{display:flex;flex-wrap:wrap;gap:12px}
+.home-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:22px;margin-top:22px}
+.card{padding:22px}
+.card h2{font-size:var(--s-4)}
+.sec-h{font:700 var(--s-1) var(--f-num);letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px;color:var(--ink-3);text-shadow:0 1px 0 #ffffff14,0 -1px 0 #0009}
+.updates{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.upd{padding:18px 18px 16px}
+.upd .seal{position:absolute;right:14px;top:-8px;width:26px;height:26px;border-radius:50%;z-index:2;
+  background:radial-gradient(circle at 35% 30%,#e0594f,#9c1f1a 60%,#5a0d0a);box-shadow:0 2px 4px #000c,inset 0 -2px 3px #0006,inset 0 1px 1px #ff9a8f}
+.upd.gold .seal{background:radial-gradient(circle at 35% 30%,var(--brass-1),var(--brass-2) 60%,var(--brass-3))}
+.upd.muted .seal{background:radial-gradient(circle at 35% 30%,#c9cfd4,#6b7279 60%,#2a2e32)}
+.upd time{font:600 var(--s-1) var(--f-num);color:var(--ink-3)}
+.upd h3{font-size:var(--s-3);margin:4px 0 6px}
+.upd p{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+.upd .prov{margin-top:12px}
+.upd p.epic{color:var(--epic);font-weight:700;margin-top:4px}
+.cont{display:flex;flex-direction:column;gap:14px}
+.cont .cta{align-self:flex-start}
+.cont-row{display:flex;gap:14px;align-items:center}
+.crest{width:56px;height:56px;flex:none;display:grid;place-items:center;border-radius:50%;font:800 24px var(--f-head);color:#3a2410;text-shadow:0 1px 0 #ffffff66;
+  background:radial-gradient(circle at 35% 30%,#f0d2a8,#c79c6e 55%,#7a5530);box-shadow:0 0 0 3px #2a1a0e,0 0 0 4px #d4b07a66,0 4px 8px #000c,inset 0 -3px 5px #0005}
+/* recessed readout wells */
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0}
+.mini div{padding:9px 11px;border-radius:5px;background:linear-gradient(180deg,#120c08,#1f160f);box-shadow:inset 0 3px 6px #000,0 1px 0 #ffffff1f}
+.mini dt{font-size:var(--s-1);color:var(--ink-3)}
+.mini dd{margin:0;font-size:var(--s-4);color:#ffe6b8;text-shadow:0 0 8px #ffb34740}
+.mini small{font-size:var(--s-1);color:var(--ink-3);text-shadow:none}
+.warn,.mini dd.warn{color:var(--warn)}
+.note{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+
+/* planner */
+.char-head{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.char-head .cont-row h1{font-size:var(--s-5)}
+/* subtabs: a row of physical keys set in a steel strip */
+.subtabs{display:flex;gap:8px;padding:8px;margin-bottom:20px;border-radius:var(--r);overflow-x:auto;scrollbar-width:thin;box-shadow:inset 0 2px 6px #000c,0 1px 0 #ffffff1a}
+.subtabs button{padding:9px 16px;border-radius:4px;font:700 var(--s-2) var(--f-head);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--ink-2);text-shadow:0 -1px 0 #000;
+  background:var(--grain),linear-gradient(180deg,var(--leather-lt),var(--leather));border:1px solid #000;box-shadow:0 1px 0 #ffffff26 inset,0 3px 0 #120a05,0 4px 6px #0009;transition:transform .08s,box-shadow .08s}
+.subtabs button:hover{color:var(--ink)}
+.subtabs button[aria-selected="true"]{color:var(--brass-1);transform:translateY(3px);background:linear-gradient(180deg,var(--leather-dk),#2f1d11);box-shadow:inset 0 3px 6px #000c,0 0 0 #000}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+.tbl-wrap{overflow-x:auto;padding:16px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:var(--s-2);position:relative;z-index:1}
+th{text-align:left;font:700 var(--s-1) var(--f-num);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:10px 12px;white-space:nowrap;border-bottom:1px solid #000;box-shadow:0 1px 0 #ffffff17;text-shadow:0 1px 0 #ffffff12,0 -1px 0 #000}
+td{padding:8px 12px;vertical-align:middle;border-bottom:1px solid #00000099;box-shadow:0 1px 0 #ffffff0d}
+tr:last-child td{border-bottom:0;box-shadow:none}
+tbody tr:hover td{background:#00000033}
+.slot{white-space:nowrap}
+.item{display:flex;align-items:center;gap:10px;font-weight:700;white-space:nowrap;text-shadow:0 1px 1px #000}
+/* gem socket glyph */
+.ico{width:30px;height:30px;flex:none;display:grid;place-items:center;border-radius:4px;font:600 10px var(--f-num);color:#ecd9ff;text-shadow:0 1px 0 #000;
+  background:radial-gradient(circle at 40% 30%,#5b3a85,var(--epic-plate) 70%);border:2px solid var(--epic);box-shadow:0 0 0 2px #120a05,inset 0 2px 4px #000a,inset 0 -1px 0 #ffffff26}
+.ench{color:var(--ok);white-space:nowrap}
+.src{color:var(--ink-2);min-width:180px}
+.src.none{color:var(--ink-3);font-style:italic}
+.tag{display:inline-block;font:700 10px var(--f-num);letter-spacing:.08em;padding:1px 6px;margin-right:6px;vertical-align:1px;border-radius:2px;color:#2a1a05;text-shadow:0 1px 0 #fff6;
+  background:linear-gradient(180deg,#ecd08a,#b0832f);border:1px solid #5d3f10;font-style:normal}
+.stats{display:flex;flex-direction:column;gap:18px}
+/* steel instrument panel */
+.gauge{position:relative;padding:20px;border-radius:var(--r);border:1px solid #000;box-shadow:0 1px 0 #ffffff33 inset,0 10px 22px #000a}
+.gauge::before,.gauge::after{content:"";position:absolute;top:8px;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8ecef,#6b7279 60%,#2a2e32);box-shadow:0 1px 1px #000}
+.gauge::before{left:8px}.gauge::after{right:8px}
+.gauge .sec-h{color:#eef2f5;text-shadow:0 -1px 0 #000}
+.stat-list{margin:0;padding:4px 12px;border-radius:4px;background:linear-gradient(180deg,#0e1013,#1a1d21);box-shadow:inset 0 3px 6px #000,0 1px 0 #ffffff26}
+.stat-list div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ffffff12}
+.stat-list div:last-child{border-bottom:0}
+.stat-list dt{color:#c9d1d7}.stat-list dd{margin:0;color:#ffe6b8}
+.stat-list dd.warn{color:var(--warn)}
+/* glass tube meter */
+.meter{position:relative;height:16px;border-radius:8px;margin:8px 0 6px;overflow:hidden;background:linear-gradient(180deg,#0b0d10,#1d2126);box-shadow:inset 0 2px 4px #000,0 1px 0 #ffffff33}
+.meter i{display:block;height:100%;width:98.6%;border-radius:8px;background:linear-gradient(180deg,#ffd27a,#e08a1e 60%,#a85b0c)}
+.meter::after{content:"";position:absolute;left:6px;right:6px;top:2px;height:5px;border-radius:4px;background:linear-gradient(180deg,#ffffff70,#ffffff00)}
+.meter b{position:absolute;top:-2px;bottom:-2px;right:0;width:2px;background:#fff;box-shadow:0 0 4px #fff}
+.gauge .note{color:#eef2f5}
+.stub{display:grid;gap:14px}
+.stub .card p{margin:6px 0 0;color:var(--ink-2)}
+.tier-row{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #000;box-shadow:0 1px 0 #ffffff12;position:relative;z-index:1}
+.tier-row:last-child{border-bottom:0;box-shadow:none}
+/* struck coin medallions */
+.coin{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;font:800 var(--s-5) var(--f-head);text-shadow:0 1px 0 #fff7,0 -1px 0 #0005;box-shadow:0 0 0 3px #120a05,0 4px 8px #000c,inset 0 -3px 5px #0006,inset 0 2px 2px #fff8}
+.coin.s{color:#3a2504;background:radial-gradient(circle at 35% 30%,#fff0bf,var(--brass-2) 60%,var(--brass-3))}
+.coin.a{color:#1b1f23;background:radial-gradient(circle at 35% 30%,#f4f7f9,#9aa1a8 60%,#4b5258)}
+.coin.b{color:#2a1408;background:radial-gradient(circle at 35% 30%,#f2c3a0,#b0703f 60%,#5e3416)}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pills span{padding:4px 11px;border-radius:3px;font-size:var(--s-2);background:linear-gradient(180deg,#1a110a,#2a1b10);box-shadow:inset 0 2px 3px #000,0 1px 0 #ffffff1f;color:var(--ink-2)}
+.pills span.me{color:var(--brass-ink);background:linear-gradient(180deg,#ecd08a,#b0832f);box-shadow:0 1px 0 #fff8 inset,0 2px 3px #000a;font-weight:700}
+.leather>*{position:relative;z-index:1}
+.mt{margin-top:18px}
+
+/* wide: labelled rail */
+@media (min-width:1100px){
+  :root{--rail-w:224px}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;box-shadow:none;padding:0;font:700 var(--s-3) var(--f-head);letter-spacing:.04em;color:inherit;pointer-events:auto}
+  .brand{justify-content:start;padding-left:8px}
+}
+@media (max-width:900px){.home-grid,.plan-grid{grid-template-columns:1fr}}
+/* phone: steel bottom bar of keys */
+@media (max-width:640px){
+  :root{--top-h:auto}
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .rail{position:fixed;inset:auto 0 0 0;top:auto;height:auto;flex-direction:row;padding:6px 6px calc(8px + env(safe-area-inset-bottom));border-right:0;border-top:2px solid #000;box-shadow:inset 0 1px 0 #ffffff33,0 -6px 16px #000a;z-index:30;gap:4px}
+  .brand,.rail .sp,.rail .rivet{display:none}
+  .rail-btn{flex:1;flex-direction:column;justify-content:center;gap:2px;height:56px;padding:0;min-width:0}
+  .rail-btn[aria-current="page"]::before{right:5px;top:5px;width:6px;height:6px}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;box-shadow:none;padding:0;font-size:10px;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .rail-btn .lbl .short{display:inline}
+  .rail-btn .lbl .full{display:none}
+  .topbar{flex-wrap:wrap;padding:10px 16px;gap:10px;padding-top:calc(10px + env(safe-area-inset-top))}
+  .search{order:3;flex-basis:100%;max-width:none}
+  main{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
+  .banner{padding:20px;min-height:360px;border-width:7px}
+  .banner::before{width:96px;height:96px;right:14px;top:22px;box-shadow:0 0 0 5px #8a6a2c,0 0 0 6px #2a1c08,0 0 0 7px #d9b86a,0 8px 16px #000c,inset -10px -10px 24px #0009,inset 8px 8px 18px #ffffff40}
+  .banner::after{display:none}
+  .banner h1{font-size:1.65rem}
+  .card,.upd{padding:18px}
+  .mini{gap:6px}.mini div{padding:8px}
+  .mini dd{font-size:var(--s-3)}
+  .tbl-wrap{padding:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail steel" aria-label="Sections">
+    <div class="brand" aria-hidden="true"><b>PD</b></div>
+    <button class="rail-btn" data-view="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg><span class="lbl"><span class="full">Home</span><span class="short">Home</span></span></button>
+    <button class="rail-btn" data-view="planner"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7.5-7 9-4-1.5-7-5-7-9V6z"/></svg><span class="lbl"><span class="full">Character Planner</span><span class="short">Planner</span></span></button>
+    <button class="rail-btn" data-view="sim"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg><span class="lbl"><span class="full">Simulation</span><span class="short">Sim</span></span></button>
+    <button class="rail-btn" data-view="comp"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 20c0-3 2-5 4-5s6 2 6 5"/></svg><span class="lbl"><span class="full">Raid Composition</span><span class="short">Comp</span></span></button>
+    <button class="rail-btn" data-view="tiers"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h11M4 15h7M4 20h4"/></svg><span class="lbl"><span class="full">Spec Tier Lists</span><span class="short">Tiers</span></span></button>
+    <button class="rail-btn" data-view="raids"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/></svg><span class="lbl"><span class="full">Raids</span><span class="short">Raids</span></span></button>
+    <button class="rail-btn" data-view="prof"><svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM11 7L3 15v6h6l8-8"/></svg><span class="lbl"><span class="full">Professions</span><span class="short">Profs</span></span></button>
+    <div class="sp"></div>
+    <span class="rivet" aria-hidden="true"></span>
+  </nav>
+
+  <header class="topbar steel">
+    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Search</span><input type="search" placeholder="Search items, bosses, specs"></label>
+    <span class="chip"><i></i>TBC Classic · Phase 2</span>
+    <div class="who"><span class="emboss">Alliance</span><span class="avatar" aria-hidden="true">HW</span></div>
+  </header>
+
+  <main id="main">
+    <section id="v-home" aria-labelledby="h-home">
+      <h1 id="h-home" class="sr">Home</h1>
+      <div class="banner">
+        <span class="eyebrow gilt">Now live · Content update</span>
+        <h1>Phase 2: Serpentshrine Cavern &amp; Tempest Keep</h1>
+        <p>Tier 5 drops from Lady Vashj and Kael'thas Sunstrider. Every Phase 1 raid stays open: Karazhan, Gruul's Lair, Magtheridon's Lair.</p>
+        <div class="row"><button class="cta" data-go="planner">Open planner</button><button class="cta ghost" data-go="raids">Browse raids</button></div>
+      </div>
+      <div class="home-grid">
+        <div class="card cont leather">
+          <p class="sec-h">Continue</p>
+          <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h2 class="emboss">Human Fury Warrior</h2><p class="prov">Alliance · Level 70 · Phase 2 set · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+          <dl class="mini">
+            <div><dt>Attack Power</dt><dd class="num">1,788</dd></div>
+            <div><dt>Hit Rating</dt><dd class="num warn">140<small>/142</small></dd></div>
+            <div><dt>Crit Rating</dt><dd class="num">536</dd></div>
+          </dl>
+          <p class="note">2 hit rating under the 142 cap (9%) for dual-wield specials.</p>
+          <button class="cta" data-go="planner">Continue planning</button>
+          <p class="prov">Last edited 2 Oct · Gear tab</p>
+        </div>
+        <div><p class="sec-h">Updates</p><div class="updates">
+          <article class="upd leather"><span class="seal" aria-hidden="true"></span><time datetime="2026-09-12">12 Sep 2026</time><h3 class="emboss">Tier lists refreshed for Phase 2</h3><p>Fury Warrior holds S tier alongside Arcane Mage, Destruction Warlock and Beast Mastery Hunter.</p><p class="prov">Wowhead · Phase 2</p></article>
+          <article class="upd leather gold"><span class="seal" aria-hidden="true"></span><time datetime="2026-09-08">8 Sep 2026</time><h3 class="emboss">T5 tokens mapped to bosses</h3><p>Destroyer pieces now show their token source: Lady Vashj, Leotheras the Blind, Kael'thas Sunstrider.</p><p class="prov">Planner data</p></article>
+          <article class="upd leather"><span class="seal" aria-hidden="true"></span><time datetime="2026-09-01">1 Sep 2026</time><h3 class="emboss">Badge of Justice vendor</h3><p>Badge rewards listed per item, e.g. Necklace of Eternal Hope for 25x Badge of Justice.</p><p class="prov">Raids · Vendors</p></article>
+          <article class="upd leather muted"><span class="seal" aria-hidden="true"></span><time datetime="2026-08-24">24 Aug 2026</time><h3 class="emboss">Sim boss fixed at 7,700 armor</h3><p>Estimated DPS now runs against a level 73 target with 7,700 armor.</p><p class="prov">Simulation</p></article>
+        </div></div>
+      </div>
+    </section>
+
+    <section id="v-planner" aria-labelledby="h-planner" hidden>
+      <div class="char-head">
+        <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h1 id="h-planner" class="emboss">Human Fury Warrior</h1><p class="prov">Alliance · Level 70 · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+        <p class="plate"><b>Wowhead</b> · Phase 2 · updated 12 Sep</p>
+      </div>
+      <div class="subtabs steel" role="tablist" aria-label="Planner">
+        <button role="tab" aria-selected="true" aria-controls="p-gear" id="t-gear">Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-compare" id="t-compare" tabindex="-1">Compare</button>
+        <button role="tab" aria-selected="false" aria-controls="p-talents" id="t-talents" tabindex="-1">Talents</button>
+        <button role="tab" aria-selected="false" aria-controls="p-buffs" id="t-buffs" tabindex="-1">Buffs</button>
+        <button role="tab" aria-selected="false" aria-controls="p-ranked" id="t-ranked" tabindex="-1">Ranked Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-build" id="t-build" tabindex="-1">Build</button>
+      </div>
+      <div id="p-gear" role="tabpanel" aria-labelledby="t-gear" class="plan-grid">
+        <div class="tbl-wrap leather"><table>
+          <caption class="sr">Equipped gear, 17 slots</caption>
+          <thead><tr><th scope="col">Slot</th><th scope="col">Item</th><th scope="col">Enchant</th><th scope="col">Source</th></tr></thead>
+          <tbody id="gear"></tbody>
+        </table></div>
+        <aside class="stats">
+          <div class="gauge steel">
+            <p class="sec-h">Melee stats</p>
+            <dl class="stat-list">
+              <div><dt>Attack Power</dt><dd class="num">1,788</dd></div>
+              <div><dt>Hit Rating</dt><dd class="num warn">140</dd></div>
+              <div><dt>Crit Rating</dt><dd class="num">536</dd></div>
+              <div><dt>Haste Rating</dt><dd class="num">163</dd></div>
+              <div><dt>Expertise</dt><dd class="num">64</dd></div>
+              <div><dt>Armor Pen</dt><dd class="num">0</dd></div>
+            </dl>
+          </div>
+          <div class="gauge steel">
+            <p class="sec-h">Hit cap · dual-wield specials</p>
+            <div class="meter" role="img" aria-label="140 of 142 hit rating"><i></i><b></b></div>
+            <p class="note"><span class="num">140 / 142</span> rating (9%). 2 rating under the cap.</p>
+          </div>
+          <p class="prov">Stats from the planner · Phase 2 · boss level 73</p>
+        </aside>
+      </div>
+      <div id="p-compare" role="tabpanel" aria-labelledby="t-compare" class="stub" hidden><div class="card leather"><h2 class="emboss">Compare</h2><p>Pick a slot to compare two items side by side, e.g. Dragonspine Trophy against Badge of the Swarmguard.</p></div></div>
+      <div id="p-talents" role="tabpanel" aria-labelledby="t-talents" class="stub" hidden><div class="card leather"><h2 class="emboss">Talents</h2><p>Fury talent tree. Sketch only in this prototype.</p></div></div>
+      <div id="p-buffs" role="tabpanel" aria-labelledby="t-buffs" class="stub" hidden><div class="card leather"><h2 class="emboss">Buffs</h2><p>Raid buffs, debuffs and consumables applied to the stats above.</p></div></div>
+      <div id="p-ranked" role="tabpanel" aria-labelledby="t-ranked" class="stub" hidden><div class="card leather"><h2 class="emboss">Ranked Gear</h2><p>Per-slot rankings for Fury Warrior.</p><p><span class="plate"><b>Wowhead</b> · Phase 2 · updated 12 Sep</span></p></div></div>
+      <div id="p-build" role="tabpanel" aria-labelledby="t-build" class="stub" hidden><div class="card leather"><h2 class="emboss">Build</h2><p>Save, load and share this set.</p></div></div>
+    </section>
+
+    <section id="v-sim" aria-labelledby="h-sim" hidden>
+      <h1 id="h-sim" class="view-title emboss">Simulation</h1>
+      <p class="prov">Estimated DPS · fixed boss: level 73, <span class="num">7,700</span> armor</p>
+      <div class="stub mt"><div class="card leather"><h2 class="emboss">Human Fury Warrior</h2><p>Runs the planner set above against the fixed target. Sketch only in this prototype.</p><p><button class="cta" data-go="planner">Review gear first</button></p></div></div>
+    </section>
+
+    <section id="v-comp" aria-labelledby="h-comp" hidden>
+      <h1 id="h-comp" class="view-title emboss">Raid Composition</h1>
+      <p class="prov">Seat 10 or 25 players and see which buffs each group gets.</p>
+      <div class="stub mt"><div class="card leather"><h2 class="emboss">25-player · 5 groups</h2><p>Drag players into groups. Sketch only in this prototype.</p></div></div>
+    </section>
+
+    <section id="v-tiers" aria-labelledby="h-tiers" hidden>
+      <h1 id="h-tiers" class="view-title emboss">Spec Tier Lists</h1>
+      <p class="plate"><b>Wowhead</b> · Phase 2 · DPS · updated 12 Sep</p>
+      <div class="card leather mt">
+        <div class="tier-row"><b class="coin s">S</b><div class="pills"><span>Arcane Mage</span><span>Destruction Warlock</span><span>Beast Mastery Hunter</span><span class="me">Fury Warrior</span></div></div>
+        <div class="tier-row"><b class="coin a">A</b><div class="pills"><span>Arms Warrior</span><span>Enhancement Shaman</span><span>Affliction Warlock</span><span>Survival Hunter</span></div></div>
+        <div class="tier-row"><b class="coin b">B</b><div class="pills"><span>Retribution Paladin</span><span>Combat Rogue</span><span>Shadow Priest</span><span>Elemental Shaman</span><span>Balance Druid</span><span>Fire Mage</span></div></div>
+      </div>
+    </section>
+
+    <section id="v-raids" aria-labelledby="h-raids" hidden>
+      <h1 id="h-raids" class="view-title emboss">Raids</h1>
+      <p class="prov">Phase 1: Karazhan, Gruul's Lair, Magtheridon's Lair · Phase 2: Serpentshrine Cavern, Tempest Keep</p>
+      <div class="updates mt">
+        <article class="upd leather gold"><span class="seal" aria-hidden="true"></span><h3 class="emboss">Karazhan · Attumen the Huntsman</h3><p class="epic">Steelhawk Crossbow</p><p class="epic">Worgen Claw Necklace</p><p class="epic">Gloves of Saintly Blessings</p></article>
+        <article class="upd leather gold"><span class="seal" aria-hidden="true"></span><h3 class="emboss">Karazhan · Moroes</h3><p class="epic">Emerald Ripper</p><p class="epic">Brooch of Unquenchable Fury</p><p class="epic">Royal Cloak of Arathi Kings</p></article>
+        <article class="upd leather"><span class="seal" aria-hidden="true"></span><h3 class="emboss">Badge of Justice vendor</h3><p class="epic">Necklace of Eternal Hope</p><p class="num">25x Badge of Justice</p></article>
+      </div>
+    </section>
+
+    <section id="v-prof" aria-labelledby="h-prof" hidden>
+      <h1 id="h-prof" class="view-title emboss">Professions</h1>
+      <p class="prov">Levelling guides 1–375 · farming maps</p>
+      <div class="card leather mt"><p class="sec-h">Mining</p><h2 class="emboss">Fel Iron Deposit</h2><p class="note">Skill <span class="num">300</span> · Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</p></div>
+    </section>
+    <p class="dirline">Variant 05-B · Launcher in Skeuomorphism: tooled leather, brushed steel and carved stone, after the Battle.net app, Riot Client and GOG GALAXY (research T1, T2, T4, T10, R4). Prototype only, not the live app.</p>
+  </main>
+</div>
+<script>
+const rail=[...document.querySelectorAll('.rail-btn')];
+function go(v){
+  document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='v-'+v);
+  rail.forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  window.scrollTo(0,0);
+}
+rail.forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
+const G=[
+ ['Head','Destroyer Battle-Helm','Glyph of Ferocity','Lady Vashj, Serpentshrine Cavern',1],
+ ['Neck','Pendant of the Perilous','','Karazhan'],
+ ['Shoulders','Destroyer Shoulderblades','Might of the Scourge',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Back','Black-Iron Battlecloak','Greater Agility',''],
+ ['Chest','Destroyer Breastplate','Exceptional Stats',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Wrists','Bracers of Eradication','Brawn',''],
+ ['Hands','Destroyer Gauntlets','Major Strength','Leotheras the Blind, Serpentshrine Cavern',1],
+ ['Waist','Belt of One-Hundred Deaths','',''],
+ ['Legs','Leggings of Murderous Intent','Nethercobra Leg Armor',''],
+ ['Feet','Warboots of Obliteration',"Cat's Swiftness",''],
+ ['Finger 1','Band of the Ranger-General','',"Kael'thas Sunstrider, Tempest Keep"],
+ ['Finger 2','Ring of Reciprocity','',''],
+ ['Trinket 1','Dragonspine Trophy','',"Gruul the Dragonkiller, Gruul's Lair"],
+ ['Trinket 2','Badge of the Swarmguard','',''],
+ ['Main Hand','Dragonstrike','Mongoose',''],
+ ['Off Hand','Talon of Azshara','Mongoose',''],
+ ['Ranged','Serpent Spine Longbow','Khorium Scope','']];
+const ini=s=>s.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('gear').innerHTML=G.map(([s,i,e,src,t])=>`<tr><td class="slot deboss">${s}</td><td><span class="item epic"><span class="ico" aria-hidden="true">${ini(s)}</span>${i}</span></td><td class="ench">${e||'<span class="prov">—</span>'}</td><td class="src${src?'':' none'}">${t?'<span class="tag">T5</span>':''}${src||'source in guide'}</td></tr>`).join('');
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function sel(t){tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});t.focus()}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>sel(t));t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d){e.preventDefault();sel(tabs[(i+d+tabs.length)%tabs.length])}})});
+document.querySelector('.search input').addEventListener('keydown',e=>{if(e.key==='Enter')go('planner')});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
+</script>
+</body>
+</html>

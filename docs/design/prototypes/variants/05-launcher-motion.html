@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Launcher · Animation / Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0f17; --rail:#070a10; --panel:#121927; --panel-2:#182234; --line:#24314a; --line-2:#33445f;
+  --ink:#e8edf6; --ink-2:#a9b5c8; --ink-3:#8593a9;
+  --accent:#2f9bff; --accent-ink:#06121f; --gold:#e6b34a; --ok:#4fd18b; --warn:#f0a03c;
+  --epic:#b866ff; --rare:#3a9bff; --unc:#1eff00; --leg:#ff8000;
+  --f-head:"Rajdhani","Arial Narrow","Segoe UI",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --s-1:.75rem; --s-2:.875rem; --s-3:1rem; --s-4:1.25rem; --s-5:1.6rem; --s-6:2.4rem;
+  --rail-w:76px; --top-h:60px; --r:4px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 var(--s-3)/1.5 var(--f-body);min-height:100vh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-head);font-weight:700;letter-spacing:.02em;margin:0;line-height:1.15}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.epic{color:var(--epic)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* shell */
+.app{display:grid;grid-template-columns:var(--rail-w) 1fr;grid-template-rows:var(--top-h) 1fr;min-height:100vh}
+.rail{grid-row:1/3;background:var(--rail);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:stretch;padding:10px 8px;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:grid;place-items:center;height:44px;margin-bottom:10px}
+.brand b{display:grid;place-items:center;width:38px;height:38px;border:2px solid var(--gold);transform:rotate(45deg);font:700 15px var(--f-head);color:var(--gold)}
+.brand b span{transform:rotate(-45deg)}
+.rail-btn{position:relative;display:flex;align-items:center;gap:12px;height:48px;padding:0 15px;border-radius:var(--r);color:var(--ink-3);border-left:3px solid transparent}
+.rail-btn svg{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
+.rail-btn:hover{color:var(--ink);background:var(--panel)}
+.rail-btn[aria-current="page"]{color:var(--ink);background:var(--panel-2);border-left-color:var(--accent)}
+.rail-btn .lbl{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--panel-2);border:1px solid var(--line-2);padding:4px 10px;font:600 var(--s-2) var(--f-body);color:var(--ink);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:20}
+.rail-btn:hover .lbl,.rail-btn:focus-visible .lbl{opacity:1}
+.rail .sp{flex:1}
+.lbl .short{display:none}
+.topbar{display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--line);background:linear-gradient(#0e1420,var(--bg))}
+.search{flex:1;max-width:420px;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);padding:0 12px;height:38px;border-radius:var(--r)}
+.search svg{width:16px;height:16px;stroke:var(--ink-3);fill:none;stroke-width:2;flex:none}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--ink);font:inherit;font-size:var(--s-2)}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus{outline:none}.search:focus-within{border-color:var(--accent)}
+.chip{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border:1px solid var(--line-2);border-radius:999px;font:600 var(--s-1) var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px #4fd18b33}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:var(--s-2);color:var(--ink-2)}
+.avatar{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);font:700 13px var(--f-head)}
+main{padding:24px;min-width:0}
+.view-title{font-size:var(--s-5);margin-bottom:4px}
+.prov{font-size:var(--s-1);color:var(--ink-3);letter-spacing:.03em}
+.prov b{color:var(--ink-2);font-weight:600}
+.dirline{font-size:var(--s-1);color:var(--ink-3);margin:28px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+
+/* home */
+.banner{position:relative;overflow:hidden;min-height:300px;border:1px solid var(--line-2);border-radius:var(--r);padding:32px;display:flex;flex-direction:column;justify-content:flex-end;
+  --gx:0px;
+  background:linear-gradient(115deg,#071526 0%,#0b2a44 45%,#123b5c 70%,#1b1236 100%)}
+/* living background: real elements (not pseudo) so GSAP can drift them; static positions match the base */
+.drift{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.drift .glow{position:absolute;border-radius:50%;filter:blur(2px)}
+.drift .g1{left:58%;top:0;width:40%;height:60%;background:radial-gradient(closest-side,#3fd3ff55,transparent)}
+.drift .g2{left:77%;top:47%;width:30%;height:45%;background:radial-gradient(closest-side,#a45cff44,transparent)}
+.drift .g3{left:30%;top:-10%;width:26%;height:40%;background:radial-gradient(closest-side,#2f9bff26,transparent)}
+.drift .rune{position:absolute;right:8%;top:12%;width:220px;height:220px;border:2px solid #7fe3ff66;transform:rotate(45deg);box-shadow:0 0 60px #3fd3ff44, inset 0 0 40px #3fd3ff33}
+.drift .rune::after{content:"";position:absolute;inset:26px;border:1px solid #7fe3ff33}
+.drift .shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,#05080ee6 100%)}
+.banner::after{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:46%;background:repeating-linear-gradient(90deg,#0e3a55 0 2px,transparent 2px 38px);background-position:var(--gx) 0;opacity:.25;-webkit-mask:linear-gradient(transparent,#000);mask:linear-gradient(transparent,#000)}
+.banner>:not(.drift){position:relative;z-index:1;max-width:620px}
+.eyebrow{font:700 var(--s-1) var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.banner h1{font-size:var(--s-6);margin:8px 0 10px}
+.banner p{margin:0 0 18px;color:var(--ink-2)}
+.cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;background:var(--accent);color:var(--accent-ink);font:700 var(--s-3) var(--f-head);letter-spacing:.08em;text-transform:uppercase;border-radius:var(--r)}
+.cta:hover{background:#5cb2ff}
+.cta.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.home-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:20px;margin-top:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h2{font-size:var(--s-4)}
+.sec-h{font:700 var(--s-1) var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.updates{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.upd{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r);padding:14px}
+.upd time{font:500 var(--s-1) var(--f-num);color:var(--ink-3)}
+.upd h3{font-size:var(--s-3);margin:4px 0 6px}
+.upd p{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+.upd .prov{margin-top:10px;color:var(--ink-3)}
+.upd p.epic{color:var(--epic);font-weight:600;margin-top:4px}
+.upd.gold{border-top-color:var(--gold)}.upd.muted{border-top-color:var(--line-2)}
+.cont{display:flex;flex-direction:column;gap:12px;border-left:3px solid var(--gold)}
+.cont .cta{align-self:flex-start}
+.cont-row{display:flex;gap:12px;align-items:center}
+.crest{width:52px;height:52px;flex:none;display:grid;place-items:center;font:700 22px var(--f-head);color:#c79c6e;border:2px solid #c79c6e;background:linear-gradient(135deg,#2a1d12,#121927)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0}
+.mini div{background:var(--panel-2);padding:8px 10px;border-radius:var(--r)}
+.mini dt{font-size:var(--s-1);color:var(--ink-3)}
+.mini dd{margin:0;font-size:var(--s-4)}
+.mini small{font-size:var(--s-1);color:var(--ink-3)}
+.warn{color:var(--warn)}
+.note{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+
+/* planner */
+.char-head{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.char-head .cont-row h1{font-size:var(--s-5)}
+.subtabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto;scrollbar-width:thin}
+.subtabs button{padding:10px 16px;font:600 var(--s-3) var(--f-head);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border-bottom:3px solid transparent;white-space:nowrap}
+.subtabs button:hover{color:var(--ink)}
+.subtabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:var(--s-2)}
+th{text-align:left;font:700 var(--s-1) var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel-2);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#18223466}
+.slot{color:var(--ink-3);white-space:nowrap}
+.item{display:flex;align-items:center;gap:10px;font-weight:600;white-space:nowrap}
+.ico{width:28px;height:28px;flex:none;display:grid;place-items:center;border:1px solid var(--epic);background:#1e1430;font:700 10px var(--f-num);color:#d9b8ff}
+.ench{color:var(--ok);white-space:nowrap}
+.src{color:var(--ink-2);min-width:180px}
+.src.none{color:var(--ink-3);font-style:italic}
+.tag{display:inline-block;font:700 10px var(--f-body);letter-spacing:.08em;padding:1px 6px;border:1px solid var(--gold);color:var(--gold);margin-right:6px;vertical-align:1px}
+.stats{display:flex;flex-direction:column;gap:16px}
+.stat-list{margin:0}
+.stat-list div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.stat-list dt{color:var(--ink-2)}.stat-list dd{margin:0}
+.meter{height:8px;background:var(--panel-2);border-radius:4px;overflow:hidden;margin:8px 0 4px}
+.meter i{display:block;height:100%;width:98.6%;background:linear-gradient(90deg,var(--accent),var(--warn))}
+.stub{display:grid;gap:12px}
+.stub .card p{margin:6px 0 0;color:var(--ink-2)}
+.tier-row{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.tier-row b{display:grid;place-items:center;height:40px;font:700 var(--s-5) var(--f-head);color:var(--accent-ink);border-radius:var(--r)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills span{padding:4px 10px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;font-size:var(--s-2)}
+.pills span.me{border-color:var(--gold);color:var(--gold)}
+
+/* wide: labelled rail */
+@media (min-width:1100px){
+  :root{--rail-w:208px}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;padding:0;font:600 var(--s-3) var(--f-head);letter-spacing:.04em;color:inherit;pointer-events:auto}
+  .brand{justify-content:start;padding-left:10px}
+}
+/* tablet */
+@media (max-width:900px){
+  .home-grid,.plan-grid{grid-template-columns:1fr}
+}
+/* phone: rail becomes bottom bar */
+@media (max-width:640px){
+  :root{--top-h:auto}
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .rail{position:fixed;inset:auto 0 0 0;top:auto;height:auto;flex-direction:row;padding:4px 4px calc(4px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);z-index:30;gap:0}
+  .brand,.rail .sp{display:none}
+  .rail-btn{flex:1;flex-direction:column;justify-content:center;gap:2px;height:56px;padding:0;border-left:0;border-top:3px solid transparent;min-width:0}
+  .rail-btn[aria-current="page"]{border-top-color:var(--accent)}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;padding:0;font-size:10px;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .rail-btn .lbl .short{display:inline}
+  .rail-btn .lbl .full{display:none}
+  .topbar{flex-wrap:wrap;padding:10px 16px;gap:10px;padding-top:calc(10px + env(safe-area-inset-top))}
+  .search{order:3;flex-basis:100%;max-width:none}
+  main{padding:16px 16px calc(88px + env(safe-area-inset-bottom))}
+  .banner{padding:20px;min-height:340px}
+  .drift .rune{width:120px;height:120px;right:-20px;top:20px}
+  .drift .rune::after{inset:14px}
+  .banner h1{font-size:1.75rem}
+  .mini dd{font-size:var(--s-3)}
+}
+/* ---------- motion layer ---------- */
+:root{--ease-out:cubic-bezier(.22,1,.36,1)}
+/* sliding indicators: only take over from the CSS borders once the script has placed them */
+.ind{position:absolute;top:0;left:0;width:3px;height:3px;display:none;background:var(--accent);pointer-events:none;z-index:2;box-shadow:0 0 12px #2f9bff88}
+.rail.has-ind .ind,.subtabs.has-ind .ind{display:block}
+.rail.has-ind .rail-btn[aria-current="page"]{border-left-color:transparent;border-top-color:transparent}
+.subtabs{position:relative}
+.subtabs.has-ind button[aria-selected="true"]{border-bottom-color:transparent}
+.motion-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border:1px solid var(--line-2);border-radius:999px;font:600 var(--s-1) var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.motion-btn:hover{color:var(--ink);border-color:var(--accent)}
+.motion-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.motion-btn[aria-pressed="false"] .wave{opacity:.3}
+.motion-btn[hidden]{display:none}
+.cta{position:relative;overflow:hidden;isolation:isolate}
+.cta::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 30%,#ffffff55 50%,transparent 70%);transform:translateX(-120%)}
+.cta.ghost::after{background:linear-gradient(105deg,transparent 30%,#2f9bff33 50%,transparent 70%)}
+/* hover micro-interactions: only when the visitor allows motion and the toggle is on */
+@media (prefers-reduced-motion:no-preference){
+  :root:not(.no-motion) .card,:root:not(.no-motion) .upd{transition:translate .35s var(--ease-out),box-shadow .35s var(--ease-out),border-color .25s}
+  :root:not(.no-motion) .upd:hover,:root:not(.no-motion) .home-grid .card:hover{translate:0 -3px;box-shadow:0 10px 28px -12px #000c,0 0 0 1px var(--line-2)}
+  :root:not(.no-motion) .cta{transition:translate .2s var(--ease-out),scale .2s var(--ease-out),background-color .2s}
+  :root:not(.no-motion) .cta:hover{translate:0 -1px}
+  :root:not(.no-motion) .cta:active{translate:0 0;scale:.97}
+  :root:not(.no-motion) .cta::after{transition:transform .6s var(--ease-out)}
+  :root:not(.no-motion) .cta:hover::after{transform:translateX(120%)}
+  :root:not(.no-motion) .rail-btn svg{transition:transform .3s var(--ease-out)}
+  :root:not(.no-motion) .rail-btn:hover svg{transform:translateX(2px) scale(1.1)}
+  :root:not(.no-motion) .ico{transition:transform .25s var(--ease-out),box-shadow .25s}
+  :root:not(.no-motion) tbody tr:hover .ico{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 12px #b866ff66}
+  :root:not(.no-motion) .pills span{transition:translate .2s var(--ease-out),border-color .2s}
+  :root:not(.no-motion) .pills span:hover{translate:0 -2px;border-color:var(--line-2)}
+  :root:not(.no-motion) .subtabs button,:root:not(.no-motion) .rail-btn{transition:color .2s,background-color .2s}
+  :root:not(.no-motion) .crest{transition:transform .4s var(--ease-out)}
+  :root:not(.no-motion) .cont-row:hover .crest{transform:rotate(-6deg) scale(1.05)}
+}
+:root.no-motion *{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Sections">
+    <div class="brand" aria-hidden="true"><b><span>PD</span></b></div>
+    <button class="rail-btn" data-view="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg><span class="lbl"><span class="full">Home</span><span class="short">Home</span></span></button>
+    <button class="rail-btn" data-view="planner"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7.5-7 9-4-1.5-7-5-7-9V6z"/></svg><span class="lbl"><span class="full">Character Planner</span><span class="short">Planner</span></span></button>
+    <button class="rail-btn" data-view="sim"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg><span class="lbl"><span class="full">Simulation</span><span class="short">Sim</span></span></button>
+    <button class="rail-btn" data-view="comp"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 20c0-3 2-5 4-5s6 2 6 5"/></svg><span class="lbl"><span class="full">Raid Composition</span><span class="short">Comp</span></span></button>
+    <button class="rail-btn" data-view="tiers"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h11M4 15h7M4 20h4"/></svg><span class="lbl"><span class="full">Spec Tier Lists</span><span class="short">Tiers</span></span></button>
+    <button class="rail-btn" data-view="raids"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/></svg><span class="lbl"><span class="full">Raids</span><span class="short">Raids</span></span></button>
+    <button class="rail-btn" data-view="prof"><svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM11 7L3 15v6h6l8-8"/></svg><span class="lbl"><span class="full">Professions</span><span class="short">Profs</span></span></button>
+    <div class="sp"></div>
+    <span class="ind" aria-hidden="true"></span>
+  </nav>
+
+  <header class="topbar">
+    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Search</span><input type="search" placeholder="Search items, bosses, specs"></label>
+    <span class="chip"><i></i>TBC Classic · Phase 2</span>
+    <button class="motion-btn" type="button" aria-pressed="true" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"/><path class="wave" d="M9 6c3 4 3 8 0 12M14 4c4 5 4 11 0 16"/></svg><span class="mlbl">Motion on</span></button>
+    <div class="who"><span>Alliance</span><span class="avatar" aria-hidden="true">HW</span></div>
+  </header>
+
+  <main id="main">
+    <section id="v-home" aria-labelledby="h-home">
+      <h1 id="h-home" class="sr">Home</h1>
+      <div class="banner">
+        <div class="drift" aria-hidden="true"><span class="glow g3"></span><span class="glow g1"></span><span class="glow g2"></span><span class="shade"></span><span class="rune"></span></div>
+        <span class="eyebrow">Now live · Content update</span>
+        <h1>Phase 2: Serpentshrine Cavern &amp; Tempest Keep</h1>
+        <p>Tier 5 drops from Lady Vashj and Kael'thas Sunstrider. Every Phase 1 raid stays open: Karazhan, Gruul's Lair, Magtheridon's Lair.</p>
+        <div><button class="cta" data-go="planner">Open planner</button> <button class="cta ghost" data-go="raids">Browse raids</button></div>
+      </div>
+      <div class="home-grid">
+        <div class="card cont">
+          <p class="sec-h">Continue</p>
+          <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h2>Human Fury Warrior</h2><p class="prov">Alliance · Level 70 · Phase 2 set · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+          <dl class="mini">
+            <div><dt>Attack Power</dt><dd class="num" data-count="1788">1,788</dd></div>
+            <div><dt>Hit Rating</dt><dd class="num warn"><span data-count="140">140</span><small>/142</small></dd></div>
+            <div><dt>Crit Rating</dt><dd class="num" data-count="536">536</dd></div>
+          </dl>
+          <p class="note">2 hit rating under the 142 cap (9%) for dual-wield specials.</p>
+          <button class="cta" data-go="planner">Continue planning</button>
+          <p class="prov">Last edited 2 Oct · Gear tab</p>
+        </div>
+        <div><p class="sec-h">Updates</p><div class="updates">
+          <article class="upd"><time datetime="2026-09-12">12 Sep 2026</time><h3>Tier lists refreshed for Phase 2</h3><p>Fury Warrior holds S tier alongside Arcane Mage, Destruction Warlock and Beast Mastery Hunter.</p><p class="prov">Wowhead · Phase 2</p></article>
+          <article class="upd gold"><time datetime="2026-09-08">8 Sep 2026</time><h3>T5 tokens mapped to bosses</h3><p>Destroyer pieces now show their token source: Lady Vashj, Leotheras the Blind, Kael'thas Sunstrider.</p><p class="prov">Planner data</p></article>
+          <article class="upd"><time datetime="2026-09-01">1 Sep 2026</time><h3>Badge of Justice vendor</h3><p>Badge rewards listed per item, e.g. Necklace of Eternal Hope for 25x Badge of Justice.</p><p class="prov">Raids · Vendors</p></article>
+          <article class="upd muted"><time datetime="2026-08-24">24 Aug 2026</time><h3>Sim boss fixed at 7,700 armor</h3><p>Estimated DPS now runs against a level 73 target with 7,700 armor.</p><p class="prov">Simulation</p></article>
+        </div></div>
+      </div>
+    </section>
+    <section id="v-planner" aria-labelledby="h-planner" hidden>
+      <div class="char-head">
+        <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h1 id="h-planner">Human Fury Warrior</h1><p class="prov">Alliance · Level 70 · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+        <p class="prov"><b>Wowhead</b> · Phase 2 · updated 12 Sep</p>
+      </div>
+      <div class="subtabs" role="tablist" aria-label="Planner">
+        <button role="tab" aria-selected="true" aria-controls="p-gear" id="t-gear">Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-compare" id="t-compare" tabindex="-1">Compare</button>
+        <button role="tab" aria-selected="false" aria-controls="p-talents" id="t-talents" tabindex="-1">Talents</button>
+        <button role="tab" aria-selected="false" aria-controls="p-buffs" id="t-buffs" tabindex="-1">Buffs</button>
+        <button role="tab" aria-selected="false" aria-controls="p-ranked" id="t-ranked" tabindex="-1">Ranked Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-build" id="t-build" tabindex="-1">Build</button>
+        <span class="ind" aria-hidden="true"></span>
+      </div>
+      <div id="p-gear" role="tabpanel" aria-labelledby="t-gear" class="plan-grid">
+        <div class="tbl-wrap"><table>
+          <caption class="sr">Equipped gear, 17 slots</caption>
+          <thead><tr><th scope="col">Slot</th><th scope="col">Item</th><th scope="col">Enchant</th><th scope="col">Source</th></tr></thead>
+          <tbody id="gear"></tbody>
+        </table></div>
+        <aside class="stats">
+          <div class="card">
+            <p class="sec-h">Melee stats</p>
+            <dl class="stat-list">
+              <div><dt>Attack Power</dt><dd class="num" data-count="1788">1,788</dd></div>
+              <div><dt>Hit Rating</dt><dd class="num warn" data-count="140">140</dd></div>
+              <div><dt>Crit Rating</dt><dd class="num" data-count="536">536</dd></div>
+              <div><dt>Haste Rating</dt><dd class="num" data-count="163">163</dd></div>
+              <div><dt>Expertise</dt><dd class="num" data-count="64">64</dd></div>
+              <div><dt>Armor Pen</dt><dd class="num">0</dd></div>
+            </dl>
+          </div>
+          <div class="card">
+            <p class="sec-h">Hit cap · dual-wield specials</p>
+            <div class="meter" role="img" aria-label="140 of 142 hit rating"><i></i></div>
+            <p class="note"><span class="num"><span data-count="140">140</span> / 142</span> rating (9%). 2 rating under the cap.</p>
+          </div>
+          <p class="prov">Stats from the planner · Phase 2 · boss level 73</p>
+        </aside>
+      </div>
+      <div id="p-compare" role="tabpanel" aria-labelledby="t-compare" class="stub" hidden><div class="card"><h2>Compare</h2><p>Pick a slot to compare two items side by side, e.g. Dragonspine Trophy against Badge of the Swarmguard.</p></div></div>
+      <div id="p-talents" role="tabpanel" aria-labelledby="t-talents" class="stub" hidden><div class="card"><h2>Talents</h2><p>Fury talent tree. Sketch only in this prototype.</p></div></div>
+      <div id="p-buffs" role="tabpanel" aria-labelledby="t-buffs" class="stub" hidden><div class="card"><h2>Buffs</h2><p>Raid buffs, debuffs and consumables applied to the stats above.</p></div></div>
+      <div id="p-ranked" role="tabpanel" aria-labelledby="t-ranked" class="stub" hidden><div class="card"><h2>Ranked Gear</h2><p>Per-slot rankings for Fury Warrior. <span class="prov">Wowhead · Phase 2 · updated 12 Sep</span></p></div></div>
+      <div id="p-build" role="tabpanel" aria-labelledby="t-build" class="stub" hidden><div class="card"><h2>Build</h2><p>Save, load and share this set.</p></div></div>
+    </section>
+
+    <section id="v-sim" aria-labelledby="h-sim" hidden>
+      <h1 id="h-sim" class="view-title">Simulation</h1>
+      <p class="prov">Estimated DPS · fixed boss: level 73, <span class="num">7,700</span> armor</p>
+      <div class="stub" style="margin-top:16px"><div class="card"><h2>Human Fury Warrior</h2><p>Runs the planner set above against the fixed target. Sketch only in this prototype.</p><button class="cta" style="margin-top:12px" data-go="planner">Review gear first</button></div></div>
+    </section>
+
+    <section id="v-comp" aria-labelledby="h-comp" hidden>
+      <h1 id="h-comp" class="view-title">Raid Composition</h1>
+      <p class="prov">Seat 10 or 25 players and see which buffs each group gets.</p>
+      <div class="stub" style="margin-top:16px"><div class="card"><h2>25-player · 5 groups</h2><p>Drag players into groups. Sketch only in this prototype.</p></div></div>
+    </section>
+
+    <section id="v-tiers" aria-labelledby="h-tiers" hidden>
+      <h1 id="h-tiers" class="view-title">Spec Tier Lists</h1>
+      <p class="prov"><b>Wowhead</b> · Phase 2 · DPS · updated 12 Sep</p>
+      <div class="card" style="margin-top:16px">
+        <div class="tier-row"><b style="background:var(--gold)">S</b><div class="pills"><span>Arcane Mage</span><span>Destruction Warlock</span><span>Beast Mastery Hunter</span><span class="me">Fury Warrior</span></div></div>
+        <div class="tier-row"><b style="background:var(--accent)">A</b><div class="pills"><span>Arms Warrior</span><span>Enhancement Shaman</span><span>Affliction Warlock</span><span>Survival Hunter</span></div></div>
+        <div class="tier-row"><b style="background:var(--ink-3)">B</b><div class="pills"><span>Retribution Paladin</span><span>Combat Rogue</span><span>Shadow Priest</span><span>Elemental Shaman</span><span>Balance Druid</span><span>Fire Mage</span></div></div>
+      </div>
+    </section>
+
+    <section id="v-raids" aria-labelledby="h-raids" hidden>
+      <h1 id="h-raids" class="view-title">Raids</h1>
+      <p class="prov">Phase 1: Karazhan, Gruul's Lair, Magtheridon's Lair · Phase 2: Serpentshrine Cavern, Tempest Keep</p>
+      <div class="updates" style="margin-top:16px">
+        <article class="upd gold"><h3>Karazhan · Attumen the Huntsman</h3><p class="epic">Steelhawk Crossbow</p><p class="epic">Worgen Claw Necklace</p><p class="epic">Gloves of Saintly Blessings</p></article>
+        <article class="upd gold"><h3>Karazhan · Moroes</h3><p class="epic">Emerald Ripper</p><p class="epic">Brooch of Unquenchable Fury</p><p class="epic">Royal Cloak of Arathi Kings</p></article>
+        <article class="upd"><h3>Badge of Justice vendor</h3><p class="epic">Necklace of Eternal Hope</p><p class="num">25x Badge of Justice</p></article>
+      </div>
+    </section>
+
+    <section id="v-prof" aria-labelledby="h-prof" hidden>
+      <h1 id="h-prof" class="view-title">Professions</h1>
+      <p class="prov">Levelling guides 1–375 · farming maps</p>
+      <div class="card" style="margin-top:16px"><p class="sec-h">Mining</p><h2>Fel Iron Deposit</h2><p class="note">Skill <span class="num">300</span> · Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</p></div>
+    </section>
+    <p class="dirline">Variant 05-F · Launcher in Animation / Motion. Prototype only, not the live app. Built on Direction 05 · Launcher, after the Battle.net app, Riot Client and GOG GALAXY (research T1, T2, T4, T10, R4). Motion by GSAP 3.12.5; it switches off with your system's reduce-motion setting or the Motion button.</p>
+  </main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* Base behaviour first (works with no GSAP and no motion), motion layered on top. */
+const $=(q,r=document)=>r.querySelector(q), $$=(q,r=document)=>[...r.querySelectorAll(q)];
+const rail=$$('.rail-btn'), railBox=$('.rail'), railInd=$('.rail .ind');
+const tabsBox=$('.subtabs'), tabInd=$('.subtabs .ind');
+const RM=matchMedia('(prefers-reduced-motion: reduce)'), PHONE=matchMedia('(max-width:640px)');
+const motionBtn=$('.motion-btn'), root=document.documentElement;
+let userOff=false, cur='home', swap=null, drift=null, pulse=null, qx=null, qy=null;
+const canMove=()=>!!window.gsap&&!RM.matches&&!userOff;
+const fmt=n=>n.toLocaleString('en-US');
+
+function setCurrent(v){rail.forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'))}
+function show(v){
+  $$('main>section').forEach(s=>s.hidden=s.id!=='v-'+v);
+  setCurrent(v);
+  document.getElementById('main').scrollTop=0;window.scrollTo(0,0);
+  if(drift)drift.paused(v!=='home');
+}
+function go(v){
+  if(!canMove()){cur=v;show(v);return}
+  if(v===cur&&!swap)return;
+  if(swap){swap.progress(1).kill();swap=null}
+  if(v===cur)return;
+  const old=document.getElementById('v-'+cur);
+  cur=v;setCurrent(v);placeRail(true);
+  swap=gsap.timeline({onComplete:()=>{swap=null}})
+    .to(old,{opacity:0,y:-10,duration:.18,ease:'power2.in',overwrite:true})
+    .add(()=>{gsap.set(old,{clearProps:'opacity,transform'});show(v);enter(v)});
+}
+rail.forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
+
+const G=[
+ ['Head','Destroyer Battle-Helm','Glyph of Ferocity','Lady Vashj, Serpentshrine Cavern',1],
+ ['Neck','Pendant of the Perilous','','Karazhan'],
+ ['Shoulders','Destroyer Shoulderblades','Might of the Scourge',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Back','Black-Iron Battlecloak','Greater Agility',''],
+ ['Chest','Destroyer Breastplate','Exceptional Stats',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Wrists','Bracers of Eradication','Brawn',''],
+ ['Hands','Destroyer Gauntlets','Major Strength','Leotheras the Blind, Serpentshrine Cavern',1],
+ ['Waist','Belt of One-Hundred Deaths','',''],
+ ['Legs','Leggings of Murderous Intent','Nethercobra Leg Armor',''],
+ ['Feet','Warboots of Obliteration',"Cat's Swiftness",''],
+ ['Finger 1','Band of the Ranger-General','',"Kael'thas Sunstrider, Tempest Keep"],
+ ['Finger 2','Ring of Reciprocity','',''],
+ ['Trinket 1','Dragonspine Trophy','',"Gruul the Dragonkiller, Gruul's Lair"],
+ ['Trinket 2','Badge of the Swarmguard','',''],
+ ['Main Hand','Dragonstrike','Mongoose',''],
+ ['Off Hand','Talon of Azshara','Mongoose',''],
+ ['Ranged','Serpent Spine Longbow','Khorium Scope','']];
+const ini=s=>s.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('gear').innerHTML=G.map(([s,i,e,src,t])=>`<tr><td class="slot">${s}</td><td><span class="item epic"><span class="ico" aria-hidden="true">${ini(s)}</span>${i}</span></td><td class="ench">${e||'<span class="prov">—</span>'}</td><td class="src${src?'':' none'}">${t?'<span class="tag">T5</span>':''}${src||'source in guide'}</td></tr>`).join('');
+
+const tabs=$$('[role=tab]');
+const curTab=()=>tabs.find(x=>x.getAttribute('aria-selected')==='true');
+function sel(t){
+  tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});
+  t.focus();
+  if(canMove()){
+    placeTab(t,true);
+    const p=document.getElementById(t.getAttribute('aria-controls'));
+    rise(p,{y:10,d:.35});
+    if(p.id==='p-gear'){gearIn();countUp(p);meterIn()}
+  }
+}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>sel(t));t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d){e.preventDefault();sel(tabs[(i+d+tabs.length)%tabs.length])}})});
+$('.search input').addEventListener('keydown',e=>{if(e.key==='Enter')go('planner')});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
+
+/* ---------- motion helpers (all fromTo with explicit end values, so an interrupted tween can never strand content half-visible) ---------- */
+function rise(els,o={}){
+  if(!canMove())return null;
+  return gsap.fromTo(els,{opacity:0,y:o.y!=null?o.y:16,x:o.x||0,scale:o.s||1},
+    {opacity:1,y:0,x:0,scale:1,duration:o.d||.5,ease:o.e||'power3.out',stagger:o.st||0,delay:o.dl||0,overwrite:true,clearProps:'opacity,transform'});
+}
+function countUp(scope){
+  if(!canMove())return;
+  $$('[data-count]',scope).forEach(el=>{
+    const end=+el.dataset.count;if(!end)return;
+    if(el._t)el._t.kill();
+    const o={v:0};
+    el._t=gsap.to(o,{v:end,duration:1.2,delay:.15,ease:'power2.out',onUpdate:()=>{el.textContent=fmt(Math.round(o.v))},onComplete:()=>{el.textContent=fmt(end);el._t=null}});
+  });
+}
+const gearIn=()=>rise('#gear tr',{x:-14,y:0,st:.03,d:.4});
+function meterIn(){
+  if(!canMove())return;
+  gsap.fromTo('.meter i',{width:'0%'},{width:'98.6%',duration:1.1,delay:.2,ease:'power2.out',overwrite:true,clearProps:'width'});
+}
+function placeRail(animate){
+  const b=rail.find(x=>x.dataset.view===cur);
+  if(!b||!canMove())return;
+  const v=PHONE.matches?{x:b.offsetLeft,y:b.offsetTop,width:b.offsetWidth,height:3}:{x:b.offsetLeft,y:b.offsetTop,width:3,height:b.offsetHeight};
+  gsap.to(railInd,{...v,duration:animate?.5:0,ease:'expo.out',overwrite:true});
+}
+function placeTab(t,animate){
+  if(!t||!canMove()||!t.offsetWidth)return;
+  gsap.to(tabInd,{x:t.offsetLeft,y:t.offsetTop+t.offsetHeight-3,width:t.offsetWidth,height:3,duration:animate?.45:0,ease:'expo.out',overwrite:true});
+}
+function enableInd(on){railBox.classList.toggle('has-ind',on);tabsBox.classList.toggle('has-ind',on)}
+
+/* Per-view entrances, used after each view switch */
+function enter(v){
+  const sec=document.getElementById('v-'+v);
+  rise(sec,{y:14,d:.45});
+  if(v==='home'){rise($$('.home-grid .card,.home-grid .upd',sec),{y:18,st:.06,dl:.05});countUp(sec)}
+  else if(v==='planner'){placeTab(curTab(),false);rise($$('.char-head,.subtabs',sec),{y:10,st:.06});if(!$('#p-gear').hidden){gearIn();meterIn()}rise($$('.stats>*',sec),{x:16,y:0,st:.08,dl:.15});countUp(sec)}
+  else if(v==='tiers'){rise($$('.tier-row b',sec),{s:.4,y:0,st:.1,e:'back.out(2)',dl:.1});rise($$('.pills span',sec),{x:-10,y:0,st:.025,dl:.2,d:.35})}
+  else rise($$('.card,.upd',sec),{y:18,st:.07,dl:.08});
+}
+
+/* Living banner: three glows drift on long sine loops, the rune turns, the floor grid scrolls */
+function startDrift(){
+  const b=$('.banner'), d=$('.drift');
+  drift=gsap.timeline();
+  drift.add(gsap.to('.g1',{xPercent:-22,yPercent:14,scale:1.18,duration:14,ease:'sine.inOut',yoyo:true,repeat:-1}),0)
+       .add(gsap.to('.g2',{xPercent:-30,yPercent:-18,scale:.85,duration:17,ease:'sine.inOut',yoyo:true,repeat:-1}),0)
+       .add(gsap.to('.g3',{xPercent:40,yPercent:20,scale:1.3,duration:21,ease:'sine.inOut',yoyo:true,repeat:-1}),0)
+       .add(gsap.to('.rune',{rotation:'+=360',duration:120,ease:'none',repeat:-1}),0)
+       .add(gsap.to('.rune',{opacity:.65,duration:4,ease:'sine.inOut',yoyo:true,repeat:-1}),0)
+       .add(gsap.to(b,{'--gx':'-38px',duration:6,ease:'none',repeat:-1}),0);
+  drift.paused(cur!=='home');
+  if(matchMedia('(pointer:fine)').matches){
+    qx=gsap.quickTo(d,'x',{duration:.9,ease:'power3'});qy=gsap.quickTo(d,'y',{duration:.9,ease:'power3'});
+  }
+  pulse=gsap.fromTo('.chip i',{boxShadow:'0 0 0 0px rgba(79,209,139,.55)'},{boxShadow:'0 0 0 7px rgba(79,209,139,0)',duration:1.8,ease:'sine.out',repeat:-1});
+}
+$('.banner').addEventListener('pointermove',e=>{
+  if(!qx||!canMove())return;
+  const r=e.currentTarget.getBoundingClientRect();
+  qx(((e.clientX-r.left)/r.width-.5)*-18);qy(((e.clientY-r.top)/r.height-.5)*-12);
+});
+$('.banner').addEventListener('pointerleave',()=>{if(qx&&canMove()){qx(0);qy(0)}});
+
+/* Orchestrated load: rail, then banner, then cards, then the numbers count up */
+function intro(){
+  const ph=PHONE.matches, tl=gsap.timeline({defaults:{ease:'power3.out',overwrite:true}});
+  const off=(n)=>ph?{y:n,x:0}:{x:-n,y:0};
+  tl.fromTo('.rail',{opacity:0,...off(24)},{opacity:1,x:0,y:0,duration:.5,clearProps:'opacity,transform'})
+    .fromTo('.brand b',{opacity:0,scale:.5,rotation:-45},{opacity:1,scale:1,rotation:45,duration:.6,ease:'back.out(1.8)'},'-=.3')
+    .fromTo(rail,{opacity:0,...off(12)},{opacity:1,x:0,y:0,duration:.4,stagger:.05,clearProps:'opacity,transform'},'-=.45')
+    .add(()=>placeRail(false),'<')
+    .fromTo('.topbar>*',{opacity:0,y:-8},{opacity:1,y:0,duration:.4,stagger:.06,clearProps:'opacity,transform'},'-=.35')
+    .fromTo('.banner',{opacity:0,scale:.985},{opacity:1,scale:1,duration:.7,clearProps:'opacity,transform'},'-=.3')
+    .fromTo('.drift .glow',{opacity:0,scale:.6},{opacity:1,scale:1,duration:1.2,stagger:.12,ease:'power2.out',clearProps:'opacity'},'<')
+    .fromTo('.rune',{opacity:0,scale:.6,rotation:-45},{opacity:1,scale:1,rotation:45,duration:1.2,ease:'expo.out'},'<+.1')
+    .fromTo('.banner>:not(.drift)',{opacity:0,y:20},{opacity:1,y:0,duration:.55,stagger:.08,clearProps:'opacity,transform'},'<+.15')
+    .fromTo('.home-grid .card,.home-grid .upd',{opacity:0,y:22},{opacity:1,y:0,duration:.55,stagger:.07,clearProps:'opacity,transform'},'-=.3')
+    .add(()=>countUp($('#v-home')),'<+.1')
+    .add(startDrift);
+}
+
+/* Motion on/off: the system setting always wins; the button is an extra switch for viewers */
+function stopAll(){
+  gsap.globalTimeline.getChildren(true,true,true).forEach(t=>t.kill());
+  drift=pulse=qx=qy=swap=null;
+  gsap.set($$('body *'),{clearProps:'opacity,transform,width,boxShadow'});
+  $('.banner').style.removeProperty('--gx');
+  $$('[data-count]').forEach(el=>{el._t=null;el.textContent=fmt(+el.dataset.count)});
+  enableInd(false);show(cur);
+}
+function startAll(){enableInd(true);show(cur);placeRail(false);placeTab(curTab(),false);startDrift();enter(cur)}
+function setBtn(){motionBtn.setAttribute('aria-pressed',String(!userOff));$('.mlbl',motionBtn).textContent=userOff?'Motion off':'Motion on'}
+if(window.gsap){
+  motionBtn.hidden=RM.matches;
+  motionBtn.addEventListener('click',()=>{userOff=!userOff;root.classList.toggle('no-motion',userOff);setBtn();userOff?stopAll():startAll()});
+  RM.addEventListener('change',()=>{motionBtn.hidden=RM.matches;if(RM.matches)stopAll();else if(!userOff)startAll()});
+  addEventListener('resize',()=>{placeRail(false);placeTab(curTab(),false)});
+  if(document.fonts)document.fonts.ready.then(()=>{placeRail(false);placeTab(curTab(),false)});
+  if(canMove()){enableInd(true);intro()}
+}
+</script>
+</body>
+</html>

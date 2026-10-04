@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portal · Brutalism</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;800&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  /* ground: black slab with a visible 24px construction grid */
+  --ground:#0d0d0d; --grid:#262626; --grid-major:#383838;
+  /* raw concrete */
+  --slab:#d9d6cf; --slab-2:#c4c0b7; --slab-3:#a9a59c; --ink:#0d0d0d; --ink-2:#2e2e2e; --ink-3:#3f3d3a;
+  --on-ground:#ecebe6; --on-ground-2:#b8b5ad;
+  /* signals: hazard orange + caution yellow */
+  --hazard:#ff4d00; --caution:#ffd400; --line:#0d0d0d;
+  --q-epic:#6f1ab8; --q-epic-ground:#c58cff;
+  --tier-s:var(--hazard); --tier-a:var(--caution); --tier-b:#8f8b84;
+  --focus:#ffd400;
+  --bw:3px; --bw-heavy:5px; --off:6px; --off-sm:4px;
+  --f-head:"Archivo Black","Arial Black",Impact,sans-serif;
+  --f-body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.875rem; --t-md:1rem; --t-lg:1.375rem; --t-xl:2rem; --t-xxl:clamp(2.5rem,7vw,4.75rem);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background-color:var(--ground);color:var(--on-ground);font:400 var(--t-md)/1.45 var(--f-body);
+  background-image:linear-gradient(var(--grid-major) 2px,transparent 2px),linear-gradient(90deg,var(--grid-major) 2px,transparent 2px),
+  linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:96px 96px,96px 96px,24px 24px,24px 24px}
+a{color:inherit;text-decoration-thickness:3px;text-underline-offset:3px}
+:focus-visible{outline:4px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 7px var(--ink)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+.dirline{font:500 var(--t-xs)/1.4 var(--f-mono);color:var(--ink);background:var(--caution);border-bottom:var(--bw) solid var(--line)}
+.dirline .wrap{padding-top:6px;padding-bottom:6px}
+/* header */
+header.top{background:var(--ground);border-bottom:var(--bw-heavy) solid var(--hazard)}
+.bar{display:flex;align-items:flex-end;gap:12px 20px;padding-top:16px;padding-bottom:16px;flex-wrap:wrap}
+.brand{font:400 var(--t-xxl)/.82 var(--f-head);letter-spacing:-.03em;text-transform:uppercase;color:var(--on-ground);text-decoration:none}
+.brand span{color:var(--ink);background:var(--hazard);padding:0 .08em;display:inline-block;margin-top:4px}
+nav.sections{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0;justify-content:flex-end;padding:0 var(--off-sm) var(--off-sm) 0}
+.press{font:800 var(--t-sm)/1 var(--f-body);text-transform:uppercase;letter-spacing:.04em;color:var(--ink);background:var(--slab);
+  border:var(--bw) solid var(--line);box-shadow:var(--off-sm) var(--off-sm) 0 var(--line);padding:10px 12px;cursor:pointer;text-decoration:none;display:inline-block;transition:transform 60ms,box-shadow 60ms}
+.press:hover{background:var(--caution)}
+.press:active{transform:translate(var(--off-sm),var(--off-sm));box-shadow:0 0 0 var(--line)}
+nav.sections .press{box-shadow:var(--off-sm) var(--off-sm) 0 var(--hazard);border-color:var(--slab)}
+nav.sections .press[aria-current="page"]{background:var(--hazard);border-color:var(--hazard);box-shadow:var(--off-sm) var(--off-sm) 0 var(--on-ground)}
+nav.sections .press:active{box-shadow:0 0 0 transparent}
+/* version filter strip */
+.flavor{background:var(--slab);color:var(--ink);border-bottom:var(--bw) solid var(--line)}
+.flavor .wrap{display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;padding-top:10px;padding-bottom:10px;font-size:var(--t-sm)}
+.flavor label{font:800 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.08em}
+.flavor select{font:600 var(--t-sm) var(--f-body);color:var(--ink);background:#fff;border:var(--bw) solid var(--line);padding:6px 8px;border-radius:0;box-shadow:3px 3px 0 var(--line);max-width:100%}
+.chip{display:inline-block;font:800 var(--t-xs)/1 var(--f-body);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;background:var(--ink);color:var(--caution)}
+.stamp{font:500 var(--t-xs)/1.3 var(--f-mono);color:var(--ink);border:2px dashed var(--line);padding:4px 7px}
+.prov{font:500 var(--t-xs)/1.4 var(--f-mono);color:var(--ink-3)}
+main{padding:28px 0 48px}
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:28px;align-content:start;min-width:0}
+.box{min-width:0}.box h2{overflow-wrap:anywhere}
+.box{background:var(--slab);color:var(--ink);border:var(--bw) solid var(--line);box-shadow:var(--off) var(--off) 0 var(--hazard);margin:0 var(--off) 0 0}
+.box>h2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0;padding:10px 12px;background:var(--ink);color:var(--on-ground);font:400 var(--t-lg)/1.05 var(--f-head);text-transform:uppercase;letter-spacing:-.01em}
+.box>h2 .no{font:800 var(--t-xs) var(--f-mono);color:var(--ink);background:var(--caution);padding:3px 5px;margin-right:8px;vertical-align:middle}
+.box>h2 small{font:500 var(--t-xs) var(--f-mono);color:var(--on-ground-2);text-transform:none}
+.box>h2 a{font:800 var(--t-xs)/1 var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink);background:var(--caution);border:2px solid var(--caution);padding:6px 8px;text-decoration:none;box-shadow:3px 3px 0 var(--hazard)}
+.box>h2 a:hover{background:var(--on-ground)}
+.box>h2 a:active{transform:translate(3px,3px);box-shadow:none}
+.box.hot{box-shadow:var(--off) var(--off) 0 var(--caution)}
+.in{padding:14px}
+.q-epic{color:var(--q-epic);font-weight:800}
+.glyph{display:inline-grid;place-items:center;width:30px;height:30px;flex:none;border:3px solid var(--q-epic);font:800 10px/1 var(--f-mono);color:var(--ink);background:#fff}
+ul.plain{list-style:none;margin:0;padding:0}
+/* glance: flat colour blocks on a visible grid */
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:var(--bw);background:var(--line)}
+.glance>div{background:var(--slab);padding:14px}
+.glance>div:nth-child(1){background:var(--hazard)}
+.glance>div:nth-child(4){background:var(--caution)}
+.glance h3{margin:0 0 6px;font:800 var(--t-xs) var(--f-mono);text-transform:uppercase;letter-spacing:.08em}
+.glance p{margin:0;font:600 var(--t-md)/1.3 var(--f-body)}
+.glance .big{display:block;font:400 var(--t-xl)/1 var(--f-head);text-transform:uppercase;letter-spacing:-.02em;margin-bottom:4px}
+/* feed */
+.feed li{display:grid;grid-template-columns:110px 1fr;border-top:var(--bw) solid var(--line)}
+.feed li:first-child{border-top:0}
+.feed time{font:800 var(--t-xs)/1.3 var(--f-mono);background:var(--slab-2);padding:12px 10px;border-right:var(--bw) solid var(--line)}
+.feed div{padding:10px 12px}
+.feed b{font:800 var(--t-md)/1.25 var(--f-body)}
+.feed p{margin:4px 0 0;font-size:var(--t-sm);color:var(--ink-2)}
+.tag{display:inline-block;font:800 10px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;background:var(--ink);color:var(--on-ground);padding:4px 5px;margin:0 8px 4px 0;vertical-align:2px}
+.tag.data{background:var(--hazard);color:var(--ink)}
+/* tiers */
+.tiers li{display:grid;grid-template-columns:56px 1fr;border-top:var(--bw) solid var(--line);font:600 var(--t-sm)/1.4 var(--f-body)}
+.tiers li:first-child{border-top:0}
+.tiers li>span:last-child{padding:10px 12px}
+.tl{display:grid;place-items:center;font:400 var(--t-xl)/1 var(--f-head);color:var(--ink);border-right:var(--bw) solid var(--line)}
+.tl.s{background:var(--tier-s)}.tl.a{background:var(--tier-a)}.tl.b{background:var(--tier-b)}
+.hl{font-weight:800;background:var(--ink);color:var(--caution);padding:0 4px;white-space:nowrap}
+/* tables */
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm)}
+th,td{text-align:left;padding:9px 12px;border-top:var(--bw) solid var(--line);vertical-align:top}
+thead th{font:800 var(--t-xs) var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink);background:var(--slab-3);border-top:0;border-bottom:var(--bw) solid var(--line)}
+thead+tbody tr:first-child>*{border-top:0}
+tbody th{font:800 var(--t-xs) var(--f-mono);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;background:var(--slab-2)}
+tbody tr:hover>*{background:#fff}
+/* character */
+.char{display:flex;gap:12px;align-items:center}
+.char .glyph{width:52px;height:52px;font-size:14px;border-width:5px}
+.char b{font:400 var(--t-lg)/1.05 var(--f-head);text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--bw);background:var(--line);border:var(--bw) solid var(--line);margin:14px 0}
+.stats div{background:#fff;padding:8px 10px;min-width:0}
+.stats dt{font:800 10px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stats dd{margin:2px 0 0;font:800 var(--t-lg)/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.warnline{font:800 var(--t-sm)/1.35 var(--f-body);background:var(--caution);color:var(--ink);border:var(--bw) solid var(--line);padding:8px 10px;margin:0 0 14px;
+  background-image:repeating-linear-gradient(-45deg,var(--ink) 0 8px,var(--caution) 8px 16px);background-size:100% 6px;background-repeat:no-repeat;padding-top:14px}
+.btn-hazard{background:var(--hazard);font-size:var(--t-md);padding:14px 18px}
+.btn-hazard:hover{background:var(--caution)}
+/* planner */
+.subtabs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px 14px;border-bottom:var(--bw) solid var(--line);background:var(--slab-2)}
+.subtabs .press[aria-selected="true"]{background:var(--ink);color:var(--caution);transform:translate(var(--off-sm),var(--off-sm));box-shadow:0 0 0 var(--line)}
+.itemcell{display:flex;gap:10px;align-items:center}
+.setbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;font-size:var(--t-sm)}
+.setbar .pip{width:16px;height:16px;border:3px solid var(--q-epic);background:#fff}
+.setbar .pip.on{background:var(--q-epic)}
+.sketch{display:grid;gap:var(--bw);background:var(--line);grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.sketch>div{background:var(--slab);padding:14px;font-size:var(--t-sm)}
+.sketch h3{margin:0 0 6px;font:400 var(--t-md)/1.1 var(--f-head);text-transform:uppercase}
+.sub-body{font:600 var(--t-md)/1.45 var(--f-body);margin:0;border-left:var(--bw-heavy) solid var(--hazard);padding-left:12px}
+footer{font:500 var(--t-xs)/1.4 var(--f-mono);color:var(--on-ground-2);border-top:var(--bw) solid var(--on-ground-2);padding:14px 0;background:var(--ground)}
+@media (max-width:520px){.feed li{grid-template-columns:1fr}.feed time{border-right:0;border-bottom:var(--bw) solid var(--line);padding:6px 12px}.stats dd{font-size:var(--t-md)}nav.sections{justify-content:flex-start;flex-basis:100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="dirline"><div class="wrap">Variant 08-D · Portal in Brutalism. After Wowhead's home, FFXIV's Lodestone and CurseForge (research T2, T5, T6, T13). Prototype only, not the live app.</div></div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#" data-go="home">Project<br><span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <button class="press" data-go="home" aria-current="page">Home</button>
+      <button class="press" data-go="planner">Character Planner</button>
+      <button class="press" data-go="sim">Simulation</button>
+      <button class="press" data-go="comp">Raid Composition</button>
+      <button class="press" data-go="tiers">Spec Tier Lists</button>
+      <button class="press" data-go="raids">Raids</button>
+      <button class="press" data-go="profs">Professions</button>
+    </nav>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <label for="phs">Phase</label>
+    <select id="phs"><option>Phase 2 · SSC, TK, T5</option><option>Phase 1 · Kara, Gruul, Mag</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="stamp">Rankings: Wowhead · Phase 2 · data checked 30 Sep 2026</span>
+  </div>
+</div>
+
+<main class="wrap">
+<section id="v-home" data-view aria-labelledby="h-home">
+  <h1 id="h-home" class="sr">Home</h1>
+  <div class="grid">
+    <div class="col">
+      <section class="box" aria-labelledby="h-glance">
+        <h2 id="h-glance"><span><span class="no" aria-hidden="true">01</span>Phase 2 at a glance</span> <small>Wowhead · Phase 2</small></h2>
+        <div class="glance">
+          <div><h3>New raids</h3><p><span class="big">SSC + TK</span>Serpentshrine Cavern · Tempest Keep (The Eye)</p></div>
+          <div><h3>Still open</h3><p>Karazhan · Gruul's Lair · Magtheridon's Lair</p></div>
+          <div><h3>Tier 5 · Warrior</h3><p><span class="q-epic">Destroyer Battlegear</span>: tokens from Lady Vashj, Leotheras the Blind, Kael'thas Sunstrider</p></div>
+          <div><h3>Badge of Justice</h3><p><span class="big num">25×</span><span class="q-epic">Necklace of Eternal Hope</span></p></div>
+        </div>
+      </section>
+      <section class="box" aria-labelledby="h-feed">
+        <h2 id="h-feed"><span><span class="no" aria-hidden="true">02</span>What changed in the data</span> <a href="#">Full log</a></h2>
+        <ul class="plain feed">
+          <li><time datetime="2026-10-01">1–2 Oct 2026</time><div><span class="tag">Research</span><b>Gaming UI study across 25 platforms</b><p>Every claim cited; the basis for these ten prototypes.</p></div></li>
+          <li><time datetime="2026-09-30">30 Sep 2026</time><div><span class="tag data">Data</span><b>Weapon enchants added for Warriors and Rogues</b><p>Mongoose and friends now selectable on main and off hand.</p></div></li>
+          <li><time datetime="2026-09-30">30 Sep 2026</time><div><span class="tag">Docs</span><b>Documentation reorganized into docs/</b><p>Design, research and logs now live in one tree.</p></div></li>
+          <li><time datetime="2026-09-28">28 Sep 2026</time><div><span class="tag">Addon</span><b>In-game exporter addon verified</b><p>Export your equipped gear in game and paste it into the planner.</p></div></li>
+        </ul>
+      </section>
+      <section class="box" aria-labelledby="h-loot">
+        <h2 id="h-loot"><span><span class="no" aria-hidden="true">03</span>Raid loot shortcuts</span> <a href="#" data-go="raids">All raids</a></h2>
+        <div class="scroll"><table>
+          <thead><tr><th scope="col">Boss</th><th scope="col">Notable drops</th><th scope="col">Raid</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Attumen the Huntsman</th><td><span class="q-epic">Steelhawk Crossbow</span>, <span class="q-epic">Worgen Claw Necklace</span>, <span class="q-epic">Gloves of Saintly Blessings</span></td><td>Karazhan</td></tr>
+            <tr><th scope="row">Moroes</th><td><span class="q-epic">Emerald Ripper</span>, <span class="q-epic">Brooch of Unquenchable Fury</span>, <span class="q-epic">Royal Cloak of Arathi Kings</span></td><td>Karazhan</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+    </div>
+    <div class="col">
+      <section class="box hot" aria-labelledby="h-you">
+        <h2 id="h-you"><span><span class="no" aria-hidden="true">04</span>Your character</span> <small>imported 28 Sep</small></h2>
+        <div class="in">
+          <div class="char"><span class="glyph" aria-hidden="true">FW</span><div><b>Human Fury Warrior</b><div class="prov">Alliance · Phase 2 set · Destroyer Battlegear (4/5)</div></div></div>
+          <dl class="stats">
+            <div><dt>Attack Power</dt><dd>1,788</dd></div><div><dt>Hit Rating</dt><dd>140</dd></div><div><dt>Crit Rating</dt><dd>536</dd></div>
+          </dl>
+          <p class="warnline">Hit 140 / 142 rating cap (9%): 2 rating under.</p>
+          <a class="press btn-hazard" href="#" data-go="planner">Open planner →</a>
+        </div>
+      </section>
+      <section class="box" aria-labelledby="h-tier">
+        <h2 id="h-tier"><span><span class="no" aria-hidden="true">05</span>Spec Tier List · DPS</span> <a href="#" data-go="tiers">Details</a></h2>
+        <ul class="plain tiers">
+          <li><span class="tl s"><span class="sr">Tier </span>S</span><span>Arcane Mage · Destruction Warlock · Beast Mastery Hunter · <span class="hl">Fury Warrior</span></span></li>
+          <li><span class="tl a"><span class="sr">Tier </span>A</span><span>Arms Warrior · Enhancement Shaman · Affliction Warlock · Survival Hunter</span></li>
+          <li><span class="tl b"><span class="sr">Tier </span>B</span><span>Retribution Paladin · Combat Rogue · Shadow Priest · Elemental Shaman · Balance Druid · Fire Mage</span></li>
+        </ul>
+      </section>
+      <section class="box" aria-labelledby="h-prof">
+        <h2 id="h-prof"><span><span class="no" aria-hidden="true">06</span>Professions</span> <a href="#" data-go="profs">Guides 1–375</a></h2>
+        <div class="in"><b style="font:400 var(--t-lg)/1.1 var(--f-head);text-transform:uppercase">Fel Iron Deposit</b>
+          <div class="prov">Mining · skill <span class="num">300</span></div>
+          <p style="margin:8px 0 0;font-weight:600">Hellfire Peninsula · Zangarmarsh · Shadowmoon Valley</p></div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<section id="v-planner" data-view hidden aria-labelledby="h-plan">
+  <div class="box">
+    <h2 id="h-plan"><span>Character Planner · Human Fury Warrior</span> <small>Wowhead · Phase 2 · updated 30 Sep</small></h2>
+    <div class="subtabs" role="tablist" aria-label="Planner">
+      <button class="press" role="tab" aria-selected="true">Gear</button><button class="press" role="tab" aria-selected="false">Compare</button><button class="press" role="tab" aria-selected="false">Talents</button><button class="press" role="tab" aria-selected="false">Buffs</button><button class="press" role="tab" aria-selected="false">Ranked Gear</button><button class="press" role="tab" aria-selected="false">Build</button>
+    </div>
+    <div class="in" id="gear-panel" role="tabpanel" aria-label="Gear">
+      <div class="setbar"><b class="q-epic">Destroyer Battlegear (4/5)</b><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip"></span><span class="prov">· Alliance · level 70</span></div>
+      <dl class="stats" id="statgrid"></dl>
+      <p class="warnline">Hit Rating 140 of 142 (9% cap for dual-wield special attacks): 2 rating under. Boss target: level 73, 7,700 armor.</p>
+    </div>
+    <div class="scroll" id="gear-wrap"><table id="gear"><thead><tr><th scope="col">Slot</th><th scope="col">Item</th><th scope="col">Enchant</th><th scope="col">Source</th></tr></thead><tbody></tbody></table></div>
+    <div class="in" id="sub-panel" role="tabpanel" hidden><p class="sub-body" id="sub-body"></p></div>
+  </div>
+</section>
+
+<section id="v-other" data-view hidden aria-labelledby="h-other">
+  <div class="box"><h2 id="h-other">Section</h2><div id="other-body"></div></div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+<script>
+const GEAR=[
+["Head","HD","Destroyer Battle-Helm","Glyph of Ferocity","T5 token · Lady Vashj, Serpentshrine Cavern"],
+["Neck","NK","Pendant of the Perilous","","Karazhan"],
+["Shoulders","SH","Destroyer Shoulderblades","Might of the Scourge","T5 token · Kael'thas Sunstrider, Tempest Keep"],
+["Back","BK","Black-Iron Battlecloak","Greater Agility",""],
+["Chest","CH","Destroyer Breastplate","Exceptional Stats","T5 token · Kael'thas Sunstrider, Tempest Keep"],
+["Wrists","WR","Bracers of Eradication","Brawn",""],
+["Hands","HN","Destroyer Gauntlets","Major Strength","T5 token · Leotheras the Blind, Serpentshrine Cavern"],
+["Waist","WA","Belt of One-Hundred Deaths","",""],
+["Legs","LG","Leggings of Murderous Intent","Nethercobra Leg Armor",""],
+["Feet","FT","Warboots of Obliteration","Cat's Swiftness",""],
+["Finger 1","F1","Band of the Ranger-General","","Kael'thas Sunstrider, Tempest Keep"],
+["Finger 2","F2","Ring of Reciprocity","",""],
+["Trinket 1","T1","Dragonspine Trophy","","Gruul the Dragonkiller, Gruul's Lair"],
+["Trinket 2","T2","Badge of the Swarmguard","",""],
+["Main Hand","MH","Dragonstrike","Mongoose",""],
+["Off Hand","OH","Talon of Azshara","Mongoose",""],
+["Ranged","RG","Serpent Spine Longbow","Khorium Scope",""]];
+const STATS=[["Attack Power","1,788"],["Hit Rating","140"],["Crit Rating","536"],["Haste Rating","163"],["Expertise","64"],["Armor Pen","0"]];
+document.getElementById("statgrid").innerHTML=STATS.map(s=>`<div><dt>${s[0]}</dt><dd>${s[1]}</dd></div>`).join("");
+document.querySelector("#gear tbody").innerHTML=GEAR.map(g=>`<tr><th scope="row">${g[0]}</th><td><span class="itemcell"><span class="glyph" aria-hidden="true">${g[1]}</span><span class="q-epic">${g[2]}</span></span></td><td>${g[3]||"—"}</td><td class="prov">${g[4]||"source in guide"}</td></tr>`).join("");
+const E=s=>`<span class="q-epic">${s}</span>`;
+const OTHER={
+ sim:["Simulation",`<div class="sketch"><div><h3>Target</h3>Boss level <span class="num">73</span> · <span class="num">7,700</span> armor</div><div><h3>Estimated DPS</h3>Run the sim from your planner set. <span class="prov">Results print with source and date.</span></div><div><h3>Hit</h3><span class="num">140</span> / <span class="num">142</span> rating · 2 under cap</div></div>`],
+ comp:["Raid Composition",`<div class="sketch"><div><h3>10-player</h3>Karazhan groups: seat 10, see buffs per party.</div><div><h3>25-player</h3>Serpentshrine Cavern and Tempest Keep: five groups of five.</div></div>`],
+ tiers:["Spec Tier Lists",document.querySelector(".tiers").outerHTML+`<p class="prov" style="padding:10px 14px;margin:0;border-top:3px solid var(--line)">Wowhead · Phase 2 · DPS rankings</p>`],
+ raids:["Raids",`<div class="sketch"><div><h3>Phase 1</h3>Karazhan · Gruul's Lair · Magtheridon's Lair</div><div><h3>Phase 2</h3>Serpentshrine Cavern · Tempest Keep</div><div><h3>Karazhan · Moroes</h3>${E("Emerald Ripper")}, ${E("Brooch of Unquenchable Fury")}, ${E("Royal Cloak of Arathi Kings")}</div><div><h3>Badge vendor</h3>${E("Necklace of Eternal Hope")} · <span class="num">25×</span> Badge of Justice</div></div>`],
+ profs:["Professions",`<div class="sketch"><div><h3>Mining 1–375</h3>Levelling guide by skill bracket.</div><div><h3>Fel Iron Deposit</h3>Skill <span class="num">300</span> · Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</div></div>`]};
+function go(v){
+  document.querySelectorAll("[data-view]").forEach(s=>s.hidden=true);
+  const id=v==="home"||v==="planner"?"v-"+v:"v-other";
+  if(id==="v-other"){document.getElementById("h-other").textContent=OTHER[v][0];document.getElementById("other-body").innerHTML=OTHER[v][1];}
+  document.getElementById(id).hidden=false;
+  document.querySelectorAll("nav.sections button").forEach(b=>{if(b.dataset.go===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
+  window.scrollTo(0,0);
+}
+const SUB={Compare:"Compare two items slot by slot; the delta prints in rating, not percent.",Talents:"Fury talent tree for the Phase 2 build.",Buffs:"Raid buffs and consumables applied to the sim.",["Ranked Gear"]:"Items ranked per slot for Fury Warrior, Phase 2. Wowhead · Phase 2.",Build:"Save, load and share this build; paste an export from the in-game addon."};
+document.querySelectorAll(".subtabs [role=tab]").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".subtabs [role=tab]").forEach(x=>x.setAttribute("aria-selected",x===t));
+  const g=t.textContent==="Gear";
+  document.getElementById("gear-panel").hidden=!g;
+  document.getElementById("gear-wrap").hidden=!g;
+  document.getElementById("sub-panel").hidden=g;
+  if(!g){document.getElementById("sub-body").textContent=SUB[t.textContent];document.getElementById("sub-panel").setAttribute("aria-label",t.textContent);}
+}));
+document.addEventListener("click",e=>{const t=e.target.closest("[data-go]");if(t){e.preventDefault();go(t.dataset.go);}});
+</script>
+</body>
+</html>

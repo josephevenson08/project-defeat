@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Refined Current</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --surface-0:#08090a;--surface-1:#0e1012;--surface-2:#16191c;--surface-3:#1f2327;
+  --line:#2a2f33;--line-strong:#3d4348;
+  --text:#cdd2d6;--text-dim:#8b9196;--text-strong:#fff;
+  --metal-0:#1b1811;--metal-1:#4e432a;--metal-2:#8b7648;--metal-edge:#c6ad77;
+  --accent:#5b9bd8;--accent-2:#e8cd72;--accent-ink:#06121f;
+  --warn:#d4a017;--ok:#6cc48a;
+  --q-epic:#b866f5;--q-rare:#3d95f0;--q-unc:#1eff00;--q-leg:#ff8000;
+  --font-display:Cinzel,'Iowan Old Style',Georgia,serif;
+  --font-sans:'Barlow Semi Condensed',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fs-xs:11px;--fs-sm:13px;--fs-md:15px;--fs-lg:20px;--fs-xl:28px;
+  --radius:2px;--track:.14em;
+}
+:root[data-faction="horde"]{
+  --surface-0:#0a0605;--surface-1:#120c0a;--surface-2:#1c1512;--surface-3:#261d19;
+  --line:#33251f;--line-strong:#4a342c;
+  --text:#ddd0ca;--text-dim:#a39189;
+  --metal-0:#1a1412;--metal-1:#40302a;--metal-2:#6e5248;--metal-edge:#b08a78;
+  --accent:#df5647;--accent-2:#dbe2e8;--accent-ink:#1a0504;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--surface-0);color:var(--text);font:400 var(--fs-md)/1.45 var(--font-sans);min-height:100vh;
+  background-image:radial-gradient(1200px 500px at 50% -200px,color-mix(in srgb,var(--accent) 10%,transparent),transparent)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+.direction{font-size:var(--fs-xs);color:var(--text-dim);padding:6px 16px;border-bottom:1px solid var(--line);text-align:left;letter-spacing:.04em}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.label{font-size:var(--fs-xs);letter-spacing:var(--track);text-transform:uppercase;color:var(--text-dim);font-weight:600}
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 0}
+.brand{font-family:var(--font-display);font-weight:700;font-size:var(--fs-lg);color:var(--text-strong);letter-spacing:.06em;margin:0}
+.brand span{color:var(--accent-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);border-radius:var(--radius);padding:2px 8px;font-size:var(--fs-xs);letter-spacing:.06em;color:var(--text);background:var(--surface-2);white-space:nowrap}
+.chip .dot{width:6px;height:6px;background:var(--ok);display:inline-block}
+.chip.phase{border-color:var(--metal-2);color:var(--accent-2)}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line-strong);background:linear-gradient(var(--surface-3),var(--surface-2));border-radius:var(--radius);padding:7px 12px;font-weight:600;font-size:var(--fs-sm);letter-spacing:.04em;min-height:36px}
+.btn:hover{border-color:var(--metal-edge)}
+.btn.primary{background:linear-gradient(color-mix(in srgb,var(--accent) 88%,#fff),var(--accent));color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent) 60%,#fff)}
+kbd{font:600 10px var(--font-sans);border:1px solid var(--line-strong);border-bottom-width:2px;padding:0 4px;border-radius:var(--radius);color:var(--text-dim);margin-left:6px}
+/* nav */
+.nav{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line-strong);scrollbar-width:thin}
+.nav button,.subtabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;white-space:nowrap;font-family:var(--font-display);font-size:var(--fs-sm);letter-spacing:.06em;color:var(--text-dim)}
+.nav button[aria-selected="true"]{color:var(--text-strong);border-bottom-color:var(--accent-2)}
+.nav button:hover,.subtabs button:hover{color:var(--text-strong)}
+.subtabs{display:flex;gap:0;overflow-x:auto;margin:14px 0 0;border-bottom:1px solid var(--line)}
+.subtabs button{font-family:var(--font-sans);font-weight:600;font-size:var(--fs-sm);letter-spacing:.04em;padding:8px 12px}
+.subtabs button[aria-selected="true"]{color:var(--accent-2);border-bottom-color:var(--accent)}
+.count{color:var(--text-dim);font-weight:500;margin-left:4px}
+/* metal panel with corner brackets */
+.panel{position:relative;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--line-strong);border-radius:var(--radius);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--metal-edge) 25%,transparent),inset 0 -1px 0 #000,0 2px 0 #000;padding:16px}
+.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--metal-edge);pointer-events:none}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.panel h2{font-family:var(--font-display);font-size:var(--fs-md);letter-spacing:.08em;color:var(--text-strong);margin:0;font-weight:700}
+.phead{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.prov{font-size:var(--fs-xs);color:var(--text-dim);letter-spacing:.03em}
+.prov b{color:var(--text);font-weight:600}
+main{padding:16px 0 40px}
+.grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.grid>*,.panel{min-width:0}
+@media (min-width:960px){.grid{grid-template-columns:300px minmax(0,1fr)}}
+/* character */
+.char{display:flex;gap:12px;align-items:center}
+.crest{width:56px;height:56px;flex:none;border:2px solid var(--metal-edge);background:linear-gradient(135deg,var(--metal-1),var(--metal-0));display:grid;place-items:center;font-family:var(--font-display);font-weight:700;color:var(--accent-2);font-size:20px}
+.char h1{font-family:var(--font-display);font-size:var(--fs-lg);margin:0;color:var(--text-strong);letter-spacing:.04em}
+.char p{margin:2px 0 0;font-size:var(--fs-sm);color:var(--text-dim)}
+.set{margin-top:12px;font-size:var(--fs-sm);border-top:1px solid var(--line);padding-top:10px}
+.set .q{color:var(--q-epic);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.actions .btn{flex:1 1 140px}
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+@media (min-width:640px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:1100px){.stats{grid-template-columns:repeat(6,1fr)}}
+.stat{background:var(--surface-1);padding:10px 12px}
+.stat .v{font-size:24px;font-weight:700;color:var(--text-strong);line-height:1.1}
+.stat .s{font-size:var(--fs-xs);color:var(--text-dim);margin-top:2px}
+.stat .s.warn{color:var(--warn)}
+.stat .s.warn::before{content:"";display:inline-block;width:7px;height:7px;background:var(--warn);margin-right:5px;transform:rotate(45deg)}
+.meter{height:4px;background:var(--surface-3);margin-top:6px}
+.meter i{display:block;height:100%;background:var(--warn)}
+/* gear */
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:var(--fs-sm)}
+th{text-align:left;font-size:var(--fs-xs);letter-spacing:var(--track);text-transform:uppercase;color:var(--text-dim);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-strong)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:color-mix(in srgb,var(--surface-3) 60%,transparent)}
+.slot{color:var(--text-dim);width:88px}
+.item{display:flex;align-items:center;gap:8px}
+.ico{width:26px;height:26px;flex:none;border:1px solid var(--q-epic);background:linear-gradient(135deg,#2a1838,#120a18);display:grid;place-items:center;font-size:10px;font-weight:700;color:#e2c8f7;letter-spacing:0}
+.epic{color:var(--q-epic);font-weight:600}
+.ench{color:var(--q-unc)}
+.src{color:var(--text-dim)}
+.t5{font-size:10px;border:1px solid var(--metal-2);color:var(--accent-2);padding:0 4px;margin-left:6px;border-radius:var(--radius);letter-spacing:.06em}
+.view[hidden]{display:none}
+.sketch{color:var(--text-dim);font-size:var(--fs-sm)}
+.sketch ul{padding-left:18px;margin:8px 0}
+.tier{display:grid;grid-template-columns:36px 1fr;gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line)}
+.tier b{font-family:var(--font-display);font-size:20px;color:var(--accent-2);text-align:center}
+/* palette */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:start center;padding:12vh 16px 16px;z-index:10}
+.scrim[hidden]{display:none}
+.palette{width:min(560px,100%);padding:0}
+.palette input{width:100%;background:var(--surface-1);border:0;border-bottom:1px solid var(--line-strong);color:var(--text-strong);font:500 var(--fs-md) var(--font-sans);padding:14px 16px}
+.palette input:focus-visible{outline:none;box-shadow:inset 0 -2px 0 var(--accent-2)}
+.palette ul{list-style:none;margin:0;padding:6px}
+.palette li button{display:flex;width:100%;justify-content:space-between;gap:8px;background:none;border:0;text-align:left;padding:8px 10px;border-radius:var(--radius)}
+.palette li button:hover,.palette li button:focus-visible{background:var(--surface-3)}
+.palette .kind{font-size:var(--fs-xs);color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:520px){.top-actions{margin-left:0;width:100%}.top-actions .btn{flex:1}.hide-sm{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<p class="direction">Direction 01 · Refined Current — the live look, kept, with provenance and status in words (research R1 R2 R3 R4 R5, T5 T7). Prototype only.</p>
+<div class="wrap">
+  <header class="top">
+    <p class="brand">Project <span>Defeat</span></p>
+    <span class="chip phase"><span class="dot" aria-hidden="true"></span>TBC Classic · Phase 2</span>
+    <div class="top-actions">
+      <button class="btn" id="searchBtn" aria-haspopup="dialog">Search<kbd>Ctrl K</kbd></button>
+      <button class="btn" id="factionBtn" aria-pressed="false">Theme: Alliance</button>
+    </div>
+  </header>
+  <nav class="nav" role="tablist" aria-label="Sections" id="nav">
+    <button role="tab" aria-selected="true" data-view="planner">Character Planner</button>
+    <button role="tab" aria-selected="false" data-view="sim">Simulation</button>
+    <button role="tab" aria-selected="false" data-view="comp">Raid Composition</button>
+    <button role="tab" aria-selected="false" data-view="tiers">Spec Tier Lists</button>
+    <button role="tab" aria-selected="false" data-view="raids">Raids</button>
+    <button role="tab" aria-selected="false" data-view="prof">Professions</button>
+  </nav>
+</div>
+<main class="wrap">
+  <section class="view" id="v-planner" aria-labelledby="charName">
+    <div class="grid">
+      <aside class="panel">
+        <div class="char">
+          <div class="crest" aria-hidden="true">FW</div>
+          <div>
+            <h1 id="charName">Human Fury Warrior</h1>
+            <p><span id="factionName">Alliance</span> · Level 70 · Phase 2 set</p>
+          </div>
+        </div>
+        <div class="set"><span class="label">Tier set</span><br><span class="q">Destroyer Battlegear (4/5)</span> <span class="src">· 4-piece bonus active</span></div>
+        <div class="actions">
+          <button class="btn primary">Equip the recommended set</button>
+          <button class="btn">Import your character</button>
+        </div>
+        <p class="prov" style="margin:12px 0 0">Recommended set: <b>Wowhead</b> · Phase 2 · updated 12 Sep</p>
+      </aside>
+      <div style="display:grid;gap:16px;min-width:0">
+        <div class="panel">
+          <div class="phead"><h2>Stats</h2><span class="prov">Calculated from gear · vs. level 73 boss, 7,700 armor</span></div>
+          <div class="stats num">
+            <div class="stat"><div class="label">Attack Power</div><div class="v">1,788</div><div class="s">Raid-buffed: not applied</div></div>
+            <div class="stat"><div class="label">Hit Rating</div><div class="v">140</div><div class="s warn">Hit: 2 rating under cap</div><div class="meter" role="img" aria-label="140 of 142 hit rating"><i style="width:98.6%"></i></div></div>
+            <div class="stat"><div class="label">Crit Rating</div><div class="v">536</div><div class="s">No cap</div></div>
+            <div class="stat"><div class="label">Haste Rating</div><div class="v">163</div><div class="s">No cap</div></div>
+            <div class="stat"><div class="label">Expertise</div><div class="v">64</div><div class="s">Rating, lowers dodge and parry</div></div>
+            <div class="stat"><div class="label">Armor Pen</div><div class="v">0</div><div class="s">None from gear</div></div>
+          </div>
+          <p class="prov" style="margin:8px 0 0">Hit cap for a dual-wielder's special attacks: <b>142 rating (9%)</b> in TBC.</p>
+        </div>
+        <div class="panel">
+          <div class="subtabs" role="tablist" aria-label="Planner" id="subtabs" style="margin-top:-6px">
+            <button role="tab" aria-selected="true" data-sub="gear">Gear<span class="count num">17</span></button>
+            <button role="tab" aria-selected="false" data-sub="compare">Compare<span class="count num">2</span></button>
+            <button role="tab" aria-selected="false" data-sub="talents">Talents<span class="count num">61</span></button>
+            <button role="tab" aria-selected="false" data-sub="buffs">Buffs<span class="count num">0</span></button>
+            <button role="tab" aria-selected="false" data-sub="ranked">Ranked Gear</button>
+            <button role="tab" aria-selected="false" data-sub="build">Build</button>
+          </div>
+          <div id="s-gear" class="sub">
+            <div class="phead" style="margin-top:12px"><h2>Equipped <span class="count num">17 slots</span></h2><span class="prov"><b>Wowhead</b> · Phase 2 · updated 12 Sep</span></div>
+            <div class="scroll" tabindex="0" role="region" aria-label="Gear table, scrolls sideways">
+              <table class="num"><thead><tr><th>Slot</th><th>Item</th><th>Enchant</th><th>Source</th></tr></thead><tbody id="gear"></tbody></table>
+            </div>
+          </div>
+          <div id="s-other" class="sub sketch" hidden><p id="subText" style="margin:14px 0 0"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="view" id="v-sim" hidden>
+    <div class="panel"><div class="phead"><h2>Simulation</h2><span class="prov">Target: level 73 boss · 7,700 armor</span></div>
+      <p class="sketch">Estimated DPS for the equipped set, with the attack table broken out. Hit sits <b style="color:var(--warn)">2 rating under cap</b>, so a small share of special attacks still miss.</p>
+      <div class="actions"><button class="btn primary">Run simulation</button><button class="btn">Change target</button></div></div>
+  </section>
+  <section class="view" id="v-comp" hidden>
+    <div class="panel"><div class="phead"><h2>Raid Composition</h2><span class="prov">Seats <b>0 / 25</b></span></div>
+      <p class="sketch">Seat 10 or 25 players into groups and see which buffs each group receives. Your Fury Warrior brings Battle Shout to the group.</p>
+      <div class="actions"><button class="btn">10-player</button><button class="btn primary">25-player</button></div></div>
+  </section>
+  <section class="view" id="v-tiers" hidden>
+    <div class="panel"><div class="phead"><h2>Spec Tier List · DPS</h2><span class="prov"><b>Wowhead</b> · Phase 2 · updated 12 Sep</span></div>
+      <div class="tier"><b>S</b><span>Arcane Mage · Destruction Warlock · Beast Mastery Hunter · <span style="color:var(--accent-2)">Fury Warrior</span></span></div>
+      <div class="tier"><b>A</b><span>Arms Warrior · Enhancement Shaman · Affliction Warlock · Survival Hunter</span></div>
+      <div class="tier"><b>B</b><span>Retribution Paladin · Combat Rogue · Shadow Priest · Elemental Shaman · Balance Druid · Fire Mage</span></div></div>
+  </section>
+  <section class="view" id="v-raids" hidden>
+    <div class="panel"><div class="phead"><h2>Raids <span class="count num">5</span></h2><span class="prov"><b>Wowhead</b> · Phase 2 · updated 12 Sep</span></div>
+      <div class="sketch"><p><span class="label">Phase 1</span> Karazhan · Gruul's Lair · Magtheridon's Lair<br><span class="label">Phase 2</span> Serpentshrine Cavern · Tempest Keep</p>
+      <div class="scroll" tabindex="0" role="region" aria-label="Karazhan loot"><table class="num"><thead><tr><th>Karazhan boss</th><th>Loot</th></tr></thead><tbody>
+        <tr><td>Attumen the Huntsman</td><td><span class="epic">Steelhawk Crossbow</span> · <span class="epic">Worgen Claw Necklace</span> · <span class="epic">Gloves of Saintly Blessings</span></td></tr>
+        <tr><td>Moroes</td><td><span class="epic">Emerald Ripper</span> · <span class="epic">Brooch of Unquenchable Fury</span> · <span class="epic">Royal Cloak of Arathi Kings</span></td></tr>
+        <tr><td>Vendor</td><td><span class="epic">Necklace of Eternal Hope</span> · 25x Badge of Justice</td></tr>
+      </tbody></table></div></div></div>
+  </section>
+  <section class="view" id="v-prof" hidden>
+    <div class="panel"><div class="phead"><h2>Professions</h2><span class="prov">Levelling guides 1–375</span></div>
+      <div class="sketch"><p><span class="label">Mining</span><br><b style="color:var(--text)">Fel Iron Deposit</b> · skill <span class="num">300</span> · Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</p></div></div>
+  </section>
+</main>
+<div class="scrim" id="scrim" hidden>
+  <div class="panel palette" role="dialog" aria-modal="true" aria-label="Search">
+    <input id="q" type="search" placeholder="Search items, bosses, specs…" aria-label="Search">
+    <ul id="results"></ul>
+  </div>
+</div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const T5=' <span class="t5">T5</span>';
+const gear=[
+ ['Head','HD','Destroyer Battle-Helm','Glyph of Ferocity','T5 token · Lady Vashj, Serpentshrine Cavern',1],
+ ['Neck','NK','Pendant of the Perilous','','Karazhan'],
+ ['Shoulders','SH','Destroyer Shoulderblades','Might of the Scourge',"T5 token · Kael'thas Sunstrider, Tempest Keep",1],
+ ['Back','BK','Black-Iron Battlecloak','Greater Agility',''],
+ ['Chest','CH','Destroyer Breastplate','Exceptional Stats',"T5 token · Kael'thas Sunstrider, Tempest Keep",1],
+ ['Wrists','WR','Bracers of Eradication','Brawn',''],
+ ['Hands','HN','Destroyer Gauntlets','Major Strength','T5 token · Leotheras the Blind, Serpentshrine Cavern',1],
+ ['Waist','WA','Belt of One-Hundred Deaths','',''],
+ ['Legs','LG','Leggings of Murderous Intent','Nethercobra Leg Armor',''],
+ ['Feet','FT','Warboots of Obliteration',"Cat's Swiftness",''],
+ ['Finger 1','F1','Band of the Ranger-General','',"Kael'thas Sunstrider, Tempest Keep"],
+ ['Finger 2','F2','Ring of Reciprocity','',''],
+ ['Trinket 1','T1','Dragonspine Trophy','',"Gruul the Dragonkiller, Gruul's Lair"],
+ ['Trinket 2','T2','Badge of the Swarmguard','',''],
+ ['Main Hand','MH','Dragonstrike','Mongoose',''],
+ ['Off Hand','OH','Talon of Azshara','Mongoose',''],
+ ['Ranged','RG','Serpent Spine Longbow','Khorium Scope','']
+];
+$('#gear').innerHTML=gear.map(([s,i,n,e,src,t])=>`<tr><td class="slot">${s}</td><td><span class="item"><span class="ico" aria-hidden="true">${i}</span><span class="epic">${n}</span>${t?T5:''}</span></td><td class="${e?'ench':'src'}">${e||'—'}</td><td class="src">${src||'Source in guide'}</td></tr>`).join('');
+
+function tabs(listSel,attr,onPick){
+  const btns=$$(listSel+' [role=tab]');
+  btns.forEach((b,i)=>{
+    b.tabIndex=b.getAttribute('aria-selected')==='true'?0:-1;
+    b.addEventListener('click',()=>pick(b));
+    b.addEventListener('keydown',e=>{
+      const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+      if(d){e.preventDefault();const n=btns[(i+d+btns.length)%btns.length];n.focus();pick(n);}
+    });
+  });
+  function pick(b){btns.forEach(x=>{const on=x===b;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});onPick(b.dataset[attr],b);}
+}
+tabs('#nav','view',v=>$$('.view').forEach(s=>s.hidden=s.id!=='v-'+v));
+const subCopy={
+ compare:'Compare two items side by side: Dragonstrike against your current main hand, with the stat difference in rating.',
+ talents:'Fury talent tree, 61 points spent. Talent planner sketch.',
+ buffs:'No raid buffs applied yet. Add Battle Shout, Blessing of Might and others to see buffed Attack Power.',
+ ranked:'Every Phase 2 item for each slot, ranked for Fury Warrior. Source: Wowhead · Phase 2 · updated 12 Sep.',
+ build:'Save, name and share this build.'
+};
+tabs('#subtabs','sub',v=>{$('#s-gear').hidden=v!=='gear';$('#s-other').hidden=v==='gear';$('#subText').textContent=subCopy[v]||'';});
+
+/* faction */
+const fb=$('#factionBtn');
+fb.addEventListener('click',()=>{
+  const horde=document.documentElement.dataset.faction!=='horde';
+  document.documentElement.dataset.faction=horde?'horde':'alliance';
+  fb.setAttribute('aria-pressed',horde);
+  fb.textContent='Theme: '+(horde?'Horde':'Alliance');
+});
+
+/* command palette */
+const items=[
+ ['Dragonspine Trophy','Item · Trinket','planner'],
+ ['Lady Vashj','Boss · Serpentshrine Cavern','raids'],
+ ["Kael'thas Sunstrider",'Boss · Tempest Keep','raids'],
+ ['Fury Warrior','Spec · S tier','tiers'],
+ ['Fel Iron Deposit','Mining · skill 300','prof'],
+ ['Run simulation','Action','sim']
+];
+const scrim=$('#scrim'),q=$('#q'),res=$('#results');let lastFocus;
+function render(){
+  const t=q.value.trim().toLowerCase();
+  const hits=items.filter(([n,k])=>(n+' '+k).toLowerCase().includes(t));
+  res.innerHTML=hits.length?hits.map(([n,k,v])=>`<li><button data-go="${v}"><span>${n}</span><span class="kind">${k}</span></button></li>`).join(''):'<li class="sketch" style="padding:8px 10px">No matches</li>';
+}
+function openP(){lastFocus=document.activeElement;scrim.hidden=false;q.value='';render();q.focus();}
+function closeP(){scrim.hidden=true;lastFocus&&lastFocus.focus();}
+$('#searchBtn').addEventListener('click',openP);
+q.addEventListener('input',render);
+res.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;closeP();$(`#nav [data-view="${b.dataset.go}"]`).click();});
+scrim.addEventListener('click',e=>{if(e.target===scrim)closeP();});
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();scrim.hidden?openP():closeP();}
+  else if(e.key==='Escape'&&!scrim.hidden)closeP();
+});
+</script>
+</body>
+</html>

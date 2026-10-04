@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Launcher · Glassmorphism</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  /* atmosphere */
+  --sky:#090c1b; --sky-2:#10142b;
+  --orb-teal:#1fb7c8; --orb-amber:#e79a3c; --orb-rose:#d2508a; --orb-cobalt:#2f5fe0; --orb-jade:#2fb27a;
+  /* glass */
+  --glass:rgba(13,18,36,.58); --glass-2:rgba(22,30,56,.62); --glass-hi:rgba(255,255,255,.07);
+  --glass-solid:#121a30; --glass-solid-2:#1a2442;
+  --edge:rgba(255,255,255,.16); --edge-2:rgba(255,255,255,.26); --edge-top:rgba(255,255,255,.34);
+  --blur:blur(20px) saturate(150%);
+  --shadow:0 18px 40px -18px rgba(0,0,0,.65),0 2px 0 0 rgba(255,255,255,.04) inset;
+  /* ink */
+  --ink:#f3f6fc; --ink-2:#cdd6e6; --ink-3:#a9b6cc;
+  --accent:#5fd6e6; --accent-ink:#04161b; --gold:#ffc86b; --ok:#74e8ab; --warn:#ffb85c;
+  --epic:#c99cff; --rare:#5aaeff; --unc:#4dff4d; --leg:#ff9a3d;
+  /* type */
+  --f-head:"Sora","Segoe UI",system-ui,sans-serif;
+  --f-body:"Nunito Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --s-1:.75rem; --s-2:.875rem; --s-3:1rem; --s-4:1.2rem; --s-5:1.55rem; --s-6:2.3rem;
+  --rail-w:80px; --top-h:64px; --r:14px; --r-sm:9px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sky);color:var(--ink);font:400 var(--s-3)/1.55 var(--f-body);min-height:100vh;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-head);font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.2}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.epic{color:var(--epic)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* atmosphere: soft CSS shapes behind every panel */
+.atmo{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(120% 90% at 50% 0%,var(--sky-2),var(--sky) 70%)}
+.atmo i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;animation:drift 38s ease-in-out infinite alternate}
+.atmo .o1{width:46vw;height:46vw;left:-10vw;top:-12vw;background:var(--orb-cobalt)}
+.atmo .o2{width:34vw;height:34vw;right:-6vw;top:8vh;background:var(--orb-teal);animation-delay:-9s}
+.atmo .o3{width:30vw;height:30vw;left:30vw;bottom:-14vw;background:var(--orb-rose);opacity:.42;animation-delay:-18s}
+.atmo .o4{width:22vw;height:22vw;right:16vw;bottom:6vh;background:var(--orb-amber);opacity:.38;animation-delay:-27s}
+.atmo .o5{width:18vw;height:18vw;left:8vw;top:52vh;background:var(--orb-jade);opacity:.32;animation-delay:-5s}
+.atmo .facet{position:absolute;right:12vw;top:18vh;width:180px;height:180px;transform:rotate(45deg);border:1px solid rgba(255,255,255,.12);border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 60%)}
+@keyframes drift{to{transform:translate3d(4vw,3vh,0) scale(1.08)}}
+
+/* glass primitive + solid fallback */
+.glass,.card,.upd,.tbl-wrap,.rail,.topbar,.banner,.subtabs{background:var(--glass);border:1px solid var(--edge);border-top-color:var(--edge-top);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--shadow)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .glass,.card,.upd,.tbl-wrap,.rail,.topbar,.banner,.subtabs{background:var(--glass-solid)}
+  .mini div,.pills span,th,.rail-btn[aria-current="page"],.search{background:var(--glass-solid-2)!important}
+}
+
+/* shell */
+.app{position:relative;z-index:1;display:grid;grid-template-columns:var(--rail-w) 1fr;grid-template-rows:var(--top-h) 1fr;min-height:100vh;gap:0 18px;padding:14px 18px 0 14px}
+.rail{grid-row:1/3;border-radius:20px;display:flex;flex-direction:column;align-items:stretch;padding:12px 9px;gap:4px;position:sticky;top:14px;height:calc(100vh - 28px)}
+.brand{display:grid;place-items:center;height:46px;margin-bottom:12px}
+.brand b{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--edge-top);border-radius:10px;transform:rotate(45deg);background:linear-gradient(135deg,rgba(255,200,107,.35),rgba(95,214,230,.18));font:700 14px var(--f-head);color:var(--ink)}
+.brand b span{transform:rotate(-45deg)}
+.rail-btn{position:relative;display:flex;align-items:center;gap:12px;height:48px;padding:0 15px;border-radius:12px;color:var(--ink-3);border:1px solid transparent;transition:background .15s,color .15s}
+.rail-btn svg{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
+.rail-btn:hover{color:var(--ink);background:var(--glass-hi)}
+.rail-btn[aria-current="page"]{color:var(--ink);background:rgba(95,214,230,.14);border-color:rgba(95,214,230,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 22px -6px rgba(95,214,230,.55)}
+.rail-btn .lbl{position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--glass-solid-2);border:1px solid var(--edge-2);border-radius:8px;padding:4px 10px;font:600 var(--s-2) var(--f-body);color:var(--ink);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:20}
+.rail-btn:hover .lbl,.rail-btn:focus-visible .lbl{opacity:1}
+.rail .sp{flex:1}
+.lbl .short{display:none}
+.topbar{display:flex;align-items:center;gap:14px;padding:0 18px;border-radius:18px;height:var(--top-h);position:relative;z-index:5}
+.search{flex:1;max-width:420px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid var(--edge);padding:0 14px;height:40px;border-radius:999px}
+.search svg{width:16px;height:16px;stroke:var(--ink-3);fill:none;stroke-width:2;flex:none}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--ink);font:inherit;font-size:var(--s-2)}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus{outline:none}.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(95,214,230,.22)}
+.chip{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 13px;border:1px solid var(--edge-2);background:rgba(255,255,255,.06);border-radius:999px;font:700 var(--s-1) var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:var(--s-2);color:var(--ink-2)}
+.avatar{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,200,107,.6);border-radius:50%;background:rgba(255,200,107,.14);color:var(--gold);font:700 12px var(--f-head)}
+main{padding:20px 0 24px;min-width:0}
+.view-title{font-size:var(--s-5);margin-bottom:4px}
+.prov{font-size:var(--s-1);color:var(--ink-3);letter-spacing:.02em;margin:0}
+.prov b{color:var(--ink-2);font-weight:700}
+.pv{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--edge);background:rgba(255,255,255,.06)}
+.pv::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.dirline{font-size:var(--s-1);color:var(--ink-3);margin:28px 0 0;padding:10px 14px;border-radius:12px}
+
+/* home */
+.banner{position:relative;overflow:hidden;min-height:310px;border-radius:24px;padding:34px;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate}
+.banner .shapes{position:absolute;inset:0;z-index:-1}
+.banner .shapes i{position:absolute;border-radius:50%;filter:blur(40px)}
+.banner .s1{width:300px;height:300px;right:4%;top:-20%;background:rgba(31,183,200,.55)}
+.banner .s2{width:220px;height:220px;right:24%;bottom:-30%;background:rgba(210,80,138,.45)}
+.banner .s3{width:160px;height:160px;right:-4%;bottom:6%;background:rgba(231,154,60,.42)}
+.banner .gem{position:absolute;right:10%;top:16%;width:190px;height:190px;transform:rotate(45deg);border-radius:28px;border:1px solid rgba(255,255,255,.4);background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,.04) 55%);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 20px 50px -10px rgba(0,0,0,.4)}
+.banner .gem::after{content:"";position:absolute;inset:26px;border-radius:18px;border:1px solid rgba(255,255,255,.22)}
+.banner .scrim{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(9,12,27,.72) 0%,rgba(9,12,27,.45) 55%,transparent 85%)}
+.banner>*:not(.shapes):not(.scrim){position:relative;max-width:620px}
+.eyebrow{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;font:700 var(--s-1) var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding:4px 12px;border-radius:999px;border:1px solid rgba(255,200,107,.45);background:rgba(255,200,107,.1)}
+.banner h1{font-size:var(--s-6);margin:12px 0 10px;font-weight:700}
+.banner p{margin:0 0 20px;color:var(--ink-2)}
+.cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;border-radius:999px;background:linear-gradient(180deg,#86e6f1,var(--accent));color:var(--accent-ink);font:600 var(--s-2) var(--f-head);letter-spacing:.02em;border:1px solid rgba(255,255,255,.55);box-shadow:0 8px 24px -8px rgba(95,214,230,.7),inset 0 1px 0 rgba(255,255,255,.6);transition:transform .15s,box-shadow .15s}
+.cta:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(95,214,230,.85),inset 0 1px 0 rgba(255,255,255,.6)}
+.cta.ghost{background:rgba(255,255,255,.08);color:var(--ink);border-color:var(--edge-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.15);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.home-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:18px;margin-top:18px}
+.card{border-radius:var(--r);padding:20px}
+.card h2{font-size:var(--s-4)}
+.sec-h{font:700 var(--s-1) var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.updates{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.upd{position:relative;border-radius:var(--r);padding:16px 16px 14px;overflow:hidden}
+.upd::before{content:"";position:absolute;left:16px;right:16px;top:0;height:2px;border-radius:2px;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+.upd time{font:500 var(--s-1) var(--f-num);color:var(--ink-3)}
+.upd h3{font-size:var(--s-3);margin:4px 0 6px}
+.upd p{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+.upd .prov{margin-top:10px;color:var(--ink-3)}
+.upd p.epic{color:var(--epic);font-weight:700;margin-top:4px}
+.upd.gold::before{background:var(--gold);box-shadow:0 0 14px var(--gold)}.upd.muted::before{background:var(--ink-3);box-shadow:none}
+.cont{display:flex;flex-direction:column;gap:12px;background:linear-gradient(160deg,rgba(255,200,107,.12),transparent 45%),var(--glass)}
+.cont .cta{align-self:flex-start}
+.cont-row{display:flex;gap:12px;align-items:center}
+.crest{width:52px;height:52px;flex:none;display:grid;place-items:center;font:700 20px var(--f-head);color:#e8c39b;border:1px solid rgba(232,195,155,.6);border-radius:16px;background:linear-gradient(135deg,rgba(199,156,110,.35),rgba(199,156,110,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0}
+.mini div{background:rgba(255,255,255,.06);border:1px solid var(--edge);padding:8px 10px;border-radius:var(--r-sm)}
+.mini dt{font-size:var(--s-1);color:var(--ink-3)}
+.mini dd{margin:0;font-size:var(--s-4)}
+.mini small{font-size:var(--s-1);color:var(--ink-3)}
+.warn{color:var(--warn)}
+.note{margin:0;font-size:var(--s-2);color:var(--ink-2)}
+
+/* planner */
+.char-head{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.char-head .cont-row h1{font-size:var(--s-5)}
+.subtabs{display:flex;gap:4px;padding:5px;border-radius:999px;margin-bottom:18px;overflow-x:auto;scrollbar-width:thin;width:max-content;max-width:100%}
+.subtabs button{padding:8px 16px;border-radius:999px;font:600 var(--s-2) var(--f-head);color:var(--ink-3);white-space:nowrap;border:1px solid transparent}
+.subtabs button:hover{color:var(--ink);background:var(--glass-hi)}
+.subtabs button[aria-selected="true"]{color:var(--ink);background:rgba(95,214,230,.16);border-color:rgba(95,214,230,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:var(--s-2)}
+th{text-align:left;font:700 var(--s-1) var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:12px;border-bottom:1px solid var(--edge);background:rgba(255,255,255,.05);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(255,255,255,.05)}
+.slot{color:var(--ink-3);white-space:nowrap}
+.item{display:flex;align-items:center;gap:10px;font-weight:700;white-space:nowrap}
+.ico{width:30px;height:30px;flex:none;display:grid;place-items:center;border:1px solid rgba(201,156,255,.7);border-radius:8px;background:linear-gradient(135deg,rgba(201,156,255,.32),rgba(201,156,255,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.22);font:500 10px var(--f-num);color:#ecdcff}
+.ench{color:var(--ok);white-space:nowrap}
+.src{color:var(--ink-2);min-width:180px}
+.src.none{color:var(--ink-3);font-style:italic}
+.tag{display:inline-block;font:700 10px var(--f-body);letter-spacing:.08em;padding:1px 7px;border:1px solid rgba(255,200,107,.6);border-radius:999px;background:rgba(255,200,107,.12);color:var(--gold);margin-right:6px;vertical-align:1px;font-style:normal}
+.stats{display:flex;flex-direction:column;gap:14px}
+.stat-list{margin:0}
+.stat-list div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.stat-list div:last-child{border-bottom:0}
+.stat-list dt{color:var(--ink-2)}.stat-list dd{margin:0}
+.meter{height:10px;background:rgba(255,255,255,.08);border:1px solid var(--edge);border-radius:999px;overflow:hidden;margin:8px 0 6px}
+.meter i{display:block;height:100%;width:98.6%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--warn));box-shadow:0 0 12px rgba(255,184,92,.6)}
+.stub{display:grid;gap:12px}
+.stub .card p{margin:6px 0 0;color:var(--ink-2)}
+.tier-row{display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.tier-row:last-child{border-bottom:0}
+.tier-row b{display:grid;place-items:center;height:44px;font:700 var(--s-5) var(--f-head);color:#0b0f1c;border-radius:12px;border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}
+.t-s{background:linear-gradient(180deg,#ffe0a3,var(--gold))}.t-a{background:linear-gradient(180deg,#a9f0f8,var(--accent))}.t-b{background:linear-gradient(180deg,#dfe6f2,#aab6ca)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills span{padding:4px 12px;background:rgba(255,255,255,.07);border:1px solid var(--edge);border-radius:999px;font-size:var(--s-2)}
+.pills span.me{border-color:rgba(255,200,107,.7);color:var(--gold);background:rgba(255,200,107,.12)}
+.mt{margin-top:16px}
+
+/* wide: labelled rail */
+@media (min-width:1100px){
+  :root{--rail-w:212px}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;padding:0;font:600 var(--s-2) var(--f-head);color:inherit;pointer-events:auto}
+  .brand{justify-content:start;padding-left:12px}
+}
+@media (max-width:900px){.home-grid,.plan-grid{grid-template-columns:1fr}}
+/* phone: rail becomes floating glass dock */
+@media (max-width:640px){
+  :root{--top-h:auto}
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:calc(12px + env(safe-area-inset-top)) 16px 0}
+  .rail{position:fixed;inset:auto 10px calc(10px + env(safe-area-inset-bottom)) 10px;top:auto;height:auto;flex-direction:row;padding:5px;border-radius:20px;z-index:30;gap:2px}
+  .brand,.rail .sp{display:none}
+  .rail-btn{flex:1;flex-direction:column;justify-content:center;gap:2px;height:56px;padding:0;min-width:0;border-radius:14px}
+  .rail-btn .lbl{position:static;transform:none;opacity:1;background:none;border:0;padding:0;font-size:10px;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .rail-btn .lbl .short{display:inline}.rail-btn .lbl .full{display:none}
+  .topbar{flex-wrap:wrap;padding:12px 14px;gap:10px}
+  .search{order:3;flex-basis:100%;max-width:none}
+  main{padding:16px 0 calc(100px + env(safe-area-inset-bottom))}
+  .banner{padding:22px;min-height:350px;border-radius:20px}
+  .banner .gem{width:110px;height:110px;right:-14px;top:22px;border-radius:20px}
+  .banner .gem::after{inset:16px;border-radius:12px}
+  .banner .scrim{background:linear-gradient(180deg,rgba(9,12,27,.25) 0%,rgba(9,12,27,.75) 55%)}
+  .banner h1{font-size:1.65rem}
+  .mini dd{font-size:var(--s-3)}
+  .atmo i{filter:blur(50px)}
+  .atmo .o1{width:80vw;height:80vw}.atmo .o2{width:60vw;height:60vw}.atmo .o3{width:70vw;height:70vw}
+  .atmo .facet{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="atmo" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i><i class="o5"></i><span class="facet"></span></div>
+<div class="app">
+  <nav class="rail" aria-label="Sections">
+    <div class="brand" aria-hidden="true"><b><span>PD</span></b></div>
+    <button class="rail-btn" data-view="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg><span class="lbl"><span class="full">Home</span><span class="short">Home</span></span></button>
+    <button class="rail-btn" data-view="planner"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7.5-7 9-4-1.5-7-5-7-9V6z"/></svg><span class="lbl"><span class="full">Character Planner</span><span class="short">Planner</span></span></button>
+    <button class="rail-btn" data-view="sim"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg><span class="lbl"><span class="full">Simulation</span><span class="short">Sim</span></span></button>
+    <button class="rail-btn" data-view="comp"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 20c0-3 2-5 4-5s6 2 6 5"/></svg><span class="lbl"><span class="full">Raid Composition</span><span class="short">Comp</span></span></button>
+    <button class="rail-btn" data-view="tiers"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h11M4 15h7M4 20h4"/></svg><span class="lbl"><span class="full">Spec Tier Lists</span><span class="short">Tiers</span></span></button>
+    <button class="rail-btn" data-view="raids"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/></svg><span class="lbl"><span class="full">Raids</span><span class="short">Raids</span></span></button>
+    <button class="rail-btn" data-view="prof"><svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM11 7L3 15v6h6l8-8"/></svg><span class="lbl"><span class="full">Professions</span><span class="short">Profs</span></span></button>
+    <div class="sp"></div>
+  </nav>
+
+  <header class="topbar">
+    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Search</span><input type="search" placeholder="Search items, bosses, specs"></label>
+    <span class="chip"><i></i>TBC Classic · Phase 2</span>
+    <div class="who"><span>Alliance</span><span class="avatar" aria-hidden="true">HW</span></div>
+  </header>
+
+  <main id="main">
+    <section id="v-home" aria-labelledby="h-home">
+      <h1 id="h-home" class="sr">Home</h1>
+      <div class="banner">
+        <div class="shapes" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i><span class="gem"></span></div>
+        <div class="scrim" aria-hidden="true"></div>
+        <span class="eyebrow">Now live · Content update</span>
+        <h1>Phase 2: Serpentshrine Cavern &amp; Tempest Keep</h1>
+        <p>Tier 5 drops from Lady Vashj and Kael'thas Sunstrider. Every Phase 1 raid stays open: Karazhan, Gruul's Lair, Magtheridon's Lair.</p>
+        <div><button class="cta" data-go="planner">Open planner</button> <button class="cta ghost" data-go="raids">Browse raids</button></div>
+      </div>
+      <div class="home-grid">
+        <div class="card cont">
+          <p class="sec-h">Continue</p>
+          <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h2>Human Fury Warrior</h2><p class="prov">Alliance · Level 70 · Phase 2 set · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+          <dl class="mini">
+            <div><dt>Attack Power</dt><dd class="num">1,788</dd></div>
+            <div><dt>Hit Rating</dt><dd class="num warn">140<small>/142</small></dd></div>
+            <div><dt>Crit Rating</dt><dd class="num">536</dd></div>
+          </dl>
+          <p class="note">2 hit rating under the 142 cap (9%) for dual-wield specials.</p>
+          <button class="cta" data-go="planner">Continue planning</button>
+          <p class="prov">Last edited 2 Oct · Gear tab</p>
+        </div>
+        <div><p class="sec-h">Updates</p><div class="updates">
+          <article class="upd"><time datetime="2026-09-12">12 Sep 2026</time><h3>Tier lists refreshed for Phase 2</h3><p>Fury Warrior holds S tier alongside Arcane Mage, Destruction Warlock and Beast Mastery Hunter.</p><p class="prov"><span class="pv">Wowhead · Phase 2</span></p></article>
+          <article class="upd gold"><time datetime="2026-09-08">8 Sep 2026</time><h3>T5 tokens mapped to bosses</h3><p>Destroyer pieces now show their token source: Lady Vashj, Leotheras the Blind, Kael'thas Sunstrider.</p><p class="prov"><span class="pv">Planner data</span></p></article>
+          <article class="upd"><time datetime="2026-09-01">1 Sep 2026</time><h3>Badge of Justice vendor</h3><p>Badge rewards listed per item, e.g. Necklace of Eternal Hope for 25x Badge of Justice.</p><p class="prov"><span class="pv">Raids · Vendors</span></p></article>
+          <article class="upd muted"><time datetime="2026-08-24">24 Aug 2026</time><h3>Sim boss fixed at 7,700 armor</h3><p>Estimated DPS now runs against a level 73 target with 7,700 armor.</p><p class="prov"><span class="pv">Simulation</span></p></article>
+        </div></div>
+      </div>
+    </section>
+
+    <section id="v-planner" aria-labelledby="h-planner" hidden>
+      <div class="char-head">
+        <div class="cont-row"><span class="crest" aria-hidden="true">W</span><div><h1 id="h-planner">Human Fury Warrior</h1><p class="prov">Alliance · Level 70 · <span class="epic">Destroyer Battlegear (4/5)</span></p></div></div>
+        <p class="prov"><span class="pv"><b>Wowhead</b> · Phase 2 · updated 12 Sep</span></p>
+      </div>
+      <div class="subtabs" role="tablist" aria-label="Planner">
+        <button role="tab" aria-selected="true" aria-controls="p-gear" id="t-gear">Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-compare" id="t-compare" tabindex="-1">Compare</button>
+        <button role="tab" aria-selected="false" aria-controls="p-talents" id="t-talents" tabindex="-1">Talents</button>
+        <button role="tab" aria-selected="false" aria-controls="p-buffs" id="t-buffs" tabindex="-1">Buffs</button>
+        <button role="tab" aria-selected="false" aria-controls="p-ranked" id="t-ranked" tabindex="-1">Ranked Gear</button>
+        <button role="tab" aria-selected="false" aria-controls="p-build" id="t-build" tabindex="-1">Build</button>
+      </div>
+      <div id="p-gear" role="tabpanel" aria-labelledby="t-gear" class="plan-grid">
+        <div class="tbl-wrap"><table>
+          <caption class="sr">Equipped gear, 17 slots</caption>
+          <thead><tr><th scope="col">Slot</th><th scope="col">Item</th><th scope="col">Enchant</th><th scope="col">Source</th></tr></thead>
+          <tbody id="gear"></tbody>
+        </table></div>
+        <aside class="stats">
+          <div class="card">
+            <p class="sec-h">Melee stats</p>
+            <dl class="stat-list">
+              <div><dt>Attack Power</dt><dd class="num">1,788</dd></div>
+              <div><dt>Hit Rating</dt><dd class="num warn">140</dd></div>
+              <div><dt>Crit Rating</dt><dd class="num">536</dd></div>
+              <div><dt>Haste Rating</dt><dd class="num">163</dd></div>
+              <div><dt>Expertise</dt><dd class="num">64</dd></div>
+              <div><dt>Armor Pen</dt><dd class="num">0</dd></div>
+            </dl>
+          </div>
+          <div class="card">
+            <p class="sec-h">Hit cap · dual-wield specials</p>
+            <div class="meter" role="img" aria-label="140 of 142 hit rating"><i></i></div>
+            <p class="note"><span class="num">140 / 142</span> rating (9%). 2 rating under the cap.</p>
+          </div>
+          <p class="prov"><span class="pv">Stats from the planner · Phase 2 · boss level 73</span></p>
+        </aside>
+      </div>
+      <div id="p-compare" role="tabpanel" aria-labelledby="t-compare" class="stub" hidden><div class="card"><h2>Compare</h2><p>Pick a slot to compare two items side by side, e.g. Dragonspine Trophy against Badge of the Swarmguard.</p></div></div>
+      <div id="p-talents" role="tabpanel" aria-labelledby="t-talents" class="stub" hidden><div class="card"><h2>Talents</h2><p>Fury talent tree. Sketch only in this prototype.</p></div></div>
+      <div id="p-buffs" role="tabpanel" aria-labelledby="t-buffs" class="stub" hidden><div class="card"><h2>Buffs</h2><p>Raid buffs, debuffs and consumables applied to the stats above.</p></div></div>
+      <div id="p-ranked" role="tabpanel" aria-labelledby="t-ranked" class="stub" hidden><div class="card"><h2>Ranked Gear</h2><p>Per-slot rankings for Fury Warrior. <span class="prov">Wowhead · Phase 2 · updated 12 Sep</span></p></div></div>
+      <div id="p-build" role="tabpanel" aria-labelledby="t-build" class="stub" hidden><div class="card"><h2>Build</h2><p>Save, load and share this set.</p></div></div>
+    </section>
+
+    <section id="v-sim" aria-labelledby="h-sim" hidden>
+      <h1 id="h-sim" class="view-title">Simulation</h1>
+      <p class="prov">Estimated DPS · fixed boss: level 73, <span class="num">7,700</span> armor</p>
+      <div class="stub mt"><div class="card"><h2>Human Fury Warrior</h2><p>Runs the planner set above against the fixed target. Sketch only in this prototype.</p><button class="cta mt" data-go="planner">Review gear first</button></div></div>
+    </section>
+
+    <section id="v-comp" aria-labelledby="h-comp" hidden>
+      <h1 id="h-comp" class="view-title">Raid Composition</h1>
+      <p class="prov">Seat 10 or 25 players and see which buffs each group gets.</p>
+      <div class="stub mt"><div class="card"><h2>25-player · 5 groups</h2><p>Drag players into groups. Sketch only in this prototype.</p></div></div>
+    </section>
+
+    <section id="v-tiers" aria-labelledby="h-tiers" hidden>
+      <h1 id="h-tiers" class="view-title">Spec Tier Lists</h1>
+      <p class="prov"><span class="pv"><b>Wowhead</b> · Phase 2 · DPS · updated 12 Sep</span></p>
+      <div class="card mt">
+        <div class="tier-row"><b class="t-s">S</b><div class="pills"><span>Arcane Mage</span><span>Destruction Warlock</span><span>Beast Mastery Hunter</span><span class="me">Fury Warrior</span></div></div>
+        <div class="tier-row"><b class="t-a">A</b><div class="pills"><span>Arms Warrior</span><span>Enhancement Shaman</span><span>Affliction Warlock</span><span>Survival Hunter</span></div></div>
+        <div class="tier-row"><b class="t-b">B</b><div class="pills"><span>Retribution Paladin</span><span>Combat Rogue</span><span>Shadow Priest</span><span>Elemental Shaman</span><span>Balance Druid</span><span>Fire Mage</span></div></div>
+      </div>
+    </section>
+
+    <section id="v-raids" aria-labelledby="h-raids" hidden>
+      <h1 id="h-raids" class="view-title">Raids</h1>
+      <p class="prov">Phase 1: Karazhan, Gruul's Lair, Magtheridon's Lair · Phase 2: Serpentshrine Cavern, Tempest Keep</p>
+      <div class="updates mt">
+        <article class="upd gold"><h3>Karazhan · Attumen the Huntsman</h3><p class="epic">Steelhawk Crossbow</p><p class="epic">Worgen Claw Necklace</p><p class="epic">Gloves of Saintly Blessings</p></article>
+        <article class="upd gold"><h3>Karazhan · Moroes</h3><p class="epic">Emerald Ripper</p><p class="epic">Brooch of Unquenchable Fury</p><p class="epic">Royal Cloak of Arathi Kings</p></article>
+        <article class="upd"><h3>Badge of Justice vendor</h3><p class="epic">Necklace of Eternal Hope</p><p class="num">25x Badge of Justice</p></article>
+      </div>
+    </section>
+
+    <section id="v-prof" aria-labelledby="h-prof" hidden>
+      <h1 id="h-prof" class="view-title">Professions</h1>
+      <p class="prov">Levelling guides 1–375 · farming maps</p>
+      <div class="card mt"><p class="sec-h">Mining</p><h2>Fel Iron Deposit</h2><p class="note">Skill <span class="num">300</span> · Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley</p></div>
+    </section>
+    <p class="dirline glass">Variant 05-C · Launcher in Glassmorphism — after the Battle.net app, Riot Client and GOG GALAXY (research T1, T2, T4, T10, R4). Prototype only, not the live app.</p>
+  </main>
+</div>
+<script>
+const rail=[...document.querySelectorAll('.rail-btn')];
+function go(v){
+  document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='v-'+v);
+  rail.forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  window.scrollTo(0,0);
+}
+rail.forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
+const G=[
+ ['Head','Destroyer Battle-Helm','Glyph of Ferocity','Lady Vashj, Serpentshrine Cavern',1],
+ ['Neck','Pendant of the Perilous','','Karazhan'],
+ ['Shoulders','Destroyer Shoulderblades','Might of the Scourge',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Back','Black-Iron Battlecloak','Greater Agility',''],
+ ['Chest','Destroyer Breastplate','Exceptional Stats',"Kael'thas Sunstrider, Tempest Keep",1],
+ ['Wrists','Bracers of Eradication','Brawn',''],
+ ['Hands','Destroyer Gauntlets','Major Strength','Leotheras the Blind, Serpentshrine Cavern',1],
+ ['Waist','Belt of One-Hundred Deaths','',''],
+ ['Legs','Leggings of Murderous Intent','Nethercobra Leg Armor',''],
+ ['Feet','Warboots of Obliteration',"Cat's Swiftness",''],
+ ['Finger 1','Band of the Ranger-General','',"Kael'thas Sunstrider, Tempest Keep"],
+ ['Finger 2','Ring of Reciprocity','',''],
+ ['Trinket 1','Dragonspine Trophy','',"Gruul the Dragonkiller, Gruul's Lair"],
+ ['Trinket 2','Badge of the Swarmguard','',''],
+ ['Main Hand','Dragonstrike','Mongoose',''],
+ ['Off Hand','Talon of Azshara','Mongoose',''],
+ ['Ranged','Serpent Spine Longbow','Khorium Scope','']];
+const ini=s=>s.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('gear').innerHTML=G.map(([s,i,e,src,t])=>`<tr><td class="slot">${s}</td><td><span class="item epic"><span class="ico" aria-hidden="true">${ini(s)}</span>${i}</span></td><td class="ench">${e||'<span class="prov">—</span>'}</td><td class="src${src?'':' none'}">${t?'<span class="tag">T5</span>':''}${src||'source in guide'}</td></tr>`).join('');
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function sel(t){tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});t.focus()}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>sel(t));t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d){e.preventDefault();sel(tabs[(i+d+tabs.length)%tabs.length])}})});
+document.querySelector('.search input').addEventListener('keydown',e=>{if(e.key==='Enter')go('planner')});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
+</script>
+</body>
+</html>
