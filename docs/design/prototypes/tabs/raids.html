@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en" data-raid="ssc" data-phase="2">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Raids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>/* pick the backdrop before first paint from the #raid hash, so the scene starts in the right light */
+(function(){try{var h=decodeURIComponent(location.hash.slice(1)),d=document.documentElement;
+if(h==="karazhan"||h==="gruuls-lair"||h==="magtheridons-lair"){d.dataset.raid="p1";d.dataset.phase="1";}else if(h==="tempest-keep"){d.dataset.raid="tk";}}catch(e){}})();</script>
+<style>
+:root{
+  color-scheme:dark;
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
+  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(3,10,14,.8);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#9ff3ea;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+/* Tempest Keep backdrop: arcane gold over violet (selected in the hero) */
+:root[data-raid="tk"]{--glow:var(--tk);--glow-soft:rgba(236,192,106,.14);--rim:rgba(200,160,255,.24);--rim-2:rgba(200,160,255,.12);--focus:#ffe2a3}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
+  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+html[data-raid="tk"] .fallback{background:
+  radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
+  radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
+  linear-gradient(180deg,#07040f 0%,#160c2a 55%,#1f1236 100%)}
+html[data-phase="1"] .fallback{background:
+  radial-gradient(60% 40% at 50% 78%,rgba(242,166,90,.26),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(217,84,43,.14),transparent 70%),
+  linear-gradient(180deg,#070504 0%,#1a120b 55%,#24170c 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections button{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections button:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{min-height:min(62vh,560px);display:grid;align-content:end;padding:48px 0 28px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+/* hit-cap gauge */
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+/* ---------- Tempest Keep arcane light (gold over violet), shared with Simulation ---------- */
+html[data-raid="tk"]{--glass:rgba(18,11,34,.74);--glass-2:rgba(28,18,48,.82);--scrim:rgba(10,6,20,.84);--ink:#efe9f8;--ink-2:#cbc0de;--ink-3:#a99cc2;--glow-ink:#1a1204;--violet:#b48cff;--violet-soft:rgba(180,140,255,.14)}
+html[data-raid="tk"] header.top{background:rgba(10,6,20,.74)}
+html[data-raid="tk"] .flavor,html[data-raid="tk"] .dirline{background:rgba(10,6,20,.6)}
+html[data-raid="tk"] .veil{background:linear-gradient(180deg,rgba(8,4,16,.4),rgba(8,4,16,0) 30%,rgba(8,4,16,.6))}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+/* ---------- Raids tab: the backdrop follows the selected raid ---------- */
+html[data-phase="1"]{--glass:rgba(26,18,12,.76);--glass-2:rgba(40,28,18,.82);--scrim:rgba(16,11,7,.84);--ink:#f5ece2;--ink-2:#d6c6b4;--ink-3:#b3a08b;--glow-ink:#1a1204;--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12)}
+html[data-phase="1"] header.top{background:rgba(16,11,7,.76)}
+html[data-phase="1"] .flavor,html[data-phase="1"] .dirline{background:rgba(16,11,7,.6)}
+html[data-phase="1"] .veil{background:linear-gradient(180deg,rgba(12,8,5,.4),rgba(12,8,5,0) 30%,rgba(12,8,5,.6))}
+html{transition:background-color .4s}
+.hero.raids{min-height:min(44vh,400px)}
+.hero.raids h1{max-width:20ch}
+/* raid picker */
+.rpick{display:grid;gap:8px;margin:4px 0 0}
+.rpick fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rpick legend{float:left;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-right:6px;padding:0}
+.rpick button{font:600 var(--t-sm) var(--f-body);background:var(--glass-2);color:var(--ink-2);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer}
+.rpick button small{font:500 10px var(--f-mono);color:var(--ink-3);margin-left:6px}
+.rpick button[aria-pressed="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.rpick button[aria-pressed="true"] small{color:var(--glow-ink)}
+.rpick button:hover{color:var(--ink)}
+/* raid summary + attunement */
+.rgrid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px;margin-bottom:16px}
+@media (min-width:900px){.rgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;padding:0;list-style:none}
+.facts li{font:500 var(--t-xs) var(--f-mono);background:var(--glow-soft);border:1px solid var(--rim);border-radius:999px;padding:3px 10px}
+.facts b{font-family:var(--f-body);color:var(--ink-3);margin-right:5px;font-weight:600}
+.box p{margin:0 0 8px;font-size:var(--t-sm);color:var(--ink-2)}
+.box p strong{color:var(--ink)}
+.box .verify{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:8px 11px;margin:0 0 10px}
+.verify strong{color:var(--warn)}
+.pre{margin:0 0 10px;padding:0 0 0 18px;font-size:var(--t-sm);color:var(--ink-2)}
+.pre li{margin:2px 0}
+ol.att{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:7px}
+ol.att li{position:relative;padding:8px 10px 8px 42px;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;font-size:var(--t-sm)}
+ol.att li .n{position:absolute;left:11px;top:9px;font:500 var(--t-xs) var(--f-mono);color:var(--glow)}
+ol.att li b{display:block;font-weight:600}
+ol.att li .qn{font-size:var(--t-xs);color:var(--ink-3)}
+ol.att li p{margin:3px 0 0;font-size:var(--t-xs);color:var(--ink-2)}
+.diff{display:inline-block;font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--rim);border-radius:4px;padding:0 5px;margin-left:6px;color:var(--ink-2);vertical-align:1px}
+.diff.Heroic{color:var(--warn);border-color:rgba(255,207,122,.4)}
+.diff.Raid{color:var(--glow)}
+/* boss cards */
+.bosshead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:8px 0 10px}
+.bosshead h2{margin:0;font:400 var(--t-xl)/1.2 var(--f-head)}
+.legend2{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:var(--t-xs);color:var(--ink-3);margin:0;padding:0;list-style:none}
+.bosses{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));perspective:1400px}
+.boss>h3{position:relative;display:flex;gap:10px;align-items:baseline;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head)}
+.boss>h3 .o{font:500 var(--t-xs) var(--f-mono);color:var(--glow);min-width:2ch}
+.boss>h3 small{margin-left:auto;font:500 var(--t-xs) var(--f-mono);color:var(--ink-3);white-space:nowrap}
+.opt{font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--warn);border:1px solid rgba(255,207,122,.4);border-radius:4px;padding:0 5px}
+.mech{font-size:var(--t-xs)!important;color:var(--ink-3)!important}
+ul.loot{list-style:none;margin:0;padding:0;display:grid;gap:1px;position:relative}
+ul.loot li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:5px 0;border-top:1px solid var(--rim-2);font-size:var(--t-sm);min-width:0}
+ul.loot li:first-child{border-top:0}
+ul.loot .nm{font-weight:600;overflow-wrap:anywhere}
+.q-e{color:var(--q-epic)}.q-r{color:var(--q-rare)}.q-u{color:var(--q-unc)}.q-l{color:var(--q-leg)}.q-n{color:var(--ink-2)}
+.tag{font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.06em;border-radius:4px;padding:0 5px;border:1px solid var(--rim);color:var(--ink-3)}
+.tag.t,.tag.s{color:var(--glow);border-color:var(--glow)}
+.tag.m{color:var(--q-leg);border-color:rgba(255,154,46,.5)}
+.tag.q{color:var(--warn);border-color:rgba(255,207,122,.4)}
+.tag.f{color:var(--glow-ink);background:var(--glow);border-color:var(--glow)}
+.tag.d{color:var(--ink-2)}
+details.more{border-top:1px solid var(--rim-2);position:relative}
+details.more>summary{cursor:pointer;font:600 var(--t-xs) var(--f-body);color:var(--glow);padding:7px 0;list-style:none}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"+ ";font-family:var(--f-mono)}
+details.more[open]>summary::before{content:"− "}
+.trash{margin-top:16px}
+.static-note{font-size:var(--t-xs);color:var(--ink-3)}
+@media (min-width:900px){.simgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Tab prototype · Raids · Step 1 baseline. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-composition.html">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html" aria-current="page">Raids</a>
+      <a href="professions.html">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Raids, bosses, loot, attunements: <code>src/domain/raids</code> · Wowhead · Phase 2 · updated 27 Sep</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+<section aria-labelledby="h-raids">
+  <div class="hero raids">
+    <div class="hero-in">
+      <div class="eyebrow">Raids · five instances · loot and attunements</div>
+      <h1 id="h-raids">Every boss, <em>every drop</em>, and the way in.</h1>
+      <p>Pick a raid to see a card per boss with its full drop table, item names in their quality colour, and the attunement chain you need before the door opens. Pieces of the Phase 2 Fury Warrior set are marked where they drop.</p>
+      <div class="rpick" id="rpick" role="group" aria-label="Choose a raid">
+        <fieldset><legend>Phase 1</legend>
+          <button type="button" data-raid="karazhan" aria-pressed="false">Karazhan<small>10</small></button>
+          <button type="button" data-raid="gruuls-lair" aria-pressed="false">Gruul's Lair<small>25</small></button>
+          <button type="button" data-raid="magtheridons-lair" aria-pressed="false">Magtheridon's Lair<small>25</small></button>
+        </fieldset>
+        <fieldset><legend>Phase 2</legend>
+          <button type="button" data-raid="serpentshrine-cavern" aria-pressed="true">Serpentshrine Cavern<small>25</small></button>
+          <button type="button" data-raid="tempest-keep" aria-pressed="false">Tempest Keep<small>25</small></button>
+        </fieldset>
+      </div>
+      <noscript><p class="static-note">Without JavaScript only Serpentshrine Cavern is shown; the raid buttons need it.</p></noscript>
+    </div>
+  </div>
+  <div id="raidview" aria-live="off"><div class="rgrid"><div class="layer" style="--z:5"><section class="box" aria-labelledby="h-raid"><h2 id="h-raid">Serpentshrine Cavern <small>Phase 2 · T5</small></h2><div class="in"><ul class="facts"><li><b>Size</b>25</li><li><b>Bosses</b>6</li><li><b>Drops</b>146</li><li><b>Zone</b>Zangarmarsh</li></ul><p>One of the two headline Phase 2 raids, and the T5 helm, glove, and leg token source. The first five bosses can be killed in any order and all five must die before the ramp to Lady Vashj opens.</p><p><strong>Getting there:</strong> Inside Coilfang Reservoir in central Zangarmarsh — swim to the drainage pipe in the middle of the reservoir; the raid portal is separate from the Slave Pens / Underbog / Steamvault entrances.</p><p><strong>Can I get in?</strong> Requires 'The Cudgel of Kar'desh' (the Mark of Vashj). Also needs a Coilfang Reservoir key for the Heroic Slave Pens step.</p><p class="prov">Loot: Wowhead drop tables via <code>ingest-raid-loot.mjs</code> · quality: <code>itemCatalogue.json</code> (wowsims/tbc) · Phase 2 · updated 27 Sep</p></div></section></div><div class="layer" style="--z:3"><section class="box" aria-labelledby="h-att"><h2 id="h-att">Attunement · The Cudgel of Kar'desh <small>4 steps</small></h2><div class="in"><p class="verify"><strong>Not yet confirmed for Anniversary realms.</strong> Step order and requirements are cross-checked against two guide sources. The one point not verified for Anniversary realms specifically is whether Blizzard has changed the Reservoir Key reputation requirement from its original Revered gate.</p><p>A short chain by TBC standards — two raid items and a walk back to a heroic dungeon — but it is expensive because both items come from Phase 1 raid bosses, one of which (Nightbane) needs its own quest chain and Violet Eye reputation before it can even be summoned.</p><h3 class="mini">Before step 1</h3><ul class="pre"><li>Level 70.</li><li>Revered with Cenarion Expedition, or a guild member who is, to obtain the Reservoir Key for Heroic Coilfang dungeons.</li><li>A raid group able to kill Gruul the Dragonkiller (25-player).</li><li>A Karazhan group with someone who holds the Blackened Urn, which requires Honored with The Violet Eye and the Medivh's Journal quest chain.</li></ul><h3 class="mini">Steps</h3><ol class="att"><li><span class="n">01</span><b>Pick up the quest from Skar'this the Heretic<span class="diff Heroic">Heroic</span></b><span class="qn">Quest: The Cudgel of Kar'desh · </span><span class="qn">The Slave Pens, Coilfang Reservoir (Zangarmarsh)</span><p>Clear Heroic The Slave Pens as far as Mennu the Betrayer, then talk to the caged naga Skar'this the Heretic just past him and accept the quest.</p></li><li><span class="n">02</span><b>Loot the Earthen Signet<span class="diff Raid">Raid</span></b><span class="qn">Gruul's Lair (Blade's Edge Mountains)</span><p>Kill Gruul the Dragonkiller and loot the Earthen Signet from his corpse. It is a guaranteed drop, and every eligible raider gets one.</p></li><li><span class="n">03</span><b>Loot the Blazing Signet<span class="diff Raid">Raid</span></b><span class="qn">Karazhan (Deadwind Pass)</span><p>Summon Nightbane on Medivh's Terrace with the Blackened Urn and kill him, then loot the Blazing Signet. Nightbane is optional content, so most groups schedule this deliberately rather than stumbling into it.</p></li><li><span class="n">04</span><b>Turn in to Skar'this<span class="diff Heroic">Heroic</span></b><span class="qn">Quest: The Cudgel of Kar'desh · </span><span class="qn">The Slave Pens, Coilfang Reservoir (Zangarmarsh)</span><p>Return to Skar'this the Heretic in Heroic The Slave Pens with both signets and hand in the quest. He casts The Mark of Vashj on you, which is the permanent attunement.</p></li></ol><p><strong>Reward:</strong> The Mark of Vashj — permanent access to Serpentshrine Cavern.</p></div></section></div></div><div class="bosshead"><h2>Bosses and loot</h2><ul class="legend2"><li><span class="q-e">Epic</span> · <span class="q-r">Rare</span> · <span class="q-n">grey: not in the catalogue</span></li><li>Sorted: tokens, quest items, mounts, DPS gear, the rest, recipes</li></ul></div><div class="bosses"><div class="layer" style="--z:4"><section class="box boss" aria-label="Hydross the Unstable"><h3><span class="o">01</span><span>Hydross the Unstable</span><small>22 drops</small></h3><div class="in"><p class="mech">A two-tank resistance fight.</p><ul class="loot"><li><span class="nm q-e">Blackfathom Warbands</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Boots of the Shifting Nightmare</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Fathomstone</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Pauldrons of the Wardancer</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ranger-General's Chestguard</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ring of Lethality</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li></ul><p class="static-note">+16 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:5"><section class="box boss" aria-label="The Lurker Below"><h3><span class="o">02</span><span>The Lurker Below</span><small>17 drops</small></h3><div class="in"><p class="mech">Summoned by fishing the strange pool in the middle of the platform ring, which needs 300 fishing skill — clear the surrounding platforms first or the pull is unsurvivable.</p><ul class="loot"><li><span class="nm q-e">Boots of Effortless Striking</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Bracers of Eradication</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Choker of Animalistic Fury</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Cord of Screaming Terrors</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Tempest-Strider Boots</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Velvet Boots of the Guardian</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li></ul><p class="static-note">+11 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:6"><section class="box boss" aria-label="Leotheras the Blind"><h3><span class="o">03</span><span>Leotheras the Blind</span><small>24 drops</small></h3><div class="in"><p class="mech">Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes threat afterwards, and a demon form that must be tanked by a warlock in fire resistance gear because of Chaos Blast.</p><ul class="loot"><li><span class="nm q-n">Gloves of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Gloves of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Gloves of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Cataclysm Gauntlets</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Handguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Deathmantle Handguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+18 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:3"><section class="box boss" aria-label="Fathom-Lord Karathress"><h3><span class="o">04</span><span>Fathom-Lord Karathress</span><small>26 drops</small></h3><div class="in"><p class="mech">Four separate targets, each on its own tank.</p><ul class="loot"><li><span class="nm q-n">Leggings of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Leggings of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Leggings of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Breeches of the Avatar</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Cataclysm Legplates</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Legguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+20 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:4"><section class="box boss" aria-label="Morogrim Tidewalker"><h3><span class="o">05</span><span>Morogrim Tidewalker</span><small>21 drops</small></h3><div class="in"><p class="mech">Earthquake damages everyone within 50 yards and spawns two packs of six murlocs from the room entrances; those packs are kited into the boss and AoE'd down, which is where a paladin off-tank earns their place.</p><ul class="loot"><li><span class="nm q-e">Illidari Shoulderpads</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Mantle of the Tireless Tracker</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ring of Sundered Souls</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Serpent-Coil Braid</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Talon of Azshara</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Warboots of Obliteration</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li></ul><p class="static-note">+15 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:5"><section class="box boss" aria-label="Lady Vashj"><h3><span class="o">06</span><span>Lady Vashj</span><small>36 drops</small></h3><div class="in"><p class="mech">Three phases and the hardest fight in Serpentshrine Cavern.</p><ul class="loot"><li><span class="nm q-n">Helm of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Helm of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Helm of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Cowl of the Avatar</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Cowl of Tirisfal</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Faceguard</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+30 more drops (turn on JavaScript to expand)</p></div></section></div></div><section class="box trash" aria-labelledby="h-trash"><h2 id="h-trash">Notable trash drops <small>2</small></h2><div class="in"><ul class="loot"><li><span class="nm q-e">Pendant of the Perilous</span><span class="sr">, Epic</span><span class="tag x">Trash drop</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Boots of Courage Unending</span><span class="sr">, Epic</span><span class="tag x">Trash drop</span></li></ul></div></section></div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. Loot tables from Wowhead via tools/ingest/ingest-raid-loot.mjs; item quality from the wowsims/tbc item catalogue; attunement steps from Wowhead quest pages and Icy Veins, as recorded in src/domain/raids. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Raids</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+/* Raids tab: the palette follows the selected raid (Serpentshrine teal water, Tempest Keep gold/violet, Phase 1 warm torchlight).
+   The naaru crystal only rises for Tempest Keep; "charge" pulses it when the raid changes. */
+const sel0=root.dataset.raid, MIX0={tk:sel0==="tk"?1:0,warm:root.dataset.phase==="1"?1:0};
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:MIX0.tk,warm:MIX0.warm,charge:0};
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
+const C=h=>new THREE.Color(h);
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.tk.light.clone(),deep:PAL.tk.deep.clone(),fog:PAL.tk.fog.clone(),acc:PAL.tk.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?260:520,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
+    vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(.85,1.,.96),.35),a);}`})));
+/* lights: phase lamp over the pool, ambient, a cool rim and a low accent (coral / violet / ember) */
+const lamp=new THREE.PointLight(cur.light.clone(),2.2,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x2a1a40,.6));
+const rim=new THREE.DirectionalLight(0xc8a0ff,.35);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a naaru-like arcane crystal: faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x24163a,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* The Eye's pillars receding into the violet fog */
+const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
+R.setClearColor(cur.fog);
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  const k=Math.max(0,MIX.tk*(1-MIX.warm));crystal.visible=halo.visible=k>.02;shards.forEach(m=>{m.visible=k>.02;});crystal.scale.set(.8*k,1.5*k,.8*k);halo.scale.setScalar(Math.max(k,.01));
+  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=2.2+MIX.charge*2.4;
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
+  tint();place();R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
+/* hooks used by the page script */
+S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+size();still();
+})();
+</script>
+<script>/* generated from src/domain/raids (sampleRaids, five *Bosses.ts, sampleAttunements) + src/domain/gear/itemCatalogue.json qualities.
+   T: "name|quality|kind|flags" (quality e/r/u/l or blank = not in the catalogue; kind t token, s set piece from a token, m mount, r recipe, q quest item, x trash;
+   flags d = for DPS roles, f = in the Phase 2 Fury Warrior set, v = needsVerification). R: raids, bosses list indices into T. */
+const DATA={"T":["Ring of Unrelenting Storms|e|x|d","Ritssyn's Lost Pendant|e|x|d","Fiery Warhorse's Reins||m|v","Gloves of Dexterous Manipulation|e||d","Steelhawk Crossbow|e||d","Bracers of the White Stag|e||","Gauntlets of Renewed Hope|e||","Gloves of Saintly Blessings|e||","Handwraps of Flowing Thought|e||","Harbinger Bands|e||","Spectral Band of Innervation|e||","Stalker's War Bands|e||","Vambraces of Courage|e||","Whirlwind Bracers|e||","Worgen Claw Necklace|e||","Schematic: Stabilized Eternium Scope||r|v","Edgewalker Longboots|e||d","Belt of Gale Force|e||","Boots of Valiance|e||","Brooch of Unquenchable Fury|e||","Crimson Girdle of the Indomitable|e||","Earthsoul Leggings|e||","Emerald Ripper|e||","Idol of the Avian Heart|e||","Moroes' Lucky Pocket Watch|e||","Nethershard Girdle|e||","Royal Cloak of Arathi Kings|e||","Shadow-Cloak of Dalaran|e||","Signet of Unshakable Faith|e||","Formula: Enchant Weapon - Mongoose||r|v","Bands of Indwelling|e||","Bands of Nefarious Deeds|e||","Barbed Choker of Discipline|e||","Boots of Foretelling|e||","Bracers of Justice|e||","Bracers of Maliciousness|e||","Gloves of Centering|e||","Gloves of Quickening|e||","Iron Gauntlets of the Maiden|e||","Mitts of the Treemender|e||","Shard of the Virtuous|e||","Totem of Healing Rains|e||","Masquerade Gown|e||d","Wicked Witch's Hat|e||d","Beastmaw Pauldrons|e||","Big Bad Wolf's Head|e||","Big Bad Wolf's Paw|e||","Blade of the Unrequited|e||","Blue Diamond Witchwand|e||","Despair|e||","Eternium Greathelm|e||","Legacy|e||","Libram of Souls Redeemed|e||","Red Riding Hood's Cloak|e||","Ribbon of Sacrifice|e||","Romulo's Poison Vial|e||","Ruby Slippers|e||","Trial-Fire Trousers|e||","Wolfslayer Sniper Rifle|e||","Gloves of the Fallen Champion||t|v","Gloves of the Fallen Defender||t|v","Gloves of the Fallen Hero||t|v","Voidheart Gloves|e|s|d","Garona's Signet Ring|e||d","Dragon-Quake Shoulderguards|e||","Forest Wind Shoulderpads|e||","Pauldrons of the Solace-Giver|e||","Staff of Infinite Mysteries|e||","Wrynn Dynasty Greaves|e||","The Lightning Capacitor|e||d","Breastplate of the Lightbinder|e||","Cincture of Will|e||","Cord of Nature's Sustenance|e||","Fool's Bane|e||","Gilded Thorium Cloak|e||","Girdle of the Prowler|e||","Malefic Girdle|e||","Mender's Heart-Ring|e||","Shadowvine Cloak of Infusion|e||","Terestian's Stranglestaff|e||","Xavian Stiletto|e||","Formula: Enchant Weapon - Soulfrost||r|v","Drape of the Dark Reavers|e||d","Mantle of the Mind Flayer|e||d","Aran's Soothing Sapphire|e||","Boots of the Incorrupt|e||","Boots of the Infernal Coven|e||","Pauldrons of the Justice-Seeker|e||","Pendant of the Violet Eye|e||","Rapscallion Boots|e||","Saberclaw Talisman|e||","Shermanar Great-Ring|e||","Steelspine Faceguard|e||","Tirisfal Wand of Ascendancy|e||","Formula: Enchant Weapon - Sunfire||r|v","Cowl of Defiance|e||d","Jewel of Infinite Possibilities|e||d","Earthblood Chestguard|e||","Girdle of Truth|e||","Mantle of Abrahmis|e||","Mithril Band of the Unscarred|e||","Pantaloons of Repentance|e||","Rip-Flayer Leggings|e||","Shining Chain of the Afterworld|e||","Skulker's Greaves|e||","Spiteblade|e||","The Night Watchman|e||","Uni-Mind Headdress|e||","Ring of Recurrence|e||d","Battlescar Boots|e||","Bladed Shoulderpads of the Merciless|e||","Fiend Slayer Boots|e||","Forestlord Striders|e||","Girdle of Treachery|e||","Headdress of the High Potentate|e||","Heart-Flame Leggings|e||","King's Defender|e||","Legplates of the Innocent|e||","Mithril Chain of Heroism|e||","Triptych Shield of the Ancients|e||","Helm of the Fallen Champion||t|v","Helm of the Fallen Defender||t|v","Helm of the Fallen Hero||t|v","Gorehowl|e||d","Nathrezim Mindblade|e||d","Ring of a Thousand Marks|e||d","Sunfury Bow of the Phoenix|e||d","The Decapitator|e||d","Adornment of Stolen Souls|e||","Farstrider Wildercloak|e||","Jade Ring of the Everliving|e||","Light's Justice|e||","Malchazeen|e||","Ruby Drape of the Mysticant|e||","Stainless Cloak of the Pure Hearted|e||","Blazing Signet||q|","Chestguard of the Conniver|e||","Dragonheart Flameshield|e||","Emberspur Talisman|e||","Ferocious Swift-Kickers|e||","Ironstriders of Urgency|e||","Nightstaff of the Everliving|e||","Panzar'Thar Breastplate|e||","Robe of the Elder Scribes|e||","Scaled Breastplate of Carnage|e||","Shield of Impenetrable Darkness|e||","Stonebough Jerkin|e||","Talisman of Nightbane|e||","Pauldrons of the Fallen Champion||t|v","Pauldrons of the Fallen Defender||t|v","Pauldrons of the Fallen Hero||t|v","Cyclone Shoulderguards|e|s|d","Justicar Shoulderguards|e|s|","Mantle of Malorne|e|s|d","Voidheart Mantle|e|s|d","Bladespire Warbands|e||d","Brute Cloak of the Ogre-Magi|e||d","Malefic Mask of the Shadows|e||d","Maulgar's Warhelm|e||d","Belt of Divine Inspiration|e||","Hammer of the Naaru|e||","Leggings of the Fallen Champion||t|v","Leggings of the Fallen Defender||t|v","Leggings of the Fallen Hero||t|v","Earthen Signet||q|","Axe of the Gronn Lords|e||d","Bloodmaw Magus-Blade|e||d","Collar of Cho'gall|e||d","Cowl of Nature's Breath|e||d","Dragonspine Trophy|e||df","Gauntlets of Martial Perfection|e||d","Gronn-Stitched Girdle|e||d","Teeth of Gruul|e||d","Windshear Boots|e||d","Aldori Legacy Defender|e||","Eye of Gruul|e||","Gauntlets of the Dragonslayer|e||","Shuriken of Negation|e||","Chestguard of the Fallen Champion||t|v","Chestguard of the Fallen Defender||t|v","Chestguard of the Fallen Hero||t|v","Breastplate of Malorne|e|s|d","Justicar Chestguard|e|s|","Magtheridon's Head||q|v","Cloak of the Pit Stalker|e||d","Eredar Wand of Obliteration|e||d","Eye of Magtheridon|e||d","Glaive of the Pit|e||d","Karaborian Talisman|e||d","Liar's Tongue Gloves|e||d","Soul-Eater's Handwraps|e||d","Terror Pit Girdle|e||d","Aegis of the Vindicator|e||","Crystalheart Pulse-Staff|e||","Girdle of the Endless Pit|e||","Thundering Greathelm|e||","Pit Lord's Satchel|||v","Pendant of the Perilous|e|x|df","Boots of Courage Unending|e|x|v","Blackfathom Warbands|e||d","Boots of the Shifting Nightmare|e||d","Fathomstone|e||d","Pauldrons of the Wardancer|e||d","Ranger-General's Chestguard|e||d","Ring of Lethality|e||d","Robe of Hateful Echoes|e||d","Shoulderpads of the Stranger|e||d","Band of Vile Aggression|e||","Brighthelm of Justice|e||","Idol of the Crescent Goddess|e||","Living Root of the Wildheart|e||","Scarab of Displacement|e||","Wraps of Purification|e||","Pattern: Belt of Blasting||r|v","Pattern: Belt of Deep Shadow||r|v","Pattern: Belt of Natural Power||r|v","Pattern: Belt of the Black Eagle||r|v","Pattern: Belt of the Long Road||r|v","Pattern: Monsoon Belt||r|v","Plans: Belt of the Guardian||r|v","Plans: Red Belt of Battle||r|v","Boots of Effortless Striking|e||d","Bracers of Eradication|e||df","Choker of Animalistic Fury|e||d","Cord of Screaming Terrors|e||d","Tempest-Strider Boots|e||d","Velvet Boots of the Guardian|e||d","Ancestral Ring of Conquest|e||","Earring of Soulful Meditation|e||","Glowing Breastplate of Truth|e||","Grove-Bands of Remulos|e||","Libram of Absolute Truth|e||","Mallet of the Tides|e||","The Seal of Danzalar|e||","Gloves of the Vanquished Champion||t|v","Gloves of the Vanquished Defender||t|v","Gloves of the Vanquished Hero||t|v","Cataclysm Gauntlets|e|s|d","Crystalforge Handguards|e|s|","Deathmantle Handguards|e|s|d","Destroyer Gauntlets|e|s|df","Gloves of the Avatar|e|s|","Nordrassil Gauntlets|e|s|d","Rift Stalker Gauntlets|e|s|d","Coral-Barbed Shoulderpads|e||d","Fang of the Leviathan|e||d","Orca-Hide Boots|e||d","True-Aim Stalker Bands|e||d","Tsunami Talisman|e||d","Girdle of the Invulnerable|e||","Leggings of the Vanquished Champion||t|v","Leggings of the Vanquished Defender||t|v","Leggings of the Vanquished Hero||t|v","Breeches of the Avatar|e|s|","Cataclysm Legplates|e|s|d","Crystalforge Legguards|e|s|","Deathmantle Legguards|e|s|d","Destroyer Greaves|e|s|d","Leggings of Tirisfal|e|s|d","Rift Stalker Leggings|e|s|d","Voidheart Leggings|e|s|dv","Destroyer Legguards||s|","Bloodsea Brigand's Vest|e||d","Sextant of Unstable Currents|e||d","World Breaker|e||d","Fathom-Brooch of the Tidewalker|e||","Frayed Tether of the Drowned|e||","Soul-Strider Boots|e||","Illidari Shoulderpads|e||d","Mantle of the Tireless Tracker|e||d","Ring of Sundered Souls|e||d","Serpent-Coil Braid|e||d","Talon of Azshara|e||df","Warboots of Obliteration|e||df","Band of the Vigilant|e||","Girdle of the Tidal Call|e||","Gnarled Chestpiece of the Ancients|e||","Luminescent Rod of the Naaru|e||","Pauldrons of the Argent Sentinel|e||","Pendant of the Lost Ages|e||","Razor-Scale Battlecloak|e||","Helm of the Vanquished Champion||t|v","Helm of the Vanquished Defender||t|v","Helm of the Vanquished Hero||t|v","Cowl of the Avatar|e|s|","Cowl of Tirisfal|e|s|d","Crystalforge Faceguard|e|s|","Crystalforge Greathelm|e|s|d","Deathmantle Helm|e|s|d","Destroyer Greathelm|e|s|d","Hood of the Corruptor|e|s|d","Nordrassil Headguard|e|s|","Nordrassil Headpiece|e|s|d","Rift Stalker Helm|e|s|d","Vashj's Vial Remnant||m|","Belt of One-Hundred Deaths|e||df","Cobra-Lash Boots|e||d","Fang of Vashj|e||d","Serpent Spine Longbow|e||df","Vestments of the Sea-Witch|e||d","Coral Band of the Revived|e||","Glorious Gauntlets of Crestfall|e||","Krakken-Heart Breastplate|e||","Lightfathom Scepter|e||","Prism of Inner Calm|e||","Ring of Endless Coils|e||","Runetotem's Mantle|e||","Nether Vortex|||v","Scroll of the Maelstrom|||v","Girdle of Fallen Stars|e|x|d","Arcanite Steam-Pistol|e||d","Band of Al'ar|e||d","Claw of the Phoenix|e||d","Fire Crest Breastplate|e||d","Gloves of the Searing Grip|e||d","Mindstorm Wristbands|e||d","Phoenix-Wing Cloak|e||d","Talon of Al'ar|e||d","Talon of the Phoenix|e||d","Tome of Fiery Redemption|e||d","Netherbane|e||","Phoenix-Ring of Rebirth|e||","Talisman of the Sun King|e||","Pauldrons of the Vanquished Champion||t|v","Pauldrons of the Vanquished Defender||t|v","Pauldrons of the Vanquished Hero||t|v","Cataclysm Shoulderplates|e|s|d","Crystalforge Pauldrons|e|s|d","Deathmantle Shoulderpads|e|s|d","Destroyer Shoulderblades|e|s|df","Mantle of the Avatar|e|s|","Mantle of Tirisfal|e|s|d","Nordrassil Life-Mantle|e|s|","Nordrassil Wrath-Mantle|e|s|d","Rift Stalker Mantle|e|s|d","Destroyer Shoulderguards||s|","Cowl of the Grand Engineer|e||d","Fel Reaver's Piston|e||d","Void Reaver Greaves|e||d","Warp-Spring Coil|e||d","Fel-Steel Warhelm|e||","Girdle of Zaetar|e||","Wristguards of Determination|e||","Heartrazor|e||d","Star-Strider Boots|e||d","Trousers of the Astromancer|e||d","Vambraces of Ending|e||d","Void Star Talisman|e||d","Wand of the Forgotten Star|e||d","Worldstorm Gauntlets|e||d","Boots of the Resilient|e||","Ethereum Life-Staff|e||","Girdle of the Righteous Path|e||","Greaves of the Bloodwarder|e||","Solarian's Sapphire|e||","Star-Soul Breeches|e||","Chestguard of the Vanquished Champion||t|v","Chestguard of the Vanquished Defender||t|v","Chestguard of the Vanquished Hero||t|v","Cataclysm Chestplate|e|s|d","Crystalforge Breastplate|e|s|","Crystalforge Chestpiece|e|s|d","Destroyer Breastplate|e|s|df","Nordrassil Chestguard|e|s|","Nordrassil Chestpiece|e|s|d","Rift Stalker Hauberk|e|s|d","Robes of Tirisfal|e|s|d","Vestments of the Avatar|e|s|","Voidheart Robe|e|s|dv","Destroyer Chestguard||s|","Lord Sanguinar's Claim|e|q|","Telonicus's Pendant of Mayhem|e|q|dv","The Darkener's Grasp|e|q|","The Sun King's Talisman||q|d","Ashes of Al'ar||m|v","Devastation|l||d","Netherstrand Longbow|l||d","Staff of Disintegration|l||d","Warp Slicer|l||dv","Band of the Ranger-General|e||df","Crown of the Sun|e||d","Gauntlets of the Sun King|e||d","Leggings of Murderous Intent|e||df","Rod of the Sun King|e||d","Royal Cloak of the Sunstriders|e||d","Sunhawk Leggings|e||d","Thalassian Wildercloak|e||d","The Nexus Key|e||d","Twinblade of the Phoenix|e||d","Cosmic Infuser|l||","Infinity Blade|l||","Phaseshift Bulwark|l||","Royal Gauntlets of Silvermoon|e||","Sunshower Light Cloak|e||","Scroll of the Sun|||v","Verdant Sphere|||v"],"R":[{"id":"karazhan","n":"Karazhan","ph":1,"tier":"T4","sz":10,"zone":"Deadwind Pass","att":"Requires 'The Master's Key' — a long chain ending in a Black Morass run. Nightbane additionally needs Honored with The Violet Eye and the Blackened Urn.","desc":"The 10-player T4 raid and still the backbone of a Phase 2 roster: it gears alts and recruits fast, it is the only source of several Phase 2 BiS items (Nathrezim Mindblade, Drape of the Dark Reavers, The Lightning Capacitor), and Nightbane drops the Blazing Signet needed for the Serpentshrine Cavern attunement. A geared group clears the whole tower in two to three hours; the critical path is Moroes → Opera → The Curator → Chess → Prince Malchezaar, with Attumen, Maiden, Illhoof, Aran, Netherspite, and Nightbane hanging off it.","loc":"The tower at the south end of Deadwind Pass, between Duskwood and the Swamp of Sorrows.","bosses":[{"n":"Attumen the Huntsman","o":1,"opt":0,"m":"Starts as the horse Midnight; Attumen joins at 95% and the two merge into one mounted boss at 25%.","loot":[2,3,4,5,6,7,8,9,10,11,12,13,14,15]},{"n":"Moroes","o":2,"opt":0,"m":"Moroes brings four of six possible dinner-guest adds, randomised per lockout, and the pull is decided entirely by the crowd-control assignments made before it.","loot":[16,17,18,19,20,21,22,23,24,25,26,27,28,29]},{"n":"Maiden of Virtue","o":3,"opt":0,"m":"A spread-out fight.","loot":[30,31,32,33,34,35,36,37,38,39,40,41]},{"n":"Opera Event","o":4,"opt":0,"m":"One of three randomised encounters per lockout.","loot":[42,43,44,45,46,47,48,49,21,50,51,52,53,54,55,56,57,58]},{"n":"The Curator","o":5,"opt":0,"m":"The Curator summons Astral Flares that must be killed on sight — they explode for heavy damage on whoever they reach.","loot":[59,60,61,62,63,64,65,66,67,68]},{"n":"Terestian Illhoof","o":6,"opt":1,"m":"Kil'rek, the imp pet, applies a stacking armour debuff to the tank and must be killed on each respawn.","loot":[69,70,71,72,73,74,75,76,77,78,79,80,81]},{"n":"Shade of Aran","o":7,"opt":0,"m":"No threat table — Aran attacks whoever he likes, so there is no tank.","loot":[82,83,84,85,86,87,88,89,90,91,92,93,94]},{"n":"Netherspite","o":8,"opt":1,"m":"Three coloured beams shine from portals and each must be intercepted by a specific person: red for the tank (damage taken up, health drain), green for a healer (healing done up, mana drain), blue for a caster (damage done up, mana drain).","loot":[95,96,97,98,99,100,101,102,103,104,105,106,107]},{"n":"Chess Event","o":9,"opt":0,"m":"A scripted game of chess where each raider controls a piece by standing on it.","loot":[108,109,110,111,112,113,114,115,116,117,118,119]},{"n":"Prince Malchezaar","o":10,"opt":0,"m":"Three phases.","loot":[120,121,122,123,124,125,126,127,128,129,130,131,132,133,134]},{"n":"Nightbane","o":11,"opt":1,"m":"Summoned on Medivh's Terrace with the Blackened Urn, which requires its own quest chain and Honored with The Violet Eye.","loot":[135,136,137,138,139,140,141,142,143,144,145,146,147]}],"trash":[0,1],"ch":{"n":"The Master's Key","sum":"Eight quests that cross two continents and four dungeons, and the longest attunement in Phase 2 by some distance.","pre":["Level 70. Karazhan itself opens at 68, but the chain sends you through level-70 dungeons.","The Shadow Labyrinth Key, from Talon King Ikiss in Sethekk Halls — needed for the first fragment.","The Key to the Arcatraz, itself a quest chain, for the third fragment.","Attunement to the Black Morass (the Caverns of Time chain through Old Hillsbrad), for the final step.","A group for four level-70 dungeons: Shadow Labyrinth, The Steamvault, The Arcatraz and The Black Morass."],"rew":"The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on.","nv":1,"note":"Quest names, ids, givers and objectives read from Wowhead's TBC Classic quest pages (9824, 9825, 9826, 9829, 9831, 9832, 9836, 9837) and cross-checked against the Icy Veins attunement guide, which agrees on the order and the fragment locations. Flagged because two things are not settled by those sources: the exact level the chain requires (Karazhan opens at 68, and the quests are listed as level 70), and whether Anniversary realms drop this attunement in 2.4 as previous Classic runs did.","steps":[[1,"Arcane Disturbances","Take two crystal readings under Karazhan","Accept from Archmage Alturus at the foot of Karazhan's steps, then use the Violet Scrying Crystal at the Underground Well and the Underground Pond in the Master's Cellar and return to him.","Deadwind Pass","Outdoor",0],[2,"Restless Activity","Collect 10 Ghostly Essence","Kill the ghosts in the same cellar until you have 10 Ghostly Essence, and hand them to Archmage Alturus.","Deadwind Pass","Outdoor",0],[3,"Contact from Dalaran","Carry Alturus's Report to Dalaran","Take Alturus's Report to Archmage Cedric, outside the Dalaran dome in the Alterac Mountains.","Alterac Mountains","Outdoor",0],[4,"Khadgar","Report to Khadgar in Shattrath","Take Cedric's reply through the Dark Portal to Khadgar, in the centre of Shattrath City.","Shattrath City (Terokkar Forest)","Outdoor",0],[5,"Entry Into Karazhan","Loot the First Key Fragment","Clear Shadow Labyrinth to Murmur and take the First Key Fragment from the arcane container in his chamber, then return to Khadgar.","Shadow Labyrinth (Auchindoun, Terokkar Forest)","Normal",0],[6,"The Second and Third Fragments","Loot the remaining two fragments","Take the Second Key Fragment from an arcane container in Coilfang Reservoir — The Steamvault, in the water by Hydromancer Thespia — and the Third from an arcane container in Tempest Keep, on the upper floor of The Arcatraz. Return both to Khadgar.","The Steamvault (Zangarmarsh) and The Arcatraz (Netherstorm)","Normal",0],[7,"The Master's Touch","Have Medivh charge the key","Take the Restored Apprentice's Key into the Black Morass and defend Medivh through all eighteen waves. He enables the key when the portal closes.","The Black Morass (Caverns of Time, Tanaris)","Normal",0],[8,"Return to Khadgar","Turn in for The Master's Key","Show the charged key to Khadgar in Shattrath City. He hands back The Master's Key, which is the permanent attunement.","Shattrath City (Terokkar Forest)","Outdoor",0]]}},{"id":"gruuls-lair","n":"Gruul's Lair","ph":1,"tier":"T4","sz":25,"zone":"Blade's Edge Mountains","att":"None. Any level 70 can walk in.","desc":"A two-boss 25-player T4 raid that most Phase 2 groups clear in under an hour, and the entry point for 25-player raiding. It hands out T4 shoulder and leg tokens, the still-excellent Dragonspine Trophy, and — critically for Phase 2 — the Earthen Signet, one of the two items required for the Serpentshrine Cavern attunement.","loc":"Gruul's Lair sits inside the Blade's Edge Mountains cliffs north-west of Evergrove, sharing the approach with the ogre stronghold of Bladespire Hold.","bosses":[{"n":"High King Maulgar","o":1,"opt":0,"m":"A five-target pull: Maulgar plus four ogre lieutenants, each of which needs its own tank or controller assigned before the pull.","loot":[148,149,150,151,152,153,154,155,156,157,158,159,160]},{"n":"Gruul the Dragonkiller","o":2,"opt":0,"m":"Growth stacks every 30 seconds and permanently raises his damage and size, which makes this a hard damage race with no soft landing.","loot":[161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177]}],"trash":[]},{"id":"magtheridons-lair","n":"Magtheridon's Lair","ph":1,"tier":"T4","sz":25,"zone":"Hellfire Peninsula","att":"None for entry. Killing Magtheridon completes the final step of the Tempest Keep attunement chain.","desc":"A single-encounter 25-player T4 raid, and the last gate on the road to Tempest Keep. It is short, but it is the most coordination-dependent T4 fight: it needs five separate groups of five assigned to the Manticron Cubes, plus interrupt and banish rotations on the Hellfire Channelers.","loc":"The lowest wing of Hellfire Citadel in Hellfire Peninsula, sharing an entrance courtyard with Hellfire Ramparts, The Blood Furnace, and The Shattered Halls.","bosses":[{"n":"Magtheridon","o":1,"opt":0,"m":"The fight opens against five Hellfire Channelers keeping Magtheridon banished; they all aggro at once, heal each other with Dark Mending, and summon Burning Abyssals that have to be banished or feared off the healers.","loot":[178,179,180,181,182,183,183,184,185,186,187,188,189,190,191,192,193,194,195,196]}],"trash":[]},{"id":"serpentshrine-cavern","n":"Serpentshrine Cavern","ph":2,"tier":"T5","sz":25,"zone":"Zangarmarsh","att":"Requires 'The Cudgel of Kar'desh' (the Mark of Vashj). Also needs a Coilfang Reservoir key for the Heroic Slave Pens step.","desc":"One of the two headline Phase 2 raids, and the T5 helm, glove, and leg token source. The first five bosses can be killed in any order and all five must die before the ramp to Lady Vashj opens.","loc":"Inside Coilfang Reservoir in central Zangarmarsh — swim to the drainage pipe in the middle of the reservoir; the raid portal is separate from the Slave Pens / Underbog / Steamvault entrances.","bosses":[{"n":"Hydross the Unstable","o":1,"opt":0,"m":"A two-tank resistance fight.","loot":[199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220]},{"n":"The Lurker Below","o":2,"opt":0,"m":"Summoned by fishing the strange pool in the middle of the platform ring, which needs 300 fishing skill — clear the surrounding platforms first or the pull is unsurvivable.","loot":[221,222,223,224,225,226,227,228,229,230,231,232,233,213,214,215,218]},{"n":"Leotheras the Blind","o":3,"opt":0,"m":"Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes threat afterwards, and a demon form that must be tanked by a warlock in fire resistance gear because of Chaos Blast.","loot":[234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,213,214,215,216,217,218,219,220]},{"n":"Fathom-Lord Karathress","o":4,"opt":0,"m":"Four separate targets, each on its own tank.","loot":[250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,213,214,215,216,217,218,219,220]},{"n":"Morogrim Tidewalker","o":5,"opt":0,"m":"Earthquake damages everyone within 50 yards and spawns two packs of six murlocs from the room entrances; those packs are kited into the boss and AoE'd down, which is where a paladin off-tank earns their place.","loot":[268,269,270,271,272,273,274,275,276,277,278,279,280,213,214,215,216,217,218,219,220]},{"n":"Lady Vashj","o":6,"opt":0,"m":"Three phases and the hardest fight in Serpentshrine Cavern.","loot":[281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,213,214,215,216,217,218,219,220]}],"trash":[197,198],"ch":{"n":"The Cudgel of Kar'desh","sum":"A short chain by TBC standards — two raid items and a walk back to a heroic dungeon — but it is expensive because both items come from Phase 1 raid bosses, one of which (Nightbane) needs its own quest chain and Violet Eye reputation before it can even be summoned.","pre":["Level 70.","Revered with Cenarion Expedition, or a guild member who is, to obtain the Reservoir Key for Heroic Coilfang dungeons.","A raid group able to kill Gruul the Dragonkiller (25-player).","A Karazhan group with someone who holds the Blackened Urn, which requires Honored with The Violet Eye and the Medivh's Journal quest chain."],"rew":"The Mark of Vashj — permanent access to Serpentshrine Cavern.","nv":1,"note":"Step order and requirements are cross-checked against two guide sources. The one point not verified for Anniversary realms specifically is whether Blizzard has changed the Reservoir Key reputation requirement from its original Revered gate.","steps":[[1,"The Cudgel of Kar'desh","Pick up the quest from Skar'this the Heretic","Clear Heroic The Slave Pens as far as Mennu the Betrayer, then talk to the caged naga Skar'this the Heretic just past him and accept the quest.","The Slave Pens, Coilfang Reservoir (Zangarmarsh)","Heroic",0],[2,"","Loot the Earthen Signet","Kill Gruul the Dragonkiller and loot the Earthen Signet from his corpse. It is a guaranteed drop, and every eligible raider gets one.","Gruul's Lair (Blade's Edge Mountains)","Raid",0],[3,"","Loot the Blazing Signet","Summon Nightbane on Medivh's Terrace with the Blackened Urn and kill him, then loot the Blazing Signet. Nightbane is optional content, so most groups schedule this deliberately rather than stumbling into it.","Karazhan (Deadwind Pass)","Raid",0],[4,"The Cudgel of Kar'desh","Turn in to Skar'this","Return to Skar'this the Heretic in Heroic The Slave Pens with both signets and hand in the quest. He casts The Mark of Vashj on you, which is the permanent attunement.","The Slave Pens, Coilfang Reservoir (Zangarmarsh)","Heroic",0]]}},{"id":"tempest-keep","n":"Tempest Keep: The Eye","ph":2,"tier":"T5","sz":25,"zone":"Netherstorm","att":"Requires 'The Tempest Key' from the Trial of the Naaru chain, which ends on a Magtheridon kill.","desc":"The other headline Phase 2 raid and the T5 shoulder and chest token source. Only four bosses, but the difficulty curve is brutal at the end: Void Reaver is a famously free loot piñata that gears a raid quickly, Al'ar and Solarian are moderate, and Kael'thas Sunstrider is a 20-plus-minute five-phase encounter that was the hardest fight in the game at this point in the expansion.","loc":"The central satellite of the Tempest Keep structure in western Netherstorm.","bosses":[{"n":"Al'ar","o":1,"opt":0,"m":"Phase 1 has Al'ar cycling clockwise between four platforms every 30 seconds, dropping a Phoenix Hawk add on each move; a tank per platform picks the boss up as it lands and melee kill the adds.","loot":[310,311,312,313,314,315,316,317,318,319,320,321,322,213,214,215,216,217,218,219,220]},{"n":"Void Reaver","o":2,"opt":0,"m":"Mechanically the simplest boss in Tier 5 and famous for gearing raids fast.","loot":[323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,213,214,215,216,217,218,219,220]},{"n":"High Astromancer Solarian","o":3,"opt":0,"m":"Three phases on a fixed timer.","loot":[343,344,345,346,347,348,349,350,351,352,353,354,355,213,214,215,216,217,218,219,220]},{"n":"Kael'thas Sunstrider","o":4,"opt":0,"m":"A five-phase, 20-plus-minute encounter and the hardest fight of Phase 2.","loot":[356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,307,394,395,213,214,215,216,217,218,219,220]}],"trash":[309],"ch":{"n":"The Trial of the Naaru","sum":"The long one.","pre":["Level 70.","The Cipher of Damnation questline in Shadowmoon Valley completed — A'dal will not offer the trials until it is done.","Key to the Arcatraz, which itself requires the Shattered Halls, Steamvault, and Botanica/Mechanar key chains.","Heroic keys for Hellfire Citadel, Coilfang Reservoir, Auchindoun, and Tempest Keep (Honored or better with the relevant factions).","A raid group able to kill Magtheridon (25-player)."],"rew":"The Tempest Key (access to The Eye), the Phoenix-fire Band, and the \"Hand of A'dal\" title.","nv":1,"note":"Step order and objectives are cross-checked against two guide sources. Unverified for Anniversary realms: whether the Cipher of Damnation prerequisite is still enforced before A'dal offers the trials, and whether the Hand of A'dal title is still awarded on this patch.","steps":[[1,"The Tempest Key","Speak to Khadgar and A'dal","Take 'The Tempest Key' from Khadgar in Shattrath City, which sends you to A'dal to begin the trials.","Shattrath City (Terokkar Forest)","Outdoor",0],[2,"Trial of the Naaru: Mercy","Save the prisoners in Shattered Halls","Clear Heroic The Shattered Halls and kill Warchief Kargath Bladefist before the Shattered Hand Executioner kills any of the three caged prisoners. The timer starts on entry, so this is a speed run, not a careful clear.","The Shattered Halls, Hellfire Citadel","Heroic",0],[3,"Trial of the Naaru: Strength","Two heroic final bosses","Kill Warlord Kalithresh in Heroic The Steamvault and Murmur in Heroic Shadow Labyrinth.","The Steamvault (Coilfang Reservoir) and Shadow Labyrinth (Auchindoun)","Heroic",0],[4,"Trial of the Naaru: Tenacity","Keep Millhouse Manastorm alive","Kill Harbinger Skyriss in Heroic The Arcatraz with Millhouse Manastorm still alive. He pulls aggro constantly and stands in everything, which is what makes this the trial groups fail most.","The Arcatraz, Tempest Keep","Heroic",0],[5,"Trial of the Naaru: Magtheridon","Kill Magtheridon","Kill Magtheridon in Magtheridon's Lair and return to A'dal.","Magtheridon's Lair, Hellfire Citadel","Raid",0]]}}]};
+</script>
+<script>
+(function(){
+"use strict";
+/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
+const $=(s,r=document)=>r?r.querySelector(s):null, $$=(s,r=document)=>r?Array.from(r.querySelectorAll(s)):[];
+const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
+const root=document.documentElement, live=$("#live");
+const say=t=>{if(live)live.textContent=t;};
+/* ---------- render: one raid -> summary, attunement and a card per boss (also run at build time for the no-JS view) ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const QN={e:"Epic",r:"Rare",u:"Uncommon",l:"Legendary"};
+const KN={t:"Tier token",s:"Set piece · from token",m:"Mount",r:"Recipe",q:"Quest item",x:"Trash drop"};
+const SHOW=6;
+let LITE=false; /* build-time no-JS view: list the first six, count the rest */
+function lootLi(i){
+  const [n,q,k,f]=DATA.T[i].split("|");
+  const tags=[];
+  if(k)tags.push(`<span class="tag ${k}">${KN[k]}</span>`);
+  if(f.includes("f"))tags.push(`<span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span>`);
+  else if(f.includes("d")&&!k)tags.push(`<span class="tag d">DPS</span>`);
+  const qt=q?`<span class="sr">, ${QN[q]}</span>`:`<span class="sr">, not in the item catalogue</span>`;
+  return `<li><span class="nm q-${q||"n"}">${esc(n)}</span>${qt}${tags.join("")}</li>`;
+}
+function lootList(ids){
+  const head=ids.slice(0,SHOW).map(lootLi).join(""),rest=ids.slice(SHOW);
+  return `<ul class="loot">${head}</ul>`+(rest.length&&LITE?`<p class="static-note">+${rest.length} more drops (turn on JavaScript to expand)</p>`:rest.length?`<details class="more"><summary>${rest.length} more</summary><ul class="loot">${rest.map(lootLi).join("")}</ul></details>`:"");
+}
+function bossCard(b){
+  const o=b.opt?`<span class="opt">Optional</span>`:`<span class="o">${String(b.o).padStart(2,"0")}</span>`;
+  return `<div class="layer" style="--z:${3+(b.o%4)}"><section class="box boss" aria-label="${esc(b.n)}"><h3>${o}<span>${esc(b.n)}</span><small>${b.loot.length} drops</small></h3>`+
+    `<div class="in"><p class="mech">${esc(b.m)}</p>${lootList(b.loot)}</div></section></div>`;
+}
+function attBox(r){
+  const c=r.ch;
+  if(!c)return `<section class="box" aria-labelledby="h-att"><h2 id="h-att">Attunement <small>none</small></h2><div class="in"><p><strong>${esc(r.att)}</strong></p>`+
+    `<p>${r.id==="magtheridons-lair"?"Killing Magtheridon is the last step of the Tempest Keep attunement.":"Gruul drops the Earthen Signet, half of the Serpentshrine Cavern attunement."}</p></div></section>`;
+  const steps=c.steps.map(s=>`<li><span class="n">${String(s[0]).padStart(2,"0")}</span><b>${esc(s[2])}${s[5]?`<span class="diff ${s[5]}">${s[5]}</span>`:""}</b>`+
+    `${s[1]?`<span class="qn">Quest: ${esc(s[1])} · </span>`:""}<span class="qn">${esc(s[4])}</span><p>${esc(s[3])}</p></li>`).join("");
+  return `<section class="box" aria-labelledby="h-att"><h2 id="h-att">Attunement · ${esc(c.n)} <small>${c.steps.length} steps</small></h2><div class="in">`+
+    (c.nv?`<p class="verify"><strong>Not yet confirmed for Anniversary realms.</strong> ${esc(c.note)}</p>`:"")+
+    `<p>${esc(c.sum)}</p><h3 class="mini">Before step 1</h3><ul class="pre">${c.pre.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`+
+    `<h3 class="mini">Steps</h3><ol class="att">${steps}</ol><p><strong>Reward:</strong> ${esc(c.rew)}</p></div></section>`;
+}
+function raidHTML(r){
+  const drops=r.bosses.reduce((n,b)=>n+b.loot.length,0);
+  const sum=`<section class="box" aria-labelledby="h-raid"><h2 id="h-raid">${esc(r.n)} <small>Phase ${r.ph} · ${r.tier}</small></h2><div class="in">`+
+    `<ul class="facts"><li><b>Size</b>${r.sz}</li><li><b>Bosses</b>${r.bosses.length}</li><li><b>Drops</b>${drops}</li><li><b>Zone</b>${esc(r.zone)}</li></ul>`+
+    `<p>${esc(r.desc)}</p><p><strong>Getting there:</strong> ${esc(r.loc)}</p><p><strong>Can I get in?</strong> ${esc(r.att)}</p>`+
+    `<p class="prov">Loot: Wowhead drop tables via <code>ingest-raid-loot.mjs</code> · quality: <code>itemCatalogue.json</code> (wowsims/tbc) · Phase ${r.ph} · updated 27 Sep</p></div></section>`;
+  const bosses=r.bosses.map(bossCard).join("");
+  const trash=r.trash.length?`<section class="box trash" aria-labelledby="h-trash"><h2 id="h-trash">Notable trash drops <small>${r.trash.length}</small></h2><div class="in">${lootList(r.trash)}</div></section>`:"";
+  return `<div class="rgrid"><div class="layer" style="--z:5">${sum}</div><div class="layer" style="--z:3">${attBox(r)}</div></div>`+
+    `<div class="bosshead"><h2>Bosses and loot</h2><ul class="legend2"><li><span class="q-e">Epic</span> · <span class="q-r">Rare</span> · <span class="q-n">grey: not in the catalogue</span></li><li>Sorted: tokens, quest items, mounts, DPS gear, the rest, recipes</li></ul></div>`+
+    `<div class="bosses">${bosses}</div>${trash}`;
+}
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+
+/* ---------- raid picker: re-renders the view, re-lights the page and the scene, keeps the choice in the URL hash ---------- */
+const view=$("#raidview"), raidBtns=$$("#rpick button[data-raid]");
+const byId=id=>DATA.R.find(r=>r.id===id);
+const look=r=>r.ph===1?{raid:"p1",phase:"1",tk:0,warm:1}:r.id==="tempest-keep"?{raid:"tk",phase:"2",tk:1,warm:0}:{raid:"ssc",phase:"2",tk:0,warm:0};
+let current=null;
+function relight(r){
+  const L=look(r);root.dataset.raid=L.raid;root.dataset.phase=L.phase;
+  if(!SC.mix)return;
+  if(M.on&&M.relight)M.relight(L);
+  else{SC.mix.tk=L.tk;SC.mix.warm=L.warm;if(SC.render)SC.render();}
+}
+function select(id,opts){
+  const r=byId(id);if(!r||!view)return;
+  const same=current===id;current=id;
+  raidBtns.forEach(b=>b.setAttribute("aria-pressed",b.dataset.raid===id));
+  if(!(opts&&opts.keepView)&&!same)view.innerHTML=raidHTML(r);
+  relight(r);
+  if(opts&&opts.user){
+    try{history.replaceState(null,"","#"+id);}catch(e){}
+    const drops=r.bosses.reduce((n,b)=>n+b.loot.length,0);
+    say(r.n+" selected: "+r.bosses.length+" bosses, "+drops+" drops"+(r.ch?", attunement "+r.ch.n:", no attunement")+".");
+    if(M.on&&M.cards)M.cards();
+  }
+}
+raidBtns.forEach(b=>on(b,"click",()=>select(b.dataset.raid,{user:true})));
+/* the static page ships Serpentshrine pre-rendered; only re-render if the hash asks for another raid */
+{const h=decodeURIComponent((location.hash||"").slice(1));select(byId(h)?h:"serpentshrine-cavern",{keepView:!byId(h)||h==="serpentshrine-cavern"});}
+on(window,"hashchange",()=>{const h=decodeURIComponent(location.hash.slice(1));if(byId(h))select(h);});
+
+
+
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+
+/* ================= MOTION LAYER ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined";
+if(tog)tog.hidden=false;
+function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  if(tog)tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+if(ST)gsap.registerPlugin(ScrollTrigger);
+let ctx=null, mm=null;
+const A=fn=>ctx?ctx.add(fn):fn();
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  const w=$("#wipe");if(w)w.style.display="none";
+  Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
+  SC.mix.charge=0;{const r=byId(current);if(r){const L=look(r);SC.mix.tk=L.tk;SC.mix.warm=L.warm;}}SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);SC.setMotion(true);
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
+  else{if(tog)tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+function splitHero(){
+  const h=$("#h-raids");if(!h||h.dataset.split)return false;
+  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
+  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
+  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
+  return true;
+}
+/* 1. Intro: the scene settles from above, words rise out of masks, the target chips land, cards in view rise. ~1.4s */
+function intro(){
+  const split=splitHero();
+  const inView=$$("#raidview .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  inView.forEach(b=>b.dataset.introd="1");
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
+  if(split&&$("#h-raids .w>span"))tl.from("#h-raids .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  if($("#rpick button"))tl.from("#rpick button",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
+  if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  safe(tl);
+}
+/* 2. Scroll: the camera drifts over the water; boss cards rise as they arrive (only the first render; a raid switch uses M.cards) */
+function scrollStory(){
+  gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
+  if($("#raidview"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#raidview",start:"top 85%",end:"top 15%",scrub:.8}});
+  $$("#raidview .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>{
+    if(!b.isConnected)return;
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"}));})}));
+}
+/* 3. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 4. Changing raid: the scene re-lights toward the new raid's palette with a short pulse; the new cards rise in */
+M.relight=L=>A(()=>safe(gsap.timeline()
+  .to(SC.mix,{tk:L.tk,warm:L.warm,duration:.9,ease:"power2.inOut",onUpdate:SC.render},0)
+  .to(SC.mix,{charge:.6,duration:.25,ease:"power2.in",onUpdate:SC.render},0)
+  .to(SC.mix,{charge:0,duration:.8,ease:"power2.out",onUpdate:SC.render},.25)));
+M.cards=()=>A(()=>{
+  if(ST)ScrollTrigger.refresh();
+  const boxes=$$("#raidview .box").filter(b=>b.getBoundingClientRect().top<innerHeight*1.2);
+  if(boxes.length)safe(gsap.fromTo(boxes,{y:40,rotationX:-10,autoAlpha:0,transformOrigin:"50% 100%"},{y:0,rotationX:0,autoAlpha:1,duration:.6,stagger:.04,ease:"expo.out",clearProps:"transform,opacity,visibility"}));
+});
+
+M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));
+/* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
+$$("nav.sections a").forEach(a=>on(a,"click",e=>{
+  if(!M.on||a.getAttribute("aria-current")==="page"||e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;
+  const w=$("#wipe"),sp=$("span",w);if(!w||!sp)return;
+  e.preventDefault();
+  const href=a.href;sp.textContent=a.textContent;w.style.display="grid";
+  const tl=gsap.timeline({onComplete:()=>{location.href=href;}});
+  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(sp,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
+  safe(tl);
+}));
+/* returning via the back/forward cache: drop the curtain */
+addEventListener("pageshow",e=>{if(e.persisted){const w=$("#wipe");if(w)w.style.display="none";SC.cam.dive=0;SC.render();}});
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
+</body>
+</html>

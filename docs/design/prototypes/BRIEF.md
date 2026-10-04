@@ -42,8 +42,8 @@ Haste Rating 163 · Expertise 64 · Armor Pen 0. Melee hit cap for a dual-wielde
 
 **Gear (slot: item + enchant, source):**
 - Head: Destroyer Battle-Helm + Glyph of Ferocity (T5 token, Lady Vashj, Serpentshrine Cavern)
-- Neck: Pendant of the Perilous (Karazhan)
-- Shoulders: Destroyer Shoulderblades + Might of the Scourge (T5 token, Kael'thas Sunstrider, Tempest Keep)
+- Neck: Pendant of the Perilous (Serpentshrine Cavern trash)
+- Shoulders: Destroyer Shoulderblades + Might of the Scourge (T5 token, Void Reaver, Tempest Keep)
 - Back: Black-Iron Battlecloak + Greater Agility
 - Chest: Destroyer Breastplate + Exceptional Stats (T5 token, Kael'thas Sunstrider, Tempest Keep)
 - Wrists: Bracers of Eradication + Brawn
@@ -60,7 +60,7 @@ Haste Rating 163 · Expertise 64 · Armor Pen 0. Melee hit cap for a dual-wielde
 - Ranged: Serpent Spine Longbow + Khorium Scope
 
 Where a source isn't listed, don't make one up: leave it off or write "source in guide".
-"Destroyer Battlegear (4/5)" is the tier set count (4 Destroyer pieces equipped).
+"Destroyer Battlegear (4/5)" is the tier set count (4 Destroyer pieces equipped). The five T5 token bosses are Lady Vashj (helm), Void Reaver (shoulders), Kael'thas Sunstrider (chest), Leotheras the Blind (gloves) and Fathom-Lord Karathress (legs); the legs token is not in this set.
 
 **Spec Tier List (Wowhead, Phase 2, DPS):** S: Arcane Mage, Destruction Warlock, Beast Mastery
 Hunter, Fury Warrior · A: Arms Warrior, Enhancement Shaman, Affliction Warlock, Survival Hunter · B:

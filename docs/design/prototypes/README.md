@@ -39,6 +39,17 @@ Three styles pushed as far as they go, each built on the Launcher, on the Portal
 the two: 9 concepts. They use live WebGL (Three.js) and GSAP-driven motion. Full write-up, including
 libraries, fallbacks and checks, in [`round3/README.md`](round3/README.md).
 
+## Round 4: the chosen direction (2026-10-03)
+
+3D · Portal's layout and scene with Motion · Portal's motion, aimed at the planner's Phase 2 job.
+The Hybrid designs from round 3 were dropped. See [`round4/README.md`](round4/README.md).
+
+## Tab by tab
+
+**Step 1 is done:** a baseline of all seven tabs in the round-4 style, linked together as one
+clickable site, on the app's real data. See [`tabs/README.md`](tabs/README.md). **Step 2** walks
+through them one at a time, three designs per step.
+
 ## Caveats
 
 - **Some numbers are invented.** DPS figures, stat weights and comparison deltas are labelled

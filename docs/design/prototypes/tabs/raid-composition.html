@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Raid Composition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
+  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(3,10,14,.8);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#9ff3ea;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
+  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+html[data-raid="tk"] .fallback{background:
+  radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
+  radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
+  linear-gradient(180deg,#07040f 0%,#160c2a 55%,#1f1236 100%)}
+html[data-phase="1"] .fallback{background:
+  radial-gradient(60% 40% at 50% 78%,rgba(242,166,90,.26),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(217,84,43,.14),transparent 70%),
+  linear-gradient(180deg,#070504 0%,#1a120b 55%,#24170c 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections button{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections button:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{min-height:min(62vh,560px);display:grid;align-content:end;padding:48px 0 28px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.btn.big{font-size:var(--t-md);padding:11px 20px}
+.capline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-sm);margin:0}
+.capline b{color:var(--warn)}
+.raidpick{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:var(--t-xs);color:var(--ink-2)}
+.raidpick button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);border-radius:999px;padding:4px 10px;cursor:pointer}
+.raidpick button[aria-pressed="true"]{border-color:var(--glow);color:var(--glow);background:var(--glow-soft)}
+.raidpick button:disabled{opacity:.55;cursor:not-allowed}
+/* hit-cap gauge */
+.gauge{height:6px;background:rgba(255,207,122,.14);border-radius:3px;overflow:hidden;margin:4px 0 6px}
+.gauge i{display:block;height:100%;width:98.6%;background:var(--warn);transform-origin:left;box-shadow:0 0 10px var(--warn)}
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+.q-epic{color:var(--q-epic)}
+.glyph{display:inline-grid;place-items:center;width:28px;height:28px;flex:none;border:2px solid var(--q-epic);border-radius:4px;font:600 10px/1 var(--f-mono);color:var(--ink-2);background:rgba(192,140,255,.08);box-shadow:0 0 10px rgba(192,140,255,.25)}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.char{display:flex;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rim-2);margin:12px 0;border:1px solid var(--rim-2);border-radius:8px;overflow:hidden}
+.stats div{background:rgba(4,16,22,.85);padding:7px 9px}
+.stats dt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stats dd{margin:0;font:500 var(--t-md) var(--f-mono);font-variant-numeric:tabular-nums}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+.subtabs{position:relative;display:flex;gap:6px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--rim-2)}
+.subtabs button{font:600 var(--t-sm) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.subtabs button[aria-selected="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.sketch{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.sketch>div{border:1px solid var(--rim-2);background:rgba(4,16,22,.7);padding:11px;border-radius:10px;font-size:var(--t-sm)}
+.sketch h3{margin:0 0 4px;font:400 var(--t-md) var(--f-head)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);background:var(--warn-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.real{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--glow);border:1px solid var(--rim);background:var(--glow-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.note{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:9px 11px;margin:0}
+.note strong{color:var(--warn)}
+.empty{font-size:var(--t-sm);color:var(--ink-3);border:1px dashed var(--rim);border-radius:10px;padding:12px;margin-top:14px}
+.full{grid-column:1/-1}
+/* ---------- Raid Composition tab: Serpentshrine teal, calmer and dimmer behind a dense roster ---------- */
+.veil{background:linear-gradient(180deg,rgba(3,9,13,.5),rgba(3,9,13,.25) 30%,rgba(3,9,13,.7))}
+.hero.rc{min-height:min(40vh,380px)}
+.hero.rc h1{max-width:20ch}
+.target{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.target span{font:500 var(--t-sm) var(--f-mono);background:var(--glow-soft);border:1px solid var(--rim);border-radius:999px;padding:4px 11px;color:var(--ink)}
+.target span b{font-family:var(--f-body);font-weight:600;color:var(--ink-3);margin-right:6px}
+.rcgrid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:1000px){.rcgrid{grid-template-columns:minmax(0,1.75fr) minmax(0,1fr)}}
+/* controls */
+.rcbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:0 0 12px}
+.seg{display:inline-flex;border:1px solid var(--rim);border-radius:999px;overflow:hidden;background:var(--glass-2)}
+.seg button{font:600 var(--t-sm) var(--f-body);background:none;border:0;color:var(--ink-2);padding:7px 14px;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--glow);color:var(--glow-ink)}
+.status{font-size:var(--t-sm);color:var(--ink-2);min-height:1.5em;margin:8px 0 0}
+.status b{color:var(--glow)}
+/* groups */
+.groups{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.grp{border:1px solid var(--rim-2);border-radius:12px;background:rgba(4,16,22,.72);padding:10px;min-width:0}
+.grp h3{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin:0 0 8px;font:400 var(--t-md) var(--f-head)}
+.grp h3 small{font:500 var(--t-xs) var(--f-mono);color:var(--ink-3)}
+.seats{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.seat{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 6px 5px 8px;border:1px solid var(--rim-2);border-radius:8px;background:var(--scrim);font-size:var(--t-sm)}
+.seat .dot{width:8px;height:8px;border-radius:50%;background:var(--c,#888);box-shadow:0 0 8px var(--c,#888)}
+.seat .who{min-width:0}
+.seat .who b{display:block;font-weight:600;overflow-wrap:anywhere}
+.seat .who small{display:block;font-size:var(--t-xs);color:var(--ink-3)}
+.seat.empty .who b{color:var(--ink-3);font-weight:400}
+.seat button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);color:var(--ink-2);border:1px solid var(--rim);border-radius:999px;padding:5px 10px;cursor:pointer;min-height:30px;white-space:nowrap}
+.seat button:hover{color:var(--ink);border-color:var(--glow)}
+.seat.held{border-color:var(--glow);box-shadow:0 0 0 1px var(--glow),0 0 18px -4px var(--glow)}
+.seat.held button{background:var(--glow);color:var(--glow-ink);border-color:var(--glow)}
+.moving .seat:not(.held) button{border-style:dashed;color:var(--glow)}
+.gets{margin:9px 0 0;padding-top:8px;border-top:1px solid var(--rim-2)}
+.gets h4{margin:0 0 5px;font:600 10px var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0;padding:0}
+.chips li{font-size:11px;line-height:1.3;padding:2px 7px;border-radius:999px;background:var(--glow-soft);border:1px solid var(--rim);color:var(--ink)}
+.chips li.none{background:none;border-style:dashed;color:var(--ink-3)}
+.gets p{margin:6px 0 0;font-size:var(--t-xs);color:var(--ink-3)}
+.scope{display:inline-block;font:700 9px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px;border:1px solid var(--rim);color:var(--ink-2)}
+.scope.party{color:var(--glow)}
+.scope.raid{color:var(--q-rare);border-color:rgba(75,163,255,.4)}
+.scope.target{color:var(--p1);border-color:rgba(242,166,90,.4)}
+/* role balance */
+.roles{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr) 2.4em;gap:8px 10px;align-items:center;font-size:var(--t-sm)}
+.roles .bar{height:8px;border-radius:4px;background:rgba(79,216,200,.1);overflow:hidden}
+.roles .bar i{display:block;height:100%;background:var(--glow);border-radius:4px;transform-origin:left}
+.roles .n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+/* add / missing lines */
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.lines li{padding:8px 10px;border-radius:9px;background:var(--scrim);border:1px solid var(--rim-2);font-size:var(--t-sm)}
+.lines li b{color:var(--glow);font-weight:600}
+.lines li .g{display:block;font:500 10px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:2px}
+.lines li.ok{border-style:dashed;color:var(--ink-3)}
+.lines li.warnl{border-color:rgba(255,207,122,.3)}
+.lines li.warnl b{color:var(--warn)}
+.box .in>p{margin:0 0 10px;font-size:var(--t-sm);color:var(--ink-2)}
+.coverage{display:grid;gap:8px}
+.coverage h3{margin:6px 0 4px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+@media (max-width:440px){.groups{grid-template-columns:1fr}.roles{grid-template-columns:minmax(0,6.5em) minmax(0,1fr) 2.2em}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Tab prototype · Raid Composition · Step 1 baseline. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-composition.html" aria-current="page">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html">Raids</a>
+      <a href="professions.html">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Buff scopes: Wowhead spell tooltips (<code>buffScope.json</code>, updated 23 Aug) · buffs: <code>sampleBuffs.ts</code>, checked against wowsims/tbc @3301fca5, updated 30 Sep</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+<section aria-labelledby="h-rc">
+  <div class="hero rc">
+    <div class="hero-in">
+      <div class="eyebrow">Raid Composition · groups of five · Serpentshrine light</div>
+      <h1 id="h-rc">Seat your raid so <em>every group gets its buffs</em>.</h1>
+      <p>In TBC, 24 of the 33 raid buffs reach only the caster's own party: every totem, every aura, both shouts. Where a player sits decides who gets them. Seat a 10 or 25-player raid, see what each group receives, and what one more seat would add.</p>
+      <div class="target" aria-label="What this screen counts">
+        <span><b>Party buffs</b>24</span>
+        <span><b>Raid or single-target</b>9</span>
+        <span><b>Boss debuffs</b>8</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rcgrid">
+    <div class="col">
+      <div class="layer" style="--z:4"><section class="box" id="b-groups" aria-labelledby="h-groups">
+        <h2 id="h-groups">Groups <small><span class="ex">example roster</span> · real specs</small></h2>
+        <div class="in">
+          <p class="note"><strong>Counts are who could cast it, not what will be up at once.</strong> This follows Wowhead's raid-composition tool: one Paladin lights up every Greater Blessing here but holds one in the game; the same goes for a Shaman's totems and a Warrior's shouts.</p>
+          <div class="rcbar">
+            <div class="seg" role="group" aria-label="Raid size">
+              <button type="button" data-size="10" aria-pressed="false">10-player</button>
+              <button type="button" data-size="25" aria-pressed="true">25-player</button>
+            </div>
+            <button class="btn ghost magnet" id="exportbtn" type="button">Export image</button>
+          </div>
+          <p class="prov" style="margin:0 0 10px">To move a player, press <b>Move</b> on their seat, then <b>Here</b> on the seat you want. The two swap. Esc cancels.</p>
+          <div class="groups" id="groups">
+            <div class="grp"><h3>Group 1 <small>5/5</small></h3><ul class="seats">
+              <li class="seat" style="--c:#C69B6D"><span class="dot"></span><span class="who"><b>Protection Warrior</b><small>Tank</small></span></li>
+              <li class="seat" style="--c:#F48CBA"><span class="dot"></span><span class="who"><b>Protection Paladin</b><small>Tank</small></span></li>
+              <li class="seat" style="--c:#FF7C0A"><span class="dot"></span><span class="who"><b>Feral (Bear) Druid</b><small>Tank</small></span></li>
+              <li class="seat" style="--c:#F48CBA"><span class="dot"></span><span class="who"><b>Holy Paladin</b><small>Healer</small></span></li>
+              <li class="seat" style="--c:#0070DD"><span class="dot"></span><span class="who"><b>Restoration Shaman</b><small>Healer</small></span></li></ul></div>
+            <div class="grp"><h3>Group 2 <small>5/5</small></h3><ul class="seats">
+              <li class="seat" style="--c:#C69B6D"><span class="dot"></span><span class="who"><b>Fury Warrior</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#C69B6D"><span class="dot"></span><span class="who"><b>Fury Warrior</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#FFF468"><span class="dot"></span><span class="who"><b>Combat Rogue</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#0070DD"><span class="dot"></span><span class="who"><b>Enhancement Shaman</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#FF7C0A"><span class="dot"></span><span class="who"><b>Feral (Cat) Druid</b><small>Physical DPS</small></span></li></ul></div>
+            <div class="grp"><h3>Group 3 <small>5/5</small></h3><ul class="seats">
+              <li class="seat" style="--c:#3FC7EB"><span class="dot"></span><span class="who"><b>Fire Mage</b><small>Caster DPS</small></span></li>
+              <li class="seat" style="--c:#8788EE"><span class="dot"></span><span class="who"><b>Destruction Warlock</b><small>Caster DPS</small></span></li>
+              <li class="seat" style="--c:#0070DD"><span class="dot"></span><span class="who"><b>Elemental Shaman</b><small>Caster DPS</small></span></li>
+              <li class="seat" style="--c:#FFFFFF"><span class="dot"></span><span class="who"><b>Shadow Priest</b><small>Caster DPS</small></span></li>
+              <li class="seat" style="--c:#FF7C0A"><span class="dot"></span><span class="who"><b>Balance Druid</b><small>Caster DPS</small></span></li></ul></div>
+            <div class="grp"><h3>Group 4 <small>5/5</small></h3><ul class="seats">
+              <li class="seat" style="--c:#AAD372"><span class="dot"></span><span class="who"><b>Beast Mastery Hunter</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#AAD372"><span class="dot"></span><span class="who"><b>Marksmanship Hunter</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#AAD372"><span class="dot"></span><span class="who"><b>Survival Hunter</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#F48CBA"><span class="dot"></span><span class="who"><b>Retribution Paladin</b><small>Physical DPS</small></span></li>
+              <li class="seat" style="--c:#FFF468"><span class="dot"></span><span class="who"><b>Combat Rogue</b><small>Physical DPS</small></span></li></ul></div>
+            <div class="grp"><h3>Group 5 <small>5/5</small></h3><ul class="seats">
+              <li class="seat" style="--c:#FFFFFF"><span class="dot"></span><span class="who"><b>Holy Priest</b><small>Healer</small></span></li>
+              <li class="seat" style="--c:#FFFFFF"><span class="dot"></span><span class="who"><b>Discipline Priest</b><small>Healer</small></span></li>
+              <li class="seat" style="--c:#FF7C0A"><span class="dot"></span><span class="who"><b>Restoration Druid</b><small>Healer</small></span></li>
+              <li class="seat" style="--c:#F48CBA"><span class="dot"></span><span class="who"><b>Holy Paladin</b><small>Healer</small></span></li>
+              <li class="seat" style="--c:#3FC7EB"><span class="dot"></span><span class="who"><b>Arcane Mage</b><small>Caster DPS</small></span></li></ul></div>
+          </div>
+          <noscript><p class="empty">Each group's buff list, the Move buttons and the "what one more seat would add" lines are worked out by the page's script, so they need JavaScript.</p></noscript>
+          <p class="status" id="status"></p>
+        </div>
+      </section></div>
+    </div>
+    <div class="col">
+      <div class="layer" style="--z:6"><section class="box" id="b-roles" aria-labelledby="h-roles">
+        <h2 id="h-roles">Role balance <small id="rolesum">25 of 25 seated</small></h2>
+        <div class="in">
+          <div class="roles" id="roles">
+            <span>Tank</span><span class="bar"><i style="width:12%"></i></span><span class="n">3</span>
+            <span>Healer</span><span class="bar"><i style="width:24%"></i></span><span class="n">6</span>
+            <span>Physical DPS</span><span class="bar"><i style="width:40%"></i></span><span class="n">10</span>
+            <span>Caster DPS</span><span class="bar"><i style="width:24%"></i></span><span class="n">6</span>
+          </div>
+          <p class="prov" style="margin:10px 0 0">Role comes from the build a seat signed up as, so a Feral (Bear) counts as a tank and a Feral (Cat) as physical DPS. Both bring Leader of the Pack. Source: <code>raidBuilds.ts</code>, <code>tbcClasses.ts</code>.</p>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:8"><section class="box" id="b-add" aria-labelledby="h-add">
+        <h2 id="h-add">What one more seat would add</h2>
+        <div class="in">
+          <p>For each group, the one build that would bring that group the most party buffs it lacks, if one seat there changed.</p>
+          <ul class="lines" id="addlist">
+            <li><span class="g">Group 1 · if one seat changed</span>A <b>Discipline Priest</b> would add Prayer of Fortitude and Prayer of Spirit.</li>
+            <li><span class="g">Group 2 · if one seat changed</span>A <b>Holy Paladin</b> would add Devotion Aura, Retribution Aura and Sanctity Aura.</li>
+            <li><span class="g">Group 3 · if one seat changed</span>A <b>Holy Paladin</b> would add Devotion Aura, Retribution Aura and Sanctity Aura.</li>
+            <li><span class="g">Group 4 · if one seat changed</span>A <b>Elemental Shaman</b> would add Strength of Earth Totem, Grace of Air Totem, Mana Spring Totem, Totem of Wrath, Wrath of Air Totem, Windfury Totem, Tranquil Air Totem and Bloodlust.</li>
+            <li><span class="g">Group 5 · if one seat changed</span>A <b>Elemental Shaman</b> would add Strength of Earth Totem, Grace of Air Totem, Mana Spring Totem, Totem of Wrath, Wrath of Air Totem, Windfury Totem, Tranquil Air Totem and Bloodlust.</li>
+          </ul>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:5"><section class="box" id="b-miss" aria-labelledby="h-miss">
+        <h2 id="h-miss">Missing — who fixes it</h2>
+        <div class="in">
+          <ul class="lines" id="misslist">
+            <li class="warnl"><span class="g">Whole raid · on the boss</span><b>Winter's Chill</b> <span class="scope target">Target</span> — nobody brings it. Needs a Frost Mage.</li>
+            <li><span class="g">Group 1 · 9 of 24 party buffs missing</span><b>any Mage</b>: Arcane Brilliance · <b>any Priest</b>: Prayer of Fortitude, Prayer of Spirit · <b>a Balance Druid</b>: Moonkin Aura · <b>a Marksmanship Hunter</b>: Trueshot Aura · <b>a Beast Mastery Hunter</b>: Ferocious Inspiration · <b>an Elemental Shaman</b>: Totem of Wrath · <b>an Enhancement Shaman</b>: Unleashed Rage · <b>any Warlock</b>: Blood Pact</li>
+            <li><span class="g">Group 2 · 12 of 24 party buffs missing</span><b>any Paladin</b>: Devotion Aura, Retribution Aura, Sanctity Aura · <b>any Mage</b>: Arcane Brilliance · <b>any Priest</b>: Prayer of Fortitude, Prayer of Spirit · <b>a Balance Druid</b>: Moonkin Aura · <b>a Marksmanship Hunter</b>: Trueshot Aura · <b>a Beast Mastery Hunter</b>: Ferocious Inspiration · <b>an Elemental Shaman</b>: Totem of Wrath · <b>a Restoration Shaman</b>: Mana Tide Totem · <b>any Warlock</b>: Blood Pact</li>
+            <li><span class="g">Group 3 · 10 of 24 party buffs missing</span><b>any Warrior</b>: Battle Shout, Commanding Shout · <b>any Paladin</b>: Devotion Aura, Retribution Aura, Sanctity Aura · <b>a Feral Druid</b>: Leader of the Pack · <b>a Marksmanship Hunter</b>: Trueshot Aura · <b>a Beast Mastery Hunter</b>: Ferocious Inspiration · <b>a Restoration Shaman</b>: Mana Tide Totem · <b>an Enhancement Shaman</b>: Unleashed Rage</li>
+            <li><span class="g">Group 4 · 19 of 24 party buffs missing</span><b>any Warrior</b>: Battle Shout, Commanding Shout · <b>any Mage</b>: Arcane Brilliance · <b>any Priest</b>: Prayer of Fortitude, Prayer of Spirit · <b>any Druid</b>: Gift of the Wild · <b>a Feral Druid</b>: Leader of the Pack · <b>a Balance Druid</b>: Moonkin Aura · <b>any Shaman</b>: Strength of Earth Totem, Grace of Air Totem, Mana Spring Totem, Wrath of Air Totem, Windfury Totem, Tranquil Air Totem, Bloodlust · <b>an Elemental Shaman</b>: Totem of Wrath · <b>a Restoration Shaman</b>: Mana Tide Totem · <b>an Enhancement Shaman</b>: Unleashed Rage · <b>any Warlock</b>: Blood Pact</li>
+            <li><span class="g">Group 5 · 17 of 24 party buffs missing</span><b>any Warrior</b>: Battle Shout, Commanding Shout · <b>a Feral Druid</b>: Leader of the Pack · <b>a Balance Druid</b>: Moonkin Aura · <b>a Marksmanship Hunter</b>: Trueshot Aura · <b>a Beast Mastery Hunter</b>: Ferocious Inspiration · <b>any Shaman</b>: Strength of Earth Totem, Grace of Air Totem, Mana Spring Totem, Wrath of Air Totem, Windfury Totem, Tranquil Air Totem, Bloodlust · <b>an Elemental Shaman</b>: Totem of Wrath · <b>a Restoration Shaman</b>: Mana Tide Totem · <b>an Enhancement Shaman</b>: Unleashed Rage · <b>any Warlock</b>: Blood Pact</li>
+          </ul>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:3"><section class="box" id="b-wide" aria-labelledby="h-wide">
+        <h2 id="h-wide">Raid-wide, single-target and on the boss</h2>
+        <div class="in coverage" id="wide">
+          <p>Greater Blessings reach the whole raid, single-target buffs go wherever the caster points them, and debuffs land on the boss. Seating does not change these, only who is in the raid.</p>
+        </div>
+      </section></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips). The roster is an example. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Raid Composition</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+/* Raid Composition tab: Serpentshrine teal, kept calm and dim behind the dense roster; "charge" gives a short glow when two seats swap */
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
+const C=h=>new THREE.Color(h);
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.ssc.light.clone(),deep:PAL.ssc.deep.clone(),fog:PAL.ssc.fog.clone(),acc:PAL.ssc.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?260:520,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
+    vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(.85,1.,.96),.35),a);}`})));
+/* lights: phase lamp over the pool, ambient, a cool rim and a low accent (coral / violet / ember) */
+const lamp=new THREE.PointLight(cur.light.clone(),1.6,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x0e2a30,.5));
+const rim=new THREE.DirectionalLight(0x9ff3ea,.3);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a glowing crystal over the pool (dimmed for this dense tab): faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x0c2a30,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x0a2026,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* pillars receding into the fog */
+const pm=new THREE.MeshStandardMaterial({color:0x07181d,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
+R.setClearColor(cur.fog);
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=1.6+MIX.charge*2.2;
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
+  tint();place();R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
+/* hooks used by the page script */
+S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+size();still();
+})();
+</script>
+<script>
+(function(){
+"use strict";
+/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
+const $=(s,r=document)=>r?r.querySelector(s):null, $$=(s,r=document)=>r?Array.from(r.querySelectorAll(s)):[];
+const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
+const root=document.documentElement, live=$("#live");
+const say=t=>{if(live)live.textContent=t;};
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+
+
+/* ---------- real data: src/domain/buffs/sampleBuffs.ts + sampleTargetDebuffs.ts (who provides),
+   src/domain/buffs/buffScope.json (Party / Raid / Single / Target, read from Wowhead tooltips) ---------- */
+const B=(id,name,scope,cls,spec)=>({id,name,scope,cls,spec});
+const BUFFS=[
+ B("battle-shout","Battle Shout","Party","Warrior"),B("commanding-shout","Commanding Shout","Party","Warrior"),
+ B("blessing-of-might","Greater Blessing of Might","Raid","Paladin"),B("blessing-of-kings","Greater Blessing of Kings","Raid","Paladin"),
+ B("blessing-of-wisdom","Greater Blessing of Wisdom","Raid","Paladin"),B("blessing-of-salvation","Greater Blessing of Salvation","Raid","Paladin"),
+ B("blessing-of-sanctuary","Greater Blessing of Sanctuary","Raid","Paladin"),
+ B("devotion-aura","Devotion Aura","Party","Paladin"),B("retribution-aura","Retribution Aura","Party","Paladin"),B("sanctity-aura","Sanctity Aura","Party","Paladin"),
+ B("arcane-intellect","Arcane Brilliance","Party","Mage"),
+ B("prayer-of-fortitude","Prayer of Fortitude","Party","Priest"),B("prayer-of-spirit","Prayer of Spirit","Party","Priest"),
+ B("shadow-protection","Shadow Protection","Single","Priest"),B("power-infusion","Power Infusion","Single","Priest","Discipline"),
+ B("mark-of-the-wild","Gift of the Wild","Party","Druid"),B("thorns","Thorns","Single","Druid"),B("innervate","Innervate","Single","Druid"),
+ B("leader-of-the-pack","Leader of the Pack","Party","Druid","Feral"),B("moonkin-aura","Moonkin Aura","Party","Druid","Balance"),
+ B("trueshot-aura","Trueshot Aura","Party","Hunter","Marksmanship"),B("ferocious-inspiration","Ferocious Inspiration","Party","Hunter","Beast Mastery"),
+ B("strength-of-earth-totem","Strength of Earth Totem","Party","Shaman"),B("grace-of-air-totem","Grace of Air Totem","Party","Shaman"),
+ B("mana-spring-totem","Mana Spring Totem","Party","Shaman"),B("totem-of-wrath","Totem of Wrath","Party","Shaman","Elemental"),
+ B("wrath-of-air-totem","Wrath of Air Totem","Party","Shaman"),B("windfury-totem","Windfury Totem","Party","Shaman"),
+ B("mana-tide-totem","Mana Tide Totem","Party","Shaman","Restoration"),B("tranquil-air-totem","Tranquil Air Totem","Party","Shaman"),
+ B("unleashed-rage","Unleashed Rage","Party","Shaman","Enhancement"),B("bloodlust","Bloodlust","Party","Shaman"),
+ B("blood-pact","Blood Pact","Party","Warlock")];
+const DEBUFFS=[
+ B("sunder-armor","Sunder Armor","Target","Warrior"),B("curse-of-recklessness","Curse of Recklessness","Target","Warlock"),
+ B("faerie-fire","Faerie Fire","Target","Druid"),B("improved-faerie-fire","Improved Faerie Fire","Target","Druid","Balance"),
+ B("improved-seal-of-the-crusader","Improved Seal of the Crusader","Target","Paladin","Retribution"),
+ B("curse-of-elements","Curse of the Elements","Target","Warlock"),B("winters-chill","Winter's Chill","Target","Mage","Frost"),
+ B("expose-weakness","Expose Weakness","Target","Hunter","Survival")];
+const PARTY=BUFFS.filter(b=>b.scope==="Party"), WIDE=BUFFS.filter(b=>b.scope!=="Party");
+/* classes, specs and default roles: src/domain/character/tbcClasses.ts; Feral split into Bear/Cat: raidBuilds.ts */
+const COLOR={Druid:"#FF7C0A",Hunter:"#AAD372",Mage:"#3FC7EB",Paladin:"#F48CBA",Priest:"#FFFFFF",Rogue:"#FFF468",Shaman:"#0070DD",Warlock:"#8788EE",Warrior:"#C69B6D"};
+const SPECS={Druid:["Balance","Feral","Restoration"],Hunter:["Beast Mastery","Marksmanship","Survival"],Mage:["Arcane","Fire","Frost"],
+ Paladin:["Holy","Protection","Retribution"],Priest:["Discipline","Holy","Shadow"],Rogue:["Assassination","Combat","Subtlety"],
+ Shaman:["Elemental","Enhancement","Restoration"],Warlock:["Affliction","Demonology","Destruction"],Warrior:["Arms","Fury","Protection"]};
+function roleOf(cls,spec,label){
+  if(label==="Feral (Bear)")return "Tank";
+  if(spec==="Protection")return "Tank";
+  if((cls==="Druid"||cls==="Shaman")&&spec==="Restoration")return "Healer";
+  if((cls==="Paladin"||cls==="Priest")&&spec==="Holy")return "Healer";
+  if(cls==="Priest"&&spec==="Discipline")return "Healer";
+  if(cls==="Druid"&&spec==="Balance")return "Caster DPS";
+  if(cls==="Hunter"||cls==="Rogue"||cls==="Warrior"||spec==="Feral"||spec==="Retribution"||spec==="Enhancement")return "Physical DPS";
+  return "Caster DPS";
+}
+const seat=(cls,spec,label)=>({cls,spec,label:label||spec});
+const provides=(s,b)=>!!s&&s.cls===b.cls&&(!b.spec||s.spec===b.spec);
+const need=b=>b.spec?(/^[AEIOU]/.test(b.spec)?"an ":"a ")+b.spec+" "+b.cls:"any "+b.cls;
+const nameOf=s=>s.label+" "+s.cls;
+/* every build a seat can sign up as (one per spec, Feral split in two) — the candidates for "one more seat" */
+const BUILDS=[];Object.keys(SPECS).forEach(c=>SPECS[c].forEach(sp=>{
+  if(c==="Druid"&&sp==="Feral"){BUILDS.push(seat(c,sp,"Feral (Bear)"),seat(c,sp,"Feral (Cat)"));}else BUILDS.push(seat(c,sp));}));
+
+/* ---------- example rosters (real specs, invented seating) ---------- */
+const W=(s)=>seat("Warrior",s),P=(s)=>seat("Paladin",s),D=(s,l)=>seat("Druid",s,l),SH=(s)=>seat("Shaman",s),
+      H=(s)=>seat("Hunter",s),R=(s)=>seat("Rogue",s),M_=(s)=>seat("Mage",s),L=(s)=>seat("Warlock",s),PR=(s)=>seat("Priest",s);
+const ROSTERS={
+ 25:[[W("Protection"),P("Protection"),D("Feral","Feral (Bear)"),P("Holy"),SH("Restoration")],
+     [W("Fury"),W("Fury"),R("Combat"),SH("Enhancement"),D("Feral","Feral (Cat)")],
+     [M_("Fire"),L("Destruction"),SH("Elemental"),PR("Shadow"),D("Balance")],
+     [H("Beast Mastery"),H("Marksmanship"),H("Survival"),P("Retribution"),R("Combat")],
+     [PR("Holy"),PR("Discipline"),D("Restoration"),P("Holy"),M_("Arcane")]],
+ 10:[[W("Protection"),P("Holy"),SH("Enhancement"),W("Fury"),R("Combat")],
+     [D("Feral","Feral (Bear)"),SH("Restoration"),PR("Shadow"),M_("Fire"),L("Destruction")]]
+};
+let size=25, held=null;
+const groups=()=>ROSTERS[size];
+const seated=()=>groups().flat().filter(Boolean);
+const groupGets=g=>PARTY.filter(b=>g.some(s=>provides(s,b)));
+
+/* ---------- rendering ---------- */
+const tag=sc=>`<span class="scope ${sc.toLowerCase()}">${sc}</span>`;
+function seatHTML(s,g,i){
+  const isHeld=held&&held.g===g&&held.i===i;
+  const lbl=!held?"Move":isHeld?"Cancel":"Here";
+  const aria=!s?`Empty seat ${i+1}, group ${g+1}`:`${nameOf(s)}, group ${g+1}`;
+  const act=!held?`Move ${aria}`:isHeld?`Cancel moving ${aria}`:`Swap with ${aria}`;
+  return `<li class="seat${s?"":" empty"}${isHeld?" held":""}" style="--c:${s?COLOR[s.cls]:"transparent"}" data-g="${g}" data-i="${i}">`+
+    `<span class="dot" aria-hidden="true"></span><span class="who"><b>${s?nameOf(s):"Empty seat"}</b><small>${s?roleOf(s.cls,s.spec,s.label):"—"}</small></span>`+
+    (s||held?`<button type="button" data-g="${g}" data-i="${i}" aria-label="${act}"${isHeld?' aria-pressed="true"':""}>${lbl}</button>`:"")+`</li>`;
+}
+function renderGroups(){
+  const host=$("#groups");if(!host)return;
+  host.classList.toggle("moving",!!held);
+  const wideHere=WIDE.filter(b=>seated().some(s=>provides(s,b))).length;
+  host.innerHTML=groups().map((g,gi)=>{
+    const gets=groupGets(g), n=g.filter(Boolean).length;
+    return `<div class="grp" data-group="${gi}"><h3>Group ${gi+1} <small>${n}/5 · ${gets.length} of ${PARTY.length} party buffs</small></h3>`+
+      `<ul class="seats">${g.map((s,i)=>seatHTML(s,gi,i)).join("")}</ul>`+
+      `<div class="gets"><h4>This group receives ${tag("Party")}</h4><ul class="chips">`+
+      (gets.length?gets.map(b=>`<li>${b.name}</li>`).join(""):`<li class="none">No party buffs</li>`)+
+      `</ul><p>Plus ${wideHere} ${tag("Raid")} or ${tag("Single")} buffs, which do not depend on seating.</p></div></div>`;
+  }).join("");
+}
+function renderRoles(){
+  const host=$("#roles");if(!host)return;
+  const order=["Tank","Healer","Physical DPS","Caster DPS"],c={};order.forEach(r=>c[r]=0);
+  seated().forEach(s=>c[roleOf(s.cls,s.spec,s.label)]++);
+  host.innerHTML=order.map(r=>`<span>${r}</span><span class="bar"><i style="width:${(c[r]/size*100).toFixed(0)}%"></i></span><span class="n">${c[r]}</span>`).join("");
+  const sum=$("#rolesum");if(sum)sum.textContent=seated().length+" of "+size+" seated";
+}
+function bestFor(g){
+  const lacking=PARTY.filter(b=>!g.some(s=>provides(s,b)));
+  let best=null,gain=[];
+  BUILDS.forEach(bd=>{const add=lacking.filter(b=>provides(bd,b));if(add.length>gain.length){best=bd;gain=add;}});
+  return {best,gain,open:g.some(s=>!s)};
+}
+const list=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1];
+function renderAdd(){
+  const host=$("#addlist");if(!host)return;
+  host.innerHTML=groups().map((g,gi)=>{
+    const r=bestFor(g);
+    if(!r.best)return `<li class="ok"><span class="g">Group ${gi+1}</span>Already gets every party buff.</li>`;
+    return `<li><span class="g">Group ${gi+1} · ${r.open?"one more seat":"if one seat changed"}</span>A <b>${nameOf(r.best)}</b> would add ${list(r.gain.map(b=>b.name))}.</li>`;
+  }).join("");
+}
+function renderMissing(){
+  const host=$("#misslist");if(!host)return;
+  const all=seated(),out=[];
+  const raidMiss=[...PARTY.map(b=>[b,"party buff"]),...WIDE.map(b=>[b,"raid or single-target"]),...DEBUFFS.map(b=>[b,"on the boss"])].filter(([b])=>!all.some(s=>provides(s,b)));
+  raidMiss.forEach(([b,where])=>out.push(`<li class="warnl"><span class="g">Whole raid · ${where}</span><b>${b.name}</b> ${tag(b.scope)} — nobody brings it. Needs ${need(b)}.</li>`));
+  if(!raidMiss.length)out.push(`<li class="ok"><span class="g">Whole raid</span>Someone in the raid can cast every one of the 33 buffs and 8 debuffs.</li>`);
+  groups().forEach((g,gi)=>{
+    const lack=PARTY.filter(b=>!g.some(s=>provides(s,b)));if(!lack.length)return;
+    const by={};lack.forEach(b=>{(by[need(b)]=by[need(b)]||[]).push(b.name);});
+    out.push(`<li><span class="g">Group ${gi+1} · ${lack.length} of ${PARTY.length} party buffs missing</span>`+
+      Object.keys(by).map(k=>`<b>${k}</b>: ${by[k].join(", ")}`).join(" · ")+`</li>`);
+  });
+  host.innerHTML=out.join("");
+}
+function renderWide(){
+  const host=$("#wide");if(!host)return;
+  const intro=$("p",host),all=seated();
+  const row=b=>{const n=all.filter(s=>provides(s,b)).length;return `<li class="${n?"":"none"}">${b.name}${tag(b.scope)} <span class="num">${n?"×"+n:"none"}</span></li>`;};
+  host.innerHTML=(intro?intro.outerHTML:"")+
+    `<h3>Raid-wide and single-target buffs</h3><ul class="chips">${WIDE.map(row).join("")}</ul>`+
+    `<h3>Debuffs on the boss</h3><ul class="chips">${DEBUFFS.map(row).join("")}</ul>`+
+    `<p class="prov" style="margin:6px 0 0">×n is how many seats could cast it (Wowhead's count), not how many copies are up.</p>`;
+}
+function renderAll(){renderGroups();renderRoles();renderAdd();renderMissing();renderWide();}
+
+/* ---------- Move: press Move on a seat, then Here on the target; the two seats swap ---------- */
+const status=t=>{const s=$("#status");if(s)s.innerHTML=t;};
+function focusSeat(g,i){const b=$(`#groups button[data-g="${g}"][data-i="${i}"]`);if(b)b.focus();}
+on($("#groups"),"click",e=>{
+  const b=e.target&&e.target.closest?e.target.closest("button[data-g]"):null;if(!b)return;
+  const g=+b.dataset.g,i=+b.dataset.i,G_=groups();
+  if(!held){
+    const s=G_[g]&&G_[g][i];if(!s)return;
+    held={g,i};renderGroups();focusSeat(g,i);
+    status(`Moving <b>${nameOf(s)}</b> from group ${g+1}. Press <b>Here</b> on the seat to swap with, or Esc to cancel.`);
+    say(`Moving ${nameOf(s)} from group ${g+1}. Choose a seat to swap with.`);
+    return;
+  }
+  if(held.g===g&&held.i===i){held=null;renderGroups();focusSeat(g,i);status("Move cancelled.");say("Move cancelled.");return;}
+  const a=G_[held.g][held.i],t=G_[g][i],from=held;
+  G_[held.g][held.i]=t;G_[g][i]=a;held=null;
+  renderAll();focusSeat(g,i);
+  const msg=t?`${nameOf(a)} (now group ${g+1}) and ${nameOf(t)} (now group ${from.g+1}) swapped.`:`${nameOf(a)} moved to group ${g+1}.`;
+  const gain=groupGets(G_[g]).length,gain2=groupGets(G_[from.g]).length;
+  status(msg+` Group ${g+1} now gets ${gain} party buffs, group ${from.g+1} gets ${gain2}.`);
+  say(msg+` Group ${g+1} now gets ${gain} party buffs, group ${from.g+1} gets ${gain2}.`);
+  if(M.on&&M.swap)M.swap([[g,i],[from.g,from.i]]);
+});
+on(document,"keydown",e=>{
+  if(e.key!=="Escape"||!held)return;
+  const h=held;held=null;renderGroups();focusSeat(h.g,h.i);status("Move cancelled.");say("Move cancelled.");
+});
+
+/* ---------- raid size ---------- */
+const sizeBtns=$$(".seg button[data-size]");
+sizeBtns.forEach(b=>on(b,"click",()=>{
+  const n=+b.dataset.size;if(n===size||!ROSTERS[n])return;
+  size=n;held=null;sizeBtns.forEach(x=>x.setAttribute("aria-pressed",x===b));
+  renderAll();status(`Showing the ${n}-player example roster: ${n/5} groups of five.`);
+  say(`${n}-player raid, ${n/5} groups.`);
+  if(M.on&&M.flash)M.flash();
+}));
+
+/* ---------- export (stub) ---------- */
+on($("#exportbtn"),"click",()=>{
+  const t=`In the app this exports the seating chart as a PNG (groups, seats and names, drawn by <code>exportRosterImage.ts</code>). This prototype does not create a file.`;
+  status(t);say("Export image: in the app this saves the seating chart as a PNG. Not available in this prototype.");
+});
+
+renderAll();
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+
+/* ================= MOTION LAYER ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined";
+if(tog)tog.hidden=false;
+function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  if(tog)tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+if(ST)gsap.registerPlugin(ScrollTrigger);
+let ctx=null, mm=null;
+const A=fn=>ctx?ctx.add(fn):fn();
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  const w=$("#wipe");if(w)w.style.display="none";
+  Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
+  SC.mix.charge=0;SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);SC.setMotion(true);
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
+  else{if(tog)tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+function splitHero(){
+  const h=$("#h-rc");if(!h||h.dataset.split)return false;
+  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
+  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
+  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
+  return true;
+}
+/* 1. Intro: the scene settles from above, words rise out of masks, the target chips land, cards in view rise. ~1.4s */
+function intro(){
+  const split=splitHero();
+  const inView=$$(".rcgrid .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  inView.forEach(b=>b.dataset.introd="1");
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
+  if(split&&$("#h-rc .w>span"))tl.from("#h-rc .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  if($(".target span"))tl.from(".target span",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
+  if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  safe(tl);
+}
+/* 2. Scroll: the camera drifts toward the crystal; bars fill and cards rise as they arrive */
+function scrollStory(){
+  gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
+  if($(".rcgrid"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:".rcgrid",start:"top 85%",end:"top 15%",scrub:.8}});
+  $$(".rcgrid .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"})))}));
+}
+/* 3. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 4. Swap: the two seats pop back in, their groups' buff chips ripple, the pool glows briefly. ~0.9s */
+M.swap=pairs=>A(()=>{
+  const tl=gsap.timeline();
+  pairs.forEach(([g,i],k)=>{
+    const s=$(`#groups .seat[data-g="${g}"][data-i="${i}"]`),chips=$$(`#groups .grp[data-group="${g}"] .chips li`);
+    if(s)tl.fromTo(s,{scale:.9,y:k?-8:8,autoAlpha:.3},{scale:1,y:0,autoAlpha:1,duration:.45,ease:"back.out(2.2)",clearProps:"all"},k*.06);
+    if(chips.length)tl.fromTo(chips,{scale:.7,autoAlpha:0},{scale:1,autoAlpha:1,duration:.3,stagger:.02,ease:"back.out(2.4)",clearProps:"all"},.15);
+  });
+  if($$("#roles .bar i").length)tl.fromTo("#roles .bar i",{scaleX:.85},{scaleX:1,duration:.4,ease:"power3.out",clearProps:"transform"},0);
+  tl.to(SC.mix,{charge:.45,duration:.18,onUpdate:SC.render},0).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render},.18);
+  safe(tl);
+});
+/* a short glow and the groups re-seat when the raid size changes */
+M.flash=()=>A(()=>{
+  const tl=gsap.timeline();
+  if($$("#groups .grp").length)tl.from("#groups .grp",{y:24,autoAlpha:0,duration:.45,stagger:.06,ease:"expo.out",clearProps:"all"},0);
+  tl.to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render},0).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render},.2);
+  safe(tl);
+});
+/* role bars fill when they scroll into view */
+if(ST&&$("#roles"))ScrollTrigger.create({trigger:"#roles",start:"top 92%",once:true,onEnter:()=>{if(M.on)A(()=>safe(gsap.fromTo("#roles .bar i",{scaleX:0},{scaleX:1,duration:.9,stagger:.06,ease:"power3.out"})));}});
+/* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
+$$("nav.sections a").forEach(a=>on(a,"click",e=>{
+  if(!M.on||a.getAttribute("aria-current")==="page"||e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;
+  const w=$("#wipe"),sp=$("span",w);if(!w||!sp)return;
+  e.preventDefault();
+  const href=a.href;sp.textContent=a.textContent;w.style.display="grid";
+  const tl=gsap.timeline({onComplete:()=>{location.href=href;}});
+  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(sp,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
+  safe(tl);
+}));
+/* returning via the back/forward cache: drop the curtain */
+addEventListener("pageshow",e=>{if(e.persisted){const w=$("#wipe");if(w)w.style.display="none";SC.cam.dive=0;SC.render();}});
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
+</body>
+</html>

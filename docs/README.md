@@ -28,7 +28,7 @@ Research written before a feature was built. Each one says what was planned and 
 | [Talent scaling](design/TALENT-SCALING-SCOPE.md) | Getting talents into the stat and damage math for all 27 specs |
 | [In-game import](design/IN-GAME-IMPORT-SCOPE.md) | The addon export format and the research behind it |
 | [UI refresh plan](design/UI-REFRESH-PLAN.md) | Planned UI changes from the gaming UI research, in three phases (not started) |
-| [Design prototypes](design/prototypes/README.md) | 10 clickable directions, then the picked two (Launcher, Portal) in six styles each |
+| [Design prototypes](design/prototypes/README.md) | Four rounds of clickable design directions, then every tab of the site in the chosen style |
 
 ## Research
 
@@ -38,6 +38,7 @@ Research written before a feature was built. Each one says what was planned and 
 | [Heuristic evaluation](research/HEURISTIC-EVALUATION.md) | A Nielsen-style heuristic evaluation of the live site, done by the owner |
 | [Study materials](research/usability-study/) | The brief, personas, per-participant transcripts and screenshots |
 | [Gaming UI research](research/gaming-ui/) | How big gaming companies and player tools design their sites in 2024–2026, and what to borrow |
+| [TBC motion research](research/wow-tbc-motion/) | How to make the animation feel like TBC Anniversary, what Blizzard's rules allow, and the proposed motion kit |
 
 ## Dev log
 

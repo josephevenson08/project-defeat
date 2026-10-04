@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en" data-raid="tk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
+  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(3,10,14,.8);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#9ff3ea;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+/* Tempest Keep backdrop: arcane gold over violet (selected in the hero) */
+:root[data-raid="tk"]{--glow:var(--tk);--glow-soft:rgba(236,192,106,.14);--rim:rgba(200,160,255,.24);--rim-2:rgba(200,160,255,.12);--focus:#ffe2a3}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
+  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+html[data-raid="tk"] .fallback{background:
+  radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
+  radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
+  linear-gradient(180deg,#07040f 0%,#160c2a 55%,#1f1236 100%)}
+html[data-phase="1"] .fallback{background:
+  radial-gradient(60% 40% at 50% 78%,rgba(242,166,90,.26),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(217,84,43,.14),transparent 70%),
+  linear-gradient(180deg,#070504 0%,#1a120b 55%,#24170c 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections button{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections button:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{min-height:min(62vh,560px);display:grid;align-content:end;padding:48px 0 28px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.btn.big{font-size:var(--t-md);padding:11px 20px}
+.capline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-sm);margin:0}
+.capline b{color:var(--warn)}
+.raidpick{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:var(--t-xs);color:var(--ink-2)}
+.raidpick button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);border-radius:999px;padding:4px 10px;cursor:pointer}
+.raidpick button[aria-pressed="true"]{border-color:var(--glow);color:var(--glow);background:var(--glow-soft)}
+.raidpick button:disabled{opacity:.55;cursor:not-allowed}
+/* hit-cap gauge */
+.gauge{height:6px;background:rgba(255,207,122,.14);border-radius:3px;overflow:hidden;margin:4px 0 6px}
+.gauge i{display:block;height:100%;width:98.6%;background:var(--warn);transform-origin:left;box-shadow:0 0 10px var(--warn)}
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+.q-epic{color:var(--q-epic)}
+.glyph{display:inline-grid;place-items:center;width:28px;height:28px;flex:none;border:2px solid var(--q-epic);border-radius:4px;font:600 10px/1 var(--f-mono);color:var(--ink-2);background:rgba(192,140,255,.08);box-shadow:0 0 10px rgba(192,140,255,.25)}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.char{display:flex;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rim-2);margin:12px 0;border:1px solid var(--rim-2);border-radius:8px;overflow:hidden}
+.stats div{background:rgba(4,16,22,.85);padding:7px 9px}
+.stats dt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stats dd{margin:0;font:500 var(--t-md) var(--f-mono);font-variant-numeric:tabular-nums}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+.subtabs{position:relative;display:flex;gap:6px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--rim-2)}
+.subtabs button{font:600 var(--t-sm) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.subtabs button[aria-selected="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.sketch{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.sketch>div{border:1px solid var(--rim-2);background:rgba(4,16,22,.7);padding:11px;border-radius:10px;font-size:var(--t-sm)}
+.sketch h3{margin:0 0 4px;font:400 var(--t-md) var(--f-head)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+/* ---------- Simulation tab: Tempest Keep arcane light (gold over violet) ---------- */
+html[data-raid="tk"]{--glass:rgba(18,11,34,.74);--glass-2:rgba(28,18,48,.82);--scrim:rgba(10,6,20,.84);--ink:#efe9f8;--ink-2:#cbc0de;--ink-3:#a99cc2;--glow-ink:#1a1204;--violet:#b48cff;--violet-soft:rgba(180,140,255,.14)}
+html[data-raid="tk"] header.top{background:rgba(10,6,20,.74)}
+html[data-raid="tk"] .flavor,html[data-raid="tk"] .dirline{background:rgba(10,6,20,.6)}
+html[data-raid="tk"] .veil{background:linear-gradient(180deg,rgba(8,4,16,.4),rgba(8,4,16,0) 30%,rgba(8,4,16,.6))}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+.hero.sim{min-height:min(46vh,420px)}
+.hero.sim h1{max-width:20ch}
+.target{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.target span{font:500 var(--t-sm) var(--f-mono);background:var(--violet-soft);border:1px solid var(--rim);border-radius:999px;padding:4px 11px;color:var(--ink)}
+.target span b{font-family:var(--f-body);font-weight:600;color:var(--ink-3);margin-right:6px}
+.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);background:var(--warn-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.real{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--glow);border:1px solid var(--rim);background:var(--glow-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+/* spec picker (20 DPS specs) */
+.specpick{display:grid;gap:10px}
+.specpick fieldset{border:0;margin:0;padding:0;min-width:0}
+.specpick legend{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);padding:0 0 6px}
+.specpick .row{display:flex;flex-wrap:wrap;gap:5px}
+.specpick button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);color:var(--ink-2);border:1px solid var(--rim);border-radius:999px;padding:5px 10px;cursor:pointer}
+.specpick button[aria-pressed="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.specpick button .rot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-left:6px;vertical-align:middle;box-shadow:0 0 6px var(--violet)}
+.legend{font-size:var(--t-xs);color:var(--ink-3);margin:2px 0 0}
+.legend .rot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-right:4px;vertical-align:middle}
+/* run + result */
+.runbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:14px 0 0}
+.result{margin-top:14px;display:grid;gap:12px}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:14px;border-radius:12px;background:var(--scrim);border:1px solid var(--rim)}
+.score .lbl{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);width:100%}
+.score strong{font:500 clamp(2.4rem,7vw,3.8rem)/1 var(--f-mono);color:var(--glow);text-shadow:0 0 28px var(--glow-soft)}
+.score .vs{font-size:var(--t-sm);color:var(--ink-2)}
+.refbar{position:relative;height:8px;border-radius:4px;background:rgba(180,140,255,.14);width:100%;overflow:hidden}
+.refbar i{position:absolute;left:0;top:0;bottom:0;background:var(--glow);border-radius:4px;transform-origin:left;box-shadow:0 0 12px var(--glow)}
+.note{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:9px 11px;margin:0}
+.note strong{color:var(--warn)}
+.empty{font-size:var(--t-sm);color:var(--ink-3);border:1px dashed var(--rim);border-radius:10px;padding:12px;margin-top:14px}
+/* damage sources, log-style */
+.src{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 3.6em 3.6em;gap:6px 10px;align-items:center;font-size:var(--t-sm)}
+.src .h{font:600 10px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.src .bar{height:10px;border-radius:3px;background:rgba(180,140,255,.12);overflow:hidden}
+.src .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--glow));transform-origin:left;border-radius:3px}
+.src .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.src .zero{color:var(--ink-3)}
+@media (max-width:440px){.src{grid-template-columns:minmax(0,1fr) 3.4em 3.4em}.src .bar{grid-column:1/-1;order:0}}
+/* breakdown */
+dl.kv{display:grid;grid-template-columns:1fr auto;gap:0;margin:0;font-size:var(--t-sm)}
+dl.kv dt,dl.kv dd{padding:6px 0;border-top:1px solid var(--rim-2);margin:0}
+dl.kv dt{color:var(--ink-2)}
+dl.kv dd{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
+/* stat weights */
+.sw{display:grid;grid-template-columns:minmax(0,8.5em) minmax(0,1fr) 3em;gap:7px 10px;align-items:center;font-size:var(--t-sm)}
+.sw .bar{height:8px;border-radius:4px;background:rgba(236,192,106,.12);overflow:hidden}
+.sw .bar i{display:block;height:100%;background:var(--glow);transform-origin:left;border-radius:4px}
+.sw .n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.unmod{margin-top:12px;border-top:1px solid var(--rim-2);padding-top:10px;font-size:var(--t-sm)}
+.unmod h3,.box h3.mini{margin:0 0 4px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.unmod p{margin:0 0 6px;color:var(--ink-2)}
+/* upgrade finder concept */
+.steps{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px;counter-reset:s}
+.steps li{position:relative;padding:8px 10px 8px 40px;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;font-size:var(--t-sm);counter-increment:s}
+.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:11px;top:9px;font:500 var(--t-xs) var(--f-mono);color:var(--glow)}
+.uprow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:10px 12px;border:1px dashed var(--rim);border-radius:10px;background:rgba(10,6,20,.6);font-size:var(--t-sm)}
+.uprow .slot{font:500 10px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);display:block}
+.uprow .ph{color:var(--q-epic);font-weight:600}
+.uprow .delta{text-align:right;font-family:var(--f-mono)}
+.uprow .delta b{display:block;color:var(--glow);font-weight:500;font-size:var(--t-lg)}
+.uprow small{display:block;color:var(--ink-3);font-size:var(--t-xs);margin-top:2px}
+.uprow .btn{grid-column:1/-1;justify-self:start}
+@media (min-width:600px){.uprow{grid-template-columns:minmax(0,1fr) auto auto}.uprow .btn{grid-column:auto}}
+/* modelled / not modelled */
+.model{display:grid;gap:12px}
+@media (min-width:760px){.model{grid-template-columns:1fr 1fr}}
+.model ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.model li{position:relative;padding:8px 10px 8px 30px;border-radius:9px;font-size:var(--t-sm);background:var(--scrim);border:1px solid var(--rim-2)}
+.model li::before{position:absolute;left:10px;top:8px;font:700 var(--t-sm)/1.45 var(--f-mono)}
+.model .yes li::before{content:"+";color:var(--glow)}
+.model .no li{border-color:rgba(255,207,122,.22)}
+.model .no li::before{content:"–";color:var(--warn)}
+.model h3{margin:0 0 6px;font:400 var(--t-md) var(--f-head)}
+.quote{font-size:var(--t-sm);color:var(--ink-2);border-left:3px solid var(--violet);padding:4px 0 4px 12px;margin:12px 0 0}
+.full{grid-column:1/-1}
+.simgrid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.simgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Tab prototype · Simulation · Step 1 baseline. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html" aria-current="page">Simulation</a>
+      <a href="raid-composition.html">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html">Raids</a>
+      <a href="professions.html">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Encounter: <code>sampleEncounters.ts</code> · reference DPS: archon.gg · Phase 2 (SSC/TK) · read 23 Aug</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+<section aria-labelledby="h-sim">
+  <div class="hero sim">
+    <div class="hero-in">
+      <div class="eyebrow">Simulation · DPS specs only · Tempest Keep light</div>
+      <h1 id="h-sim">Estimate your DPS against <em>one fixed raid boss</em>.</h1>
+      <p>One attack-table and spell-table pass over your planner set: stat totals, talents, buffs, consumables and target debuffs. Then stat weights from re-running it with each stat nudged, and an upgrade finder that re-runs it for every gear swap.</p>
+      <div class="target" aria-label="The fixed encounter">
+        <span><b>Target</b>Generic Phase 1/2 Raid Boss</span>
+        <span><b>Level</b>73</span>
+        <span><b>Armor</b>7,700</span>
+        <span><b>Targets</b>1</span>
+      </div>
+      <p class="prov" style="margin:0">Fixed encounter, no settings to change. Armor is a common generic TBC raid-boss approximation, not a specific boss tooltip; real bosses vary. Flagged <code>needsVerification</code> in the data.</p>
+    </div>
+  </div>
+
+  <div class="simgrid">
+    <div class="col">
+      <div class="layer" style="--z:6"><section class="box" id="b-run" aria-labelledby="h-run">
+        <h2 id="h-run">Simulate <small>shown for the 20 DPS specs</small></h2>
+        <div class="in">
+          <div class="specpick" id="specpick">
+            <fieldset><legend>Physical DPS · 11 specs</legend><div class="row" data-role="Physical DPS"><button type="button" aria-pressed="true" data-spec="Fury Warrior" data-ref="2053" data-multi="1">Fury Warrior<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Arms Warrior" data-ref="1706" data-multi="1">Arms Warrior<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Beast Mastery Hunter" data-ref="2068" data-multi="0">Beast Mastery Hunter</button><button type="button" aria-pressed="false" data-spec="Survival Hunter" data-ref="1696" data-multi="0">Survival Hunter</button><button type="button" aria-pressed="false" data-spec="Marksmanship Hunter" data-ref="1341" data-multi="0">Marksmanship Hunter</button><button type="button" aria-pressed="false" data-spec="Combat Rogue" data-ref="1731" data-multi="0">Combat Rogue</button><button type="button" aria-pressed="false" data-spec="Assassination Rogue" data-ref="1362" data-multi="0">Assassination Rogue</button><button type="button" aria-pressed="false" data-spec="Subtlety Rogue" data-ref="1292" data-multi="0">Subtlety Rogue</button><button type="button" aria-pressed="false" data-spec="Enhancement Shaman" data-ref="1693" data-multi="0">Enhancement Shaman</button><button type="button" aria-pressed="false" data-spec="Retribution Paladin" data-ref="1785" data-multi="0">Retribution Paladin</button><button type="button" aria-pressed="false" data-spec="Feral Druid" data-ref="1655" data-multi="0">Feral Druid</button></div></fieldset>
+            <fieldset><legend>Caster DPS · 9 specs</legend><div class="row" data-role="Caster DPS"><button type="button" aria-pressed="false" data-spec="Arcane Mage" data-ref="2084" data-multi="0">Arcane Mage</button><button type="button" aria-pressed="false" data-spec="Fire Mage" data-ref="1413" data-multi="0">Fire Mage</button><button type="button" aria-pressed="false" data-spec="Frost Mage" data-ref="1120" data-multi="0">Frost Mage</button><button type="button" aria-pressed="false" data-spec="Destruction Warlock" data-ref="1838" data-multi="1">Destruction Warlock<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Affliction Warlock" data-ref="1629" data-multi="1">Affliction Warlock<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Demonology Warlock" data-ref="1619" data-multi="0">Demonology Warlock</button><button type="button" aria-pressed="false" data-spec="Shadow Priest" data-ref="1330" data-multi="1">Shadow Priest<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Elemental Shaman" data-ref="1422" data-multi="0">Elemental Shaman</button><button type="button" aria-pressed="false" data-spec="Balance Druid" data-ref="1401" data-multi="0">Balance Druid</button></div></fieldset>
+            <p class="legend"><span class="rot" aria-hidden="true"></span>Multi-ability rotation (5 specs of 27). Every other spec is a single-ability approximation. Healer and Tank specs do not get this tab.</p>
+          </div>
+                    <div class="runbar">
+            <button class="btn big magnet" id="runbtn" type="button">Run Simulation</button>
+            <span class="prov" id="runfor">Human Fury Warrior · Alliance · Phase 2 planner set</span>
+          </div>
+          <div class="empty" id="simempty" hidden>No run yet. Press Run Simulation to estimate DPS for the planner set.</div>
+          <div class="result" id="result">
+            <div class="score">
+              <span class="lbl">Estimated DPS <span class="ex">example output</span></span>
+              <strong class="num" id="score">1,480</strong>
+              <span class="vs">vs. <b class="num" id="refdps">2,053</b> observed average <span class="real">archon.gg</span></span>
+              <div class="refbar" aria-hidden="true"><i id="refbar" style="width:72%"></i></div>
+              <span class="prov" id="scoreprov">Prototype value, not computed here. The live model reads 1.05x to 2.15x low against archon.gg's observed averages, and never above them.</span>
+            </div>
+            <p class="note" id="specnote"><strong>What this estimate misses for your spec:</strong> rage income. A talented Fury warrior makes more than the 3.4/sec an untalented one does but less than the 7.5/sec Bloodthirst and Whirlwind want, so the Heroic Strike dump stays unfunded and contributes nothing. Rage from damage taken is pinned at 0.</p>
+          </div>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:4"><section class="box" id="b-src" aria-labelledby="h-src">
+        <h2 id="h-src">Damage sources <span class="ex">example</span></h2>
+        <div class="in">
+          <p class="prov" style="margin:0 0 10px">Shaped like a Warcraft Logs damage table. Post-mitigation DPS; the rows sum to the estimate. Source names are the app's; the shares are example values. <span id="srcwhich"></span></p>
+          <div class="src" id="srcs" aria-label="Damage sources, example values">
+            <span class="h">Source</span><span class="h" aria-hidden="true"></span><span class="h n">Share</span><span class="h n">DPS</span>
+            <span>Melee main hand</span><span class="bar" aria-hidden="true"><i style="width:38%"></i></span><span class="n">38.0%</span><span class="n">562.4</span>
+            <span>Bloodthirst</span><span class="bar" aria-hidden="true"><i style="width:26%"></i></span><span class="n">26.0%</span><span class="n">384.8</span>
+            <span>Melee off hand</span><span class="bar" aria-hidden="true"><i style="width:19%"></i></span><span class="n">19.0%</span><span class="n">281.2</span>
+            <span>Whirlwind</span><span class="bar" aria-hidden="true"><i style="width:17%"></i></span><span class="n">17.0%</span><span class="n">251.6</span>
+            <span class="zero">Heroic Strike</span><span class="bar" aria-hidden="true"><i style="width:0"></i></span><span class="n zero">0.0%</span><span class="n zero">0</span>
+          </div>
+          <p class="prov" style="margin:10px 0 0">Heroic Strike is carried in the ability data and contributes 0: a rage-costed ability with no cooldown is excluded rather than given a guessed rate.</p>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:3"><section class="box" aria-labelledby="h-brk">
+        <h2 id="h-brk">How the number was computed <small>inputs</small></h2>
+        <div class="in">
+          <dl class="kv">
+            <dt>Target armor</dt><dd>7,700</dd>
+            <dt>Armor mitigation, no debuffs <span class="real">derived</span></dt><dd>42.2%</dd>
+            <dt>With Sunder Armor, Faerie Fire, Curse of Recklessness (−4,010 armor) <span class="real">derived</span></dt><dd>25.9%</dd>
+            <dt>Attack Power</dt><dd>1,788</dd>
+            <dt>Hit Rating (cap 142, 9% for dual-wield specials)</dt><dd>140</dd>
+            <dt>Crit Rating</dt><dd>536</dd>
+            <dt>Rage income, talented Fury <span class="ex">about</span></dt><dd>5.4 / sec</dd>
+          </dl>
+          <p class="prov" style="margin:8px 0 0">Mitigation from the TBC armor formula for a level 70 attacker; stats from the Phase 2 planner set. Rage figure from <code>featureFlags.ts</code> notes (only the 3.4 to 7.5 band is asserted). Holy damage, bleeds and poisons skip armor.</p>
+        </div>
+      </section></div>
+    </div>
+    <div class="col">
+      <div class="layer" style="--z:8"><section class="box" id="b-sw" aria-labelledby="h-sw">
+        <h2 id="h-sw">Stat priority <span class="ex">example values</span></h2>
+        <div class="in">
+          <p class="prov" style="margin:0 0 10px">Each stat is probed by adding 100 of it, re-running the simulation and measuring the change. Per single point, normalized so 1 Attack Power = 1.00.</p>
+          <div class="sw" id="sw" role="list" aria-label="Stat weights, example values">
+            <span role="listitem" class="sr">Strength 2.20</span><span aria-hidden="true">Strength</span><span class="bar" aria-hidden="true"><i style="width:100%"></i></span><span class="n" aria-hidden="true">2.20</span>
+            <span role="listitem" class="sr">Hit Rating 1.90</span><span aria-hidden="true">Hit Rating</span><span class="bar" aria-hidden="true"><i style="width:86%"></i></span><span class="n" aria-hidden="true">1.90</span>
+            <span role="listitem" class="sr">Expertise 1.75</span><span aria-hidden="true">Expertise</span><span class="bar" aria-hidden="true"><i style="width:80%"></i></span><span class="n" aria-hidden="true">1.75</span>
+            <span role="listitem" class="sr">Crit Rating 1.60</span><span aria-hidden="true">Crit Rating</span><span class="bar" aria-hidden="true"><i style="width:73%"></i></span><span class="n" aria-hidden="true">1.60</span>
+            <span role="listitem" class="sr">Haste Rating 1.45</span><span aria-hidden="true">Haste Rating</span><span class="bar" aria-hidden="true"><i style="width:66%"></i></span><span class="n" aria-hidden="true">1.45</span>
+            <span role="listitem" class="sr">Agility 1.15</span><span aria-hidden="true">Agility</span><span class="bar" aria-hidden="true"><i style="width:52%"></i></span><span class="n" aria-hidden="true">1.15</span>
+            <span role="listitem" class="sr">Attack Power 1.00</span><span aria-hidden="true">Attack Power</span><span class="bar" aria-hidden="true"><i style="width:45%"></i></span><span class="n" aria-hidden="true">1.00</span>
+          </div>
+          <div class="score" style="margin-top:12px;padding:10px 12px">
+            <span class="lbl">Highest value stat <span class="ex">example</span></span>
+            <b id="swbest">Strength</b>
+            <span class="prov" style="width:100%">Re-check after large gear changes: crossing the hit cap in particular reshuffles this list. Measured in the app's notes: haste is worth 0.059 DPS per point on the default Fury set.</span>
+          </div>
+          <div class="unmod">
+            <h3>Not modeled by the simulator yet</h3>
+            <p>These score zero because the engine doesn't read them, <strong>not</strong> because they're worthless in TBC.</p>
+            <span class="spec" style="display:inline-block;background:var(--scrim);border:1px solid rgba(255,207,122,.3);border-radius:999px;padding:2px 9px;font-size:var(--t-sm)">Armor Penetration</span>
+          </div>
+        </div>
+      </section></div>
+      <div class="layer" style="--z:5"><section class="box" id="b-up" aria-labelledby="h-up">
+        <h2 id="h-up">Upgrade finder <small>concept</small></h2>
+        <div class="in">
+          <ol class="steps">
+            <li>Every legal item for every slot is tried as a straight swap against the planner set.</li>
+            <li>Sockets are filled with the best colour-matched gem for this character, and the slot's enchant carries over while it stays legal, so a gain is what the item is worth <strong>once gemmed</strong>.</li>
+            <li>Each swap re-runs the simulation; the list is ranked by how far the estimate moves, at most 2 per slot and 12 in all.</li>
+          </ol>
+          <div class="uprow" aria-label="Example upgrade row">
+            <div>
+              <span class="slot">Slot</span>
+              <span class="ph">Candidate item from the catalog</span>
+              <small>replaces your equipped item · instance · boss</small>
+              <small>Assumes the gems it was scored with</small>
+            </div>
+            <div class="delta"><b>+DPS</b><span>+%</span> <span class="ex">example</span></div>
+            <button class="btn ghost" type="button" disabled title="Prototype only">Equip</button>
+          </div>
+          <p class="prov" style="margin:10px 0 0">Equip applies exactly the gems and enchant the score assumed. About 3% of catalog items still carry estimated stats; a row says so when its comparison rests on one, because a sourced item measured against an estimated one reads high. Rule source: <code>findUpgrades.ts</code>, <code>UpgradesPanel.tsx</code>.</p>
+        </div>
+      </section></div>
+    </div>
+
+    <div class="layer full" style="--z:2"><section class="box" id="b-model" aria-labelledby="h-model">
+      <h2 id="h-model">What is and isn't modelled <small>docs/known-limitations.md · featureFlags.ts</small></h2>
+      <div class="in">
+        <div class="model">
+          <div class="yes">
+            <h3>Modelled</h3>
+            <ul>
+              <li>White damage plus one signature special per spec where its sustained rate is defensible: a cooldown, an energy cost against 10/sec regen, or a hunter's shot weave.</li>
+              <li><strong>Multi-ability rotations cover 5 specs of 27:</strong> Arms and Fury press three buttons each; Affliction keeps four DoTs under a Shadow Bolt filler; Shadow keeps two DoTs up with Mind Blast and Mind Flay; Destruction keeps Immolate and fills with Incinerate.</li>
+              <li>Retribution's Holy damage, faction-split: Seal of Blood is Horde-only in Phase 2. Holy damage is not reduced by armor.</li>
+              <li>Windfury Weapon for Enhancement, as a proc on the main-hand swing (main hand assumed to carry the imbue).</li>
+              <li>A hunter's pet: auto attack, Bite, Claw and Kill Command. A Demonology warlock's Felguard.</li>
+              <li>Feral's Rake and Rip bleeds (ticks ignore armor) and Feral Attack Power on 26 catalogued weapons.</li>
+              <li>Slice and Dice for every rogue, Combat Potency, and Instant and Deadly poisons on the spell table.</li>
+              <li>Talents reach all 27 specs; spells record a damage school, so Demonic Sacrifice applies per spell.</li>
+            </ul>
+          </div>
+          <div class="no">
+            <h3>Not modelled, or only approximated</h3>
+            <ul>
+              <li><strong>The other 22 specs are a single-ability approximation</strong>, which understates any spec whose damage is spread across several buttons.</li>
+              <li>Rage-costed abilities with no cooldown are excluded: Heroic Strike is carried in the data and contributes nothing. Rage from damage taken is pinned at 0.</li>
+              <li>No mana-costed ability is capped by mana; the breakdown reports mana per second spent instead. Aspect of the Viper, Judgement of Wisdom, Shamanistic Rage and potions are unmodelled.</li>
+              <li>Caster estimates model one signature ability: no cooldowns, procs, downranking or multi-spell priority.</li>
+              <li>A named list of talent groups is still refused; per-spell effects such as Ignite, Shadow Weaving and Ruin dominate it. Expect a talented estimate to read low, especially for casters.</li>
+              <li>No multi-iteration variance and no result charts, so every number is a point estimate.</li>
+              <li>Bestial Wrath and Mangle are still missing; Flametongue and Elemental Weapons are not applied.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="quote">Measured against archon.gg's observed Phase 2 averages for all 20 DPS specs, the model reads <b class="num">1.05x</b> to <b class="num">2.15x</b> low, and no spec may read above its reference. Worst today: Demonology Warlock. Source: <code>featureFlags.ts</code>, <code>dpsReference.ts</code> (archon.gg, read 2026-08-23).</p>
+        <p class="prov" style="margin:8px 0 0">The tab is shown for the 20 DPS specs (Physical DPS and Caster DPS roles) by the owner's call on 2026-08-21. Healer and Tank math is still computed and tested but not shown as a headline.</p>
+      </div>
+    </section></div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. Reference DPS: archon.gg Classic Fresh, raid / normal / all bosses, read 2026-08-23. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Simulation</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+/* Simulation tab: starts fully in Tempest Keep light; "charge" flares the naaru crystal while a run computes */
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:1,warm:0,charge:0};
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
+const C=h=>new THREE.Color(h);
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.tk.light.clone(),deep:PAL.tk.deep.clone(),fog:PAL.tk.fog.clone(),acc:PAL.tk.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?260:520,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
+    vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(.85,1.,.96),.35),a);}`})));
+/* lights: phase lamp over the pool, ambient, a cool rim and a low accent (coral / violet / ember) */
+const lamp=new THREE.PointLight(cur.light.clone(),2.2,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x2a1a40,.6));
+const rim=new THREE.DirectionalLight(0xc8a0ff,.35);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a naaru-like arcane crystal: faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x24163a,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* The Eye's pillars receding into the violet fog */
+const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
+R.setClearColor(cur.fog);
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=2.2+MIX.charge*2.4;
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
+  tint();place();R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
+/* hooks used by the page script */
+S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+size();still();
+})();
+</script>
+<script>
+(function(){
+"use strict";
+/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
+const $=(s,r=document)=>r?r.querySelector(s):null, $$=(s,r=document)=>r?Array.from(r.querySelectorAll(s)):[];
+const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
+const root=document.documentElement, live=$("#live");
+const say=t=>{if(live)live.textContent=t;};
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+
+/* ---------- per-spec notes, paraphrased from docs/known-limitations.md and featureFlags.ts ---------- */
+const NOTE={
+ "Fury Warrior":"rage income. A talented Fury warrior makes more than the 3.4/sec an untalented one does but less than the 7.5/sec Bloodthirst and Whirlwind want, so the Heroic Strike dump stays unfunded and contributes nothing. Rage from damage taken is pinned at 0.",
+ "Arms Warrior":"rage income. Rage-costed abilities with no cooldown are excluded, so Heroic Strike contributes nothing, and rage from damage taken is pinned at 0.",
+ "Beast Mastery Hunter":"Bestial Wrath, which needs a cooldown usage policy. The pet is modelled, but the estimate assumes one pet family; the eight families span 0.91 to 1.1 on damage and there is no picker.",
+ "Survival Hunter":"a multi-ability rotation: this spec is a single-ability approximation (auto shot plus Steady Shot and the pet). No mana cap is enforced; the readout reports mana per second instead.",
+ "Marksmanship Hunter":"very little: auto shot, Steady Shot and a pet are all in, and this spec reads within about 5% of its archon.gg reference.",
+ "Combat Rogue":"a full rotation. Slice and Dice, Combat Potency and Instant and Deadly poisons are modelled, but the rest is a single-ability approximation.",
+ "Assassination Rogue":"a full rotation. Slice and Dice and poisons are modelled (Nature damage on the spell table), but the rest is a single-ability approximation.",
+ "Subtlety Rogue":"a full rotation. Slice and Dice and poisons are modelled, but the rest is a single-ability approximation.",
+ "Enhancement Shaman":"mana. Stormstrike is not capped by mana, and Shamanistic Rage is unmodelled. Windfury assumes the main hand carries the imbue; Flametongue and Elemental Weapons are not applied.",
+ "Retribution Paladin":"little on the Holy side: seals and the judgement are modelled and faction-split, Seal of Blood being Horde-only in Phase 2. Judgement of Wisdom and mana are unmodelled.",
+ "Feral Druid":"Mangle. Rake and Rip are modelled and their ticks ignore armor, and Feral Attack Power is read from 26 catalogued weapons. Bear and cat modes are not split yet.",
+ "Arcane Mage":"cooldowns, procs, downranking and multi-spell priority: casters model one signature ability.",
+ "Fire Mage":"Ignite and the other per-spell talents, plus cooldowns and procs: casters model one signature ability.",
+ "Frost Mage":"cooldowns, procs and multi-spell priority: casters model one signature ability. Winter's Chill is not modelled.",
+ "Destruction Warlock":"talent effects that are refused by name, such as Ruin. Immolate is maintained and Incinerate fills; Demonic Sacrifice applies per spell school.",
+ "Affliction Warlock":"talent effects that are refused by name. Four DoTs are maintained under a Shadow Bolt filler.",
+ "Demonology Warlock":"the most of any spec: it is the worst-reading spec against its reference today. See the limitations panel.",
+ "Shadow Priest":"Shadow Weaving and other per-spell talents. Two DoTs are kept up, Mind Blast on cooldown, Mind Flay in the gaps.",
+ "Elemental Shaman":"cooldowns, procs and multi-spell priority: casters model one signature ability.",
+ "Balance Druid":"cooldowns, procs and multi-spell priority: casters model one signature ability (Starfire, recorded as Arcane)."
+};
+
+/* ---------- spec picker (20 DPS specs, archon.gg reference per button) ---------- */
+const specBtns=$$("#specpick button[data-spec]");
+let spec=(specBtns.find(b=>b.getAttribute("aria-pressed")==="true")||specBtns[0]||{dataset:{}}).dataset;
+function exampleFor(ref){return Math.round(ref*.7209);} /* illustrative only: about 1.39x low, inside the measured 1.05x-2.15x band; Fury lands on the 1,480 the example sources sum to */
+function renderSpec(){
+  const ref=+spec.ref||0, ex=exampleFor(ref);
+  const runfor=$("#runfor");if(runfor)runfor.textContent=(spec.spec||"")+" · Phase 2 planner set";
+  const r=$("#refdps");if(r)r.textContent=fmt(ref);
+  const s=$("#score");if(s){s.dataset.to=ex;s.textContent=fmt(ex);}
+  const bar=$("#refbar");if(bar)bar.style.width=(ref?Math.min(100,ex/ref*100):0).toFixed(1)+"%";
+  const n=$("#specnote");if(n)n.innerHTML="<strong>What this estimate misses for your spec:</strong> "+(NOTE[spec.spec]||"see the limitations panel below.");
+  const srcp=$("#srcwhich");if(srcp)srcp.textContent=spec.spec==="Fury Warrior"?"":"Shown for Fury Warrior; other specs list their own sources.";
+}
+specBtns.forEach(b=>on(b,"click",()=>{
+  specBtns.forEach(x=>x.setAttribute("aria-pressed",x===b));
+  spec=b.dataset;renderSpec();
+  say(spec.spec+" selected. Reference "+fmt(+spec.ref)+" DPS.");
+  if(M.on&&M.flash)M.flash();
+}));
+renderSpec();
+/* with JS the result waits for a run; without JS it stays visible as a static example */
+{const r0=$("#result"),e0=$("#simempty");if(r0&&e0){r0.hidden=true;e0.hidden=false;}}
+
+/* ---------- Simulate ---------- */
+const runbtn=$("#runbtn"), result=$("#result"), empty=$("#simempty");
+let running=false;
+function reveal(){
+  if(result)result.hidden=false;
+  if(empty)empty.hidden=true;
+  say("Estimated DPS for "+(spec.spec||"")+": "+fmt(exampleFor(+spec.ref||0))+", example output. Observed average "+fmt(+spec.ref||0)+".");
+}
+on(runbtn,"click",()=>{
+  if(running)return;
+  if(M.on&&M.run){running=true;runbtn.setAttribute("aria-busy","true");M.run(()=>{running=false;runbtn.removeAttribute("aria-busy");},reveal);}
+  else reveal();
+});
+
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+
+/* ================= MOTION LAYER ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined";
+if(tog)tog.hidden=false;
+function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  if(tog)tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+if(ST)gsap.registerPlugin(ScrollTrigger);
+let ctx=null, mm=null;
+const A=fn=>ctx?ctx.add(fn):fn();
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  const s=$("#score");if(s&&s.dataset.to)s.textContent=fmt(+s.dataset.to);
+  const w=$("#wipe");if(w)w.style.display="none";
+  Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
+  SC.mix.charge=0;SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);SC.setMotion(true);
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
+  else{if(tog)tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+function splitHero(){
+  const h=$("#h-sim");if(!h||h.dataset.split)return false;
+  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
+  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
+  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
+  return true;
+}
+/* 1. Intro: the scene settles from above, words rise out of masks, the target chips land, cards in view rise. ~1.4s */
+function intro(){
+  const split=splitHero();
+  const inView=$$(".simgrid .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  inView.forEach(b=>b.dataset.introd="1");
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
+  if(split&&$("#h-sim .w>span"))tl.from("#h-sim .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  if($(".target span"))tl.from(".target span",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
+  if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  safe(tl);
+}
+/* 2. Scroll: the camera drifts toward the crystal; bars fill and cards rise as they arrive */
+function scrollStory(){
+  gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
+  if($(".simgrid"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:".simgrid",start:"top 85%",end:"top 15%",scrub:.8}});
+  const sw=$("#sw");
+  if(sw)ScrollTrigger.create({trigger:sw,start:"top 92%",once:true,onEnter:()=>A(()=>safe(gsap.fromTo("#sw .bar i",{scaleX:0},{scaleX:1,duration:.9,stagger:.06,ease:"power3.out"})))});
+  const srcs=$("#srcs");
+  if(srcs)ScrollTrigger.create({trigger:srcs,start:"top 92%",once:true,onEnter:()=>A(()=>safe(gsap.fromTo("#srcs .bar i",{scaleX:0},{scaleX:1,duration:.9,stagger:.08,ease:"power3.out"})))});
+  $$(".simgrid .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"})))}));
+  $$(".model li").forEach((li,i)=>ScrollTrigger.create({trigger:li,start:"top 94%",once:true,onEnter:()=>A(()=>
+    safe(gsap.fromTo(li,{x:li.closest(".no")?24:-24},{x:0,duration:.5,delay:(i%4)*.04,ease:"power3.out",clearProps:"transform"})))}));
+}
+/* 3. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 4. Simulate: the naaru crystal charges, the number counts up, bars fill, the crystal settles. ~1.6s */
+M.run=(done,show)=>A(()=>{
+  const s=$("#score"),to=s?+s.dataset.to||0:0,o={v:0};
+  const tl=gsap.timeline({onComplete:()=>{if(s)s.textContent=fmt(to);done();}});
+  tl.to(SC.mix,{charge:1,duration:.45,ease:"power2.in",onUpdate:SC.render})
+    .add(()=>{show();if(s)s.textContent="0";})
+    .to(o,{v:to,duration:.9,ease:"power2.out",onUpdate:()=>{if(s)s.textContent=fmt(o.v);}});
+  if($("#refbar"))tl.fromTo("#refbar",{scaleX:0},{scaleX:1,duration:.9,ease:"power3.out"},"<");
+  if($("#specnote"))tl.from("#specnote",{y:12,autoAlpha:0,duration:.4,clearProps:"all"},"<.3");
+  tl.to(SC.mix,{charge:0,duration:.9,ease:"power2.out",onUpdate:SC.render},"<.2");
+  safe(tl);
+});
+/* a short arcane pulse when the spec changes */
+M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));
+/* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
+$$("nav.sections a").forEach(a=>on(a,"click",e=>{
+  if(!M.on||a.getAttribute("aria-current")==="page"||e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;
+  const w=$("#wipe"),sp=$("span",w);if(!w||!sp)return;
+  e.preventDefault();
+  const href=a.href;sp.textContent=a.textContent;w.style.display="grid";
+  const tl=gsap.timeline({onComplete:()=>{location.href=href;}});
+  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(sp,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
+  safe(tl);
+}));
+/* returning via the back/forward cache: drop the curtain */
+addEventListener("pageshow",e=>{if(e.persisted){const w=$("#wipe");if(w)w.style.display="none";SC.cam.dive=0;SC.render();}});
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
+</body>
+</html>

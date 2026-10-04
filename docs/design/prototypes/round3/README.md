@@ -2,6 +2,11 @@
 
 **Made 2026-10-03. Concept prototypes only; nothing here is the live app.**
 
+> **Owner review, 2026-10-03:** the **Hybrid** designs were dropped (their files are kept here for
+> reference but removed from the gallery). The favourites were **3D · Portal** (its layout and its
+> scene) and the **motion of Motion · Portal**. Round 4 puts Motion · Portal's motion onto 3D · Portal's
+> layout, aimed more squarely at the planner's WoW Phase 2 job: [`../round4/`](../round4/).
+
 Three styles, each pushed as far as it would go, built three ways: on the **Launcher** (05), on the
 **Portal** (08), and as a **Hybrid** that puts the Portal's home content inside the Launcher's shell.
 Sections were moved and merged freely where it helped the style. The brief every designer worked to

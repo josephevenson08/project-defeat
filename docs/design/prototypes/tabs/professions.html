@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Professions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
+  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(3,10,14,.8);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#9ff3ea;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+/* Tempest Keep backdrop: arcane gold over violet (selected in the hero) */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
+  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections button{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections button:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{min-height:min(62vh,560px);display:grid;align-content:end;padding:48px 0 28px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+/* ---------- Professions tab: Serpentshrine teal, calm and dim behind dense tables ---------- */
+.veil{background:linear-gradient(180deg,rgba(3,9,13,.5),rgba(3,9,13,.25) 30%,rgba(3,9,13,.7))}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+.hero.prof{min-height:min(40vh,380px)}
+.hero.prof h1{max-width:21ch}
+.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);background:var(--warn-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.real{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--glow);border:1px solid var(--rim);background:var(--glow-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.note{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:9px 11px;margin:0}
+.note strong{color:var(--warn)}
+/* profession picker */
+.pickgrp{margin:0 0 14px}
+.pickgrp h3{margin:0 0 8px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));list-style:none;margin:0;padding:0}
+.pcard{display:grid;gap:4px;height:100%;padding:11px 12px;border-radius:12px;background:var(--scrim);border:1px solid var(--rim-2);color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s,box-shadow .2s}
+.pcard:hover{border-color:var(--glow);box-shadow:0 0 22px -8px var(--glow);transform:translateY(-2px)}
+.pcard b{font:400 var(--t-lg)/1.15 var(--f-head);letter-spacing:.02em}
+.pcard span{font-size:var(--t-xs);color:var(--ink-2)}
+.pcard .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.kind{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:1px 6px;border:1px solid var(--rim);color:var(--ink-2)}
+.kind.stat{color:var(--q-leg);border-color:rgba(255,154,46,.45);background:rgba(255,154,46,.1)}
+.kind.gear{color:var(--q-epic);border-color:rgba(192,140,255,.45);background:rgba(192,140,255,.08)}
+.kind.utility{color:var(--q-rare);border-color:rgba(75,163,255,.45);background:rgba(75,163,255,.08)}
+.kind.feeds{color:var(--ink-3)}
+.kind.full{color:var(--glow);border-color:var(--glow);background:var(--glow-soft)}
+/* a profession's page */
+.pgrid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:980px){.pgrid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr)}}
+.phead{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--scrim);border:1px solid var(--rim)}
+.phead h2{margin:0;font:400 var(--t-xl)/1.1 var(--f-head)}
+.phead .meta{font-size:var(--t-sm);color:var(--ink-2)}
+.phead .links{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.verdict{font:400 var(--t-lg)/1.35 var(--f-head);margin:0 0 10px}
+ul.perks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.perks li{padding:9px 11px;border-radius:10px;background:var(--scrim);border:1px solid var(--rim-2);font-size:var(--t-sm)}
+ul.perks li.stat{border-color:rgba(255,154,46,.45);box-shadow:inset 3px 0 0 var(--q-leg)}
+ul.perks .pn{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-weight:700;margin-bottom:3px}
+ul.perks p{margin:0;color:var(--ink-2)}
+/* the skill line with trainer stops */
+.sline{position:relative;height:34px;margin:6px 6px 4px}
+.sline .track{position:absolute;left:0;right:0;top:15px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--rim),var(--glow))}
+.sline .stop{position:absolute;top:6px;width:2px;height:22px;background:var(--warn);transform:translateX(-1px)}
+.sline .stop i{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px var(--warn)}
+.sline .tick{position:absolute;top:24px;font:500 10px var(--f-mono);color:var(--ink-3);transform:translateX(-50%)}
+ol.stops{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+ol.stops li{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:4px 10px;font-size:var(--t-sm);padding:7px 0;border-top:1px solid var(--rim-2)}
+ol.stops li:first-child{border-top:0}
+ol.stops .at{font:500 var(--t-md) var(--f-mono);color:var(--warn)}
+ol.stops p{margin:2px 0 0;color:var(--ink-2)}
+/* climb table with trainer stops written into the row */
+table.climb td,table.climb th{padding:8px 10px}
+table.climb tbody tr.sel{background:var(--glow-soft)}
+table.climb .rng{font:500 var(--t-sm) var(--f-mono);background:none;border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:3px 9px;cursor:pointer;white-space:nowrap}
+table.climb tr.sel .rng{background:var(--glow);color:var(--glow-ink);border-color:var(--glow)}
+.train{display:block;margin-top:6px;font-size:var(--t-xs);color:var(--warn);background:var(--warn-soft);border:1px solid rgba(255,207,122,.25);border-radius:6px;padding:4px 7px}
+.ore{display:inline-block;margin:0 4px 3px 0;font-size:var(--t-xs);padding:1px 7px;border-radius:999px;background:rgba(79,216,200,.08);border:1px solid var(--rim-2);white-space:nowrap}
+.zl{font-size:var(--t-xs);color:var(--ink-2)}
+.zl .nm{color:var(--ink-3)}
+.gd{margin:12px 0 0;font-size:var(--t-sm);color:var(--ink-2);border-left:3px solid var(--glow);padding:4px 0 4px 12px}
+/* farming map */
+.map{width:100%;height:auto;display:block;border-radius:10px;background:radial-gradient(80% 80% at 50% 50%,#0a2a33,#041218);border:1px solid var(--rim-2)}
+.map .cell{fill:var(--glow)}
+.map .pts{stroke:#d7fff9;stroke-linecap:round;stroke-width:.9;opacity:.75}
+.map .route{fill:none;stroke:var(--amber);stroke-width:.7;stroke-linejoin:round;filter:drop-shadow(0 0 1.2px var(--amber))}
+.map .gridl{stroke:rgba(120,220,215,.08);stroke-width:.2}
+.map text{font:3px var(--f-mono);fill:var(--ink-3)}
+.maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--t-xs);color:var(--ink-2);margin:8px 0}
+.maplegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+/* zones list */
+ul.zones{list-style:none;margin:0;padding:0;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+ul.zones li{font-size:var(--t-sm);padding:7px 9px;border-radius:9px;background:var(--scrim);border:1px solid var(--rim-2)}
+ul.zones li b{display:block;font-weight:600}
+ul.zones li span{font-size:var(--t-xs);color:var(--ink-2)}
+/* crafting path */
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.seg button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);border-radius:999px;padding:5px 11px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.rg{display:block;font-size:var(--t-xs);color:var(--ink-2)}
+.rg .buy{color:var(--amber)}
+.rg .alt{color:var(--ink-3)}
+.shop{display:grid;gap:12px}
+@media (min-width:560px){.shop{grid-template-columns:1fr 1fr}}
+.shop h3{margin:0 0 6px;font:400 var(--t-md) var(--f-head)}
+.shop ul{list-style:none;margin:0;padding:0;font-size:var(--t-sm)}
+.shop li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px solid var(--rim-2)}
+.shop li:first-child{border-top:0}
+.shop .q{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.shop .tot{margin-top:6px;font-size:var(--t-sm);color:var(--amber)}
+.summ{font-size:var(--t-sm);color:var(--ink-2)}
+.full{grid-column:1/-1}
+.backbtn{font:600 var(--t-sm) var(--f-body);background:none;border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:6px 12px;cursor:pointer}
+@media (max-width:520px){table.climb thead{display:none}table.climb tr{display:grid;grid-template-columns:1fr;border-top:1px solid var(--rim-2);padding:6px 0}table.climb td{border:0;padding:4px 10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Tab prototype · Professions · Step 1 baseline. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-composition.html">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html">Raids</a>
+      <a href="professions.html" aria-current="page">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Tiers, trainers, payoffs, nodes and craft counts: <code>src/domain/professions</code> · Phase 2 · updated 30 Sep</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+<section aria-labelledby="h-prof">
+  <div class="hero prof">
+    <div class="hero-in">
+      <div class="eyebrow">Professions · 13 professions · Serpentshrine light</div>
+      <h1 id="h-prof">Take a profession to <em>375</em>, and know what it is worth at 70.</h1>
+      <p>Where to stop and train, what each skill range draws or makes, where the nodes actually are, and the shopping list from first recipe to cap. Then the honest part: in this expansion only one profession puts a stat on your character sheet.</p>
+      <p class="prov" style="margin:0">Trainer stops from <code>sampleProfessionTiers.ts</code>; payoffs from <code>professionPayoffs.ts</code> (icy-veins.com, wowhead.com); node coordinates from Wowhead object pages via <code>nodeSpawns.json</code>; craft counts computed by <code>compute-leveling-paths.mjs</code>. TBC Classic Phase 2 · data updated 30 Sep.</p>
+    </div>
+  </div>
+
+  <div class="layer" style="--z:4" id="pickwrap"><section class="box" id="b-pick" aria-labelledby="h-pick">
+    <h2 id="h-pick">Pick a profession <small>13 · skill cap 375</small></h2>
+    <div class="in">
+<div class="pickgrp"><h3>Gathering · 3</h3><ul class="cards">
+<li><a class="pcard" href="#p=herbalism" data-prof="Herbalism"><b>Herbalism</b><span>Master at skill 275, level 40</span><span class="tags"><span class="kind feeds">feeds others</span></span></a></li>
+<li><a class="pcard" href="#p=mining" data-prof="Mining"><b>Mining</b><span>Master at skill 275, level 40</span><span class="tags"><span class="kind full">full guide</span><span class="kind feeds">feeds others</span></span></a></li>
+<li><a class="pcard" href="#p=skinning" data-prof="Skinning"><b>Skinning</b><span>Master at skill 275, level 40</span><span class="tags"><span class="kind feeds">feeds others</span></span></a></li>
+</ul></div>
+<div class="pickgrp"><h3>Crafting · 7</h3><ul class="cards">
+<li><a class="pcard" href="#p=alchemy" data-prof="Alchemy"><b>Alchemy</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind gear">own gear</span><span class="kind utility">utility</span></span></a></li>
+<li><a class="pcard" href="#p=blacksmithing" data-prof="Blacksmithing"><b>Blacksmithing</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind full">full guide</span><span class="kind gear">own gear</span><span class="kind feeds">feeds others</span></span></a></li>
+<li><a class="pcard" href="#p=enchanting" data-prof="Enchanting"><b>Enchanting</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind stat">stat bonus</span></span></a></li>
+<li><a class="pcard" href="#p=engineering" data-prof="Engineering"><b>Engineering</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind gear">own gear</span><span class="kind utility">utility</span></span></a></li>
+<li><a class="pcard" href="#p=jewelcrafting" data-prof="Jewelcrafting"><b>Jewelcrafting</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind gear">own gear</span><span class="kind utility">utility</span></span></a></li>
+<li><a class="pcard" href="#p=leatherworking" data-prof="Leatherworking"><b>Leatherworking</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind utility">utility</span><span class="kind gear">own gear</span><span class="kind feeds">feeds others</span></span></a></li>
+<li><a class="pcard" href="#p=tailoring" data-prof="Tailoring"><b>Tailoring</b><span>Master at skill 275, level 50</span><span class="tags"><span class="kind gear">own gear</span><span class="kind utility">utility</span></span></a></li>
+</ul></div>
+<div class="pickgrp"><h3>Secondary · 3</h3><ul class="cards">
+<li><a class="pcard" href="#p=cooking" data-prof="Cooking"><b>Cooking</b><span>Master at skill 300, level 55</span><span class="tags"><span class="kind utility">utility</span></span></a></li>
+<li><a class="pcard" href="#p=first-aid" data-prof="First Aid"><b>First Aid</b><span>Master at skill 300, level 50</span><span class="tags"><span class="kind utility">utility</span></span></a></li>
+<li><a class="pcard" href="#p=fishing" data-prof="Fishing"><b>Fishing</b><span>Master at skill 300, level 55</span><span class="tags"><span class="kind feeds">feeds others</span></span></a></li>
+</ul></div>
+      <p class="prov" style="margin:0">Mining and Blacksmithing are fully built in this prototype; the other eleven open on their real trainer stops and payoff. Every profession links out to wow-professions.com for the step-by-step, which this app links rather than copies.</p>
+      <noscript><p class="note" style="margin-top:10px"><strong>Profession pages need JavaScript.</strong> They are drawn from the page's data block; the list above is the static summary.</p></noscript>
+    </div>
+  </section></div>
+
+  <div id="ppage" hidden tabindex="-1" aria-live="off"></div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. Node coordinates: Wowhead object pages (g_mapperData), as percentages of each zone. Routes are computed by this app from those coordinates, never copied from a published guide. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Professions</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Profession data, generated from src/domain/professions (sampleProfessions, sampleProfessionTiers, professionPayoffs, gatheringGuides + gatheringPlan, farmingRoutes over nodeSpawns.json, craftingPaths.json) by running the app's own functions. */
+window.PD={"P":[{"n":"Alchemy","c":"Crafting","g":"https://www.wow-professions.com/tbc/alchemy-leveling-guide-burning-crusade-classic","s":"https://www.wow-professions.com/tbc/alchemy-specializations-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Alchemy trainer in Outland: Alchemist Gribble (Alliance) / Apothecary Antonivich (Horde), both in Hellfire Peninsula, or Lorokeem (neutral) in Shattrath City."]],"pv":"Flasks that survive death, transmutes half the other professions depend on, and a specialisation that pays you roughly a sixth more output for free.","pk":[["Alchemist Stone trinkets","gear","Assassin's, Redeemer's, Guardian's and Sorcerer's Alchemist Stone — epic trinkets crafted at Alchemy 375, one per role.",375,5,1],["Elixir, Potion or Transmute Master","utility","Pick one and that category has a chance to produce extra on every craft — measured at roughly 17% more output on average."],["Flasks and transmutes","utility","Flasks persist through death, which is what makes them a raid consumable rather than a pull consumable. Primal Might and the Skyfire Diamonds other professions need come from transmutes."]],"src":["icy-veins.com","wowhead.com"],"cp":[20,417,1102860]},{"n":"Blacksmithing","c":"Crafting","g":"https://www.wow-professions.com/tbc/blacksmithing-leveling-guide-burning-crusade-classic","s":"https://www.wow-professions.com/tbc/blacksmithing-specializations-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Blacksmithing trainer in Outland: Humphry (Alliance, Honor Hold) / Rohok (Horde, Thrallmar), Hellfire Peninsula."]],"pv":"Plate and weapons that soulbind to you the moment you make them — and, contrary to what nearly everyone remembers, no extra sockets.","pk":[["Armorsmith or Weaponsmith","gear","Armorsmithing makes Breastplate of Kings, Bulwark of Kings and the Nether Chain Shirt line; the three weapon specialisations make Lionheart Blade, Thunder, Drakefist Hammer, Lunar Crescent and The Planar Edge. All bind on pickup."],["No socket bracer or gloves in TBC","feeds","Adding two gem slots to your own bracers and gloves is a Wrath perk that needs Blacksmithing 400. It does not exist here, and it is the single most common thing people expect Blacksmithing to do."]],"src":["icy-veins.com","wowhead.com"],"cp":[33,551,3400]},{"n":"Enchanting","c":"Crafting","g":"https://www.wow-professions.com/tbc/enchanting-leveling-guide-burning-crusade-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Enchanting trainer in Outland: Johan Barnes (Alliance, Honor Hold) / Felannia (Horde, Thrallmar); neutral options Asarnan (Consortium, Stormspire, Netherstorm) or High Enchanter Bardolan (Scryers, Shattrath, requires Scryers reputation)."]],"pv":"The only profession in the expansion that puts a permanent stat bonus on your character sheet, and it applies to both rings.","pk":[["Enchant Ring - Stats","stat","+4 all stats per ring, so +8 across both. Honored with Lower City buys the formula."],["Enchant Ring - Striking","stat","+2 weapon damage per ring, so +4 across both. Revered with The Consortium."],["Enchant Ring - Spellpower","stat","+12 damage and healing per ring, so +24 across both. Honored with Keepers of Time."],["Enchant Ring - Healing Power","stat","+20 healing per ring, so +40 across both. Revered with The Sha'tar."]],"src":["icy-veins.com","wowhead.com (spell=27927)"],"cp":[16,438,6088]},{"n":"Engineering","c":"Crafting","g":"https://www.wow-professions.com/tbc/engineering-leveling-guide-burning-crusade-classic","s":"https://www.wow-professions.com/tbc/engineering-specializations-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Engineering trainer in Outland: Lebowski (Alliance, Honor Hold) / Zebig (Horde, Thrallmar) in Hellfire Peninsula, K. Lee Smallfry (Alliance) / Mack Diver (Horde) in Zangarmarsh, or neutral Xyrol at Area 52, Netherstorm."]],"pv":"Eleven epic goggles, one for every armour type and role, plus a pile of gadgets no other profession has.","pk":[["Epic goggles","gear","All eleven require Engineering 350 to equip and are taught by Outland trainers at 350 — a head slot you craft rather than compete for.",350,0,0],["Gadgets","utility","Rocket boots, bombs, repair bots and the rest. None of it is a stat, all of it is something nobody else in the raid can do."]],"src":["icy-veins.com","warcrafttavern.com"],"cp":[28,470,2100]},{"n":"Herbalism","c":"Gathering","g":"https://www.wow-professions.com/tbc/herbalism-leveling-guide-tbc-classic","note":"Provides the raw materials consumed by Alchemy; see Alchemy for what it crafts them into.","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,40,"Master Herbalism trainer in Outland, Hellfire Peninsula (Honor Hold/Thrallmar).",1]],"pv":"No bonus to your character at all — it is the supply line for Alchemy, and it pays in gold rather than stats.","pk":[["No combat bonus in TBC","feeds","Gathering professions gained their stat perks in Wrath, not here — Lifeblood, Toughness and Master of Anatomy are all later additions. In The Burning Crusade the whole payoff is what it supplies: every flask, elixir and potion an alchemist makes starts here."]],"src":["icy-veins.com","warcrafttavern.com"]},{"n":"Jewelcrafting","c":"Crafting","g":"https://www.wow-professions.com/tbc/jewelcrafting-leveling-guide-burning-crusade-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Jewelcrafting trainer in Outland: Tatiana (Alliance, Honor Hold) / Kalaen (Horde, Thrallmar), Hellfire Peninsula, or neutral Xyrol at Area 52, Netherstorm."]],"pv":"Cut your own gems for every socket you own, and — from Sunwell — trinkets and necklaces nobody else can wear.","pk":[["Figurine trinkets","gear","Five bind-on-pickup trinkets that require Jewelcrafting to equip — Crimson Serpent, Khorium Boar, Empyrean Tortoise, Seaspray Albatross and Shadowsong Panther, one per role.",375,5,1],["Jewelcrafter-only necklaces","gear","Hard Khorium Choker, Pendant of Sunfire and Amulet of Flowing Life, all bind-on-pickup.",0,5,1],["Cutting your own gems","utility","The everyday payoff, and the one available from the day you hit 375. Gems themselves are tradeable — TBC Jewelcrafting has no bind-on-pickup gems, which is a Wrath idea."]],"src":["icy-veins.com","wowhead.com"],"cp":[21,420,0]},{"n":"Leatherworking","c":"Crafting","g":"https://www.wow-professions.com/tbc/leatherworking-leveling-guide-burning-crusade-classic","s":"https://www.wow-professions.com/tbc/leatherworking-specializations-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Leatherworking trainer in Outland: Brumman (Alliance, Honor Hold) / Barim Spilthoof (Horde, Thrallmar), Hellfire Peninsula, or neutral Darmari in Shattrath."]],"pv":"Drums, which the raid needs someone to bring — and which are the clearest case of a profession whose payoff lands on other people.","pk":[["Drums","utility","Drums of Battle and its siblings buff the whole party, not you alone, and several leatherworkers rotating them keeps the buff up. Greater versions later gain 40-yard range and an instant cast."],["Specialisation gear","gear","Dragonscale, Elemental and Tribal each unlock bind-on-pickup pieces the others cannot make.",0,0,1],["No Fur Lining in TBC","feeds","The self-only bracer enchants people remember are a Wrath addition. Leatherworking gives you nothing here that you wear and nobody else could."]],"src":["icy-veins.com","noobtoboss.com"],"cp":[27,462,497220]},{"n":"Mining","c":"Gathering","g":"https://www.wow-professions.com/tbc/mining-leveling-guide-tbc-classic","note":"Provides the raw materials consumed by Blacksmithing, Engineering, and Jewelcrafting.","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,40,"Master Mining trainer in Outland: Hurnak Grimmord (Alliance, Honor Hold) / Krugosh (Horde, Thrallmar), Hellfire Peninsula."]],"pv":"No bonus to your character at all — it feeds three crafting professions and is the most reliably sellable gathering skill in the expansion.","pk":[["No combat bonus in TBC","feeds","Gathering professions gained their stat perks in Wrath, not here — Lifeblood, Toughness and Master of Anatomy are all later additions. In The Burning Crusade the whole payoff is what it supplies: Blacksmithing, Engineering and Jewelcrafting all run on ore."]],"src":["icy-veins.com","warcrafttavern.com"]},{"n":"Skinning","c":"Gathering","g":"https://www.wow-professions.com/tbc/skinning-leveling-guide-tbc-classic","note":"Provides the raw materials consumed by Leatherworking.","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,40,"Master Skinning trainer in Outland: Jelena Nightsky (Alliance) / Moorutu (Horde), both at Honor Hold/Thrallmar, Hellfire Peninsula."]],"pv":"No bonus to your character at all — but it is the only gathering profession that costs you no extra time, since the skill comes off mobs you were killing anyway.","pk":[["No combat bonus in TBC","feeds","Gathering professions gained their stat perks in Wrath, not here — Lifeblood, Toughness and Master of Anatomy are all later additions. In The Burning Crusade the whole payoff is what it supplies: Leatherworking, and the drums the raid wants, run on leather."]],"src":["icy-veins.com","warcrafttavern.com"]},{"n":"Tailoring","c":"Crafting","g":"https://www.wow-professions.com/tbc/tailoring-leveling-guide-burning-crusade-classic","s":"https://www.wow-professions.com/tbc/tailoring-specializations-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Any Azeroth city trainer"],["Artisan",200,35,"Any Azeroth city trainer"],["Master",275,50,"Master Tailoring trainer in Outland: Hama (Alliance, Honor Hold) / Dalinna (Horde, Thrallmar), Hellfire Peninsula."]],"pv":"Three bind-on-pickup sets, one of which is the strongest caster gear available outside a raid.","pk":[["Spellfire, Shadoweave and Primal Mooncloth","gear","Pick a specialisation and you can make that set. Spellfire is the caster damage set, Shadoweave the shadow one, Primal Mooncloth the healing one.",0,0,1],["Bags","utility","Not a stat, and the thing a tailor is thanked for most often."]],"src":["icy-veins.com","noobtoboss.com"],"cp":[26,443,657340]},{"n":"Cooking","c":"Secondary","g":"https://www.wow-professions.com/tbc/cooking-leveling-guide-tbc-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Not a live trainer: purchase the Expert Cookbook from a cooking supplies vendor, then learn it from your bag.",1],["Artisan",225,35,"Not a live trainer: complete the \"Clamlette Surprise\" quest from Dirge Quikcleave in Gadgetzan, Tanaris. Needs Cooking 225 and character level 35."],["Master",300,55,"Not a live trainer: purchase the Master Cookbook from Gaston (Alliance, Honor Hold), Baxter (Horde, Thrallmar), or Naka (neutral, Cenarion Refuge, Zangarmarsh), then learn it from your bag."]],"pv":"A well-fed buff every raid night, which is a real stat bonus that simply is not permanent.","pk":[["Well Fed","utility","Outland food gives a sizeable stat buff for 30 minutes and survives anything but death. Anyone can eat it; a cook does not have to buy it."]],"src":["icy-veins.com"],"cp":[13,407,7085]},{"n":"First Aid","c":"Secondary","g":"https://www.wow-professions.com/tbc/first-aid-leveling-guide-burning-crusade-classic","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Not a live trainer: purchase the Expert First Aid manual from Balai Lok'Wein (Horde, Dustwallow Marsh) or Deneb Walker (Alliance, Arathi Highlands), then learn it from your bag.",1],["Artisan",225,35,"Not a live trainer: complete the \"Triage\" quest (Doctor Gustaf VanHowzen for Alliance, Doctor Gregory Victor for Horde). Needs First Aid 225 and character level 35."],["Master",300,50,"Not a live trainer: purchase \"Master First Aid - Doctor in the House\" from Burko (Alliance, Temple of Telhamat) or Aresella (Horde, Falcon Watch), Hellfire Peninsula, then learn it from your bag.",1]],"pv":"A free heal on a cooldown that does not share with your class, which matters most to those who have none.","pk":[["Heavy Netherweave Bandage","utility","Self-healing out of combat for classes that cannot heal themselves, and a genuine cooldown-free option between pulls."]],"src":["icy-veins.com"],"cp":[14,543,0]},{"n":"Fishing","c":"Secondary","g":"https://www.wow-professions.com/tbc/fishing-leveling-guide-burning-crusade-classic","note":"Fishing gates Expert/Artisan behind a vendor purchase and the Nat Pagle questline rather than plain trainer visits; treated here as a secondary profession alongside Cooking and First Aid.","ms":[["Journeyman",50,10,"Any Azeroth city trainer"],["Expert",125,20,"Not a live trainer: purchase \"Expert Fishing - The Bass and You\" from Old Man Heming in Booty Bay for 1 gold, then learn it from your bag. Both factions can use this vendor.",1],["Artisan",225,35,"Not a live trainer: complete \"Nat Pagle, Angler Extreme\" from Nat Pagle in Dustwallow Marsh. The quest wants four rare fish from four separate zones and needs Fishing 225 and character level 35."],["Master",300,55,"Not a live trainer: purchase \"Master Fishing - The Art of Angling\" from Juno Dufrain at Cenarion Refuge, Zangarmarsh, then learn it from your bag."]],"pv":"The supply line for Cooking, and the only way to get a few of the best food buffs in the expansion.","pk":[["Furious Crawdad and the Outland pools","feeds","Terokkar's Highland Mixed Schools hold the fish behind the strongest melee food in TBC. Nothing about fishing itself is a stat."]],"src":["icy-veins.com"]}],"MIN":[{"r":[1,65],"lv":"1-12","m":["Copper Ore"],"t":[["Journeyman",50,10]],"z":[["Dun Morogh",188],["Elwynn Forest",188],["The Barrens",190],["Durotar",0],["Mulgore",0],["Tirisfal Glades",0],["Darkshore",0]],"x":[],"gd":"Copper is the only ore you can touch until 65, and every starting zone has it, so the answer is usually \"the zone you are already in\". The exception is Teldrassil, which has no mineral nodes at all — night elves have to reach Darkshore before mining starts for them. Copper stays orange to 25 and yellow to 50, so the first fifty points come close to one per node."},{"r":[65,125],"lv":"15-30","m":["Tin Ore","Silver Ore"],"t":[],"z":[["Loch Modan",107],["Redridge Mountains",110],["Ashenvale",119],["Hillsbrad Foothills",0],["The Barrens",0]],"x":[["Arathi Highlands",200],["Thousand Needles",189],["Desolace",182]],"gd":"Tin opens at 65 and Silver at 75, and they share zones rather than having any of their own — Silver Veins are simply much rarer, so treat them as a bonus on a Tin loop rather than something to hunt. Copper keeps giving skill until 100 and is still worth taking on the way past."},{"r":[125,175],"lv":"30-40","m":["Iron Ore","Gold Ore"],"t":[["Expert",125,20]],"z":[["Arathi Highlands",351],["Desolace",343],["Thousand Needles",0],["Stranglethorn Vale",298],["Badlands",0]],"x":[],"gd":"Iron opens at 125 and Gold at 155, and this is the range that explains why Gold has no section of its own: Gold Veins sit in the same zones as Iron, on the same lap, so you pick them up without going looking. Silver is still here too and still worth mining. Thousand Needles and Badlands are the gentler alternatives if you arrived here under level 35 — both are widely recommended for this range and neither made the top three zones our ingest keeps per ore, so they have no map below."},{"r":[175,245],"lv":"43-52","m":["Mithril Ore","Truesilver Ore"],"t":[["Artisan",200,35]],"z":[["The Hinterlands",289],["Tanaris",99],["Azshara",233],["Un'Goro Crater",0],["Feralas",0]],"x":[["Winterspring",146]],"gd":"Mithril at 175 is the long one — seventy points on essentially a single ore. Truesilver joins at 230 near the end and is rare enough to be a bonus rather than a plan. This is the range where a mount stops being optional."},{"r":[245,275],"lv":"50-58","m":["Thorium Ore"],"t":[],"z":[["Un'Goro Crater",64],["Burning Steppes",63],["Silithus",61]],"x":[],"gd":"Small Thorium Veins open at 245. These are genuinely sparse next to everything below them — the three zones here hold about sixty recorded spawns each, against several hundred for Iron or Fel Iron — so expect a real lap rather than a dense patch. It is thirty points and it is the slowest stretch of the climb."},{"r":[275,300],"lv":"53-60","m":["Thorium Ore"],"t":[["Master",275,40]],"z":[["Winterspring",74],["Eastern Plaguelands",68],["Azshara",59],["Un'Goro Crater",0]],"x":[],"gd":"Rich Thorium Veins open at 275 and drop several ore each, so the last twenty-five points before Outland go faster than the thirty before them. This is also where to stop and train Master Mining if you are level 40 or above — it needs skill 275 exactly, and the bar will not move past 300 without it."},{"r":[300,325],"lv":"58-63","m":["Fel Iron Ore"],"t":[],"z":[["Hellfire Peninsula",333],["Zangarmarsh",124],["Shadowmoon Valley",111]],"x":[],"gd":"Fel Iron at 300 is the first Outland ore, and Hellfire Peninsula is not a close call: it holds roughly three times the recorded Fel Iron of anywhere else, because it is the one Outland zone where Adamantite does not compete for the spawn slots. Every mining node in Hellfire is Fel Iron."},{"r":[325,350],"lv":"64-68","m":["Adamantite Ore"],"t":[],"z":[["Nagrand",191],["Blade's Edge Mountains",196],["Netherstorm",162],["Terokkar Forest",0],["Zangarmarsh",0]],"x":[],"gd":"Adamantite opens at 325 and does not spawn in Hellfire Peninsula at all, so this is the range where you have to move on. Fel Iron is still green and still worth taking on the way past. Go all the way to the back of any cave you enter — Outland nodes sit deep enough inside that they are invisible from the entrance."},{"r":[350,375],"lv":"67-70","m":["Adamantite Ore","Khorium Ore"],"t":[],"z":[["Netherstorm",161],["Shadowmoon Valley",134],["Blade's Edge Mountains",266],["Nagrand",233]],"x":[["Hellfire Peninsula",246]],"gd":"Rich Adamantite at 350 finishes the climb. Khorium needs 375, so you cannot mine a single vein of it while levelling — which is the point of capping rather than a footnote. Khorium Veins are a rare replacement spawn that lands mostly on Adamantite nodes, so the route you rode to 375 is the route you keep riding afterwards. Nagrand is the usual pick for that because it has the Adamantite density and does not need a flying mount."}],"ROUTE":{"zone":"Hellfire Peninsula","count":333,"sampled":true,"len":366,"grid":16,"pts":[[6.3,49.4],[6.3,49.5],[7.9,52.9],[10.2,55.3],[10.3,55.5],[10.8,47.8],[11.8,41.9],[12,47],[12.2,58.7],[12.3,38.4],[12.3,38.7],[12.4,36],[12.4,44.4],[12.4,44.6],[12.5,36.1],[12.5,44.4],[12.5,44.5],[12.6,53.8],[13.4,40.3],[13.4,40.5],[13.5,40.5],[14.7,37.4],[14.7,37.5],[15.3,40.8],[15.3,62.6],[15.4,62.4],[15.5,44.2],[15.9,59.4],[16,59.5],[17.9,46.3],[18,38.3],[18.1,42.4],[18.1,42.5],[19.2,57.3],[19.3,54.4],[19.4,54.5],[19.5,54.4],[19.5,54.5],[20.3,52.9],[21.2,62.7],[21.4,65.4],[21.4,65.5],[21.5,65.4],[21.5,65.5],[21.7,67.8],[22.1,56.8],[22.3,61.4],[22.3,70.1],[22.4,61.6],[22.5,70.2],[22.8,65.7],[22.9,53.5],[23,53.4],[23.9,68.3],[24.1,61],[24.4,58.2],[24.5,58.1],[25,75.4],[25,75.5],[25.3,71],[25.4,78.4],[25.4,78.5],[25.5,78.5],[26.2,65.4],[26.2,65.5],[26.2,72.9],[26.4,45.3],[26.4,45.5],[26.4,76.1],[26.5,45.3],[26.5,45.5],[27.2,78.3],[27.3,78.5],[27.7,69.4],[28.1,54.1],[28.1,80.8],[28.4,39.3],[28.4,71.7],[28.5,39.5],[28.5,71.7],[28.6,39.2],[29.7,65],[30.3,48.4],[30.3,48.7],[30.3,59.8],[30.4,66.2],[30.4,72.8],[30.5,66.2],[30.5,72.8],[31.2,63],[31.3,41.2],[31.3,41.5],[31.6,70.8],[32,34.4],[32,34.5],[32.1,60.1],[32.3,43.5],[32.4,43.3],[32.5,43.3],[32.9,63.4],[32.9,63.5],[33.1,92.6],[33.3,65.2],[33.4,36.1],[33.4,49.9],[33.4,89.6],[33.5,36],[33.6,89.6],[34,29.1],[34.2,64.1],[34.3,58.7],[34.6,60.9],[34.8,66.6],[34.8,92.4],[34.8,92.5],[35.3,70.4],[35.3,70.6],[35.3,88.4],[35.3,88.5],[35.7,40.8],[36.2,58.3],[36.2,58.5],[36.2,65],[36.7,60.5],[37.2,38.4],[37.2,38.5],[37.4,48.1],[37.5,48.2],[37.7,53.3],[37.8,28.4],[37.8,28.5],[37.8,32.4],[37.8,32.5],[37.8,70.5],[37.9,70.4],[38.2,85.7],[38.4,38.3],[38.5,38.2],[38.6,30],[39.1,88.3],[39.1,88.5],[40.1,83.4],[40.1,83.5],[40.2,41.1],[40.8,62.6],[41.2,34.4],[41.2,34.5],[41.3,53.9],[41.4,85.5],[41.5,85.4],[41.5,85.5],[41.8,29.2],[41.9,29.5],[42.2,76.8],[42.4,49],[42.5,49],[42.7,80.2],[43.2,33.6],[43.9,56.6],[43.9,68.8],[44.6,74],[44.6,86.2],[45,82.9],[45.9,29.2],[45.9,75.4],[45.9,75.5],[46,62.3],[46,62.5],[46.2,42.3],[46.4,65.4],[46.4,65.5],[46.5,65.4],[46.6,65.5],[46.7,80.6],[46.9,46.3],[46.9,46.5],[47.2,35.5],[47.2,57.7],[47.3,35.3],[47.3,70.9],[47.4,83.9],[47.5,84],[47.6,47.9],[47.9,28.4],[48,28.6],[48,56.7],[48.2,72.1],[48.3,40.9],[48.6,65.4],[48.6,65.6],[49,28.8],[49,33.9],[49,77.5],[49.1,77.4],[49.3,49.4],[49.3,49.5],[49.4,83.7],[50.2,54],[51.1,48.9],[51.2,69.8],[51.3,27.6],[51.7,22],[52.1,52.7],[52.1,85],[52.2,47.6],[52.8,58.2],[53.4,30],[53.5,30.1],[53.8,83.2],[54,26.7],[55,49.3],[55.2,48],[55.2,52.2],[55.3,28.7],[55.4,56.2],[55.4,82.8],[55.4,85.2],[55.5,56.1],[55.5,82.8],[55.5,85.2],[56.4,51.3],[56.4,51.5],[56.5,51.3],[56.6,72.3],[57.6,75.1],[58,32.9],[58.1,47.9],[58.1,76],[58.4,52.5],[58.4,69.4],[58.4,69.6],[58.5,52.4],[58.5,52.6],[58.5,69.4],[58.5,69.5],[58.7,78.8],[59.6,32.8],[60.1,46.1],[60.3,48.4],[60.3,48.5],[60.8,52.8],[61.2,38.8],[61.4,50.7],[61.5,50.7],[62,31],[62,67.5],[62.1,67.4],[63.1,79.6],[63.4,32.7],[63.5,32.7],[63.6,64],[63.6,66.6],[63.7,74.4],[63.7,74.6],[63.9,37],[63.9,42],[64.8,28.4],[64.8,28.5],[65,59.8],[65.3,71.8],[65.4,57.9],[65.4,75.8],[65.5,56],[65.5,58],[65.5,75.8],[65.7,34.2],[65.7,63.6],[65.7,77.9],[65.8,33.1],[65.8,63.4],[66.4,36.1],[67,71.7],[67.1,77.8],[67.2,56.4],[67.2,56.6],[67.4,63.3],[67.5,63.3],[67.5,63.5],[67.5,66.6],[67.6,66.4],[67.9,45.4],[67.9,45.5],[68,33.1],[68.1,37.7],[68.3,52],[68.7,68.1],[68.7,77.6],[68.8,59.3],[69.2,47.2],[69.3,47.5],[69.3,75.1],[69.5,75.1],[70.1,68.4],[70.2,68.6],[70.7,42.8],[71,71.7],[71.1,71.4],[71.3,53],[71.5,53],[71.9,57.9],[72.7,60.2],[72.7,60.5],[72.8,37.4],[72.9,37.6],[73.3,41.3],[74.4,38.7],[74.6,38.7],[75,63.9],[75.1,67.7],[77.3,63.7],[77.7,74.4],[77.7,74.5],[78.4,80.1],[78.5,80.2],[78.6,73.5],[78.7,73.4],[79,70.1],[80,79.3],[80,79.5],[80.6,77.5]],"cells":[[1,7,6],[1,8,3],[1,6,3],[1,9,1],[1,5,1],[2,5,2],[2,7,4],[2,8,1],[2,6,8],[2,10,1],[2,9,3],[3,9,7],[3,8,7],[3,10,8],[3,11,2],[4,12,9],[4,11,7],[4,10,6],[4,7,6],[4,8,1],[4,6,3],[4,9,1],[5,6,8],[5,11,3],[5,5,4],[5,9,6],[5,10,6],[5,14,7],[5,7,2],[5,4,1],[6,7,3],[6,8,2],[6,4,5],[6,5,5],[6,11,2],[6,13,6],[6,6,3],[6,14,2],[6,10,1],[6,12,2],[7,9,4],[7,11,4],[7,13,5],[7,4,4],[7,12,5],[7,10,7],[7,6,2],[7,7,5],[7,5,3],[8,8,5],[8,7,4],[8,11,1],[8,4,5],[8,3,1],[8,13,6],[8,9,1],[9,8,9],[9,11,5],[9,12,3],[9,5,2],[9,7,4],[9,6,1],[9,4,1],[9,10,2],[10,12,6],[10,5,7],[10,10,10],[10,11,4],[10,6,2],[10,4,2],[10,9,5],[10,8,2],[10,7,2],[11,9,4],[11,7,2],[11,12,2],[11,10,2],[11,6,5],[11,11,2],[11,8,2],[11,5,1],[12,10,3],[12,11,5],[12,12,5]],"stops":[[65.7,63.6],[72.7,60.2],[60.1,46.1],[73.3,41.3],[65.7,34.2],[54,26.7],[47.9,28.4],[41.8,29.2],[41.2,34.4],[33.5,36],[35.7,40.8],[26.5,45.5],[15.3,40.8],[10.8,47.8],[17.9,46.3],[22.9,53.5],[22.3,61.4],[21.5,65.5],[29.7,65],[28.4,71.7],[27.3,78.5],[33.6,89.6],[40.1,83.5],[47.4,83.9],[52.1,85],[49,77.5],[47.3,70.9],[46.6,65.5],[34.8,66.6],[34.3,58.7],[47.2,57.7],[46.9,46.5],[52.2,47.6],[52.1,52.7],[58.5,52.6],[65,59.8],[58.4,69.6],[65.7,77.9],[78.4,80.1],[78.7,73.4],[65.3,71.8]],"mats":[{"material":"Fel Iron Ore","count":333}]},"BS":[[[1,38],"Rough Sharpening Stone",48,0,0,[["Rough Stone",48,0]]],[[38,65],"Rough Grinding Stone",35,0,0,[["Rough Stone",70,0]]],[[65,75],"Coarse Sharpening Stone",16,0,0,[["Coarse Stone",16,0]]],[[75,96],"Coarse Grinding Stone",44,0,0,[["Coarse Stone",88,0]]],[[96,100],"Gemmed Copper Gauntlets",4,1,0,[["Copper Bar",32,0],["Tigerseye",4,0],["Malachite",4,0]]],[[100,115],"Silver Skeleton Key",27,0,0,[["Silver Bar",27,0],["Rough Grinding Stone",27,0,[["Rough Stone",54]]]]],[[115,125],"Rough Bronze Leggings",10,0,0,[["Bronze Bar",60,0]]],[[125,138],"Heavy Sharpening Stone",28,0,0,[["Heavy Stone",28,0]]],[[138,150],"Rough Bronze Leggings",13,0,0,[["Bronze Bar",78,0]]],[[150,154],"Iron Buckle",7,0,0,[["Iron Bar",7,0]]],[[154,165],"Golden Skeleton Key",22,0,0,[["Gold Bar",22,0],["Heavy Grinding Stone",22,0,[["Heavy Stone",66]]]]],[[165,197],"Green Iron Bracers",34,0,3400,[["Iron Bar",204,0],["Green Dye",34,100]]],[[197,200],"Golden Scale Bracers",3,0,0,[["Steel Bar",15,0],["Heavy Grinding Stone",6,0,[["Heavy Stone",18]]]]],[[200,208],"Solid Sharpening Stone",15,0,0,[["Solid Stone",15,0]]],[[208,216],"Truesilver Skeleton Key",21,0,0,[["Truesilver Bar",21,0],["Solid Grinding Stone",21,0,[["Solid Stone",84]]]]],[[216,231],"Inlaid Mithril Cylinder",16,0,0,[["Mithril Bar",80,0],["Gold Bar",16,0],["Truesilver Bar",16,0]]],[[231,236],"Mithril Scale Bracers",5,0,0,[["Mithril Bar",40,0]]],[[236,250],"Mithril Spurs",14,1,0,[["Mithril Bar",56,0],["Solid Grinding Stone",42,0,[["Solid Stone",168]]]]],[[250,260],"Dense Sharpening Stone",17,0,0,[["Dense Stone",17,0]]],[[260,265],"Mithril Spurs",8,1,0,[["Mithril Bar",32,0],["Solid Grinding Stone",24,0,[["Solid Stone",96]]]]],[[265,275],"Radiant Belt",10,1,0,[["Thorium Bar",100,0],["Heart of Fire",20,0]]],[[275,283],"Arcanite Skeleton Key",15,0,0,[["Arcanite Bar",15,0],["Dense Grinding Stone",15,0,[["Dense Stone",60]]]]],[[283,300],"Dark Iron Shoulders",17,1,0,[["Dark Iron Bar",102,0],["Heart of Fire",17,0]]],[[300,306],"Fel Sharpening Stone",9,0,0,[["Fel Iron Bar",9,0],["Mote of Earth",9,0]]],[[306,324],"Fel Iron Plate Belt",21,0,0,[["Fel Iron Bar",84,0]]],[[324,325],"Fel Iron Chain Bracers",1,0,0,[["Fel Iron Bar",6,0]]],[[325,334],"Lesser Rune of Warding",20,0,0,[["Adamantite Bar",20,0]]],[[334,335],"Adamantite Cleaver",1,0,0,[["Adamantite Bar",8,0]]],[[335,340],"Adamantite Weapon Chain",5,1,0,[["Hardened Adamantite Bar",10,0],["Khorium Bar",5,0]]],[[340,348],"Lesser Ward of Shielding",15,0,0,[["Adamantite Bar",15,0]]],[[348,350],"Adamantite Weapon Chain",4,1,0,[["Hardened Adamantite Bar",8,0],["Khorium Bar",4,0]]],[[350,360],"Greater Rune of Warding",30,0,0,[["Khorium Bar",30,0]]],[[360,375],"Felsteel Gloves",16,1,0,[["Felsteel Bar",96,0]]]],"model":"Craft counts are computed, not sourced: chance = (grey - skill) / (grey - yellow) between yellow and grey, 1 below yellow. Expected crafts is the reciprocal summed across the range, rounded up. Recipe choice minimises the reagents you have to go and get per skill point; vendor staples are bought rather than farmed, so they are excluded from that count and priced separately at their fixed vendor cost. Two farmed reagents are still counted alike, since pricing those would need auction data that varies by realm and week.","intro":["Mining levels off nodes in the world, so the only real question at any point is which zone to ride. Every range below names the ore it opens, the zones worth riding it in, and a loop computed from where the nodes actually are.","Nodes follow the same colour rule as everything else: orange up to 25 points above the requirement, yellow to 50, green to 100, and grey after that. An ore stops giving skill 100 points past its requirement, which is why the ranges below are roughly that wide and why it is almost never worth staying anywhere longer.","Mining is trained in five tiers and the bar simply stops moving when you hit one. The table marks where each falls. Master Mining is the one that surprises people: character level 40 and skill 275, from a trainer in Hellfire Peninsula rather than in Azeroth."],"ZONES":[["The Barrens",[["Copper Vein",1,190]]],["Dun Morogh",[["Copper Vein",1,188]]],["Elwynn Forest",[["Copper Vein",1,188]]],["Ashenvale",[["Tin Vein",65,119]]],["Redridge Mountains",[["Tin Vein",65,110]]],["Loch Modan",[["Tin Vein",65,107]]],["Desolace",[["Silver Vein",75,182],["Iron Deposit",125,143],["Gold Vein",155,200]]],["Arathi Highlands",[["Silver Vein",75,200],["Iron Deposit",125,163],["Gold Vein",155,188]]],["Thousand Needles",[["Silver Vein",75,189]]],["Stranglethorn Vale",[["Iron Deposit",125,135],["Gold Vein",155,163]]],["The Hinterlands",[["Mithril Deposit",175,143],["Truesilver Deposit",230,146]]],["Tanaris",[["Mithril Deposit",175,99]]],["Azshara",[["Mithril Deposit",175,97],["Truesilver Deposit",230,136],["Rich Thorium Vein",275,59]]],["Winterspring",[["Truesilver Deposit",230,146],["Rich Thorium Vein",275,74]]],["Un'Goro Crater",[["Small Thorium Vein",245,64]]],["Burning Steppes",[["Small Thorium Vein",245,63]]],["Silithus",[["Small Thorium Vein",245,61]]],["Eastern Plaguelands",[["Rich Thorium Vein",275,68]]],["Hellfire Peninsula",[["Fel Iron Deposit",300,333],["Khorium Vein",375,246]]],["Zangarmarsh",[["Fel Iron Deposit",300,124]]],["Shadowmoon Valley",[["Fel Iron Deposit",300,111],["Rich Adamantite Deposit",350,134]]],["Blade's Edge Mountains",[["Adamantite Deposit",325,196],["Rich Adamantite Deposit",350,35],["Khorium Vein",375,231]]],["Nagrand",[["Adamantite Deposit",325,191],["Khorium Vein",375,233]]],["Netherstorm",[["Adamantite Deposit",325,162],["Rich Adamantite Deposit",350,161]]]]};
+</script>
+<script>
+/* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+/* Professions tab: Serpentshrine teal, calm and dim behind dense tables (fewer motes, a softer lamp). "charge" only pulses faintly when a profession opens */
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,setMotion(){},render(){},pointer(){}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
+const C=h=>new THREE.Color(h);
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.ssc.light.clone(),deep:PAL.ssc.deep.clone(),fog:PAL.ssc.fog.clone(),acc:PAL.ssc.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?180:340,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
+    vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(.85,1.,.96),.35),a);}`})));
+/* lights: phase lamp over the pool, ambient, a cool rim and a low accent (coral / violet / ember) */
+const lamp=new THREE.PointLight(cur.light.clone(),1.8,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x2a1a40,.6));
+const rim=new THREE.DirectionalLight(0xc8a0ff,.35);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a naaru-like arcane crystal: faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x24163a,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* The Eye's pillars receding into the violet fog */
+const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
+R.setClearColor(cur.fog);
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  crystal.material.emissiveIntensity=.18+MIX.charge*.9;halo.material.opacity=.45+MIX.charge*.5;lamp.intensity=1.8+MIX.charge*2.4;
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
+  tint();place();R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();});
+/* hooks used by the page script */
+S.setMotion=on=>{moving=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+size();still();
+})();
+</script>
+<script>
+(function(){
+"use strict";
+/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
+const $=(s,r=document)=>r?r.querySelector(s):null, $$=(s,r=document)=>r?Array.from(r.querySelectorAll(s)):[];
+const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
+const root=document.documentElement, live=$("#live");
+const say=t=>{if(live)live.textContent=t;};
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+
+/* ---------- data: window.PD, generated from src/domain/professions by running the app's own functions ---------- */
+const D=window.PD||null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug=n=>String(n).toLowerCase().replace(/ /g,"-");
+const KL={stat:"stat bonus",gear:"own gear",utility:"utility",feeds:"feeds others"};
+/* formatCopper from craftingPaths.ts */
+const coin=c=>{if(c<=0)return "0c";const g=Math.floor(c/1e4),s=Math.floor(c%1e4/100),r=c%100;return [g&&g+"g",s&&s+"s",r&&r+"c"].filter(Boolean).join(" ");};
+const box=(id,title,small,inner,z,cls)=>`<div class="layer${cls?" "+cls:""}" style="--z:${z}"><section class="box" id="${id}" aria-labelledby="h-${id}"><h2 id="h-${id}">${title}${small?` <small>${small}</small>`:""}</h2><div class="in">${inner}</div></section></div>`;
+const tierOf=(p,t)=>p.ms.find(m=>m[0]===t);
+/* milestonesWithin: half-open window, closed at the top of the last step */
+const within=(p,lo,hi,last)=>p.ms.filter(m=>m[1]>=lo&&(last?m[1]<=hi:m[1]<hi));
+const trainLine=m=>`<span class="train">Bar stops at <b class="num">${m[1]}</b>: train ${esc(m[0])} (character level ${m[2]}) · ${esc(m[3])}${m[4]?' <span class="ex">needs verification</span>':""}</span>`;
+
+function payoffBox(p){
+  const perks=p.pk.map(k=>{
+    const [name,kind,detail,skill,phase,nv]=k;
+    const tags=[`<span class="kind ${kind}">${KL[kind]||kind}</span>`];
+    if(skill)tags.push(`<span class="real">skill ${skill}</span>`);
+    if(phase)tags.push(phase>2?`<span class="ex">Phase ${phase} · not in Phase 2</span>`:`<span class="real">Phase ${phase}</span>`);
+    if(nv)tags.push('<span class="ex">needs verification</span>');
+    return `<li class="${kind}"><div class="pn">${esc(name)} ${tags.join(" ")}</div><p>${esc(detail)}</p></li>`;
+  }).join("");
+  const stat=p.pk.some(k=>k[1]==="stat");
+  return box("b-pay","Worth at 70",stat?"the one stat payoff in TBC":"no stat bonus",
+    `<p class="verdict">${esc(p.pv)}</p><ul class="perks">${perks}</ul>
+     <p class="prov" style="margin:10px 0 0">Sources: ${p.src.map(esc).join(", ")} · <code>professionPayoffs.ts</code>. Herbalism, Mining and Skinning stat perks are Wrath additions and are not shown.</p>`,7);
+}
+function stopsBox(p){
+  const ticks=[1,75,150,225,300,375].map(v=>`<span class="tick" style="left:${(v/375*100).toFixed(2)}%">${v}</span>`).join("");
+  const marks=p.ms.map(m=>`<span class="stop" style="left:${(m[1]/375*100).toFixed(2)}%" title="${esc(m[0])} at ${m[1]}"><i></i></span>`).join("");
+  const list=p.ms.map(m=>`<li><span class="at">${m[1]}</span><div><b>${esc(m[0])}</b> · character level ${m[2]}${m[4]?' <span class="ex">needs verification</span>':""}<p>${esc(m[3])}</p></div></li>`).join("");
+  return box("b-stops","Trainer stops","where the bar stops moving",
+    `<div class="sline" aria-hidden="true"><span class="track"></span>${marks}${ticks}</div>
+     <ol class="stops">${list}</ol>
+     <p class="prov" style="margin:8px 0 0">Apprentice is trained at skill 1. A stop sits at the skill where the next tier becomes trainable (<code>minSkillToTrainNext</code>), not where the tier starts. <code>sampleProfessionTiers.ts</code>.</p>`,5);
+}
+function headBar(p){
+  const links=`<a class="btn ghost" href="${esc(p.g)}" target="_blank" rel="noopener noreferrer">Levelling guide on wow-professions.com</a>`+
+    (p.s?`<a class="btn ghost" href="${esc(p.s)}" target="_blank" rel="noopener noreferrer">Specialisations</a>`:"");
+  return `<div class="phead"><button class="backbtn" type="button" id="backbtn">← All professions</button>
+    <div><h2 id="h-page" tabindex="-1">${esc(p.n)}</h2><span class="meta">${esc(p.c)} · to 375</span></div>
+    <div class="links">${links}</div>${p.note?`<p class="summ" style="margin:0;width:100%">${esc(p.note)}</p>`:""}</div>`;
+}
+/* the other eleven: real tiers and payoff, plus a one-line summary of what the app carries */
+function summaryBox(p){
+  let s;
+  if(p.cp)s=`The app carries a computed <b class="num">${p.cp[0]}</b>-step path from first recipe to 375: <b class="num">${p.cp[1].toLocaleString("en-US")}</b> crafts in all, <b class="num">${coin(p.cp[2])}</b> of it at vendors. Not drawn in this baseline; see Blacksmithing for the shape.`;
+  else if(p.n==="Herbalism")s="The app carries a range-by-range climb with computed farming maps, the same shape as Mining. Not drawn in this baseline; see Mining for the shape.";
+  else if(p.n==="Skinning")s="Skinning comes off mobs, not nodes, so there is nothing to map: the app gives the climb as zones and level bands only.";
+  else s="Fishing comes off pools, not nodes, so there is no route map. Its tiers are a vendor book and a quest rather than trainer visits.";
+  return box("b-sum","Levelling","summary",`<p class="summ" style="margin:0">${s}</p>`,3);
+}
+/* ---------- Mining: the climb, one row per skill range, trainer stops written into the row ---------- */
+const MAPRANGE="300-325";
+function climbBox(p){
+  const rows=D.MIN.map((r,i)=>{
+    const key=r.r.join("-");
+    const train=r.t.map(t=>trainLine(tierOf(p,t[0])||[t[0],t[1],t[2],""])).join("");
+    const zones=r.z.map(z=>z[1]?`${esc(z[0])} <span class="num">${z[1]}</span>`:`<span class="nm">${esc(z[0])} (no map)</span>`).join(" · ");
+    const extra=r.x.length?`<br><span class="nm">Also dense: ${r.x.map(z=>esc(z[0])+" "+z[1]).join(" · ")}</span>`:"";
+    return `<tr data-r="${key}"${key===MAPRANGE?' class="sel"':""}><td><button class="rng" type="button" aria-pressed="${key===MAPRANGE}" data-r="${key}">${r.r[0]}–${r.r[1]}</button>${train}</td>
+      <td>${r.m.map(o=>`<span class="ore">${esc(o)}</span>`).join("")}</td>
+      <td class="zl">${zones}${extra}</td><td class="num">${esc(r.lv)}</td></tr>`;
+  }).join("");
+  return box("b-climb","The climb, 1–375","9 ranges · pick one to read it",
+    `<div class="scroll"><table class="climb"><thead><tr><th>Skill</th><th>Ores it draws</th><th>Zones (recorded spawns)</th><th>Char level</th></tr></thead><tbody id="climbrows">${rows}</tbody></table></div>
+     <p class="gd" id="gd"></p>
+     <p class="prov" style="margin:8px 0 0">Ores are derived from each node's <code>requiredSkill</code> on Wowhead, not written per row; spawn counts are the zone's recorded nodes for that range. "No map" means the zone is recommended but outside the three busiest zones the ingest keeps per ore. Guidance from <code>gatheringGuides.ts</code> (icy-veins.com, warcrafttavern.com, checked against the ingest).</p>`,4,"full");
+}
+/* ---------- the farming map: Fel Iron in Hellfire Peninsula, drawn from real coordinates ---------- */
+function mapBox(){
+  const R=D.ROUTE,W=150,H=100,g=R.grid,cw=W/g,ch=H/g,mx=Math.max(...R.cells.map(c=>c[2]));
+  const X=x=>(x*1.5).toFixed(1),Y=y=>(+y).toFixed(1);
+  let grid="";for(let i=1;i<g;i++)grid+=`M${(i*cw).toFixed(2)} 0V${H}M0 ${(i*ch).toFixed(2)}H${W}`;
+  const cells=R.cells.map(c=>`<rect class="cell" x="${(c[0]*cw).toFixed(2)}" y="${(c[1]*ch).toFixed(2)}" width="${cw.toFixed(2)}" height="${ch.toFixed(2)}" opacity="${(.08+.5*c[2]/mx).toFixed(2)}"/>`).join("");
+  const pts=R.pts.map(p=>`M${X(p[0])} ${Y(p[1])}h0`).join("");
+  const route="M"+R.stops.map(s=>X(s[0])+" "+Y(s[1])).join("L")+"Z";
+  const s0=R.stops[0];
+  const svg=`<svg class="map" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="maptitle mapdesc">
+    <title id="maptitle">Fel Iron Deposits in Hellfire Peninsula, with a computed loop</title>
+    <desc id="mapdesc">${R.pts.length} recorded spawn points shaded on a ${g} by ${g} density grid; a closed loop visits ${R.stops.length} stops on the densest cells. Nodes sit around the outer edge and ridgelines rather than the middle.</desc>
+    <path class="gridl" d="${grid}"/>${cells}<path class="pts" d="${pts}"/>
+    <path class="route" id="route" d="${route}"/>
+    <circle cx="${X(s0[0])}" cy="${Y(s0[1])}" r="1.6" fill="var(--amber)"/><text x="${(+X(s0[0])+2.4).toFixed(1)}" y="${(s0[1]+1).toFixed(1)}" style="fill:var(--amber)">start · densest cell</text>
+    <text x="3" y="6">N ↑</text><text x="3" y="97">Hellfire Peninsula · zone % coordinates</text></svg>`;
+  return box("b-map","Farming map · 300–325","Fel Iron, Hellfire Peninsula",
+    `<p class="note" style="margin:0 0 10px" id="mapnote"><strong>A computed circuit, not a published route.</strong> Nearest-neighbour from the densest cell, each stop snapped to a real spawn, then uncrossed with 2-opt. A heuristic loop through the busy places, not the shortest possible one.</p>
+     ${svg}
+     <div class="maplegend"><span><i style="background:var(--glow);opacity:.6"></i>Spawn density (16 × 16)</span><span><i style="background:#d7fff9;border-radius:50%"></i>Recorded node</span><span><i style="background:var(--amber)"></i>Computed loop · ${R.stops.length} stops</span></div>
+     <p class="prov" style="margin:0">${R.pts.length} of <b class="num">${R.count}</b> recorded Fel Iron Deposits plotted (thinned for the bundle; the shape is kept, the count is not). Every mining node in Hellfire is Fel Iron at this skill. Loop length about ${(R.len/100).toFixed(1)}× the zone's width. Zone art is not drawn in this prototype. Source: Wowhead object=181555, <code>farmingRoutes.ts</code>.</p>`,6);
+}
+function zonesBox(){
+  const li=D.ZONES.map(z=>`<li><b>${esc(z[0])}</b><span>${z[1].map(n=>`${esc(n[0])} (${n[1]}) <span class="num">${n[2]}</span>`).join(" · ")}</span></li>`).join("");
+  return box("b-zones","Zones with recorded mining nodes",D.ZONES.length+" zones",
+    `<ul class="zones">${li}</ul><p class="prov" style="margin:8px 0 0">Node (required skill) and recorded spawns. The ingest keeps each node's three busiest zones, which is why Darkshore and Badlands have no entry. <code>nodeSpawns.json</code>.</p>`,3,"full");
+}
+/* ---------- Blacksmithing: the computed path and its shopping list ---------- */
+let bsScope=0;
+function bsRows(p){
+  return D.BS.map((s,i)=>{
+    const [r,name,n,,vc,mats]=s,last=i===D.BS.length-1;
+    if(r[1]<=bsScope)return "";
+    const rg=mats.map(m=>m[2]?`<span class="rg"><span class="buy">${m[1]} ${esc(m[0])} · bought, ${coin(m[2])} each</span></span>`
+      :`<span class="rg">${m[1]} ${esc(m[0])}${m[3]?` <span class="alt">or make from ${m[3].map(c=>c[1]+" "+esc(c[0])).join(", ")}</span>`:""}</span>`).join("");
+    const train=within(p,r[0],r[1],last).map(trainLine).join("");
+    return `<tr><td class="num">${r[0]}–${r[1]}${train}</td><td>${esc(name)}</td><td class="num">${n}</td><td>${rg}</td></tr>`;
+  }).join("");
+}
+function shopList(){
+  const buy=new Map(),farm=new Map();let cost=0,crafts=0;
+  D.BS.forEach(s=>{if(s[0][1]<=bsScope)return;crafts+=s[2];cost+=s[4];
+    s[5].forEach(m=>{const t=m[2]?buy:farm;t.set(m[0],(t.get(m[0])||0)+m[1]);});});
+  const ul=t=>[...t].sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li><span>${esc(k)}</span><span class="q">${v.toLocaleString("en-US")}</span></li>`).join("");
+  return `<div class="shop"><div><h3>Bought from a vendor</h3><ul>${ul(buy)||"<li>Nothing in this stretch</li>"}</ul><p class="tot">Vendor total: ${coin(cost)}</p></div>
+    <div><h3>Farmed, mined or made</h3><ul>${ul(farm)}</ul></div></div>
+    <p class="prov" style="margin:8px 0 0"><b class="num">${crafts}</b> crafts in this stretch. Bought means vendor-only: unlimited at a fixed game price. Everything else has to be gathered, bought on the auction house or made; no auction prices are shown because they vary by realm and week.</p>`;
+}
+function pathBox(p){
+  return box("b-path","Path from first recipe to 375","33 steps · computed",
+    `<div class="seg" role="group" aria-label="Which stretch"><button type="button" data-sc="0" aria-pressed="true">Whole climb 1–375</button><button type="button" data-sc="300" aria-pressed="false">Outland 300–375</button></div>
+     <div class="scroll"><table class="climb"><thead><tr><th>Skill</th><th>Make</th><th>How many</th><th>Reagents</th></tr></thead><tbody id="bsrows">${bsRows(p)}</tbody></table></div>
+     <p class="prov" style="margin:8px 0 0"><span class="real">computed</span> ${esc(D.model)} Source: <code>craftingPaths.json</code> from Wowhead recipe data.</p>`,4,"full");
+}
+/* ---------- open a profession: #p=<slug> in the address bar, so Back works ---------- */
+const page=$("#ppage"),pick=$("#pickwrap");
+let current=null;
+function pickRange(key){
+  const row=D.MIN.find(r=>r.r.join("-")===key);if(!row)return;
+  $$("#climbrows tr").forEach(tr=>tr.classList.toggle("sel",tr.dataset.r===key));
+  $$("#climbrows .rng").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r===key));
+  const gd=$("#gd");if(gd)gd.textContent=`${row.r[0]}–${row.r[1]} · level ${row.lv}. ${row.gd}`+(key===MAPRANGE?" The map below draws this range.":" The map below is drawn for 300–325 only in this prototype.");
+}
+function render(p){
+  if(!page||!D)return;
+  let main="",side="";
+  if(p.n==="Mining"){
+    main=climbBox(p)+`<div class="col">${mapBox()}</div><div class="col">${payoffBox(p)}${stopsBox(p)}</div>`+zonesBox();
+    page.innerHTML=headBar(p)+`<div class="pgrid">${main}</div>`;
+    pickRange(MAPRANGE);
+  }else if(p.n==="Blacksmithing"){
+    bsScope=0;
+    main=pathBox(p)+`<div class="col">${box("b-shop","Shopping list","bought vs farmed",`<div id="shop">${shopList()}</div>`,5)}</div><div class="col">${payoffBox(p)}${stopsBox(p)}</div>`;
+    page.innerHTML=headBar(p)+`<div class="pgrid">${main}</div>`;
+  }else{
+    side=summaryBox(p);
+    page.innerHTML=headBar(p)+`<div class="pgrid"><div class="col">${payoffBox(p)}${side}</div><div class="col">${stopsBox(p)}</div></div>`;
+  }
+  wirePage(p);
+}
+function wirePage(p){
+  on($("#backbtn"),"click",()=>{if(location.hash)history.pushState(null,"",location.pathname+location.search);show(null);});
+  $$("#climbrows .rng").forEach(b=>on(b,"click",()=>{pickRange(b.dataset.r);say("Range "+b.textContent+" selected.");}));
+  $$(".seg button[data-sc]").forEach(b=>on(b,"click",()=>{
+    bsScope=+b.dataset.sc||0;
+    $$(".seg button[data-sc]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    const rows=$("#bsrows"),shop=$("#shop");if(rows)rows.innerHTML=bsRows(p);if(shop)shop.innerHTML=shopList();
+    say("Showing "+b.textContent+".");
+  }));
+}
+function show(name){
+  const p=name&&D?D.P.find(x=>slug(x.n)===name||x.n===name):null;
+  if(!page||!pick)return;
+  if(!p){
+    page.hidden=true;page.innerHTML="";pick.hidden=false;
+    const back=current&&$(`.pcard[data-prof="${current}"]`);current=null;
+    if(back)back.focus();
+    if(M.on&&M.close)M.close();
+    return;
+  }
+  current=p.n;render(p);pick.hidden=true;page.hidden=false;
+  const h=$("#h-page");if(h)h.focus({preventScroll:true});
+  const top=page.getBoundingClientRect().top+scrollY-70;scrollTo({top:Math.max(0,top),behavior:moving()?"smooth":"auto"});
+  say(p.n+" opened.");
+  if(M.on&&M.open)M.open(p.n);
+}
+const fromHash=()=>{const m=/^#p=([a-z-]+)$/.exec(location.hash);return m?m[1]:null;};
+addEventListener("hashchange",()=>show(fromHash()));
+if(!D){const n=$("#b-pick .in");if(n)n.insertAdjacentHTML("beforeend",'<p class="note" style="margin-top:10px"><strong>Profession data did not load.</strong> The list above is the static summary.</p>');}
+show(fromHash());
+
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+
+/* ================= MOTION LAYER ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined";
+if(tog)tog.hidden=false;
+function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  if(tog)tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+if(ST)gsap.registerPlugin(ScrollTrigger);
+let ctx=null, mm=null;
+const A=fn=>ctx?ctx.add(fn):fn();
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  const w=$("#wipe");if(w)w.style.display="none";
+  Object.assign(SC.cam,{depth:0,dip:current?.55:0,rise:0,dive:0,intro:0});
+  SC.mix.charge=0;SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);SC.setMotion(true);
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
+  else{if(tog)tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
+function splitHero(){
+  const h=$("#h-prof");if(!h||h.dataset.split)return false;
+  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
+  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
+  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
+  return true;
+}
+/* 1. Intro: the scene settles from above, words rise out of masks, the profession cards ripple in. ~1.4s, calm */
+function intro(){
+  const split=splitHero();
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.6,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.9,ease:"power1.out"},0);
+  if(split&&$("#h-prof .w>span"))tl.from("#h-prof .w>span",{yPercent:115,rotate:6,duration:.7,stagger:.04},.1);
+  if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  const cards=$$(".pcard").filter(c=>c.offsetParent&&c.getBoundingClientRect().top<innerHeight);
+  if(cards.length)tl.from(cards,{y:26,rotationX:-14,autoAlpha:0,transformOrigin:"50% 100%",duration:.6,stagger:.035,ease:"expo.out",clearProps:"all"},.4);
+  const boxes=$$("#ppage .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  if(boxes.length)tl.from(boxes,{y:60,rotationX:-14,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  safe(tl);
+}
+/* 2. Scroll: the camera sinks slowly toward the pool as the reader goes down a long table */
+function scrollStory(){
+  gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:1.2}});
+}
+/* draw the computed loop along its own length, then light the start */
+function drawRoute(){
+  const r=$("#route");if(!r||!r.getTotalLength)return;
+  const L=r.getTotalLength();
+  const go=()=>A(()=>safe(gsap.fromTo(r,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:2.2,ease:"power1.inOut",clearProps:"strokeDasharray,strokeDashoffset"})));
+  if(ST)ScrollTrigger.create({trigger:r.closest("svg")||r,start:"top 85%",once:true,onEnter:go});else go();
+}
+/* 3. Opening a profession: the camera dips toward the water, its boxes rise in order, the loop draws */
+M.open=name=>A(()=>{
+  const tl=gsap.timeline();
+  tl.to(SC.cam,{dip:.55,duration:.7,ease:"power2.out",onUpdate:SC.render})
+    .to(SC.mix,{charge:.25,duration:.3,onUpdate:SC.render},0).to(SC.mix,{charge:0,duration:.9,ease:"power2.out",onUpdate:SC.render},.3);
+  if($("#ppage .phead"))tl.from("#ppage .phead",{y:-16,autoAlpha:0,duration:.45,ease:"power3.out",clearProps:"all"},0);
+  const boxes=$$("#ppage .box");
+  if(boxes.length)tl.from(boxes,{y:46,rotationX:-12,transformOrigin:"50% 100%",autoAlpha:0,duration:.7,stagger:.07,ease:"expo.out",clearProps:"all"},.1);
+  if($("#ppage .sline .stop"))tl.from("#ppage .sline .stop",{scaleY:0,transformOrigin:"50% 100%",duration:.4,stagger:.08,ease:"back.out(2)"},.5);
+  safe(tl);
+  if(name==="Mining")drawRoute();
+  if(ST)ScrollTrigger.refresh();
+});
+M.close=()=>A(()=>{
+  safe(gsap.to(SC.cam,{dip:0,duration:.6,ease:"power2.out",onUpdate:SC.render}));
+  const cards=$$(".pcard");if(cards.length)safe(gsap.from(cards,{y:16,autoAlpha:0,duration:.45,stagger:.02,ease:"power3.out",clearProps:"all"}));
+});
+/* 3. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 4. Simulate: the naaru crystal charges, the number counts up, bars fill, the crystal settles. ~1.6s */
+/* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
+$$("nav.sections a").forEach(a=>on(a,"click",e=>{
+  if(!M.on||a.getAttribute("aria-current")==="page"||e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;
+  const w=$("#wipe"),sp=$("span",w);if(!w||!sp)return;
+  e.preventDefault();
+  const href=a.href;sp.textContent=a.textContent;w.style.display="grid";
+  const tl=gsap.timeline({onComplete:()=>{location.href=href;}});
+  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(sp,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
+  safe(tl);
+}));
+/* returning via the back/forward cache: drop the curtain */
+addEventListener("pageshow",e=>{if(e.persisted){const w=$("#wipe");if(w)w.style.display="none";SC.cam.dive=0;SC.render();}});
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
