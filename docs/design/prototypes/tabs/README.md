@@ -5,7 +5,9 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Step 2, next.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
+**Next session:** start from [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md), the owner's review of these pages. In short: Home gets a Dark Portal scene, Raid Composition gets its own theme and a fully working raid table, Raids gets search, the Planner gets row hover, and every tab gets its own look.
+
+**Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
 1. Home
 2. Gear

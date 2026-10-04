@@ -48,7 +48,8 @@ The Hybrid designs from round 3 were dropped. See [`round4/README.md`](round4/RE
 
 **Step 1 is done:** a baseline of all seven tabs in the round-4 style, linked together as one
 clickable site, on the app's real data. See [`tabs/README.md`](tabs/README.md). **Step 2** walks
-through them one at a time, three designs per step.
+through them one at a time, three designs per step. The owner's review and the plan for the next
+session are in [`tabs/NEXT-SESSION-PLAN.md`](tabs/NEXT-SESSION-PLAN.md).
 
 ## Caveats
 
