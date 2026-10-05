@@ -198,6 +198,32 @@ details.more[open]>summary::before{content:"− "}
 #h-att.has-rune small{margin-left:auto}
 #h-att .rslot{flex:none;display:inline-flex;width:22px;height:22px;line-height:0}
 .static-note{font-size:var(--t-xs);color:var(--ink-3)}
+/* loot search: a field under the raid picker; results replace the single-raid view while a query is active */
+.lsearch{display:grid;gap:4px;margin:14px 0 0;max-width:520px}
+.lsearch label{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.lsf{position:relative;display:flex}
+.lsf input{flex:1;min-width:0;font:400 var(--t-md) var(--f-body);color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);border-radius:999px;padding:8px 44px 8px 14px}
+.lsf input::placeholder{color:var(--ink-3)}
+.lsf input:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-color:var(--glow)}
+.lsf input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.lqx{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:0;background:none;color:var(--ink-2);font:400 1.3rem/1 var(--f-body);cursor:pointer}
+.lqx:hover{color:var(--ink);background:var(--glow-soft)}
+.lqh{font-size:var(--t-xs);color:var(--ink-3)}
+kbd{font:500 var(--t-xs) var(--f-mono);border:1px solid var(--rim);border-radius:4px;padding:0 5px;background:var(--glass-2);color:var(--ink-2)}
+mark{background:color-mix(in srgb,var(--glow) 32%,transparent);color:inherit;border-radius:2px;padding:0 1px;text-decoration:underline 2px;text-underline-offset:2px}
+.lhead{position:relative;margin:8px 0 14px;padding:10px 14px;background:var(--scrim);border:1px solid var(--rim);border-radius:12px}
+.lhead h2{margin:0;font:400 var(--t-xl)/1.2 var(--f-head)}
+.lhead p{margin:2px 0 0}
+.rgroup{margin:0 0 22px;scroll-margin-top:76px}
+.ghead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 10px;padding:8px 12px;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;font:400 var(--t-xl)/1.2 var(--f-head)}
+.ghead small{font:500 var(--t-xs) var(--f-mono);color:var(--ink-3)}
+.ghead .chip{font-family:var(--f-body)}
+#lresults .mech,#lresults details.more>summary{display:none}
+#lresults details.more{border-top:0}
+#lresults ul.loot li{border-top:0}
+#lresults ul.loot li:not([hidden])~li{border-top:1px solid var(--rim-2)}
+.lempty{margin:8px 0 16px}
+.box.lempty p{font-size:var(--t-md)}
 @media (min-width:900px){.simgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
 </style>
 </head>
@@ -249,10 +275,16 @@ details.more[open]>summary::before{content:"− "}
           <button type="button" data-raid="tempest-keep" aria-pressed="false">Tempest Keep<small>25</small></button>
         </fieldset>
       </div>
+      <div class="lsearch" id="lsearch" role="search" hidden>
+        <label for="lq">Search loot</label>
+        <div class="lsf"><input type="search" id="lq" placeholder="Dragonspine Trophy, Destroyer, Mongoose…" autocomplete="off" spellcheck="false" aria-describedby="lq-hint"><button type="button" class="lqx" id="lqx" aria-label="Clear search" hidden>×</button></div>
+        <span class="lqh" id="lq-hint">Searches the drops of all five raids · press <kbd>/</kbd> to jump here, <kbd>Esc</kbd> to clear</span>
+      </div>
       <noscript><p class="static-note">Without JavaScript only Serpentshrine Cavern is shown; the raid buttons need it.</p></noscript>
     </div>
   </div>
   <div id="raidview" aria-live="off"><div class="rgrid"><div class="layer" style="--z:5"><section class="box" aria-labelledby="h-raid"><h2 id="h-raid">Serpentshrine Cavern <small>Phase 2 · T5</small></h2><div class="in"><ul class="facts"><li><b>Size</b>25</li><li><b>Bosses</b>6</li><li><b>Drops</b>146</li><li><b>Zone</b>Zangarmarsh</li></ul><p>One of the two headline Phase 2 raids, and the T5 helm, glove, and leg token source. The first five bosses can be killed in any order and all five must die before the ramp to Lady Vashj opens.</p><p><strong>Getting there:</strong> Inside Coilfang Reservoir in central Zangarmarsh — swim to the drainage pipe in the middle of the reservoir; the raid portal is separate from the Slave Pens / Underbog / Steamvault entrances.</p><p><strong>Can I get in?</strong> Requires 'The Cudgel of Kar'desh' (the Mark of Vashj). Also needs a Coilfang Reservoir key for the Heroic Slave Pens step.</p><p class="prov">Loot: Wowhead drop tables via <code>ingest-raid-loot.mjs</code> · quality: <code>itemCatalogue.json</code> (wowsims/tbc) · Phase 2 · updated 27 Sep</p></div></section></div><div class="layer" style="--z:3"><section class="box" aria-labelledby="h-att"><h2 id="h-att">Attunement · The Cudgel of Kar'desh <small>4 steps</small></h2><div class="in"><p class="verify"><strong>Not yet confirmed for Anniversary realms.</strong> Step order and requirements are cross-checked against two guide sources. The one point not verified for Anniversary realms specifically is whether Blizzard has changed the Reservoir Key reputation requirement from its original Revered gate.</p><p>A short chain by TBC standards — two raid items and a walk back to a heroic dungeon — but it is expensive because both items come from Phase 1 raid bosses, one of which (Nightbane) needs its own quest chain and Violet Eye reputation before it can even be summoned.</p><h3 class="mini">Before step 1</h3><ul class="pre"><li>Level 70.</li><li>Revered with Cenarion Expedition, or a guild member who is, to obtain the Reservoir Key for Heroic Coilfang dungeons.</li><li>A raid group able to kill Gruul the Dragonkiller (25-player).</li><li>A Karazhan group with someone who holds the Blackened Urn, which requires Honored with The Violet Eye and the Medivh's Journal quest chain.</li></ul><h3 class="mini">Steps</h3><ol class="att"><li><span class="n">01</span><b>Pick up the quest from Skar'this the Heretic<span class="diff Heroic">Heroic</span></b><span class="qn">Quest: The Cudgel of Kar'desh · </span><span class="qn">The Slave Pens, Coilfang Reservoir (Zangarmarsh)</span><p>Clear Heroic The Slave Pens as far as Mennu the Betrayer, then talk to the caged naga Skar'this the Heretic just past him and accept the quest.</p></li><li><span class="n">02</span><b>Loot the Earthen Signet<span class="diff Raid">Raid</span></b><span class="qn">Gruul's Lair (Blade's Edge Mountains)</span><p>Kill Gruul the Dragonkiller and loot the Earthen Signet from his corpse. It is a guaranteed drop, and every eligible raider gets one.</p></li><li><span class="n">03</span><b>Loot the Blazing Signet<span class="diff Raid">Raid</span></b><span class="qn">Karazhan (Deadwind Pass)</span><p>Summon Nightbane on Medivh's Terrace with the Blackened Urn and kill him, then loot the Blazing Signet. Nightbane is optional content, so most groups schedule this deliberately rather than stumbling into it.</p></li><li><span class="n">04</span><b>Turn in to Skar'this<span class="diff Heroic">Heroic</span></b><span class="qn">Quest: The Cudgel of Kar'desh · </span><span class="qn">The Slave Pens, Coilfang Reservoir (Zangarmarsh)</span><p>Return to Skar'this the Heretic in Heroic The Slave Pens with both signets and hand in the quest. He casts The Mark of Vashj on you, which is the permanent attunement.</p></li></ol><p><strong>Reward:</strong> The Mark of Vashj — permanent access to Serpentshrine Cavern.</p></div></section></div></div><div class="bosshead"><h2>Bosses and loot</h2><ul class="legend2"><li><span class="q-e">Epic</span> · <span class="q-r">Rare</span> · <span class="q-n">grey: not in the catalogue</span></li><li>Sorted: tokens, quest items, mounts, DPS gear, the rest, recipes</li></ul></div><div class="bosses"><div class="layer" style="--z:4"><section class="box boss" aria-label="Hydross the Unstable"><h3><span class="o">01</span><span>Hydross the Unstable</span><small>22 drops</small></h3><div class="in"><p class="mech">A two-tank resistance fight.</p><ul class="loot"><li><span class="nm q-e">Blackfathom Warbands</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Boots of the Shifting Nightmare</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Fathomstone</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Pauldrons of the Wardancer</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ranger-General's Chestguard</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ring of Lethality</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li></ul><p class="static-note">+16 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:5"><section class="box boss" aria-label="The Lurker Below"><h3><span class="o">02</span><span>The Lurker Below</span><small>17 drops</small></h3><div class="in"><p class="mech">Summoned by fishing the strange pool in the middle of the platform ring, which needs 300 fishing skill — clear the surrounding platforms first or the pull is unsurvivable.</p><ul class="loot"><li><span class="nm q-e">Boots of Effortless Striking</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Bracers of Eradication</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Choker of Animalistic Fury</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Cord of Screaming Terrors</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Tempest-Strider Boots</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Velvet Boots of the Guardian</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li></ul><p class="static-note">+11 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:6"><section class="box boss" aria-label="Leotheras the Blind"><h3><span class="o">03</span><span>Leotheras the Blind</span><small>24 drops</small></h3><div class="in"><p class="mech">Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes threat afterwards, and a demon form that must be tanked by a warlock in fire resistance gear because of Chaos Blast.</p><ul class="loot"><li><span class="nm q-n">Gloves of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Gloves of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Gloves of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Cataclysm Gauntlets</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Handguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Deathmantle Handguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+18 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:3"><section class="box boss" aria-label="Fathom-Lord Karathress"><h3><span class="o">04</span><span>Fathom-Lord Karathress</span><small>26 drops</small></h3><div class="in"><p class="mech">Four separate targets, each on its own tank.</p><ul class="loot"><li><span class="nm q-n">Leggings of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Leggings of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Leggings of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Breeches of the Avatar</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Cataclysm Legplates</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Legguards</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+20 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:4"><section class="box boss" aria-label="Morogrim Tidewalker"><h3><span class="o">05</span><span>Morogrim Tidewalker</span><small>21 drops</small></h3><div class="in"><p class="mech">Earthquake damages everyone within 50 yards and spawns two packs of six murlocs from the room entrances; those packs are kited into the boss and AoE'd down, which is where a paladin off-tank earns their place.</p><ul class="loot"><li><span class="nm q-e">Illidari Shoulderpads</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Mantle of the Tireless Tracker</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Ring of Sundered Souls</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Serpent-Coil Braid</span><span class="sr">, Epic</span><span class="tag d">DPS</span></li><li><span class="nm q-e">Talon of Azshara</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Warboots of Obliteration</span><span class="sr">, Epic</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li></ul><p class="static-note">+15 more drops (turn on JavaScript to expand)</p></div></section></div><div class="layer" style="--z:5"><section class="box boss" aria-label="Lady Vashj"><h3><span class="o">06</span><span>Lady Vashj</span><small>36 drops</small></h3><div class="in"><p class="mech">Three phases and the hardest fight in Serpentshrine Cavern.</p><ul class="loot"><li><span class="nm q-n">Helm of the Vanquished Champion</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Helm of the Vanquished Defender</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-n">Helm of the Vanquished Hero</span><span class="sr">, not in the item catalogue</span><span class="tag t">Tier token</span></li><li><span class="nm q-e">Cowl of the Avatar</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Cowl of Tirisfal</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li><li><span class="nm q-e">Crystalforge Faceguard</span><span class="sr">, Epic</span><span class="tag s">Set piece · from token</span></li></ul><p class="static-note">+30 more drops (turn on JavaScript to expand)</p></div></section></div></div><section class="box trash" aria-labelledby="h-trash"><h2 id="h-trash">Notable trash drops <small>2</small></h2><div class="in"><ul class="loot"><li><span class="nm q-e">Pendant of the Perilous</span><span class="sr">, Epic</span><span class="tag x">Trash drop</span><span class="tag f" title="In the Phase 2 Fury Warrior set">Fury set</span></li><li><span class="nm q-e">Boots of Courage Unending</span><span class="sr">, Epic</span><span class="tag x">Trash drop</span></li></ul></div></section></div>
+  <div id="lresults" hidden></div>
 </section>
 </main>
 <footer><div class="wrap">Prototype content for design review. Loot tables from Wowhead via tools/ingest/ingest-raid-loot.mjs; item quality from the wowsims/tbc item catalogue; attunement steps from Wowhead quest pages and Icy Veins, as recorded in src/domain/raids. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
@@ -516,13 +548,122 @@ function select(id,opts){
     try{history.replaceState(null,"","#"+id);}catch(e){}
     const drops=r.bosses.reduce((n,b)=>n+b.loot.length,0);
     say(r.n+" selected: "+r.bosses.length+" bosses, "+drops+" drops"+(r.ch?", attunement "+r.ch.n:", no attunement")+".");
-    if(M.on&&M.cards)M.cards();
+    if(M.on&&M.cards&&!opts.quiet)M.cards(); /* quiet: the view is hidden behind search results */
   }
 }
-raidBtns.forEach(b=>on(b,"click",()=>select(b.dataset.raid,{user:true})));
+raidBtns.forEach(b=>on(b,"click",()=>{const id=b.dataset.raid,s=SR.active;select(id,{user:true,quiet:s});if(s)jump(id);}));
 /* the static page ships Serpentshrine pre-rendered; only re-render if the hash asks for another raid */
 {const h=decodeURIComponent((location.hash||"").slice(1));select(byId(h)?h:"serpentshrine-cavern",{initial:true,keepView:!byId(h)||h==="serpentshrine-cavern"});}
-on(window,"hashchange",()=>{const h=decodeURIComponent(location.hash.slice(1));if(byId(h))select(h);});
+on(window,"hashchange",()=>{const h=decodeURIComponent(location.hash.slice(1));if(byId(h)){select(h);if(SR.active)jump(h);}});
+
+/* ---------- loot search: filters every boss card in all five raids, hides bosses without a match, groups by raid.
+   The single-raid view (#raidview) is never touched: it is hidden while a query is active and shown again on clear,
+   so the selected raid and its collapsed "+N more" expanders come back exactly as they were. ---------- */
+const sBox=$("#lsearch"), sIn=$("#lq"), sX=$("#lqx"), res=$("#lresults");
+const SR={active:false,q:"",built:false,groups:[],t:0,a:0,shown:null};
+const plural=(n,one,many)=>n+" "+(n===1?one:many);
+function buildResults(){
+  if(SR.built||!res)return;SR.built=true;
+  res.innerHTML=`<div class="lhead" id="lhead"><h2 id="lcount"></h2><p class="prov">Searching all five raids · pick a raid above to jump to its matches</p></div>`+
+    `<div class="box lempty" id="lempty" hidden><div class="in"><p id="lemptymsg"></p><p>Try part of a name, such as "Trophy", "Destroyer" or "Mongoose".</p><button type="button" class="btn ghost" id="lclear2">Clear search</button></div></div>`+
+    DATA.R.map(r=>`<section class="rgroup" id="lr-${r.id}" aria-labelledby="lrh-${r.id}"><h2 class="ghead" id="lrh-${r.id}">${esc(r.n)} <small>Phase ${r.ph} · ${r.tier} · <span class="gn"></span></small><span class="chip gsel" hidden>Selected raid</span></h2>`+
+      `<div class="bosses">${r.bosses.map(bossCard).join("")}</div>`+
+      (r.trash.length?`<section class="box trash" aria-labelledby="lrt-${r.id}"><h2 id="lrt-${r.id}">Notable trash drops <small></small></h2><div class="in">${lootList(r.trash)}</div></section>`:"")+
+      `</section>`).join("");
+  SR.groups=DATA.R.map(r=>{
+    const el=$("#lr-"+r.id,res);
+    const cards=$$(".box.boss, .box.trash",el).map(box=>{
+      const det=$("details.more",box);if(det)det.open=true; /* auto-expanded: every match shows */
+      const items=$$("ul.loot li",box).map(li=>{const nm=$(".nm",li),name=nm?nm.textContent:"";return {li,nm,name,lc:name.toLowerCase(),m:false};});
+      return {wrap:box.classList.contains("boss")?box.closest(".layer")||box:box,small:$("h3 small, h2 small",box),det,items};
+    });
+    return {raid:r,el,n:$(".gn",el),sel:$(".gsel",el),cards,count:0};
+  });
+  on($("#lclear2",res),"click",clearSearch);
+}
+/* highlight every case-insensitive occurrence; the rest of the name stays escaped text */
+function hl(name,q){
+  const lc=name.toLowerCase();let i=0,j,out="";
+  while((j=lc.indexOf(q,i))>-1){out+=esc(name.slice(i,j))+"<mark>"+esc(name.slice(j,j+q.length))+"</mark>";i=j+q.length;}
+  return out+esc(name.slice(i));
+}
+function filter(q){
+  let drops=0,raids=0;
+  SR.groups.forEach(g=>{
+    let gn=0;
+    g.cards.forEach(c=>{
+      let n=0,nd=0;
+      c.items.forEach(it=>{
+        const m=!!it.nm&&it.lc.includes(q);
+        if(m){it.nm.innerHTML=hl(it.name,q);n++;if(c.det&&c.det.contains(it.li))nd++;}
+        else if(it.m)it.nm.textContent=it.name;
+        it.m=m;it.li.hidden=!m;
+      });
+      if(c.det)c.det.hidden=!nd;
+      c.wrap.hidden=!n;
+      if(c.small)c.small.textContent=n+" of "+plural(c.items.length,"drop","drops");
+      gn+=n;
+    });
+    g.count=gn;g.el.hidden=!gn;if(g.n)g.n.textContent=plural(gn,"match","matches");
+    if(gn){raids++;drops+=gn;}
+  });
+  return {drops,raids};
+}
+function markSelected(){SR.groups.forEach(g=>{if(g.sel)g.sel.hidden=g.raid.id!==current;});}
+function refreshST(){if(M.on&&typeof ScrollTrigger!=="undefined")ScrollTrigger.refresh();}
+function announce(t){clearTimeout(SR.a);SR.a=setTimeout(()=>say(t),400);}
+function runSearch(raw){
+  const q=raw.trim().toLowerCase();
+  if(sX)sX.hidden=!raw;
+  if(q.length<2){ /* one letter (or nothing): the normal single-raid view */
+    if(SR.active){exitSearch();const r=byId(current);announce("Search cleared. Showing "+(r?r.n:"the selected raid")+".");}
+    return;
+  }
+  if(SR.active&&q===SR.q)return;
+  buildResults();if(!res)return;
+  const entering=!SR.active;let R0={drops:0,raids:0};
+  const mutate=()=>{R0=filter(q);};
+  if(!entering&&M.on&&!RMQ.matches&&M.searchFx)M.searchFx(res,mutate);else mutate();
+  SR.q=q;markSelected();
+  const head=$("#lhead",res),empty=$("#lempty",res),msg=$("#lemptymsg",res),count=$("#lcount",res);
+  const text=R0.drops?plural(R0.drops,"drop matches","drops match")+" in "+plural(R0.raids,"raid","raids"):"";
+  if(count)count.textContent=text;
+  if(msg)msg.textContent="No drops match “"+raw.trim()+"”.";
+  if(head)head.hidden=!R0.drops;if(empty)empty.hidden=!!R0.drops;
+  if(entering){SR.active=true;if(view)view.hidden=true;res.hidden=false;refreshST();if(M.on&&M.searchFx)M.searchFx(res,null,true);}
+  const vis=R0.drops?head:empty;
+  if(KIT&&vis&&vis!==SR.shown)KIT.enter(vis); /* K8 ring on the results header (or the empty state) as it appears */
+  SR.shown=vis;
+  announce(R0.drops?text+".":"No drops match "+raw.trim()+".");
+}
+function exitSearch(){
+  SR.active=false;SR.q="";SR.shown=null;
+  if(res)res.hidden=true;if(view)view.hidden=false;refreshST();
+}
+function clearSearch(){
+  if(!sIn)return;
+  clearTimeout(SR.t);sIn.value="";runSearch("");sIn.focus();
+}
+/* picking a raid while searching jumps to that raid's group (focus stays on the picker) */
+function jump(id){
+  const g=SR.groups.find(x=>x.raid.id===id),r=byId(id);markSelected();
+  if(!g||!r)return;
+  if(g.el.hidden){announce(r.n+" selected: no drops there match “"+sIn.value.trim()+"”.");return;}
+  g.el.scrollIntoView({behavior:M.on&&!RMQ.matches?"smooth":"auto",block:"start"});
+  announce(r.n+" selected: "+plural(g.count,"drop matches","drops match")+" there.");
+}
+if(sBox&&sIn&&res){
+  sBox.hidden=false;
+  on(sIn,"input",()=>{clearTimeout(SR.t);if(sX)sX.hidden=!sIn.value;SR.t=setTimeout(()=>runSearch(sIn.value),120);});
+  on(sIn,"keydown",e=>{if(e.key==="Escape"&&sIn.value){e.preventDefault();clearSearch();}});
+  on(sX,"click",clearSearch);
+  on(document,"keydown",e=>{
+    if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey||e.defaultPrevented)return;
+    const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+    e.preventDefault();sIn.focus();sIn.select();
+  });
+  if(sIn.value)runSearch(sIn.value); /* a value restored by the browser on back/forward */
+}
 
 
 
@@ -634,7 +775,7 @@ function scrollStory(){
   gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
   if($("#raidview"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#raidview",start:"top 85%",end:"top 15%",scrub:.8}});
   $$("#raidview .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>{
-    if(!b.isConnected)return;
+    if(!b.isConnected||b.closest("[hidden]"))return; /* hidden behind loot search results: stay static */
     safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"}));
     if(KIT&&b.classList.contains("boss"))KIT.enter(b); /* K8 light-portal entry per boss card */
   })}));
@@ -663,7 +804,31 @@ M.cards=()=>A(()=>{
   if(boxes.length)safe(gsap.fromTo(boxes,{y:40,rotationX:-10,autoAlpha:0,transformOrigin:"50% 100%"},{y:0,rotationX:0,autoAlpha:1,duration:.6,stagger:.04,ease:"expo.out",clearProps:"transform,opacity,visibility"}));
   if(KIT)boxes.forEach((b,i)=>{if(b.classList.contains("boss"))KIT.enter(b,{delay:i*.04});});
 });
-
+/* 4b. Loot search: entering rises the visible result cards in; each later query tweens every card's body from its old
+   height to its new one (collapse / expand) and fades in cards that just reappeared. Motion off: search changes are instant. */
+const boxOf=w=>w.classList.contains("layer")?w.firstElementChild||w:w;
+const inView=el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;};
+M.searchFx=(scope,mutate,entering)=>{
+  if(entering){
+    A(()=>{const els=$$(".rgroup:not([hidden]) .layer:not([hidden]), .rgroup:not([hidden]) .box.trash:not([hidden])",scope).map(boxOf).filter(inView);
+      if(els.length)safe(gsap.fromTo(els,{y:18,autoAlpha:0},{y:0,autoAlpha:1,duration:.35,stagger:.03,ease:"power2.out",clearProps:"transform,opacity,visibility"}));});
+    return;
+  }
+  const ins=$$(".box .in",scope).filter(el=>el.offsetParent);
+  const before=new Map(ins.map(el=>[el,el.offsetHeight]));
+  const wasHidden=$$(".layer, .box.trash",scope).filter(w=>w.hidden);
+  gsap.killTweensOf(ins);ins.forEach(el=>{el.style.height="";el.style.overflow="";});
+  mutate();
+  A(()=>{
+    before.forEach((h,el)=>{
+      if(!el.offsetParent||!inView(el))return;
+      const h2=el.offsetHeight;
+      if(Math.abs(h2-h)>1)safe(gsap.fromTo(el,{height:h,overflow:"hidden"},{height:h2,duration:.24,ease:"power2.out",clearProps:"height,overflow"}));
+    });
+    const back=wasHidden.filter(w=>!w.hidden&&w.offsetParent).map(boxOf).filter(inView);
+    if(back.length)safe(gsap.fromTo(back,{y:10,autoAlpha:0},{y:0,autoAlpha:1,duration:.25,stagger:.03,ease:"power2.out",clearProps:"transform,opacity,visibility"}));
+  });
+};
 M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.5,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));
 /* 5. Leaving for a sibling tab: the amber curtain rises with the tab's name while the camera dives, then navigates */
 $$("nav.sections a").forEach(a=>on(a,"click",e=>{
