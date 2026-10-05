@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Home C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  /* Home C · Nether Window: nether violet glass, fel-green accents */
+  --abyss:#08040e; --deep:#120a1c; --glass:rgba(18,10,28,.8); --glass-2:rgba(28,16,42,.84); --rim:rgba(178,150,255,.24); --rim-2:rgba(178,150,255,.12);
+  --ink:#efeaf7; --ink-2:#c6bcd8; --ink-3:#a398b8;
+  --glow:#8cff7a; --glow-ink:#0a1a06; --glow-soft:rgba(140,255,122,.13);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(10,5,16,.82);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#c8ff9e;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(70% 55% at 88% 0%,rgba(96,30,120,.32),transparent 62%),radial-gradient(60% 45% at 0% 100%,rgba(120,58,26,.16),transparent 62%),var(--abyss);background-attachment:fixed;color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1480px;margin:0 auto;padding:0 16px}
+/* split layout: content on the left, the Nether Window on the right (above the content on phones) */
+.split{max-width:1480px;margin:0 auto;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:0 24px}
+.lcol{min-width:0}
+.stage{--pv:transparent;position:relative;height:min(60vh,480px);min-height:300px;margin:14px 0 0;border-radius:18px;overflow:hidden;border:1px solid var(--rim);background:#0c0418;isolation:isolate;box-shadow:0 30px 70px -30px rgba(0,0,0,.9),0 0 60px -30px rgba(140,255,122,.35)}
+@media (min-width:960px){
+  .split{grid-template-columns:minmax(0,1fr) minmax(380px,42%)}
+  .lcol{order:1}
+  .stage{order:2;position:sticky;top:70px;align-self:start;height:calc(100vh - 88px);min-height:520px;margin-top:18px}
+}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* the caption names what the portal is showing; the stage itself is decorative (cards carry the meaning) */
+.pvcap{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 28px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:500 var(--t-xs)/1.4 var(--f-mono);letter-spacing:.08em;color:var(--ink);background:rgba(8,4,14,.82);border:1px solid var(--rim);border-radius:999px;padding:5px 12px}
+.pvcap b{font-weight:500;color:var(--glow)}
+/* CSS fallback (no WebGL, or 3D off): nether sky, our own spiky arch silhouette, the void as a colour */
+.fallback{position:absolute;inset:0;z-index:0;background:
+  linear-gradient(122deg,transparent 60%,rgba(110,255,120,.10) 64%,rgba(110,255,120,.03) 69%,transparent 72%),
+  radial-gradient(1.5px 1.5px at 12% 14%,#fff,transparent),radial-gradient(1px 1px at 28% 30%,#e8dcff,transparent),
+  radial-gradient(1.5px 1.5px at 44% 9%,#fff,transparent),radial-gradient(1px 1px at 63% 24%,#fff,transparent),
+  radial-gradient(1.5px 1.5px at 82% 12%,#f2eaff,transparent),radial-gradient(1px 1px at 91% 36%,#fff,transparent),
+  radial-gradient(1px 1px at 7% 42%,#fff,transparent),radial-gradient(1px 1px at 72% 44%,#e8dcff,transparent),
+  radial-gradient(70% 28% at 50% 100%,rgba(150,74,30,.5),transparent 70%),
+  radial-gradient(60% 40% at 24% 26%,rgba(130,30,120,.34),transparent 70%),
+  radial-gradient(50% 34% at 80% 46%,rgba(70,40,150,.30),transparent 70%),
+  linear-gradient(180deg,#0b0417 0%,#250a31 48%,#2c1219 82%,#1a0c0c 100%)}
+html[data-phase="1"] .fallback{filter:sepia(.25) saturate(1.1)}
+.fb-arch{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);width:min(70%,340px);aspect-ratio:3/4.3;background:linear-gradient(90deg,#2c1d22,#4a3436 40%,#3e2c2f 60%,#241820);
+  clip-path:polygon(2% 100%,98% 100%,98% 94%,90% 94%,87% 30%,97% 18%,86% 24%,86% 20%,78% 18%,76% 5%,70% 16%,60% 16%,56% 7%,52% 15%,50% 2%,48% 15%,44% 7%,40% 16%,30% 16%,24% 5%,22% 18%,14% 20%,14% 24%,3% 18%,13% 30%,10% 94%,2% 94%)}
+.fb-void{position:absolute;left:22%;right:22%;top:26%;bottom:7%;overflow:hidden;background:
+  radial-gradient(1px 1px at 30% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 40%,#fff,transparent),
+  radial-gradient(1px 1px at 45% 70%,#ffe6c8,transparent),radial-gradient(1px 1px at 20% 55%,#fff,transparent),
+  radial-gradient(40% 30% at 60% 60%,rgba(160,80,30,.35),transparent 70%),#07030c;
+  box-shadow:inset 0 0 18px 6px #6dff5a,inset 0 0 44px 10px rgba(80,220,70,.45)}
+.fb-void::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 55%,var(--pv),transparent 85%);opacity:0;transition:opacity .5s}
+.stage[data-pv]:not([data-pv=""]) .fb-void::after{opacity:.85}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections a{display:block;text-decoration:none;font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{display:grid;align-content:end;padding:30px 0 20px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:6px 2px 4px}
+
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+/* SplitText masks (wordsClass "w", mask:"words" adds the "-mask" wrappers) */
+.hero h1 [class$="-mask"]{display:inline-block;overflow:clip;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.btn.big{font-size:var(--t-md);padding:11px 20px}
+.capline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-sm);margin:0}
+.capline b{color:var(--warn)}
+/* hit-cap gauge */
+.gauge{height:6px;background:rgba(255,207,122,.14);border-radius:3px;overflow:hidden;margin:4px 0 6px}
+.gauge i{display:block;height:100%;width:98.6%;background:var(--warn);transform-origin:left;box-shadow:0 0 10px var(--warn)}
+/* motion toggle */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+/* "step through": the portal's light opens out from the window over the page, tinted by the tab's world.
+   Dark at its centre colour, never white, so it reads as a passage rather than a flash. */
+.wipe{--pv:#8cff7a;position:fixed;inset:0;z-index:50;color:var(--ink);pointer-events:none;display:none;place-items:center;overflow:hidden;
+  background:#0c0814; /* browsers without color-mix() keep a plain dark passage */
+  background:radial-gradient(circle at var(--ox,50%) var(--oy,50%),color-mix(in srgb,var(--pv) 34%,#07040c) 0%,color-mix(in srgb,var(--pv) 14%,#07040c) 45%,#07040c 80%)}
+.wipe span{display:block;font:400 clamp(2rem,7vw,5rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px;text-shadow:0 2px 24px rgba(0,0,0,.7)}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+.q-epic{color:var(--q-epic)}
+.glyph{display:inline-grid;place-items:center;width:28px;height:28px;flex:none;border:2px solid var(--q-epic);border-radius:4px;font:600 10px/1 var(--f-mono);color:var(--ink-2);background:rgba(192,140,255,.08);box-shadow:0 0 10px rgba(192,140,255,.25)}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+/* feed: a self-drawing timeline spine */
+.feed{position:relative;padding:14px 14px 4px 46px}
+.feed svg.line{position:absolute;left:20px;top:22px;width:4px;height:calc(100% - 44px);overflow:visible}
+.feed svg.line line{stroke:var(--rim);stroke-width:2}
+.feed svg.line line.draw{stroke:var(--glow)}
+.feed li{position:relative;padding:4px 0 16px}
+.feed li::before{content:"";position:absolute;left:-31px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--abyss);border:2px solid var(--glow);box-shadow:0 0 10px var(--glow-soft);transform:scale(var(--dot,1))}
+.feed time{font:500 var(--t-xs)/1.6 var(--f-mono);color:var(--glow)}
+.feed b{display:block;font-weight:600}
+.feed p{margin:2px 0 0;font-size:var(--t-sm);color:var(--ink-2)}
+.tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--glow);margin-left:8px}
+/* "Phase 2 at a glance": full-width glass card, pinned and scrubbed on desktop */
+.story{margin:0 0 16px}
+.glancebox .story-in{position:relative;display:grid;gap:18px;padding:18px 16px}
+@media (min-width:1280px){.glancebox .story-in{grid-template-columns:1fr 1.3fr;align-items:center;padding:24px 22px}}
+.glancebox h2{font:400 clamp(1.5rem,3.6vw,2.6rem)/1.05 var(--f-head);margin:0}
+.counter{font:500 clamp(2.2rem,6vw,4.2rem)/1 var(--f-mono);color:var(--glow);margin-top:12px;text-shadow:0 0 24px var(--glow-soft)}
+.counter small{font-size:.32em;color:var(--ink-3)}
+.pbar{height:3px;background:var(--rim);margin-top:12px;max-width:260px}
+.pbar i{display:block;height:100%;width:100%;background:var(--glow);transform-origin:left}
+.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px;overflow-x:clip}
+.fact{position:relative;background:var(--scrim);border:1px solid var(--rim);border-radius:10px;padding:12px 14px 12px 52px}
+.fact b.ix{position:absolute;left:14px;top:13px;font:500 var(--t-sm) var(--f-mono);color:var(--glow)}
+.fact h3{margin:0 0 4px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.fact p{margin:0;font-size:var(--t-sm)}
+.fact .rail{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--glow);transform-origin:top;border-radius:10px 0 0 10px}
+.fact.on{border-color:var(--glow);box-shadow:0 0 22px -8px var(--glow)}
+.hl{font-weight:700;color:var(--glow)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.char{display:flex;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rim-2);margin:12px 0;border:1px solid var(--rim-2);border-radius:8px;overflow:hidden}
+.stats div{background:rgba(4,16,22,.85);padding:7px 9px}
+.stats dt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stats dd{margin:0;font:500 var(--t-md) var(--f-mono);font-variant-numeric:tabular-nums}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+/* home: what the app is */
+.what{margin:0 0 16px}
+.what .in{display:grid;gap:14px}
+@media (min-width:900px){.what .in{grid-template-columns:1.2fr 1fr;align-items:start}}
+.what p{margin:0;color:var(--ink-2);max-width:62ch}
+.what ul{margin:0;padding-left:18px;font-size:var(--t-sm);color:var(--ink-2)}
+.what li{margin:0 0 4px}
+.what li b{color:var(--ink)}
+/* home: entry cards into the six other tabs */
+.doors{margin:0 0 16px}
+.doors>h2{font:400 var(--t-xl)/1.2 var(--f-head);margin:0 0 4px}
+.doors>p{margin:0 0 12px}
+.tcards{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:1fr;perspective:1200px}
+@media (min-width:640px){.tcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.tcards>li{display:flex}
+.tcard{position:relative;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;text-decoration:none;color:var(--ink);padding:14px 16px 16px;transition:border-color .2s,box-shadow .2s,transform .25s ease-out}
+.tcard:hover,.tcard:focus-visible{border-color:var(--glow);box-shadow:0 0 30px -10px var(--glow),0 20px 50px -20px rgba(0,0,0,.8)}
+.tcard:hover{transform:translateY(-3px)}
+.tcard .ix{position:relative;font:500 var(--t-xs) var(--f-mono);color:var(--glow);letter-spacing:.14em;text-transform:uppercase}
+.tcard .nm{position:relative;font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.tcard .bl{position:relative;font-size:var(--t-sm);color:var(--ink-2)}
+.tcard .go{position:relative;margin-top:auto;padding-top:6px;font:600 var(--t-xs) var(--f-body);color:var(--glow)}
+.tcard .go::after{content:" →"}
+/* each card owns a world; its swatch matches what the portal shows while the card is hovered or focused */
+.tcard .ix::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:1px;background:var(--wc,var(--glow));box-shadow:0 0 8px var(--wc,var(--glow))}
+.tcard.pv-on{border-color:var(--wc,var(--glow));box-shadow:0 0 30px -10px var(--wc,var(--glow)),0 20px 50px -20px rgba(0,0,0,.8)}
+
+/* home: import your character */
+.imp textarea{display:block;width:100%;min-height:76px;resize:vertical;font:400 var(--t-sm)/1.4 var(--f-mono);color:var(--ink);background:rgba(3,12,16,.85);border:1px solid var(--rim);border-radius:8px;padding:8px 10px;margin:8px 0}
+.imp textarea:focus-visible{border-color:var(--glow)}
+.imp code{font:500 var(--t-sm) var(--f-mono);color:var(--glow)}
+.imp .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.imp .btn[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.imp .note{font-size:var(--t-xs);color:var(--ink-3);margin:8px 0 0}
+.imp .msg{font-size:var(--t-sm);margin:8px 0 0;color:var(--ink-2)}
+.imp .imprune{display:inline-flex;color:var(--glow)}
+.imp .imprune:empty{display:none}
+.example{margin-top:14px;padding-top:12px;border-top:1px dashed var(--rim)}
+.example h3{margin:0 0 8px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.badge-ex{font:700 10px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--warn);border:1px solid rgba(255,207,122,.35);border-radius:999px;padding:1px 7px;margin-left:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="dirline">Step 2 · Home C · Nether Window. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home-c.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Tabs">
+      <a href="home-c.html" aria-current="page">Home</a>
+      <a href="planner.html" data-wipe="Character Planner">Character Planner</a>
+      <a href="simulation.html" data-wipe="Simulation">Simulation</a>
+      <a href="raid-composition.html" data-wipe="Raid Composition">Raid Composition</a>
+      <a href="tier-lists.html" data-wipe="Spec Tier Lists">Spec Tier Lists</a>
+      <a href="raids.html" data-wipe="Raids">Raids</a>
+      <a href="professions.html" data-wipe="Professions">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <label for="phs">Phase</label>
+    <select id="phs"><option value="2">Phase 2 · SSC, TK, T5</option><option value="1">Phase 1 · Kara, Gruul, Mag</option></select>
+    <span class="chip" id="phchip">TBC Classic · Phase 2</span>
+    <span class="prov" id="flavprov">Rankings: Wowhead · Phase 2 · updated 12 Sep</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="split">
+<!-- The Nether Window: decorative; each tab card below carries the same information in text.
+     Our own procedural scene (Three.js shaders + low-poly arch); nothing traced from game art. -->
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="fallback"><div class="fb-arch"><i class="fb-void"></i></div></div>
+  <canvas id="scene"></canvas>
+  <p class="pvcap" id="pvcap">Through the portal: <b id="pvname">the open nether</b></p>
+</div>
+<div class="lcol">
+<section id="v-home" aria-labelledby="h-home">
+  <div class="hero">
+    <div class="hero-in">
+      <div class="eyebrow" id="hero-eyebrow">Phase 2 DPS gear planner · Serpentshrine Cavern · Tempest Keep</div>
+      <h1 id="h-home">Plan your DPS gear for <em>Serpentshrine Cavern</em> and <em>Tempest Keep</em>.</h1>
+      <p>Project Defeat is a gear planner for DPS players in World of Warcraft®: The Burning Crusade® Classic Anniversary, Phase 2. Fill every slot from real rankings, see where each piece drops, and check the numbers before raid night.</p>
+      <div class="actions"><a class="btn big magnet" href="planner.html" data-wipe="Character Planner">Open the Character Planner</a> <a class="btn ghost big" href="#import">Import your character</a></div>
+      <p class="capline prov">Rankings: Wowhead · Phase 2 · updated 12 Sep · every number on the site carries its source and date</p>
+    </div>
+  </div>
+  <section class="doors" aria-labelledby="h-doors">
+    <h2 id="h-doors">Where to go</h2>
+    <p class="prov">Six tabs, one job each. Point at a card to see its world through the portal. Every tab shows its source and date beside its numbers.</p>
+    <ul class="tcards" id="tcards">
+      <li class="layer" style="--z:6" data-k="planner"><a class="tcard box" style="--wc:#3fd6c8" href="planner.html" data-wipe="Character Planner"><span class="ix">Gear, gems and talents</span><span class="nm">Character Planner</span><span class="bl">Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to. Gear, Compare, Talents, Buffs, Ranked Gear and Build.</span><span class="go">Open the planner</span></a></li>
+      <li class="layer" style="--z:5" data-k="sim"><a class="tcard box" style="--wc:#ecc06a" href="simulation.html" data-wipe="Simulation"><span class="ix">Estimated DPS</span><span class="nm">Simulation</span><span class="bl">Estimated DPS for your set against one fixed boss (level <span class="num">73</span>, <span class="num">7,700</span> armor), with stat weights, an upgrade finder and a plain list of what is and isn't modelled.</span><span class="go">Run the estimate</span></a></li>
+      <li class="layer" style="--z:4" data-k="comp"><a class="tcard box" style="--wc:#c9b6ff" href="raid-composition.html" data-wipe="Raid Composition"><span class="ix">Buff coverage</span><span class="nm">Raid Composition</span><span class="bl">Seat a <span class="num">10</span> or <span class="num">25</span>-player raid in groups of five, see which buffs and debuffs each group gets, and what one more seat would add.</span><span class="go">Seat a raid</span></a></li>
+      <li class="layer" style="--z:6" data-k="tiers"><a class="tcard box" style="--wc:#ff8f86" href="tier-lists.html" data-wipe="Spec Tier Lists"><span class="ix">Where specs stand</span><span class="nm">Spec Tier Lists</span><span class="bl">Wowhead's Phase 2 rankings for damage, healing and tanking: <span class="num">3</span> lists, <span class="num">27</span> specs, all on one page with your spec marked.</span><span class="go">See the rankings</span></a></li>
+      <li class="layer" style="--z:5" data-k="raids"><a class="tcard box" style="--wc:#ff9a4a" href="raids.html" data-wipe="Raids"><span class="ix">Loot tables</span><span class="nm">Raids</span><span class="bl">What drops where across Serpentshrine Cavern, Tempest Keep and the Phase 1 raids still worth running: a card per boss, loot by quality, attunement steps.</span><span class="go">Browse the raids</span></a></li>
+      <li class="layer" style="--z:4" data-k="profs"><a class="tcard box" style="--wc:#8fd0ff" href="professions.html" data-wipe="Professions"><span class="ix">Levelling and payoffs</span><span class="nm">Professions</span><span class="bl">Take any of <span class="num">13</span> professions from <span class="num">1</span> to <span class="num">375</span> without wasting materials: trainer stops, crafting shopping lists, and farming routes for Mining and Herbalism.</span><span class="go">Pick a profession</span></a></li>
+    </ul>
+  </section>
+  <div class="layer what" style="--z:4"><section class="box" aria-labelledby="h-what">
+    <h2 id="h-what">What this is <small>TBC Classic Anniversary · Phase 2</small></h2>
+    <div class="in">
+      <p>A planner for damage dealers. Pick a class and spec, gear all <span class="num">17</span> slots against Wowhead's Phase 2 rankings, apply raid buffs, and get an estimated DPS against a fixed raid boss. The other tabs answer the questions around that: who to bring, where specs stand, what drops where, and which profession pays off at <span class="num">70</span>.</p>
+      <ul>
+        <li><b>Real data only.</b> Items, rankings and drops come from the app's data files, each with its source.</li>
+        <li><b>Built for DPS.</b> Healer and tank rankings are shown for raid planning; gearing and simulation target DPS specs.</li>
+        <li><b>Nothing uploaded.</b> A character import stays in your browser.</li>
+      </ul>
+    </div>
+  </section></div>
+  <section class="story" id="story" aria-labelledby="h-glance">
+    <div class="layer" style="--z:5"><div class="box glancebox">
+      <div class="story-in">
+        <div>
+          <h2 id="h-glance">Phase 2 at a glance</h2>
+          <p class="prov">Wowhead · Phase 2 · updated 12 Sep</p>
+          <div class="counter num" aria-hidden="true"><span id="fcount">04</span><small> / 04 essentials</small></div>
+          <div class="pbar" aria-hidden="true"><i id="fbar"></i></div>
+        </div>
+        <ol class="facts" id="facts">
+          <li class="fact" data-k="new"><span class="rail" aria-hidden="true"></span><b class="ix">01</b><h3>New raids</h3><p>Serpentshrine Cavern · Tempest Keep (The Eye)</p></li>
+          <li class="fact" data-k="open"><span class="rail" aria-hidden="true"></span><b class="ix">02</b><h3>Still open</h3><p>Karazhan · Gruul's Lair · Magtheridon's Lair</p></li>
+          <li class="fact" data-k="t5"><span class="rail" aria-hidden="true"></span><b class="ix">03</b><h3>Tier 5 · Warrior</h3><p><span class="q-epic">Destroyer Battlegear</span>: tokens from Leotheras the Blind, Fathom-Lord Karathress, Lady Vashj, Void Reaver and Kael'thas Sunstrider</p></li>
+          <li class="fact" data-k="badge"><span class="rail" aria-hidden="true"></span><b class="ix">04</b><h3>Badge of Justice</h3><p><span class="q-epic">Necklace of Eternal Hope</span> · <span class="num tick" data-to="25">25</span>× Badge of Justice</p></li>
+        </ol>
+      </div>
+    </div></div>
+  </section>
+  <div class="grid">
+    <div class="col" id="colL">
+      <div class="layer" id="b-feed" style="--z:3"><section class="box" aria-labelledby="h-feed">
+        <h2 id="h-feed">What changed in the data <small>project log · updated 30 Sep</small></h2>
+        <div class="feed">
+          <svg class="line" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 4 100"><line x1="2" y1="0" x2="2" y2="100" vector-effect="non-scaling-stroke"/><line class="draw" id="feedline" x1="2" y1="0" x2="2" y2="100" vector-effect="non-scaling-stroke"/></svg>
+          <ul class="plain" id="feedlist">
+            <li><time datetime="2026-09-30">30 Sep 2026</time><span class="tag">Gear data</span><b>Weapon and ranged enchants filled in from the guides</b><p>Arms and Fury Warriors gain weapon enchants, Rogue off hands are no longer bare, and the recommended scopes are in: Khorium for Warriors, Stabilized Eternium for Rogues and Hunters. <span class="num">20</span> entries changed; no gem moved.</p></li>
+            <li><time datetime="2026-09-28">28 Sep 2026</time><span class="tag">Import</span><b>Your in-game character imports as itself</b><p>The exporter addon was run in game. Gear from later phases is now worn rather than swapped out; only the recommendations stop at Phase 2.</p></li>
+            <li><time datetime="2026-09-23">23 Sep 2026</time><span class="tag">Simulation</span><b>No score without a weapon</b><p>A missing weapon is named above the estimate instead of a confident number with nothing behind it.</p></li>
+            <li><time datetime="2026-09-20">20 Sep 2026</time><span class="tag">Builds</span><b>Share a build as a link; empty slots survive save and load</b><p>The whole build travels in the link and is never uploaded. Empty slots no longer come back wearing default items.</p></li>
+          </ul>
+        </div>
+      </section></div>
+    </div>
+    <div class="col" id="colR">
+      <div class="layer" id="b-imp" style="--z:8"><section class="box imp" id="import" aria-labelledby="h-imp" tabindex="-1">
+        <h2 id="h-imp">Import your character <small>in-game addon</small></h2>
+        <div class="in">
+          <p style="margin:0;font-size:var(--t-sm)">Already playing? In game, run <code>/pdexport</code>, press Ctrl+C, and paste it here. Nothing is uploaded: the string never leaves your browser, and it carries no character name or realm.</p>
+          <label class="sr" for="imptext">Paste your character export</label>
+          <textarea id="imptext" rows="3" placeholder='{"format":"project-defeat-character" …'></textarea>
+          <div class="row"><button class="btn magnet" type="button" id="impgo" disabled>Load my character</button><span class="imprune" id="imprune" aria-hidden="true"></span><a class="btn ghost" href="planner.html" data-wipe="Character Planner">Start from scratch</a></div>
+          <p class="msg" id="impmsg" role="status"></p>
+          <div class="example">
+            <h3>What an import gives you <span class="badge-ex">example</span></h3>
+            <div class="char"><span class="glyph" aria-hidden="true">FW</span><div><b>Human Fury Warrior</b><div class="prov">Alliance · Destroyer Battlegear (4/5) · example import</div></div></div>
+            <dl class="stats">
+              <div><dt>Attack Power</dt><dd class="tick" data-to="1788">1,788</dd></div><div><dt>Hit Rating</dt><dd class="tick" data-to="140">140</dd></div><div><dt>Crit Rating</dt><dd class="tick" data-to="536">536</dd></div>
+            </dl>
+            <div class="gauge" aria-hidden="true"><i></i></div>
+            <p class="warnline" style="margin:0">Hit 140 / 142 rating cap (9%): 2 rating under. Example values.</p>
+          </div>
+        </div>
+      </section></div>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+<footer><div class="wrap">Prototype content for design review. World of Warcraft® and The Burning Crusade® are trademarks or registered trademarks of Blizzard Entertainment, Inc. Project Defeat is a free fan tool, not affiliated with or endorsed by Blizzard. The portal, arch and sky on this page are our own procedural code; no game art is used.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Character Planner</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Home C · "Nether Window" (WebGL, Three.js r128). Everything here is our own procedural work:
+   a stylised low-poly stone arch (no statues, not a copy of any game model), a portal whose fel-green
+   edge churns (fBm + domain warp, added on top of the void), a drifting nether sky, and a "preview world"
+   drawn into a small render target that the portal's void crossfades to while a tab card is hovered
+   or focused. The page drives it through window.SCENE (contract at the top of tbc-kit.js) plus
+   SCENE.pv {a,b,ab,mix,surge,open} and SCENE.cam {dive,intro}. Any failure leaves the CSS portal. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),stage=document.getElementById("stage"),btn=document.getElementById("scenebtn");
+const CAM={dive:0,intro:0},MIX={tk:0,warm:0};
+/* preview state: world a, crossfading to world b by ab; mix = starfield → world; surge = step-through; open = portal lit */
+const PV={a:0,b:0,ab:0,mix:0,surge:0,open:1};
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,pv:PV,speed:1,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
+if(!window.THREE||!cv||!stage){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+const small=Math.min(innerWidth,innerHeight)<700||(navigator.deviceMemory&&navigator.deviceMemory<=2);
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(46,1,.1,140);
+const C=h=>new THREE.Color(h);
+/* palette: violet moonlight over dark nether; Phase 1 warms it slightly. tbc-kit's onTint may lerp it further. */
+const PAL={base:{light:C("#b9a2ff"),deep:C("#12081c"),fog:C("#150a1a"),acc:C("#7dff6a")},
+           p1:{light:C("#ffb27a"),deep:C("#170b0a"),fog:C("#180c0a"),acc:C("#ffb547")}};
+const cur={light:PAL.base.light.clone(),deep:PAL.base.deep.clone(),fog:PAL.base.fog.clone(),acc:PAL.base.acc.clone()};
+const U={uTime:{value:0},uDpr:{value:R.getPixelRatio()},uRes:{value:new THREE.Vector2(1,1)},uWarm:{value:0},uPan:{value:new THREE.Vector2()}};
+/* our GLSL: hash, value noise, fBm (fewer octaves on small screens), one domain warp, a twinkling star grid.
+   Twinkle rates stay under ~0.3 Hz per star, so nothing flashes. */
+const GN=`#define OCT ${small?3:4}
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<OCT;i++){s+=a*vn(p);p=p*2.02+vec2(3.1,1.7);a*=.5;}return s;}
+float warp(vec2 p,float t){vec2 q=vec2(fbm(p+vec2(0.,t)),fbm(p+vec2(5.2,1.3)-t));return fbm(p+2.4*q);}
+float stars(vec2 p,float t,float dens){vec2 i=floor(p),f=fract(p);float h=h21(i);if(h>dens)return 0.;
+  vec2 o=vec2(h21(i+7.1),h21(i+3.3))*.7+.15;float d=length(f-o);
+  float tw=.55+.45*sin(t*(.5+h*1.3)+h*40.);
+  return smoothstep(.09,0.,d)*tw*(.4+.6*fract(h*13.));}
+`;
+const VUV=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+/* ---------- the nether sky: one screen-space quad drawn first ---------- */
+const sky=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,depthTest:false,depthWrite:false,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,.999,1.);}`,
+  fragmentShader:GN+`uniform float uTime,uWarm;uniform vec2 uRes,uPan;varying vec2 vUv;
+  void main(){vec2 uv=vUv;float asp=uRes.x/max(uRes.y,1.);vec2 p=vec2((uv.x-.5)*asp,uv.y)+uPan;float t=uTime;
+    vec3 top=vec3(.045,.018,.10),mid=vec3(.19,.05,.23),low=vec3(.16,.07,.11);
+    vec3 col=mix(low,mid,smoothstep(.05,.5,uv.y));col=mix(col,top,smoothstep(.55,1.,uv.y));
+    /* magenta and violet nebula, drifting very slowly */
+    float n=warp(p*1.5+vec2(t*.012,0.),t*.02);
+    float n2=fbm(p*3.1-vec2(t*.02,t*.006));
+    col+=vec3(.46,.10,.42)*smoothstep(.45,.85,n)*.55*smoothstep(.12,.6,uv.y);
+    col+=vec3(.22,.12,.56)*smoothstep(.5,.9,n2)*.35;
+    /* warm orange-brown dust low down */
+    float lo=smoothstep(.48,0.,uv.y);
+    float d=fbm(vec2(p.x*2.2+t*.03,p.y*5.)+n*.6);
+    col=mix(col,vec3(.42,.20,.09)*(.5+.7*d),lo*smoothstep(.3,.75,d)*.75);
+    col+=vec3(.30,.13,.05)*lo*lo*.35;
+    /* one fel-green beam slanting down from the top right */
+    vec2 rel=p-vec2(.42*asp,1.08);vec2 dir=normalize(vec2(-.5,-1.));
+    float along=dot(rel,dir),across=dot(rel,vec2(-dir.y,dir.x));
+    float w=.035+max(along,0.)*.07;
+    float beam=exp(-across*across/(w*w))*smoothstep(-.05,.15,along)*smoothstep(1.15,.2,along);
+    beam*=(.6+.4*fbm(vec2(along*4.-t*.25,across*12.)))*(.85+.15*sin(t*.3));
+    col+=vec3(.36,1.,.42)*beam*.32;
+    /* stars, twinkling slowly, fading into the dust */
+    float s=stars(p*38.,t,.16)+stars(p*70.+11.,t*1.3,.12)*.6;
+    col+=vec3(.95,.9,1.)*s*smoothstep(.18,.6,uv.y)*(1.-beam);
+    col=mix(col,col*vec3(1.15,.95,.78),uWarm);
+    gl_FragColor=vec4(col,1.);}`}));
+sky.frustumCulled=false;sky.renderOrder=-10;scene.add(sky);
+/* ---------- our own arch: square-frustum pillars, a lintel and crown, spikes as 4-sided cones, two steps ---------- */
+const stone=new THREE.MeshStandardMaterial({color:0x4d3638,roughness:.95,metalness:0,flatShading:true});
+const stoneDk=new THREE.MeshStandardMaterial({color:0x2e2026,roughness:1,metalness:0,flatShading:true});
+const cliff=new THREE.MeshStandardMaterial({color:0x5a2a20,roughness:1,metalness:0,flatShading:true});
+function put(geo,mat,x,y,z,rz,sx,sy,sz){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);
+  if(rz)m.rotation.z=rz;if(sx)m.scale.set(sx,sy,sz);scene.add(m);return m;}
+const PW=3.4,PH=6.32,PY=.8+PH/2; /* the opening: 3.4 wide, from the top step (y .8) to the lintel (y 7.12) */
+const pil=new THREE.CylinderGeometry(.62,.86,6.6,4,1);pil.rotateY(Math.PI/4);
+[-1,1].forEach(s=>{put(pil,stone,s*2.3,4.1,0);
+  put(new THREE.BoxGeometry(1.3,.5,1.3),stoneDk,s*2.3,1.05,0); /* plinths */
+});
+put(new THREE.BoxGeometry(6.4,.95,1.7),stone,0,7.6,0);       /* lintel */
+put(new THREE.BoxGeometry(4.4,.55,1.3),stoneDk,0,8.35,-.05); /* crown */
+put(new THREE.BoxGeometry(1.5,.7,1.1),stone,0,8.95,-.05);    /* crown cap */
+put(new THREE.BoxGeometry(7.8,.4,3.4),stoneDk,0,.2,.3);      /* steps */
+put(new THREE.BoxGeometry(6.6,.4,2.6),stone,0,.6,.2);
+const spk=new THREE.ConeGeometry(.24,1.8,4,1),horn=new THREE.ConeGeometry(.42,2.8,5,1);
+[[0,10.1,0,1.5],[.95,9.4,-.12,1.1],[1.75,8.95,-.3,1],[2.6,8.7,-.55,.9]].forEach(([x,y,rz,s])=>{
+  put(spk,stone,x,y,-.05,rz,s,s,s);if(x)put(spk,stone,-x,y,-.05,-rz,s,s,s);});
+[-1,1].forEach(s=>{put(horn,stone,s*3.55,8.45,0,-s*.75);  /* swept horns at the lintel ends */
+  put(spk,stoneDk,s*3.0,5.6,0,-s*1.15,.9,.9,.9);put(spk,stoneDk,s*3.0,3.2,0,-s*1.25,.8,.8,.8);});
+/* red-brown cliffs to the left, a few boulders to the right, and the ground */
+[[-8.6,1.8,-4,3,3.6,2.6],[-11.5,3.2,-10,3.8,6.4,3.2],[-6.4,.6,1.4,1.6,1.2,1.4],[7.6,.8,-3.5,2,1.6,1.8],[10.5,1.6,-11,3,3,2.6]].forEach((r,i)=>{
+  const m=put(new THREE.DodecahedronGeometry(1,0),cliff,r[0],r[1],r[2],0,r[3],r[4],r[5]);m.rotation.y=i*1.3;});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(140,90),new THREE.MeshStandardMaterial({color:0x2b1416,roughness:1,metalness:0}));
+ground.rotation.x=-Math.PI/2;ground.position.z=-25;scene.add(ground);
+/* lights: the portal's fel lamp (tbc-kit owns its intensity), violet moonlight, ambient, warm dust bounce */
+const lamp=new THREE.PointLight(0x6dff5a,2.6,16);lamp.position.set(0,PY,1.3);scene.add(lamp);
+const LAMP0=lamp.intensity;
+const moon=new THREE.DirectionalLight(cur.light.clone(),.55);moon.position.set(-5,9,7);scene.add(moon);
+scene.add(new THREE.AmbientLight(0x2a1838,.75));
+const dust=new THREE.PointLight(0xff7a3a,.7,26);dust.position.set(6,1,-6);scene.add(dust);
+/* the keystone gem above the opening is the kit's "crystal" (K3 swell brightens it; K1 ignition settles into it) */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(.34,0),new THREE.MeshStandardMaterial({color:0x10240f,emissive:C("#6dff5a"),emissiveIntensity:.35,metalness:.3,roughness:.3,flatShading:true}));
+crystal.scale.set(.8,1.25,.8);crystal.position.set(0,7.6,.95);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(.55,.018,6,48),new THREE.MeshBasicMaterial({color:0x9dff8a,transparent:true,opacity:.4}));
+halo.position.copy(crystal.position);scene.add(halo);
+scene.fog=new THREE.Fog(cur.fog.clone(),16,46);
+/* ---------- the preview world: drawn at low resolution into a render target only while it shows ---------- */
+const RTW=small?176:256,RTH=Math.round(RTW*PH/PW);
+const rt=new THREE.WebGLRenderTarget(RTW,RTH,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,depthBuffer:false,stencilBuffer:false});
+const QU={uTime:U.uTime,uA:{value:0},uB:{value:0},uAB:{value:0},uAsp:{value:PW/PH}};
+const pScene=new THREE.Scene(),pCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+/* six small procedural worlds, one per tab (index order: planner, sim, raids, comp, tiers, profs).
+   p is centred, x in about ±0.27, y in ±0.5. All motion is slow; torch flicker is smooth noise, not strobing. */
+const WORLDS=`uniform float uTime,uA,uB,uAB,uAsp;varying vec2 vUv;
+float in1(float lo,float hi,float x){return 1.-smoothstep(lo,hi,x);}
+vec3 wSsc(vec2 uv,vec2 p,float t){ /* Serpentshrine water: teal depths, caustics, shafts, rising bubbles */
+  vec3 c=mix(vec3(.01,.07,.09),vec3(.05,.34,.37),uv.y);
+  float ca=fbm(p*4.+vec2(t*.15,t*.1)),cb=fbm(p*4.3-vec2(t*.12,-t*.08)+3.);
+  c+=vec3(.35,.95,.88)*pow(max(1.-abs(ca-cb)*3.,0.),6.)*.35*(.4+uv.y);
+  c+=vec3(.4,.95,.9)*smoothstep(.55,.85,fbm(vec2(p.x*3.+p.y*.8,t*.1)))*uv.y*.35;
+  c+=vec3(.7,1.,.95)*stars(vec2(p.x*7.,p.y*7.-t*.5),0.,.25)*.5;
+  return c;}
+vec3 wTk(vec2 uv,vec2 p,float t){ /* Tempest Keep: a gold crystal over violet, shards orbiting */
+  vec3 c=mix(vec3(.06,.02,.12),vec3(.22,.10,.38),uv.y);vec3 gold=vec3(1.,.78,.38);
+  vec2 q=p-vec2(0.,.03);float d=abs(q.x)*2.4+abs(q.y)*1.1;
+  float body=in1(.47,.5,d);float ang=atan(q.y,q.x)+t*.12;float fac=fract(ang*.955);
+  c=mix(c,mix(vec3(.35,.2,.55),gold,.3+.45*fac)*(.55+.7*(.5-d)),body);
+  c+=gold*(exp(-d*d*12.)*.45+exp(-d*3.)*.12);
+  for(int i=0;i<5;i++){float an=t*.25+float(i)*1.2566;vec2 o=vec2(cos(an)*.22,sin(an)*.30+.03);
+    float sd=abs(p.x-o.x)*3.+abs(p.y-o.y)*1.6;c+=mix(gold,vec3(.7,.5,1.),.5)*in1(0.,.11,sd)*.8;}
+  c+=vec3(.6,.4,1.)*stars(p*14.,t,.12)*.6;
+  return c;}
+vec3 wRaid(vec2 uv,vec2 p,float t){ /* a hall of raid doors in warm torchlight; the middle one is "selected" */
+  vec3 c=mix(vec3(.05,.025,.015),vec3(.15,.075,.04),smoothstep(0.,.7,uv.y));
+  c=mix(c,vec3(.11,.055,.03)*(.7+.5*fbm(p*vec2(30.,8.))),step(p.y,-.26));
+  for(int i=0;i<3;i++){float fi=float(i)-1.;vec2 d=p-vec2(fi*.17,-.1);float w=.055,h=.15;
+    float s=min(max(abs(d.x)-w,abs(d.y)-h),length(d-vec2(0.,h))-w);
+    float fl=.85+.15*fbm(vec2(t*.7+fi*3.,fi));float hi=fi==0.?1.35:.8;
+    c=mix(c,vec3(1.,.55,.2)*(.3+.35*(1.-(d.y+h)/(3.*h)))*fl*hi,in1(-.006,.006,s));
+    c+=vec3(1.,.5,.15)*exp(-max(s,0.)*40.)*.22*fl*hi;}
+  for(int i=0;i<2;i++){vec2 tp=vec2(float(i)*.17-.085,.15);float fl=.8+.2*fbm(vec2(t*.9,float(i)*5.));
+    c+=vec3(1.,.62,.22)*(exp(-length((p-tp)*vec2(1.,.6))*42.)*.9+exp(-length(p-tp)*9.)*.16)*fl;}
+  c+=vec3(1.,.6,.25)*stars(vec2(p.x*20.,p.y*20.-t*.45),t,.08)*.45;
+  return c;}
+vec3 wComp(vec2 uv,vec2 p,float t){ /* five groups of five, a ring of markers around a gold-white light */
+  vec3 c=mix(vec3(.03,.025,.06),vec3(.09,.07,.15),uv.y);vec2 q=p-vec2(0.,.02);float r=length(q);
+  c+=vec3(1.,.93,.72)*(exp(-r*r*60.)*.6+exp(-r*7.)*.12);
+  c+=vec3(.9,.8,.55)*in1(0.,.006,abs(r-.19))*.35;
+  for(int g=0;g<5;g++){float an=float(g)*1.2566+t*.08;vec2 gc=vec2(cos(an),sin(an))*.19;
+    c+=vec3(.78,.7,1.)*in1(0.,.006,abs(length(q-gc)-.05))*.6;
+    for(int k=0;k<5;k++){float bk=float(k)*1.2566-t*.2;vec2 sc=gc+vec2(cos(bk),sin(bk))*.032;
+      float pu=.75+.25*sin(t*.8+float(g*5+k));vec2 dd=q-sc;
+      c+=vec3(.82,.76,1.)*exp(-dot(dd,dd)*4000.)*pu;}}
+  return c;}
+vec3 tierC(float i){return i<.5?vec3(.56,.86,.6):i<1.5?vec3(.5,.74,1.):i<2.5?vec3(.97,.74,.4):i<3.5?vec3(1.,.56,.52):vec3(1.,.86,.55);}
+vec3 wTier(vec2 uv,vec2 p,float t){ /* stacked tiers of light, narrowing to the top */
+  vec3 c=mix(vec3(.04,.02,.05),vec3(.10,.05,.10),uv.y);
+  for(int i=0;i<5;i++){float fi=float(i);float y=-.3+fi*.14;float hw=.23-fi*.034;vec3 tc=tierC(fi);
+    float bx=max(abs(p.x)-hw,abs(p.y-y)-.035);float sh=.75+.25*sin(p.x*8.-t*.6+fi);
+    c=mix(c,tc*.55*sh,in1(-.004,.004,bx));c+=tc*exp(-max(bx,0.)*28.)*.22;}
+  c+=vec3(1.,.9,.7)*stars(vec2(p.x*24.,p.y*24.-t*.3),t,.06)*.35;
+  return c;}
+vec3 wProf(vec2 uv,vec2 p,float t){ /* a calm ore vein: dark rock, slow-breathing seams */
+  vec3 c=vec3(.05,.045,.05)+vec3(.07,.06,.07)*fbm(p*5.+3.);
+  float v=abs(fbm(p*3.2+vec2(1.7,.3))-.5),v2=abs(fbm(p*5.5+vec2(-2.,4.))-.5);
+  float br=.8+.2*sin(t*.5);
+  c+=vec3(.5,.8,1.)*in1(0.,.035,v)*.75*br+vec3(.95,.75,.45)*in1(0.,.02,v2)*.45*(1.2-br*.5);
+  c+=vec3(.45,.75,1.)*exp(-v*25.)*.14*br;
+  c+=vec3(.9,.95,1.)*stars(p*30.,t,.06)*.35*in1(0.,.08,v);
+  return c;}
+vec3 world(float k,vec2 uv,vec2 p,float t){
+  if(k<.5)return wSsc(uv,p,t);if(k<1.5)return wTk(uv,p,t);if(k<2.5)return wRaid(uv,p,t);
+  if(k<3.5)return wComp(uv,p,t);if(k<4.5)return wTier(uv,p,t);return wProf(uv,p,t);}
+void main(){vec2 uv=vUv;vec2 p=(uv-.5)*vec2(uAsp,1.);float t=uTime;
+  vec3 c=world(uA,uv,p,t);
+  if(uAB>.001)c=mix(c,world(uB,uv,p,t),uAB);
+  c*=1.-.35*pow(length(p*vec2(1.6,1.)),2.);
+  gl_FragColor=vec4(c,1.);}`;
+pScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:QU,depthTest:false,depthWrite:false,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`,fragmentShader:GN+WORLDS})));
+/* ---------- the portal: churning fel edge over a starry void (or the preview world) ---------- */
+const PU={uTime:U.uTime,uOpen:{value:1},uMix:{value:0},uSurge:{value:0},uSwell:{value:0},uPrev:{value:rt.texture},uSize:{value:new THREE.Vector2(PW,PH)}};
+const portal=new THREE.Mesh(new THREE.PlaneGeometry(PW,PH),new THREE.ShaderMaterial({uniforms:PU,vertexShader:VUV,
+  fragmentShader:GN+`uniform float uTime,uOpen,uMix,uSurge,uSwell;uniform vec2 uSize;uniform sampler2D uPrev;varying vec2 vUv;
+  void main(){vec2 uv=vUv;vec2 p=(uv-.5)*uSize;float t=uTime;
+    /* distance to the stone frame, in world units */
+    float e=min(min(uv.x,1.-uv.x)*uSize.x,min(uv.y,1.-uv.y)*uSize.y);
+    /* the green: domain-warped fBm flowing up the frame, with a second layer of wisps */
+    float n=warp(p*1.15+vec2(0.,-t*.22),t*.12);
+    float n2=fbm(p*2.6+vec2(t*.15,-t*.3)+n*1.8);
+    float w=(.32+.85*n)*(1.+uSurge*1.8);
+    float m=1.-smoothstep(0.,w,e);
+    float wisp=smoothstep(.55,.9,n2)*exp(-e*(1.3-uSurge*.8))*.8;
+    /* the void: a slowly turning starfield with orange-brown nebula flecks */
+    float a=t*.015;vec2 vp=mat2(cos(a),-sin(a),sin(a),cos(a))*p;
+    float st=stars(vp*5.5+vec2(0.,t*.05),t,.22)+stars(vp*10.+3.7-vec2(t*.04,0.),t*1.2,.18)*.7;
+    float neb=warp(vp*.7+vec2(t*.01,0.),t*.03);
+    vec3 vc=vec3(.02,.01,.04)+vec3(.12,.04,.20)*smoothstep(.3,.9,neb)*.5;
+    vc+=vec3(.46,.21,.07)*smoothstep(.52,.85,neb)*.5+vec3(.24,.11,.05)*smoothstep(.62,.8,fbm(vp*2.3-t*.02))*.5;
+    vc+=vec3(.95,.9,.85)*st;
+    /* the preview, lensed a touch by the energy near the frame */
+    vec2 puv=uv+(n-.5)*.03*exp(-e*1.5);
+    vec3 pv=texture2D(uPrev,clamp(puv,.002,.998)).rgb;
+    vec3 inside=mix(vc,pv,uMix)*mix(.06,1.,uOpen);
+    vec3 fel=mix(vec3(.10,.45,.08),vec3(.42,1.,.36),m)+vec3(.85,1.,.7)*pow(m,5.)*.5;
+    float en=(m*(.65+.55*n)+wisp)*uOpen*(1.+uSwell*.35+uSurge*.5);
+    vec3 col=inside*(1.-m*.85)+fel*en;
+    col+=vec3(.30,.9,.34)*uSurge*uSurge*.22*uOpen;
+    gl_FragColor=vec4(min(col,vec3(1.25)),1.);}`}));
+portal.position.set(0,PY,0);scene.add(portal);
+/* the spill: an additive glow hugging the frame, so the green light washes over the stone */
+const spill=new THREE.Mesh(new THREE.PlaneGeometry(PW+2.6,PH+2.6),new THREE.ShaderMaterial({uniforms:PU,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexShader:VUV,
+  fragmentShader:GN+`uniform float uTime,uOpen,uSurge,uSwell;uniform vec2 uSize;varying vec2 vUv;
+  void main(){vec2 p=(vUv-.5)*(uSize+2.6);vec2 q=abs(p)-uSize*.5;
+    float sd=length(max(q,0.))+min(max(q.x,q.y),0.);
+    float n=fbm(p*1.3+vec2(0.,-uTime*.3));
+    float a=exp(-abs(sd)*(2.8-n*1.2))*.3*uOpen*(1.+uSwell*.6+uSurge*1.1)*(1.-smoothstep(.85,1.,max(abs(vUv.x-.5),abs(vUv.y-.5))*2.));
+    gl_FragColor=vec4(vec3(.32,1.,.36)*a,1.);}`}));
+spill.position.set(0,PY,.95);spill.renderOrder=2;scene.add(spill);
+/* ---------- camera: frames the whole arch for the stage's shape; sway + pointer; intro rise; the dive ---------- */
+const ptr={x:0,y:0,sx:0,sy:0};
+let t=0,DIST=14,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const dv=CAM.dive,k=1-dv;
+  cam.position.set((Math.sin(t*.07)*.35+ptr.sx*.6)*k,4.45+CAM.intro*2.4+(Math.sin(t*.05)*.12-ptr.sy*.35)*k-dv*.5,DIST*(1-dv*.93));
+  cam.lookAt(ptr.sx*.2*k,4.6-dv*.65+CAM.intro*.9,0);
+  U.uPan.value.set((ptr.sx*.03+Math.sin(t*.07)*.012)*k,-ptr.sy*.02*k);
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.base[n]).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
+  moon.color.copy(cur.light);scene.fog.color.copy(cur.fog);U.uWarm.value=MIX.warm;
+}
+function pose(){
+  crystal.position.y=7.6+Math.sin(t*.8)*.05;halo.position.y=crystal.position.y;
+}
+function syncPV(){
+  PU.uOpen.value=PV.open;PU.uMix.value=PV.mix;PU.uSurge.value=PV.surge;
+  PU.uSwell.value=Math.max(0,(lamp.intensity-LAMP0)/1.1); /* follows the kit's K3 swell of the lamp */
+  QU.uA.value=PV.a;QU.uB.value=PV.b;QU.uAB.value=PV.ab;
+}
+function draw(){
+  syncPV();
+  if(PV.mix>.001){R.setRenderTarget(rt);R.render(pScene,pCam);R.setRenderTarget(null);}
+  R.render(scene,cam);
+}
+function size(){
+  const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
+  R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();U.uRes.value.set(w,h);
+  const th=Math.tan(cam.fov*Math.PI/360);
+  DIST=Math.max(5.3/th,4.1/(th*cam.aspect)); /* keep the arch (about ±4 wide, 0–10 tall) in the window */
+}
+function frame(dt){
+  dt*=S.speed;t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*.4;halo.rotation.z+=dt*.15;pose();
+  each(HK.frame,[dt,t]);tint();place();draw();
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();draw();}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+const resized=()=>{size();if(!raf)still();};
+if("ResizeObserver" in window)new ResizeObserver(resized).observe(stage);else addEventListener("resize",resized,{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){size();moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,portal};
+size();still();
+})();
+</script>
+<script src="tbc-kit.js"></script>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const root=document.documentElement, live=$("#live");
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off */
+const KIT=window.TBCKit||null;
+/* K2's shattered sky with its aurora pushed to violet ("karazhan" in the kit); this also keeps the kit's
+   Serpentshrine water shafts and Tempest Keep pillars switched off, so the nether is ours alone */
+if(KIT)KIT.theme("karazhan",{instant:true});
+/* M is the motion layer; every hook is optional so the page works without GSAP */
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+
+/* ---------- the portal is the navigation preview: hover or focus a tab card and its world shows through ---------- */
+const stage=$("#stage"),pvname=$("#pvname");
+const PV=SC.pv||{a:0,b:0,ab:0,mix:0,surge:0,open:1};
+const WORLD={"planner.html":0,"simulation.html":1,"raids.html":2,"raid-composition.html":3,"tier-lists.html":4,"professions.html":5};
+const WNAME=["Serpentshrine water","Tempest Keep crystal","raid halls in torchlight","five groups in a ring","tiers of light","a calm ore vein"];
+const WCOL=["#3fd6c8","#ecc06a","#ff9a4a","#c9b6ff","#ff8f86","#8fd0ff"];
+const worldOf=href=>{try{const f=new URL(href,location.href).pathname.split("/").pop();return f in WORLD?WORLD[f]:-1;}catch(e){return -1;}};
+let pvCur=-1,pvT=0;
+const animPV=()=>G&&M.on&&moving()&&!!SC.isEnabled&&SC.isEnabled();
+function showWorld(k){
+  clearTimeout(pvT);
+  if(k===pvCur)return;
+  pvCur=k;
+  if(stage){stage.dataset.pv=k<0?"":String(k);stage.style.setProperty("--pv",k<0?"transparent":WCOL[k]);}
+  if(pvname)pvname.textContent=k<0?"the open nether":WNAME[k];
+  $$(".tcard").forEach(c=>c.classList.toggle("pv-on",k>=0&&worldOf(c.href)===k));
+  const anim=animPV();
+  if(G)gsap.killTweensOf(PV,"mix,ab");
+  if(k<0){ /* back to the starfield */
+    if(anim)gsap.to(PV,{mix:0,duration:.6,ease:"sine.inOut",onUpdate:SC.render});else{PV.mix=0;SC.render();}
+    return;
+  }
+  if(PV.mix<.05||!anim){ /* from the starfield (or instantly, with motion off): show world k on its own */
+    PV.a=k;PV.ab=0;
+    if(anim)gsap.to(PV,{mix:1,duration:.7,ease:"sine.inOut",onUpdate:SC.render});else{PV.mix=1;SC.render();}
+    return;
+  }
+  /* world → world: crossfade inside the render target */
+  PV.a=PV.ab>.5?PV.b:PV.a;PV.b=k;PV.ab=0;
+  gsap.to(PV,{mix:1,duration:.3,ease:"sine.out"});
+  gsap.to(PV,{ab:1,duration:.6,ease:"sine.inOut",onUpdate:SC.render,onComplete:()=>{PV.a=k;PV.ab=0;SC.render();}});
+}
+/* a short delay on entry (so sweeping the pointer across cards doesn't churn) and on exit (so moving between cards doesn't drop to stars) */
+const hoverWorld=k=>{clearTimeout(pvT);pvT=setTimeout(()=>showWorld(k),k<0?220:80);};
+$$(".tcard").forEach(c=>{
+  const k=worldOf(c.href);
+  c.addEventListener("pointerenter",()=>hoverWorld(k));
+  c.addEventListener("pointerleave",()=>hoverWorld(-1));
+  c.addEventListener("focus",()=>showWorld(k)); /* keyboard focus switches at once */
+  c.addEventListener("blur",()=>hoverWorld(-1));
+});
+
+/* ---------- tab links: plain links; with motion on, the portal surges and the camera steps through first ---------- */
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a[data-wipe]");
+  if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+  let url;try{url=new URL(a.href,location.href);}catch(err){return;}
+  if(url.pathname===location.pathname)return;
+  if(M.on&&M.leave&&moving()){e.preventDefault();M.leave(url.href,a.dataset.wipe,a);}
+});
+/* coming back through the browser's back button: never show a stale step-through, and drop back to the stars */
+addEventListener("pageshow",()=>{const w=$("#wipe");if(w){w.style.display="none";w.style.clipPath="";}
+  if(SC.cam)SC.cam.dive=0;PV.surge=0;PV.open=1;M.leaving=false;showWorld(-1);if(SC.render)SC.render();});
+const say=t=>{if(live)live.textContent=t;};
+
+/* ---------- import your character (prototype: validates the shape, stays in the browser) ---------- */
+const impT=$("#imptext"),impB=$("#impgo"),impM=$("#impmsg");
+if(impT&&impB&&impM){
+  const syncImp=()=>{impB.disabled=impT.value.trim().length===0;};
+  impT.addEventListener("input",()=>{syncImp();impM.textContent="";});syncImp();
+  impB.addEventListener("click",()=>{
+    let ok=false;try{const o=JSON.parse(impT.value);ok=!!o&&o.format==="project-defeat-character";}catch(err){ok=false;}
+    const done=()=>{
+      impM.textContent=ok?"Recognized a Project Defeat export. In the app this loads your character and opens the Character Planner; this prototype stops here."
+        :"That doesn't look like a /pdexport string. Copy it again in game with Ctrl+C and paste the whole thing.";
+      impM.style.color=ok?"var(--glow)":"var(--warn)";
+      if(ok&&KIT)KIT.swell(); /* K3: a soft naaru swell when a character loads */
+    };
+    /* K7: with motion on, a rune ring draws while the export is read (in the app this is the real parse) */
+    const slot=$("#imprune");
+    if(KIT&&slot&&moving()&&M.on){
+      impB.disabled=true;impM.style.color="";impM.textContent="Reading the export…";
+      const ring=KIT.runeRing(slot,{size:24,glyphs:8,spinDur:6});
+      setTimeout(()=>{ring.remove();syncImp();done();},700);
+    }else done();
+  });
+}
+$$('a[href="#import"]').forEach(a=>a.addEventListener("click",e=>{const b=$("#import");if(!b)return;e.preventDefault();
+  b.scrollIntoView({behavior:moving()?"smooth":"auto",block:"start"});b.focus({preventScroll:true});}));
+
+/* ---------- scene palette: GSAP-animated when motion is on, one re-lit frame when off ---------- */
+function relight(key,val){
+  if(M.on&&G){const o={};o[key]=val;safe(gsap.to(SC.mix,Object.assign(o,{duration:1.2,ease:"power2.inOut",overwrite:"auto",onUpdate:SC.render})));}
+  else{if(G)gsap.killTweensOf(SC.mix,key);SC.mix[key]=val;SC.render();}
+}
+
+/* ---------- phase filter: Flip re-layout of the facts and tab cards + scene re-light ---------- */
+const PH={
+ "2":{chip:"TBC Classic · Phase 2",eyebrow:"Phase 2 DPS gear planner · Serpentshrine Cavern · Tempest Keep",title:"Phase 2 at a glance",prov:"Rankings: Wowhead · Phase 2 · updated 12 Sep",
+   new:["New raids","Serpentshrine Cavern · Tempest Keep (The Eye)"],open:["Still open","Karazhan · Gruul's Lair · Magtheridon's Lair"]},
+ "1":{chip:"TBC Classic · Phase 1",eyebrow:"Phase 1 view · Karazhan · Gruul's Lair · Magtheridon's Lair",title:"Phase 1 at a glance",prov:"Raids: Phase 1 · Karazhan, Gruul's Lair, Magtheridon's Lair",
+   new:["Raids","Karazhan · Gruul's Lair · Magtheridon's Lair"],open:["Coming in Phase 2","Serpentshrine Cavern · Tempest Keep (The Eye)"]}};
+const setText=(s,t)=>{const el=$(s);if(el)el.textContent=t;};
+function applyPhase(p){
+  const d=PH[p];if(!d)return;root.dataset.phase=p;
+  setText("#phchip",d.chip);setText("#hero-eyebrow",d.eyebrow);setText("#h-glance",d.title);setText("#flavprov",d.prov);
+  ["new","open"].forEach(k=>{const f=$(`.fact[data-k=${k}]`);if(!f)return;const h=$("h3",f),q=$("p",f);if(h)h.textContent=d[k][0];if(q)q.textContent=d[k][1];});
+  const facts=$("#facts"),tc=$("#tcards"),t5=$(".fact[data-k=t5]"),badge=$(".fact[data-k=badge]");
+  const planner=$('#tcards [data-k=planner]'),raids=$('#tcards [data-k=raids]'),profs=$('#tcards [data-k=profs]');
+  if(p==="1"){ /* Phase 1: the T5 fact drops to the end, Raids moves up beside the planner */
+    if(facts&&t5)facts.appendChild(t5);
+    if(tc&&raids&&planner)tc.insertBefore(raids,planner.nextElementSibling);
+  }else{
+    if(facts&&t5)facts.insertBefore(t5,badge);
+    if(tc&&raids)tc.insertBefore(raids,profs);
+  }
+  $$(".fact .ix").forEach((b,i)=>b.textContent="0"+(i+1));
+  say("Showing "+d.chip);
+}
+const phs=$("#phs");
+if(phs)phs.addEventListener("change",e=>{
+  const p=e.target.value;
+  if(M.on&&M.flipHome)M.flipHome(()=>applyPhase(p));else applyPhase(p);
+  relight("warm",p==="1"?1:0);
+});
+
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+/* ================= MOTION LAYER (from round4/motion-3d-portal) ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined", FL=G&&typeof Flip!=="undefined", TX=G&&typeof TextPlugin!=="undefined";
+const DS=G&&typeof DrawSVGPlugin!=="undefined", SPL=G&&typeof SplitText!=="undefined";
+if(!tog){SC.setMotion(!RMQ.matches);return;} /* no toggle in the page: leave it static, scene drifts unless reduced motion */
+tog.hidden=false;
+function label(on,why){tog.setAttribute("aria-pressed",on);if(mstate)mstate.textContent=why||(on?"on":"off");}
+/* Safety: any one-shot animation not finished ~1.5s past its planned end is forced to its end state */
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,TX&&TextPlugin,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));
+let ctx=null, mm=null;
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const A=fn=>ctx?ctx.add(fn):fn();
+function tick(el,dur){
+  const to=+el.dataset.to,o={v:0};
+  return safe(gsap.to(o,{v:to,duration:dur||1.1,ease:"power2.out",onUpdate:()=>{el.textContent=fmt(o.v);},onComplete:()=>{el.textContent=fmt(to);}}));
+}
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  $$(".tick").forEach(el=>el.textContent=fmt(+el.dataset.to));
+  const w=$("#wipe");if(w)w.style.display="none";
+  $$(".fact").forEach(f=>f.classList.remove("on"));
+  setText("#fcount","0"+$$(".fact").length);
+  Object.assign(SC.cam,{dive:0,intro:0});
+  /* the portal at rest: fully open, no surge, the current preview shown at once */
+  PV.open=1;PV.surge=0;if(PV.ab>0){PV.a=PV.ab>.5?PV.b:PV.a;PV.ab=0;}PV.mix=pvCur<0?0:1;M.leaving=false;
+  if(SC.render)SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  SC.setMotion(true); /* before the intro, so the kit's K8 rings and K1 ignition see motion as on */
+  if(ST){ /* pin first so later triggers measure the pin spacer */
+    mm=gsap.matchMedia();
+    mm.add("(min-width:900px)",()=>pinGlance());
+  }
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=mm||gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);
+  /* K1: the portal ignition, once per browser session, never under reduced motion; click or Esc skips it */
+  /* the ignition is the portal opening: while K1's vortex blooms, the window's own fel edge and void fade up
+     from dark (only when the ignition actually plays; it returns null after the first visit of the session) */
+  if(first&&KIT){const ig=KIT.ignite();
+    if(ig){PV.open=0;SC.render();safe(gsap.to(PV,{open:1,duration:2.2,delay:.2,ease:"sine.inOut",onUpdate:SC.render}));}}
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+tog.addEventListener("click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();tog.disabled=true;label(false,"off (reduced motion)");}
+  else{tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* 1. Intro: the scene fades and settles down from above, words rise out of masks (SplitText,
+   which keeps the sentence for screen readers and is reverted with the context when motion turns off),
+   cards in view rise onto their depth layers in sequence. Capped near 1.4s. */
+function intro(){
+  const inView=$$("#v-home .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  inView.forEach(b=>b.dataset.introd="1");
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
+  if(SPL&&$("#h-home")){
+    const sp=SplitText.create("#h-home",{type:"words",wordsClass:"w",mask:"words",aria:"auto"});
+    tl.from(sp.words,{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  }
+  tl.from(".hero-in>p, .actions",{y:18,autoAlpha:0,duration:.45,stagger:.06},.45)
+    .from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  /* K8: tab cards already in view open through a small ring of light */
+  if(KIT)inView.filter(b=>b.classList.contains("tcard")).forEach((b,i)=>KIT.enter(b,{delay:.35+i*.09}));
+  safe(tl);
+}
+/* 2. Scroll story pieces available at every width */
+function scrollStory(){
+  /* (the Nether Window stays put while the page scrolls: it is a sticky window on desktop and scrolls away on
+     phones, so there is no scroll-driven camera here; the portal reacts to the tab cards instead) */
+  /* the feed's spine draws itself as you scroll through the timeline */
+  if($("#feedline")&&$("#b-feed .feed"))gsap.fromTo("#feedline",{scaleY:0},{scaleY:1,transformOrigin:"50% 0%",ease:"none",
+    scrollTrigger:{trigger:"#b-feed .feed",start:"top 80%",end:"bottom 55%",scrub:.5}});
+  /* entries snap onto the spine as the line reaches them (played on enter, never pre-hidden) */
+  $$("#feedlist li").forEach((li,i)=>ScrollTrigger.create({trigger:li,start:"top 85%",once:true,onEnter:()=>A(()=>{
+    const tl=gsap.timeline({delay:i<2?.15*i:0});
+    tl.fromTo(li,{x:44,rotate:-2},{x:0,rotate:0,duration:.7,ease:"back.out(2.4)"})
+      .fromTo(li,{"--dot":0},{"--dot":1,duration:.5,ease:"elastic.out(1,.4)"},"-=.45");
+    const tm=$("time",li);
+    if(TX&&tm){const txt=tm.textContent;tl.fromTo(tm,{text:{value:""}},{text:{value:txt},duration:.4,ease:"none"},"<");}
+    safe(tl);
+  })}));
+  /* number tickers fire when they enter the viewport */
+  $$("#v-home .tick").forEach(el=>ScrollTrigger.create({trigger:el,start:"top 92%",once:true,onEnter:()=>A(()=>tick(el))}));
+  /* example hit-cap gauge fills to 140/142 */
+  const gauge=$("#v-home .gauge i");
+  if(gauge)ScrollTrigger.create({trigger:gauge.parentElement,start:"top 92%",once:true,onEnter:()=>A(()=>safe(gsap.fromTo(gauge,{scaleX:0},{scaleX:1,duration:1.1,ease:"power3.out"})))});
+  /* the six tab cards deal up onto their depth layers a row at a time */
+  const doors=$$(".tcard").filter(b=>!b.dataset.introd);
+  if(doors.length)ScrollTrigger.batch(doors,{start:"top 92%",once:true,onEnter:els=>A(()=>{
+    safe(gsap.fromTo(els,{y:60,rotationX:-18,transformOrigin:"50% 100%"},{y:0,rotationX:0,duration:.8,stagger:.09,ease:"expo.out",clearProps:"transform"}));
+    if(KIT)els.forEach((el,i)=>KIT.enter(el,{delay:i*.09})); /* K8 light-portal entry per card */
+  })});
+  /* cards below the fold rise onto their depth layers with a skew settle */
+  $$(".grid .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"})))}));
+}
+/* 3. Desktop: pin "Phase 2 at a glance" and scrub the four essentials in one by one.
+   Facts stay opaque; only position, scale and the rail move. */
+function pinGlance(){
+  const facts=$$("#facts .fact"),n=facts.length,cnt=$("#fcount"),bar=$("#fbar");
+  if(!n||!$("#story"))return;
+  const count=k=>{if(cnt)cnt.textContent="0"+k;};
+  const tl=gsap.timeline({scrollTrigger:{trigger:"#story",start:"top 64px",end:"+="+(n*60)+"%",pin:true,scrub:.6,
+    snap:{snapTo:"labels",duration:{min:.2,max:.5},ease:"power1.inOut"},
+    onUpdate:s=>{const k=Math.max(1,Math.ceil(s.progress*n-.001));count(k);facts.forEach((f,i)=>f.classList.toggle("on",i===k-1));},
+    onLeave:()=>{count(n);facts.forEach(f=>f.classList.remove("on"));},
+    onLeaveBack:()=>{count(n);facts.forEach(f=>f.classList.remove("on"));}}});
+  tl.addLabel("f0");
+  facts.forEach((f,i)=>{
+    tl.fromTo(f,{x:90,scale:.94},{x:0,scale:1,duration:1,ease:"power3.out"},i);
+    const rl=$(".rail",f);if(rl)tl.fromTo(rl,{scaleY:0},{scaleY:1,duration:.6},i+.3);
+    tl.addLabel("f"+(i+1),i+1);
+  });
+  if(bar)tl.fromTo(bar,{scaleX:0},{scaleX:1,duration:n,ease:"none"},0);
+  return ()=>{restoreStatic();};
+}
+/* phones: no pin, the facts stay stacked */
+/* 4. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 5. Leaving for another tab: "step through". The portal shows the destination's world, its fel edge
+   surges once (a single rise, not a pulse), the camera walks into the opening, and the portal's light opens
+   out over the page from the window, tinted by that world, with the tab's name. Then the browser navigates;
+   the next tab plays its own intro. With the window off-screen (phones, scrolled) it opens from the link. */
+M.leave=(href,name,from)=>{
+  let gone=false;const nav=()=>{if(!gone){gone=true;location.href=href;}};
+  if(M.leaving)return;
+  const w=$("#wipe"),s=w&&$("span",w);if(!w||!s){nav();return;}
+  M.leaving=true;
+  const k=worldOf(href);showWorld(k);
+  const r=stage?stage.getBoundingClientRect():null;
+  const seen=!!r&&r.width>0&&r.bottom>40&&r.top<innerHeight-40;
+  let ox=innerWidth/2,oy=innerHeight/2,r0=0;
+  if(seen){ox=r.left+r.width/2;oy=r.top+r.height*.5;r0=Math.min(r.width,r.height)*.16;}
+  else if(from&&from.getBoundingClientRect){const b=from.getBoundingClientRect();ox=b.left+b.width/2;oy=b.top+b.height/2;}
+  const r1=Math.hypot(Math.max(ox,innerWidth-ox),Math.max(oy,innerHeight-oy))+4;
+  w.style.setProperty("--pv",k<0?"#8cff7a":WCOL[k]);
+  w.style.setProperty("--ox",ox.toFixed(0)+"px");w.style.setProperty("--oy",oy.toFixed(0)+"px");
+  s.textContent=name||"";w.style.display="grid";
+  const at=rad=>`circle(${rad.toFixed(0)}px at ${ox.toFixed(0)}px ${oy.toFixed(0)}px)`;
+  const tl=gsap.timeline({onComplete:nav});
+  tl.to(PV,{surge:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.62,ease:"power2.in",onUpdate:SC.render},.06)
+    .fromTo(w,{clipPath:at(r0)},{clipPath:at(r1),duration:.42,ease:"power3.in"},.24)
+    .fromTo(s,{autoAlpha:0,scale:.94},{autoAlpha:1,scale:1,duration:.28,ease:"power2.out"},.44);
+  setTimeout(nav,1400); /* never strand the viewer mid-step */
+};
+if(FL){
+  /* 6. Flip: switching phase re-orders the facts and tab cards (they trade places); the scene re-lights alongside */
+  M.flipHome=fn=>A(()=>{
+    const els=$$("#tcards>li, #facts .fact");
+    const st=Flip.getState(els);
+    fn();
+    safe(Flip.from(st,{duration:.85,ease:"power3.inOut",stagger:.04,
+      onComplete:()=>{gsap.set(els,{clearProps:"transform"});if(ST)ScrollTrigger.refresh();}}));
+    if(TX)["#h-glance","#phchip","#hero-eyebrow"].forEach(s=>{const el=$(s);if(!el)return;const t=el.textContent;
+      safe(gsap.fromTo(el,{text:{value:""}},{text:{value:t},duration:.5,ease:"none"}));});
+  });
+}
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+/* belt and braces: if the intro is still mid-flight after 1.5s (throttled tab, slow device), finish it */
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
+</body>
+</html>

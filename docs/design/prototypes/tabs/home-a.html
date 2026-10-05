@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Home A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  /* Home A · Through the Portal: fel green over a nether-violet night, warm Hellfire stone */
+  --abyss:#07040c; --deep:#120a1e; --glass:rgba(14,8,22,.8); --glass-2:rgba(24,13,36,.84); --rim:rgba(140,255,110,.22); --rim-2:rgba(180,150,255,.14);
+  --ink:#f1ecf6; --ink-2:#cbc1d8; --ink-3:#a598b8;
+  --glow:#8cff5a; --glow-ink:#0b1a04; --glow-soft:rgba(140,255,90,.14);
+  --p1:#f2a65a; --p2:#8cff5a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(8,4,14,.84);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#c8ff9e;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+/* No-WebGL fallback: a static CSS sky (stars, violet/magenta nebula, warm dust, one fel beam),
+   our own simple stone gate silhouette, a glowing rectangular portal and red-brown rocks on the left */
+.fallback{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+  radial-gradient(1.5px 1.5px at 12% 14%,#fff,transparent),radial-gradient(1px 1px at 27% 31%,#ecdcff,transparent),
+  radial-gradient(1.5px 1.5px at 41% 8%,#fff,transparent),radial-gradient(1px 1px at 63% 22%,#fff,transparent),
+  radial-gradient(1px 1px at 71% 9%,#ffe9d6,transparent),radial-gradient(1.5px 1.5px at 88% 36%,#fff,transparent),
+  radial-gradient(1px 1px at 19% 44%,#fff,transparent),radial-gradient(1px 1px at 56% 40%,#e6d6ff,transparent),
+  radial-gradient(1px 1px at 93% 12%,#fff,transparent),radial-gradient(1px 1px at 5% 27%,#fff,transparent),
+  radial-gradient(75% 16% at 50% 68%,rgba(168,86,34,.42),transparent 72%),
+  radial-gradient(45% 12% at 18% 64%,rgba(140,70,30,.35),transparent 70%),
+  radial-gradient(50% 38% at 24% 18%,rgba(150,36,140,.38),transparent 70%),
+  radial-gradient(48% 34% at 76% 28%,rgba(92,40,176,.40),transparent 70%),
+  linear-gradient(180deg,#0a0416 0%,#1c0a2e 42%,#3a1424 66%,#1c0a0c 78%,#0e0608 100%)}
+.fb-beam{position:absolute;top:-20vh;right:4vw;width:12vw;height:90vh;transform:rotate(30deg);transform-origin:top center;
+  background:linear-gradient(180deg,rgba(140,255,100,.22),rgba(110,255,80,.08) 60%,transparent);filter:blur(10px)}
+.fb-rocks{position:absolute;left:-2vw;bottom:0;width:28vw;height:58vh;background:linear-gradient(180deg,#4a2418,#1e0d08);
+  clip-path:polygon(0 100%,0 8%,18% 0,30% 16%,46% 12%,58% 34%,72% 40%,80% 62%,100% 74%,100% 100%)}
+.fb-gate{position:absolute;left:50%;top:max(150px,16vh);width:min(84vw,62vh);height:min(78vh,124vw);transform:translateX(-50%)}
+.fb-stone{position:absolute;inset:0;background:linear-gradient(180deg,#4a2a24,#24120e 70%,#140906);
+  clip-path:polygon(4% 100%,9% 30%,0 4%,16% 18%,34% 18%,40% 7%,46% 18%,54% 18%,60% 7%,66% 18%,84% 18%,100% 4%,91% 30%,96% 100%)}
+.fb-portal{position:absolute;inset:31% 25% 4% 25%;border-radius:8px;
+  background:radial-gradient(1.5px 1.5px at 30% 40%,#fff,transparent),radial-gradient(1px 1px at 64% 22%,#fff,transparent),
+  radial-gradient(1px 1px at 52% 70%,#ffe2c4,transparent),radial-gradient(1px 1px at 22% 78%,#fff,transparent),
+  radial-gradient(30% 18% at 60% 58%,rgba(170,90,30,.35),transparent 70%),radial-gradient(26% 14% at 34% 32%,rgba(120,60,24,.3),transparent 70%),#05030a;
+  box-shadow:inset 0 0 2.2vmin .6vmin rgba(150,255,110,.9),inset 0 0 9vmin 1vmin rgba(80,230,60,.45),0 0 5vmin rgba(100,255,70,.35)}
+html[data-phase="1"] .fallback{filter:sepia(.25) saturate(1.1)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(8,4,14,.35),rgba(8,4,14,0) 26%,rgba(8,4,14,0) 60%,rgba(8,4,14,.5))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(8,4,14,.65)}
+header.top{background:rgba(8,4,14,.74);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections a{display:block;text-decoration:none;font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+.flavor{background:rgba(8,4,14,.6);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+/* hero: full-bleed and centred inside the portal; the scroll push carries the camera through it */
+/* the panel sits at the hero's foot so the upper portal and its churning edge stay in view */
+.hero{position:relative;min-height:max(540px,calc(100vh - 124px));min-height:max(540px,calc(100svh - 124px));display:grid;place-items:end center;padding:36px 16px 66px;text-align:center}
+.lede{margin:0 0 16px;padding:16px 18px;text-align:center}
+.lede p{position:relative;margin:0 auto 8px;max-width:64ch;color:var(--ink-2)}
+.lede .capline{justify-content:center;margin:0}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+/* the scrim keeps AA contrast over the brightest frame (the opening flare at full fel green) */
+.hero-in{width:100%;max-width:620px;padding:16px 20px 18px;border-radius:14px;background:var(--scrim);border:1px solid var(--rim-2);box-shadow:0 0 60px 10px rgba(8,4,14,.55);backdrop-filter:blur(6px)}
+.hero h1{font:400 clamp(1.6rem,3.6vw,2.5rem)/1.06 var(--f-head);margin:6px auto 12px;max-width:24ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero .actions{justify-content:center;margin-bottom:0}
+.cue{position:absolute;left:0;right:0;margin:0 auto;width:max-content;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 var(--t-xs) var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);background:rgba(8,4,14,.7);padding:5px 12px;border-radius:999px}
+.cue::after{content:"";width:8px;height:8px;border-right:2px solid var(--glow);border-bottom:2px solid var(--glow);transform:rotate(45deg)}
+main>section>.wrap{padding-top:8px}
+/* SplitText masks (wordsClass "w", mask:"words" adds the "-mask" wrappers) */
+.hero h1 [class$="-mask"]{display:inline-block;overflow:clip;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.btn.big{font-size:var(--t-md);padding:11px 20px}
+.capline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-sm);margin:0}
+.capline b{color:var(--warn)}
+/* hit-cap gauge */
+.gauge{height:6px;background:rgba(255,207,122,.14);border-radius:3px;overflow:hidden;margin:4px 0 6px}
+.gauge i{display:block;height:100%;width:98.6%;background:var(--warn);transform-origin:left;box-shadow:0 0 10px var(--warn)}
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+.q-epic{color:var(--q-epic)}
+.glyph{display:inline-grid;place-items:center;width:28px;height:28px;flex:none;border:2px solid var(--q-epic);border-radius:4px;font:600 10px/1 var(--f-mono);color:var(--ink-2);background:rgba(192,140,255,.08);box-shadow:0 0 10px rgba(192,140,255,.25)}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+/* feed: a self-drawing timeline spine */
+.feed{position:relative;padding:14px 14px 4px 46px}
+.feed svg.line{position:absolute;left:20px;top:22px;width:4px;height:calc(100% - 44px);overflow:visible}
+.feed svg.line line{stroke:var(--rim);stroke-width:2}
+.feed svg.line line.draw{stroke:var(--glow)}
+.feed li{position:relative;padding:4px 0 16px}
+.feed li::before{content:"";position:absolute;left:-31px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--abyss);border:2px solid var(--glow);box-shadow:0 0 10px var(--glow-soft);transform:scale(var(--dot,1))}
+.feed time{font:500 var(--t-xs)/1.6 var(--f-mono);color:var(--glow)}
+.feed b{display:block;font-weight:600}
+.feed p{margin:2px 0 0;font-size:var(--t-sm);color:var(--ink-2)}
+.tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--glow);margin-left:8px}
+/* "Phase 2 at a glance": full-width glass card, pinned and scrubbed on desktop */
+.story{margin:0 0 16px}
+.glancebox .story-in{position:relative;display:grid;gap:18px;padding:18px 16px}
+@media (min-width:900px){.glancebox .story-in{grid-template-columns:1fr 1.35fr;align-items:center;padding:28px 26px;min-height:min(70vh,560px)}}
+.glancebox h2{font:400 clamp(1.5rem,3.6vw,2.6rem)/1.05 var(--f-head);margin:0}
+.counter{font:500 clamp(2.2rem,6vw,4.2rem)/1 var(--f-mono);color:var(--glow);margin-top:12px;text-shadow:0 0 24px var(--glow-soft)}
+.counter small{font-size:.32em;color:var(--ink-3)}
+.pbar{height:3px;background:var(--rim);margin-top:12px;max-width:260px}
+.pbar i{display:block;height:100%;width:100%;background:var(--glow);transform-origin:left}
+.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px;overflow-x:clip}
+.fact{position:relative;background:var(--scrim);border:1px solid var(--rim);border-radius:10px;padding:12px 14px 12px 52px}
+.fact b.ix{position:absolute;left:14px;top:13px;font:500 var(--t-sm) var(--f-mono);color:var(--glow)}
+.fact h3{margin:0 0 4px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.fact p{margin:0;font-size:var(--t-sm)}
+.fact .rail{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--glow);transform-origin:top;border-radius:10px 0 0 10px}
+.fact.on{border-color:var(--glow);box-shadow:0 0 22px -8px var(--glow)}
+.hl{font-weight:700;color:var(--glow)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.char{display:flex;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rim-2);margin:12px 0;border:1px solid var(--rim-2);border-radius:8px;overflow:hidden}
+.stats div{background:rgba(12,6,20,.9);padding:7px 9px}
+.stats dt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stats dd{margin:0;font:500 var(--t-md) var(--f-mono);font-variant-numeric:tabular-nums}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(8,4,14,.8)}
+/* home: what the app is */
+.what{margin:0 0 16px}
+.what .in{display:grid;gap:14px}
+@media (min-width:900px){.what .in{grid-template-columns:1.2fr 1fr;align-items:start}}
+.what p{margin:0;color:var(--ink-2);max-width:62ch}
+.what ul{margin:0;padding-left:18px;font-size:var(--t-sm);color:var(--ink-2)}
+.what li{margin:0 0 4px}
+.what li b{color:var(--ink)}
+/* home: entry cards into the six other tabs */
+.doors{margin:0 0 16px}
+.doors>h2{font:400 var(--t-xl)/1.2 var(--f-head);margin:0 0 4px}
+.doors>p{margin:0 0 12px}
+.tcards{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:1fr;perspective:1200px}
+@media (min-width:640px){.tcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1000px){.tcards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tcards>li{display:flex}
+.tcard{position:relative;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;text-decoration:none;color:var(--ink);padding:14px 16px 16px;transition:border-color .2s,box-shadow .2s,transform .25s ease-out}
+.tcard:hover,.tcard:focus-visible{border-color:var(--glow);box-shadow:0 0 30px -10px var(--glow),0 20px 50px -20px rgba(0,0,0,.8)}
+.tcard:hover{transform:translateY(-3px)}
+.tcard .ix{position:relative;font:500 var(--t-xs) var(--f-mono);color:var(--glow);letter-spacing:.14em;text-transform:uppercase}
+.tcard .nm{position:relative;font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.tcard .bl{position:relative;font-size:var(--t-sm);color:var(--ink-2)}
+.tcard .go{position:relative;margin-top:auto;padding-top:6px;font:600 var(--t-xs) var(--f-body);color:var(--glow)}
+.tcard .go::after{content:" →"}
+/* home: import your character */
+.imp textarea{display:block;width:100%;min-height:76px;resize:vertical;font:400 var(--t-sm)/1.4 var(--f-mono);color:var(--ink);background:rgba(10,5,18,.9);border:1px solid var(--rim);border-radius:8px;padding:8px 10px;margin:8px 0}
+.imp textarea:focus-visible{border-color:var(--glow)}
+.imp code{font:500 var(--t-sm) var(--f-mono);color:var(--glow)}
+.imp .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.imp .btn[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.imp .note{font-size:var(--t-xs);color:var(--ink-3);margin:8px 0 0}
+.imp .msg{font-size:var(--t-sm);margin:8px 0 0;color:var(--ink-2)}
+.imp .imprune{display:inline-flex;color:var(--glow)}
+.imp .imprune:empty{display:none}
+.example{margin-top:14px;padding-top:12px;border-top:1px dashed var(--rim)}
+.example h3{margin:0 0 8px;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.badge-ex{font:700 10px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--warn);border:1px solid rgba(255,207,122,.35);border-radius:999px;padding:1px 7px;margin-left:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"><i class="fb-beam"></i><i class="fb-rocks"></i><div class="fb-gate"><i class="fb-stone"></i><i class="fb-portal"></i></div></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Step 2 · Home A · Through the Portal. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html" data-wipe="Home">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Tabs">
+      <a href="home.html" aria-current="page">Home</a>
+      <a href="planner.html" data-wipe="Character Planner">Character Planner</a>
+      <a href="simulation.html" data-wipe="Simulation">Simulation</a>
+      <a href="raid-composition.html" data-wipe="Raid Composition">Raid Composition</a>
+      <a href="tier-lists.html" data-wipe="Spec Tier Lists">Spec Tier Lists</a>
+      <a href="raids.html" data-wipe="Raids">Raids</a>
+      <a href="professions.html" data-wipe="Professions">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <label for="phs">Phase</label>
+    <select id="phs"><option value="2">Phase 2 · SSC, TK, T5</option><option value="1">Phase 1 · Kara, Gruul, Mag</option></select>
+    <span class="chip" id="phchip">TBC Classic · Phase 2</span>
+    <span class="prov" id="flavprov">Rankings: Wowhead · Phase 2 · updated 12 Sep</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main>
+<section id="v-home" aria-labelledby="h-home">
+  <div class="hero" id="hero">
+    <div class="hero-in">
+      <div class="eyebrow" id="hero-eyebrow">Phase 2 DPS gear planner · Serpentshrine Cavern · Tempest Keep</div>
+      <h1 id="h-home">Plan your DPS gear for <em>Serpentshrine Cavern</em> and <em>Tempest Keep</em>.</h1>
+      <div class="actions"><a class="btn big magnet" href="planner.html" data-wipe="Character Planner">Open the Character Planner</a> <a class="btn ghost big" href="#import">Import your character</a></div>
+    </div>
+    <div class="cue" aria-hidden="true">Scroll to step through</div>
+  </div>
+  <div class="wrap">
+  <div class="lede box">
+    <p>Project Defeat is a gear planner for DPS players in World of Warcraft: TBC Classic Anniversary, Phase 2. Fill every slot from real rankings, see where each piece drops, and check the numbers before raid night.</p>
+    <p class="capline prov">Rankings: Wowhead · Phase 2 · updated 12 Sep · every number on the site carries its source and date</p>
+  </div>
+  <div class="layer what" style="--z:4"><section class="box" aria-labelledby="h-what">
+    <h2 id="h-what">What this is <small>TBC Classic Anniversary · Phase 2</small></h2>
+    <div class="in">
+      <p>A planner for damage dealers. Pick a class and spec, gear all <span class="num">17</span> slots against Wowhead's Phase 2 rankings, apply raid buffs, and get an estimated DPS against a fixed raid boss. The other tabs answer the questions around that: who to bring, where specs stand, what drops where, and which profession pays off at <span class="num">70</span>.</p>
+      <ul>
+        <li><b>Real data only.</b> Items, rankings and drops come from the app's data files, each with its source.</li>
+        <li><b>Built for DPS.</b> Healer and tank rankings are shown for raid planning; gearing and simulation target DPS specs.</li>
+        <li><b>Nothing uploaded.</b> A character import stays in your browser.</li>
+      </ul>
+    </div>
+  </section></div>
+  <section class="story" id="story" aria-labelledby="h-glance">
+    <div class="layer" style="--z:5"><div class="box glancebox">
+      <div class="story-in">
+        <div>
+          <h2 id="h-glance">Phase 2 at a glance</h2>
+          <p class="prov">Wowhead · Phase 2 · updated 12 Sep</p>
+          <div class="counter num" aria-hidden="true"><span id="fcount">04</span><small> / 04 essentials</small></div>
+          <div class="pbar" aria-hidden="true"><i id="fbar"></i></div>
+        </div>
+        <ol class="facts" id="facts">
+          <li class="fact" data-k="new"><span class="rail" aria-hidden="true"></span><b class="ix">01</b><h3>New raids</h3><p>Serpentshrine Cavern · Tempest Keep (The Eye)</p></li>
+          <li class="fact" data-k="open"><span class="rail" aria-hidden="true"></span><b class="ix">02</b><h3>Still open</h3><p>Karazhan · Gruul's Lair · Magtheridon's Lair</p></li>
+          <li class="fact" data-k="t5"><span class="rail" aria-hidden="true"></span><b class="ix">03</b><h3>Tier 5 · Warrior</h3><p><span class="q-epic">Destroyer Battlegear</span>: tokens from Leotheras the Blind, Fathom-Lord Karathress, Lady Vashj, Void Reaver and Kael'thas Sunstrider</p></li>
+          <li class="fact" data-k="badge"><span class="rail" aria-hidden="true"></span><b class="ix">04</b><h3>Badge of Justice</h3><p><span class="q-epic">Necklace of Eternal Hope</span> · <span class="num tick" data-to="25">25</span>× Badge of Justice</p></li>
+        </ol>
+      </div>
+    </div></div>
+  </section>
+  <section class="doors" aria-labelledby="h-doors">
+    <h2 id="h-doors">Where to go</h2>
+    <p class="prov">Six tabs, one job each. Every tab shows its source and date beside its numbers.</p>
+    <ul class="tcards" id="tcards">
+      <li class="layer" style="--z:6" data-k="planner"><a class="tcard box" href="planner.html" data-wipe="Character Planner"><span class="ix">Gear, gems and talents</span><span class="nm">Character Planner</span><span class="bl">Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to. Gear, Compare, Talents, Buffs, Ranked Gear and Build.</span><span class="go">Open the planner</span></a></li>
+      <li class="layer" style="--z:5" data-k="sim"><a class="tcard box" href="simulation.html" data-wipe="Simulation"><span class="ix">Estimated DPS</span><span class="nm">Simulation</span><span class="bl">Estimated DPS for your set against one fixed boss (level <span class="num">73</span>, <span class="num">7,700</span> armor), with stat weights, an upgrade finder and a plain list of what is and isn't modelled.</span><span class="go">Run the estimate</span></a></li>
+      <li class="layer" style="--z:4" data-k="comp"><a class="tcard box" href="raid-composition.html" data-wipe="Raid Composition"><span class="ix">Buff coverage</span><span class="nm">Raid Composition</span><span class="bl">Seat a <span class="num">10</span> or <span class="num">25</span>-player raid in groups of five, see which buffs and debuffs each group gets, and what one more seat would add.</span><span class="go">Seat a raid</span></a></li>
+      <li class="layer" style="--z:6" data-k="tiers"><a class="tcard box" href="tier-lists.html" data-wipe="Spec Tier Lists"><span class="ix">Where specs stand</span><span class="nm">Spec Tier Lists</span><span class="bl">Wowhead's Phase 2 rankings for damage, healing and tanking: <span class="num">3</span> lists, <span class="num">27</span> specs, all on one page with your spec marked.</span><span class="go">See the rankings</span></a></li>
+      <li class="layer" style="--z:5" data-k="raids"><a class="tcard box" href="raids.html" data-wipe="Raids"><span class="ix">Loot tables</span><span class="nm">Raids</span><span class="bl">What drops where across Serpentshrine Cavern, Tempest Keep and the Phase 1 raids still worth running: a card per boss, loot by quality, attunement steps.</span><span class="go">Browse the raids</span></a></li>
+      <li class="layer" style="--z:4" data-k="profs"><a class="tcard box" href="professions.html" data-wipe="Professions"><span class="ix">Levelling and payoffs</span><span class="nm">Professions</span><span class="bl">Take any of <span class="num">13</span> professions from <span class="num">1</span> to <span class="num">375</span> without wasting materials: trainer stops, crafting shopping lists, and farming routes for Mining and Herbalism.</span><span class="go">Pick a profession</span></a></li>
+    </ul>
+  </section>
+  <div class="grid">
+    <div class="col" id="colL">
+      <div class="layer" id="b-feed" style="--z:3"><section class="box" aria-labelledby="h-feed">
+        <h2 id="h-feed">What changed in the data <small>project log · updated 30 Sep</small></h2>
+        <div class="feed">
+          <svg class="line" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 4 100"><line x1="2" y1="0" x2="2" y2="100" vector-effect="non-scaling-stroke"/><line class="draw" id="feedline" x1="2" y1="0" x2="2" y2="100" vector-effect="non-scaling-stroke"/></svg>
+          <ul class="plain" id="feedlist">
+            <li><time datetime="2026-09-30">30 Sep 2026</time><span class="tag">Gear data</span><b>Weapon and ranged enchants filled in from the guides</b><p>Arms and Fury Warriors gain weapon enchants, Rogue off hands are no longer bare, and the recommended scopes are in: Khorium for Warriors, Stabilized Eternium for Rogues and Hunters. <span class="num">20</span> entries changed; no gem moved.</p></li>
+            <li><time datetime="2026-09-28">28 Sep 2026</time><span class="tag">Import</span><b>Your in-game character imports as itself</b><p>The exporter addon was run in game. Gear from later phases is now worn rather than swapped out; only the recommendations stop at Phase 2.</p></li>
+            <li><time datetime="2026-09-23">23 Sep 2026</time><span class="tag">Simulation</span><b>No score without a weapon</b><p>A missing weapon is named above the estimate instead of a confident number with nothing behind it.</p></li>
+            <li><time datetime="2026-09-20">20 Sep 2026</time><span class="tag">Builds</span><b>Share a build as a link; empty slots survive save and load</b><p>The whole build travels in the link and is never uploaded. Empty slots no longer come back wearing default items.</p></li>
+          </ul>
+        </div>
+      </section></div>
+    </div>
+    <div class="col" id="colR">
+      <div class="layer" id="b-imp" style="--z:8"><section class="box imp" id="import" aria-labelledby="h-imp" tabindex="-1">
+        <h2 id="h-imp">Import your character <small>in-game addon</small></h2>
+        <div class="in">
+          <p style="margin:0;font-size:var(--t-sm)">Already playing? In game, run <code>/pdexport</code>, press Ctrl+C, and paste it here. Nothing is uploaded: the string never leaves your browser, and it carries no character name or realm.</p>
+          <label class="sr" for="imptext">Paste your character export</label>
+          <textarea id="imptext" rows="3" placeholder='{"format":"project-defeat-character" …'></textarea>
+          <div class="row"><button class="btn magnet" type="button" id="impgo" disabled>Load my character</button><span class="imprune" id="imprune" aria-hidden="true"></span><a class="btn ghost" href="planner.html" data-wipe="Character Planner">Start from scratch</a></div>
+          <p class="msg" id="impmsg" role="status"></p>
+          <div class="example">
+            <h3>What an import gives you <span class="badge-ex">example</span></h3>
+            <div class="char"><span class="glyph" aria-hidden="true">FW</span><div><b>Human Fury Warrior</b><div class="prov">Alliance · Destroyer Battlegear (4/5) · example import</div></div></div>
+            <dl class="stats">
+              <div><dt>Attack Power</dt><dd class="tick" data-to="1788">1,788</dd></div><div><dt>Hit Rating</dt><dd class="tick" data-to="140">140</dd></div><div><dt>Crit Rating</dt><dd class="tick" data-to="536">536</dd></div>
+            </dl>
+            <div class="gauge" aria-hidden="true"><i></i></div>
+            <p class="warnline" style="margin:0">Hit 140 / 142 rating cap (9%): 2 rating under. Example values.</p>
+          </div>
+        </div>
+      </section></div>
+    </div>
+  </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span>Character Planner</span></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Home A · "Through the Portal" (WebGL, Three.js r128). Everything here is our own procedural work:
+   a simplified low-poly stone gate (no statues, not a copy of any game model), a fel-green portal
+   shader, a nether-sky shader, red-brown rocks. No textures, no Blizzard assets, no sound.
+   The page's motion layer drives it through window.SCENE: camera values (cam: push, intro, dive…),
+   palette mix (mix.warm), the portal's opening state (portal: open, mix, flare) and setMotion(on).
+   Any failure leaves the CSS fallback (static sky + gate + portal) in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+const CAM={push:0,depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0};
+/* portal state at rest = open and fel green; the page's opening sequence tweens these from 0 */
+const PORTAL={open:1,mix:1,flare:0};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,portal:PORTAL,speed:1,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+/* everything from here to the first still frame is guarded: any build or render failure drops back
+   to the CSS fallback instead of leaving a blank canvas over the page */
+let raf=0;
+try{
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,140);
+const C=h=>new THREE.Color(h);
+const SMALL=innerWidth<700;
+/* palette slots: light = warm key from the horizon, fog = horizon/ground haze, acc = the portal's fel.
+   The kit's Hellfire theme lerps these further through onTint; Phase 1 warms the sky through uWarm. */
+const PAL={p2:{light:C("#ff9a4a"),deep:C("#1c0a16"),fog:C("#1c0a12"),acc:C("#7dff4a")},
+           p1:{light:C("#ffb060"),deep:C("#1e0c08"),fog:C("#1e0c08"),acc:C("#9dff5a")}};
+const cur={light:PAL.p2.light.clone(),deep:PAL.p2.deep.clone(),fog:PAL.p2.fog.clone(),acc:PAL.p2.acc.clone()};
+const BLUE=C("#3a8cff"),FEL=C("#62ff3c"),hot=new THREE.Color();
+/* gate dimensions (world units): the opening is HW×HH half-size, centred at y=OY; the portal skin sits at z=ZP */
+const HW=2.5,HH=3.2,OY=3.7,ZP=.84;
+const U={uTime:{value:0},uDpr:{value:R.getPixelRatio()},uAsp:{value:1},uWarm:{value:0},uPar:{value:new THREE.Vector2()},
+  uHz:{value:cur.fog},uFel:{value:FEL.clone()},uBlue:{value:BLUE},uOpen:{value:1},uMix:{value:1},uFlare:{value:0},
+  uSwell:{value:0},uFly:{value:0},uHalf:{value:new THREE.Vector2(HW,HH)},uQuad:{value:new THREE.Vector2(HW+1.4,HH+1.4)},uSky:{value:null}};
+/* shared GLSL: value noise, fBm (octaves via OCT) and one domain warp, same family as the kit's */
+const NOISE=`
+#ifndef OCT
+#define OCT 4
+#endif
+float h21(vec2 p){return fract(sin(dot(p,vec2(41.3,289.1)))*43758.5453);}
+float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<OCT;i++){s+=a*vnoise(p);p=p*2.03+7.1;a*=.5;}return s;}
+float warped(vec2 p,float t){vec2 q=vec2(fbm(p+vec2(0.,t*.05)),fbm(p+vec2(5.2,1.3)));return fbm(p+3.*q);}
+`;
+const CLIP=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
+/* 1. NETHER SKY, drawn at reduced size into a render target (every 2nd frame while moving):
+   violet → magenta domain-warped nebula drifting high, warm orange-brown dust low on the horizon,
+   and one slanted fel beam from the top right. Stars are added later at full resolution. */
+const skyRT=new THREE.WebGLRenderTarget(4,4,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,depthBuffer:false});
+U.uSky.value=skyRT.texture;
+const skyMat=new THREE.ShaderMaterial({defines:{OCT:SMALL?3:4},uniforms:U,depthTest:false,depthWrite:false,vertexShader:CLIP,
+  fragmentShader:NOISE+`uniform float uTime,uAsp,uWarm;uniform vec2 uPar;uniform vec3 uHz,uFel;varying vec2 vUv;
+  void main(){vec2 p=vec2((vUv.x-.5)*uAsp,vUv.y)+uPar;float y=vUv.y,t=uTime;
+    vec3 top=vec3(.035,.012,.075),mid=vec3(.15,.04,.17),low=mix(vec3(.26,.08,.12),vec3(.34,.13,.06),uWarm);
+    vec3 col=mix(low,mid,smoothstep(.3,.6,y));col=mix(col,top,smoothstep(.55,1.,y));
+    col=mix(uHz*1.6,col,smoothstep(.22,.42,y));
+    /* nebula: two warped fBm fields, violet into magenta, drifting slowly sideways */
+    float n1=warped(p*1.5+vec2(t*.012,t*.004),t*.35);
+    float n2=fbm(p*3.4-vec2(t*.02,t*.006));
+    vec3 neb=mix(vec3(.30,.08,.50),vec3(.70,.14,.46),n2);neb=mix(neb,vec3(.7,.3,.2),uWarm*.4);
+    col+=neb*smoothstep(.38,.85,n1)*.6*smoothstep(.25,.7,y);
+    col+=vec3(.2,.05,.25)*smoothstep(.5,.9,n2)*.25*smoothstep(.4,.9,y);
+    /* dust clouds: banded warm fBm low on the horizon */
+    float d=warped(vec2(p.x*1.1+t*.01,p.y*3.4)+5.,t*.25);
+    float band=smoothstep(.22,.36,y)*smoothstep(.66,.38,y);
+    col=mix(col,mix(vec3(.30,.13,.06),vec3(.62,.30,.11),d)*(.55+.6*d),smoothstep(.42,.72,d)*band*.85);
+    /* the fel beam: a soft slanted shaft from the top right, its grain drifting down the beam */
+    vec2 o=vec2(.5*uAsp-.08,1.08),dir=normalize(vec2(-.5,-1.));vec2 r=p-uPar-o;
+    float along=dot(r,dir),perp=dot(r,vec2(-dir.y,dir.x));float w=.025+along*.09;
+    float beam=exp(-perp*perp/(w*w))*smoothstep(0.,.08,along)*smoothstep(.95,.1,along);
+    beam*=.55+.45*fbm(vec2(along*4.-t*.12,perp*14.));
+    col+=uFel*beam*.38+vec3(.8,1.,.7)*beam*beam*.08;
+    gl_FragColor=vec4(col,1.);}`});
+const skyScene=new THREE.Scene(),skyCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const skyQuad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),skyMat);skyQuad.frustumCulled=false;skyScene.add(skyQuad);
+/* 2. BACKDROP: the sky texture composited at full resolution with two twinkling star layers
+   (pixel-sized, with a little camera parallax), dimmed behind bright cloud, plus a soft vignette */
+const bg=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,depthTest:false,depthWrite:false,vertexShader:CLIP,
+  fragmentShader:`uniform sampler2D uSky;uniform float uTime,uDpr;uniform vec2 uPar;varying vec2 vUv;
+  float h21(vec2 p){return fract(sin(dot(p,vec2(41.3,289.1)))*43758.5453);}
+  float starL(vec2 p,float dens,float sz,float rate){vec2 i=floor(p),f=fract(p);float h=h21(i);if(h>dens)return 0.;
+    vec2 c=vec2(h21(i+1.7),h21(i+9.2))*.7+.15;float d=length(f-c);
+    float tw=.62+.38*sin(uTime*(rate+h21(i+4.1)*rate)+h*60.); /* slow twinkle, well under 1 Hz */
+    return smoothstep(sz,0.,d)*tw*(.35+.65*h21(i+2.3));}
+  void main(){vec3 col=texture2D(uSky,vUv).rgb;
+    vec2 px=gl_FragCoord.xy/uDpr;
+    float s=starL((px+uPar*900.)/11.,.10,.14,.5)+starL((px+uPar*1800.)/27.+5.,.07,.085,.35)*1.4;
+    float lum=dot(col,vec3(.3,.5,.2));
+    col+=vec3(1.,.93,1.)*s*smoothstep(.3,.6,vUv.y)*(1.-smoothstep(.12,.32,lum));
+    vec2 v=vUv-.5;col*=1.-.4*dot(v,v)*1.6;
+    gl_FragColor=vec4(col,1.);}`}));
+bg.frustumCulled=false;bg.renderOrder=-100;scene.add(bg);
+/* 3. THE PORTAL SKIN: one quad a little larger than the opening.
+   Inside a rounded rectangle (signed distance sd < 0) it is a dark void seen in true perspective:
+   each pixel casts a ray from the camera into three star planes and one nebula plane behind the
+   surface, so the starfield parallaxes as the camera moves and as the scroll push flies through.
+   Around the edge, churning fel energy: fBm sampled on twisted polar coordinates (continuous,
+   no seam) with a domain warp, its tongues licking inward by a noise-driven reach and spilling
+   a soft additive glow outward over the stone. Premultiplied blend: opaque void + additive light. */
+const portalMat=new THREE.ShaderMaterial({defines:{OCT:SMALL?3:4},uniforms:U,transparent:true,depthWrite:false,
+  blending:THREE.CustomBlending,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,
+  vertexShader:`varying vec2 vUv;varying vec3 vW;void main(){vUv=uv;vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+  fragmentShader:NOISE+`uniform float uTime,uOpen,uMix,uFlare,uSwell,uFly;uniform vec2 uHalf,uQuad;uniform vec3 uFel,uBlue;
+  varying vec2 vUv;varying vec3 vW;
+  float sdBox(vec2 p,vec2 b){vec2 d=abs(p)-b;return length(max(d,0.))+min(max(d.x,d.y),0.);}
+  float star(vec2 p,float dens,float sz){vec2 i=floor(p),f=fract(p);float h=h21(i);if(h>dens)return 0.;
+    vec2 c=vec2(h21(i+1.7),h21(i+9.2))*.6+.2;return smoothstep(sz,0.,length(f-c))*(.45+.55*h21(i+3.3));}
+  void main(){
+    vec2 p=(vUv-.5)*uQuad*2.;float op=max(uOpen,.001);
+    float sd=sdBox(p,uHalf*op-.25*op)-.25*op;
+    float inside=smoothstep(.03,-.03,sd);
+    /* the void */
+    vec3 ro=cameraPosition,rd=normalize(vW-ro);
+    float a=uTime*.012;mat2 Rm=mat2(cos(a),-sin(a),sin(a),cos(a));
+    vec3 vc=vec3(.012,.006,.026);
+    for(int k=0;k<3;k++){float fk=float(k);
+      float L=(3.5+fk*8.)/(1.+uFly*1.4);float zp=vW.z-L;float tt=(zp-ro.z)/rd.z;
+      vec2 h=Rm*(ro.xy+rd.xy*tt)+vec2(uTime*.05,uTime*.018)*(1.-fk*.3);
+      float sz=.13*clamp((ro.z-zp)/(L+8.6),.25,1.);
+      vc+=vec3(.86,.9,1.)*star(h*(2.4-fk*.55)+fk*17.,.1,sz)*(1.-fk*.22);}
+    float Ln=9./(1.+uFly*1.4);vec2 hn=Rm*(ro.xy+rd.xy*((vW.z-Ln-ro.z)/rd.z))+vec2(uTime*.03,0.);
+    float nb=fbm(hn*.32),fl=fbm(hn*1.3+7.);
+    vc+=mix(vec3(.28,.11,.04),vec3(.78,.40,.13),fl)*smoothstep(.5,.78,nb)*smoothstep(.42,.74,fl)*.75;
+    vc+=vec3(.07,.03,.09)*nb;
+    /* the fel edge */
+    vec3 hc=mix(uBlue,uFel,uMix);
+    float ang=atan(p.y,p.x),tw=ang+.9*sd-uTime*.12;
+    vec2 q=vec2(cos(tw),sin(tw))*(2.2+sd*1.3)+vec2(0.,uTime*.05);
+    float n=warped(q*1.15,uTime),n2=fbm(q*3.1-vec2(uTime*.35,0.));
+    float reach=(.3+1.3*n*n)*op;
+    float inE=sd<0.?smoothstep(reach,0.,-sd):0.;
+    float outE=sd>=0.?exp(-sd*5.)*.5:0.;
+    float rim=exp(-abs(sd)*16.);
+    float gain=.85+.6*uSwell+1.1*uFlare;
+    float e=(inE*(.5+.65*n2)+outE*(.4+.6*n))*gain;
+    vec3 ec=mix(hc*.3,hc,clamp(n*1.35,0.,1.))*e+mix(hc,vec3(1.),.5)*rim*.55*(.6+.4*n2)*gain;
+    ec*=smoothstep(0.,.6,min(uQuad.x-abs(p.x),uQuad.y-abs(p.y)))*smoothstep(0.,.08,uOpen);
+    gl_FragColor=vec4(vc*inside*(1.-inE*.55)+ec,inside);}`});
+const portal=new THREE.Mesh(new THREE.PlaneGeometry((HW+1.4)*2,(HH+1.4)*2),portalMat);
+portal.position.set(0,OY,ZP);portal.renderOrder=2;scene.add(portal);
+/* 4. THE GATE: our own simplified, stylized silhouette built from a handful of low-poly blocks:
+   two square pillars with sloped buttresses, two steps, a lintel, a stepped crown and four
+   outward-leaning spikes. A fel keystone sits in the crown (the kit's K3 swell lights it). */
+const stone=new THREE.MeshStandardMaterial({color:0x3e241e,roughness:.95,metalness:0,flatShading:true});
+const gate=new THREE.Group();scene.add(gate);
+const blk=(w,h,d,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),stone);m.position.set(x,y,z);gate.add(m);return m;};
+const prism=(r0,r1,h,x,y,z,rz)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r0,r1,h,4),stone);m.position.set(x,y,z);m.rotation.order="ZYX";m.rotation.set(0,Math.PI/4,rz||0);gate.add(m);return m;};
+blk(10.6,.3,4.4,0,.15,.4);blk(8.6,.3,3.2,0,.45,.2);              /* steps */
+[-1,1].forEach(s=>{
+  blk(1.5,7.2,1.6,s*(HW+.75),4.1,0);                             /* pillar (front face z=.8, just behind the skin) */
+  prism(.45,1.15,4.6,s*(HW+1.95),2.6,0);                         /* buttress */
+  prism(0,.55,3.6,s*4.55,9.1,0,-s*.55);                          /* outer spike, leaning out */
+  prism(0,.36,2.3,s*2.35,9.5,0,-s*.22);                          /* inner spike */
+});
+blk(9.6,1.2,1.9,0,OY+HH+.6,0);                                   /* lintel */
+blk(6.2,.7,1.5,0,OY+HH+1.55,0);blk(3.2,.6,1.3,0,OY+HH+2.2,0);   /* stepped crown */
+/* faint fel rune slots on the pillar faces (unlit, so they read in the dark) */
+const slotMat=new THREE.MeshBasicMaterial({color:FEL.clone().multiplyScalar(.45)});
+[-1,1].forEach(s=>[1.9,3.6,5.3].forEach(y=>{const m=new THREE.Mesh(new THREE.BoxGeometry(.5,.08,.04),slotMat);m.position.set(s*(HW+.75),y,.82);gate.add(m);}));
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x10200c,emissive:cur.acc.clone(),emissiveIntensity:.6,metalness:.3,roughness:.25,flatShading:true}));
+crystal.scale.set(.36,.56,.28);crystal.position.set(0,OY+HH+1.55,.8);scene.add(crystal);
+const KEY_E=.6;
+/* 5. HELLFIRE GROUND + red-brown rock silhouettes on the left (jittered low-poly lumps) */
+function lump(seed){
+  const g=new THREE.IcosahedronGeometry(1,1),p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);
+    const j=1+.2*Math.sin(x*11.3+y*7.9+z*5.1+seed*3.7);p.setXYZ(i,x*j,y*j*(y<0?.6:1),z*j);}
+  g.computeVertexNormals();return g;
+}
+const rockMat=new THREE.MeshStandardMaterial({color:0x4e2416,roughness:1,metalness:0,flatShading:true});
+[[-5.4,.5,4.6,1.5,2.1,1.4,.3],[-6.9,1.6,2.4,1.9,3.4,1.7,1.2],[-4.4,.1,6,.9,.8,.8,2],[-9.8,2.4,-2.6,3.2,5.2,2.6,.7],
+ [-13.5,3.4,-8,4.2,7.4,3.2,2.4],[-8.2,.4,5.2,1.6,1.2,1.4,.9],[7.4,.2,1.4,1.3,.8,1.1,1.7],[10.5,.8,-4,2.4,1.8,2,.4]].forEach((r,i)=>{
+  const m=new THREE.Mesh(lump(i+1),rockMat);m.position.set(r[0],r[1],r[2]);m.scale.set(r[3],r[4],r[5]);m.rotation.y=r[6];scene.add(m);});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(220,220),new THREE.MeshStandardMaterial({color:0x2a130d,roughness:1,metalness:0}));
+ground.rotation.x=-Math.PI/2;scene.add(ground);
+/* lights: nether-violet sky fill, a warm key from the horizon (right), a violet backlight, and the portal's own fel lamp */
+scene.add(new THREE.HemisphereLight(0x4a2a7a,0x2a1008,.75));
+const key=new THREE.DirectionalLight(cur.light.clone(),.85);key.position.set(9,4,6);scene.add(key);
+const back=new THREE.DirectionalLight(0x8a5cff,.4);back.position.set(-6,6,-9);scene.add(back);
+const lamp=new THREE.PointLight(cur.acc.clone(),2.4,16);lamp.position.set(0,OY,2.6);scene.add(lamp);
+scene.fog=new THREE.Fog(cur.fog.clone(),16,70);
+R.setClearColor(cur.fog);
+/* camera: a slow sway + pointer, plus the values GSAP drives. push (scroll) and dive (leaving)
+   carry it from the hero framing straight through the portal skin, where only the void remains;
+   depth / dip / rise then fly it deeper through the void's star planes (uFly). */
+const ptr={x:0,y:0,sx:0,sy:0};
+let t=20,moving=false,enabled=true,lost=false,last=0,fc=0,skyDirty=true;
+function place(){
+  const c=CAM,a=cam.aspect,tf=Math.tan(cam.fov*Math.PI/360);
+  const base=Math.max(9.4,(7.2/a)/(2*tf)); /* narrow screens step back so the opening and pillars fit */
+  const pu=Math.min(1,Math.max(c.push,c.dive*.85)),e=pu*pu*(3-2*pu),sw=1-e;
+  const z0=base+c.intro*3.5,z1=ZP+.3;
+  cam.position.set((Math.sin(t*.05)*.35+ptr.sx*.7)*sw,(3.9+c.intro*1.4-ptr.sy*.35)*sw+OY*e,z0+(z1-z0)*e);
+  cam.lookAt(ptr.sx*.25*sw,(4.4+c.intro*.3)*sw+OY*e,0);
+  U.uPar.value.set(cam.position.x*.012,(cam.position.y-3.9)*.012);
+  U.uFly.value=c.depth*.7+c.dip*(1-c.rise)*.35+c.dive*.5;
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.p2[n]).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
+  const P=PORTAL;
+  U.uFel.value.copy(FEL).lerp(cur.acc,.35);
+  hot.copy(BLUE).lerp(U.uFel.value,P.mix);
+  lamp.color.copy(hot).multiplyScalar(Math.min(1,P.open*1.25)*(1+P.flare*.6));
+  crystal.material.emissive.copy(hot);  /* colour only: the kit owns emissiveIntensity */
+  slotMat.color.copy(hot).multiplyScalar(.2+.3*P.open);
+  key.color.copy(cur.light);scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+  U.uOpen.value=P.open;U.uMix.value=P.mix;U.uFlare.value=P.flare;U.uWarm.value=MIX.warm;
+  /* read (never write) the kit's K3 swell off the keystone and let it brighten the portal edge too */
+  U.uSwell.value=Math.max(0,(crystal.material.emissiveIntensity-KEY_E)/.7);
+}
+function drawSky(force){
+  if(!(force||skyDirty||fc%2===0))return;
+  skyDirty=false;const prev=R.getRenderTarget();R.setRenderTarget(skyRT);R.render(skyScene,skyCam);R.setRenderTarget(prev);
+}
+function size(){
+  const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();
+  U.uAsp.value=w/h;const pr=R.getPixelRatio(),k=Math.min(.5,900/(w*pr));
+  skyRT.setSize(Math.max(2,Math.round(w*pr*k)),Math.max(2,Math.round(h*pr*k)));skyDirty=true;
+}
+function frame(dt){
+  dt*=S.speed;t+=dt;fc++;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*.3;
+  each(HK.frame,[dt,t]);tint();place();drawSky(false);R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, 3D re-enabled, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;U.uTime.value=t;each(HK.frame,[0,t]);tint();place();drawSky(true);R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{if(!S.ok)return;size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+/* no halo and no water: the kit switches those effects off. crystal = the keystone, lamp = the portal's light. */
+size();still();
+/* only now is the scene known to work: show the canvas and hand the kit its handles */
+root.classList.add("gl");S.ok=true;
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,lamp};
+}catch(err){
+  if(raf){cancelAnimationFrame(raf);raf=0;}
+  /* back to inert hooks so nothing tries to draw again */
+  Object.assign(S,{three:null,setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},isEnabled:()=>false});
+  off("3D scene: unavailable");
+  if(window.console)console.warn("Home A: 3D scene unavailable, showing the static portal",err);
+}
+})();
+</script>
+<script src="tbc-kit.js"></script>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const root=document.documentElement, live=$("#live");
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
+const G=typeof gsap!=="undefined";
+/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off */
+const KIT=window.TBCKit||null;
+/* Hellfire theme: K2's sky fragments turn to warm floating Hellfire rock, hellfire embers rise behind the gate */
+if(KIT)KIT.theme("hellfire",{instant:true});
+/* M is the motion layer; every hook is optional so the page works without GSAP */
+const M={on:false};
+const moving=()=>!RMQ.matches&&(G?M.on:true);
+
+/* ---------- tab links: plain links; with motion on, the amber curtain covers the page before it leaves ---------- */
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a[data-wipe]");
+  if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+  let url;try{url=new URL(a.href,location.href);}catch(err){return;}
+  if(url.pathname===location.pathname)return;
+  if(M.on&&M.leave){e.preventDefault();M.leave(url.href,a.dataset.wipe);}
+});
+/* coming back through the browser's back button: never show a stale curtain */
+addEventListener("pageshow",()=>{const w=$("#wipe");if(w){w.style.display="none";w.style.clipPath="";}SC.cam.dive=0;SC.render();});
+const say=t=>{if(live)live.textContent=t;};
+
+/* ---------- import your character (prototype: validates the shape, stays in the browser) ---------- */
+const impT=$("#imptext"),impB=$("#impgo"),impM=$("#impmsg");
+if(impT&&impB&&impM){
+  const syncImp=()=>{impB.disabled=impT.value.trim().length===0;};
+  impT.addEventListener("input",()=>{syncImp();impM.textContent="";});syncImp();
+  impB.addEventListener("click",()=>{
+    let ok=false;try{const o=JSON.parse(impT.value);ok=!!o&&o.format==="project-defeat-character";}catch(err){ok=false;}
+    const done=()=>{
+      impM.textContent=ok?"Recognized a Project Defeat export. In the app this loads your character and opens the Character Planner; this prototype stops here."
+        :"That doesn't look like a /pdexport string. Copy it again in game with Ctrl+C and paste the whole thing.";
+      impM.style.color=ok?"var(--glow)":"var(--warn)";
+      if(ok&&KIT)KIT.swell(); /* K3: a soft naaru swell when a character loads */
+    };
+    /* K7: with motion on, a rune ring draws while the export is read (in the app this is the real parse) */
+    const slot=$("#imprune");
+    if(KIT&&slot&&moving()&&M.on){
+      impB.disabled=true;impM.style.color="";impM.textContent="Reading the export…";
+      const ring=KIT.runeRing(slot,{size:24,glyphs:8,spinDur:6});
+      setTimeout(()=>{ring.remove();syncImp();done();},700);
+    }else done();
+  });
+}
+$$('a[href="#import"]').forEach(a=>a.addEventListener("click",e=>{const b=$("#import");if(!b)return;e.preventDefault();
+  b.scrollIntoView({behavior:moving()?"smooth":"auto",block:"start"});b.focus({preventScroll:true});}));
+
+/* ---------- scene palette: GSAP-animated when motion is on, one re-lit frame when off ---------- */
+function relight(key,val){
+  if(M.on&&G){const o={};o[key]=val;safe(gsap.to(SC.mix,Object.assign(o,{duration:1.2,ease:"power2.inOut",overwrite:"auto",onUpdate:SC.render})));}
+  else{if(G)gsap.killTweensOf(SC.mix,key);SC.mix[key]=val;SC.render();}
+}
+
+/* ---------- phase filter: Flip re-layout of the facts and tab cards + scene re-light ---------- */
+const PH={
+ "2":{chip:"TBC Classic · Phase 2",eyebrow:"Phase 2 DPS gear planner · Serpentshrine Cavern · Tempest Keep",title:"Phase 2 at a glance",prov:"Rankings: Wowhead · Phase 2 · updated 12 Sep",
+   new:["New raids","Serpentshrine Cavern · Tempest Keep (The Eye)"],open:["Still open","Karazhan · Gruul's Lair · Magtheridon's Lair"]},
+ "1":{chip:"TBC Classic · Phase 1",eyebrow:"Phase 1 view · Karazhan · Gruul's Lair · Magtheridon's Lair",title:"Phase 1 at a glance",prov:"Raids: Phase 1 · Karazhan, Gruul's Lair, Magtheridon's Lair",
+   new:["Raids","Karazhan · Gruul's Lair · Magtheridon's Lair"],open:["Coming in Phase 2","Serpentshrine Cavern · Tempest Keep (The Eye)"]}};
+const setText=(s,t)=>{const el=$(s);if(el)el.textContent=t;};
+function applyPhase(p){
+  const d=PH[p];if(!d)return;root.dataset.phase=p;
+  setText("#phchip",d.chip);setText("#hero-eyebrow",d.eyebrow);setText("#h-glance",d.title);setText("#flavprov",d.prov);
+  ["new","open"].forEach(k=>{const f=$(`.fact[data-k=${k}]`);if(!f)return;const h=$("h3",f),q=$("p",f);if(h)h.textContent=d[k][0];if(q)q.textContent=d[k][1];});
+  const facts=$("#facts"),tc=$("#tcards"),t5=$(".fact[data-k=t5]"),badge=$(".fact[data-k=badge]");
+  const planner=$('#tcards [data-k=planner]'),raids=$('#tcards [data-k=raids]'),profs=$('#tcards [data-k=profs]');
+  if(p==="1"){ /* Phase 1: the T5 fact drops to the end, Raids moves up beside the planner */
+    if(facts&&t5)facts.appendChild(t5);
+    if(tc&&raids&&planner)tc.insertBefore(raids,planner.nextElementSibling);
+  }else{
+    if(facts&&t5)facts.insertBefore(t5,badge);
+    if(tc&&raids)tc.insertBefore(raids,profs);
+  }
+  $$(".fact .ix").forEach((b,i)=>b.textContent="0"+(i+1));
+  say("Showing "+d.chip);
+}
+const phs=$("#phs");
+if(phs)phs.addEventListener("change",e=>{
+  const p=e.target.value;
+  if(M.on&&M.flipHome)M.flipHome(()=>applyPhase(p));else applyPhase(p);
+  relight("warm",p==="1"?1:0);
+});
+
+/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
+const rs=root.style;
+function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
+if(matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    SC.pointer(nx,ny);
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx).toFixed(3));rs.setProperty("--py",(-ny).toFixed(3));});},{passive:true});
+}
+/* ================= MOTION LAYER (from round4/motion-3d-portal) ================= */
+const tog=$("#mtoggle"), mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined", FL=G&&typeof Flip!=="undefined", TX=G&&typeof TextPlugin!=="undefined";
+const DS=G&&typeof DrawSVGPlugin!=="undefined", SPL=G&&typeof SplitText!=="undefined";
+if(!tog){SC.setMotion(!RMQ.matches);return;} /* no toggle in the page: leave it static, scene drifts unless reduced motion */
+tog.hidden=false;
+function label(on,why){tog.setAttribute("aria-pressed",on);if(mstate)mstate.textContent=why||(on?"on":"off");}
+/* Safety: any one-shot animation not finished ~1.5s past its planned end is forced to its end state */
+function safe(a){
+  if(!a)return a;
+  const ms=Math.max(1500,a.totalDuration()*1000+400);
+  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
+  return a;
+}
+if(!G){ /* no GSAP: static page, scene drifts on its own unless reduced motion */
+  tog.disabled=true;label(false,"unavailable");
+  const sync=()=>{SC.setMotion(moving());if(!moving())resetParallax();};
+  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
+  sync();return;
+}
+gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,TX&&TextPlugin,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));
+let ctx=null, mm=null;
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const A=fn=>ctx?ctx.add(fn):fn();
+function tick(el,dur){
+  const to=+el.dataset.to,o={v:0};
+  return safe(gsap.to(o,{v:to,duration:dur||1.1,ease:"power2.out",onUpdate:()=>{el.textContent=fmt(o.v);},onComplete:()=>{el.textContent=fmt(to);}}));
+}
+function finishAll(){
+  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
+    if(t.scrollTrigger)return;
+    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
+  });
+}
+function restoreStatic(){
+  $$(".tick").forEach(el=>el.textContent=fmt(+el.dataset.to));
+  const w=$("#wipe");if(w)w.style.display="none";
+  $$(".fact").forEach(f=>f.classList.remove("on"));
+  setText("#fcount","0"+$$(".fact").length);
+  Object.assign(SC.cam,{push:0,depth:0,dip:0,rise:0,dive:0,intro:0});
+  if(SC.portal)Object.assign(SC.portal,{open:1,mix:1,flare:0}); /* the portal at rest: open, fel green */
+  SC.render();
+}
+function enable(first){
+  if(M.on)return;
+  M.on=true;root.classList.add("motion");
+  SC.setMotion(true); /* before the intro, so the kit's K8 rings and K1 ignition see motion as on */
+  if(ST){ /* pin first so later triggers measure the pin spacer */
+    mm=gsap.matchMedia();
+    mm.add("(min-width:900px)",()=>pinGlance());
+    mm.add("(max-width:899px)",()=>dipMobile());
+  }
+  ctx=gsap.context(()=>{
+    if(first)intro();
+    if(ST)scrollStory();
+  });
+  mm=mm||gsap.matchMedia();
+  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
+  if(ST)ScrollTrigger.refresh();
+  label(true);
+  /* K1: the portal ignition, once per browser session, never under reduced motion; click or Esc skips it */
+  if(first)openPortal();
+}
+function disable(){
+  if(!M.on)return;
+  finishAll();
+  if(mm){mm.revert();mm=null;}
+  if(ctx){ctx.revert();ctx=null;}
+  M.on=false;root.classList.remove("motion");
+  restoreStatic();resetParallax();
+  label(false);SC.setMotion(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+tog.addEventListener("click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();SC.setMotion(false);resetParallax();tog.disabled=true;label(false,"off (reduced motion)");}
+  else{tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+/* 1. Intro: the scene fades and settles down from above, words rise out of masks (SplitText,
+   which keeps the sentence for screen readers and is reverted with the context when motion turns off),
+   cards in view rise onto their depth layers in sequence. Capped near 1.4s. */
+function intro(){
+  const inView=$$("#v-home .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
+  inView.forEach(b=>b.dataset.introd="1");
+  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
+  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
+    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
+  if(SPL&&$("#h-home")){
+    const sp=SplitText.create("#h-home",{type:"words",wordsClass:"w",mask:"words",aria:"auto"});
+    tl.from(sp.words,{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
+  }
+  tl.from(".hero .actions",{y:18,autoAlpha:0,duration:.45,stagger:.06},.45)
+    .from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
+  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
+  /* K8: tab cards already in view open through a small ring of light */
+  if(KIT)inView.filter(b=>b.classList.contains("tcard")).forEach((b,i)=>KIT.enter(b,{delay:.35+i*.09}));
+  safe(tl);
+}
+/* 1b. The portal opening (this page's take on the kit's K1 ignition): on the first visit of the
+   browser session the gate starts dark, a pinpoint of cold blue light irises out into the full
+   rectangle, crossfades to fel green and settles with one slow flare (a single swell, never a
+   flash), then the kit's K3 swell lights the keystone. ~2.8s; a click, tap or Esc skips to the end.
+   Never under reduced motion; Motion off ends it at rest. Add ?open to the URL to replay it. */
+const OKEY="pd-home-a-opened";
+function openPortal(){
+  const P=SC.portal;if(!P||!SC.ok)return;
+  let seen=null;try{seen=sessionStorage.getItem(OKEY);}catch(e){}
+  if(seen&&!/[?&]open\b/.test(location.search))return;
+  try{sessionStorage.setItem(OKEY,"1");}catch(e){}
+  Object.assign(P,{open:0,mix:0,flare:0});
+  let tl=null;
+  function skip(e){if(e.type==="keydown"&&e.key!=="Escape")return;if(tl)tl.progress(1);}
+  function off(){removeEventListener("pointerdown",skip,true);removeEventListener("keydown",skip,true);Object.assign(P,{open:1,mix:1,flare:0});SC.render();}
+  /* built inside the motion context, so Motion off (finishAll, then revert) always ends it open */
+  A(()=>{
+    tl=gsap.timeline({onComplete:off,onInterrupt:off});
+    tl.to(P,{open:1,duration:1.7,ease:"expo.out"},.25)
+      .to(P,{flare:1,duration:.8,ease:"sine.out"},.25)
+      .to(P,{flare:0,duration:1.5,ease:"sine.inOut"},1.05)
+      .to(P,{mix:1,duration:1.8,ease:"sine.inOut"},.75)
+      .add(()=>{if(KIT&&M.on)KIT.swell();},2.5);
+    safe(tl);
+  });
+  addEventListener("pointerdown",skip,true);addEventListener("keydown",skip,true);
+}
+/* 2. Scroll story pieces available at every width */
+function scrollStory(){
+  /* THE PUSH: scrolling through the hero carries the camera toward and through the portal skin,
+     so the page content arrives over the void; scrolling back pulls the camera out again.
+     The hero panel lifts away in the first half so nothing sits between the viewer and the portal. */
+  if($("#hero")){
+    gsap.fromTo(SC.cam,{push:0},{push:1,ease:"none",immediateRender:false,
+      scrollTrigger:{trigger:"#hero",start:0,end:"bottom top",scrub:.9}});
+    gsap.fromTo(".hero-in, .cue",{autoAlpha:1},{autoAlpha:0,y:-24,ease:"none",immediateRender:false,
+      scrollTrigger:{trigger:"#hero",start:0,end:"45% top",scrub:.5}});
+  }
+  /* past the skin, the void deepens: its star planes rush closer across the whole home (uFly), and ease back once the tab cards arrive */
+  if($("#v-home"))gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#v-home",start:"top top",end:"bottom bottom",scrub:.8}});
+  if($("#tcards"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#tcards",start:"top 85%",end:"top 15%",scrub:.8}});
+  /* the feed's spine draws itself as you scroll through the timeline */
+  if($("#feedline")&&$("#b-feed .feed"))gsap.fromTo("#feedline",{scaleY:0},{scaleY:1,transformOrigin:"50% 0%",ease:"none",
+    scrollTrigger:{trigger:"#b-feed .feed",start:"top 80%",end:"bottom 55%",scrub:.5}});
+  /* entries snap onto the spine as the line reaches them (played on enter, never pre-hidden) */
+  $$("#feedlist li").forEach((li,i)=>ScrollTrigger.create({trigger:li,start:"top 85%",once:true,onEnter:()=>A(()=>{
+    const tl=gsap.timeline({delay:i<2?.15*i:0});
+    tl.fromTo(li,{x:44,rotate:-2},{x:0,rotate:0,duration:.7,ease:"back.out(2.4)"})
+      .fromTo(li,{"--dot":0},{"--dot":1,duration:.5,ease:"elastic.out(1,.4)"},"-=.45");
+    const tm=$("time",li);
+    if(TX&&tm){const txt=tm.textContent;tl.fromTo(tm,{text:{value:""}},{text:{value:txt},duration:.4,ease:"none"},"<");}
+    safe(tl);
+  })}));
+  /* number tickers fire when they enter the viewport */
+  $$("#v-home .tick").forEach(el=>ScrollTrigger.create({trigger:el,start:"top 92%",once:true,onEnter:()=>A(()=>tick(el))}));
+  /* example hit-cap gauge fills to 140/142 */
+  const gauge=$("#v-home .gauge i");
+  if(gauge)ScrollTrigger.create({trigger:gauge.parentElement,start:"top 92%",once:true,onEnter:()=>A(()=>safe(gsap.fromTo(gauge,{scaleX:0},{scaleX:1,duration:1.1,ease:"power3.out"})))});
+  /* the six tab cards deal up onto their depth layers a row at a time */
+  const doors=$$(".tcard").filter(b=>!b.dataset.introd);
+  if(doors.length)ScrollTrigger.batch(doors,{start:"top 92%",once:true,onEnter:els=>A(()=>{
+    safe(gsap.fromTo(els,{y:60,rotationX:-18,transformOrigin:"50% 100%"},{y:0,rotationX:0,duration:.8,stagger:.09,ease:"expo.out",clearProps:"transform"}));
+    if(KIT)els.forEach((el,i)=>KIT.enter(el,{delay:i*.09})); /* K8 light-portal entry per card */
+  })});
+  /* cards below the fold rise onto their depth layers with a skew settle */
+  $$(".grid .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>
+    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"})))}));
+}
+/* 3. Desktop: pin "Phase 2 at a glance", scrub the four essentials in one by one while the camera
+   drifts deeper into the void. Facts stay opaque; only position, scale and the rail move. */
+function pinGlance(){
+  const facts=$$("#facts .fact"),n=facts.length,cnt=$("#fcount"),bar=$("#fbar");
+  if(!n||!$("#story"))return;
+  const count=k=>{if(cnt)cnt.textContent="0"+k;};
+  const tl=gsap.timeline({scrollTrigger:{trigger:"#story",start:"top 64px",end:"+="+(n*60)+"%",pin:true,scrub:.6,
+    snap:{snapTo:"labels",duration:{min:.2,max:.5},ease:"power1.inOut"},
+    onUpdate:s=>{const k=Math.max(1,Math.ceil(s.progress*n-.001));count(k);facts.forEach((f,i)=>f.classList.toggle("on",i===k-1));},
+    onLeave:()=>{count(n);facts.forEach(f=>f.classList.remove("on"));},
+    onLeaveBack:()=>{count(n);facts.forEach(f=>f.classList.remove("on"));}}});
+  tl.addLabel("f0");
+  facts.forEach((f,i)=>{
+    tl.fromTo(f,{x:90,scale:.94},{x:0,scale:1,duration:1,ease:"power3.out"},i);
+    const rl=$(".rail",f);if(rl)tl.fromTo(rl,{scaleY:0},{scaleY:1,duration:.6},i+.3);
+    tl.addLabel("f"+(i+1),i+1);
+  });
+  if(bar)tl.fromTo(bar,{scaleX:0},{scaleX:1,duration:n,ease:"none"},0);
+  tl.fromTo(SC.cam,{dip:0},{dip:1,duration:n-.3,ease:"sine.inOut"},0);
+  return ()=>{restoreStatic();};
+}
+/* phones: no pin, the facts stay stacked; the camera still dips as the card scrolls through */
+function dipMobile(){
+  if($("#story"))gsap.fromTo(SC.cam,{dip:0},{dip:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"#story",start:"top 75%",end:"bottom 35%",scrub:.6}});
+  return ()=>{SC.cam.dip=0;};
+}
+/* 4. Magnetic primary buttons (fine pointers only) */
+function magnets(){
+  const offs=[];
+  $$(".magnet, .mtoggle").forEach(b=>{
+    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
+    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
+    const lv=()=>{xTo(0);yTo(0);};
+    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
+    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
+  });
+  return ()=>offs.forEach(f=>f());
+}
+/* 5. Leaving for another tab: the amber curtain rises with the tab's name while the camera dives
+   through the portal skin, then the browser navigates. The next tab plays its own intro. */
+M.leave=(href,name)=>{
+  let gone=false;const nav=()=>{if(!gone){gone=true;location.href=href;}};
+  const w=$("#wipe"),s=w&&$("span",w);if(!w||!s){nav();return;}
+  s.textContent=name||"";w.style.display="grid";
+  const tl=gsap.timeline({onComplete:nav});
+  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
+    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
+    .fromTo(s,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
+  setTimeout(nav,1200); /* never strand the viewer behind the curtain */
+};
+if(FL){
+  /* 6. Flip: switching phase re-orders the facts and tab cards (they trade places); the scene re-lights alongside */
+  M.flipHome=fn=>A(()=>{
+    const els=$$("#tcards>li, #facts .fact");
+    const st=Flip.getState(els);
+    fn();
+    safe(Flip.from(st,{duration:.85,ease:"power3.inOut",stagger:.04,
+      onComplete:()=>{gsap.set(els,{clearProps:"transform"});if(ST)ScrollTrigger.refresh();}}));
+    if(TX)["#h-glance","#phchip","#hero-eyebrow"].forEach(s=>{const el=$(s);if(!el)return;const t=el.textContent;
+      safe(gsap.fromTo(el,{text:{value:""}},{text:{value:t},duration:.5,ease:"none"}));});
+  });
+}
+/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);SC.setMotion(false);}
+else enable(true);
+/* belt and braces: if the intro is still mid-flight after 1.5s (throttled tab, slow device), finish it */
+setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
+})();
+</script>
+</body>
+</html>
