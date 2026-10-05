@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Raid Composition B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Cabin+Sketch:wght@400;700&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ---------- Hellfire War Camp: torchlight and ember over iron and soot, a blood-red dusk ---------- */
+:root{
+  color-scheme:dark;
+  --soot:#0c0807; --soot-2:#150d0b; --iron:#231e1c; --iron-2:#322b28; --iron-3:#463d39; --iron-hi:#7a6e66;
+  --plate:rgba(24,18,16,.86); --plate-2:rgba(38,30,27,.9); --scrim:rgba(12,7,6,.82);
+  --ink:#f4e9de; --ink-2:#d2c1b2; --ink-3:#ad998b;
+  --chalk:#efe6d4; --chalk-dim:rgba(239,230,212,.55);
+  --torch:#ff9b3d; --torch-ink:#1d0c02; --torch-soft:rgba(255,155,61,.14);
+  --ember:#e5482b; --blood:#7c1712; --blood-2:#5a0f0c; --ash:#8e837c;
+  --glow:#ff9b3d; --glow-soft:rgba(255,155,61,.14);
+  --rim:rgba(255,170,110,.22); --rim-2:rgba(255,170,110,.11);
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --ok:#b9d98a;
+  --focus:#ffd38f;
+  --rivet:radial-gradient(circle at 35% 35%,#9a8d84 0 1.5px,#4a403b 2.2px,transparent 3px);
+  --f-head:"Grenze Gotisch","Palatino Linotype",Georgia,serif;
+  --f-chalk:"Cabin Sketch","Segoe Print","Comic Sans MS",cursive;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.2rem; --t-xl:1.55rem; --t-hero:clamp(2.1rem,6.2vw,3.9rem);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--soot);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--torch)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+code{font-family:var(--f-mono);font-size:.92em}
+/* scene + fallback (a still dusk: blood sky, ridge line, torch glow low on the ground) */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(40% 22% at 70% 74%,rgba(255,140,50,.30),transparent 70%),
+  radial-gradient(30% 16% at 22% 80%,rgba(229,72,43,.20),transparent 70%),
+  linear-gradient(176deg,transparent 0 58%,#120a08 58.4% 100%),
+  linear-gradient(180deg,#1a0605 0%,#4a0f0b 30%,#8a2a12 52%,#3a120b 60%,#0e0807 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(12,7,6,.45),rgba(12,7,6,.15) 28%,rgba(12,7,6,.72))}
+.page{position:relative;z-index:2}
+/* chrome (shared base: nav, toggles) */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(12,7,6,.7)}
+header.top{background:rgba(16,10,9,.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:700 var(--t-xl)/1 var(--f-head);letter-spacing:.03em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--torch)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--torch);text-shadow:0 0 12px rgba(255,155,61,.6)}
+nav.sections a:hover{color:var(--ink)}
+.flavor{background:rgba(16,10,9,.62);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn,input[type=text]{font:inherit;color:var(--ink);background:var(--plate-2);border:1px solid var(--rim);padding:5px 9px;border-radius:4px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--torch-soft);border-color:var(--torch);color:var(--torch)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:3px;background:var(--torch-soft);color:var(--torch);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--plate-2);color:var(--ink);border:1px solid var(--rim);border-radius:4px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:2px;background:var(--iron-3);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:1px;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--torch)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--torch-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(12,7,6,.8)}
+/* buttons: forged iron plates; the primary one is lit like a torch */
+.btn{display:inline-flex;align-items:center;gap:6px;font:700 var(--t-sm) var(--f-body);background:linear-gradient(180deg,#ffb15c,var(--torch) 55%,#e07a24);color:var(--torch-ink);border:1px solid #ffc47e;padding:9px 16px;border-radius:4px;cursor:pointer;min-height:40px;box-shadow:0 0 22px -6px var(--torch),inset 0 -2px 0 rgba(0,0,0,.25)}
+.btn.ghost{background:linear-gradient(180deg,var(--iron-2),var(--iron));color:var(--ink);border-color:var(--iron-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 0 #000}
+.btn.ghost:hover{border-color:var(--torch);color:var(--torch)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* hero: an orders slate */
+.hero{min-height:min(46vh,420px);display:grid;align-content:end;padding:40px 0 22px}
+.hero-in{max-width:780px;padding:20px 18px;border-radius:6px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 70%,rgba(12,7,6,.35) 100%);border-left:3px solid var(--ember)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--torch)}
+.hero h1{font:700 var(--t-hero)/1 var(--f-head);margin:8px 0 10px;max-width:20ch;letter-spacing:.01em;text-shadow:0 2px 24px rgba(0,0,0,.7)}
+.hero h1 em{font-style:normal;color:var(--torch)}
+.hero p{max-width:56ch;color:var(--ink-2);margin:0 0 12px}
+.target{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.target span{font:500 var(--t-sm) var(--f-mono);background:var(--plate-2);border:1px solid var(--rim);border-radius:3px;padding:4px 10px}
+.target span b{font-family:var(--f-body);font-weight:600;color:var(--ink-3);margin-right:6px}
+/* the muster board: one iron plate holding the banners */
+main{padding:0 0 48px}
+.plate{position:relative;background:var(--plate);border:1px solid var(--iron-3);border-radius:6px;box-shadow:0 24px 50px -22px #000,inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(8px)}
+.plate::before{content:"";position:absolute;inset:6px;pointer-events:none;background:var(--rivet) 0 0/12px 12px no-repeat,var(--rivet) 100% 0/12px 12px no-repeat,var(--rivet) 0 100%/12px 12px no-repeat,var(--rivet) 100% 100%/12px 12px no-repeat}
+.plate>h2{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin:0;padding:12px 18px 10px;border-bottom:1px solid var(--iron-3);font:700 var(--t-xl)/1.1 var(--f-head);letter-spacing:.02em}
+.plate>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.plate .in{padding:12px 16px 16px}
+.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);background:var(--warn-soft);border-radius:3px;padding:1px 6px;vertical-align:middle}
+.note{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:4px;padding:9px 11px;margin:0 0 12px}
+.note strong{color:var(--warn)}
+.orders{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:0 0 12px}
+.orders .grp-btns{display:flex;flex-wrap:wrap;gap:8px}
+.seg{display:inline-flex;border:1px solid var(--iron-hi);border-radius:4px;overflow:hidden;background:var(--iron)}
+.seg button{font:600 var(--t-sm) var(--f-body);background:none;border:0;color:var(--ink-2);padding:7px 14px;cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--torch);color:var(--torch-ink)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0 0 12px;font-size:var(--t-sm)}
+.meta label{display:flex;flex-direction:column;gap:2px;color:var(--ink-3);font-size:var(--t-xs);flex:1 1 140px;min-width:0}
+.meta input{min-height:36px;width:100%}
+.howto{margin:0 0 12px}
+.status{font-size:var(--t-sm);color:var(--ink-2);min-height:1.5em;margin:10px 0 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.status b{color:var(--torch)}
+.status button{font:600 var(--t-xs) var(--f-body);background:none;border:1px solid var(--torch);color:var(--torch);border-radius:3px;padding:4px 10px;cursor:pointer;min-height:30px}
+.muster-empty{border:2px dashed var(--chalk-dim);border-radius:6px;padding:14px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:var(--f-chalk);color:var(--chalk);font-size:1.05rem}
+/* groups: iron-banded banners hung from a pole, five seat slots below */
+.groups{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:560px){.groups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:820px){.groups.g25{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1120px){.groups.g25{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.grp{position:relative;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(35,30,28,.92),rgba(20,15,13,.94));border:1px solid var(--iron-3);border-radius:4px;padding:0 8px 10px}
+.grp .pole{height:12px;margin:0 -8px;background:linear-gradient(180deg,#5d534d,#2b2421 60%,#191412);border-bottom:1px solid #000;border-radius:3px 3px 0 0;position:relative}
+.grp .pole::before,.grp .pole::after{content:"";position:absolute;top:0;width:12px;height:12px;background:var(--rivet)}
+.grp .pole::before{left:3px}.grp .pole::after{right:3px}
+.cloth{position:relative;margin:0 4px 10px;padding:8px 10px 18px;background:linear-gradient(180deg,#3a2f2b,#2a221f);clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 10px),0 100%);transform-origin:50% 0;color:var(--chalk)}
+.grp.full .cloth{background:linear-gradient(180deg,#9a2318,var(--blood) 60%,var(--blood-2))}
+.cloth h3{margin:0;font:700 1.25rem/1.05 var(--f-chalk);letter-spacing:.04em;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.cloth h3 small{font:400 var(--t-xs) var(--f-mono);color:var(--chalk)}
+.cloth .gsum{display:block;font:400 var(--t-xs)/1.3 var(--f-body);color:rgba(244,233,222,.85);margin-top:2px}
+.seats{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.seat{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr);gap:4px 8px;align-items:start;padding:7px 8px 7px 10px;border:1px solid var(--iron-3);border-radius:3px;background:linear-gradient(180deg,#1d1715,#151110);font-size:var(--t-sm);min-height:60px;box-shadow:inset 4px 0 0 var(--c,transparent)}
+.seat .slotno{font:700 var(--t-sm)/1.4 var(--f-chalk);color:var(--chalk-dim);text-align:center}
+.seat .who{min-width:0}
+.seat .who b{display:block;font-weight:700;overflow-wrap:anywhere;color:var(--ink)}
+.seat .who .spec{display:block;font-size:var(--t-xs);color:var(--c,var(--ink-2));font-weight:600;overflow-wrap:anywhere}
+.seat .who .role{display:block;font-size:11px;color:var(--ink-3)}
+.seat .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
+.sbtn{font:600 var(--t-xs) var(--f-body);background:linear-gradient(180deg,var(--iron-2),var(--iron));color:var(--ink-2);border:1px solid var(--iron-hi);border-radius:3px;padding:4px 9px;cursor:pointer;min-height:32px;white-space:nowrap}
+.sbtn:hover{color:var(--ink);border-color:var(--torch)}
+.sbtn.add{color:var(--torch);border-color:rgba(255,155,61,.55)}
+.seat.empty{background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 6px,transparent 6px 12px),#130e0d;border:1px dashed var(--chalk-dim);box-shadow:none}
+.seat.empty .who b{font:400 var(--t-sm) var(--f-chalk);color:var(--chalk-dim)}
+.seat.held{border-color:var(--torch);box-shadow:inset 4px 0 0 var(--c),0 0 0 1px var(--torch),0 0 20px -4px var(--torch)}
+.seat.held .sbtn.mv{background:var(--torch);color:var(--torch-ink);border-color:var(--torch)}
+.moving .seat:not(.held) .sbtn.here{border-style:dashed;color:var(--torch);border-color:var(--torch)}
+.seat.over{outline:2px dashed var(--torch);outline-offset:2px}
+.seat[draggable="true"]{cursor:grab}
+.seat .rn{display:flex;gap:4px;margin-top:3px}
+.seat .rn input{min-width:0;flex:1;padding:4px 6px;min-height:32px;font-size:var(--t-sm)}
+.gets{margin:10px 0 0;padding-top:8px;border-top:1px dashed var(--iron-hi)}
+.gets h4{margin:0 0 5px;font:700 var(--t-xs) var(--f-chalk);letter-spacing:.06em;color:var(--chalk-dim)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0;padding:0}
+.chips li{font-size:11px;line-height:1.3;padding:2px 6px;border-radius:2px;background:var(--torch-soft);border:1px solid var(--rim);color:var(--ink)}
+.chips li.none{background:none;border-style:dashed;color:var(--ink-3)}
+.scope{display:inline-block;font:700 9px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border-radius:2px;padding:0 4px;margin-left:4px;vertical-align:1px;border:1px solid var(--rim);color:var(--ink-2)}
+.scope.party{color:var(--torch)}
+.scope.raid{color:#8fc0ff;border-color:rgba(143,192,255,.4)}
+.scope.target{color:#ff8a78;border-color:rgba(255,138,120,.4)}
+/* the class → spec picker opens inside the banner, under the seats */
+.picker{margin-top:8px;padding:10px;border:1px solid var(--torch);border-radius:4px;background:#1a1311;box-shadow:0 0 24px -10px var(--torch)}
+.picker h4{margin:0 0 8px;font:700 var(--t-sm) var(--f-chalk);color:var(--chalk);display:flex;justify-content:space-between;gap:6px;align-items:baseline}
+.picker .cls{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:5px}
+.picker .cls button,.picker .bld button{font:600 var(--t-xs) var(--f-body);text-align:left;background:#120d0c;color:var(--ink);border:1px solid var(--iron-hi);border-left:4px solid var(--c);border-radius:3px;padding:6px 7px;cursor:pointer;min-height:36px}
+.picker .cls button:hover,.picker .bld button:hover{border-color:var(--torch);border-left-color:var(--c)}
+.picker .bld{display:grid;gap:5px}
+.picker .bld small{display:block;font-weight:400;color:var(--ink-3)}
+.picker label{display:block;font-size:var(--t-xs);color:var(--ink-3);margin:0 0 8px}
+.picker label input{display:block;width:100%;margin-top:2px;min-height:34px}
+.picker .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+/* the reports pinned under the board */
+.reports{display:grid;gap:16px;margin-top:16px;grid-template-columns:1fr}
+@media (min-width:900px){.reports{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1180px){.reports{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1.1fr)}}
+.reports .wide{grid-column:1/-1}
+.reports .plate>h2{font-size:var(--t-lg)}
+.roles{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr) 2.4em;gap:8px 10px;align-items:center;font-size:var(--t-sm)}
+.roles .bar{height:10px;border-radius:1px;background:var(--iron);border:1px solid var(--iron-3);overflow:hidden}
+.roles .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ember),var(--torch));transform-origin:left}
+.roles .n{font-family:var(--f-mono);text-align:right}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.lines li{padding:8px 10px;border-radius:3px;background:var(--scrim);border:1px solid var(--iron-3);font-size:var(--t-sm)}
+.lines li b{color:var(--torch);font-weight:600}
+.lines li .g{display:block;font:700 var(--t-xs) var(--f-chalk);letter-spacing:.05em;color:var(--chalk-dim);margin-bottom:2px}
+.lines li.ok{border-style:dashed;color:var(--ink-3)}
+.lines li.warnl{border-color:rgba(255,207,122,.35)}
+.lines li.warnl b{color:var(--warn)}
+.plate .in>p{margin:0 0 10px;font-size:var(--t-sm);color:var(--ink-2)}
+.coverage h3{margin:10px 0 4px;font:700 var(--t-xs) var(--f-chalk);letter-spacing:.06em;color:var(--chalk-dim)}
+@media (max-width:440px){.roles{grid-template-columns:minmax(0,6.5em) minmax(0,1fr) 2.2em}.plate>h2{padding:10px 14px}.plate .in{padding:10px 12px 14px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Step 2 · Raid Composition B · Hellfire War Camp. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-comp-b.html" aria-current="page">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html">Raids</a>
+      <a href="professions.html">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Buff scopes: Wowhead spell tooltips (<code>buffScope.json</code>) · buffs: <code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code> · builds: <code>raidBuilds.ts</code></span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+  <div class="hero">
+    <div class="hero-in">
+      <div class="eyebrow">Raid Composition · the muster board · Hellfire war camp</div>
+      <h1 id="h-rc">Muster your raid so <em>every banner gets its buffs</em>.</h1>
+      <p>24 of the 33 raid buffs in TBC reach only the caster's own party: every totem, every aura, both shouts. Seat a 10 or 25-player raid on the board and see, group by group, what each banner receives and what it still lacks.</p>
+      <div class="target" aria-label="What this board counts">
+        <span><b>Party buffs</b>24</span>
+        <span><b>Raid or single-target</b>9</span>
+        <span><b>Boss debuffs</b>8</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="plate" id="board" aria-labelledby="h-board">
+    <h2 id="h-board">Muster board <small id="boardsum">0 of 25 seated</small></h2>
+    <div class="in">
+      <p class="note"><strong>Counts are who could cast it, not what will be up at once.</strong> This follows Wowhead's raid-composition tool: one Paladin lights up every Greater Blessing here but holds one in the game; the same goes for a Shaman's totems and a Warrior's shouts.</p>
+      <div class="orders">
+        <div class="seg" role="group" aria-label="Raid size">
+          <button type="button" data-size="10" aria-pressed="false">10-player</button>
+          <button type="button" data-size="25" aria-pressed="true">25-player</button>
+        </div>
+        <div class="grp-btns">
+          <button class="btn ghost" id="resetbtn" type="button">Reset to example</button>
+          <button class="btn ghost" id="clearbtn" type="button">Clear raid</button>
+          <button class="btn" id="exportbtn" type="button">Export image</button>
+        </div>
+      </div>
+      <div class="meta" role="group" aria-label="Raid details (optional, shown on the exported chart)">
+        <label>Raid title<input type="text" id="m-title" maxlength="60" placeholder="e.g. SSC, Tuesday" autocomplete="off"></label>
+        <label>Date<input type="date" id="m-date"></label>
+        <label>Start time<input type="time" id="m-time"></label>
+      </div>
+      <p class="prov howto" id="howto">Press <b>Add</b> on an open seat to pick a class and spec. To move a player, press <b>Move</b>, then <b>Here</b> on the seat you want; if it is taken, the two swap. Esc cancels. With a mouse you can also drag a player onto another seat.</p>
+      <div class="muster-empty" id="emptyboard" hidden>
+        <span>The board is empty. Seat players one by one, or load the example roster.</span>
+        <button class="btn" id="loadbtn" type="button">Load example roster</button>
+      </div>
+      <div class="groups g25" id="groups" aria-describedby="howto"></div>
+      <noscript><p class="note">The muster board, the picker and every coverage line are worked out by the page's script, so they need JavaScript.</p></noscript>
+      <div class="status" id="status" role="status"></div>
+    </div>
+  </section>
+
+  <div class="reports">
+    <section class="plate" id="b-roles" aria-labelledby="h-roles">
+      <h2 id="h-roles">Role balance <small id="rolesum">0 of 25 seated</small></h2>
+      <div class="in">
+        <div class="roles" id="roles"></div>
+        <p class="prov" style="margin:10px 0 0">Role comes from the build a seat signed up as, so a Feral (Bear) counts as a tank and a Feral (Cat) as physical DPS. Both bring Leader of the Pack. Source: <code>raidBuilds.ts</code>, <code>tbcClasses.ts</code>.</p>
+      </div>
+    </section>
+    <section class="plate" id="b-add" aria-labelledby="h-add">
+      <h2 id="h-add">What one more seat would add</h2>
+      <div class="in">
+        <p>For each banner, the one build that would bring that group the most party buffs it lacks.</p>
+        <ul class="lines" id="addlist"></ul>
+      </div>
+    </section>
+    <section class="plate" id="b-miss" aria-labelledby="h-miss">
+      <h2 id="h-miss">Missing — who fixes it</h2>
+      <div class="in"><ul class="lines" id="misslist"></ul></div>
+    </section>
+    <section class="plate wide" id="b-wide" aria-labelledby="h-wide">
+      <h2 id="h-wide">Raid-wide, single-target and on the boss</h2>
+      <div class="in coverage" id="wide"></div>
+    </section>
+  </div>
+</main>
+<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips). The example roster is an example. The war-camp scene is our own procedural art. World of Warcraft® is a trademark of Blizzard Entertainment, Inc.; this project is not affiliated with or endorsed by Blizzard.</div></footer>
+</div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Hellfire war camp at dusk (WebGL, Three.js r128): a blood-red sky over a ridge line, a scorched plain,
+   a few tents and a palisade, a command brazier, drifting ash. All procedural, our own geometry and shaders.
+   Exposes window.SCENE for tbc-kit.js (contract at the top of that file). Any failure leaves the CSS fallback. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+const CAM={intro:0,depth:0}, MIX={tk:0,warm:0,charge:0};
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,calm:.45,speed:1,cam:CAM,mix:MIX,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,120);
+const C=h=>new THREE.Color(h);
+/* torchlight over soot; acc is the ember red low in the haze */
+const PAL={light:C("#ff9b3d"),deep:C("#1a0806"),fog:C("#2a0b07"),acc:C("#e5482b")};
+const cur={light:PAL.light.clone(),deep:PAL.deep.clone(),fog:PAL.fog.clone(),acc:PAL.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+const NZ=`float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fb(vec2 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*n(p);p*=2.07;a*=.5;}return s;}`;
+/* sky: a far plane, blood red at the horizon to soot at the top, slow smoke banks and a low sun glow */
+const sky=new THREE.Mesh(new THREE.PlaneGeometry(160,60),new THREE.ShaderMaterial({uniforms:U,depthWrite:false,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:NZ+`uniform float uTime;uniform vec3 uAcc,uLight;varying vec2 vUv;
+  void main(){float y=vUv.y;vec3 top=vec3(.06,.02,.02),mid=vec3(.42,.07,.04),hor=vec3(.78,.24,.08);
+    vec3 col=mix(hor,mid,smoothstep(.0,.35,y));col=mix(col,top,smoothstep(.3,.85,y));
+    float sm=fb(vec2(vUv.x*5.+uTime*.012,y*3.-uTime*.004));col*=.72+.5*sm;
+    float sun=exp(-pow(distance(vUv*vec2(2.6,1.),vec2(1.75,.16)),2.)*9.);col+=uLight*sun*.35;
+    col=mix(col,uAcc*.6,(1.-smoothstep(0.,.12,y))*.4);gl_FragColor=vec4(col,1.);}`}));
+sky.position.set(0,14,-48);scene.add(sky);
+/* the scorched plain: soot with faint ember cracks */
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,70,1,1),new THREE.ShaderMaterial({uniforms:U,
+  vertexShader:`varying vec2 vUv;varying float vD;void main(){vUv=uv;vec4 m=modelViewMatrix*vec4(position,1.);vD=-m.z;gl_Position=projectionMatrix*m;}`,
+  fragmentShader:NZ+`uniform float uTime;uniform vec3 uDeep,uFog,uAcc,uLight;varying vec2 vUv;varying float vD;
+  void main(){vec2 p=vUv*28.;float s=fb(p*.6);float cr=1.-smoothstep(.0,.05,abs(n(p*.9)-.5));
+    vec3 col=uDeep*(.55+.8*s)+uAcc*cr*.22*(.75+.25*sin(uTime*.4+p.x));
+    float lit=exp(-pow(distance(vUv,vec2(.53,.56)),2.)*60.);col+=uLight*lit*.35;
+    col=mix(col,uFog,smoothstep(8.,40.,vD));gl_FragColor=vec4(col,1.);}`}));
+ground.rotation.x=-Math.PI/2;scene.add(ground);
+/* ridge line, tents and palisade: flat-shaded silhouettes */
+const dark=new THREE.MeshStandardMaterial({color:0x140c0a,roughness:1,flatShading:true});
+const rock=new THREE.MeshStandardMaterial({color:0x2a120c,roughness:1,flatShading:true});
+[[-30,-40,9,14],[-18,-42,6,10],[-6,-44,7,15],[8,-43,5,9],[20,-41,8,13],[33,-40,6,11],[-40,-36,7,8]].forEach(([x,z,r,hh],i)=>{
+  const m=new THREE.Mesh(new THREE.ConeGeometry(r,hh,5,1),rock);m.position.set(x,hh/2-.5,z);m.rotation.y=i*1.3;scene.add(m);});
+const tentMat=new THREE.MeshStandardMaterial({color:0x3a1d14,roughness:.95,flatShading:true});
+[[-7,-9,1.6],[-4.2,-12,1.3],[6.5,-10,1.8],[9.5,-14,1.4],[-11,-15,1.5]].forEach(([x,z,s],i)=>{
+  const m=new THREE.Mesh(new THREE.ConeGeometry(s,s*1.5,4,1),tentMat);m.position.set(x,s*.75,z);m.rotation.y=.4+i;scene.add(m);});
+const spike=new THREE.ConeGeometry(.16,2.2,5,1);
+for(let i=0;i<34;i++){const m=new THREE.Mesh(spike,dark);m.position.set(-17+i,1,-19+Math.sin(i*.7)*.6);m.rotation.z=(i%2?.08:-.06);scene.add(m);}
+/* the command brazier: a pole, an iron bowl and a fire core (the kit's K3 swell brightens core, ring and lamp) */
+const pole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.1,2.4,6),dark);pole.position.set(2.4,1.2,-4);scene.add(pole);
+const bowl=new THREE.Mesh(new THREE.CylinderGeometry(.55,.3,.35,8,1,true),new THREE.MeshStandardMaterial({color:0x2a2420,metalness:.6,roughness:.5,side:THREE.DoubleSide,flatShading:true}));
+bowl.position.set(2.4,2.5,-4);scene.add(bowl);
+const crystal=new THREE.Mesh(new THREE.IcosahedronGeometry(.42,0),new THREE.MeshStandardMaterial({color:0x2a0a04,emissive:cur.light.clone(),emissiveIntensity:.18,roughness:.6,flatShading:true}));
+crystal.position.set(2.4,2.78,-4);crystal.scale.set(1,1.35,1);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(.62,.025,6,48),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.set(2.4,2.66,-4);halo.rotation.x=Math.PI/2;scene.add(halo);
+const lamp=new THREE.PointLight(cur.light.clone(),2.2,20);lamp.position.set(2.4,3.3,-4);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x3a1610,.55));
+const acc=new THREE.PointLight(cur.acc.clone(),1.2,26);acc.position.set(-8,2,-12);scene.add(acc);
+/* camp torches: soft additive flames that breathe slowly (well under 1 Hz, never a flicker-flash) */
+const TP=[[-17,-19],[-9,-19],[-1,-19],[7,-19],[15,-19],[-7,-8],[6.5,-8.6]],tpos=new Float32Array(TP.length*3),tseed=new Float32Array(TP.length);
+TP.forEach(([x,z],i)=>{tpos[i*3]=x;tpos[i*3+1]=2.35;tpos[i*3+2]=z;tseed[i]=i*1.7;});
+const tg=new THREE.BufferGeometry();tg.setAttribute("position",new THREE.BufferAttribute(tpos,3));tg.setAttribute("aSeed",new THREE.BufferAttribute(tseed,1));
+scene.add(new THREE.Points(tg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec4 m=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*m;
+    vA=.78+.12*sin(uTime*1.3+aSeed)+.06*sin(uTime*2.1+aSeed*3.);gl_PointSize=46.*uDpr*(6./-m.z);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){vec2 c=gl_PointCoord-.5;c.y*=.75;float d=length(c);float a=smoothstep(.5,0.,d);
+    gl_FragColor=vec4(mix(uLight,vec3(1.,.9,.6),a*a),a*a*vA*.8);}`})));
+/* drifting ash: grey flakes falling slowly and wandering (the kit adds rising embers on top) */
+const N=innerWidth<700?220:420,apos=new Float32Array(N*3),aseed=new Float32Array(N);
+for(let i=0;i<N;i++){apos[i*3]=(Math.random()-.5)*40;apos[i*3+1]=Math.random()*12;apos[i*3+2]=-1-Math.random()*26;aseed[i]=Math.random();}
+const ag=new THREE.BufferGeometry();ag.setAttribute("position",new THREE.BufferAttribute(apos,3));ag.setAttribute("aSeed",new THREE.BufferAttribute(aseed,1));
+const ash=new THREE.Points(ag,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=12.-mod(12.-p.y+uTime*(.15+aSeed*.25),12.);
+    p.x+=sin(uTime*.4+aSeed*30.)*.8+uTime*.05;p.x=mod(p.x+20.,40.)-20.;
+    vec4 m=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*m;
+    gl_PointSize=(1.2+aSeed*2.)*uDpr*(12./-m.z);vA=(1.-smoothstep(10.,30.,-m.z))*.55;}`,
+  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);gl_FragColor=vec4(vec3(.62,.57,.54),smoothstep(.5,.1,d)*vA);}`}));
+ash.frustumCulled=false;scene.add(ash);
+scene.fog=new THREE.Fog(cur.fog.clone(),10,46);R.setClearColor(cur.fog);
+/* camera: a slow sway over the camp + pointer drift; intro settles it from higher up */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,2.2,-12);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  cam.position.set(Math.sin(t*.04)*1.1+ptr.sx*1.2,3.1+CAM.intro*3-CAM.depth*.5-ptr.sy*.4,9-CAM.depth*2);
+  cam.lookAt(look.x+ptr.sx*.5,look.y+CAM.intro*.8-CAM.depth*.3,look.z);
+}
+function tint(){
+  ["light","deep","fog","acc"].forEach(k=>cur[k].copy(PAL[k]));
+  each(HK.tint,[cur]);
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);acc.color.copy(cur.acc);
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?64:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  dt*=S.calm*S.speed;t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*.3;halo.rotation.z+=dt*.15;
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
+}
+function still(){if(lost||!enabled)return;each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp};
+size();still();
+})();
+</script>
+<script src="tbc-kit.js"></script>
+<script id="rc-logic">
+/* Roster + coverage logic for the muster board. Pure: no DOM, so it can be tested in node.
+   Mirrors src/domain/raidcomp (rosterTypes.ts: fixed five-seat groups, moveSeat swaps, renameSeat trims,
+   resizeRoster keeps what fits; raidBuilds.ts: one build per spec, Feral split into Bear/Cat, Dreamstate added). */
+(function(g){
+"use strict";
+/* ---------- real data: sampleBuffs.ts + sampleTargetDebuffs.ts (who provides), buffScope.json (scope) ---------- */
+const B=(id,name,scope,cls,spec)=>({id,name,scope,cls,spec});
+const BUFFS=[
+ B("battle-shout","Battle Shout","Party","Warrior"),B("commanding-shout","Commanding Shout","Party","Warrior"),
+ B("blessing-of-might","Greater Blessing of Might","Raid","Paladin"),B("blessing-of-kings","Greater Blessing of Kings","Raid","Paladin"),
+ B("blessing-of-wisdom","Greater Blessing of Wisdom","Raid","Paladin"),B("blessing-of-salvation","Greater Blessing of Salvation","Raid","Paladin"),
+ B("blessing-of-sanctuary","Greater Blessing of Sanctuary","Raid","Paladin"),
+ B("devotion-aura","Devotion Aura","Party","Paladin"),B("retribution-aura","Retribution Aura","Party","Paladin"),B("sanctity-aura","Sanctity Aura","Party","Paladin"),
+ B("arcane-intellect","Arcane Brilliance","Party","Mage"),
+ B("prayer-of-fortitude","Prayer of Fortitude","Party","Priest"),B("prayer-of-spirit","Prayer of Spirit","Party","Priest"),
+ B("shadow-protection","Shadow Protection","Single","Priest"),B("power-infusion","Power Infusion","Single","Priest","Discipline"),
+ B("mark-of-the-wild","Gift of the Wild","Party","Druid"),B("thorns","Thorns","Single","Druid"),B("innervate","Innervate","Single","Druid"),
+ B("leader-of-the-pack","Leader of the Pack","Party","Druid","Feral"),B("moonkin-aura","Moonkin Aura","Party","Druid","Balance"),
+ B("trueshot-aura","Trueshot Aura","Party","Hunter","Marksmanship"),B("ferocious-inspiration","Ferocious Inspiration","Party","Hunter","Beast Mastery"),
+ B("strength-of-earth-totem","Strength of Earth Totem","Party","Shaman"),B("grace-of-air-totem","Grace of Air Totem","Party","Shaman"),
+ B("mana-spring-totem","Mana Spring Totem","Party","Shaman"),B("totem-of-wrath","Totem of Wrath","Party","Shaman","Elemental"),
+ B("wrath-of-air-totem","Wrath of Air Totem","Party","Shaman"),B("windfury-totem","Windfury Totem","Party","Shaman"),
+ B("mana-tide-totem","Mana Tide Totem","Party","Shaman","Restoration"),B("tranquil-air-totem","Tranquil Air Totem","Party","Shaman"),
+ B("unleashed-rage","Unleashed Rage","Party","Shaman","Enhancement"),B("bloodlust","Bloodlust","Party","Shaman"),
+ B("blood-pact","Blood Pact","Party","Warlock")];
+const DEBUFFS=[
+ B("sunder-armor","Sunder Armor","Target","Warrior"),B("curse-of-recklessness","Curse of Recklessness","Target","Warlock"),
+ B("faerie-fire","Faerie Fire","Target","Druid"),B("improved-faerie-fire","Improved Faerie Fire","Target","Druid","Balance"),
+ B("improved-seal-of-the-crusader","Improved Seal of the Crusader","Target","Paladin","Retribution"),
+ B("curse-of-elements","Curse of the Elements","Target","Warlock"),B("winters-chill","Winter's Chill","Target","Mage","Frost"),
+ B("expose-weakness","Expose Weakness","Target","Hunter","Survival")];
+const PARTY=BUFFS.filter(b=>b.scope==="Party"), WIDE=BUFFS.filter(b=>b.scope!=="Party");
+/* classes + specs: tbcClasses.ts; roles: getRoleForSpec; colours: the class colours the live app uses */
+const COLOR={Druid:"#FF7C0A",Hunter:"#AAD372",Mage:"#3FC7EB",Paladin:"#F48CBA",Priest:"#FFFFFF",Rogue:"#FFF468",Shaman:"#0070DD",Warlock:"#8788EE",Warrior:"#C69B6D"};
+const SPECS={Druid:["Balance","Feral","Restoration"],Hunter:["Beast Mastery","Marksmanship","Survival"],Mage:["Arcane","Fire","Frost"],
+ Paladin:["Holy","Protection","Retribution"],Priest:["Discipline","Holy","Shadow"],Rogue:["Assassination","Combat","Subtlety"],
+ Shaman:["Elemental","Enhancement","Restoration"],Warlock:["Affliction","Demonology","Destruction"],Warrior:["Arms","Fury","Protection"]};
+const CLASSES=Object.keys(SPECS);
+function roleFor(c,s){
+  if(s==="Protection"&&(c==="Warrior"||c==="Paladin"))return "Tank";
+  if(c==="Druid"&&s==="Balance")return "Caster DPS";
+  if(c==="Druid"&&s==="Restoration")return "Healer";
+  if(c==="Druid"&&s==="Feral")return "Physical DPS";
+  if(c==="Paladin"&&s==="Holy")return "Healer";
+  if(c==="Priest"&&(s==="Discipline"||s==="Holy"))return "Healer";
+  if(c==="Shaman"&&s==="Restoration")return "Healer";
+  if(c==="Hunter"||c==="Rogue"||c==="Warrior")return "Physical DPS";
+  if((c==="Paladin"&&s==="Retribution")||(c==="Shaman"&&s==="Enhancement"))return "Physical DPS";
+  return "Caster DPS";
+}
+const slug=s=>s.toLowerCase().replace(/\s+/g,"-");
+const BUILDS=[];
+CLASSES.forEach(c=>SPECS[c].forEach(s=>{
+  if(c==="Druid"&&s==="Feral"){
+    BUILDS.push({id:"druid-feral-tank",cls:c,spec:s,label:"Feral (Bear)",role:"Tank"},{id:"druid-feral-cat",cls:c,spec:s,label:"Feral (Cat)",role:"Physical DPS"});
+    return;}
+  BUILDS.push({id:slug(c+"-"+s),cls:c,spec:s,label:s,role:roleFor(c,s)});
+  if(c==="Druid"&&s==="Restoration")BUILDS.push({id:"druid-dreamstate",cls:c,spec:"Restoration",label:"Dreamstate",role:"Healer",
+    note:"Balance/Restoration hybrid healer. Heals in caster form, so it does not bring Moonkin Aura."});
+}));
+const BY_ID={};BUILDS.forEach(b=>BY_ID[b.id]=b);
+const ROLES=["Tank","Healer","Physical DPS","Caster DPS"];
+/* ---------- the roster: {size, groups:[[slot|null ×5] × size/5], src, meta}; slot = {b: build id, n?: name} ---------- */
+const SEATS=5, SIZES=[10,25];
+const build=s=>s&&BY_ID[s.b]||null;
+const nameOf=s=>{const b=build(s);return b?b.label+" "+b.cls:"";};
+const cloneG=gs=>gs.map(gr=>gr.map(s=>s?Object.assign({},s):null));
+const emptyGroups=n=>Array.from({length:n/SEATS},()=>Array(SEATS).fill(null));
+function empty(size){return {size:SIZES.indexOf(size)>=0?size:25,groups:emptyGroups(SIZES.indexOf(size)>=0?size:25),src:"own",meta:{}};}
+const touch=(st,gs,extra)=>Object.assign({},st,{groups:gs,src:st.src==="example"?"edited":st.src},extra||{});
+function seatAt(st,g,i){return st.groups[g]&&st.groups[g][i]||null;}
+function place(st,g,i,id,name){
+  if(!BY_ID[id]||!st.groups[g]||i<0||i>=SEATS||st.groups[g][i])return st;
+  const gs=cloneG(st.groups),n=(name||"").trim().slice(0,24);
+  gs[g][i]=n?{b:id,n}:{b:id};return touch(st,gs);
+}
+function remove(st,g,i){if(!seatAt(st,g,i))return st;const gs=cloneG(st.groups);gs[g][i]=null;return touch(st,gs);}
+/* moveSeat: swaps when the target is taken (never overwrites anyone) */
+function move(st,f,t){
+  if(f.g===t.g&&f.i===t.i)return st;
+  const a=seatAt(st,f.g,f.i);if(!a||!st.groups[t.g]||t.i<0||t.i>=SEATS)return st;
+  const gs=cloneG(st.groups),b=gs[t.g][t.i];gs[t.g][t.i]=gs[f.g][f.i];gs[f.g][f.i]=b;return touch(st,gs);
+}
+function rename(st,g,i,name){
+  const s=seatAt(st,g,i);if(!s)return st;
+  const gs=cloneG(st.groups),n=(name||"").trim().slice(0,24);
+  gs[g][i]=n?{b:s.b,n}:{b:s.b};return touch(st,gs);
+}
+/* resizeRoster: 25 → 10 drops groups 3-5, 10 → 25 adds three empty groups */
+function resize(st,size){
+  if(SIZES.indexOf(size)<0||size===st.size)return st;
+  const want=size/SEATS,gs=cloneG(st.groups).slice(0,want);
+  while(gs.length<want)gs.push(Array(SEATS).fill(null));
+  return Object.assign({},st,{size,groups:gs});
+}
+const filled=st=>st.groups.reduce((a,gr)=>a.concat(gr.filter(Boolean)),[]);
+const dropped=(st,size)=>st.groups.slice(size/SEATS).reduce((n,gr)=>n+gr.filter(Boolean).length,0);
+/* example rosters: real builds, invented seating, no names (labelled "example" wherever shown) */
+const EX={
+ 25:[["warrior-protection","paladin-protection","druid-feral-tank","paladin-holy","shaman-restoration"],
+     ["warrior-fury","warrior-fury","rogue-combat","shaman-enhancement","druid-feral-cat"],
+     ["mage-fire","warlock-destruction","shaman-elemental","priest-shadow","druid-balance"],
+     ["hunter-beast-mastery","hunter-marksmanship","hunter-survival","paladin-retribution","rogue-combat"],
+     ["priest-holy","priest-discipline","druid-restoration","paladin-holy","mage-arcane"]],
+ 10:[["warrior-protection","paladin-holy","shaman-enhancement","warrior-fury","rogue-combat"],
+     ["druid-feral-tank","shaman-restoration","priest-shadow","mage-fire","warlock-destruction"]]};
+function example(size,meta){const s=SIZES.indexOf(size)>=0?size:25;
+  return {size:s,groups:EX[s].map(gr=>gr.map(id=>({b:id}))),src:"example",meta:Object.assign({},meta||{})};}
+/* ---------- coverage (Wowhead's model: who could cast it, nothing capped) ---------- */
+const provides=(s,b)=>{const x=build(s);return !!x&&x.cls===b.cls&&(!b.spec||x.spec===b.spec);};
+const groupGets=gr=>PARTY.filter(b=>gr.some(s=>provides(s,b)));
+const lacking=gr=>PARTY.filter(b=>!gr.some(s=>provides(s,b)));
+const need=b=>b.spec?(/^[AEIOU]/.test(b.spec)?"an ":"a ")+b.spec+" "+b.cls:"any "+b.cls;
+/* the one build that would add the most missing party buffs to this group (ties keep the first in class order) */
+function bestFor(gr){
+  const lack=lacking(gr);let best=null,gain=[];
+  BUILDS.forEach(bd=>{const add=lack.filter(b=>provides({b:bd.id},b));if(add.length>gain.length){best=bd;gain=add;}});
+  return {best,gain,open:gr.some(s=>!s),seated:gr.filter(Boolean).length};
+}
+function raidMissing(st){
+  const all=filled(st);
+  return [...PARTY.map(b=>[b,"party buff"]),...WIDE.map(b=>[b,"raid or single-target"]),...DEBUFFS.map(b=>[b,"on the boss"])]
+    .filter(([b])=>!all.some(s=>provides(s,b)));
+}
+function lackByProvider(gr){const by={};lacking(gr).forEach(b=>{(by[need(b)]=by[need(b)]||[]).push(b.name);});return by;}
+const castCount=(st,b)=>filled(st).filter(s=>provides(s,b)).length;
+function roles(st){const c={};ROLES.forEach(r=>c[r]=0);filled(st).forEach(s=>{const b=build(s);if(b)c[b.role]++;});return c;}
+/* ---------- session storage: validate rather than trust (a bad seat is dropped, not fatal) ---------- */
+function validate(raw){
+  try{
+    const o=typeof raw==="string"?JSON.parse(raw):raw;
+    if(!o||SIZES.indexOf(o.size)<0||!Array.isArray(o.groups))return null;
+    const st=empty(o.size);
+    st.groups=st.groups.map((gr,gi)=>gr.map((_,si)=>{
+      const s=o.groups[gi]&&o.groups[gi][si];if(!s||typeof s.b!=="string"||!BY_ID[s.b])return null;
+      const n=typeof s.n==="string"?s.n.trim().slice(0,24):"";return n?{b:s.b,n}:{b:s.b};}));
+    st.src=["example","edited","own"].indexOf(o.src)>=0?o.src:"own";
+    const m=o.meta&&typeof o.meta==="object"?o.meta:{};
+    st.meta={};["title","date","time"].forEach(k=>{if(typeof m[k]==="string"&&m[k].trim())st.meta[k]=m[k].trim().slice(0,60);});
+    return st;
+  }catch(e){return null;}
+}
+g.RCB={BUFFS,DEBUFFS,PARTY,WIDE,COLOR,SPECS,CLASSES,BUILDS,BY_ID,ROLES,SEATS,build,nameOf,empty,seatAt,place,remove,move,rename,resize,
+  filled,dropped,example,provides,groupGets,lacking,need,bestFor,raidMissing,lackByProvider,castCount,roles,validate};
+})(typeof window!=="undefined"?window:globalThis);
+</script>
+<script>
+(function(){
+"use strict";
+/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
+const $=(s,r=document)=>{try{return r?r.querySelector(s):null;}catch(e){return null;}};
+const $$=(s,r=document)=>{try{return r?Array.from(r.querySelectorAll(s)):[];}catch(e){return [];}};
+const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
+const RC=window.RCB;if(!RC)return;
+const root=document.documentElement,live=$("#live");
+const say=t=>{if(!live)return;live.textContent="";setTimeout(()=>{live.textContent=t;},30);};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
+const RMQ=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+const G=typeof gsap!=="undefined";
+const M={on:false};
+const KIT=window.TBCKit||null;
+/* this tab's world: the kit's Hellfire theme (blood-red aurora, ember-lit rocks) with its K4 'hellfire' embers */
+if(KIT){KIT.theme("hellfire",{instant:true});KIT.embers(true,{preset:"hellfire",height:9});}
+const ROMAN=["I","II","III","IV","V"];
+const list=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1];
+const tag=sc=>`<span class="scope ${sc.toLowerCase()}">${sc}</span>`;
+
+/* ---------- state: kept for this browser session only ---------- */
+const KEY="pd-proto-raidcomp-b";
+function loadState(){try{const raw=sessionStorage.getItem(KEY);return raw?RC.validate(raw):null;}catch(e){return null;}}
+function saveState(){try{sessionStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+let st=loadState()||RC.empty(25);
+let held=null, pick=null, naming=null, undo=null;
+/* pick = {g,i,cls?}; naming = {g,i}; undo = {state,label} */
+
+const seatLabel=(g,i)=>`group ${g+1}, seat ${i+1}`;
+const who=s=>{const b=RC.build(s);return b?(s.n?`${s.n} (${b.label} ${b.cls})`:`${b.label} ${b.cls}`):"";};
+
+/* ---------- the board ---------- */
+function seatHTML(s,g,i){
+  const b=RC.build(s),isHeld=held&&held.g===g&&held.i===i,L=seatLabel(g,i);
+  const attrs=`data-g="${g}" data-i="${i}"`;
+  const btn=(act,txt,aria,cls,extra)=>`<button type="button" class="sbtn ${cls||act}" data-act="${act}" ${attrs} aria-label="${esc(aria)}"${extra||""}>${txt}</button>`;
+  let acts="";
+  if(held&&!isHeld)acts=btn("here","Here",s?`Swap with ${who(s)}, ${L}`:`Move here: empty ${L}`);
+  else if(isHeld)acts=btn("move","Cancel",`Cancel moving ${who(s)}`,"mv",' aria-pressed="true"');
+  else if(!s)acts=btn("add","+ Add",`Add a player to ${L}`,"add",pick&&pick.g===g&&pick.i===i?' aria-expanded="true"':' aria-expanded="false"');
+  else acts=btn("move","Move",`Move ${who(s)}, ${L}`,"mv")+btn("rename","Rename",`Rename ${who(s)}, ${L}`)+btn("remove","Remove",`Remove ${who(s)} from ${L}`);
+  let body;
+  if(!s)body=`<span class="who"><b>Open seat</b></span>`;
+  else if(naming&&naming.g===g&&naming.i===i)
+    body=`<span class="who"><span class="spec">${esc(b.label)} ${esc(b.cls)}</span><span class="rn"><label class="sr" for="rn-${g}-${i}">Player name for ${esc(who(s))}</label>`+
+      `<input type="text" id="rn-${g}-${i}" maxlength="24" value="${esc(s.n||"")}" placeholder="Name (optional)" autocomplete="off" data-g="${g}" data-i="${i}"></span></span>`,
+    acts=btn("rename-save","Save",`Save the name for ${who(s)}`)+btn("rename-cancel","Cancel",`Cancel renaming ${who(s)}`);
+  else body=`<span class="who"><b>${s.n?esc(s.n):esc(b.label)+" "+esc(b.cls)}</b>${s.n?`<span class="spec">${esc(b.label)} ${esc(b.cls)}</span>`:""}<span class="role">${b.role}</span></span>`;
+  return `<li class="seat${s?"":" empty"}${isHeld?" held":""}" style="--c:${s?RC.COLOR[b.cls]:"transparent"}" ${attrs}${s&&!naming?' draggable="true"':""}>`+
+    `<span class="slotno" aria-hidden="true">${i+1}</span>${body}<span class="acts">${acts}</span></li>`;
+}
+function pickerHTML(g){
+  if(!pick||pick.g!==g)return "";
+  const head=`Seat ${pick.i+1}`;
+  if(!pick.cls)return `<div class="picker" role="group" aria-labelledby="pk-h"><h4 id="pk-h">${head} · choose a class</h4>`+
+    `<div class="cls">${RC.CLASSES.map(c=>`<button type="button" data-act="cls" data-cls="${c}" style="--c:${RC.COLOR[c]}">${c}</button>`).join("")}</div>`+
+    `<div class="row"><button type="button" class="sbtn" data-act="cancel">Cancel</button></div></div>`;
+  const bs=RC.BUILDS.filter(b=>b.cls===pick.cls);
+  return `<div class="picker" role="group" aria-labelledby="pk-h"><h4 id="pk-h">${head} · ${pick.cls}: choose a spec</h4>`+
+    `<label>Player name (optional)<input type="text" id="pk-name" maxlength="24" autocomplete="off" value="${esc(pick.name||"")}"></label>`+
+    `<div class="bld">${bs.map(b=>`<button type="button" data-act="build" data-b="${b.id}" style="--c:${RC.COLOR[b.cls]}"${b.note?` title="${esc(b.note)}"`:""}>${esc(b.label)} ${b.cls}<small>${b.role}${b.note?" · no Moonkin Aura":""}</small></button>`).join("")}</div>`+
+    `<div class="row"><button type="button" class="sbtn" data-act="back">Back to classes</button><button type="button" class="sbtn" data-act="cancel">Cancel</button></div></div>`;
+}
+function renderGroups(){
+  const host=$("#groups");if(!host)return;
+  host.classList.toggle("moving",!!held);host.classList.toggle("g25",st.size===25);
+  host.innerHTML=st.groups.map((gr,gi)=>{
+    const gets=RC.groupGets(gr),n=gr.filter(Boolean).length;
+    return `<section class="grp${n===RC.SEATS?" full":""}" data-group="${gi}" aria-labelledby="gh-${gi}"><div class="pole" aria-hidden="true"></div>`+
+      `<div class="cloth"><h3 id="gh-${gi}"><span><span aria-hidden="true">Group ${ROMAN[gi]}</span><span class="sr">Group ${gi+1}</span></span><small>${n}/5</small></h3>`+
+      `<span class="gsum">${gets.length} of ${RC.PARTY.length} party buffs</span></div>`+
+      `<ul class="seats">${gr.map((s,i)=>seatHTML(s,gi,i)).join("")}</ul>${pickerHTML(gi)}`+
+      `<div class="gets"><h4>This banner receives ${tag("Party")}</h4><ul class="chips">`+
+      (gets.length?gets.map(b=>`<li>${b.name}</li>`).join(""):`<li class="none">No party buffs yet</li>`)+`</ul></div></section>`;
+  }).join("");
+  const n=RC.filled(st).length,sum=$("#boardsum");
+  if(sum)sum.innerHTML=`${n} of ${st.size} seated`+(st.src==="example"?` · <span class="ex">example roster</span>`:st.src==="edited"?` · <span class="ex">edited example</span>`:"");
+  const eb=$("#emptyboard");if(eb)eb.hidden=n>0;
+  const cb=$("#clearbtn");if(cb)cb.disabled=n===0;
+  $$(".seg button[data-size]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.size===st.size)));
+}
+/* ---------- the reports ---------- */
+function renderRoles(){
+  const host=$("#roles");if(!host)return;
+  const c=RC.roles(st);
+  host.innerHTML=RC.ROLES.map(r=>`<span>${r}</span><span class="bar" aria-hidden="true"><i style="width:${(c[r]/st.size*100).toFixed(0)}%"></i></span><span class="n" aria-label="${c[r]} ${r}">${c[r]}</span>`).join("");
+  const sum=$("#rolesum");if(sum)sum.textContent=RC.filled(st).length+" of "+st.size+" seated";
+}
+function renderAdd(){
+  const host=$("#addlist");if(!host)return;
+  host.innerHTML=st.groups.map((gr,gi)=>{
+    const r=RC.bestFor(gr);
+    if(!r.best)return `<li class="ok"><span class="g">Group ${gi+1}</span>Already gets every party buff.</li>`;
+    const when=r.seated===0?"first seat":r.open?"one more seat":"if one seat changed";
+    return `<li><span class="g">Group ${gi+1} · ${when}</span>A <b>${esc(r.best.label)} ${r.best.cls}</b> would add ${list(r.gain.map(b=>b.name))}.</li>`;
+  }).join("");
+}
+function renderMissing(){
+  const host=$("#misslist");if(!host)return;
+  if(!RC.filled(st).length){host.innerHTML=`<li class="ok"><span class="g">Whole raid</span>Nobody is seated yet, so every buff is missing. Seat a few players and this list says who fixes each gap.</li>`;return;}
+  const out=[],miss=RC.raidMissing(st);
+  miss.forEach(([b,where])=>out.push(`<li class="warnl"><span class="g">Whole raid · ${where}</span><b>${b.name}</b> ${tag(b.scope)} — nobody brings it. Needs ${RC.need(b)}.</li>`));
+  if(!miss.length)out.push(`<li class="ok"><span class="g">Whole raid</span>Someone in the raid can cast every one of the 33 buffs and 8 debuffs.</li>`);
+  st.groups.forEach((gr,gi)=>{
+    const by=RC.lackByProvider(gr),keys=Object.keys(by);if(!keys.length)return;
+    const n=keys.reduce((a,k)=>a+by[k].length,0);
+    out.push(`<li><span class="g">Group ${gi+1} · ${n} of ${RC.PARTY.length} party buffs missing</span>`+keys.map(k=>`<b>${k}</b>: ${by[k].join(", ")}`).join(" · ")+`</li>`);
+  });
+  host.innerHTML=out.join("");
+}
+function renderWide(){
+  const host=$("#wide");if(!host)return;
+  const row=b=>{const n=RC.castCount(st,b);return `<li class="${n?"":"none"}">${b.name}${tag(b.scope)} <span class="num">${n?"×"+n:"none"}</span></li>`;};
+  host.innerHTML=`<p>Greater Blessings reach the whole raid, single-target buffs go wherever the caster points them, and debuffs land on the boss. Seating does not change these, only who is in the raid.</p>`+
+    `<h3>Raid-wide and single-target buffs</h3><ul class="chips">${RC.WIDE.map(row).join("")}</ul>`+
+    `<h3>Debuffs on the boss</h3><ul class="chips">${RC.DEBUFFS.map(row).join("")}</ul>`+
+    `<p class="prov" style="margin:8px 0 0">×n is how many seats could cast it (Wowhead's count), not how many copies are up at once.</p>`;
+}
+function renderAll(){renderGroups();renderRoles();renderAdd();renderMissing();renderWide();}
+function renderMeta(){const m=st.meta||{};[["#m-title","title"],["#m-date","date"],["#m-time","time"]].forEach(([s,k])=>{const el=$(s);if(el)el.value=m[k]||"";});}
+
+/* ---------- status line (with a one-step Undo for Clear, Reset, Remove and shrinking the raid) ---------- */
+function status(html,withUndo){
+  const s=$("#status");if(!s)return;
+  s.innerHTML=`<span>${html}</span>`+(withUndo&&undo?`<button type="button" id="undobtn">Undo</button>`:"");
+}
+function focusSel(sel){const el=$(sel);if(el)try{el.focus({preventScroll:false});}catch(e){el.focus();}}
+const focusSeat=(g,i,act)=>focusSel(`#groups [data-g="${g}"][data-i="${i}"]`+(act?`[data-act="${act}"]`:"[data-act]"));
+
+/* commit: swap in the new roster, save, redraw, then let the motion layer react to what changed */
+function commit(next,fx){
+  const before=st.groups.map(gr=>({n:gr.filter(Boolean).length,ids:new Set(RC.groupGets(gr).map(b=>b.id))}));
+  st=next;saveState();renderAll();
+  if(!fx)return;
+  const filledNow=[],gained=[];
+  st.groups.forEach((gr,gi)=>{
+    const b=before[gi],n=gr.filter(Boolean).length;
+    if(b&&b.n<RC.SEATS&&n===RC.SEATS)filledNow.push(gi);
+    if(b&&RC.groupGets(gr).some(x=>!b.ids.has(x.id)))gained.push(gi);
+  });
+  if(M.on)motionFx(fx.seats||[],filledNow,gained.length>0);
+  return {filledNow,gained};
+}
+/* ---------- actions ---------- */
+const gainNote=(r,gs)=>{if(!r||!r.gained.length)return "";const g=r.gained.filter(x=>gs.indexOf(x)>=0);
+  return g.map(x=>` Group ${x+1} now gets ${RC.groupGets(st.groups[x]).length} party buffs.`).join("");};
+function doMove(from,to){
+  const a=RC.seatAt(st,from.g,from.i),t=RC.seatAt(st,to.g,to.i);held=null;
+  if(!a||(from.g===to.g&&from.i===to.i)){renderGroups();return;}
+  const r=commit(RC.move(st,from,to),{seats:[[to.g,to.i]].concat(t?[[from.g,from.i]]:[])});
+  const msg=t?`${who(a)} and ${who(t)} swapped: ${who(a)} is now in ${seatLabel(to.g,to.i)}, ${who(t)} in ${seatLabel(from.g,from.i)}.`
+             :`${who(a)} moved to ${seatLabel(to.g,to.i)}.`;
+  const extra=gainNote(r,[to.g,from.g]);
+  status(esc(msg)+extra);say(msg+extra);focusSeat(to.g,to.i,"move");
+}
+function doAdd(id){
+  if(!pick)return;
+  const nm=$("#pk-name"),name=nm?nm.value:"",{g,i}=pick,b=RC.BY_ID[id];if(!b)return;
+  pick=null;const r=commit(RC.place(st,g,i,id,name),{seats:[[g,i]]});
+  const s=RC.seatAt(st,g,i),msg=`${who(s)} added to ${seatLabel(g,i)}.`+gainNote(r,[g])+(r&&r.filledNow.indexOf(g)>=0?` Group ${g+1} is full.`:"");
+  status(esc(msg));say(msg);focusSeat(g,i,"move");
+}
+function doRemove(g,i){
+  const s=RC.seatAt(st,g,i);if(!s)return;
+  undo={state:st,label:`${who(s)} removed`};commit(RC.remove(st,g,i));
+  const msg=`${who(s)} removed from ${seatLabel(g,i)}.`;status(esc(msg),true);say(msg+" Undo is available.");focusSeat(g,i,"add");
+}
+function doRename(g,i,save){
+  const inp=$(`#rn-${g}-${i}`),s=RC.seatAt(st,g,i);naming=null;
+  if(save&&inp&&s){commit(RC.rename(st,g,i,inp.value));const n=RC.seatAt(st,g,i);
+    const msg=n.n?`${RC.nameOf(n)} in ${seatLabel(g,i)} is now named ${n.n}.`:`Name cleared for the ${RC.nameOf(n)} in ${seatLabel(g,i)}.`;status(esc(msg));say(msg);}
+  else{renderGroups();say("Rename cancelled.");}
+  focusSeat(g,i,"rename");
+}
+on($("#groups"),"click",e=>{
+  const b=e.target&&e.target.closest?e.target.closest("button[data-act]"):null;if(!b)return;
+  const act=b.dataset.act,g=+b.dataset.g,i=+b.dataset.i;
+  if(act==="add"){
+    if(pick&&pick.g===g&&pick.i===i){pick=null;renderGroups();focusSeat(g,i,"add");say("Picker closed.");return;}
+    pick={g,i};naming=null;renderGroups();focusSel(`#groups .picker .cls button`);
+    say(`Choose a class for ${seatLabel(g,i)}.`);return;}
+  if((act==="cls"||act==="back"||act==="build")&&!pick)return;
+  if(act==="cls"){pick.cls=b.dataset.cls;renderGroups();focusSel("#pk-name");say(`${pick.cls}. Optionally type a name, then choose a spec.`);return;}
+  if(act==="back"){const nm=$("#pk-name");if(nm)pick.name=nm.value;pick.cls=null;renderGroups();focusSel(`#groups .picker .cls button`);return;}
+  if(act==="cancel"){const p=pick;pick=null;renderGroups();if(p)focusSeat(p.g,p.i,"add");say("Picker closed.");return;}
+  if(act==="build"){doAdd(b.dataset.b);return;}
+  if(act==="remove"){doRemove(g,i);return;}
+  if(act==="rename"){naming={g,i};pick=null;renderGroups();const inp=$(`#rn-${g}-${i}`);if(inp){inp.focus();inp.select();}return;}
+  if(act==="rename-save"){doRename(g,i,true);return;}
+  if(act==="rename-cancel"){doRename(g,i,false);return;}
+  if(act==="move"){
+    if(held&&held.g===g&&held.i===i){held=null;renderGroups();focusSeat(g,i,"move");status("Move cancelled.");say("Move cancelled.");return;}
+    const s=RC.seatAt(st,g,i);if(!s)return;
+    held={g,i};pick=null;naming=null;renderGroups();focusSeat(g,i,"move");
+    status(`Moving <b>${esc(who(s))}</b> from group ${g+1}. Press <b>Here</b> on any seat (a taken seat swaps), or Esc to cancel.`);
+    say(`Moving ${who(s)}. Choose a seat; a taken seat swaps.`);return;}
+  if(act==="here"&&held){doMove(held,{g,i});}
+});
+on($("#groups"),"keydown",e=>{
+  const t=e.target;if(!t||!t.id)return;
+  if(t.id.indexOf("rn-")===0&&e.key==="Enter"){e.preventDefault();doRename(+t.dataset.g,+t.dataset.i,true);}
+  if(t.id==="pk-name"&&e.key==="Enter"){e.preventDefault();focusSel("#groups .picker .bld button");}
+});
+on(document,"keydown",e=>{
+  if(e.key!=="Escape")return;
+  if(naming){doRename(naming.g,naming.i,false);return;}
+  if(pick){const p=pick;pick=null;renderGroups();focusSeat(p.g,p.i,"add");say("Picker closed.");return;}
+  if(held){const h=held;held=null;renderGroups();focusSeat(h.g,h.i,"move");status("Move cancelled.");say("Move cancelled.");}
+});
+/* drag and drop (mouse); the Move button is the keyboard and touch path */
+let drag=null;
+on($("#groups"),"dragstart",e=>{
+  const li=e.target&&e.target.closest?e.target.closest(".seat[draggable]"):null;if(!li)return;
+  drag={g:+li.dataset.g,i:+li.dataset.i};held=null;
+  try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",drag.g+","+drag.i);}catch(x){}
+});
+on($("#groups"),"dragover",e=>{
+  if(!drag)return;const li=e.target&&e.target.closest?e.target.closest(".seat"):null;if(!li)return;
+  e.preventDefault();$$("#groups .seat.over").forEach(x=>{if(x!==li)x.classList.remove("over");});li.classList.add("over");
+});
+on($("#groups"),"dragleave",e=>{const li=e.target&&e.target.closest?e.target.closest(".seat"):null;if(li&&!li.contains(e.relatedTarget))li.classList.remove("over");});
+on($("#groups"),"drop",e=>{
+  const li=e.target&&e.target.closest?e.target.closest(".seat"):null;if(!drag||!li)return;
+  e.preventDefault();const from=drag;drag=null;doMove(from,{g:+li.dataset.g,i:+li.dataset.i});
+});
+on($("#groups"),"dragend",()=>{drag=null;$$("#groups .seat.over").forEach(x=>x.classList.remove("over"));});
+/* ---------- orders: size, example, clear, undo, export, raid details ---------- */
+const reset=()=>{held=null;pick=null;naming=null;};
+$$(".seg button[data-size]").forEach(b=>on(b,"click",()=>{
+  const n=+b.dataset.size;if(n===st.size)return;
+  const lost=RC.dropped(st,n);reset();
+  if(lost){undo={state:st,label:"resize"};}
+  commit(RC.resize(st,n),{seats:[]});
+  const msg=`${n}-player raid: ${n/5} groups of five.`+(lost?` ${lost} player${lost>1?"s":""} in groups 3 to 5 left the board.`:"");
+  status(esc(msg),!!lost);say(msg+(lost?" Undo is available.":""));
+  if(M.on)M.reseat();
+}));
+function loadExample(){
+  const had=RC.filled(st).length;reset();
+  if(had){undo={state:st,label:"reset"};}
+  commit(RC.example(st.size,st.meta),{seats:[]});
+  const msg=`Loaded the ${st.size}-player example roster (real specs, example seating).`;
+  status(esc(msg),!!had);say(msg+(had?" Undo is available.":""));
+  if(M.on)M.reseat(true);
+  focusSel(`#groups [data-act="move"]`);
+}
+on($("#loadbtn"),"click",loadExample);
+on($("#resetbtn"),"click",loadExample);
+on($("#clearbtn"),"click",()=>{
+  const had=RC.filled(st).length;if(!had)return;reset();
+  undo={state:st,label:"clear"};
+  commit(Object.assign(RC.empty(st.size),{meta:st.meta}));
+  status(`Cleared the raid: ${had} seats emptied.`,true);say(`Raid cleared, ${had} seats emptied. Undo is available.`);
+  focusSel("#loadbtn");
+});
+on($("#status"),"click",e=>{
+  if(!e.target||e.target.id!=="undobtn"||!undo)return;
+  const u=undo;undo=null;reset();commit(u.state,{seats:[]});renderMeta();
+  status("Undone.");say("Undone. The roster is back as it was.");focusSel(`#groups [data-act]`);
+});
+on($("#exportbtn"),"click",()=>{
+  const m=st.meta||{},t=[m.title,m.date,m.time].filter(Boolean).join(" · ");
+  status(`In the app this saves the seating chart as a PNG (groups, seats and names${t?`, titled “${esc(t)}”`:""}, drawn by <code>exportRosterImage.ts</code>). This prototype does not create a file.`);
+  say("Export image: in the app this saves the seating chart as a PNG. Not available in this prototype.");
+});
+[["#m-title","title"],["#m-date","date"],["#m-time","time"]].forEach(([s,k])=>on($(s),"change",e=>{
+  const v=(e.target.value||"").trim().slice(0,60);st=Object.assign({},st,{meta:Object.assign({},st.meta,{[k]:v||undefined})});
+  if(!v)delete st.meta[k];saveState();
+}));
+renderMeta();renderAll();
+if(RC.filled(st).length)status(`Picked up where you left off: ${RC.filled(st).length} of ${st.size} seated (kept for this browser session).`);
+/* ================= MOTION LAYER: weighty and martial =================
+   seats stamp down onto the board (with a K8 ring as they land), a banner unfurls when its group fills,
+   a slow torch-flare (K3 swell, never restarted mid-swell, no flash) when a group gains a buff it lacked. */
+const tog=$("#mtoggle"),mstate=$("#mstate");
+const ST=G&&typeof ScrollTrigger!=="undefined";
+if(tog)tog.hidden=false;
+function label(v,why){if(tog)tog.setAttribute("aria-pressed",String(v));if(mstate)mstate.textContent=why||(v?"on":"off");}
+const runs=new Set();
+function safe(a){if(!a)return a;runs.add(a);
+  setTimeout(()=>{runs.delete(a);if(a.progress()<1)a.progress(1);},Math.max(1500,a.totalDuration()*1000+500));return a;}
+function finishAll(){runs.forEach(a=>{if(a.progress()<1)a.progress(1);});runs.clear();}
+const seatEl=(g,i)=>$(`#groups .seat[data-g="${g}"][data-i="${i}"]`);
+function stamp(el,k){
+  const grp=el.closest?el.closest(".grp"):null,tl=gsap.timeline({delay:(k||0)*.07});
+  tl.fromTo(el,{scale:1.16,y:-16,rotation:-1.5,autoAlpha:0},{scale:1,y:0,rotation:0,autoAlpha:1,duration:.3,ease:"power3.in",clearProps:"transform,opacity,visibility"});
+  if(grp)tl.fromTo(grp,{y:0},{y:3,duration:.07,ease:"power1.out",yoyo:true,repeat:1,clearProps:"transform"},.3);
+  return safe(tl);
+}
+function unfurl(gi,delay){
+  const c=$(`#groups .grp[data-group="${gi}"] .cloth`);if(!c)return;
+  safe(gsap.fromTo(c,{scaleY:.06},{scaleY:1,duration:.9,delay:delay||0,ease:"back.out(1.25)",clearProps:"transform"}));
+}
+function motionFx(seats,filledNow,gained){
+  if(!G||!M.on)return;
+  seats.forEach(([g,i],k)=>{const el=seatEl(g,i);if(!el)return;stamp(el,k);if(KIT)KIT.enter(el,{delay:k*.07});});
+  filledNow.forEach(gi=>unfurl(gi,.3));
+  if(gained&&KIT)setTimeout(()=>{if(M.on)KIT.swell();},320);
+}
+M.reseat=full=>{
+  if(!G||!M.on)return;
+  const grps=$$("#groups .grp");if(!grps.length)return;
+  safe(gsap.fromTo(grps,{y:-28,autoAlpha:0},{y:0,autoAlpha:1,duration:.45,stagger:.07,ease:"power3.in",clearProps:"transform,opacity,visibility"}));
+  if(full)grps.forEach((g,k)=>{if(g.classList.contains("full"))unfurl(k,.35+k*.07);});
+  if(KIT)KIT.enter($("#groups"));
+};
+function intro(){
+  const tl=gsap.timeline({defaults:{ease:"power3.out"}});
+  if(SC.cam)tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.6,ease:"expo.out",onUpdate:()=>SC.render&&SC.render()},0);
+  if($(".hero-in"))tl.from(".hero-in",{x:-30,autoAlpha:0,duration:.7,clearProps:"all"},.1);
+  if($(".target span"))tl.from(".target span",{y:-12,autoAlpha:0,duration:.3,stagger:.07,ease:"power3.in",clearProps:"all"},.5);
+  const grps=$$("#groups .grp");
+  if(grps.length)tl.from(grps,{y:-30,autoAlpha:0,duration:.45,stagger:.08,ease:"power3.in",clearProps:"transform,opacity,visibility"},.55);
+  $$("#groups .grp .cloth").forEach((c,k)=>tl.fromTo(c,{scaleY:.06},{scaleY:1,duration:.8,ease:"back.out(1.25)",clearProps:"transform"},.9+k*.08));
+  safe(tl);
+  if(KIT&&$("#board"))setTimeout(()=>{if(M.on)KIT.enter($("#board"));},350);
+}
+function reportsRise(){
+  if(!ST)return;
+  $$(".reports .plate").forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>{
+    if(!M.on)return;safe(gsap.from(b,{y:40,autoAlpha:0,duration:.6,ease:"power3.out",clearProps:"all"}));if(KIT)KIT.enter(b);}}));
+}
+/* pointer drift for the camp camera (fine pointers, motion on) */
+if(window.matchMedia&&matchMedia("(pointer:fine)").matches){
+  let praf=0,nx=0,ny=0;
+  addEventListener("pointermove",e=>{if(!M.on)return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
+    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(M.on&&SC.pointer)SC.pointer(nx,ny);});},{passive:true});
+}
+function setScene(v){if(SC.setMotion)SC.setMotion(v);if(!window.SCENE&&KIT&&KIT.setMotion)KIT.setMotion(v);}
+if(!G){if(tog)tog.disabled=true;label(false,"unavailable");setScene(!RMQ.matches);return;}
+if(ST)gsap.registerPlugin(ScrollTrigger);
+let triggered=false;
+function enable(first){
+  if(M.on)return;M.on=true;root.classList.add("motion");setScene(true);label(true);
+  if(first)intro();
+  if(!triggered){triggered=true;reportsRise();}
+}
+function disable(){
+  if(!M.on)return;M.on=false;finishAll();root.classList.remove("motion");
+  if(SC.cam)SC.cam.intro=0;setScene(false);label(false);
+}
+function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
+function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
+on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
+function syncRM(){
+  if(RMQ.matches){disable();setScene(false);if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
+  else{if(tog)tog.disabled=false;label(M.on);}
+}
+if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
+if(RMQ.matches)syncRM();
+else if(stored()==="0"){label(false);setScene(false);}
+else enable(true);
+})();
+</script>
+</body>
+</html>

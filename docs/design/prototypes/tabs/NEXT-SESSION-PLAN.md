@@ -1,5 +1,78 @@
 # Next session plan: owner feedback on the tab prototypes
 
+## ▶ Where we left off (2026-10-05): start here
+
+Work stopped on purpose ahead of the weekly usage limit. Pick up from this section. The original plan
+from 2026-10-04 follows further down, for reference.
+
+### The owner's new direction for the background (decided 2026-10-05)
+
+- **Drop the Dark Portal designs and keep it simple.** Of the three portal Home pages, the owner liked **Home B, The Approach**, best. But the decision is to drop the portal concept altogether rather than build on it.
+- **Go back to the original crystal look:** the naaru-like crystal over the cool, light teal-blue water from Round 4 and the Step 1 tabs.
+- **Give every tab its own version of that background.** Each tab gets its own background scene and **its own colour**, so the tabs feel related but no two match.
+- **Scope:** this is about the background scenes only (the 3D model and colour behind each page). The layouts and content of the tabs stay as they are.
+
+**What to build next session:** one simple background per tab. For each one:
+- The same crystal-and-water family as the original.
+- Its own colour palette.
+- Its own small signature detail.
+
+These are only starting points. Propose them to the owner before building:
+
+| Tab | Starting idea for colour and detail |
+| --- | --- |
+| Home | The original light teal-blue crystal, the "signature" look |
+| Character Planner | Deep sea blue, with slow rising bubbles |
+| Simulation | Gold over violet (it already has this, and the owner likes it) |
+| Raid Composition | Warm white-gold light |
+| Spec Tier Lists | Emerald green |
+| Raids | Changes per raid (it already does this, and the owner likes it) |
+| Professions | Amber, with ore-vein glints |
+
+Keep the existing rules: no Blizzard assets, the Motion and 3D toggles, reduced motion, the WebGL
+fallback, AA text and no sound. Build each background as a theme in `tbc-kit.js`, or as a small shared
+background module, so every page reuses one scene with a different palette and detail. That keeps it simple.
+
+### What is done (and pushed)
+
+- **Step 1:** all seven tab pages, in `tabs/`.
+- **The TBC motion kit:** `tabs/tbc-kit.js`.
+- **Character Planner:** the row hover and keyboard-focus highlight, checked in a browser.
+- **Raids:** loot search across all five raids, which filters loot and narrows the boss list. Checked in a browser: "destroyer" finds 8 drops in 2 raids.
+- **Three Home designs around the Dark Portal:** `home-a.html`, `home-b.html`, `home-c.html`. All three passed the checks, but they are **now superseded** by the decision above. They are kept for reference.
+
+### What is in progress
+
+**Raid Composition: three designs, each with its own theme and a working raid table.**
+- **A, Terrace of Light** (`raid-comp-a.html`, Shattrath gold-white): built, and it passed the standard checks.
+  - A hands-on browser test confirmed that **adding a player** (an Enhancement Shaman named "Thrallson") and **loading the example roster** both work.
+  - The **Move** step timed out in the test. That may be the test's own button selector rather than a page bug. Re-test Move, drag, Remove, Rename and Clear before showing it to the owner.
+- **B, Hellfire War Camp** (`raid-comp-b.html`, torchlit iron and orange): built and logic-tested by its designer in node. It has **not yet** been through the browser checks or the hands-on test.
+- **C, Arcane Tactical Board** (`raid-comp-c.html`): **not done.** The usage limit stopped its designer just after it copied the old page. The file is an unfinished copy, left uncommitted. Rebuild it next time.
+
+With the new direction, Raid Composition's backgrounds should follow the "own colour per tab" idea too.
+Its **planning table** stays the priority: the owner needs to be able to actually plan a raid. When
+it's shown to the owner, focus on picking the best table, not the scenery.
+
+### What is left, in order
+
+1. **Backgrounds:** confirm the per-tab colour and detail list with the owner, then build one simple background per tab. Drop the portal from Home.
+2. **Raid Composition:**
+   - finish C (or skip it if the owner is happy with A or B);
+   - re-test the table hands-on in a browser;
+   - show the owner the tables, and let them pick.
+3. **Gallery:** update it. Mark the portal Home designs as superseded, and add the Raid Composition designs.
+4. **Step 2 walkthrough:** resume it for the remaining tabs. Professions waits for a later update.
+5. **Separate fix-it tasks** that came out of the prototype work:
+   - the Felguard doc contradiction;
+   - the incomplete Fury Warrior talent preset;
+   - Lady Vashj's helm token;
+   - the zone-map attribution wording.
+
+---
+
+## The original plan (2026-10-04)
+
 **Written 2026-10-04 from the owner's review of the seven tab pages (with the TBC motion kit). Nothing
 here is built yet.** This is the starting point for the next session, and it folds into the Step 2
 walkthrough (three designs per step).
