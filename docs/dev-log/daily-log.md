@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**435 commits across 67 days**, from 2026-06-25 to 2026-10-04.
+**438 commits across 68 days**, from 2026-06-25 to 2026-10-05.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_8 commits_
+_11 commits_
+
+### Monday 5 October — 3 commits
+
+- Add loot search to Raids and a row highlight to the Planner — [`439b974`](https://github.com/josephevenson08/project-defeat/commit/439b97407ab2df8196a6d40b015fde85738a2c3c)
+- Add three Home designs around the Dark Portal (Step 2) — [`1e49385`](https://github.com/josephevenson08/project-defeat/commit/1e493857067730f6a7e37579b2cb8b6016075530)
+- Record where the prototype work stopped, and the new background direction — [`8d95269`](https://github.com/josephevenson08/project-defeat/commit/8d95269ce1f6466b5e1941370a0b0318cb99fb56)
 
 ### Sunday 4 October — 4 commits
 
