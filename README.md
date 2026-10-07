@@ -83,9 +83,25 @@ upgrades from your in-game export. It will run on a Raspberry Pi. See the
 ## Coming next: a UI refresh
 
 Research into how 25 gaming companies and player tools design their sites in 2024–2026
-([findings](docs/research/gaming-ui/README.md)) is turned into a three-phase
-[plan](docs/design/UI-REFRESH-PLAN.md): small fixes first, then showing the source, phase and age of
-the data beside the numbers, then search across the whole app.
+([findings](docs/research/gaming-ui/README.md)) led to a [plan](docs/design/UI-REFRESH-PLAN.md),
+then to clickable [design prototypes](docs/design/prototypes/README.md) of every tab. Their animation
+is tuned to TBC by [this research](docs/research/wow-tbc-motion/README.md).
+
+### Picking the work back up
+
+The prototype work stopped on 2026-10-05. **Continue from
+[`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md)**:
+the top section says where things stand and what's next. In short:
+
+1. **Backgrounds.** The Dark Portal Home designs are dropped. Go back to the original crystal-over-teal
+   look, and give every tab a simple background of its own in its own colour. The starting colour ideas
+   are in the plan; confirm them before building.
+2. **Raid Composition.** Finish and browser-test the planning tables in `raid-comp-a.html` and
+   `raid-comp-b.html`, then pick one. Design C was cut off and only exists locally, unfinished.
+3. Update the [prototype gallery](docs/design/prototypes/index.html), then continue the tab-by-tab
+   walkthrough. Professions comes later.
+
+The app stays on Phase 2 on purpose, even though Phase 3 is live.
 
 ## Status
 
