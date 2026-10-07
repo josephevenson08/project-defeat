@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-09-26.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-07.** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** the section below is where things stand, and ["What is left, in one
@@ -9,7 +9,70 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ---
 
-## Where this is right now (2026-09-26, latest — READ THIS FIRST)
+## Where this is right now (2026-10-07, latest — READ THIS FIRST)
+
+**Between 2026-09-30 and 2026-10-05 the work was repo cleanup, research and design prototypes. The app
+itself (`src/`) is unchanged since 2026-09-30.** The next task is in the prototypes, and its exact
+starting point is the top of
+[`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md).
+Read that first.
+
+### What was done
+
+- **Repo cleanup (2026-09-30).**
+  - Docs moved into `docs/` (architecture, design, research, dev-log, images). The README became a short front page.
+  - `CHANGELOG.md` became `docs/dev-log/daily-log.md`, and `npm run changelog` writes there.
+  - The doc-figures test reads `docs/features.md`, `docs/ROADMAP.md`, this file and `docs/known-limitations.md`.
+- **Data fix:** weapon enchants and ranged scopes are now recommended for Warrior and Rogue. `tools/ingest/ingest-bis-recommendations.mjs` maps the guides' "Main Hand Weapon", "Off Hand Weapon" and "Ranged" rows, and a generic "Weapon" row now fills dual-wield off hands.
+- **Discord bot:** planned only, in `discord-bot/PLAN.md`. Its commands are `/bis`, `/whodrops`, `/loot`, `/attune`, `/farm` and `/import`. Not built.
+- **Research, every claim cited:**
+  - `docs/research/gaming-ui/` covers 25 platforms.
+  - `docs/research/wow-tbc-motion/` covers TBC's look, Blizzard's fan-content rules, techniques, and the approved "TBC motion kit".
+- **Design prototypes** (`docs/design/prototypes/`, static HTML, gallery at `index.html`):
+  - Rounds 1–4 explored directions. The chosen style is Round 4: a Three.js crystal-and-water scene with GSAP motion.
+  - Step 1 built all seven tabs in that style on real app data: `tabs/home.html`, `planner.html`, `simulation.html`, `raid-composition.html`, `tier-lists.html`, `raids.html` and `professions.html`.
+  - `tabs/tbc-kit.js` is a shared motion kit. Its `window.SCENE` contract is documented at the top of the file, and it uses GSAP 3.13.0 and Three.js r128.
+  - Owner review changes since then:
+    - The Planner has a row hover highlight.
+    - Raids has a loot search.
+    - Three Dark Portal Home designs were built (`home-a`, `home-b`, `home-c`) and then **dropped**.
+    - Raid Composition has designs A and B, each with a working planning table.
+
+### What is next (in order)
+
+1. **Backgrounds:** go back to the original crystal-over-teal look, with a simple background of its own and a colour of its own per tab. Confirm the colour list in the plan with the owner first.
+2. **Raid Composition:**
+   - Browser-test the A and B planning tables. In A, add and load-example work; Move needs a re-test.
+   - Design C (`raid-comp-c.html`) was cut off and is an unfinished local copy, not committed.
+   - The owner picks one table.
+3. **Gallery and walkthrough:** update the gallery, then continue the tab-by-tab walkthrough. Professions comes later.
+4. **Fix-it tasks** found while prototyping, offered as separate tasks:
+   - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
+   - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points, and takes Flurry without Enrage.
+   - Lady Vashj's loot lists Destroyer Greathelm (tank) tagged for DPS.
+   - The zone-map credit cites Microsoft's "Game Content Usage Rules".
+
+### Owner decisions to keep
+
+- **Phase 2 on purpose.** Phase 3 went live 2026-08-27, but the app stays on Phase 2 until the owner moves it.
+- **Plan before structural changes,** and ask before pushing unless told to push.
+- **Motion:** no sound. The portal intro played once per visit, but that design is now dropped.
+- **No Blizzard assets in prototypes.** The owner's reference screenshots are described in words, never committed.
+
+### How the prototypes were checked
+
+Playwright on system Edge, because Playwright's own browsers aren't installed:
+- at 1280px, at 400px, with reduced motion, and with WebGL disabled;
+- checking for script errors, failed loads, sideways scroll and invisible content;
+- plus screenshots.
+
+The check scripts were temporary and are not in the repo; recreate them from these notes if needed. Run
+`npx playwright install chromium` to use `npm run test` normally.
+
+---
+
+## Where this was on 2026-09-26
+
 
 **The planner was rebuilt around what it is for, and all five of the owner's heuristic findings are
 answered.** They rated the post-creation screen's density a major problem and said to fix that first;
