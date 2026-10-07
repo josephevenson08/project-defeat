@@ -38,11 +38,12 @@ a{color:var(--glow)}
 .wrap{max-width:1240px;margin:0 auto;padding:0 16px}
 /* scene + fallback */
 #scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+/* without WebGL: the tab's deep sea blue */
 .fallback{position:fixed;inset:0;z-index:0;background:
-  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
-  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
-  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
-  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+  radial-gradient(60% 40% at 50% 78%,rgba(90,176,255,.26),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(190,228,255,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(190,228,255,.08),transparent 70%),
+  linear-gradient(180deg,#01040e 0%,#04133a 55%,#082054 100%)}
 html[data-raid="tk"] .fallback{background:
   radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
   radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
@@ -565,7 +566,7 @@ const moving=()=>!RMQ.matches&&(G?M.on:true);
 /* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
    The planner stays calm: K2 sky over K5 Coilfang water, dimmed by the veil; no K1 ignition here. */
 const KIT=window.TBCKit||null;
-if(KIT)KIT.theme("ssc",{instant:true});
+if(KIT)KIT.theme("planner",{instant:true}); /* the tab's own colour: deep sea blue with slow rising bubbles */
 /* K10: the hit-cap warning takes a slow sickly-green tint while hit is under cap (the text stays the cue) */
 const HIT={have:140,cap:142};
 const taintHit=()=>{const el=$("#hitwarn");if(KIT&&el)KIT.taint(el,HIT.have<HIT.cap);};

@@ -1,9 +1,37 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-05): start here
+## ▶ Where we left off (2026-10-07): start here
 
-Work stopped on purpose ahead of the weekly usage limit. Pick up from this section. The original plan
-from 2026-10-04 follows further down, for reference.
+**Step 1 of the list below is done: every tab has its own background.** The owner approved the colour
+list as proposed, and decided two things about Home:
+- The fel-green portal ignition is replaced by one soft crystal swell per browser session.
+- Home's Serpentshrine/Tempest Keep backdrop switch is removed, so Home always shows its own teal.
+
+What was built and how it was checked is in [`README.md`](README.md#per-tab-backgrounds-2026-10-07). In
+short: four new themes in `tbc-kit.js`, one line per page to pick one, and a matching WebGL-off fallback
+on each page.
+
+**Two values differ slightly from the approved swatches:**
+- Raid Composition's crystal and water are warmer (`#ffe2a6` over `#1a1610`, not `#fff3d6` over
+  `#17161c`). The first version rendered silver-grey rather than white-gold.
+- Professions' pillars are dark brown stone instead of violet, so the ore veins read.
+
+Both are easy to revert.
+
+**Next, in order** (steps 2 to 5 of the list below):
+1. **Raid Composition:** finish C or skip it, re-test A's and B's tables hands-on (Move, drag, Remove, Rename, Clear), and let the owner pick one. B's Hellfire orange sits near Professions' amber, which is worth weighing.
+2. **Gallery:** update it.
+3. **Step 2 walkthrough.**
+4. **Fix-it tasks.**
+
+**Open question for the owner:** the text accents (links, headings, buttons) are still teal on every
+tab. On Professions (amber) and Tier Lists (emerald), they could follow the tab's colour too. This was
+out of scope, so it was left alone.
+
+## Where we left off (2026-10-05)
+
+Work stopped on purpose ahead of the weekly usage limit. The original plan from 2026-10-04 follows
+further down, for reference.
 
 ### The owner's new direction for the background (decided 2026-10-05)
 
@@ -56,7 +84,7 @@ it's shown to the owner, focus on picking the best table, not the scenery.
 
 ### What is left, in order
 
-1. **Backgrounds:** confirm the per-tab colour and detail list with the owner, then build one simple background per tab. Drop the portal from Home.
+1. ~~**Backgrounds:** confirm the per-tab colour and detail list with the owner, then build one simple background per tab. Drop the portal from Home.~~ **Done 2026-10-07.**
 2. **Raid Composition:**
    - finish C (or skip it if the owner is happy with A or B);
    - re-test the table hands-on in a browser;

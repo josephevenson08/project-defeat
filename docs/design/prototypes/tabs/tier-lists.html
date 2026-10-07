@@ -39,11 +39,12 @@ a{color:var(--glow)}
 .wrap{max-width:1240px;margin:0 auto;padding:0 16px}
 /* scene + fallback */
 #scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+/* without WebGL: the tab's emerald */
 .fallback{position:fixed;inset:0;z-index:0;background:
-  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
-  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
-  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
-  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+  radial-gradient(60% 40% at 50% 78%,rgba(62,224,143,.24),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(232,210,90,.08),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,200,.08),transparent 70%),
+  linear-gradient(180deg,#010805 0%,#052516 55%,#08361f 100%)}
 html[data-raid="tk"] .fallback{background:
   radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
   radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
@@ -339,7 +340,7 @@ nav.sections a:hover{color:var(--ink)}
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-/* Spec Tier Lists tab: Serpentshrine teal, lamp dimmed behind the dense lists; "charge" gives a short pulse when a filter changes */
+/* Spec Tier Lists tab: emerald (tbc-kit.js "tiers" theme), lamp dimmed behind the dense lists; "charge" gives a short pulse when a filter changes */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
 /* hooks for tbc-kit.js (contract documented at the top of that file) */
 const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
@@ -484,7 +485,7 @@ const moving=()=>!RMQ.matches&&(G?M.on:true);
 /* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
    This tab stays calm: K2 sky over K5 Coilfang water; K7 rune base under the shelves; K8 on filter / view changes; no K1 here. */
 const KIT=window.TBCKit||null;
-if(KIT)KIT.theme("ssc",{instant:true});
+if(KIT)KIT.theme("tiers",{instant:true}); /* the tab's own colour: emerald, three stacked rank rings */
 /* K7: (re)mount the rune base. Called with motion on it draws in and turns slowly; otherwise it is drawn static at rest. */
 let rune=null;
 function mountRune(){

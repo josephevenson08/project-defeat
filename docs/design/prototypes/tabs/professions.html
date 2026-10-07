@@ -37,11 +37,12 @@ a{color:var(--glow)}
 .wrap{max-width:1240px;margin:0 auto;padding:0 16px}
 /* scene + fallback */
 #scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+/* without WebGL: the tab's amber */
 .fallback{position:fixed;inset:0;z-index:0;background:
-  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
-  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
-  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
-  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+  radial-gradient(60% 40% at 50% 78%,rgba(255,181,71,.24),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(216,236,255,.07),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(255,220,150,.08),transparent 70%),
+  linear-gradient(180deg,#070401 0%,#1a1004 55%,#2a1906 100%)}
 html.gl .fallback{display:none}
 html:not(.gl) #scene{display:none}
 .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
@@ -293,7 +294,7 @@ window.PD={"P":[{"n":"Alchemy","c":"Crafting","g":"https://www.wow-professions.c
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-/* Professions tab: Serpentshrine teal, calm and dim behind dense tables. "charge" only spins the crystal briefly when a profession opens */
+/* Professions tab: amber (tbc-kit.js "profs" theme), calm and dim behind dense tables. "charge" only spins the crystal briefly when a profession opens */
 const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
 /* hooks for tbc-kit.js (contract documented at the top of that file) */
 const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
@@ -362,10 +363,10 @@ const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBa
 halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
 const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
 const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
-/* The Eye's pillars receding into the violet fog */
-const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+/* dark stone pillars receding into the fog; tbc-kit.js runs veins of ore up them (the "profs" theme) */
+const pm=new THREE.MeshStandardMaterial({color:0x1a1009,roughness:.9,flatShading:true}),pillars=[];
 [[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
-  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);pillars.push(c);});
 scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
 R.setClearColor(cur.fog);
 /* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
@@ -416,7 +417,7 @@ S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
 S.isEnabled=()=>enabled&&!lost;
 S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
 S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
-S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water,pillars};
 size();still();
 })();
 </script>
@@ -440,7 +441,7 @@ const fmt=n=>Math.round(n).toLocaleString("en-US");
    This tab stays calm: K2 sky over K5 Coilfang water; K4 fel embers behind Mining's Fel Iron route,
    a K7 rune ring that draws with that route, K8 when a profession or a skill range opens. No K1 here. */
 const KIT=window.TBCKit||null;
-if(KIT)KIT.theme("ssc",{instant:true});
+if(KIT)KIT.theme("profs",{instant:true}); /* the tab's own colour: amber, ore glints on the floating rocks */
 let ring=null,selRange=null;
 const dropRing=()=>{if(ring){ring.remove();ring=null;}};
 /* K4: fel embers only while Mining shows the Fel Iron (Hellfire Peninsula) range */

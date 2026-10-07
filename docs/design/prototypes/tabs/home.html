@@ -25,8 +25,6 @@
   --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
   --px:0; --py:0;
 }
-/* Tempest Keep backdrop: arcane gold over violet (selected in the hero) */
-:root[data-raid="tk"]{--glow:var(--tk);--glow-soft:rgba(236,192,106,.14);--rim:rgba(200,160,255,.24);--rim-2:rgba(200,160,255,.12);--focus:#ffe2a3}
 :root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -43,10 +41,6 @@ a{color:var(--glow)}
   radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
   radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
   linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
-html[data-raid="tk"] .fallback{background:
-  radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
-  radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
-  linear-gradient(180deg,#07040f 0%,#160c2a 55%,#1f1236 100%)}
 html[data-phase="1"] .fallback{background:
   radial-gradient(60% 40% at 50% 78%,rgba(242,166,90,.26),transparent 70%),
   radial-gradient(26% 16% at 72% 82%,rgba(217,84,43,.14),transparent 70%),
@@ -88,10 +82,6 @@ select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px 
 .btn.big{font-size:var(--t-md);padding:11px 20px}
 .capline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-sm);margin:0}
 .capline b{color:var(--warn)}
-.raidpick{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:var(--t-xs);color:var(--ink-2)}
-.raidpick button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink-2);border-radius:999px;padding:4px 10px;cursor:pointer}
-.raidpick button[aria-pressed="true"]{border-color:var(--glow);color:var(--glow);background:var(--glow-soft)}
-.raidpick button:disabled{opacity:.55;cursor:not-allowed}
 /* hit-cap gauge */
 .gauge{height:6px;background:rgba(255,207,122,.14);border-radius:3px;overflow:hidden;margin:4px 0 6px}
 .gauge i{display:block;height:100%;width:98.6%;background:var(--warn);transform-origin:left;box-shadow:0 0 10px var(--warn)}
@@ -242,7 +232,6 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
       <p>Project Defeat is a gear planner for DPS players in World of Warcraft: TBC Classic Anniversary, Phase 2. Fill every slot from real rankings, see where each piece drops, and check the numbers before raid night.</p>
       <div class="actions"><a class="btn big magnet" href="planner.html" data-wipe="Character Planner">Open the Character Planner</a> <a class="btn ghost big" href="#import">Import your character</a></div>
       <p class="capline prov">Rankings: Wowhead · Phase 2 · updated 12 Sep · every number on the site carries its source and date</p>
-      <div class="raidpick" role="group" aria-label="Raid backdrop"><span>Backdrop:</span><button type="button" data-raid="ssc" aria-pressed="true">Serpentshrine Cavern</button><button type="button" data-raid="tk" aria-pressed="false">Tempest Keep</button></div>
     </div>
   </div>
   <div class="layer what" style="--z:4"><section class="box" aria-labelledby="h-what">
@@ -546,7 +535,6 @@ function applyPhase(p){
     if(tc&&raids)tc.insertBefore(raids,profs);
   }
   $$(".fact .ix").forEach((b,i)=>b.textContent="0"+(i+1));
-  $$(".raidpick button").forEach(b=>b.disabled=p==="1");
   say("Showing "+d.chip);
 }
 const phs=$("#phs");
@@ -555,16 +543,6 @@ if(phs)phs.addEventListener("change",e=>{
   if(M.on&&M.flipHome)M.flipHome(()=>applyPhase(p));else applyPhase(p);
   relight("warm",p==="1"?1:0);
 });
-
-/* ---------- raid backdrop: Serpentshrine Cavern (teal water) or Tempest Keep (arcane gold / violet) ---------- */
-$$(".raidpick button").forEach(b=>b.addEventListener("click",()=>{
-  const r=b.dataset.raid;
-  $$(".raidpick button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  if(r==="tk")root.dataset.raid="tk";else delete root.dataset.raid;
-  if(KIT)KIT.theme(r==="tk"?"tk":"ssc"); /* K5 Coilfang water ↔ K6 crystalline fortress, 1.2s crossfade */
-  else relight("tk",r==="tk"?1:0);
-  say("Backdrop: "+b.textContent);
-}));
 
 /* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
 const rs=root.style;
@@ -633,8 +611,11 @@ function enable(first){
   mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
   if(ST)ScrollTrigger.refresh();
   label(true);
-  /* K1: the portal ignition, once per browser session, never under reduced motion; click or Esc skips it */
-  if(first&&KIT)KIT.ignite();
+  /* K3: the crystal brightens once per browser session as the page settles (the portal ignition was dropped 2026-10-05) */
+  if(first&&KIT){
+    let seen=null;try{seen=sessionStorage.getItem("pd-home-swell");sessionStorage.setItem("pd-home-swell","1");}catch(e){}
+    if(!seen)setTimeout(()=>{if(M.on)KIT.swell();},700);
+  }
 }
 function disable(){
   if(!M.on)return;
@@ -666,7 +647,7 @@ function intro(){
     const sp=SplitText.create("#h-home",{type:"words",wordsClass:"w",mask:"words",aria:"auto"});
     tl.from(sp.words,{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
   }
-  tl.from(".hero-in>p, .actions, .raidpick",{y:18,autoAlpha:0,duration:.45,stagger:.06},.45)
+  tl.from(".hero-in>p, .actions",{y:18,autoAlpha:0,duration:.45,stagger:.06},.45)
     .from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
   if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
   /* K8: tab cards already in view open through a small ring of light */

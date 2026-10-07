@@ -89,13 +89,12 @@ is tuned to TBC by [this research](docs/research/wow-tbc-motion/README.md).
 
 ### Picking the work back up
 
-The prototype work stopped on 2026-10-05. **Continue from
+The prototype work was last updated on 2026-10-07. **Continue from
 [`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md)**:
 the top section says where things stand and what's next. In short:
 
-1. **Backgrounds.** The Dark Portal Home designs are dropped. Go back to the original crystal-over-teal
-   look, and give every tab a simple background of its own in its own colour. The starting colour ideas
-   are in the plan; confirm them before building.
+1. **Backgrounds: done.** Every tab now has its own colour over the original crystal and water, and
+   the Dark Portal designs are dropped.
 2. **Raid Composition.** Finish and browser-test the planning tables in `raid-comp-a.html` and
    `raid-comp-b.html`, then pick one. Design C was cut off and only exists locally, unfinished.
 3. Update the [prototype gallery](docs/design/prototypes/index.html), then continue the tab-by-tab

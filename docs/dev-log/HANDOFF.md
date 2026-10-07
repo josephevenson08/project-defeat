@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-07.** Self-contained
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-07 (per-tab backgrounds built).** Self-contained
 brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** the section below is where things stand, and ["What is left, in one
@@ -40,7 +40,11 @@ Read that first.
 
 ### What is next (in order)
 
-1. **Backgrounds:** go back to the original crystal-over-teal look, with a simple background of its own and a colour of its own per tab. Confirm the colour list in the plan with the owner first.
+1. ~~**Backgrounds:**~~ **Done 2026-10-07.** Every tab has its own colour over the original crystal and water:
+   - Home teal, Planner deep sea blue, Simulation gold over violet, Raid Composition warm white-gold, Tier Lists emerald, Raids per raid, and Professions amber.
+   - The four new ones are themes in `tabs/tbc-kit.js`, each with one small signature detail.
+   - Home's portal ignition became a crystal swell, and its backdrop switch is gone.
+   - Details are in `tabs/README.md` ("Per-tab backgrounds") and at the top of the next-session plan.
 2. **Raid Composition:**
    - Browser-test the A and B planning tables. In A, add and load-example work; Move needs a re-test.
    - Design C (`raid-comp-c.html`) was cut off and is an unfinished local copy, not committed.

@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md), the owner's review of these pages. In short: Home gets a Dark Portal scene, Raid Composition gets its own theme and a fully working raid table, Raids gets search, the Planner gets row hover, and every tab gets its own look.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). Every tab now has its own background (see [below](#per-tab-backgrounds-2026-10-07)). Next is choosing a Raid Composition table.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -32,13 +32,13 @@ sound. Each page connects its Three.js scene through a documented `window.SCENE`
 
 | Page | How it uses the kit |
 | --- | --- |
-| Home | Portal ignition once per visit (blue to fel green, into the crystal). Shattered sky over Coilfang water. Entry rings on tab cards. A rune ring and naaru swell on import. |
-| Character Planner | Calm Coilfang water. Entry rings between sub-tabs. A swell on equip, share and import. A taint tint on the hit-cap warning. A rebirth burst on "Reset to recommended set". A one-time lift when all 17 slots match. |
+| Home | A crystal swell once per browser session (until 2026-10-07 this was the portal ignition, blue to fel green). Shattered sky over Coilfang water. Entry rings on tab cards. A rune ring and naaru swell on import. |
+| Character Planner | Calm deep-sea-blue water with rising bubbles (originally Coilfang teal). Entry rings between sub-tabs. A swell on equip, share and import. A taint tint on the hit-cap warning. A rebirth burst on "Reset to recommended set". A one-time lift when all 17 slots match. |
 | Simulation | Crystalline fortress (Tempest Keep). On Simulate: fel embers and a rune ring while it charges, then a swell and entry rings when the result lands. |
-| Raid Composition | Calm Coilfang water. Entry rings on swapped seats and on 10/25. A swell when a swap gives a group a buff it was missing. |
-| Spec Tier Lists | Coilfang water. A rune-ring base under the 3D shelves. Entry rings on filter and view changes. |
+| Raid Composition | Calm warm white-gold water with five group lights (originally Coilfang teal). Entry rings on swapped seats and on 10/25. A swell when a swap gives a group a buff it was missing. |
+| Spec Tier Lists | Emerald water with rank rings (originally Coilfang teal). A rune-ring base under the 3D shelves. Entry rings on filter and view changes. |
 | Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on boss cards. A rune ring beside each attunement chain. |
-| Professions | Calm water. On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
+| Professions | Calm amber water with ore veins (originally teal). On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
 
 **Kit fixes made during the rollout:**
 - Motion off now ends embers that a user action started, while a raid theme's embers stay in the still frame.
@@ -48,6 +48,30 @@ sound. Each page connects its Three.js scene through a documented `window.SCENE`
 **Checks:** all seven were checked with Playwright on Edge at 1280px, at 400px, with reduced motion and with WebGL disabled. There were no script errors, failed loads, sideways scroll or invisible content. Screenshots confirm the ignition and the per-raid themes.
 
 The automated browser renders 3D in software, so it always picked the low performance tier. The medium and high tiers haven't been seen yet.
+
+## Per-tab backgrounds (2026-10-07)
+
+The owner's direction from 2026-10-05: drop the Dark Portal, keep the original crystal over water, and
+give every tab its own colour. The layouts, content and text colours are unchanged.
+
+Each colour is a theme in `tbc-kit.js`. A page picks it with one line, such as
+`KIT.theme("planner",{instant:true})`. The four new themes each add one small detail. The kit builds a
+detail the first time its theme is shown, and the detail fades in and out with its theme. Each page's
+WebGL-off fallback gradient uses the same colour.
+
+| Tab | Theme | Colour | Signature detail |
+| --- | --- | --- | --- |
+| Home | `ssc` | Teal, the original | Light shafts and the water pulse. The fel-green portal ignition is gone: the crystal now swells softly once per browser session. The Serpentshrine/Tempest Keep backdrop switch was removed, so Home always shows its own teal. |
+| Character Planner | `planner` | Deep sea blue | Slow rising bubbles |
+| Simulation | `tk` | Gold over violet (unchanged) | Crystal pillars |
+| Raid Composition | `raidcomp` | Warm white-gold | Five lights circling the crystal on a faint ring, one per raid group |
+| Spec Tier Lists | `tiers` | Emerald | Three dashed rings of light stepping up under the crystal, like a podium |
+| Raids | follows the raid (unchanged) | Per raid | As before |
+| Professions | `profs` | Amber | Veins of ore up the dark stone pillars, with a glint running up each one now and then, and ore glints on the floating rocks |
+
+- **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
+- **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
+- **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
 
 ## The seven pages
 

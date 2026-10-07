@@ -25,7 +25,9 @@
      onState(f)    fn        host calls f(SCENE) whenever motion / enabled / lost changes
      three         object    { scene, camera, renderer, uniforms, crystal, halo, lamp, water }
                              crystal: Mesh with MeshStandardMaterial (emissive); halo: Mesh with opacity;
-                             lamp: PointLight. Missing members just switch the matching effect off.
+                             lamp: PointLight; pillars (optional): array of the host's static pillar Meshes
+                             (CylinderGeometry), used for the 'profs' ore veins.
+                             Missing members just switch the matching effect off.
    The kit OWNS the crystal's emissiveIntensity, the halo's opacity and the lamp's intensity (K3 swell
    writes them outright). Hosts must not write those every frame; animate rotation/scale instead.
    The host owns the render loop (rAF, visibilitychange pause, context loss). The kit never starts
@@ -37,7 +39,8 @@
      ignite({force})             K1 portal ignition; once per browser session; skippable (click / Esc)
      swell()                     K3 naaru swell, ~1.2s soft brightness rise and fall, never restarts mid-swell
      embers(on, {count,height,preset:'fel'|'hellfire'})   K4 fel embers
-     theme(name, {instant})      'ssc' (K5) | 'tk' (K6) | 'hellfire' | 'bladesedge' | 'karazhan'; 1.2s crossfade
+     theme(name, {instant})      'ssc' (K5) | 'tk' (K6) | 'hellfire' | 'bladesedge' | 'karazhan', or a tab theme
+                                 'planner' | 'raidcomp' | 'tiers' | 'profs' (see TAB THEMES below); 1.2s crossfade
      runeRing(el, {size,glyphs,seed,spin})  K7 SVG rune ring into el → {svg, remove()}
      enter(el, {delay})          K8 light-portal entry ring for a panel
      rebirth(x, y)               K9 gold-orange sparks scatter and re-form (viewport px; default centre)
@@ -46,6 +49,15 @@
      setMotion(on)               only for pages without a SCENE
      tier / ok / themeName       read-only: 'low'|'medium'|'high', 3D extras built, current theme
    K2 (shattered sky: instanced rocks + nether aurora) is built by init and runs under every theme.
+
+   TAB THEMES (every tab its own colour over the same crystal-and-water scene, decided 2026-10-05)
+     Home 'ssc' teal (light shafts + water pulse) · Simulation 'tk' gold over violet (crystal pillars)
+     · Raids follows the raid. The four below each add one small signature detail, built the first
+     time the theme is shown and faded with the theme's weight:
+     planner   deep sea blue     slow rising bubbles
+     raidcomp  warm white-gold   five lights circling the crystal, one per raid group
+     tiers     emerald           three stacked rank rings under the crystal
+     profs     amber             ore glints in veins on the floating rocks
 
    ACCESSIBILITY: reduced motion → still frame, no ignition, no swells, rings drawn static.
    Every pulse is a single slow swell (< 1 per second); nothing flashes 3 times a second.
@@ -58,11 +70,12 @@ const RMQ=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{matc
 const hasG=()=>typeof window.gsap!=="undefined";
 const hasT=()=>typeof window.THREE!=="undefined";
 const hasDraw=()=>hasG()&&typeof window.DrawSVGPlugin!=="undefined";
-const THEMES=["ssc","tk","hellfire","bladesedge","karazhan"];
+const TABS=["planner","raidcomp","tiers","profs"];
+const THEMES=["ssc","tk","hellfire","bladesedge","karazhan"].concat(TABS);
 const SKEY="pd-tbc-ignited";
 let S=null,GL=false,hostMotion=null;
 const K={t:0,frames:0,tier:"medium",theme:"ssc",every:3,auDirty:true,emUser:false,emTheme:false,igniting:null};
-const W={ssc:1,tk:0,hellfire:0,bladesedge:0,karazhan:0};
+const W={ssc:1,tk:0,hellfire:0,bladesedge:0,karazhan:0,planner:0,raidcomp:0,tiers:0,profs:0};
 const live=new Set();
 
 function motionOn(){
@@ -114,10 +127,10 @@ const VUV=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*mode
 
 /* ---------- performance tiers: start on medium, measure ~2s of real frames, then settle ---------- */
 const TIERS={
-  low:   {rocks:6, embers:150,aurora:0,  every:0,oct:3,dpr:1,  shafts:2},
-  medium:{rocks:12,embers:300,aurora:.25,every:3,oct:4,dpr:1.5,shafts:4},
-  high:  {rocks:18,embers:500,aurora:.5, every:2,oct:5,dpr:1.5,shafts:4}};
-const MAXROCKS=18,MAXEMB=500;
+  low:   {rocks:6, embers:150,aurora:0,  every:0,oct:3,dpr:1,  shafts:2,bubbles:50},
+  medium:{rocks:12,embers:300,aurora:.25,every:3,oct:4,dpr:1.5,shafts:4,bubbles:100},
+  high:  {rocks:18,embers:500,aurora:.5, every:2,oct:5,dpr:1.5,shafts:4,bubbles:160}};
+const MAXROCKS=18,MAXEMB=500,MAXBUB=160;
 const perf={n:0,sum:0,last:0,start:0,done:false};
 function seedTier(){const dm=navigator.deviceMemory;return dm&&dm<=2?"low":"medium";}
 function measure(){
@@ -139,6 +152,8 @@ function setTier(name){
   if(G3.rocks)G3.rocks.count=Math.min(T.rocks,MAXROCKS);
   G3.emCap=Math.round(T.embers*(small?.5:1));
   if(G3.emGeo)G3.emGeo.setDrawRange(0,Math.min(G3.emWant||G3.emCap,G3.emCap));
+  G3.bubCap=Math.round(T.bubbles*(small?.5:1));
+  if(D.planner&&D.planner.geo)D.planner.geo.setDrawRange(0,G3.bubCap);
   G3.shafts.forEach((m,i)=>{m.userData.tierOn=i<T.shafts;});
   [G3.auMat,G3.shaftMat,G3.glowMat].forEach(m=>{if(m){m.defines.OCT=Math.min(T.oct,m.userData.maxOct||5);m.needsUpdate=true;}});
   if(G3.auPlane){
@@ -150,7 +165,8 @@ function setTier(name){
 }
 
 /* ---------- attach to the host scene ---------- */
-const G3={shafts:[],pillars:[],emCap:300,emWant:0};
+const G3={shafts:[],pillars:[],emCap:300,emWant:0,bubCap:100};
+const D={}; /* tab-theme details, built on first use */
 function init(scn){
   css();
   if(!scn||S===scn)return api;
@@ -179,6 +195,7 @@ function frame(dt){
   updateAurora(dt);
   if(G3.glow&&cr){G3.glow.visible=cr.visible!==false;G3.glow.position.copy(cr.position);if(cam)G3.glow.quaternion.copy(cam.quaternion);}
   if(G3.portal&&cam)G3.portal.quaternion.copy(cam.quaternion);
+  updateDetails();
 }
 function onState(){
   const m=motionOn(),g=glOn();
@@ -290,9 +307,16 @@ function buildFortress(){
 /* ---------- themes: weights W crossfade over 1.2s; the host palette lerps through onTint ---------- */
 const EXTRA_HEX={hellfire:{light:"#ff8a3a",deep:"#1c0805",fog:"#160504",acc:"#7dff4a"},
   bladesedge:{light:"#f0a070",deep:"#140d16",fog:"#1b0f16",acc:"#9b6bff"},
-  karazhan:{light:"#b48cff",deep:"#0d0a1c",fog:"#0a0714",acc:"#5ad1ff"}};
+  karazhan:{light:"#b48cff",deep:"#0d0a1c",fog:"#0a0714",acc:"#5ad1ff"},
+  planner:{light:"#5ab0ff",deep:"#031033",fog:"#020a22",acc:"#9fe8ff"},
+  raidcomp:{light:"#ffe2a6",deep:"#1a1610",fog:"#0f0d09",acc:"#8cc8f0"},
+  tiers:{light:"#3ee08f",deep:"#03190f",fog:"#020e08",acc:"#e8d25a"},
+  profs:{light:"#ffb547",deep:"#1a1004",fog:"#0f0903",acc:"#d8ecff"}};
 const AUC={ssc:["#5cf2c0","#4a2a90",.55],tk:["#ecc06a","#8a5cff",1],hellfire:["#ff6a2a","#6a1010",.7],
-  bladesedge:["#ff9a6a","#4a2a6a",.6],karazhan:["#b48cff","#2a1a6a",.75]};
+  bladesedge:["#ff9a6a","#4a2a6a",.6],karazhan:["#b48cff","#2a1a6a",.75],
+  planner:["#6ab8ff","#1a2a7a",.5],raidcomp:["#ffe2a0","#3a3a6a",.55],tiers:["#5cf2a0","#0e4a3a",.55],profs:["#ffc061","#5a2a10",.5]};
+/* the floating rocks take a little of each tab's colour (violet by default, ember for Hellfire / Blade's Edge) */
+const ROCK_HEX={planner:"#0f2a66",raidcomp:"#3a3020",tiers:"#0f3a26",profs:"#4a2808"};
 let EXTRA=null,AUCOL=null;
 function colors(){
   if(EXTRA||!hasT())return;
@@ -301,7 +325,7 @@ function colors(){
 }
 function tintHook(cur){
   colors();
-  ["hellfire","bladesedge","karazhan"].forEach(k=>{const w=W[k];if(w>.001)["light","deep","fog","acc"].forEach(n=>{if(cur&&cur[n])cur[n].lerp(EXTRA[k][n],w);});});
+  Object.keys(EXTRA_HEX).forEach(k=>{const w=W[k];if(w>.001)["light","deep","fog","acc"].forEach(n=>{if(cur&&cur[n])cur[n].lerp(EXTRA[k][n],w);});});
 }
 function applyTheme(){
   if(!GL)return;colors();
@@ -314,7 +338,164 @@ function applyTheme(){
   G3.pumpMat.uniforms.uI.value=W.ssc;G3.pump.visible=W.ssc>.01;
   G3.pilMat.opacity=W.tk*.95;G3.pillars.forEach(m=>{m.visible=W.tk>.01;});
   G3.rockMat.emissive.set("#2a1450").lerp(tmpC.set("#6a2c14"),W.bladesedge+W.hellfire*.6);
-  G3.rockMat.emissiveIntensity=.35+.25*W.bladesedge;
+  TABS.forEach(k=>{if(W[k]>0)G3.rockMat.emissive.lerp(tmpC.set(ROCK_HEX[k]),W[k]);});
+  G3.rockMat.emissiveIntensity=.35+.25*W.bladesedge+.15*W.profs;
+  TABS.forEach(k=>{if(W[k]>0&&!D[k])buildDetail(k);showDetail(k,W[k]);});
+}
+/* ---------- tab-theme details (see TAB THEMES at the top) ---------- */
+function dprU(){const U=S.three.uniforms;return U&&U.uDpr?U.uDpr:{value:Math.min(window.devicePixelRatio||1,1.5)};}
+function additive(U,vs,fs,extra){return new THREE.ShaderMaterial(Object.assign({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexShader:vs,fragmentShader:fs},extra||{}));}
+function buildDetail(k){
+  try{({planner:buildBubbles,raidcomp:buildGroupLights,tiers:buildRankRings,profs:buildOreGlints})[k]();}
+  catch(e){D[k]={failed:true};if(window.console)console.warn("TBCKit: "+k+" detail unavailable",e);}
+}
+function showDetail(k,w){
+  const d=D[k];if(!d||d.failed)return;const on=w>.01;
+  if(d.U){d.U.uI.value=w;d.mesh.visible=on;if(d.veins)d.veins.visible=on;}
+  if(d.orbit){d.orbit.material.opacity=.16*w;d.orbit.visible=on;}
+  if(d.rings)d.rings.forEach(m=>{m.material.uniforms.uI.value=w;m.visible=on;});
+}
+/* the crystal bobs, so the details that circle it follow it every frame (still frames included) */
+function updateDetails(){
+  const cr=S.three.crystal;
+  const lights=D.raidcomp,rings=D.tiers,ore=D.profs;
+  if(cr&&lights&&lights.U){const c=cr.position,on=W.raidcomp>.01&&cr.visible!==false;
+    lights.U.uC.value.copy(c);lights.orbit.position.set(c.x,c.y-.35,c.z);lights.mesh.visible=lights.orbit.visible=on;}
+  if(cr&&rings&&rings.rings){const c=cr.position,on=W.tiers>.01&&cr.visible!==false;
+    rings.rings.forEach(m=>{m.position.set(c.x,m.userData.y,c.z);m.visible=on;});}
+  if(ore&&ore.U)ore.U.uCount.value=G3.rocks?G3.rocks.count:0;
+}
+/* planner: soft hollow bubbles rise from the water, wobble, and fade out high up; all on the GPU */
+function buildBubbles(){
+  const r=rng(4242),pos=new Float32Array(MAXBUB*3),seed=new Float32Array(MAXBUB);
+  for(let i=0;i<MAXBUB;i++){pos[i*3]=(r()-.5)*24;pos[i*3+1]=r()*7;pos[i*3+2]=-r()*15;seed[i]=r();}
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+  geo.setDrawRange(0,G3.bubCap);
+  const U={uTime:KU.uTime,uDpr:dprU(),uCol:{value:new THREE.Color("#bfe4ff")},uI:{value:0}};
+  const mesh=new THREE.Points(geo,additive(U,
+    `uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+    void main(){vec3 p=position;float y=mod(p.y+uTime*(.12+aSeed*.22),7.);p.y=y+.1;
+      p.x+=sin(uTime*(.7+aSeed)+aSeed*40.)*.18;p.z+=cos(uTime*.6+aSeed*25.)*.12;
+      vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+      gl_PointSize=(8.+aSeed*12.)*uDpr*(10./-mv.z);
+      vA=smoothstep(0.,.6,y)*(1.-smoothstep(5.,7.,y))*(1.-smoothstep(10.,30.,-mv.z));}`,
+    `uniform vec3 uCol;uniform float uI;varying float vA;
+    void main(){vec2 c=gl_PointCoord-.5;float d=length(c);
+      float rim=smoothstep(.5,.44,d)*smoothstep(.3,.42,d);
+      float hi=smoothstep(.14,0.,length(c-vec2(-.16,-.16)));
+      gl_FragColor=vec4(uCol,(rim*.8+hi*.85)*vA*uI);}`));
+  mesh.frustumCulled=false;mesh.visible=false;S.three.scene.add(mesh);
+  D.planner={mesh,U,geo};
+}
+/* raidcomp: five warm lights orbit the crystal on a faint ring, one per raid group, each breathing slowly */
+function buildGroupLights(){
+  const pos=new Float32Array(15),idx=new Float32Array([0,1,2,3,4]);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("aI",new THREE.BufferAttribute(idx,1));
+  const U={uTime:KU.uTime,uDpr:dprU(),uC:{value:new THREE.Vector3()},uCol:{value:new THREE.Color("#fff0c8")},uI:{value:0}};
+  const mesh=new THREE.Points(geo,additive(U,
+    `uniform float uTime,uDpr;uniform vec3 uC;attribute float aI;varying float vB;
+    void main(){float a=aI*1.25664+uTime*.12;
+      vec3 p=uC+vec3(cos(a)*2.4,-.35+sin(uTime*.45+aI*1.3)*.15,sin(a)*2.4);
+      vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+      vB=.75+.25*sin(uTime*.5+aI*2.1);
+      gl_PointSize=26.*uDpr*(12./-mv.z);}`,
+    `uniform vec3 uCol;uniform float uI;varying float vB;
+    void main(){float d=length(gl_PointCoord-.5);float a=exp(-d*d*40.)+exp(-d*d*9.)*.35;
+      gl_FragColor=vec4(mix(uCol,vec3(1.),exp(-d*d*120.)*.6),clamp(a,0.,1.)*vB*uI);}`));
+  mesh.frustumCulled=false;mesh.visible=false;S.three.scene.add(mesh);
+  const orbit=new THREE.Mesh(new THREE.TorusGeometry(2.4,.012,4,120),
+    new THREE.MeshBasicMaterial({color:new THREE.Color("#fff0c8"),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  orbit.rotation.x=Math.PI/2;orbit.visible=false;S.three.scene.add(orbit);
+  D.raidcomp={mesh,U,orbit};
+}
+/* tiers: three flat rings of light stepping up under the crystal like a podium, dashed, turning slowly in turn */
+function buildRankRings(){
+  const rings=[];
+  [[2.7,.38,24,1],[2,.7,18,-1],[1.3,1.02,12,1]].forEach(([rad,y,n,dir],i)=>{
+    const U={uTime:KU.uTime,uCol:{value:new THREE.Color(i===2?"#e8d25a":"#5cf2a8")},uI:{value:0},uN:{value:n},uS:{value:.015*dir*(1+i*.4)}};
+    const m=new THREE.Mesh(new THREE.RingGeometry(rad-.05,rad+.05,160,1),additive(U,
+      `varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      `uniform float uTime,uI,uN,uS;uniform vec3 uCol;varying vec2 vP;
+      void main(){float f=fract(atan(vP.y,vP.x)/6.28318*uN+uTime*uS*uN);
+        float dash=smoothstep(0.,.08,f)*smoothstep(.62,.54,f);
+        gl_FragColor=vec4(uCol,(.18+.5*dash)*uI);}`,{side:THREE.DoubleSide}));
+    m.rotation.x=-Math.PI/2;m.userData.y=y;m.visible=false;S.three.scene.add(m);rings.push(m);});
+  D.tiers={rings};
+}
+/* profs: veins of ore. On the host's pillars (if it lists them) each vein is a dotted line with one glint
+   running up it every ~10s; on the floating rocks, short veins whose points twinkle on their own 5–12s
+   cycles. Both stay well under one flash a second in any one place. */
+const ORE_FS=`uniform vec3 uCol;uniform float uI;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);
+    gl_FragColor=vec4(mix(uCol,vec3(1.),smoothstep(.2,0.,d)*.7),smoothstep(.5,0.,d)*vA*uI);}`;
+function buildPillarVeins(U){
+  const P=S.three.pillars;if(!P||!P.length)return null;
+  const r=rng(31337),pts=[],seeds=[],steps=[],v=new THREE.Vector3(),TAU=Math.PI*2;
+  P.forEach(pl=>{
+    const g=pl.geometry&&pl.geometry.parameters;if(!g||!g.height)return;
+    pl.updateMatrixWorld(true);
+    const n=g.radialSegments||8,h=g.height,seg=TAU/n;
+    const at=(th,y)=>{ /* a point on the prism's flat face at angle th, height y, pushed just outside it */
+      const rad=g.radiusBottom+(g.radiusTop-g.radiusBottom)*(y+h/2)/h;
+      th=((th%TAU)+TAU)%TAU;const k=Math.floor(th/seg),s=th/seg-k,a0=k*seg,a1=a0+seg;
+      v.set(rad*(Math.sin(a0)+(Math.sin(a1)-Math.sin(a0))*s)*1.03,y,rad*(Math.cos(a0)+(Math.cos(a1)-Math.cos(a0))*s)*1.03);
+      return v.applyMatrix4(pl.matrixWorld);};
+    for(let vein=0;vein<3;vein++){
+      const len=2.5+r()*2,y0=-h/2+.6+r()*(h-len-1.2),th0=r()*TAU,drift=(r()-.5)*.5,sd=r();
+      for(let j=0;j<22;j++){
+        const y=y0+j*len/21,th=th0+drift*(y-y0)+(j%2?.05:-.05);
+        const p=at(th,y);pts.push(p.x,p.y,p.z);seeds.push(sd);steps.push(j);
+      }
+    }
+  });
+  if(!pts.length)return null;
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(pts),3));
+  geo.setAttribute("aSeed",new THREE.BufferAttribute(new Float32Array(seeds),1));
+  geo.setAttribute("aJ",new THREE.BufferAttribute(new Float32Array(steps),1));
+  const m=new THREE.Points(geo,additive(U,
+    `uniform float uTime,uDpr;attribute float aSeed,aJ;varying float vA;
+    void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;
+      float tw=pow(max(0.,sin(uTime*.6+aSeed*60.-aJ*.22)),24.);
+      vA=(.55+tw*.45)*(1.-smoothstep(16.,34.,-mv.z));
+      gl_PointSize=(4.+tw*7.)*uDpr*(14./-mv.z);}`,ORE_FS));
+  m.frustumCulled=false;m.visible=false;S.three.scene.add(m);
+  return m;
+}
+function buildOreGlints(){
+  const src=G3.rocks.geometry.attributes.position,faces=src.count/3,per=8,n=MAXROCKS*per,r=rng(777);
+  const pos=new Float32Array(n*3),aC=new Float32Array(n*4),aQ=new Float32Array(n*4),seed=new Float32Array(n),idx=new Float32Array(n);
+  const v=k=>[src.getX(k),src.getY(k),src.getZ(k)];
+  for(let k=0;k<MAXROCKS;k++){
+    const R=RD[k];
+    for(let vein=0;vein<2;vein++){
+      const f=Math.floor(r()*faces),e=Math.floor(r()*3),A=v(f*3+e),B=v(f*3+(e+1)%3);
+      for(let j=0;j<4;j++){
+        const i=k*per+vein*4+j,t=.15+j*.25;
+        for(let c=0;c<3;c++)pos[i*3+c]=(A[c]+(B[c]-A[c])*t)*1.03;
+        aC.set([R.x,R.y,R.z,R.s],i*4);aQ.set([R.ph,R.ry,R.sp,R.rx],i*4);seed[i]=r();idx[i]=k;
+      }
+    }
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("aC",new THREE.BufferAttribute(aC,4));
+  geo.setAttribute("aQ",new THREE.BufferAttribute(aQ,4));geo.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+  geo.setAttribute("aIdx",new THREE.BufferAttribute(idx,1));
+  const U={uTime:KU.uTime,uDpr:dprU(),uCount:{value:0},uCol:{value:new THREE.Color("#ffe3a0")},uI:{value:0}};
+  const mesh=new THREE.Points(geo,additive(U,
+    /* the same transform updateRocks() gives each rock: scale, rotate Y then X, bob */
+    `uniform float uTime,uDpr,uCount;attribute vec4 aC,aQ;attribute float aSeed,aIdx;varying float vA;
+    void main(){vec3 o=position*aC.w;
+      float ay=aQ.y+uTime*aQ.z,cy=cos(ay),sy=sin(ay),cx=cos(aQ.w),sx=sin(aQ.w);
+      o=vec3(cy*o.x+sy*o.z,o.y,-sy*o.x+cy*o.z);o=vec3(o.x,cx*o.y-sx*o.z,sx*o.y+cx*o.z);
+      vec3 p=aC.xyz+o;p.y+=sin(uTime*.35+aQ.x)*.18;
+      vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+      float tw=pow(max(0.,sin(uTime*(.5+aSeed*.7)+aSeed*60.)),18.),on=step(aIdx,uCount-.5);
+      vA=(.45+tw*.55)*on*(1.-smoothstep(16.,34.,-mv.z));gl_PointSize=(3.5+tw*7.)*uDpr*(14./-mv.z)*on;}`,ORE_FS));
+  mesh.frustumCulled=false;mesh.visible=false;S.three.scene.add(mesh);
+  D.profs={mesh,U,veins:buildPillarVeins(U)};
 }
 function theme(name,opts){
   if(THEMES.indexOf(name)<0)return null;
