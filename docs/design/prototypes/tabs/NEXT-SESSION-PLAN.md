@@ -14,10 +14,16 @@ has its chosen planning table.
 - **Testing:** both tables passed a hands-on browser test of every control, and phone tap targets were fixed on both. Details are in [`README.md`](README.md#raid-composition-the-planning-table-2026-10-07).
 
 **Next, in order:**
-1. **Raid Composition: click-to-fill and a pencil for names** (the owner's feedback on design A, 2026-10-07).
+1. **Raid Composition: click-to-fill, a pencil for names, and a dark page** (the owner's feedback on design A, 2026-10-07).
    The owner prefers how adding worked before to pressing "+ Add" on a seat and using the picker dialog.
    - **A palette of every class and spec, always on screen.** Clicking one seats that spec in the next open seat automatically, filling group 1 first, then 2, through to 5.
    - **A small pencil icon on each player's tag** to type their name. It replaces the "Name" button.
+   - **Make the page dark, like the other tabs.** The owner prefers dark to A's light page. A was light only because of its "Terrace of Light" concept. This means:
+     - Swap A's light colours (page, panels, ink, chips, picker) for the dark ones the other tabs use. The table layout stays.
+     - Give it a dark background that keeps the warm white-gold. Two ways to do that, to put to the owner:
+       - (a) Darken A's terrace scene and keep its per-group rings, which fill as buffs are covered.
+       - (b) Restore the dark white-gold water theme with five orbiting lights. It was removed today and is in git at `2ec0e64` (`tbc-kit.js`: `raidcomp` in `EXTRA_HEX`, `AUC` and `ROCK_HEX`, plus `buildGroupLights`).
+     - Re-check contrast on the dark version.
    - **Keep:** Move and drag, Remove, Undo, 10/25, example, Clear, and the results.
    - **The live app already does this.** Port it:
      - `src/features/raidcomp/RaidCompositionPanel.tsx`: the "Add a spec" palette is lines 501–537, grouped by class in class colours. `place()` and `targetGroup` are lines 320–330: the selected group if it has room, else the first group with room.

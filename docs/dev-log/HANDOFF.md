@@ -14,7 +14,7 @@ begin work; the rest is the record of how each decision was reached, newest firs
 > **Night of 2026-10-07: Raid Composition is decided.**
 > - The owner picked design A, the Terrace of Light, which is now `raid-composition.html`.
 > - Design C was dropped, and B is kept for reference.
-> - **Next is the owner's feedback on A.** Bring back the live app's click-to-fill palette of every class and spec, which fills group 1 first through group 5, and add a pencil icon on each player's tag for their name. Then the gallery.
+> - **Next is the owner's feedback on A.** Bring back the live app's click-to-fill palette of every class and spec, which fills group 1 first through group 5, and add a pencil icon on each player's tag for their name. Also make the page **dark** like the other tabs, still warm white-gold; A is light only because of its "Terrace of Light" concept. Then the gallery.
 >
 > The exact place to resume is the top of
 > [`tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md).
