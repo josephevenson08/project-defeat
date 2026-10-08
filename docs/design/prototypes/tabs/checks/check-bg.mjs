@@ -8,7 +8,7 @@ import { pathToFileURL } from "node:url";
 const TABS = path.resolve("docs/design/prototypes/tabs");
 const OUT = process.env.OUT;
 const PAGES = {
-  home: "ssc", planner: "planner", simulation: "tk", "raid-composition": null,
+  home: "ssc", planner: "planner", simulation: "tk", "raid-composition": "raidcomp",
   "tier-lists": "tiers", raids: null, professions: "profs",
 };
 const MODES = [

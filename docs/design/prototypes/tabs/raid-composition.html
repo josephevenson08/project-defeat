@@ -5,218 +5,224 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Project Defeat · Raid Composition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ---------- Raid Composition · "Terrace of Light" (design A, picked by the owner 2026-10-07 over B and C): Shattrath's naaru light on a pale dusk.
-   Its own palette (white-gold + soft sky blue on lavender dusk, dark dusk-indigo ink) and its own
-   motion personality: slow radiant swells, seats that settle like light landing. ---------- */
+/* ---------- Raid Composition: the planning table from design A (picked 2026-10-07) on the site's dark shell.
+   Dark like every other tab (the owner's call, 2026-10-07); this tab's colour is warm white-gold, so its
+   accents are gold and its scene is the kit's "raidcomp" water, one light per raid group. ---------- */
 :root{
-  color-scheme:light;
-  --dusk-top:#a9bbe0; --dusk-mid:#dcd5ec; --dusk-low:#f6e6c8; --ground:#e7e2ef;
-  --panel:rgba(255,251,243,.88); --panel-2:rgba(255,255,255,.94); --panel-3:rgba(250,244,230,.9);
-  --rim:rgba(178,136,52,.38); --rim-2:rgba(98,96,140,.18); --rim-3:rgba(98,96,140,.30);
-  --ink:#1c2040; --ink-2:#3d4264; --ink-3:#575c7e;
-  --gold:#7d560a; --gold-hi:#f2c75c; --gold-pale:#fff3cf; --gold-soft:rgba(242,199,92,.22);
-  --sky:#235d96; --sky-hi:#9cc8f0; --sky-soft:rgba(120,175,230,.20);
-  --rose:#9a2f55; --violet:#5a479a;
-  --warn:#8f3f00; --warn-soft:rgba(255,170,80,.16);
-  --glow:#f2c75c; --glow-ink:#2a1d02; --focus:#1f5c99;
-  --scrim:rgba(255,251,243,.9);
-  --f-head:"Cormorant Garamond","Palatino Linotype",Georgia,serif;
+  color-scheme:dark;
+  --abyss:#0a0806; --glass:rgba(22,18,12,.76); --glass-2:rgba(34,28,19,.82); --scrim:rgba(12,10,7,.84);
+  --rim:rgba(242,199,92,.26); --rim-2:rgba(242,199,92,.13); --rim-3:rgba(230,215,180,.22);
+  --ink:#f3ecdd; --ink-2:#cfc2a8; --ink-3:#a99c84;
+  --glow:#f2c75c; --glow-ink:#241801; --glow-soft:rgba(242,199,92,.14);
+  --sky:#9cc8f0; --violet:#b9a6ff; --rose:#ff9fb6;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --focus:#ffe2a3;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
   --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
-  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.25rem; --t-xl:1.6rem; --t-hero:clamp(2.1rem,6vw,3.8rem);
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
   --px:0; --py:0;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-body{background:var(--ground);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
-a{color:var(--sky)}
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
 .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{max-width:1280px;margin:0 auto;padding:0 16px}
 code{font:500 .92em var(--f-mono);color:var(--ink-2)}
-/* scene + fallback: pale dusk sky, the naaru's glow at the zenith, the terrace's light pooled below */
+/* scene + fallback (without WebGL: the tab's warm white-gold) */
 #scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
 .fallback{position:fixed;inset:0;z-index:0;background:
-  radial-gradient(16% 12% at 50% 22%,rgba(255,250,228,.95),rgba(255,236,170,.4) 45%,transparent 75%),
-  radial-gradient(70% 26% at 50% 86%,rgba(255,228,160,.55),transparent 70%),
-  radial-gradient(54% 16% at 50% 86%,transparent 58%,rgba(178,136,52,.22) 60%,transparent 64%),
-  linear-gradient(180deg,var(--dusk-top) 0%,var(--dusk-mid) 48%,var(--dusk-low) 100%)}
+  radial-gradient(60% 40% at 50% 78%,rgba(255,226,166,.24),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(140,200,240,.08),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(255,240,210,.08),transparent 70%),
+  linear-gradient(180deg,#090806 0%,#1a1610 55%,#2a2318 100%)}
 html.gl .fallback{display:none}
 html:not(.gl) #scene{display:none}
-.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(231,226,239,.15),rgba(231,226,239,0) 30%,rgba(231,226,239,.45))}
+/* a heavier veil keeps the water calm behind the dense table */
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(8,6,4,.5),rgba(8,6,4,.25) 30%,rgba(8,6,4,.72))}
 .page{position:relative;z-index:2}
-/* chrome */
-.dirline{font-size:var(--t-xs);color:var(--ink-2);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(255,251,243,.75)}
-header.top{background:rgba(255,251,243,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+/* chrome (shared with the other tabs) */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(8,6,4,.6)}
+header.top{background:rgba(12,10,6,.74);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
 .bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
-.brand{font:600 var(--t-xl)/1 var(--f-head);letter-spacing:.03em;color:var(--ink);text-decoration:none}
-.brand span{color:var(--gold)}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
 nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
 nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
-nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--gold-hi);box-shadow:inset 0 -8px 12px -10px var(--gold-hi)}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
 nav.sections a:hover{color:var(--ink)}
-.flavor{background:rgba(255,251,243,.66);border-bottom:1px solid var(--rim-2)}
+.flavor{background:rgba(12,10,6,.58);border-bottom:1px solid var(--rim-2)}
 .flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
 .flavor label{font-weight:600;color:var(--ink-2)}
-select,input,textarea,.tbtn{font:inherit;color:var(--ink);background:var(--panel-2);border:1px solid var(--rim-3);padding:5px 9px;border-radius:8px}
+select,input,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:8px}
 select,.tbtn{border-radius:999px}
 .tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
-.tbtn[aria-pressed="true"]{background:var(--gold-soft);border-color:var(--rim);color:var(--gold)}
-.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--gold-soft);color:var(--gold);border:1px solid var(--rim)}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
 .prov{font-size:var(--t-xs);color:var(--ink-3)}
-.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--panel-2);color:var(--ink);border:1px solid var(--rim-3);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
-.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim-3);position:relative;transition:background .2s}
-.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;transition:transform .2s}
-.mtoggle[aria-pressed="true"] i{background:var(--gold)}
-.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px)}
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
 .mtoggle[disabled]{opacity:.7;cursor:not-allowed}
-/* leaving the tab: a dawn curtain of white-gold light */
-.wipe{position:fixed;inset:0;z-index:50;background:radial-gradient(60% 50% at 50% 40%,#fffaf0,#f7e2b0 70%,#e9c977);color:var(--ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
-.wipe span{display:block;font:600 clamp(2rem,8vw,6rem)/1 var(--f-head);text-align:center;padding:0 16px}
+/* leaving the tab: a curtain of white-gold light */
+.wipe{position:fixed;inset:0;z-index:50;background:radial-gradient(60% 50% at 50% 40%,#ffe9b8,#f2c75c 75%);color:var(--glow-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
+.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);text-align:center;padding:0 16px}
 /* hero: short, so the table is close to the top */
 main{padding:0 0 48px}
-.hero{min-height:min(38vh,360px);display:grid;align-content:end;padding:36px 0 22px}
-.hero-in{max-width:780px;padding:18px 20px;border-radius:18px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 70%,rgba(255,251,243,.55) 100%);border:1px solid rgba(255,255,255,.7);box-shadow:0 18px 50px -24px rgba(60,50,110,.35)}
+.hero{min-height:min(36vh,340px);display:grid;align-content:end;padding:36px 0 22px}
+.hero-in{max-width:780px;padding:18px 20px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 70%,rgba(12,10,7,.35) 100%)}
 @media (max-width:640px){.hero-in{background:var(--scrim)}}
-.eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
-.hero h1{font:600 var(--t-hero)/1 var(--f-head);margin:8px 0 10px;max-width:20ch;letter-spacing:.005em}
+.eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:20ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
 .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
 .hero h1 .w>span{display:inline-block}
-.hero h1 em{font-style:italic;color:var(--gold)}
+.hero h1 em{font-style:normal;color:var(--glow)}
 .hero p{max-width:60ch;color:var(--ink-2);margin:0}
-/* panels: ivory glass with a thin gold rim and a soft light from above */
+/* panels */
 .layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .3s ease-out}
-.box{position:relative;background:var(--panel);border:1px solid var(--rim);border-radius:18px;backdrop-filter:blur(14px) saturate(1.15);box-shadow:0 22px 60px -30px rgba(50,40,100,.45),inset 0 1px 0 #fff}
-.box::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(60% 40% at 50% 0%,rgba(255,240,200,.55),transparent 70%)}
-.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0;padding:12px 16px;border-bottom:1px solid var(--rim-2);font:600 var(--t-lg)/1.2 var(--f-head)}
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.15);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
 .box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
-.box .in{position:relative;padding:12px 16px}
+.box>h2 small .ex{margin-right:4px}
+.box .in{position:relative;padding:12px 14px}
 .box .in>p{margin:0 0 10px;font-size:var(--t-sm);color:var(--ink-2)}
-.btn{display:inline-flex;align-items:center;gap:6px;font:700 var(--t-sm) var(--f-body);background:linear-gradient(180deg,#fff4d2,#f2c75c);color:var(--glow-ink);border:1px solid rgba(150,105,20,.55);padding:8px 15px;border-radius:999px;cursor:pointer;min-height:38px;box-shadow:0 6px 18px -8px rgba(178,136,52,.8)}
-.btn.ghost{background:var(--panel-2);color:var(--ink);border-color:var(--rim-3);box-shadow:none}
-.btn:disabled{opacity:.55;cursor:not-allowed}
-.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(143,63,0,.35);background:var(--warn-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
-.note{font-size:var(--t-sm);background:var(--sky-soft);color:var(--ink);border:1px solid rgba(35,93,150,.25);border-left:3px solid var(--sky);border-radius:10px;padding:9px 11px;margin:0 0 12px}
-.note strong{color:var(--sky)}
+.btn{display:inline-flex;align-items:center;gap:6px;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:8px 15px;border-radius:999px;cursor:pointer;min-height:38px;box-shadow:0 0 24px -6px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.ex{display:inline-block;font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);background:var(--warn-soft);border-radius:4px;padding:1px 6px;vertical-align:middle}
+.note{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:9px 11px;margin:0 0 12px}
+.note strong{color:var(--warn)}
 /* the planning table toolbar */
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 10px}
 .toolbar .grow{flex:1}
-.seg{display:inline-flex;border:1px solid var(--rim-3);border-radius:999px;overflow:hidden;background:var(--panel-2)}
+.seg{display:inline-flex;border:1px solid var(--rim);border-radius:999px;overflow:hidden;background:var(--glass-2)}
 .seg button{font:600 var(--t-sm) var(--f-body);background:none;border:0;color:var(--ink-2);padding:7px 14px;cursor:pointer;min-height:38px}
-.seg button[aria-pressed="true"]{background:var(--ink);color:#fff8e6}
+.seg button[aria-pressed="true"]{background:var(--glow);color:var(--glow-ink)}
 .count{font:500 var(--t-sm) var(--f-mono);color:var(--ink-2)}
 .count b{color:var(--ink);font-weight:600}
-details.meta{margin:0 0 12px;border:1px solid var(--rim-2);border-radius:12px;background:var(--panel-3)}
+details.meta{margin:0 0 12px;border:1px solid var(--rim-2);border-radius:12px;background:rgba(8,6,4,.45)}
 details.meta summary{cursor:pointer;padding:8px 12px;font-weight:600;font-size:var(--t-sm);color:var(--ink-2)}
 .metagrid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));padding:0 12px 12px}
 .metagrid label{display:grid;gap:3px;font-size:var(--t-xs);font-weight:600;color:var(--ink-2)}
 .metagrid .wide{grid-column:1/-1}
 .status{font-size:var(--t-sm);color:var(--ink-2);min-height:1.6em;margin:10px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.status b{color:var(--ink)}
-.status button{font:600 var(--t-xs) var(--f-body);background:var(--panel-2);border:1px solid var(--rim-3);color:var(--sky);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:30px}
+.status b{color:var(--glow)}
+.status button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:30px}
 .howto{font-size:var(--t-xs);color:var(--ink-3);margin:0 0 12px}
-/* the terrace table: groups are columns of five seats (5 × 5 at 25, 2 × 5 at 10); one group per row on phones */
+/* the spec palette: every class and build, always on screen; a click seats that build in the next open seat */
+.palette{margin:0 0 12px;border:1px solid var(--rim-2);border-radius:12px;background:rgba(8,6,4,.45);padding:10px 12px 12px}
+.palette>header{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;justify-content:space-between;margin:0 0 8px}
+.palette h3{margin:0;font:400 var(--t-md) var(--f-head)}
+.palette h3 .tgt{color:var(--glow)}
+.palette .aim{font-size:var(--t-xs);color:var(--ink-3)}
+.palette .aim button{font:600 var(--t-xs) var(--f-body);background:none;border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:3px 10px;cursor:pointer;min-height:28px;margin-left:4px}
+.pclasses{display:grid;gap:10px 14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.pclass h4{margin:0 0 5px;font:700 var(--t-xs) var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+.pbuilds{display:flex;flex-wrap:wrap;gap:5px}
+.pbuilds button{display:inline-flex;align-items:center;gap:6px;font:600 var(--t-xs) var(--f-body);color:var(--ink);background:var(--glass-2);border:1px solid var(--rim-3);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer;min-height:34px}
+.pbuilds button:hover,.pbuilds button:focus-visible{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 0 14px -6px var(--c)}
+.pbuilds button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;border-color:var(--rim-3)}
+.ico{flex:none;width:26px;height:26px;border-radius:5px;display:block;background:color-mix(in srgb,var(--c,#888) 30%,#000);box-shadow:0 0 0 1px rgba(0,0,0,.7)}
+/* the groups: columns of five seats (5 × 5 at 25, 2 × 5 at 10); one group per row on phones */
 .terrace{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(228px,1fr))}
 @media (min-width:1180px){.terrace.g5{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media (min-width:700px){.terrace.g2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.terrace,.terrace.g2{grid-template-columns:1fr}}
-.grp{position:relative;border:1px solid var(--rim-2);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(250,244,230,.88));padding:10px;min-width:0}
+.grp{position:relative;border:1px solid var(--rim-2);border-radius:14px;background:rgba(14,11,7,.8);padding:10px;min-width:0}
 .grp.full{border-color:var(--rim)}
+.grp.aimed{border-color:var(--glow);box-shadow:0 0 0 1px var(--glow),0 0 24px -10px var(--glow)}
 .grp header{display:flex;gap:9px;align-items:center;margin:0 0 8px}
-.grp h3{margin:0;font:700 var(--t-lg)/1 var(--f-head)}
+.grp h3{margin:0;font:400 var(--t-lg)/1 var(--f-head)}
+.aimbtn{font:inherit;color:var(--ink);background:none;border:0;border-radius:6px;padding:3px 6px;margin:-3px -6px;cursor:pointer;min-height:30px}
+.aimbtn:hover{color:var(--glow)}
+.aimbtn[aria-pressed="true"]{color:var(--glow);text-decoration:underline;text-underline-offset:4px}
 .grp header small{display:block;font:500 11px var(--f-mono);color:var(--ink-3);margin-top:3px}
 .ringm{flex:none;width:34px;height:34px}
 .ringm circle{fill:none;stroke-width:3.5}
-.ringm .bg{stroke:rgba(98,96,140,.16)}
-.ringm .fg{stroke:var(--gold-hi);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 0 3px rgba(242,199,92,.9))}
+.ringm .bg{stroke:rgba(242,199,92,.16)}
+.ringm .fg{stroke:var(--glow);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 0 3px rgba(242,199,92,.8))}
 .ringm text{font:600 10px var(--f-mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
 /* seats */
-.seats{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:seat}
-.seat{position:relative;border:1px solid var(--rim-2);border-radius:11px;background:#fff;min-height:64px;display:grid;align-content:center;gap:6px;padding:7px 8px 7px 12px;overflow:hidden}
+.seats{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.seat{position:relative;border:1px solid var(--rim-2);border-radius:10px;background:var(--scrim);min-height:60px;display:grid;align-content:center;gap:6px;padding:7px 8px 7px 12px;overflow:hidden}
 .seat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,transparent)}
-.seat.filled{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 16%,#fff) 0%,#fff 70%)}
+.seat.filled{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 14%,rgba(12,10,7,.88)) 0%,rgba(12,10,7,.88) 70%)}
 .seat .top{display:flex;gap:8px;align-items:center;min-width:0}
-.gem{flex:none;width:12px;height:12px;border-radius:50%;background:var(--c,#fff);border:1.5px solid rgba(28,32,64,.55);box-shadow:0 0 0 3px color-mix(in srgb,var(--c,#fff) 30%,transparent)}
-.seat.empty .gem{background:none;border-style:dashed;border-color:var(--rim-3);box-shadow:none}
+.seat .ico{width:28px;height:28px;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.7),0 0 0 2px color-mix(in srgb,var(--c) 55%,transparent)}
+.gem{flex:none;width:12px;height:12px;border-radius:50%;border:1.5px dashed var(--rim-3)}
 .who{min-width:0;flex:1}
 .who b{display:block;font-weight:700;font-size:var(--t-sm);line-height:1.2;overflow-wrap:anywhere}
 .who small{display:block;font-size:var(--t-xs);color:var(--ink-3);line-height:1.3;overflow-wrap:anywhere}
 .who .pname{color:var(--ink);font-weight:600}
-.seat.empty{background:repeating-linear-gradient(135deg,rgba(255,255,255,.75) 0 8px,rgba(240,234,222,.75) 8px 16px);border-style:dashed;border-color:var(--rim-3)}
+/* the pencil on a player's tag: type their name in place */
+.pen{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--rim-3);background:var(--glass-2);color:var(--ink-2);cursor:pointer}
+.pen:hover,.pen:focus-visible{color:var(--glow);border-color:var(--glow)}
+.pen svg{width:14px;height:14px;display:block}
+.seat.empty{background:repeating-linear-gradient(135deg,rgba(255,240,200,.025) 0 8px,rgba(255,240,200,.06) 8px 16px);border-style:dashed;border-color:var(--rim-3);min-height:48px}
 .seat.empty .who b{font-weight:600;color:var(--ink-3)}
+.seat.next{border-color:var(--glow)}
+.seat.next .gem{border-color:var(--glow);border-style:solid;box-shadow:0 0 8px var(--glow)}
+.seat.next .who small{color:var(--glow)}
 .acts{display:flex;gap:4px;flex-wrap:wrap}
-.acts button,.seat .add{font:600 var(--t-xs) var(--f-body);background:var(--panel-2);color:var(--ink-2);border:1px solid var(--rim-3);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:32px;white-space:nowrap}
-.acts button:hover,.seat .add:hover{color:var(--ink);border-color:var(--gold)}
+.acts button{font:600 var(--t-xs) var(--f-body);background:var(--glass-2);color:var(--ink-2);border:1px solid var(--rim-3);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:32px;white-space:nowrap}
+.acts button:hover{color:var(--ink);border-color:var(--glow)}
 .acts button.rm{color:var(--rose)}
-/* phones and touch screens: every seat control is a 44px target, as in the app */
-@media (max-width:699px),(pointer:coarse){.acts button,.seat .add{min-height:44px;padding:8px 14px}
-  .toolbar button,.picker button,.picker input,.metagrid input,details.meta>summary{min-height:44px}}
-.seat .add{justify-self:start;color:var(--gold);border-color:var(--rim);background:var(--gold-pale)}
+.seat .acts button[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
 .seat[draggable="true"]{cursor:grab}
 .seat.dragging{opacity:.45}
 .seat.dropok{outline:2px dashed var(--sky);outline-offset:-3px}
-.seat.held{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-hi),0 0 22px -4px var(--gold-hi)}
+.seat.held{border-color:var(--glow);box-shadow:0 0 0 2px var(--glow),0 0 22px -4px var(--glow)}
 /* while a seat is held, every other seat is one big "Move here / Swap here" button */
-.seat .here{position:absolute;inset:0;width:100%;border:0;border-radius:inherit;background:rgba(255,248,226,.55);font:700 var(--t-sm) var(--f-body);color:var(--sky);cursor:pointer;display:flex;align-items:flex-end;justify-content:flex-end;padding:6px 10px}
-.seat .here:hover,.seat .here:focus-visible{background:rgba(156,200,240,.35)}
-/* "settling" light: a brief bloom behind a seat that just received someone (motion on only) */
-.seat .bloom{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(70% 120% at 50% 0%,rgba(255,236,170,.9),rgba(255,236,170,0) 70%);opacity:0}
+.seat .here{position:absolute;inset:0;width:100%;border:0;border-radius:inherit;background:rgba(20,16,10,.62);font:700 var(--t-sm) var(--f-body);color:var(--glow);cursor:pointer;display:flex;align-items:flex-end;justify-content:flex-end;padding:6px 10px}
+.seat .here:hover,.seat .here:focus-visible{background:rgba(242,199,92,.16)}
+/* "settling" light: a brief bloom on a seat that just received someone (motion on only) */
+.seat .bloom{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(70% 120% at 50% 0%,rgba(255,226,166,.42),rgba(255,226,166,0) 70%);opacity:0}
+label.who{display:block}
+.seat .ren{display:block;width:100%;min-height:36px;margin-top:4px;font-size:var(--t-sm)}
+#groups .seat:focus{outline:2px solid var(--focus);outline-offset:2px}
 .gets{margin:10px 0 0;padding-top:9px;border-top:1px solid var(--rim-2)}
 .gets h4{margin:0 0 5px;font:700 10px var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
 .chips{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0;padding:0}
-.chips li{font-size:11px;line-height:1.3;padding:2px 7px;border-radius:999px;background:var(--gold-soft);border:1px solid var(--rim);color:var(--ink)}
+.chips li{font-size:11px;line-height:1.3;padding:2px 7px;border-radius:999px;background:var(--glow-soft);border:1px solid var(--rim);color:var(--ink)}
 .chips li.none{background:none;border-style:dashed;border-color:var(--rim-3);color:var(--ink-3)}
 .chips li .num{color:var(--ink-3);margin-left:3px}
 .gets p{margin:6px 0 0;font-size:var(--t-xs);color:var(--ink-3)}
-.scope{display:inline-block;font:700 9px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px;border:1px solid var(--rim-3);color:var(--ink-2);background:#fff}
-.scope.party{color:var(--gold);border-color:var(--rim)}
-.scope.raid{color:var(--sky);border-color:rgba(35,93,150,.4)}
-.scope.single{color:var(--violet);border-color:rgba(90,71,154,.4)}
-.scope.target{color:var(--rose);border-color:rgba(154,47,85,.4)}
+.scope{display:inline-block;font:700 9px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px;border:1px solid var(--rim-3);color:var(--ink-2);background:rgba(0,0,0,.3)}
+.scope.party{color:var(--glow);border-color:var(--rim)}
+.scope.raid{color:var(--sky);border-color:rgba(156,200,240,.4)}
+.scope.single{color:var(--violet);border-color:rgba(185,166,255,.4)}
+.scope.target{color:var(--rose);border-color:rgba(255,159,182,.4)}
 /* results under the table */
 .results{display:grid;gap:16px;margin-top:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
 .roles{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr) 2.4em;gap:9px 10px;align-items:center;font-size:var(--t-sm)}
-.roles .rb{height:9px;border-radius:5px;background:rgba(98,96,140,.12);overflow:hidden}
-.roles .rb i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--sky-hi),var(--gold-hi));transform-origin:left;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+.roles .rb{height:9px;border-radius:5px;background:rgba(242,199,92,.1);overflow:hidden}
+.roles .rb i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--sky),var(--glow));transform-origin:left;transition:width .6s cubic-bezier(.2,.7,.2,1)}
 .roles .n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
 .lines{list-style:none;margin:0;padding:0;display:grid;gap:7px}
-.lines li{padding:8px 10px;border-radius:10px;background:#fff;border:1px solid var(--rim-2);font-size:var(--t-sm)}
-.lines li b{color:var(--ink);font-weight:700}
+.lines li{padding:8px 10px;border-radius:10px;background:var(--scrim);border:1px solid var(--rim-2);font-size:var(--t-sm)}
+.lines li b{color:var(--glow);font-weight:700}
 .lines li .g{display:block;font:500 10px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:2px}
 .lines li.ok{border-style:dashed;color:var(--ink-3)}
-.lines li.warnl{border-color:rgba(143,63,0,.3);background:#fffaf2}
+.lines li.warnl{border-color:rgba(255,207,122,.3)}
 .lines li.warnl b{color:var(--warn)}
-.lines li .quick{margin-top:6px;font:600 var(--t-xs) var(--f-body);background:var(--gold-pale);border:1px solid var(--rim);color:var(--gold);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:30px}
+.lines li .quick{margin-top:6px;font:600 var(--t-xs) var(--f-body);background:var(--glow-soft);border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:30px}
 .coverage h3{margin:8px 0 5px;font:700 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
-.empty-note{font-size:var(--t-sm);color:var(--ink-3);border:1px dashed var(--rim-3);border-radius:10px;padding:10px 12px;margin:0}
-/* the seat picker: a modal dialog (class → spec, optional name) */
-dialog.picker{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;border:1px solid var(--rim);border-radius:18px;padding:0;background:#fffbf3;color:var(--ink);box-shadow:0 30px 80px -20px rgba(40,30,90,.55)}
-dialog.picker::backdrop{background:rgba(60,56,100,.35);backdrop-filter:blur(3px)}
-.pk-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:14px 16px 10px;border-bottom:1px solid var(--rim-2);background:radial-gradient(60% 120% at 50% 0%,rgba(255,236,170,.6),transparent 70%)}
-.pk-head h2{margin:0;font:700 var(--t-xl)/1.1 var(--f-head)}
-.pk-body{padding:12px 16px;display:grid;gap:12px}
-.pk-body fieldset{border:0;margin:0;padding:0;min-width:0}
-.pk-body legend{font:700 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:6px;padding:0}
-.pk-classes{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px}
-.pk-classes button,.pk-specs button{display:flex;gap:7px;align-items:center;font:600 var(--t-sm) var(--f-body);background:#fff;color:var(--ink);border:1px solid var(--rim-3);border-radius:10px;padding:8px 10px;cursor:pointer;min-height:44px;text-align:left}
-.pk-classes button[aria-pressed="true"],.pk-specs button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-pale);box-shadow:0 0 0 2px var(--gold-hi)}
-.pk-specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-.pk-specs button{display:grid;gap:1px}
-.pk-specs small{font-weight:400;font-size:var(--t-xs);color:var(--ink-3)}
-.pk-body .fld{display:grid;gap:4px;font-size:var(--t-sm);font-weight:600;color:var(--ink-2)}
-.pk-body .fld input{min-height:44px}
-.pk-foot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid var(--rim-2)}
-footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-2);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(255,251,243,.85)}
-label.who{display:block}
-.seat .ren{display:block;width:100%;min-height:36px;margin-top:4px;font-size:var(--t-sm);border-radius:8px}
-.seat .acts button[aria-pressed="true"]{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
-#groups .seat:focus{outline:2px solid var(--focus);outline-offset:2px}
-.box>h2 small .ex{margin-right:4px}
-@media (max-width:440px){.roles{grid-template-columns:minmax(0,6.5em) minmax(0,1fr) 2.2em}.hero-in{padding:14px}}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(8,6,4,.78)}
+/* phones and touch screens: every control is a 44px target, as in the app */
+@media (max-width:699px),(pointer:coarse){
+  .acts button{min-height:44px;padding:8px 14px}
+  .pen{width:44px;height:44px}
+  .toolbar button,.pbuilds button,.palette .aim button,.aimbtn,.metagrid input,details.meta>summary,.status button,.lines li .quick,.seat .ren{min-height:44px}}
+@media (max-width:440px){.roles{grid-template-columns:minmax(0,6.5em) minmax(0,1fr) 2.2em}.hero-in{padding:14px}.pclasses{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
 </style>
 </head>
@@ -225,7 +231,7 @@ label.who{display:block}
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Raid Composition (design A, Terrace of Light). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Raid Composition: design A's planning table, dark like the other tabs. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -254,14 +260,14 @@ label.who{display:block}
 <section aria-labelledby="h-rc">
   <div class="hero">
     <div class="hero-in">
-      <div class="eyebrow">Raid Composition · Terrace of Light</div>
-      <h1 id="h-rc">Seat your raid in the light, <em>five to a ring</em>.</h1>
-      <p>In TBC, 24 of the 33 raid buffs reach only the caster's own party: every totem, every aura, both shouts. Fill the seats below, move people between groups, and watch what each group receives.</p>
+      <div class="eyebrow">Raid Composition · Groups of five</div>
+      <h1 id="h-rc">Seat your raid so <em>every group gets its buffs</em>.</h1>
+      <p>In TBC, 24 of the 33 raid buffs reach only the caster's own party: every totem, every aura, both shouts. Click specs to fill the seats, move people between groups, and watch what each group receives.</p>
     </div>
   </div>
 
   <div class="layer" style="--z:3"><section class="box" id="b-table" aria-labelledby="h-table">
-    <h2 id="h-table">Raid table <small id="rostertag">Empty raid · start by adding a player or load the example</small></h2>
+    <h2 id="h-table">Raid table <small id="rostertag">Empty raid · click a spec below, or load the example</small></h2>
     <div class="in">
       <p class="note"><strong>Counts are who could cast it, not what will be up at once.</strong> This follows Wowhead's raid-composition tool: one Paladin lights up every Greater Blessing here but holds one in the game; the same goes for a Shaman's totems and a Warrior's shouts.</p>
       <div class="toolbar">
@@ -285,9 +291,16 @@ label.who{display:block}
           <label class="wide">Description<input id="m-desc" type="text" maxlength="120" autocomplete="off"></label>
         </div>
       </details>
-      <p class="howto">Press <b>Add</b> on an empty seat to pick a class and spec. To move someone, press <b>Move</b> on their seat, then the seat you want (an occupied seat swaps), or drag them there. Esc cancels.</p>
+      <section class="palette" aria-labelledby="h-pal">
+        <header>
+          <h3 id="h-pal">Add a player · next seat: <span class="tgt" id="paltgt">group 1, seat 1</span></h3>
+          <span class="aim" id="palaim"></span>
+        </header>
+        <div class="pclasses" id="pal" role="group" aria-labelledby="h-pal"></div>
+      </section>
+      <p class="howto">Click a spec to seat it in the next open seat, filling group 1 first. Press a group's name to fill that group instead. To move someone, press <b>Move</b> on their seat, then the seat you want (an occupied seat swaps), or drag them there. The pencil names a player. Esc cancels.</p>
       <div class="terrace g5" id="groups" aria-describedby="h-table"></div>
-      <noscript><p class="empty-note">The raid table, its buttons and every buff list are built by the page's script, so they need JavaScript.</p></noscript>
+      <noscript><p class="prov">The raid table, its buttons and every buff list are built by the page's script, so they need JavaScript.</p></noscript>
       <div class="status" id="status"></div>
     </div>
   </section></div>
@@ -318,22 +331,8 @@ label.who{display:block}
   </div>
 </section>
 </main>
-<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips); classes, specs and builds from <code>tbcClasses.ts</code> and <code>raidBuilds.ts</code>. The example roster is invented seating of real specs. The scene is drawn in code. World of Warcraft® is a registered trademark of Blizzard Entertainment; no affiliation.</div></footer>
+<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips); classes, specs and builds from <code>tbcClasses.ts</code> and <code>raidBuilds.ts</code>. Spec icons are the files the live app ships in <code>public/icons</code> (<code>raidcompIcons.json</code>). The example roster is invented seating of real specs. The scene is drawn in code. World of Warcraft® and its icons are trademarks of Blizzard Entertainment; no affiliation.</div></footer>
 </div>
-<dialog class="picker" id="picker" aria-labelledby="pk-title">
-  <form method="dialog" id="pkform">
-    <div class="pk-head"><h2 id="pk-title">Add a player</h2><span class="prov" id="pk-where"></span></div>
-    <div class="pk-body">
-      <fieldset><legend id="pk-cl">1 · Class</legend><div class="pk-classes" id="pk-classes" role="group" aria-labelledby="pk-cl"></div></fieldset>
-      <fieldset><legend id="pk-sl">2 · Spec or build</legend><div class="pk-specs" id="pk-specs" role="group" aria-labelledby="pk-sl"><p class="prov" style="margin:0">Pick a class first.</p></div></fieldset>
-      <label class="fld" for="pk-name">3 · Player name (optional)<input id="pk-name" type="text" maxlength="24" autocomplete="off" placeholder="Leave blank to seat the spec only"></label>
-    </div>
-    <div class="pk-foot">
-      <button class="btn ghost" type="button" id="pk-cancel">Cancel</button>
-      <button class="btn" type="submit" id="pk-ok" disabled>Seat player</button>
-    </div>
-  </form>
-</dialog>
 <div class="wipe" id="wipe" aria-hidden="true"><span>Raid Composition</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
@@ -344,24 +343,24 @@ label.who{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* Terrace of Light (WebGL, Three.js r128), drawn entirely in code: a pale-dusk sky, a round white-stone
-   terrace where each raid group sits as a ring of light (five seat-beads per ring), a naaru crystal
-   turning slowly above it in a column of light, and holy motes drifting upward. The page drives it
-   through window.SCENE (contract at the top of tbc-kit.js) plus setGroups(list, count).
-   The kit's own sky, water, pillars and embers are hidden: this tab is Shattrath light, not Serpentshrine.
-   Any failure leaves the CSS fallback backdrop in place. */
+/* The tab's water scene (WebGL, Three.js r128), shared with the other tabs and ported from 3d-portal; tbc-kit.js
+   tints it warm white-gold (the "raidcomp" theme) and adds one light per raid group.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on). Any failure leaves the CSS fallback backdrop in place. */
 (function(){
 "use strict";
 const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
-const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,charge:0};
+/* Raid Composition tab: warm white-gold (tbc-kit.js "raidcomp" theme), kept calm and dim behind the dense roster; "charge" gives a short glow when two seats swap */
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:0,warm:0,charge:0};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
 const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
 const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
 const emit=()=>each(HK.state,[S]);
-/* group targets: f = share of party buffs the group receives (0–1), n = seats filled (0–5) */
-const GT=[0,1,2,3,4].map(()=>({f:0,n:0}));let GN=5;
-const S=window.SCENE={ok:false,calm:.5,speed:1,cam:CAM,mix:MIX,three:null,
+/* calm: this tab's slow-down (the roster is dense, so the world drifts slowly); speed: the kit's "lift" */
+const S=window.SCENE={ok:false,calm:.3,speed:1,cam:CAM,mix:MIX,three:null,
   setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
-  setGroups(list,n){GN=n||GN;GT.forEach((g,i)=>{const v=list&&list[i];g.f=v?v.f:0;g.n=v?v.n:0;});},
+  /* each group's party-buff coverage → its light in the kit's raidcomp theme (one light per group) */
+  setGroups(list,n){const K=window.TBCKit;if(K&&K.groups)K.groups(list,n);},
   isMoving:()=>mv,isEnabled:()=>false,
   onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
 const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
@@ -370,144 +369,97 @@ let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"
 if(!R.getContext()){off("3D scene: unavailable");return;}
 root.classList.add("gl");S.ok=true;
 R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
-const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(48,1,.1,160);
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
 const C=h=>new THREE.Color(h);
-/* naaru palette: white-gold light, pale lavender fog, soft sky-blue accent */
-const PAL={light:C("#ffdf96"),deep:C("#efe8f2"),fog:C("#e4dbec"),acc:C("#9cc8f0")};
-const cur={light:PAL.light.clone(),deep:PAL.deep.clone(),fog:PAL.fog.clone(),acc:PAL.acc.clone()};
-const U={uTime:{value:0},uLight:{value:cur.light},uFog:{value:cur.fog},uAcc:{value:cur.acc},uCharge:{value:0},uDpr:{value:R.getPixelRatio()}};
-const VUV=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
-const mine=new Set(),add=o=>{scene.add(o);mine.add(o);return o;};
-/* sky dome: dusk blue at the zenith, lavender, then warm gold at the horizon behind the terrace */
-add(new THREE.Mesh(new THREE.SphereGeometry(90,32,16),new THREE.ShaderMaterial({uniforms:U,side:THREE.BackSide,depthWrite:false,
-  vertexShader:`varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`uniform vec3 uLight;varying vec3 vD;
-  void main(){float y=vD.y;vec3 top=vec3(.62,.71,.87),mid=vec3(.86,.835,.925),low=vec3(.965,.9,.78);
-    vec3 c=mix(low,mid,smoothstep(-.06,.2,y));c=mix(c,top,smoothstep(.2,.8,y));
-    float sun=pow(max(dot(vD,normalize(vec3(0.,.25,-1.))),0.),18.);c=mix(c,vec3(1.,.97,.9),sun*.55);
-    gl_FragColor=vec4(c,1.);}`})));
-/* the terrace: pale stone, gold inlay rings, an eight-point star, a pool of light under the naaru */
-const terrace=add(new THREE.Mesh(new THREE.CircleGeometry(7.6,96),new THREE.ShaderMaterial({uniforms:U,transparent:true,
-  vertexShader:VUV,
-  fragmentShader:`uniform float uTime,uCharge;uniform vec3 uLight,uAcc;varying vec2 vUv;
-  float band(float r,float c,float w){float d=(r-c)/w;return exp(-d*d);}
-  void main(){vec2 p=(vUv-.5)*2.;float r=length(p);float a=atan(p.y,p.x);
-    vec3 c=vec3(.955,.93,.885)*(.94+.035*sin(a*24.)*smoothstep(.3,.32,r)*smoothstep(.84,.8,r));
-    float inl=band(r,.2,.008)+band(r,.84,.01)+band(r,.94,.006);
-    float star=smoothstep(.97,1.,cos(a*8.))*smoothstep(.2,.3,r)*smoothstep(.84,.74,r);
-    c=mix(c,vec3(.82,.64,.28),clamp(inl+star*.45,0.,1.)*.75);
-    c=mix(c,uAcc,band(r,.58,.05)*.18);
-    c+=uLight*exp(-r*r*7.)*(.32+uCharge*.5);
-    gl_FragColor=vec4(c,smoothstep(1.,.9,r));}`})));
-terrace.rotation.x=-Math.PI/2;terrace.renderOrder=-1;
-/* the groups: a ring of light per group with five seat-beads; the pool under it warms from sky blue to gold
-   as the group receives more of the party buffs */
-const RG=[],ringGeo=new THREE.TorusGeometry(.95,.05,8,64),poolGeo=new THREE.CircleGeometry(1.4,48),beadGeo=new THREE.OctahedronGeometry(.11,0);
-for(let i=0;i<5;i++){
-  const m=new THREE.MeshStandardMaterial({color:0xf6eedb,emissive:cur.light.clone(),emissiveIntensity:.05,roughness:.35,metalness:.25});
-  const ring=add(new THREE.Mesh(ringGeo,m));ring.rotation.x=-Math.PI/2;
-  const pu={uF:{value:0},uLight:U.uLight,uAcc:U.uAcc};
-  const pool=add(new THREE.Mesh(poolGeo,new THREE.ShaderMaterial({uniforms:pu,transparent:true,depthWrite:false,vertexShader:VUV,
-    fragmentShader:`uniform float uF;uniform vec3 uLight,uAcc;varying vec2 vUv;
-    void main(){float r=length(vUv-.5)*2.;float a=exp(-r*r*2.4)*(.16+.5*uF)*smoothstep(1.,.8,r);
-      gl_FragColor=vec4(mix(uAcc,uLight,uF),a);}`})));
-  pool.rotation.x=-Math.PI/2;
-  const bm=new THREE.MeshStandardMaterial({color:0xffffff,emissive:cur.light.clone(),emissiveIntensity:.0,roughness:.3,flatShading:true});
-  const beads=[0,1,2,3,4].map(()=>add(new THREE.Mesh(beadGeo,bm.clone())));
-  RG.push({ring,pool,m,pu,beads,f:0,b:[0,0,0,0,0],x:0,z:4.3,s:1});
-}
-/* the naaru: a faceted white-gold crystal, two slow halos (gold and sky blue) and six orbiting shards */
-const crystal=add(new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xfff4dc,emissive:C("#ffd98a"),emissiveIntensity:.35,metalness:.15,roughness:.25,flatShading:true})));
-crystal.scale.set(.7,1.3,.7);crystal.position.set(0,4.6,0);
-const halo=add(new THREE.Mesh(new THREE.TorusGeometry(1.9,.025,6,96),new THREE.MeshBasicMaterial({color:C("#f7d27a"),transparent:true,opacity:.55})));
-halo.rotation.x=Math.PI/2.2;
-const halo2=add(new THREE.Mesh(new THREE.TorusGeometry(2.45,.016,6,96),new THREE.MeshBasicMaterial({color:C("#7fb2e6"),transparent:true,opacity:.5})));
-halo2.rotation.x=Math.PI/1.8;
-const shardMat=new THREE.MeshStandardMaterial({color:0xfff8ea,emissive:C("#a8d0f5"),emissiveIntensity:.55,flatShading:true,roughness:.3});
-const shards=[0,1,2,3,4,5].map(i=>add(new THREE.Mesh(new THREE.OctahedronGeometry(i%2?.15:.22,0),shardMat)));
-/* the column of light from the naaru down to the terrace */
-const beamMat=new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,vertexShader:VUV,
-  fragmentShader:`uniform float uTime,uCharge;uniform vec3 uLight;varying vec2 vUv;
-  void main(){float s=.75+.25*sin(vUv.x*18.+uTime*.4)*sin(vUv.x*7.-uTime*.25);
-    float a=smoothstep(0.,.25,vUv.y)*smoothstep(1.,.7,vUv.y)*s*(.13+uCharge*.12);gl_FragColor=vec4(uLight*a,1.);}`});
-const beam=add(new THREE.Mesh(new THREE.CylinderGeometry(.4,1.7,4.4,40,1,true),beamMat));beam.position.y=2.2;
-/* holy motes: rise slowly and fade at both ends, entirely on the GPU; a slow shimmer, never a flash */
-const N=innerWidth<700?140:300,pos=new Float32Array(N*3),seed=new Float32Array(N);
-for(let i=0;i<N;i++){const a=Math.random()*6.283,r=Math.sqrt(Math.random())*10;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.random()*9;pos[i*3+2]=Math.sin(a)*r-1;seed[i]=Math.random();}
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.ssc.light.clone(),deep:PAL.ssc.deep.clone(),fog:PAL.ssc.fog.clone(),acc:PAL.ssc.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?260:520,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
 const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
-const motes=add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
   vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
-  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.12+aSeed*.22),9.);
-    p.x+=sin(uTime*.25+aSeed*40.)*.35;p.z+=cos(uTime*.2+aSeed*30.)*.3;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
     vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
-    gl_PointSize=(2.+aSeed*3.5)*uDpr*(16./-mv.z);
-    vA=smoothstep(0.,1.4,p.y)*smoothstep(9.,6.,p.y)*(.6+.4*sin(uTime*.5+aSeed*60.));}`,
-  fragmentShader:`varying float vA;
-  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,.05,d)*vA*.9;
-    gl_FragColor=vec4(mix(vec3(.93,.7,.22),vec3(1.,.99,.94),smoothstep(.3,0.,d)),a);}`})));
-motes.frustumCulled=false;
-/* lights: warm naaru lamp (brightness owned by the kit's K3 swell), dusk hemisphere, a soft key */
-const lamp=add(new THREE.PointLight(cur.light.clone(),1.5,22));lamp.position.set(0,4.6,0);
-add(new THREE.HemisphereLight(0xdde7ff,0xf3e2c0,.95));
-const key=add(new THREE.DirectionalLight(0xffffff,.45));key.position.set(5,10,7);
-scene.fog=new THREE.Fog(cur.fog.clone(),18,46);
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(1.,.97,.9),.35),a);}`})));
+/* lights: the lamp over the pool, a warm ambient and rim (this tab is white-gold, not the teal of the shared scene), and a low sky-blue accent */
+const lamp=new THREE.PointLight(cur.light.clone(),1.6,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x2a2216,.5));
+const rim=new THREE.DirectionalLight(0xffe6b8,.3);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a glowing crystal over the pool (dimmed for this dense tab): faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x2a2416,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x241e12,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* dark warm-stone pillars receding into the fog */
+const pm=new THREE.MeshStandardMaterial({color:0x16110b,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
 R.setClearColor(cur.fog);
-/* camera: a slow orbit-sway + pointer, plus the values GSAP drives (scroll depth, rise, curtain dive, intro) */
-const ptr={x:0,y:0,sx:0,sy:0};
-let t=0,moving=false,enabled=true,lost=false,raf=0,last=0,narrow=false;
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
 function place(){
-  const c=CAM,lift=c.dip*(1-c.rise),back=narrow?4:0;
-  cam.position.set(Math.sin(t*.04)*1.4+ptr.sx*1.2,
-    6.4+c.intro*3-c.depth*1.3-lift*1.4-c.dive*3.4-ptr.sy*.4+back*.3,
-    12.6+back-c.depth*2.4-c.dive*7);
-  cam.lookAt(ptr.sx*.4,1.5+c.intro*1.4+c.depth*.5+c.dive*1.6,0);
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
 }
-/* groups sit evenly round the terrace (25: five rings; 10: two rings at the front); positions and glow ease, a still frame snaps */
-function pose(dt){
-  const cy=4.6+Math.sin(t*.5)*.15;crystal.position.y=cy;halo.position.y=cy;halo2.position.y=cy;lamp.position.y=cy;
-  shards.forEach((m,i)=>{const a=t*.35+i*1.047,rr=i%2?1.3:1.62;m.position.set(Math.cos(a)*rr,cy+Math.sin(a*1.5+i)*.4,Math.sin(a)*rr);m.rotation.set(a,a*.6,0);});
-  const k=dt>0?Math.min(1,dt*2.4):1;
-  RG.forEach((g,i)=>{
-    const on=i<GN,ang=GN===2?Math.PI/2+(i?.72:-.72):Math.PI/2+i*Math.PI*2/5;
-    const tx=Math.cos(ang)*4.3,tz=Math.sin(ang)*4.3;
-    g.x+=(tx-g.x)*k;g.z+=(tz-g.z)*k;g.s+=((on?1:0)-g.s)*k;g.f+=(GT[i].f-g.f)*k;
-    const vis=g.s>.02;
-    g.ring.visible=g.pool.visible=vis;g.ring.position.set(g.x,.09,g.z);g.ring.scale.setScalar(Math.max(g.s,.001));
-    g.pool.position.set(g.x,.02,g.z);g.pool.scale.setScalar(Math.max(g.s,.001));
-    g.m.emissiveIntensity=.06+g.f*.85+MIX.charge*.3;g.pu.uF.value=g.f;
-    g.beads.forEach((b,j)=>{
-      g.b[j]+=((j<GT[i].n?1:0)-g.b[j])*k;
-      const a=t*.06+j*1.2566;b.visible=vis;
-      b.position.set(g.x+Math.cos(a)*.95*g.s,.2+g.b[j]*.12,g.z+Math.sin(a)*.95*g.s);
-      b.scale.setScalar(Math.max(.001,g.s*(.55+g.b[j]*.65)));b.rotation.y=a*2;
-      b.material.emissiveIntensity=g.b[j]*.9;
-    });
-  });
-}
-/* the kit builds K2 rocks + aurora, K5 water/shafts, K6 pillars and K4 embers into every scene; this tab keeps
-   only its own objects and the kit's K3 naaru glow (the plane whose colour is the crystal's emissive) */
-function keepOwn(){
-  scene.children.forEach(o=>{if(mine.has(o))return;const u=o.material&&o.material.uniforms;
-    if(u&&u.uCol&&u.uCol.value===crystal.material.emissive)return;o.visible=false;});
-}
-const PALE=C("#fff3d6");
 function tint(){
-  ["light","deep","fog","acc"].forEach(n=>cur[n].copy(PAL[n]));
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
   each(HK.tint,[cur]);
-  crystal.material.emissive.copy(cur.light).lerp(PALE,.3);lamp.color.copy(cur.light);
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  /* brightness (crystal emissive, halo opacity, lamp) is left to the kit's K3 swell; "charge" only spins the crystal */
   scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
 }
-function size(){const w=innerWidth,h=innerHeight;narrow=w<700;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=narrow?60:48;cam.updateProjectionMatrix();}
-function draw(dt){U.uCharge.value=MIX.charge;pose(dt);each(HK.frame,[dt,t]);tint();place();keepOwn();R.render(scene,cam);}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
 function frame(dt){
   const spin=dt*S.speed;dt*=S.calm*S.speed; /* the swap spin keeps full speed so it still reads behind the calm world */
   t+=dt;U.uTime.value=t;
   ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
-  crystal.rotation.y+=dt*.3+spin*MIX.charge*2;halo.rotation.z+=dt*.12+spin*MIX.charge*1.2;halo2.rotation.z-=dt*.08;
-  draw(dt);
+  crystal.rotation.y+=dt*.25+spin*MIX.charge*2.2;halo.rotation.z+=dt*.1+spin*MIX.charge*1.4;pose();
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
 }
 /* one static frame (Motion off, reduced motion, or a re-light while frozen) */
-function still(){if(lost||!enabled)return;draw(0);}
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
 function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
 function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
 function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
@@ -520,11 +472,10 @@ if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria
 S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
 S.render=()=>{if(!raf)still();};
 S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
-S.setGroups=(list,n)=>{GN=n||GN;GT.forEach((g,i)=>{const v=list&&list[i];g.f=v?v.f:0;g.n=v?v.n:0;});if(!raf)still();};
 S.isEnabled=()=>enabled&&!lost;
 S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
 S.setDpr=v=>{R.setPixelRatio(Math.min(v,1.5));U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
-S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
 size();still();
 })();
 </script>
@@ -545,9 +496,10 @@ const G=typeof gsap!=="undefined";
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-/* the shared TBC motion kit: K3 swell when a group gains a buff it lacked, K8 entry rings where seats fill.
-   No theme() call: the scene hides the kit's Serpentshrine water and sky and keeps only the naaru glow. */
+/* the shared TBC motion kit: the tab's "raidcomp" theme (warm white-gold water, one light per raid group, fed by
+   setGroups), a K3 swell when a group gains a buff it lacked, and K8 entry rings where seats fill. */
 const KIT=window.TBCKit||null;
+if(KIT)KIT.theme("raidcomp",{instant:true});
 
 /* ---- core:begin (pure data + roster logic; no DOM, so it can be tested in node) ---- */
 /* real data: src/domain/buffs/sampleBuffs.ts + sampleTargetDebuffs.ts (who provides),
@@ -609,6 +561,14 @@ CLASSES.forEach(c=>SPECS[c].forEach(s=>{
   if(c==="Druid"&&s==="Restoration")mk("druid-dreamstate","Dreamstate","Healer","Balance/Restoration hybrid healer. Heals in caster form, so it does not provide Moonkin Aura.");
 }));
 const BUILD={};BUILDS.forEach(b=>{BUILD[b.id]=b;});
+/* spec icons: the files the live app ships in public/icons, mapped as in raidcompIcons.json and raidBuilds.ts
+   (Bear, Cat and Dreamstate have their own) */
+const SPEC_ICON={"Druid|Balance":"spell_nature_starfall","Druid|Feral":"ability_druid_ferociousbite","Druid|Restoration":"spell_nature_healingtouch","Hunter|Beast Mastery":"ability_hunter_beasttaming","Hunter|Marksmanship":"ability_marksmanship","Hunter|Survival":"ability_hunter_swiftstrike","Mage|Arcane":"spell_holy_magicalsentry","Mage|Fire":"spell_fire_firebolt02","Mage|Frost":"spell_frost_frostbolt02","Paladin|Holy":"spell_holy_holybolt","Paladin|Protection":"spell_holy_devotionaura","Paladin|Retribution":"spell_holy_auraoflight","Priest|Discipline":"spell_holy_wordfortitude","Priest|Holy":"spell_holy_renew","Priest|Shadow":"spell_shadow_shadowwordpain","Rogue|Assassination":"ability_rogue_eviscerate","Rogue|Combat":"ability_backstab","Rogue|Subtlety":"ability_stealth","Shaman|Elemental":"spell_nature_lightning","Shaman|Enhancement":"spell_nature_lightningshield","Shaman|Restoration":"spell_nature_magicimmunity","Warlock|Affliction":"spell_shadow_deathcoil","Warlock|Demonology":"spell_shadow_metamorphosis","Warlock|Destruction":"spell_shadow_rainoffire","Warrior|Arms":"ability_warrior_savageblow","Warrior|Fury":"ability_warrior_innerrage","Warrior|Protection":"ability_warrior_defensivestance"};
+const BUILD_ICON={"druid-feral-tank":"ability_racial_bearform","druid-feral-cat":"ability_druid_ferociousbite","druid-dreamstate":"ability_druid_dreamstate"};
+const ICON_DIR="../../../../public/icons/";
+const iconOf=bd=>ICON_DIR+(BUILD_ICON[bd.id]||SPEC_ICON[bd.cls+"|"+bd.spec])+".jpg";
+/* class colours for text on the dark page: Blizzard's, with Shaman's blue lifted so it passes AA */
+const TCOLOR=Object.assign({},COLOR,{Shaman:"#4aa3ff"});
 /* a slot is {id, name?}; coverage matches the build's real (class, spec) pair, never its label */
 const bOf=slot=>slot&&BUILD[slot.id]||null;
 const provides=(bd,b)=>!!bd&&bd.cls===b.cls&&(!b.spec||bd.spec===b.spec);
@@ -684,32 +644,37 @@ const KEY="pd-raidcomp-a:v1";
 function load(){try{const r=sessionStorage.getItem(KEY);return r?validate(JSON.parse(r)):null;}catch(e){return null;}}
 function save(){try{sessionStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 let st=load()||{size:25,groups:emptyGroups(25),example:false,edited:false,meta:{}};
-let held=null,editing=null,undo=null,pick=null,drag=null;
+let held=null,editing=null,undo=null,drag=null,aim=null;
 const snapshot=()=>({size:st.size,groups:clone(st.groups),example:st.example,edited:st.edited});
+/* where the palette seats next: the group the viewer picked (aim) if it has room, else the first group with room */
+const firstOpen=()=>st.groups.findIndex(r=>r.includes(null));
+const targetGroup=()=>aim!=null&&st.groups[aim]&&st.groups[aim].includes(null)?aim:firstOpen();
 
 /* ---------- rendering ---------- */
 const tag=sc=>`<span class="scope ${sc.toLowerCase()}">${sc}</span>`;
 const where=(g,i)=>`group ${g+1}, seat ${i+1}`;
-function seatHTML(s,g,i){
+/* our own pencil (drawn here, not an icon font) */
+const PEN=`<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.2 2.3l2.5 2.5-7.9 7.9-3.2.7.7-3.2z M9.8 3.7l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+const icon=bd=>`<img class="ico" src="${iconOf(bd)}" alt="" width="28" height="28" loading="lazy" decoding="async" style="--c:${COLOR[bd.cls]}">`;
+function seatHTML(s,g,i,next){
   const bd=bOf(s),isHeld=!!held&&held.g===g&&held.i===i,isEd=!!editing&&editing.g===g&&editing.i===i;
   const hs=held&&!isHeld?seatAt(st.groups,held.g,held.i):null,d=`data-g="${g}" data-i="${i}"`;
-  let h=`<li class="seat ${bd?"filled":"empty"}${isHeld?" held":""}" style="--c:${bd?COLOR[bd.cls]:"transparent"}" ${d}${bd&&!held&&!isEd?' draggable="true"':""}>`+
-    `<span class="bloom" aria-hidden="true"></span><div class="top"><span class="gem" aria-hidden="true"></span>`;
+  let h=`<li class="seat ${bd?"filled":"empty"}${isHeld?" held":""}${next?" next":""}" style="--c:${bd?COLOR[bd.cls]:"transparent"}" ${d}${bd&&!held&&!isEd?' draggable="true"':""}>`+
+    `<span class="bloom" aria-hidden="true"></span><div class="top">`;
   if(bd&&isEd){
-    h+=`<label class="who"><small>Name for the ${esc(buildName(bd))} in ${where(g,i)}</small>`+
+    h+=icon(bd)+`<label class="who"><small>Name for the ${esc(buildName(bd))} in ${where(g,i)}</small>`+
       `<input type="text" class="ren" maxlength="24" autocomplete="off" value="${esc(s.name||"")}" placeholder="Player name" ${d}></label></div>`+
       `<div class="acts"><button type="button" data-act="save" ${d}>Save</button><button type="button" data-act="unedit" ${d}>Cancel</button></div>`;
   }else if(bd){
     const nm=slotName(s);
-    h+=`<span class="who"><b>${s.name?`<span class="pname">${esc(s.name)}</span>`:esc(buildName(bd))}</b>`+
-      `<small>${s.name?esc(buildName(bd))+" · ":""}${bd.role}</small></span></div>`;
+    h+=icon(bd)+`<span class="who"><b>${s.name?`<span class="pname">${esc(s.name)}</span>`:esc(buildName(bd))}</b>`+
+      `<small>${s.name?esc(buildName(bd))+" · ":""}${bd.role}</small></span>`+
+      (held?"":`<button type="button" class="pen" data-act="rename" ${d} aria-label="${s.name?"Rename":"Name"} ${esc(nm)}" title="${s.name?"Rename":"Name"} this player">${PEN}</button>`)+`</div>`;
     if(!held)h+=`<div class="acts"><button type="button" data-act="move" ${d} aria-label="Move ${esc(nm)} from ${where(g,i)}">Move</button>`+
-      `<button type="button" data-act="rename" ${d} aria-label="${s.name?"Rename":"Name"} ${esc(nm)}">${s.name?"Rename":"Name"}</button>`+
       `<button type="button" class="rm" data-act="remove" ${d} aria-label="Remove ${esc(nm)} from ${where(g,i)}">Remove</button></div>`;
     else if(isHeld)h+=`<div class="acts"><button type="button" data-act="move" ${d} aria-pressed="true" aria-label="Cancel moving ${esc(nm)}">Cancel move</button></div>`;
   }else{
-    h+=`<span class="who"><b>Empty seat</b><small>Seat ${i+1}</small></span></div>`;
-    if(!held)h+=`<button type="button" class="add" data-act="add" ${d} aria-label="Add a player to ${where(g,i)}">+ Add</button>`;
+    h+=`<span class="gem" aria-hidden="true"></span><span class="who"><b>Open seat</b><small>${next?"Next to fill":"Seat "+(i+1)}</small></span></div>`;
   }
   if(hs)h+=`<button type="button" class="here" data-act="here" ${d} aria-label="${s?`Swap ${esc(slotName(hs))} with ${esc(slotName(s))} in ${where(g,i)}`:`Move ${esc(slotName(hs))} to ${where(g,i)}`}">${s?"Swap here":"Move here"}</button>`;
   return h+`</li>`;
@@ -717,14 +682,15 @@ function seatHTML(s,g,i){
 function renderGroups(){
   const host=$("#groups");if(!host)return;
   host.className="terrace g"+st.groups.length;
+  const tg=targetGroup(),ti=tg>=0?st.groups[tg].indexOf(null):-1;
   const wideN=WIDE.filter(b=>casters(st.groups,b)).length,CIRC=2*Math.PI*14;
   host.innerHTML=st.groups.map((row,gi)=>{
     const gets=groupGets(row),n=row.filter(Boolean).length,f=gets.length/PARTY.length;
-    return `<section class="grp${n===PARTY_SIZE?" full":""}" data-group="${gi}" aria-labelledby="gh-${gi}">`+
+    return `<section class="grp${n===PARTY_SIZE?" full":""}${aim===gi?" aimed":""}" data-group="${gi}" aria-labelledby="gh-${gi}">`+
       `<header><svg class="ringm" viewBox="0 0 34 34" aria-hidden="true"><circle class="bg" cx="17" cy="17" r="14"/>`+
       `<circle class="fg" cx="17" cy="17" r="14" stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${(CIRC*(1-f)).toFixed(2)}"/><text x="17" y="17">${n}</text></svg>`+
-      `<div><h3 id="gh-${gi}">Group ${gi+1}</h3><small>${n} of 5 seated · ${gets.length} of ${PARTY.length} party buffs</small></div></header>`+
-      `<ol class="seats" aria-label="Group ${gi+1} seats">${row.map((s,i)=>seatHTML(s,gi,i)).join("")}</ol>`+
+      `<div><h3 id="gh-${gi}"><button type="button" class="aimbtn" data-act="aim" data-g="${gi}" aria-pressed="${aim===gi}" aria-label="Group ${gi+1}: fill this group next">Group ${gi+1}</button></h3><small>${n} of 5 seated · ${gets.length} of ${PARTY.length} party buffs</small></div></header>`+
+      `<ol class="seats" aria-label="Group ${gi+1} seats">${row.map((s,i)=>seatHTML(s,gi,i,gi===tg&&i===ti)).join("")}</ol>`+
       `<div class="gets"><h4>This group receives ${tag("Party")}</h4><ul class="chips">`+
       (gets.length?gets.map(b=>`<li>${b.name}</li>`).join(""):`<li class="none">No party buffs yet</li>`)+
       `</ul><p>Plus ${wideN} ${tag("Raid")} or ${tag("Single")} buffs, which do not depend on seating.</p></div></section>`;
@@ -734,7 +700,7 @@ function renderGroups(){
 function renderHead(){
   const n=filled(st.groups).length,cnt=$("#count"),tagEl=$("#rostertag"),ex=$("#examplebtn"),clr=$("#clearbtn");
   if(cnt)cnt.innerHTML=`<b>${n}</b> of ${st.size} seated`;
-  if(tagEl)tagEl.innerHTML=!n?"Empty raid · start by adding a player or load the example"
+  if(tagEl)tagEl.innerHTML=!n?"Empty raid · click a spec below, or load the example"
     :st.example?`<span class="ex">Example</span> ${st.edited?"roster, edited":"roster: invented seating of real specs"} · ${n} of ${st.size} seated`
     :`Your raid · ${n} of ${st.size} seated`;
   if(ex)ex.textContent=n?"Reset to example":"Load example roster";
@@ -776,7 +742,7 @@ function renderWide(){
     `<h3>Debuffs on the boss</h3><ul class="chips">${DEBUFFS.map(row).join("")}</ul>`+
     `<p class="prov" style="margin:6px 0 0">×n is how many seats could cast it (Wowhead's count), not how many copies are up.</p>`;
 }
-function renderAll(){renderHead();renderGroups();renderRoles();renderAdd();renderMissing();renderWide();}
+function renderAll(){renderHead();renderGroups();renderPalette();renderRoles();renderAdd();renderMissing();renderWide();}
 /* ---------- status line (visible) + polite announcement; an Undo button after anything that removes people ---------- */
 function status(html,spoken,withUndo){
   const s=$("#status");
@@ -799,58 +765,46 @@ function commit(fn,opts){
   if(gained(before,coverIds(st.groups))&&KIT&&KIT.swell)KIT.swell();
   (opts.lit||[]).forEach(([g,i],k)=>{const el=$(`#groups .seat[data-g="${g}"][data-i="${i}"]`);if(el&&M.on){if(M.settle)M.settle(el);if(KIT&&KIT.enter)KIT.enter(el,{delay:k*.08});}});
 }
-/* ---------- Add: the picker dialog (class → spec or build → optional name) seats into the chosen seat ---------- */
-const dlg=$("#picker"),okBtn=$("#pk-ok");
-function renderClasses(){
-  const host=$("#pk-classes");if(!host||!pick)return;
-  host.innerHTML=CLASSES.map(c=>`<button type="button" data-cls="${c}" aria-pressed="${pick.cls===c}"><span class="gem" style="--c:${COLOR[c]}" aria-hidden="true"></span>${c}</button>`).join("");
+/* ---------- Add: the spec palette, every class and build always on screen (as in the live app). A click seats that
+   build in the next open seat: the group the viewer picked if it has room, else group 1 first, on through group 5. ---------- */
+function renderPalette(){
+  const host=$("#pal");if(!host)return;
+  const g=targetGroup(),full=g<0;
+  if(!host.dataset.built){
+    host.innerHTML=CLASSES.map(c=>`<div class="pclass"><h4 style="color:${TCOLOR[c]}">${c}</h4><div class="pbuilds">`+
+      BUILDS.filter(b=>b.cls===c).map(b=>`<button type="button" data-id="${b.id}" style="--c:${COLOR[c]}" title="${esc(b.role+(b.note?" · "+b.note:""))}" aria-label="Seat ${esc(art(buildName(b)).toLowerCase()+" "+buildName(b))}, ${b.role}">`+
+        `${icon(b)}<span>${esc(b.label)}</span></button>`).join("")+`</div></div>`).join("");
+    host.dataset.built="1";
+  }
+  $$("button[data-id]",host).forEach(b=>{b.disabled=full;});
+  const tgt=$("#paltgt");if(tgt)tgt.textContent=full?"none, the raid is full":"group "+(g+1)+", seat "+(st.groups[g].indexOf(null)+1);
+  const am=$("#palaim");
+  if(am)am.innerHTML=aim!=null&&g===aim?`Filling group ${aim+1}. <button type="button" data-act="unaim">Fill in order</button>`
+    :full?"Remove someone, or switch to 25-player, to seat more.":`Fills group 1 first, on through group ${st.groups.length}.`;
 }
-function renderSpecs(){
-  const host=$("#pk-specs");if(!host||!pick)return;
-  host.innerHTML=!pick.cls?`<p class="prov" style="margin:0">Pick a class first.</p>`:
-    BUILDS.filter(b=>b.cls===pick.cls).map(b=>`<button type="button" data-id="${b.id}" aria-pressed="${pick.id===b.id}"><span>${b.label}</span><small>${b.role}${b.note?" · "+b.note:""}</small></button>`).join("");
-  if(okBtn){okBtn.disabled=!pick.id;okBtn.textContent=pick.id?"Seat "+buildName(BUILD[pick.id]):"Seat player";}
-}
-function openPicker(g,i){
-  if(!dlg)return;
-  pick={g,i,cls:null,id:null};
-  const w=$("#pk-where"),nm=$("#pk-name");if(w)w.textContent="Group "+(g+1)+", seat "+(i+1);if(nm)nm.value="";
-  renderClasses();renderSpecs();
-  try{if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}catch(e){dlg.setAttribute("open","");}
-  const first=$("#pk-classes button");if(first)first.focus();
-}
-function closePicker(cancelled){
-  const p=pick;pick=null;
-  try{if(dlg.close)dlg.close();else dlg.removeAttribute("open");}catch(e){if(dlg)dlg.removeAttribute("open");}
-  if(cancelled&&p){focusSeat(p.g,p.i,"add");say("Add cancelled.");}
-}
-on($("#pk-classes"),"click",e=>{
-  const b=e.target.closest&&e.target.closest("button[data-cls]");if(!b||!pick)return;
-  pick.cls=b.dataset.cls;pick.id=null;renderClasses();renderSpecs();
-  const f=$("#pk-specs button");if(f)f.focus();
-  say(pick.cls+". Now choose a spec or build.");
-});
-on($("#pk-specs"),"click",e=>{
-  const b=e.target.closest&&e.target.closest("button[data-id]");if(!b||!pick)return;
-  pick.id=b.dataset.id;renderSpecs();
-  const again=$(`#pk-specs button[data-id="${pick.id}"]`);if(again)again.focus();
-  say(buildName(BUILD[pick.id])+" selected. Add a name if you like, then Seat.");
-});
-function seatPick(){
-  if(!pick||!pick.id)return;
-  const p=pick,nmEl=$("#pk-name"),nm=nmEl?nmEl.value.trim().slice(0,24):"";
-  const slot={id:p.id};if(nm)slot.name=nm;
-  closePicker(false);
-  if(seatAt(st.groups,p.g,p.i))return;
-  commit(()=>{st.groups[p.g][p.i]=slot;},{lit:[[p.g,p.i]]});
-  focusSeat(p.g,p.i,"move");
-  const n=groupGets(st.groups[p.g]).length,msg=`Seated ${slotName(slot)} in ${where(p.g,p.i)}. Group ${p.g+1} now receives ${n} of ${PARTY.length} party buffs.`;
+function placeBuild(id,btn){
+  const bd=BUILD[id];if(!bd)return;
+  const g=targetGroup();
+  if(g<0){status("The raid is full. Remove someone, or switch to 25-player, to seat more.");return;}
+  const i=st.groups[g].indexOf(null),slot={id:bd.id};
+  commit(()=>{st.groups[g][i]=slot;},{lit:[[g,i]]});
+  const n=groupGets(st.groups[g]).length;
+  const msg=`Seated ${art(buildName(bd)).toLowerCase()} ${buildName(bd)} in ${where(g,i)}. Group ${g+1} now receives ${n} of ${PARTY.length} party buffs.`+(targetGroup()<0?" The raid is full.":"");
   status(esc(msg),msg);
+  if(btn&&!btn.disabled)btn.focus({preventScroll:true}); /* stay on the palette, so the next seat is one press away */
 }
-on($("#pkform"),"submit",e=>{e.preventDefault();seatPick();});
-on($("#pk-cancel"),"click",()=>closePicker(true));
-on(dlg,"cancel",e=>{e.preventDefault();closePicker(true);});
-on(dlg,"click",e=>{if(e.target===dlg)closePicker(true);}); /* a click on the backdrop */
+on($("#pal"),"click",e=>{const b=e.target.closest&&e.target.closest("button[data-id]");if(b&&!b.disabled)placeBuild(b.dataset.id,b);});
+on($("#palaim"),"click",e=>{
+  if(!(e.target.closest&&e.target.closest('[data-act="unaim"]')))return;
+  aim=null;renderGroups();renderPalette();say("Filling in order again, group 1 first.");
+  const f=$("#pal button[data-id]:not(:disabled)");if(f)f.focus();
+});
+function toggleAim(g){
+  aim=aim===g?null:g;renderGroups();renderPalette();
+  const b=$(`#groups [data-act="aim"][data-g="${g}"]`);if(b)b.focus();
+  const t=targetGroup();
+  say(aim===null?"Filling in order, group 1 first.":t===g?`The palette now fills group ${g+1}.`:`Group ${g+1} is full, so the palette fills group ${t+1} instead.`);
+}
 
 /* ---------- Move (press Move, then Move here / Swap here), Remove, Name ---------- */
 function toggleHold(g,i){
@@ -897,7 +851,7 @@ const gh=$("#groups");
 on(gh,"click",e=>{
   const b=e.target&&e.target.closest?e.target.closest("[data-act]"):null;if(!b)return;
   const g=+b.dataset.g,i=+b.dataset.i,act=b.dataset.act;
-  if(act==="add")openPicker(g,i);
+  if(act==="aim")toggleAim(g);
   else if(act==="move")toggleHold(g,i);
   else if(act==="here")doMove(held,{g,i});
   else if(act==="remove")removeSeat(g,i);
@@ -911,7 +865,7 @@ on(gh,"keydown",e=>{
   else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();cancelRename(+inp.dataset.g,+inp.dataset.i);}
 });
 on(document,"keydown",e=>{
-  if(e.key!=="Escape"||!held||pick)return;
+  if(e.key!=="Escape"||!held)return;
   const h=held;held=null;renderGroups();focusSeat(h.g,h.i,"move");status("Move cancelled.");
 });
 /* drag and drop (fine pointers); the Move button is the keyboard and touch path */
@@ -946,7 +900,7 @@ const ring=()=>{if(M.on&&M.flash)M.flash();if(M.on&&KIT&&KIT.enter)$$("#groups .
 $$(".seg button[data-size]").forEach(b=>on(b,"click",()=>{
   const n=+b.dataset.size;if(n===st.size||SIZES.indexOf(n)<0)return;
   const dropped=n<st.size?filled(st.groups.slice(n/PARTY_SIZE)).length:0;
-  commit(()=>{st.groups=resize(st.groups,n);st.size=n;},{undoable:dropped>0});
+  commit(()=>{st.groups=resize(st.groups,n);st.size=n;if(aim!=null&&aim>=n/PARTY_SIZE)aim=null;},{undoable:dropped>0});
   const msg=`${n}-player raid: ${n/PARTY_SIZE} groups of five.`+(dropped?` ${dropped} ${dropped===1?"player":"players"} in groups 3 to 5 ${dropped===1?"was":"were"} removed.`:"");
   status(msg,msg+(dropped?" Undo is available after this message.":""),dropped>0);ring();
 }));
@@ -1062,7 +1016,7 @@ function splitHero(){
   h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
   return true;
 }
-/* 1. Intro: the camera settles down onto the terrace, words rise out of masks, the version chip lands, cards in view rise. ~1.4s */
+/* 1. Intro: the camera settles down over the water, words rise out of masks, the version chip lands, cards in view rise. ~1.4s */
 function intro(){
   const split=splitHero();
   const inView=$$(".results .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
@@ -1076,7 +1030,7 @@ function intro(){
   if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
   safe(tl);
 }
-/* 2. Scroll: the camera drifts in over the terrace; cards rise as they arrive */
+/* 2. Scroll: the camera drifts in over the water; cards rise as they arrive */
 function scrollStory(){
   gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
   if($(".results"))gsap.fromTo(SC.cam,{rise:0},{rise:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:".results",start:"top 85%",end:"top 15%",scrub:.8}});
@@ -1096,7 +1050,7 @@ function magnets(){
   return ()=>offs.forEach(f=>f());
 }
 /* 4. Settle and swap, the tab's own motion: a seat that receives someone fills with light from above, like light
-   landing (one slow rise and fall, ~0.9s); on a move both seats drift gently into place and the terrace brightens once. */
+   landing (one slow rise and fall, ~0.9s); on a move both seats drift gently into place and the crystal spins up once. */
 M.settle=el=>A(()=>{
   const b=$(".bloom",el);if(!b)return;
   safe(gsap.timeline().fromTo(b,{opacity:0},{opacity:.95,duration:.35,ease:"sine.out"}).to(b,{opacity:0,duration:.55,ease:"sine.inOut"}));

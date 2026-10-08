@@ -12,6 +12,7 @@ for (const [d, file, ex, pickSel] of [["A","raid-composition.html","#examplebtn"
   await p.click('#groups [data-act="move"][data-g="0"][data-i="0"]'); await p.waitForTimeout(200);
   const here = await p.evaluate(s => eval(s), short('#groups [data-act="here"]'));
   await p.keyboard.press("Escape");
+  if (d === "A") { console.log(d, "page:", page.join(" | ") || "all ≥44"); console.log(d, "move targets:", here.join(" | ") || "all ≥44"); console.log(d, "picker: none (the palette and pencils are in the page check)"); await ctx.close(); continue; }
   await p.click('#groups [data-act="remove"][data-g="0"][data-i="0"]'); await p.waitForTimeout(200);
   await p.click('#groups [data-act="add"][data-g="0"][data-i="0"]'); await p.waitForTimeout(200);
   const pk1 = await p.evaluate(s => eval(s), short(pickSel));

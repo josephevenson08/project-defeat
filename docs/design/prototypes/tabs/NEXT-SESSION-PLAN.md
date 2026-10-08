@@ -1,6 +1,21 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-07, night): start here
+## ▶ Where we left off (2026-10-08): start here
+
+**Item 1 of the list below is done.** Raid Composition is dark, adds players from a click-to-fill palette of spec icons, and names them with a pencil. All checks pass. The details are in [`README.md`](README.md#raid-composition-the-planning-table-2026-10-07).
+
+**To view the prototypes in the in-app browser pane,** start the `prototypes` server from `.claude/launch.json` (Python on port 8765). Then open `http://localhost:8765/docs/design/prototypes/tabs/raid-composition.html`. The pane opens local files as static snapshots, so icons and `tbc-kit.js` don't load that way.
+
+**Next:**
+1. **Gallery** (`../index.html`):
+   - Mark the three portal Home designs and Raid Composition B as superseded.
+   - Note that C was dropped.
+   - Make sure the seven tabs show their current look.
+2. **The Step 2 walkthrough:** resume it for the remaining tabs. Professions waits for a later update.
+3. **The fix-it tasks** (see the list below).
+4. **Open question:** should the text accents follow each tab's colour, as Raid Composition's gold now does? They are teal on the other dark tabs.
+
+## Where we left off (2026-10-07, night)
 
 **Steps 1 and 2 of the list below are done.** Every tab has its own background, and Raid Composition
 has its chosen planning table.
@@ -14,7 +29,7 @@ has its chosen planning table.
 - **Testing:** both tables passed a hands-on browser test of every control, and phone tap targets were fixed on both. Details are in [`README.md`](README.md#raid-composition-the-planning-table-2026-10-07).
 
 **Next, in order:**
-1. **Raid Composition: click-to-fill, a pencil for names, and a dark page** (the owner's feedback on design A, 2026-10-07).
+1. ~~**Raid Composition: click-to-fill, a pencil for names, and a dark page**~~ **Done 2026-10-08** (the owner's feedback on design A, 2026-10-07).
    The owner prefers how adding worked before to pressing "+ Add" on a seat and using the picker dialog.
    - **A palette of every class and spec, always on screen.** Clicking one seats that spec in the next open seat automatically, filling group 1 first, then 2, through to 5.
    - **A small pencil icon on each player's tag** to type their name. It replaces the "Name" button.

@@ -18,6 +18,13 @@ const AD = {
       await p.locator("#pk-ok").click();
     },
     renameInput: () => "#groups input.ren",
+    /* the palette: aim at the group, click the spec (it takes the group's first open seat), name it with the pencil */
+    async add(p, g, i, cls, id, name) {
+      const aimBtn = p.locator(`#groups [data-act="aim"][data-g="${g}"]`);
+      if ((await aimBtn.getAttribute("aria-pressed")) !== "true") await aimBtn.click();
+      await p.locator(`#pal button[data-id="${id}"]`).click();
+      if (name) { await p.locator(`#groups [data-act="rename"][data-g="${g}"][data-i="${i}"]`).click(); const inp = p.locator("#groups input.ren"); await inp.fill(name); await inp.press("Enter"); }
+    },
   },
   b: {
     file: "raid-comp-b.html", count: "#boardsum", example: "#resetbtn",
@@ -27,6 +34,7 @@ const AD = {
       await p.locator(`#groups .picker button[data-b="${id}"]`).click();
     },
     renameInput: (g, i) => `#rn-${g}-${i}`,
+    async add(p, g, i, cls, id, name) { await p.locator(`#groups [data-act="add"][data-g="${g}"][data-i="${i}"]`).click(); await this.pick(p, cls, id, name); },
   },
 };
 
@@ -38,6 +46,7 @@ const errs = [];
 p.on("pageerror", e => errs.push("pageerror: " + e.message));
 p.on("console", m => { if (m.type() === "error" && !/WebGL context/.test(m.text())) errs.push("console: " + m.text()); });
 p.setDefaultTimeout(4000);
+p.setDefaultNavigationTimeout(30000); /* page loads wait on the CDN; only clicks and checks use the short limit */
 
 const results = [];
 async function step(name, fn) {
@@ -61,17 +70,25 @@ await step("starts empty: 0 of 25, Clear disabled", async () => {
   expect(await p.locator("#clearbtn").isDisabled(), "Clear is enabled on an empty raid");
 });
 await step("Add: Enhancement Shaman named Thrallson into group 1 seat 1", async () => {
-  await act("add", 0, 0).click(); await A.pick(p, "Shaman", "shaman-enhancement", "Thrallson"); await settle();
+  await A.add(p, 0, 0, "Shaman", "shaman-enhancement", "Thrallson"); await settle();
   const t = await seatText(0, 0);
   expect(/Thrallson/.test(t) && /Enhancement/.test(t), "seat reads " + t);
   expect(await chips(0) > 0, "group 1 shows no party buffs");
   expect(/^1 of 25/.test(await countText()), "count is " + await countText());
 });
 await step("Add: Fury Warrior (no name) into group 2 seat 1", async () => {
-  await act("add", 1, 0).click(); await A.pick(p, "Warrior", "warrior-fury", ""); await settle();
+  await A.add(p, 1, 0, "Warrior", "warrior-fury", ""); await settle();
   expect(/Fury Warrior/.test(await seatText(1, 0)), "seat reads " + await seatText(1, 0));
 });
-await step("Add: cancel the picker leaves the seat empty", async () => {
+if (which === "a") await step("Group targeting: aim at group 3, then back to filling in order", async () => {
+  await p.locator('#groups [data-act="aim"][data-g="2"]').click(); await settle();
+  let t = await p.locator("#paltgt").innerText(); expect(/group 3, seat 1/.test(t), "target reads " + t);
+  expect(await p.locator('#groups section.grp[data-group="2"]').evaluate(e => e.classList.contains("aimed")), "group 3 not marked as aimed");
+  await p.locator('#palaim [data-act="unaim"]').click(); await settle();
+  t = await p.locator("#paltgt").innerText(); expect(/group 1, seat 2/.test(t), "after Fill in order the target reads " + t);
+  expect(/Next to fill/.test(await seatText(0, 1)), "group 1 seat 2 is not marked next: " + await seatText(0, 1));
+});
+else await step("Add: cancel the picker leaves the seat empty", async () => {
   await act("add", 2, 0).click(); await p.keyboard.press("Escape"); await settle();
   expect(/Empty seat|Open seat/.test(await seatText(2, 0)), "seat reads " + await seatText(2, 0));
   expect(await act("add", 2, 0).isVisible(), "Add button not back");
@@ -172,7 +189,7 @@ await step("Suggestions use the right article (an Elemental, not a Elemental)", 
   const texts = [];
   for (const ids of [["shaman-restoration"], ["warrior-fury"], ["mage-arcane"], []]) {
     await p.locator("#clearbtn").click().catch(() => {}); await settle();
-    for (const [k, id] of ids.entries()) { const [cls] = id.split("-"); await act("add", 0, k).click(); await A.pick(p, cls[0].toUpperCase() + cls.slice(1), id, ""); await settle(); }
+    for (const [k, id] of ids.entries()) { const [cls] = id.split("-"); await A.add(p, 0, k, cls[0].toUpperCase() + cls.slice(1), id, ""); await settle(); }
     texts.push((await p.locator("#addlist").innerText()).replace(/s+/g, " "));
   }
   await p.locator(A.example).click(); await settle(); texts.push((await p.locator("#addlist").innerText()).replace(/s+/g, " "));
@@ -195,6 +212,27 @@ if (which === "a") await step("Quick add from 'one more seat' seats the suggesti
   await q.click(); await settle();
   expect(/^1 of 25/.test(await countText()), "count is " + await countText() + " after " + label);
 });
+if (which === "a") {
+  await step("Palette fills in order: group 1 first, then group 2", async () => {
+    await p.locator("#clearbtn").click(); await settle();
+    for (const id of ["warrior-protection", "paladin-holy", "priest-holy", "shaman-restoration", "mage-arcane", "rogue-combat"]) { await p.locator(`#pal button[data-id="${id}"]`).click(); await p.waitForTimeout(120); }
+    await settle();
+    const got = [await seatText(0, 0), await seatText(0, 4), await seatText(1, 0)];
+    expect(/Protection Warrior/.test(got[0]) && /Arcane Mage/.test(got[1]) && /Combat Rogue/.test(got[2]), "seats read " + got.join(" / "));
+    expect(/^6 of 25/.test(await countText()), "count is " + await countText());
+  });
+  await step("A full raid disables the palette", async () => {
+    await p.locator(A.example).click(); await settle();
+    const enabled = await p.locator("#pal button[data-id]:not(:disabled)").count();
+    expect(enabled === 0, enabled + " palette buttons still enabled");
+    expect(/full/.test(await p.locator("#paltgt").innerText()), "target reads " + await p.locator("#paltgt").innerText());
+  });
+  await step("Spec icons load in the palette", async () => {
+    await p.locator("#pal").scrollIntoViewIfNeeded(); await p.waitForTimeout(600);
+    const r = await p.evaluate(() => { const im = [...document.querySelectorAll("#pal img")]; return { n: im.length, ok: im.filter(i => i.complete && i.naturalWidth > 0).length, broken: im.filter(i => i.complete && i.naturalWidth === 0).map(i => i.src.split("/").pop()) }; });
+    expect(r.n === 29 && r.ok === 29 && !r.broken.length, `${r.n} icons, ${r.ok} loaded, broken: ${r.broken.join(", ")}`);
+  });
+}
 await step("Keyboard: Move with Enter, Tab to a target, Enter", async () => {
   await p.locator(A.example).click(); await settle();
   const before = await seatText(0, 0);

@@ -11,6 +11,12 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ## Where this is right now (2026-10-07, latest — READ THIS FIRST)
 
+> **2026-10-08: Raid Composition is done.**
+> - It's dark like the other tabs, over the white-gold water, with one light per group that brightens as the group's buffs are covered.
+> - A click-to-fill palette of spec icons fills group 1 first, and a pencil names players.
+> - All checks pass. The next step is the gallery.
+> - To view prototypes in the browser pane, use the `prototypes` server in `.claude/launch.json`. Local files open there as static snapshots, without icons.
+>
 > **Night of 2026-10-07: Raid Composition is decided.**
 > - The owner picked design A, the Terrace of Light, which is now `raid-composition.html`.
 > - Design C was dropped, and B is kept for reference.

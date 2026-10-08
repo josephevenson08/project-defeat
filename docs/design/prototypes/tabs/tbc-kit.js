@@ -40,23 +40,24 @@
      swell()                     K3 naaru swell, ~1.2s soft brightness rise and fall, never restarts mid-swell
      embers(on, {count,height,preset:'fel'|'hellfire'})   K4 fel embers
      theme(name, {instant})      'ssc' (K5) | 'tk' (K6) | 'hellfire' | 'bladesedge' | 'karazhan', or a tab theme
-                                 'planner' | 'tiers' | 'profs' (see TAB THEMES below); 1.2s crossfade
+                                 'planner' | 'raidcomp' | 'tiers' | 'profs' (see TAB THEMES below); 1.2s crossfade
      runeRing(el, {size,glyphs,seed,spin})  K7 SVG rune ring into el → {svg, remove()}
      enter(el, {delay})          K8 light-portal entry ring for a panel
      rebirth(x, y)               K9 gold-orange sparks scatter and re-form (viewport px; default centre)
      taint(el, on)               K10 slow teal → sickly-green state tint (text/icon stay the real cue)
      lift({targets})             the rare Gravity Lapse "lift" (17/17 recommended gear)
+     groups(list, n)             raidcomp: per-group brightness, list = [{f: 0..1}, …], n = groups shown (2 or 5)
      setMotion(on)               only for pages without a SCENE
      tier / ok / themeName       read-only: 'low'|'medium'|'high', 3D extras built, current theme
    K2 (shattered sky: instanced rocks + nether aurora) is built by init and runs under every theme.
 
    TAB THEMES (every tab its own colour over the same crystal-and-water scene, decided 2026-10-05)
      Home 'ssc' teal (light shafts + water pulse) · Simulation 'tk' gold over violet (crystal pillars)
-     · Raids follows the raid · Raid Composition draws its own white-gold terrace (design A) and
-     hides the kit's 3D extras except the K3 naaru glow (its keepOwn()). The three below each add
-     one small signature detail, built
-     the first time the theme is shown and faded with the theme's weight:
+     · Raids follows the raid. The four below each add one small signature detail, built the first
+     time the theme is shown and faded with the theme's weight:
      planner   deep sea blue     slow rising bubbles
+     raidcomp  warm white-gold   one light per raid group circling the crystal; groups(list, n) sets
+                                 how bright each one is from that group's party-buff coverage
      tiers     emerald           three stacked rank rings under the crystal
      profs     amber             ore glints in veins on the floating rocks
 
@@ -71,12 +72,12 @@ const RMQ=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{matc
 const hasG=()=>typeof window.gsap!=="undefined";
 const hasT=()=>typeof window.THREE!=="undefined";
 const hasDraw=()=>hasG()&&typeof window.DrawSVGPlugin!=="undefined";
-const TABS=["planner","tiers","profs"];
+const TABS=["planner","raidcomp","tiers","profs"];
 const THEMES=["ssc","tk","hellfire","bladesedge","karazhan"].concat(TABS);
 const SKEY="pd-tbc-ignited";
 let S=null,GL=false,hostMotion=null;
 const K={t:0,frames:0,tier:"medium",theme:"ssc",every:3,auDirty:true,emUser:false,emTheme:false,igniting:null};
-const W={ssc:1,tk:0,hellfire:0,bladesedge:0,karazhan:0,planner:0,tiers:0,profs:0};
+const W={ssc:1,tk:0,hellfire:0,bladesedge:0,karazhan:0,planner:0,raidcomp:0,tiers:0,profs:0};
 const live=new Set();
 
 function motionOn(){
@@ -310,13 +311,14 @@ const EXTRA_HEX={hellfire:{light:"#ff8a3a",deep:"#1c0805",fog:"#160504",acc:"#7d
   bladesedge:{light:"#f0a070",deep:"#140d16",fog:"#1b0f16",acc:"#9b6bff"},
   karazhan:{light:"#b48cff",deep:"#0d0a1c",fog:"#0a0714",acc:"#5ad1ff"},
   planner:{light:"#5ab0ff",deep:"#031033",fog:"#020a22",acc:"#9fe8ff"},
+  raidcomp:{light:"#ffe2a6",deep:"#1a1610",fog:"#0f0d09",acc:"#8cc8f0"},
   tiers:{light:"#3ee08f",deep:"#03190f",fog:"#020e08",acc:"#e8d25a"},
   profs:{light:"#ffb547",deep:"#1a1004",fog:"#0f0903",acc:"#d8ecff"}};
 const AUC={ssc:["#5cf2c0","#4a2a90",.55],tk:["#ecc06a","#8a5cff",1],hellfire:["#ff6a2a","#6a1010",.7],
   bladesedge:["#ff9a6a","#4a2a6a",.6],karazhan:["#b48cff","#2a1a6a",.75],
-  planner:["#6ab8ff","#1a2a7a",.5],tiers:["#5cf2a0","#0e4a3a",.55],profs:["#ffc061","#5a2a10",.5]};
+  planner:["#6ab8ff","#1a2a7a",.5],raidcomp:["#ffe2a0","#3a3a6a",.55],tiers:["#5cf2a0","#0e4a3a",.55],profs:["#ffc061","#5a2a10",.5]};
 /* the floating rocks take a little of each tab's colour (violet by default, ember for Hellfire / Blade's Edge) */
-const ROCK_HEX={planner:"#0f2a66",tiers:"#0f3a26",profs:"#4a2808"};
+const ROCK_HEX={planner:"#0f2a66",raidcomp:"#3a3020",tiers:"#0f3a26",profs:"#4a2808"};
 let EXTRA=null,AUCOL=null;
 function colors(){
   if(EXTRA||!hasT())return;
@@ -346,18 +348,21 @@ function applyTheme(){
 function dprU(){const U=S.three.uniforms;return U&&U.uDpr?U.uDpr:{value:Math.min(window.devicePixelRatio||1,1.5)};}
 function additive(U,vs,fs,extra){return new THREE.ShaderMaterial(Object.assign({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexShader:vs,fragmentShader:fs},extra||{}));}
 function buildDetail(k){
-  try{({planner:buildBubbles,tiers:buildRankRings,profs:buildOreGlints})[k]();}
+  try{({planner:buildBubbles,raidcomp:buildGroupLights,tiers:buildRankRings,profs:buildOreGlints})[k]();}
   catch(e){D[k]={failed:true};if(window.console)console.warn("TBCKit: "+k+" detail unavailable",e);}
 }
 function showDetail(k,w){
   const d=D[k];if(!d||d.failed)return;const on=w>.01;
   if(d.U){d.U.uI.value=w;d.mesh.visible=on;if(d.veins)d.veins.visible=on;}
+  if(d.orbit){d.orbit.material.opacity=.16*w;d.orbit.visible=on;}
   if(d.rings)d.rings.forEach(m=>{m.material.uniforms.uI.value=w;m.visible=on;});
 }
 /* the crystal bobs, so the details that circle it follow it every frame (still frames included) */
 function updateDetails(){
   const cr=S.three.crystal;
-  const rings=D.tiers,ore=D.profs;
+  const lights=D.raidcomp,rings=D.tiers,ore=D.profs;
+  if(cr&&lights&&lights.U){const c=cr.position,on=W.raidcomp>.01&&cr.visible!==false;
+    lights.U.uC.value.copy(c);lights.orbit.position.set(c.x,c.y-.35,c.z);lights.mesh.visible=lights.orbit.visible=on;}
   if(cr&&rings&&rings.rings){const c=cr.position,on=W.tiers>.01&&cr.visible!==false;
     rings.rings.forEach(m=>{m.position.set(c.x,m.userData.y,c.z);m.visible=on;});}
   if(ore&&ore.U)ore.U.uCount.value=G3.rocks?G3.rocks.count:0;
@@ -384,6 +389,36 @@ function buildBubbles(){
       gl_FragColor=vec4(uCol,(rim*.8+hi*.85)*vA*uI);}`));
   mesh.frustumCulled=false;mesh.visible=false;S.three.scene.add(mesh);
   D.planner={mesh,U,geo};
+}
+/* raidcomp: one warm light per raid group orbits the crystal on a faint ring; each breathes slowly and is as
+   bright as its group is covered (groups()). Empty groups stay as half-bright motes; at 10-player only two lights show. */
+const GL5={f:[.6,.6,.6,.6,.6],n:5};
+function groups(list,n){
+  if(Array.isArray(list))for(let i=0;i<5;i++){const v=list[i];GL5.f[i]=v&&typeof v.f==="number"?Math.max(0,Math.min(1,v.f)):0;}
+  if(n)GL5.n=Math.max(1,Math.min(5,n|0));
+  const d=D.raidcomp;if(d&&d.U){const a=d.geo.attributes.aF;for(let i=0;i<5;i++)a.array[i]=GL5.f[i];a.needsUpdate=true;d.U.uN.value=GL5.n;rerender();}
+}
+function buildGroupLights(){
+  const pos=new Float32Array(15),idx=new Float32Array([0,1,2,3,4]);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("aI",new THREE.BufferAttribute(idx,1));
+  geo.setAttribute("aF",new THREE.BufferAttribute(new Float32Array(GL5.f),1));
+  const U={uTime:KU.uTime,uDpr:dprU(),uN:{value:GL5.n},uC:{value:new THREE.Vector3()},uCol:{value:new THREE.Color("#fff0c8")},uI:{value:0}};
+  const mesh=new THREE.Points(geo,additive(U,
+    `uniform float uTime,uDpr,uN;uniform vec3 uC;attribute float aI,aF;varying float vB;
+    void main(){float on=step(aI,uN-.5),a=aI*6.28318/max(uN,1.)+uTime*.12;
+      vec3 p=uC+vec3(cos(a)*2.4,-.35+sin(uTime*.45+aI*1.3)*.15,sin(a)*2.4);
+      vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+      vB=(.5+.5*aF)*(.85+.15*sin(uTime*.5+aI*2.1))*on;
+      gl_PointSize=(30.+24.*aF)*uDpr*(12./-mv.z)*on;}`,
+    `uniform vec3 uCol;uniform float uI;varying float vB;
+    void main(){float d=length(gl_PointCoord-.5);float a=exp(-d*d*60.)+exp(-d*d*12.)*.5;
+      gl_FragColor=vec4(mix(uCol,vec3(1.),exp(-d*d*160.)*.7),clamp(a,0.,1.)*vB*uI);}`));
+  mesh.frustumCulled=false;mesh.visible=false;S.three.scene.add(mesh);
+  const orbit=new THREE.Mesh(new THREE.TorusGeometry(2.4,.012,4,120),
+    new THREE.MeshBasicMaterial({color:new THREE.Color("#fff0c8"),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  orbit.rotation.x=Math.PI/2;orbit.visible=false;S.three.scene.add(orbit);
+  D.raidcomp={mesh,U,orbit,geo};
 }
 /* tiers: three flat rings of light stepping up under the crystal like a podium, dashed, turning slowly in turn */
 function buildRankRings(){
@@ -743,7 +778,7 @@ function lift(opts){
 
 /* ---------- public API ---------- */
 const api={
-  version:"1.0.0",init,ignite,swell,embers,theme,runeRing,enter,rebirth,taint,lift,
+  version:"1.0.0",init,ignite,swell,embers,theme,groups,runeRing,enter,rebirth,taint,lift,
   setMotion(on){hostMotion=!!on;onState();},
   get tier(){return K.tier;},get ok(){return GL;},get themeName(){return K.theme;},
   motion:motionOn
