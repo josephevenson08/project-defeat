@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**444 commits across 70 days**, from 2026-06-25 to 2026-10-08.
+**445 commits across 70 days**, from 2026-06-25 to 2026-10-08.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,11 +13,12 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_17 commits_
+_18 commits_
 
-### Thursday 8 October — 1 commit
+### Thursday 8 October — 2 commits
 
 - Make Raid Composition dark, with a click-to-fill spec palette and a pencil for names — [`200e660`](https://github.com/josephevenson08/project-defeat/commit/200e660b5786b3ec9b66ef6786bf554386bf1ec6)
+- Drop the curtain between tabs, and put the current tabs first in the gallery — [`3a2b016`](https://github.com/josephevenson08/project-defeat/commit/3a2b016e13c7d600caa1926362efd6dda5bdeb62)
 
 ### Wednesday 7 October — 5 commits
 
