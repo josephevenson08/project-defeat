@@ -137,6 +137,9 @@ main{padding:0 0 48px}
 .seat .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
 .sbtn{font:600 var(--t-xs) var(--f-body);background:linear-gradient(180deg,var(--iron-2),var(--iron));color:var(--ink-2);border:1px solid var(--iron-hi);border-radius:3px;padding:4px 9px;cursor:pointer;min-height:32px;white-space:nowrap}
 .sbtn:hover{color:var(--ink);border-color:var(--torch)}
+/* phones and touch screens: every seat control is a 44px target, as in the app */
+@media (max-width:699px),(pointer:coarse){.sbtn{min-height:44px;padding:8px 12px}
+  .orders button,.muster-empty button,#groups .picker button,#groups .picker input,.meta input{min-height:44px}}
 .sbtn.add{color:var(--torch);border-color:rgba(255,155,61,.55)}
 .seat.empty{background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 6px,transparent 6px 12px),#130e0d;border:1px dashed var(--chalk-dim);box-shadow:none}
 .seat.empty .who b{font:400 var(--t-sm) var(--f-chalk);color:var(--chalk-dim)}
@@ -674,7 +677,7 @@ function renderAdd(){
     const r=RC.bestFor(gr);
     if(!r.best)return `<li class="ok"><span class="g">Group ${gi+1}</span>Already gets every party buff.</li>`;
     const when=r.seated===0?"first seat":r.open?"one more seat":"if one seat changed";
-    return `<li><span class="g">Group ${gi+1} · ${when}</span>A <b>${esc(r.best.label)} ${r.best.cls}</b> would add ${list(r.gain.map(b=>b.name))}.</li>`;
+    return `<li><span class="g">Group ${gi+1} · ${when}</span>${/^[AEIOU]/.test(r.best.label)?"An":"A"} <b>${esc(r.best.label)} ${r.best.cls}</b> would add ${list(r.gain.map(b=>b.name))}.</li>`;
   }).join("");
 }
 function renderMissing(){

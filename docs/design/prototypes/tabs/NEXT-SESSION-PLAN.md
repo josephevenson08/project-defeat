@@ -1,6 +1,45 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-07): start here
+## ▶ Where we left off (2026-10-07, night): start here
+
+**Steps 1 and 2 of the list below are done.** Every tab has its own background, and Raid Composition
+has its chosen planning table.
+
+**Raid Composition (decided 2026-10-07):**
+- **The owner picked design A, the Terrace of Light.** It is now `raid-composition.html`, so every tab's link reaches it.
+- **Its background is A's own white-gold terrace,** with one ring of light per group that fills as that group's buffs are covered.
+- **The `raidcomp` kit theme was removed.** It was the white-gold water with five lights, built earlier that day.
+- **B** (`raid-comp-b.html`, Hellfire) is kept for reference.
+- **C was dropped** unbuilt, and its unfinished copy deleted.
+- **Testing:** both tables passed a hands-on browser test of every control, and phone tap targets were fixed on both. Details are in [`README.md`](README.md#raid-composition-the-planning-table-2026-10-07).
+
+**Next, in order:**
+1. **Raid Composition: click-to-fill and a pencil for names** (the owner's feedback on design A, 2026-10-07).
+   The owner prefers how adding worked before to pressing "+ Add" on a seat and using the picker dialog.
+   - **A palette of every class and spec, always on screen.** Clicking one seats that spec in the next open seat automatically, filling group 1 first, then 2, through to 5.
+   - **A small pencil icon on each player's tag** to type their name. It replaces the "Name" button.
+   - **Keep:** Move and drag, Remove, Undo, 10/25, example, Clear, and the results.
+   - **The live app already does this.** Port it:
+     - `src/features/raidcomp/RaidCompositionPanel.tsx`: the "Add a spec" palette is lines 501–537, grouped by class in class colours. `place()` and `targetGroup` are lines 320–330: the selected group if it has room, else the first group with room.
+     - `addToGroup` in `src/domain/raidcomp/rosterTypes.ts`.
+     - The app also lets you click a group to make it the target. Worth keeping.
+   - **Open question before building: icons.** The app uses real spec icons (`raidcompIcons.json`). The prototypes have used no Blizzard art so far. Either reuse the app's icons, which the live app already ships, or draw stand-ins (class-colour gems with the spec's initial). Ask the owner.
+   - **Then** re-run `checks/rc-handson.mjs a`. Its Add steps use the dialog, so update them to the palette and the Name steps to the pencil.
+2. **Gallery** (`../index.html`):
+   - Mark the three portal Home designs and Raid Composition B as superseded.
+   - Note that C was dropped.
+   - Make sure the seven tabs show their current look.
+3. **The Step 2 walkthrough:** resume it for the remaining tabs. Professions waits for a later update.
+4. **The fix-it tasks** (see the list below).
+5. **Open question:** should the text accents (links, headings, buttons) follow each tab's colour? They are teal on every dark tab.
+
+**`tabs/checks/`** holds the test scripts. Run each from the repo root; they use Playwright on system Edge.
+- `rc-handson.mjs a|b`: the table test. Set `WIDTH=400` for a phone and `RM=1` for reduced motion.
+- `rc-taps.mjs`: phone tap sizes.
+- `check-bg.mjs`: every tab in 4 modes.
+- `scene-only.mjs`: background screenshots. It needs the `OUT` environment variable set to a folder.
+
+## Where we left off (2026-10-07, earlier)
 
 **Step 1 of the list below is done: every tab has its own background.** The owner approved the colour
 list as proposed, and decided two things about Home:
@@ -85,7 +124,7 @@ it's shown to the owner, focus on picking the best table, not the scenery.
 ### What is left, in order
 
 1. ~~**Backgrounds:** confirm the per-tab colour and detail list with the owner, then build one simple background per tab. Drop the portal from Home.~~ **Done 2026-10-07.**
-2. **Raid Composition:**
+2. ~~**Raid Composition:**~~ **Done 2026-10-07: the owner picked A, and C was skipped.**
    - finish C (or skip it if the owner is happy with A or B);
    - re-test the table hands-on in a browser;
    - show the owner the tables, and let them pick.

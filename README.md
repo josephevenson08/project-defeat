@@ -95,8 +95,8 @@ the top section says where things stand and what's next. In short:
 
 1. **Backgrounds: done.** Every tab now has its own colour over the original crystal and water, and
    the Dark Portal designs are dropped.
-2. **Raid Composition.** Finish and browser-test the planning tables in `raid-comp-a.html` and
-   `raid-comp-b.html`, then pick one. Design C was cut off and only exists locally, unfinished.
+2. **Raid Composition: done.** Design A, the Terrace of Light, was picked and is now the Raid
+   Composition page. It has a full planning table that was browser-tested control by control.
 3. Update the [prototype gallery](docs/design/prototypes/index.html), then continue the tab-by-tab
    walkthrough. Professions comes later.
 

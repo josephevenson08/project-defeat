@@ -11,6 +11,14 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ## Where this is right now (2026-10-07, latest — READ THIS FIRST)
 
+> **Night of 2026-10-07: Raid Composition is decided.**
+> - The owner picked design A, the Terrace of Light, which is now `raid-composition.html`.
+> - Design C was dropped, and B is kept for reference.
+> - **Next is the owner's feedback on A.** Bring back the live app's click-to-fill palette of every class and spec, which fills group 1 first through group 5, and add a pencil icon on each player's tag for their name. Then the gallery.
+>
+> The exact place to resume is the top of
+> [`tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md).
+
 **Between 2026-09-30 and 2026-10-05 the work was repo cleanup, research and design prototypes. The app
 itself (`src/`) is unchanged since 2026-09-30.** The next task is in the prototypes, and its exact
 starting point is the top of
@@ -36,19 +44,21 @@ Read that first.
     - The Planner has a row hover highlight.
     - Raids has a loot search.
     - Three Dark Portal Home designs were built (`home-a`, `home-b`, `home-c`) and then **dropped**.
-    - Raid Composition has designs A and B, each with a working planning table.
+    - Raid Composition had designs A and B, each with a working planning table. The owner picked A on 2026-10-07.
 
 ### What is next (in order)
 
 1. ~~**Backgrounds:**~~ **Done 2026-10-07.** Every tab has its own colour over the original crystal and water:
-   - Home teal, Planner deep sea blue, Simulation gold over violet, Raid Composition warm white-gold, Tier Lists emerald, Raids per raid, and Professions amber.
-   - The four new ones are themes in `tabs/tbc-kit.js`, each with one small signature detail.
+   - Home teal, Planner deep sea blue, Simulation gold over violet, Raid Composition warm white-gold (design A's own terrace scene), Tier Lists emerald, Raids per raid, and Professions amber.
+   - Planner, Tier Lists and Professions are themes in `tabs/tbc-kit.js`, each with one small signature detail.
    - Home's portal ignition became a crystal swell, and its backdrop switch is gone.
    - Details are in `tabs/README.md` ("Per-tab backgrounds") and at the top of the next-session plan.
-2. **Raid Composition:**
-   - Browser-test the A and B planning tables. In A, add and load-example work; Move needs a re-test.
-   - Design C (`raid-comp-c.html`) was cut off and is an unfinished local copy, not committed.
-   - The owner picks one table.
+2. ~~**Raid Composition:**~~ **Done 2026-10-07.**
+   - Both tables passed a hands-on browser test of every control. Move works; the earlier timeout was the test's own fault.
+   - Phone tap targets were raised to 44px on both.
+   - The owner picked **A**, which replaced `raid-composition.html`, keeping A's own white-gold terrace scene. The unused `raidcomp` kit theme was removed.
+   - B is kept for reference, and C was dropped.
+   - The test scripts are now in `tabs/checks/`.
 3. **Gallery and walkthrough:** update the gallery, then continue the tab-by-tab walkthrough. Professions comes later.
 4. **Fix-it tasks** found while prototyping, offered as separate tasks:
    - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.

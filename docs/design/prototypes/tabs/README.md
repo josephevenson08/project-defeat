@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). Every tab now has its own background (see [below](#per-tab-backgrounds-2026-10-07)). Next is choosing a Raid Composition table.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). Every tab has its own background (see [below](#per-tab-backgrounds-2026-10-07)), and Raid Composition has its chosen planning table (see [below](#raid-composition-the-planning-table-2026-10-07)). Next is updating the gallery.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -35,7 +35,7 @@ sound. Each page connects its Three.js scene through a documented `window.SCENE`
 | Home | A crystal swell once per browser session (until 2026-10-07 this was the portal ignition, blue to fel green). Shattered sky over Coilfang water. Entry rings on tab cards. A rune ring and naaru swell on import. |
 | Character Planner | Calm deep-sea-blue water with rising bubbles (originally Coilfang teal). Entry rings between sub-tabs. A swell on equip, share and import. A taint tint on the hit-cap warning. A rebirth burst on "Reset to recommended set". A one-time lift when all 17 slots match. |
 | Simulation | Crystalline fortress (Tempest Keep). On Simulate: fel embers and a rune ring while it charges, then a swell and entry rings when the result lands. |
-| Raid Composition | Calm warm white-gold water with five group lights (originally Coilfang teal). Entry rings on swapped seats and on 10/25. A swell when a swap gives a group a buff it was missing. |
+| Raid Composition | Design A, the Terrace of Light: its own white-gold terrace scene, with one ring of light per group that fills as that group's buffs are covered. It hides the kit's 3D extras except the naaru glow. Entry rings on placed and swapped seats and on 10/25. A swell when a change gives a group a buff it was missing. |
 | Spec Tier Lists | Emerald water with rank rings (originally Coilfang teal). A rune-ring base under the 3D shelves. Entry rings on filter and view changes. |
 | Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on boss cards. A rune ring beside each attunement chain. |
 | Professions | Calm amber water with ore veins (originally teal). On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
@@ -64,7 +64,7 @@ WebGL-off fallback gradient uses the same colour.
 | Home | `ssc` | Teal, the original | Light shafts and the water pulse. The fel-green portal ignition is gone: the crystal now swells softly once per browser session. The Serpentshrine/Tempest Keep backdrop switch was removed, so Home always shows its own teal. |
 | Character Planner | `planner` | Deep sea blue | Slow rising bubbles |
 | Simulation | `tk` | Gold over violet (unchanged) | Crystal pillars |
-| Raid Composition | `raidcomp` | Warm white-gold | Five lights circling the crystal on a faint ring, one per raid group |
+| Raid Composition | none (its own scene) | Warm white-gold | Design A's terrace: one ring of light per group, filling as its buffs are covered. A `raidcomp` kit theme (white-gold water with five orbiting lights) was built first, then removed when design A was picked with its own scene. |
 | Spec Tier Lists | `tiers` | Emerald | Three dashed rings of light stepping up under the crystal, like a podium |
 | Raids | follows the raid (unchanged) | Per raid | As before |
 | Professions | `profs` | Amber | Veins of ore up the dark stone pillars, with a glint running up each one now and then, and ore glints on the floating rocks |
@@ -73,6 +73,33 @@ WebGL-off fallback gradient uses the same colour.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
 
+## Raid Composition: the planning table (2026-10-07)
+
+The owner couldn't plan a raid in the Step 1 page, so three designs were started, each with a full
+planning table. **The owner picked A, the Terrace of Light,** and it is now `raid-composition.html`.
+The Step 1 baseline it replaced is in git history.
+
+- **B, the Hellfire War Camp** (`raid-comp-b.html`), is kept for reference. It has the same table logic, with an inline picker and a dark iron-and-orange look.
+- **C, the Arcane Tactical Board,** was cut off unfinished by a usage limit and was dropped without being built.
+
+Why A won:
+- A dialog picker that shows each spec's role and notes.
+- Move, Name and Remove fit on one row.
+- The whole seat is the move target.
+- A one-press "seat this suggestion" button.
+- Its white-gold was already the colour picked for this tab.
+
+**How it was checked:** `checks/rc-handson.mjs` drives every control on both A and B in Edge, at 1280px,
+at 400px and with reduced motion.
+- **What it drives:** add with a name; cancel; move to an empty seat; swap; Escape and Cancel on a held move; drag to an empty seat and onto a taken one; rename; rename with Escape; clearing a name; remove with Undo; 10/25 with Undo; reload; example and "edited"; the one-more-seat and missing lists; Clear with Undo; Export; quick-add; and keyboard Move.
+- **Result:** A passed all 27–28 steps in each mode, and so did B.
+- **Move works.** A timeout in the previous session came from that test's own button selector.
+- **Flaky runs:** two automated runs out of about twenty timed out once each, on a reload and on a click. Neither reproduced in three retries, so both look like slow loads in software rendering, not page bugs.
+
+**Fixed while testing,** on both pages:
+- Every control on a phone is now at least 44px tall, the app's own tap-target rule. Before, the seat buttons, toolbar, detail fields and picker were 30–41px. `checks/rc-taps.mjs` measures this.
+- B's suggestion line read "A Elemental Shaman". It now reads "An".
+
 ## The seven pages
 
 | Page | Size | What it shows, all from the app's real data |
@@ -80,7 +107,7 @@ WebGL-off fallback gradient uses the same colour.
 | [Home](home.html) | 55 KB | The front door. It covers what the app is, Phase 2 at a glance (all five T5 token bosses), a feed of real data changes from the project log, a card for each tab, and character import. |
 | [Character Planner](planner.html) | 75 KB | The character line, the stat bar with the hit cap (140/142) and all six sub-tabs. **Gear:** 17 slots. **Compare:** the next-ranked alternative from the BiS rankings. **Talents:** real Warrior trees. **Buffs:** real buffs, debuffs and consumables. **Ranked Gear:** six slots. **Build:** the real share-link format and the paste box. |
 | [Simulation](simulation.html) | 63 KB | The fixed level-73 boss, the 20 DPS specs with real archon.gg reference DPS, the upgrade finder's method, and an honest "what is and isn't modelled" panel. The estimate and weights are labelled example. The scene uses Tempest Keep's arcane light. |
-| [Raid Composition](raid-composition.html) | 65 KB | A 10/25-player toggle, a working Move-to-swap, and each group's party buffs from the real buff-scope data. Also role balance, "what one more seat would add" and "missing, and who fixes it". The roster is an example made of real specs. |
+| [Raid Composition](raid-composition.html) | 83 KB | Design A, a full planning table. **Seats:** add a player from a class, then a spec or build, with an optional name; move or swap by pressing Move then a seat, or by dragging; rename; remove. **Raid:** 10/25 with Undo, load or reset the example, Clear with Undo, raid details for the export, an Export stub, and the roster kept for the browser session. **Results,** live from the real buff-scope data: each group's party buffs, role balance, "what one more seat would add" with a one-press seat, "missing, and who fixes it", and raid-wide and boss coverage. |
 | [Spec Tier Lists](tier-lists.html) | 55 KB | All three Wowhead Phase 2 lists, with all 28 placements. Fury Warrior is marked. The DPS list has 3D shelves with a List view and animated class filters. |
 | [Raids](raids.html) | 86 KB | All five raids, 24 bosses and 462 drops with quality colors and token, recipe and mount labels. The three attunement chains are marked "not yet confirmed for Anniversary realms". The scene changes with the selected raid. |
 | [Professions](professions.html) | 88 KB | All 13 professions with real trainer stops and what each is worth at 70. Mining is built out in full, with a climb table, zones and a computed Fel Iron route drawn from 320 real spawn points. Blacksmithing shows its 33-step path to 375 and a bought-vs-farmed shopping list. |
