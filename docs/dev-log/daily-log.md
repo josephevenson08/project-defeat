@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**441 commits across 69 days**, from 2026-06-25 to 2026-10-07.
+**442 commits across 69 days**, from 2026-06-25 to 2026-10-07.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,14 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_14 commits_
+_15 commits_
 
-### Wednesday 7 October — 3 commits
+### Wednesday 7 October — 4 commits
 
 - Point the README at where the prototype work left off — [`fc522b6`](https://github.com/josephevenson08/project-defeat/commit/fc522b65e45833c95851684de80590786e13230e)
 - Bring the handoff up to date for a fresh chat — [`d422351`](https://github.com/josephevenson08/project-defeat/commit/d422351729790c13ac2daec812d4fcea528dd007)
 - Give every prototype tab its own background colour — [`47ec7f0`](https://github.com/josephevenson08/project-defeat/commit/47ec7f0808deb929e16a54ae5694edbb16329959)
+- Make design A the Raid Composition page, after testing both tables hands-on — [`9327ee9`](https://github.com/josephevenson08/project-defeat/commit/9327ee9d850f176e882b0a715c98b75df3ca035b)
 
 ### Monday 5 October — 3 commits
 
