@@ -92,8 +92,6 @@ select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px 
 .mtoggle[aria-pressed="true"] i{background:var(--glow)}
 .mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
 .mtoggle[disabled]{opacity:.7;cursor:not-allowed}
-.wipe{position:fixed;inset:0;z-index:50;background:var(--amber);color:var(--amber-ink);pointer-events:none;display:none;place-items:center;overflow:hidden}
-.wipe span{display:block;font:400 clamp(2rem,8vw,6rem)/1 var(--f-head);letter-spacing:.01em;text-align:center;padding:0 16px}
 /* depth cards */
 main{padding:0 0 48px}
 .grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
@@ -199,15 +197,15 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
 <div class="dirline">Tab prototype · Home · Step 1 baseline. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
-    <a class="brand" href="home.html" data-wipe="Home">Project <span>Defeat</span></a>
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
     <nav class="sections" aria-label="Tabs">
       <a href="home.html" aria-current="page">Home</a>
-      <a href="planner.html" data-wipe="Character Planner">Character Planner</a>
-      <a href="simulation.html" data-wipe="Simulation">Simulation</a>
-      <a href="raid-composition.html" data-wipe="Raid Composition">Raid Composition</a>
-      <a href="tier-lists.html" data-wipe="Spec Tier Lists">Spec Tier Lists</a>
-      <a href="raids.html" data-wipe="Raids">Raids</a>
-      <a href="professions.html" data-wipe="Professions">Professions</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-composition.html">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html">Raids</a>
+      <a href="professions.html">Professions</a>
     </nav>
     <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
   </div>
@@ -230,7 +228,7 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
       <div class="eyebrow" id="hero-eyebrow">Phase 2 DPS gear planner · Serpentshrine Cavern · Tempest Keep</div>
       <h1 id="h-home">Plan your DPS gear for <em>Serpentshrine Cavern</em> and <em>Tempest Keep</em>.</h1>
       <p>Project Defeat is a gear planner for DPS players in World of Warcraft: TBC Classic Anniversary, Phase 2. Fill every slot from real rankings, see where each piece drops, and check the numbers before raid night.</p>
-      <div class="actions"><a class="btn big magnet" href="planner.html" data-wipe="Character Planner">Open the Character Planner</a> <a class="btn ghost big" href="#import">Import your character</a></div>
+      <div class="actions"><a class="btn big magnet" href="planner.html">Open the Character Planner</a> <a class="btn ghost big" href="#import">Import your character</a></div>
       <p class="capline prov">Rankings: Wowhead · Phase 2 · updated 12 Sep · every number on the site carries its source and date</p>
     </div>
   </div>
@@ -267,12 +265,12 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
     <h2 id="h-doors">Where to go</h2>
     <p class="prov">Six tabs, one job each. Every tab shows its source and date beside its numbers.</p>
     <ul class="tcards" id="tcards">
-      <li class="layer" style="--z:6" data-k="planner"><a class="tcard box" href="planner.html" data-wipe="Character Planner"><span class="ix">Gear, gems and talents</span><span class="nm">Character Planner</span><span class="bl">Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to. Gear, Compare, Talents, Buffs, Ranked Gear and Build.</span><span class="go">Open the planner</span></a></li>
-      <li class="layer" style="--z:5" data-k="sim"><a class="tcard box" href="simulation.html" data-wipe="Simulation"><span class="ix">Estimated DPS</span><span class="nm">Simulation</span><span class="bl">Estimated DPS for your set against one fixed boss (level <span class="num">73</span>, <span class="num">7,700</span> armor), with stat weights, an upgrade finder and a plain list of what is and isn't modelled.</span><span class="go">Run the estimate</span></a></li>
-      <li class="layer" style="--z:4" data-k="comp"><a class="tcard box" href="raid-composition.html" data-wipe="Raid Composition"><span class="ix">Buff coverage</span><span class="nm">Raid Composition</span><span class="bl">Seat a <span class="num">10</span> or <span class="num">25</span>-player raid in groups of five, see which buffs and debuffs each group gets, and what one more seat would add.</span><span class="go">Seat a raid</span></a></li>
-      <li class="layer" style="--z:6" data-k="tiers"><a class="tcard box" href="tier-lists.html" data-wipe="Spec Tier Lists"><span class="ix">Where specs stand</span><span class="nm">Spec Tier Lists</span><span class="bl">Wowhead's Phase 2 rankings for damage, healing and tanking: <span class="num">3</span> lists, <span class="num">27</span> specs, all on one page with your spec marked.</span><span class="go">See the rankings</span></a></li>
-      <li class="layer" style="--z:5" data-k="raids"><a class="tcard box" href="raids.html" data-wipe="Raids"><span class="ix">Loot tables</span><span class="nm">Raids</span><span class="bl">What drops where across Serpentshrine Cavern, Tempest Keep and the Phase 1 raids still worth running: a card per boss, loot by quality, attunement steps.</span><span class="go">Browse the raids</span></a></li>
-      <li class="layer" style="--z:4" data-k="profs"><a class="tcard box" href="professions.html" data-wipe="Professions"><span class="ix">Levelling and payoffs</span><span class="nm">Professions</span><span class="bl">Take any of <span class="num">13</span> professions from <span class="num">1</span> to <span class="num">375</span> without wasting materials: trainer stops, crafting shopping lists, and farming routes for Mining and Herbalism.</span><span class="go">Pick a profession</span></a></li>
+      <li class="layer" style="--z:6" data-k="planner"><a class="tcard box" href="planner.html"><span class="ix">Gear, gems and talents</span><span class="nm">Character Planner</span><span class="bl">Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to. Gear, Compare, Talents, Buffs, Ranked Gear and Build.</span><span class="go">Open the planner</span></a></li>
+      <li class="layer" style="--z:5" data-k="sim"><a class="tcard box" href="simulation.html"><span class="ix">Estimated DPS</span><span class="nm">Simulation</span><span class="bl">Estimated DPS for your set against one fixed boss (level <span class="num">73</span>, <span class="num">7,700</span> armor), with stat weights, an upgrade finder and a plain list of what is and isn't modelled.</span><span class="go">Run the estimate</span></a></li>
+      <li class="layer" style="--z:4" data-k="comp"><a class="tcard box" href="raid-composition.html"><span class="ix">Buff coverage</span><span class="nm">Raid Composition</span><span class="bl">Seat a <span class="num">10</span> or <span class="num">25</span>-player raid in groups of five, see which buffs and debuffs each group gets, and what one more seat would add.</span><span class="go">Seat a raid</span></a></li>
+      <li class="layer" style="--z:6" data-k="tiers"><a class="tcard box" href="tier-lists.html"><span class="ix">Where specs stand</span><span class="nm">Spec Tier Lists</span><span class="bl">Wowhead's Phase 2 rankings for damage, healing and tanking: <span class="num">3</span> lists, <span class="num">27</span> specs, all on one page with your spec marked.</span><span class="go">See the rankings</span></a></li>
+      <li class="layer" style="--z:5" data-k="raids"><a class="tcard box" href="raids.html"><span class="ix">Loot tables</span><span class="nm">Raids</span><span class="bl">What drops where across Serpentshrine Cavern, Tempest Keep and the Phase 1 raids still worth running: a card per boss, loot by quality, attunement steps.</span><span class="go">Browse the raids</span></a></li>
+      <li class="layer" style="--z:4" data-k="profs"><a class="tcard box" href="professions.html"><span class="ix">Levelling and payoffs</span><span class="nm">Professions</span><span class="bl">Take any of <span class="num">13</span> professions from <span class="num">1</span> to <span class="num">375</span> without wasting materials: trainer stops, crafting shopping lists, and farming routes for Mining and Herbalism.</span><span class="go">Pick a profession</span></a></li>
     </ul>
   </section>
   <div class="grid">
@@ -297,7 +295,7 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
           <p style="margin:0;font-size:var(--t-sm)">Already playing? In game, run <code>/pdexport</code>, press Ctrl+C, and paste it here. Nothing is uploaded: the string never leaves your browser, and it carries no character name or realm.</p>
           <label class="sr" for="imptext">Paste your character export</label>
           <textarea id="imptext" rows="3" placeholder='{"format":"project-defeat-character" …'></textarea>
-          <div class="row"><button class="btn magnet" type="button" id="impgo" disabled>Load my character</button><span class="imprune" id="imprune" aria-hidden="true"></span><a class="btn ghost" href="planner.html" data-wipe="Character Planner">Start from scratch</a></div>
+          <div class="row"><button class="btn magnet" type="button" id="impgo" disabled>Load my character</button><span class="imprune" id="imprune" aria-hidden="true"></span><a class="btn ghost" href="planner.html">Start from scratch</a></div>
           <p class="msg" id="impmsg" role="status"></p>
           <div class="example">
             <h3>What an import gives you <span class="badge-ex">example</span></h3>
@@ -316,7 +314,6 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
 </main>
 <footer><div class="wrap">Prototype content for design review. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
 </div>
-<div class="wipe" id="wipe" aria-hidden="true"><span>Character Planner</span></div>
 <p class="sr" id="live" aria-live="polite"></p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
@@ -471,16 +468,7 @@ if(KIT)KIT.theme("ssc",{instant:true}); /* K2 shattered sky over K5 Coilfang wat
 const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 
-/* ---------- tab links: plain links; with motion on, the amber curtain covers the page before it leaves ---------- */
-document.addEventListener("click",e=>{
-  const a=e.target.closest("a[data-wipe]");
-  if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
-  let url;try{url=new URL(a.href,location.href);}catch(err){return;}
-  if(url.pathname===location.pathname)return;
-  if(M.on&&M.leave){e.preventDefault();M.leave(url.href,a.dataset.wipe);}
-});
-/* coming back through the browser's back button: never show a stale curtain */
-addEventListener("pageshow",()=>{const w=$("#wipe");if(w){w.style.display="none";w.style.clipPath="";}SC.cam.dive=0;SC.render();});
+/* ---------- tab links are plain links: no curtain between tabs (the owner's call, 2026-10-08) ---------- */
 const say=t=>{if(live)live.textContent=t;};
 
 /* ---------- import your character (prototype: validates the shape, stays in the browser) ---------- */
@@ -589,7 +577,6 @@ function finishAll(){
 }
 function restoreStatic(){
   $$(".tick").forEach(el=>el.textContent=fmt(+el.dataset.to));
-  const w=$("#wipe");if(w)w.style.display="none";
   $$(".fact").forEach(f=>f.classList.remove("on"));
   setText("#fcount","0"+$$(".fact").length);
   Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
@@ -724,18 +711,6 @@ function magnets(){
   });
   return ()=>offs.forEach(f=>f());
 }
-/* 5. Leaving for another tab: the amber curtain rises with the tab's name while the camera dives
-   through the water surface, then the browser navigates. The next tab plays its own intro. */
-M.leave=(href,name)=>{
-  let gone=false;const nav=()=>{if(!gone){gone=true;location.href=href;}};
-  const w=$("#wipe"),s=w&&$("span",w);if(!w||!s){nav();return;}
-  s.textContent=name||"";w.style.display="grid";
-  const tl=gsap.timeline({onComplete:nav});
-  tl.fromTo(w,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",duration:.38,ease:"power3.in"})
-    .fromTo(SC.cam,{dive:0},{dive:1,duration:.5,ease:"power2.in",onUpdate:SC.render},0)
-    .fromTo(s,{yPercent:120,skewY:6},{yPercent:0,skewY:0,duration:.3,ease:"power3.out"},.26);
-  setTimeout(nav,1200); /* never strand the viewer behind the curtain */
-};
 if(FL){
   /* 6. Flip: switching phase re-orders the facts and tab cards (they trade places); the scene re-lights alongside */
   M.flipHome=fn=>A(()=>{

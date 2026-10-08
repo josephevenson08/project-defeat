@@ -97,8 +97,10 @@ the top section says where things stand and what's next. In short:
    the Dark Portal designs are dropped.
 2. **Raid Composition: done.** Design A, the Terrace of Light, was picked and is now the Raid
    Composition page. It has a full planning table that was browser-tested control by control.
-3. Update the [prototype gallery](docs/design/prototypes/index.html), then continue the tab-by-tab
-   walkthrough. Professions comes later.
+3. **Gallery: done.** The [prototype gallery](docs/design/prototypes/index.html) shows the current
+   tabs first. The tabs no longer use a full-screen curtain between them.
+4. **Next:** continue the tab-by-tab walkthrough, starting with the Character Planner's sub-tabs.
+   Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

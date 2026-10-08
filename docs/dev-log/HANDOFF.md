@@ -9,12 +9,13 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ---
 
-## Where this is right now (2026-10-07, latest — READ THIS FIRST)
+## Where this is right now (2026-10-08, latest — READ THIS FIRST)
 
-> **2026-10-08: Raid Composition is done.**
-> - It's dark like the other tabs, over the white-gold water, with one light per group that brightens as the group's buffs are covered.
-> - A click-to-fill palette of spec icons fills group 1 first, and a pencil names players.
-> - All checks pass. The next step is the gallery.
+> **2026-10-08: Raid Composition, the tab curtain and the gallery are done.**
+> - Raid Composition is dark like the other tabs, over the white-gold water, with one light per group that brightens as the group's buffs are covered. A click-to-fill palette of spec icons fills group 1 first, and a pencil names players.
+> - The full-screen curtain between tabs is removed at the owner's request; tab links are plain links.
+> - The gallery shows the current tabs first, then the dropped designs.
+> - **Next is the Step 2 walkthrough,** starting at the Character Planner's sub-tabs. See the top of `tabs/NEXT-SESSION-PLAN.md`.
 > - To view prototypes in the browser pane, use the `prototypes` server in `.claude/launch.json`. Local files open there as static snapshots, without icons.
 >
 > **Night of 2026-10-07: Raid Composition is decided.**

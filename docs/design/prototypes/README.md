@@ -51,6 +51,15 @@ clickable site, on the app's real data. See [`tabs/README.md`](tabs/README.md). 
 through them one at a time, three designs per step. The owner's review and the plan for the next
 session are in [`tabs/NEXT-SESSION-PLAN.md`](tabs/NEXT-SESSION-PLAN.md).
 
+**Where Step 2 stands (2026-10-08):**
+- **Every tab has its own colour** over the crystal and water.
+- **Home** keeps its original look. The three Dark Portal designs were dropped.
+- **Raid Composition** is design A's planning table, now dark, with a click-to-fill spec palette. B was not picked, and C was dropped before it was built.
+- **Moving between tabs** is a plain link. The full-screen curtain is gone.
+- **The gallery** shows the current tabs first, then the dropped designs.
+
+To view the prototypes in the in-app browser pane, serve them over HTTP (the `prototypes` entry in `.claude/launch.json` runs `python -m http.server 8765`). The pane shows local files as static snapshots, without their icons and scripts.
+
 ## Caveats
 
 - **Some numbers are invented.** DPS figures, stat weights and comparison deltas are labelled

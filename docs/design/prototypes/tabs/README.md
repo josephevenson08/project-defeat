@@ -73,6 +73,13 @@ WebGL-off fallback gradient uses the same colour.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
 
+## No curtain between tabs (2026-10-08)
+
+The owner didn't like the full-screen curtain that covered the page with the next tab's name, so it is gone. Tab links are now plain links on all seven tabs, and each tab still plays its own intro on arrival.
+- **Removed from Home, Simulation, Raid Composition, Tier Lists, Raids and Professions:** the `#wipe` element, its styles, and the leave animation (Home's `M.leave` and `data-wipe` links). The Planner never had one.
+- **Checked:** clicking each tab's link, with motion on, navigates straight to the next tab, with no curtain and no script errors.
+- **Not changed:** the dropped reference pages (`home-a/b/c`, `raid-comp-b`) still have the curtain.
+
 ## Raid Composition: the planning table (2026-10-07)
 
 The owner couldn't plan a raid in the Step 1 page, so three designs were started, each with a full

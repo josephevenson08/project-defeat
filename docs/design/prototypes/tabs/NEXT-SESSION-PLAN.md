@@ -2,18 +2,18 @@
 
 ## ▶ Where we left off (2026-10-08): start here
 
-**Item 1 of the list below is done.** Raid Composition is dark, adds players from a click-to-fill palette of spec icons, and names them with a pencil. All checks pass. The details are in [`README.md`](README.md#raid-composition-the-planning-table-2026-10-07).
+**Done on 2026-10-08:**
+- **Raid Composition** is dark, adds players from a click-to-fill palette of spec icons, and names them with a pencil. See the [README](README.md#raid-composition-the-planning-table-2026-10-07).
+- **The curtain between tabs is gone.** The owner didn't like it, so tab links are plain links on all seven tabs. See the [README](README.md#no-curtain-between-tabs-2026-10-08).
+- **The gallery** (`../index.html`) now shows the current tabs first, with each tab's colour in its description. The dropped designs follow with the reasons: the three portal Homes and Raid Composition B, plus a note that C was dropped. The gallery also gained a doctype and UTF-8, so "·" no longer shows as "Â·", and all 40 of its links open.
 
-**To view the prototypes in the in-app browser pane,** start the `prototypes` server from `.claude/launch.json` (Python on port 8765). Then open `http://localhost:8765/docs/design/prototypes/tabs/raid-composition.html`. The pane opens local files as static snapshots, so icons and `tbc-kit.js` don't load that way.
+**To view the prototypes in the in-app browser pane,** start the `prototypes` server from `.claude/launch.json` (Python on port 8765). Then open `http://localhost:8765/docs/design/prototypes/index.html`. The pane opens local files as static snapshots, so icons and `tbc-kit.js` don't load that way.
 
 **Next:**
-1. **Gallery** (`../index.html`):
-   - Mark the three portal Home designs and Raid Composition B as superseded.
-   - Note that C was dropped.
-   - Make sure the seven tabs show their current look.
-2. **The Step 2 walkthrough:** resume it for the remaining tabs. Professions waits for a later update.
-3. **The fix-it tasks** (see the list below).
-4. **Open question:** should the text accents follow each tab's colour, as Raid Composition's gold now does? They are teal on the other dark tabs.
+1. **The Step 2 walkthrough:** three designs per step, and the owner picks one. Home and Raid Composition are settled, so it picks up at the Character Planner's sub-tabs (Gear, Compare, Ranked Gear, Talents, Buffs, Build). Then Simulation, Raids and Spec Tier Lists. Professions waits for a later update.
+2. **The fix-it tasks** (see the list below).
+3. **Open question:** should the text accents follow each tab's colour, as Raid Composition's gold now does? They are teal on the other dark tabs.
+4. **Minor:** the gallery page itself follows the system's light or dark setting. Make it always dark if the owner wants.
 
 ## Where we left off (2026-10-07, night)
 
