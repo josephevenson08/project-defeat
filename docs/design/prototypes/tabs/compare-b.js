@@ -76,7 +76,7 @@ function render(){
     <span class="mk now" style="left:0;width:${pct(before)}%"></span><span class="mk then" style="left:0;width:${pct(after)}%"></span><span class="cap" style="left:${pct(G.HIT_CAP)}%"></span></div>
     <div class="cb-key"><span><i style="background:rgba(160,180,210,.5)"></i>Now: ${before}</span><span><i style="background:var(--glow)"></i>After the swap: ${after}</span></div></div>`;
   h+=`<div class="cb-act"><button type="button" class="btn" data-act="equip">Equip ${G.esc(ib.name)}</button><span class="okline" id="cb-msg" aria-live="polite"></span></div>
-  <p class="prov" style="margin:10px 0 0">Bars and change are real stat differences for this slot (gear, gems, enchant and socket bonus). The example score weighs them with illustrative values and stops counting hit at the cap. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
+  <p class="prov" style="margin:10px 0 0">Bars and change are real stat differences for this slot (gear, gems, enchant and socket bonus). The example score weighs them with illustrative values, counting hit past the cap at half weight since it only helps white swings. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
   mount.innerHTML=h;
   if(moving()&&window.gsap){const bars=mount.querySelectorAll(".cb-chart i");if(bars.length)gsap.from(bars,{scaleX:0,duration:.6,stagger:.04,ease:"power3.out"});}
 }

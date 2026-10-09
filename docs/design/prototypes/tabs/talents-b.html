@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Project Defeat · Character Planner</title>
+<title>Project Defeat · Character Planner · Talents B</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -160,6 +160,25 @@ td.d-up{color:var(--tier-b)} td.d-dn{color:var(--tier-s)} td.d-eq{color:var(--in
 .score .bar{height:8px;background:var(--rim-2);border-radius:4px;overflow:hidden}
 .score .bar i{display:block;height:100%;background:var(--glow);transform-origin:left;border-radius:4px}
 .score .bar.b i{background:var(--q-epic)}
+/* talents */
+.tsum{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.tsum span{font:500 var(--t-sm) var(--f-mono);background:var(--scrim);border:1px solid var(--rim-2);border-radius:999px;padding:3px 10px}
+.tsum span.on{border-color:var(--glow);color:var(--glow)}
+.tgrid{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:900px){.tgrid{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}}
+.tree{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;background:radial-gradient(80% 60% at 50% 0%,var(--glow-soft),transparent 70%),var(--scrim);border:1px solid var(--rim-2);border-radius:10px;padding:8px}
+.tal{font:600 11px/1.2 var(--f-body);text-align:left;color:var(--ink-3);background:rgba(4,16,22,.8);border:1px solid var(--rim-2);border-radius:6px;padding:5px 6px;min-height:46px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:3px;overflow-wrap:anywhere}
+.tal .rk{font:500 10px var(--f-mono);color:var(--ink-3)}
+.tal.on{color:var(--ink);border-color:var(--glow);box-shadow:0 0 12px -4px var(--glow)}
+.tal.on .rk{color:var(--glow)}
+.tal.part{color:var(--ink-2);border-color:var(--rim)}
+.tal[aria-pressed="true"]{outline:2px solid var(--focus);outline-offset:1px}
+.tal.gap{visibility:hidden}
+.tdetail{background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;padding:10px 12px;font-size:var(--t-sm);min-height:84px}
+.tdetail b{display:block;font:400 var(--t-md) var(--f-head)}
+ul.tlist{list-style:none;margin:8px 0 0;padding:0;font-size:var(--t-sm)}
+ul.tlist li{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--rim-2)}
+@media (max-width:480px){.tal{font-size:10px;min-height:52px;padding:4px}}
 /* buffs */
 .bgrid{display:grid;gap:12px;grid-template-columns:1fr}
 @media (min-width:760px){.bgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -181,6 +200,7 @@ ol.rank .m{color:var(--ink-3);font-size:var(--t-xs)}
 /* dense sub-tabs: the scene dims a step further and slows */
 #scene,.fallback{transition:filter .6s ease}
 html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62) saturate(.8)}
+.tree .tal{grid-column:var(--c);grid-row:var(--r)}
 .rslot[hidden]{display:none}
 /* build */
 .bfield{display:grid;gap:4px;font-size:var(--t-sm);font-weight:600;color:var(--ink-2);margin:0 0 12px}
@@ -203,7 +223,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Character Planner. Gear is design B, the character sheet, with design C's checklist (picked 2026-10-09); Compare is design A, side-by-side tooltips, with design B's summary (picked 2026-10-09); Talents is design A, the talent window, with design C's "What's off" list (picked 2026-10-09). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Character Planner · Talents design B: What it gives you. The stat bar's hit cap follows Precision. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -290,7 +310,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
     </div>
 
     <div class="panel" id="p-talents" role="tabpanel" aria-labelledby="t-talents">
-      <div id="talui"><p class="prov">The Talents tab needs JavaScript.</p></div>
+      <div id="talui"><p class="prov">The talents design needs JavaScript.</p></div>
     </div>
 
     <div class="panel" id="p-buffs" role="tabpanel" aria-labelledby="t-buffs">
@@ -499,7 +519,7 @@ size();still();
 </script>
 <script src="tbc-kit.js"></script>
 <script>
-/* Planner page script: sub-tabs, compare, buffs, ranked gear, build; then the motion layer.
+/* Planner page script: sub-tabs, compare, talent tree, buffs, ranked gear, build; then the motion layer.
    Every lookup is guarded, so a missing element or library leaves the static page in place. */
 (function(){
 "use strict";
@@ -520,8 +540,10 @@ if(KIT)KIT.theme("planner",{instant:true}); /* the tab's own colour: deep sea bl
 const HIT={have:140,cap:95}; /* the special-attack cap with the Fury preset's Precision 3/3; gear-common.js keeps it live */
 const taintHit=()=>{const el=$("#hitwarn");if(KIT&&el)KIT.taint(el,HIT.have<HIT.cap);};
 /* real data, generated from src/domain: Wowhead Fury Warrior Phase 2 rankings resolved through the
-   wowsims/tbc item catalogue (RK). The Talents tab has its own data (talent-data.js). */
+   wowsims/tbc item catalogue (RK), and the Warrior talent trees with the wowsims Fury preset (TAL:
+   row, column, name, max rank, points, top-rank text, prerequisite) */
 const RK={"Head":[[1,"Destroyer Battle-Helm","E",133,"Best","Drop: Serpentshrine Cavern",{"Str":47,"Sta":45,"Hit":21,"Crit":36}],[2,"Furious Gizmatic Goggles","E",127,"Great","Profession: Engineering BoP",{"Str":48,"Sta":28,"Hit":13,"Crit":38}],[3,"Warbringer Battle-Helm","E",120,"P1 BiS","Drop: Karazhan",{"Str":45,"Sta":45,"Hit":14,"Crit":24}]],"Chest":[[1,"Destroyer Breastplate","E",133,"Best","Drop: Tempest keep",{"Str":50,"Sta":48,"Hit":15,"Crit":33}],[2,"Bloodsea Brigand's Vest","E",128,"Best","Drop: Serpentshrine Cavern",{"Sta":24,"AP":92,"Hit":27,"Crit":36}],[3,"Krakken-Heart Breastplate","E",138,"Great","Drop: Serpentshrine Cavern",{"Str":61,"Agi":43,"Sta":42,"Hit":30}],[4,"Terrorweave Tunic","E",120,"Great (World Boss)","Drop: World Boss",{"AP":96,"Hit":21,"Crit":25}]],"Legs":[[1,"Leggings of Murderous Intent","E",138,"Best","Drop: Tempest Keep",{"Agi":45,"Sta":31,"AP":92,"Crit":37}],[2,"Greaves of the Bloodwarder","E",128,"Great","Drop: Tempest Keep",{"Str":49,"Sta":46,"Crit":31}],[3,"Destroyer Greaves","E",133,"Great","Drop: Serpentshrine Cavern",{"Str":52,"Sta":57,"Hit":22,"Crit":32}],[4,"Scaled Greaves of the Marksman","E",120,"Great (World Boss)","Drop: Hellfire Peninsula",{"Agi":37,"AP":76,"Hit":16}]],"Trinket 1":[[1,"Dragonspine Trophy","E",125,"Best","Drop: Gruul's Lair",{"AP":40}],[2,"Badge of the Swarmguard","E",76,"Best","Drop: Ahn'Qiraj",{}],[3,"Bloodlust Brooch","E",110,"Best","Vendor: 41 Badges of Justice",{"AP":72}],[4,"Tsunami Talisman","E",128,"Best","Drop: Serpentshrine Cavern",{"Hit":10,"Crit":38}]],"Main Hand":[[1,"Dragonstrike","E",136,"Best","Profession: Master Hammersmith Blacksmithing BoP",{"Sta":19}],[2,"Dragonmaw","E",123,"Best","Profession: Master Hammersmith Blacksmithing BoP",{"Sta":9}],[3,"Rod of the Sun King","E",141,"Great","Drop: Tempest Keep",{"AP":52}],[4,"Talon of the Phoenix","E",134,"Great","Drop: Tempest Keep",{"AP":52,"Hit":15,"Crit":19}]],"Off Hand":[[1,"Talon of Azshara","E",134,"Best","Drop: Serpentshrine Cavern",{"Agi":15,"AP":40,"Hit":20}],[2,"Rod of the Sun King","E",141,"Great","Drop: Tempest Keep",{"AP":52}],[3,"Merciless Gladiator's Slicer","E",136,"Great","PvP: 2175",{"Sta":27,"AP":30,"Hit":10,"Crit":19}],[4,"Netherbane","E",134,"Great (Orc)","Drop: Tempest Keep",{"Agi":25,"Sta":21,"AP":40}]]};
+const TAL={"Arms":[[0,0,"Improved Heroic Strike",3,3,"Reduces the cost of your Heroic Strike ability by 3 rage points.",""],[0,1,"Deflection",5,0,"Increases your Parry chance by 5%.",""],[0,2,"Improved Rend",3,0,"Increases the bleed damage done by your Rend ability by 75%.",""],[1,0,"Improved Charge",2,0,"Increases the amount of rage generated by your Charge ability by 6.",""],[1,1,"Iron Will",5,0,"Increases your chance to resist Stun and Charm effects by an additional 15%.",""],[1,2,"Improved Thunder Clap",3,0,"Reduces the cost of your Thunder Clap ability by 4 rage points and increases the damage by 100% and the slowing effect by an additional 10%.",""],[2,0,"Improved Overpower",2,0,"Increases the critical strike chance of your Overpower ability by 50%.",""],[2,1,"Anger Management",1,1,"Generates 1 rage per 3 seconds while in combat.",""],[2,2,"Deep Wounds",3,3,"Your critical strikes cause the opponent to bleed, dealing 60% of your melee weapon's average damage over 12 sec.",""],[3,1,"Two-Handed Weapon Specialization",5,0,"Increases the damage you deal with two-handed melee weapons by 5%.",""],[3,2,"Impale",2,2,"Increases the critical strike damage bonus of your abilities in Battle, Defensive, and Berserker stance by 20%.","Deep Wounds 3"],[4,0,"Poleaxe Specialization",5,0,"Increases your chance to get a critical strike with Axes and Polearms by 5%.",""],[4,1,"Death Wish",1,0,"When activated, increases your physical damage by 20% and makes you immune to Fear effects, but increases all damage taken by 5%. Lasts 30 sec.",""],[4,2,"Mace Specialization",5,0,"Gives your melee attacks a chance to stun your target for 3 sec and generate 7 rage when using a Mace. More effective than Mace Specialization…",""],[4,3,"Sword Specialization",5,0,"Gives you a 5% chance to get an extra attack on the same target after hitting your target with your Sword.",""],[5,0,"Improved Intercept",2,0,"Reduces the cooldown of your Intercept ability by 10 sec.",""],[5,2,"Improved Hamstring",3,0,"Gives your Hamstring ability a 15% chance to immobilize the target for 5 sec.",""],[5,3,"Improved Disciplines",3,0,"Reduces the cooldown of your Retaliation, Recklessness and Shield Wall abilities by 10 min and increases their duration by 6 sec.",""],[6,0,"Blood Frenzy",2,0,"Your Rend and Deep Wounds abilities also increase all physical damage caused to that target by 4%.",""],[6,1,"Mortal Strike",1,0,"A vicious strike that deals weapon damage plus 85 and wounds the target, reducing the effectiveness of any healing by 50% for 10…","Death Wish 1"],[6,2,"Second Wind",2,0,"Whenever you are struck by a Stun or Immobilize effect you will generate 20 rage and 10% of your total health over 10 sec.",""],[7,1,"Improved Mortal Strike",5,0,"Reduces the cooldown of your Mortal Strike ability by 1 sec and increases the damage it causes by 5%.","Mortal Strike 1"],[8,1,"Endless Rage",1,0,"You generate 25% more rage from damage dealt.",""]],"Fury":[[0,1,"Booming Voice",5,0,"Increases the area of effect and duration of your Battle Shout, Demoralizing Shout and Commanding Shout by 50%.",""],[0,2,"Cruelty",5,5,"Increases your chance to get a critical strike with melee weapons by 5%.",""],[1,1,"Improved Demoralizing Shout",5,0,"Increases the melee attack power reduction of your Demoralizing Shout by 40%.",""],[1,2,"Unbridled Wrath",5,5,"Gives you a chance to generate an additional rage point when you deal melee damage with a weapon. Effect occurs more often than Unbridled Wrath…",""],[2,0,"Improved Cleave",3,0,"Increases the bonus damage done by your Cleave ability by 120%.",""],[2,1,"Piercing Howl",1,0,"Causes all enemies within 10 yards to be Dazed, reducing movement speed by 50% for 6 sec.",""],[2,2,"Blood Craze",3,0,"Regenerates 3% of your total Health over 6 sec after being the victim of a critical strike.",""],[2,3,"Commanding Presence",5,5,"Increases the melee attack power bonus of your Battle Shout and the health bonus of your Commanding Shout by 25%.",""],[3,0,"Dual Wield Specialization",5,5,"Increases the damage done by your offhand weapon by 25%.",""],[3,1,"Improved Execute",2,0,"Reduces the rage cost of your Execute ability by 5.",""],[3,2,"Enrage",5,0,"Gives you a 25% melee damage bonus for 12 sec up to a maximum of 12 swings after being the victim of a critical strike.",""],[4,0,"Improved Slam",2,0,"Decreases the casting time of your Slam ability by 1 sec.",""],[4,1,"Sweeping Strikes",1,1,"Your next 10 melee attacks strike an additional nearby opponent.",""],[4,3,"Weapon Mastery",2,2,"Reduces the chance for your attacks to be dodged by 2% and reduces the duration of all Disarm effects used against you by 50%. This does not stack…",""],[5,0,"Improved Berserker Rage",2,0,"The Berserker Rage ability will generate 10 rage when used.",""],[5,2,"Flurry",5,5,"Increases your attack speed by 25% for your next 3 swings after dealing a melee critical strike.","Enrage 5"],[6,0,"Precision",3,3,"Increases your chance to hit with melee weapons by 3%.",""],[6,1,"Bloodthirst",1,1,"Instantly attack the target causing (Attack Power * 45 / 100) damage. In addition, the next 5 successful melee attacks will restore 10 health.…","Sweeping Strikes 1"],[6,2,"Improved Whirlwind",2,1,"Reduces the cooldown of your Whirlwind ability by 2 sec.",""],[7,2,"Improved Berserker Stance",5,5,"Increases attack power by 10% and reduces threat caused by 10% while in Berserker Stance.",""],[8,1,"Rampage",1,1,"Warrior goes on a rampage, increasing attack power by 30 and causing most successful melee attacks to increase attack power by an additional 30.…","Bloodthirst 1"]],"Protection":[[0,0,"Improved Bloodrage",2,0,"Increases the instant rage generated by your Bloodrage ability by 6.",""],[0,1,"Tactical Mastery",3,0,"You retain up to an additional 15 of your rage points when you change stances. Also greatly increases the threat generated by your Bloodthirst and…",""],[0,2,"Anticipation",5,0,"Increases your Defense skill by 20.",""],[1,1,"Shield Specialization",5,0,"Increases your chance to block attacks with a shield by 5% and has a 100% chance to generate 1 rage when a block occurs.",""],[1,2,"Toughness",5,0,"Increases your armor value from items by 10%.",""],[2,0,"Last Stand",1,0,"When activated, this ability temporarily grants you 30% of your maximum health for 20 sec. After the effect expires, the health is lost.",""],[2,1,"Improved Shield Block",1,0,"Allows your Shield Block ability to block an additional attack and increases the duration by 1 second.","Shield Specialization 5"],[2,2,"Improved Revenge",3,0,"Gives your Revenge ability a 45% chance to stun the target for 3 sec.",""],[2,3,"Defiance",3,0,"Increases the threat generated by your attacks by 15% while in Defensive Stance and increases your expertise by 6.",""],[3,0,"Improved Sunder Armor",3,0,"Reduces the cost of your Sunder Armor and Devastate abilities by 3 rage point.",""],[3,1,"Improved Disarm",3,0,"Increases the duration of your Disarm ability by 3 secs.",""],[3,2,"Improved Taunt",2,0,"Reduces the cooldown of your Taunt ability by 2 sec.",""],[4,0,"Improved Shield Wall",2,0,"Increases the effect duration of your Shield Wall ability by 5 secs.",""],[4,1,"Concussion Blow",1,0,"Stuns the opponent for 5 sec.",""],[4,2,"Improved Shield Bash",2,0,"Gives your Shield Bash ability a 100% chance to silence the target for 3 sec.",""],[5,0,"Shield Mastery",3,0,"Increases the amount of damage absorbed by your shield by 30%.",""],[5,2,"One-Handed Weapon Specialization",5,0,"Increases physical damage you deal when a one-handed melee weapon is equipped by 10%.",""],[6,0,"Improved Defensive Stance",3,0,"Reduces all spell damage taken while in Defensive Stance by 6%.",""],[6,1,"Shield Slam",1,0,"Slam the target with your shield, causing 225 to 235 damage, modified by your shield block value, and dispels 1 magic effect on the target. Also…","Concussion Blow 1"],[6,2,"Focused Rage",3,0,"Reduces the rage cost of your offensive abilities by 3.",""],[7,1,"Vitality",5,0,"Increases your total Stamina by 5% and your total Strength by 10%.",""],[8,1,"Devastate",1,0,"Sunder the target's armor causing the Sunder Armor effect. In addition, causes 50% of weapon damage plus 15 for each application of Sunder Armor…",""]]};
 const EQ=new Set($$("#gear .q-epic").map(e=>e.textContent));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const qc=q=>q==="E"?"q-epic":q==="R"?"q-rare":q==="U"?"q-unc":"q-leg";
@@ -606,6 +628,32 @@ function renderCompare(slot){
 const cmpslot=$("#cmpslot");
 on(cmpslot,"change",()=>{renderCompare(cmpslot.value);say(live,"Comparing "+cmpslot.value);});
 if(cmpslot)renderCompare(cmpslot.value);
+
+/* ---------- talents: a compact 4-column tree per spec, built from the real trees ---------- */
+const treeEl=$("#tree"),tdetail=$("#tdetail"),treepick=$("#treepick");
+function showTalent(r,btn){
+  if(tdetail)tdetail.innerHTML=`<b>${esc(r[2])}</b><span class="num">${r[4]}/${r[3]}</span> · ${esc(r[5])}${r[6]?`<br><span class="prov">Requires ${esc(r[6])}</span>`:""}`;
+  if(treeEl)$$(".tal",treeEl).forEach(x=>x.setAttribute("aria-pressed",x===btn));
+}
+function renderTree(name){
+  if(!treeEl||typeof TAL==="undefined"||!TAL[name])return;
+  const list=TAL[name];
+  treeEl.setAttribute("aria-label",name+" talent tree");
+  treeEl.innerHTML=list.map((r,i)=>`<button type="button" class="tal${r[4]===r[3]?" on":r[4]?" part":""}" style="--r:${r[0]+1};--c:${r[1]+1}" data-i="${i}" aria-pressed="false" aria-label="${esc(r[2])}, ${r[4]} of ${r[3]}"><span>${esc(r[2])}</span><span class="rk">${r[4]}/${r[3]}</span></button>`).join("");
+  $$(".tal",treeEl).forEach(b=>on(b,"click",()=>showTalent(list[+b.dataset.i],b)));
+  const first=list.filter(r=>r[4]).pop()||list[0];
+  showTalent(first,$$(".tal",treeEl)[list.indexOf(first)]);
+  if(M.on&&M.tree)M.tree(treeEl);
+}
+if(treeEl&&typeof TAL!=="undefined"){
+  treeEl.hidden=false;if(treepick)treepick.hidden=false;
+  $$("button",treepick||document.createElement("div")).forEach(b=>on(b,"click",()=>{
+    $$("button",treepick).forEach(x=>x.setAttribute("aria-pressed",x===b));
+    $$("#tsum span").forEach(s=>s.classList.toggle("on",s.textContent.trim().startsWith(b.dataset.tree)));
+    renderTree(b.dataset.tree);say(live,b.dataset.tree+" tree shown");
+  }));
+  renderTree("Fury");
+}
 
 /* ---------- buffs: a running count of what is applied ---------- */
 function countBuffs(){
@@ -721,8 +769,9 @@ M.panel=(p,k)=>A(()=>{
   safe(gsap.fromTo(kids,{y:16,autoAlpha:0},{y:0,autoAlpha:1,duration:.4,stagger:.04,ease:"power3.out",clearProps:"transform,opacity,visibility"}));
   if(k==="compare")M.bars($("#cmpscore"));
 });
-/* 4. example score bars grow; ranked rows stack in */
+/* 4. example score bars grow; talent buttons ripple out row by row; ranked rows stack in */
 M.bars=sc=>A(()=>{if(sc&&$("i",sc))safe(gsap.fromTo($$("i",sc),{scaleX:0},{scaleX:1,duration:.8,stagger:.12,ease:"power3.out"}));});
+M.tree=el=>A(()=>{const b=$$(".tal",el);if(b.length)safe(gsap.fromTo(b,{scale:.85,autoAlpha:0},{scale:1,autoAlpha:1,duration:.35,ease:"back.out(2)",stagger:{each:.012,from:"start"},clearProps:"transform,opacity,visibility"}));});
 M.rank=el=>A(()=>{const li=$$("li",el);if(li.length)safe(gsap.fromTo(li,{x:30,autoAlpha:0},{x:0,autoAlpha:1,duration:.4,stagger:.05,ease:"power3.out",clearProps:"transform,opacity,visibility"}));});
 /* 5. magnetic primary buttons (fine pointers only) */
 function magnets(){
@@ -783,8 +832,6 @@ setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach
 <script>window.COMPARE_IN_PLANNER=true;</script>
 <script src="compare-common.js"></script>
 <script src="compare-a.js"></script>
-<!-- the Talents tab: design A (the talent window) with design C's "What's off" list, over the shared build that the hit cap reads -->
-<script>window.TALENTS_IN_PLANNER=true;</script>
-<script src="talents-a.js"></script>
+<script src="talents-b.js"></script>
 </body>
 </html>

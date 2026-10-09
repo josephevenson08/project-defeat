@@ -1,6 +1,26 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-09, later): start here
+## ▶ Where we left off (2026-10-09, evening): start here
+
+**The Talents tab is decided and built into `planner.html`:** design A, the talent window, with design C's "What's off" list (one-press fixes and "Show where").
+- The three design pages stay as references, and the gallery shows the decision.
+- Every check passes; details are in [`README.md`](README.md#character-planner-the-talents-tab-2026-10-09).
+- Waiting on the owner's go-ahead to commit and push.
+
+**Also done in the same step:**
+- **The hit cap follows Precision:** 142 rating without it, 95 at 3/3, so the recommended set is 45 over the cap. The Compare tab no longer calls hit past the cap "wasted".
+- **"Change character"** no longer shows its picker open on load.
+
+**Next:**
+1. **The Step 2 walkthrough continues with the planner's Buffs sub-tab:** three designs, then the owner picks. Then Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
+   - Same pattern: copy `make-talent-pages.mjs` and `checks/talents-handson.mjs`.
+   - Buffs could feed the hit cap too: Improved Faerie Fire and a Draenei's Heroic Presence each lower it.
+2. **The other open questions** further down (text accents, the gallery always dark, GitHub Pages, Obsidian notes).
+3. **The fix-it tasks in the live app** now number five. The two talent ones:
+   - The stored presets skip Enrage and the filler points, so they break the game's row rules (it's not just Flurry).
+   - `canRemovePoint` lets a point out from under a deeper talent.
+
+## Where we left off (2026-10-09, later)
 
 **The Character Planner's Gear and Compare tabs are both decided and built into `planner.html`.** Everything is committed and pushed (last work commit `3659a74`).
 - **Gear:** B, the character sheet, with C's "What's left" checklist.
@@ -8,7 +28,7 @@
 - The design pages stay as references, and the gallery shows both decisions.
 - Every check passes, with full details in [`README.md`](README.md).
 
-**Next:**
+**Next (as of then):**
 1. **The Step 2 walkthrough continues with the planner's Talents sub-tab:** three designs, then the owner picks. Then Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions waits until later.
    - The pattern so far: copy `planner.html` with only that sub-tab swapped (see `make-compare-pages.mjs`), test with a `checks/*-handson.mjs`, show the three side by side, then build the pick into `planner.html`.
    - Ranked Gear could read the shared character too, as Compare does.

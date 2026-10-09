@@ -2,7 +2,8 @@
 //   node docs/design/prototypes/tabs/checks/gear-handson.mjs a|b|c|p   (WIDTH=400 for a phone, RM=1 for reduced motion)
 // p = planner.html, the chosen Gear tab (B's character sheet with C's checklist as "What's left").
 // The hit-rating checks use real numbers: Destroyer Battle-Helm has 21 hit, Furious Gizmatic Goggles 13, Glyph of
-// Ferocity 16, Rigid Dawnstone 8; the recommended set totals 140 against the 142 cap.
+// Ferocity 16, Rigid Dawnstone 8; the recommended set totals 140 (the cap is 95 with the Fury preset's Precision 3/3 on
+// the planner, 142 on the older design pages, which have no talents).
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -24,13 +25,13 @@ const results = [];
 async function step(name, fn) { try { await fn(); results.push(["PASS", name]); } catch (e) { results.push(["FAIL", name, String(e.message || e).split("\n").filter(l => l.trim()).slice(0, 6).join(" / ").slice(0, 600)]); } }
 const expect = (c, m) => { if (!c) throw new Error(m); };
 const settle = () => p.waitForTimeout(process.env.RM ? 120 : 450);
-const hit = async () => +((await p.locator("#hitwarn").innerText()).match(/(\d+) \/ 142/) || [0, -1])[1];
+const hit = async () => +((await p.locator("#hitwarn").innerText()).match(/(\d+) \/ (?:95|142)\b/) || [0, -1])[1];
 const nameOf = async s => (await p.locator(AD.name(s)).first().innerText()).trim();
 const openSlot = async s => { await p.locator(AD.open(s)).first().click(); await settle(); };
 
 await p.goto(pathToFileURL(path.resolve(`docs/design/prototypes/tabs/${FILE}`)).href);
 await p.waitForTimeout(process.env.RM ? 900 : 2800);
-await step("loads: 17 slots, real icons, hit 140 / 142", async () => {
+await step("loads: 17 slots, real icons, hit 140", async () => {
   await p.locator("#gx-rec").click(); await settle();
   const r = await p.evaluate(() => ({ slots: document.querySelectorAll("#gearui [data-slot], #gearui [data-open]").length, ok: [...document.querySelectorAll("#gearui img")].filter(i => i.complete && i.naturalWidth > 0).length, broken: [...document.querySelectorAll("#gearui img")].filter(i => i.complete && i.naturalWidth === 0).length }));
   /* icons below the first screen load when scrolled to, so only count the broken ones */

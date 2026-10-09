@@ -1,8 +1,9 @@
 /* compare-common.js — shared logic for the three Compare sub-tab designs (compare-a/b/c.html), over gear-common.js.
    Every design compares against the character the Gear tab holds (the shared "planner" store), and scores each item the
    way the live app does: what you wear counts as worn; an item you don't wear is counted with Wowhead's gem for each
-   socket colour and the slot's current enchant. Hit is cap-aware (142 rating for dual-wield specials): rating past the
-   cap is wasted. Any single score here is an EXAMPLE with illustrative weights, labelled as such: the prototype has no
+   socket colour and the slot's current enchant. Hit is cap-aware: the special-attack cap is 142 rating, less 1% per
+   Precision rank (95 at 3/3, see gear-common.js). Past it, extra hit only helps white swings, so the example score counts
+   it at half weight. Any single score here is an EXAMPLE with illustrative weights, labelled as such: the prototype has no
    simulator, and the app's real numbers come from its Simulation tab. */
 (function(){
 "use strict";
@@ -12,6 +13,8 @@ const ORDER=["Str","Agi","AP","Hit","Crit","Haste","Expertise","ArP","Sta"];
 const NAME={Str:"Strength",Agi:"Agility",AP:"Attack Power",Hit:"Hit Rating",Crit:"Crit Rating",Haste:"Haste Rating",Expertise:"Expertise Rating",ArP:"Armor Penetration",Sta:"Stamina"};
 /* illustrative weights per point, the prototype's long-standing example values (not the app's simulated weights) */
 const XW={Str:2.2,Agi:1.6,AP:1,Hit:2.4,Crit:2.1,Haste:1.6,Expertise:2.5,ArP:.4,Sta:0};
+/* hit past the special-attack cap: it still stops white swings missing, so it counts, at this (equally illustrative) weight */
+const XW_WHITE_HIT=1.2;
 const st=()=>S.get();
 
 /* what an item would look like in a slot: the worn state if it is what you wear, else Wowhead's gems and your enchant */
@@ -34,13 +37,14 @@ function slotStats(side){
 function diff(a,b){return ORDER.filter(k=>a[k]||b[k]).map(k=>({k,name:NAME[k],a:a[k],b:b[k],d:b[k]-a[k]}));}
 /* the whole character's hit with this slot holding `side` instead */
 function hitWith(slot,side){const all=G.totals(st()).Hit,cur=slotStats(st()[slot]).Hit;return all-cur+slotStats(side).Hit;}
-/* example score of swapping `a` for `b` in a slot: weighted stat change, hit only counted up to the cap */
+/* example score of swapping `a` for `b` in a slot: weighted stat change; hit up to the cap at full weight, past it at
+   the white-swing weight */
 function exampleDelta(slot,a,b){
   const sa=slotStats(a),sb=slotStats(b),cap=G.HIT_CAP;
   const hitA=hitWith(slot,a),hitB=hitWith(slot,b);
-  const useful=h=>Math.min(h,cap);
+  const worth=h=>Math.min(h,cap)*XW.Hit+Math.max(0,h-cap)*XW_WHITE_HIT;
   let s=0;ORDER.forEach(k=>{if(k==="Hit")return;s+=(sb[k]-sa[k])*XW[k];});
-  s+=(useful(hitB)-useful(hitA))*XW.Hit;
+  s+=worth(hitB)-worth(hitA);
   return Math.round(s);
 }
 /* what you can compare in a slot: Wowhead's ranked list, plus what you wear if it is not on it */
@@ -55,7 +59,7 @@ const capNote=(before,after)=>{const cap=G.HIT_CAP;
   if(before>=cap&&after<cap)return {warn:true,text:`drops you ${cap-after} under the hit cap`};
   if(before<cap&&after>=cap)return {warn:false,text:after===cap?"brings you exactly to the hit cap":`takes you ${after-cap} over the hit cap`};
   if(after<cap)return {warn:true,text:`leaves you ${cap-after} under the hit cap`};
-  return {warn:false,text:after===cap?"keeps you at the hit cap":`keeps you over the hit cap (${after-cap} rating wasted)`};};
+  return {warn:false,text:after===cap?"keeps you at the hit cap":`keeps you ${after-cap} over the hit cap, where extra hit only helps white swings`};};
 /* equip from Compare: the Gear tab redraws through the shared store */
 function equip(slot,itemId,from){const s=G.clone(st());s[slot]=sideFor(slot,itemId);S.set(s,from||"compare");}
 /* the slot picker every design shares: one button per slot, showing what you wear there */

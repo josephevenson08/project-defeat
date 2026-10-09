@@ -10,7 +10,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ---
 
-## Where this is right now (2026-10-09, latest — READ THIS FIRST)
+## Where this is right now (2026-10-09, evening — READ THIS FIRST)
 
 ### In short
 
@@ -18,10 +18,15 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Everything is committed and pushed
+### The Talents tab is decided and built, waiting to be committed
 
-As of 2026-10-09, all work is on `main` and pushed. The last work commit is `3659a74` (the Compare tab), followed by
-a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh chat starts clean.
+The owner picked Talents design A (the talent window) with design C's "What's off" list, on 2026-10-09. It is built into
+`planner.html`, every check passes, and the gallery shows the decision. Nothing from this step is committed yet: the last
+commit on `main` is `795f39e`. Ask the owner before committing. The same uncommitted work includes:
+- **The hit cap now follows Precision on every planner tab:** 142 without it, 95 at 3/3. `gear-common.js` reads `TalentKit.precision()`.
+- **Compare's wording:** hit past the cap now "only helps white swings", instead of being "wasted".
+- **"Change character"** no longer opens on load.
+- **The Gear and Compare tests** are updated for the new cap.
 
 **How commits are done here:**
 - Commit and push only when the owner says so; they always confirm first.
@@ -34,7 +39,7 @@ a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh
 | Tab | Page | State |
 | --- | --- | --- |
 | Home | `home.html` | Original teal crystal over water. The Dark Portal designs were dropped. A soft crystal swell plays once per session. |
-| Character Planner | `planner.html` | Deep sea blue. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. Talents, Buffs, Ranked Gear and Build are still the Step 1 baseline: **next**. |
+| Character Planner | `planner.html` | Deep sea blue. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. The hit cap follows its Precision (95 at 3/3). Buffs, Ranked Gear and Build are still the Step 1 baseline: **next**. |
 | Simulation | `simulation.html` | Gold over violet. Step 1 baseline (later in the walkthrough). |
 | Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
 | Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline. |
@@ -46,10 +51,11 @@ a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh
 
 ### Next, in order
 
-1. **The Character Planner's Talents sub-tab:** three designs, the owner picks, then build the pick into `planner.html`. After it come Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
-2. **Four small fixes in the real app** (`src/`), offered as separate tasks:
+1. **The Character Planner's Buffs sub-tab:** three designs, the owner picks, then build the pick into `planner.html`. After it come Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+2. **Five small fixes in the real app** (`src/`), offered as separate tasks:
    - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
-   - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points, and takes Flurry without Enrage.
+   - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points and takes Flurry without Enrage. It also skips the filler points that open its deeper rows, and so does the Arms preset: wowsims lists only the talents its simulator reads.
+   - `canRemovePoint` in `talentTypes.ts` counts all points in the tree, so it lets a point out from under a deeper talent. With 41 in Fury, Cruelty can drop while Rampage stays.
    - Lady Vashj's loot lists Destroyer Greathelm (a tank helm) tagged for DPS.
    - The zone-map credit cites Microsoft's "Game Content Usage Rules".
 3. **Open questions for the owner, asked but not answered yet:**
@@ -58,7 +64,7 @@ a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh
    - Should the prototypes be published on GitHub Pages at `/prototypes/`? The owner said to wait, so plan it first.
    - Should the Obsidian vault get notes on the prototype work and the Discord bot plan?
 
-### How a walkthrough step is done (the pattern Gear and Compare followed)
+### How a walkthrough step is done (the pattern Gear, Compare and Talents followed)
 
 1. **Research:** read the prototype's current version of the sub-tab and the live app's feature (`src/features/...`), and find the real data in `src/domain`.
 2. **Propose three distinct directions** in chat, with an AskUserQuestion to confirm. So far the owner has chosen "Build all three".
@@ -86,8 +92,14 @@ a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh
   - `gear-planner.js` handles the Gear tab's buttons and its view switch.
   - `gear-b.js` and `gear-c.js` draw the two views.
 - **Compare tab:** `compare-common.js` holds the shared rules, and `compare-a.js` draws the tab. `window.COMPARE_IN_PLANNER` turns on design B's summary.
+- **Talents:**
+  - `talent-data.js` is generated by `gen-talent-data.mjs` from `src/domain/talents`.
+  - `talent-common.js` holds the rules, the shared build (`pd-talents-planner`, fires `talents:change`), tooltips, the tree grid and `precision()` for the hit cap. `planner.html` already loads both, before the gear scripts.
+  - `talents-a/b/c.js` are the three designs, built into pages by `make-talent-pages.mjs` (now retired).
+  - The planner uses `talents-a.js` with `window.TALENTS_IN_PLANNER`, which swaps in C's "What's off" box (`offHTML` and `offClick` in `talent-common.js`).
 - **Icons:** real item, gem and spec icons come from `public/icons`, via `../../../../public/icons/`. The owner approved this on 2026-10-08.
-- **Checks:** `tabs/checks/` holds `check-bg.mjs`, `rc-handson.mjs`, `rc-taps.mjs`, `gear-handson.mjs`, `compare-handson.mjs` and `scene-only.mjs`.
+- **Checks:** `tabs/checks/` holds `check-bg.mjs`, `rc-handson.mjs`, `rc-taps.mjs`, `gear-handson.mjs`, `compare-handson.mjs`, `talents-handson.mjs` and `scene-only.mjs`.
+  - Run them one at a time. Several at once starve the software 3D, and the clicks time out.
   - They run from the repo root with Playwright on system Edge (`channel: "msedge"`), because Playwright's own browsers aren't installed.
   - Run `npx playwright install chromium` to use `npm run test` normally.
 

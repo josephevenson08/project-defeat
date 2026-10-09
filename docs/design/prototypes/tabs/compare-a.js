@@ -66,7 +66,7 @@ function render(){
   }
   h+=summary+`<div class="ca-tips">${left}${right||`<div class="ca-same">Pick an item above to compare.</div>`}</div>`;
   if(b)h+=`<div class="ca-act"><button type="button" class="btn" data-act="equip">Equip ${G.esc(G.item(b.item).name)}</button><span class="okline" id="ca-msg" aria-live="polite"></span></div>`;
-  h+=`<p class="prov" style="margin:10px 0 0">The example score weighs each stat with illustrative values and stops counting hit at the cap. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
+  h+=`<p class="prov" style="margin:10px 0 0">The example score weighs each stat with illustrative values, counting hit past the cap at half weight since it only helps white swings. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
   mount.innerHTML=h;
 }
 mount.addEventListener("click",e=>{

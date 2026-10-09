@@ -71,7 +71,7 @@ function render(){
         `<tr><th scope="row">Hit after (cap ${G.HIT_CAP})</th><td class="num">${p1.hit}</td><td class="num">${p2.hit}</td><td class="num ${p2.hit-p1.hit>0?"cx-up":p2.hit-p1.hit<0?"cx-dn":"cx-eq"}">${p2.hit-p1.hit?C.fmt(p2.hit-p1.hit):"same"}</td></tr>`+
         `<tr><th scope="row">Example score <span class="cx-ex">example</span></th><td class="num">${p1.ex}</td><td class="num">${p2.ex}</td><td class="num ${p2.ex-p1.ex>0?"cx-up":p2.ex-p1.ex<0?"cx-dn":"cx-eq"}">${p2.ex-p1.ex?C.fmt(p2.ex-p1.ex):"same"}</td></tr></tbody></table></section>`;}
   }else h+=`<p class="cc-hint">Pin two items to compare them head-to-head.</p>`;
-  h+=`<p class="prov" style="margin:10px 0 0">Stat changes are real, for this slot (gear, gems, enchant and socket bonus); items you don't wear count with Wowhead's gems and your current enchant. The example score uses illustrative weights and stops counting hit at the cap. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
+  h+=`<p class="prov" style="margin:10px 0 0">Stat changes are real, for this slot (gear, gems, enchant and socket bonus); items you don't wear count with Wowhead's gems and your current enchant. The example score uses illustrative weights, counting hit past the cap at half weight since it only helps white swings. It is <span class="cx-ex">example</span> only: run Simulation for real numbers.</p>`;
   mount.innerHTML=h;
 }
 mount.addEventListener("click",e=>{

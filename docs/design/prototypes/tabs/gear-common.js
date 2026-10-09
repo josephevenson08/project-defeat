@@ -3,7 +3,8 @@
    - state: what each of the 17 slots holds (item, enchant, gems), kept per design for the browser session
    - presets: the recommended set (Wowhead's rank 1, second ring and trinket take rank 2), a part-geared example, empty
    - sockets: which gem colours match which socket, and whether an item's socket bonus is on
-   - totals: gear + gems + enchants, and the live hit-rating row in the stat bar (cap 142 for dual-wield specials)
+   - totals: gear + gems + enchants, and the live hit-rating row in the stat bar (the special-attack cap: 142 rating,
+     less 1% per Precision rank the Talents tab holds, so 95 at 3/3)
    - a game-style tooltip, written in our own words (no Blizzard art beyond the item icons the live app ships)
    Every DOM lookup is guarded, so a page without some element just skips that feature. */
 (function(){
@@ -11,7 +12,12 @@
 const D=window.GEAR_DATA;
 if(!D){if(window.console)console.warn("gear-common: GEAR_DATA missing");return;}
 const ICON_DIR="../../../../public/icons/";
-const HIT_CAP=142;
+/* the special-attack hit cap against a level-73 boss: 9% at 15.77 rating per 1% = 142 rating. Each Precision rank in the
+   Talents tab (talent-common.js, when the page loads it) is 1% the gear doesn't have to supply, so 3/3 makes it 95.
+   Past the cap extra hit isn't wasted for a dual-wielder: it still stops white swings missing. Raid help (Improved
+   Faerie Fire, a Draenei's Heroic Presence) would lower the cap further; the Buffs tab doesn't feed it yet. */
+const precisionRank=()=>{const T=window.TalentKit;return T&&T.precision?T.precision():0;};
+const hitCap=()=>Math.ceil((9-precisionRank())*15.7692);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const SLOTS=D.slots, SLOT=Object.fromEntries(SLOTS.map(s=>[s.key,s]));
@@ -91,15 +97,16 @@ const filledCount=st=>SLOTS.filter(({key})=>st[key]&&st[key].item).length;
 
 /* the stat bar's hit row follows the gear (the other stat-bar numbers stay as imported) */
 function updateHit(st){
-  const hit=totals(st).Hit,row=document.getElementById("hitwarn");
+  const hit=totals(st).Hit,row=document.getElementById("hitwarn"),cap=hitCap(),prec=precisionRank();
   if(row){const b=row.querySelector("b"),spans=row.querySelectorAll("span");
-    const diff=hit-HIT_CAP,txt=diff<0?`${-diff} under`:diff>0?`${diff} over`:"exactly at the cap";
-    if(spans[1])spans[1].innerHTML=`<b>${hit} / ${HIT_CAP}</b> rating · ${txt}`;else if(b)b.textContent=`${hit} / ${HIT_CAP}`;}
+    const diff=hit-cap,txt=diff<0?`${-diff} under`:diff>0?`${diff} over`:"exactly at the cap";
+    if(spans[0])spans[0].textContent=prec?`Hit cap for special attacks (9%, ${prec}% of it from Precision)`:"Hit cap for special attacks (9%)";
+    if(spans[1])spans[1].innerHTML=`<b>${hit} / ${cap}</b> rating · ${txt}`;else if(b)b.textContent=`${hit} / ${cap}`;}
   const g=document.querySelector(".statbar .gauge");
-  if(g){g.setAttribute("aria-label",`Hit rating ${hit} of ${HIT_CAP}`);const i=g.querySelector("i");if(i)i.style.width=Math.min(100,hit/HIT_CAP*100).toFixed(1)+"%";}
-  const K=window.TBCKit;if(K&&row)K.taint(row,hit<HIT_CAP);
+  if(g){g.setAttribute("aria-label",`Hit rating ${hit} of ${cap}`);const i=g.querySelector("i");if(i)i.style.width=Math.min(100,hit/cap*100).toFixed(1)+"%";}
+  const K=window.TBCKit;if(K&&row)K.taint(row,hit<cap);
   const note=document.getElementById("statnote");
-  if(note)note.textContent="Hit rating follows the gear below (gear, gems and enchants; cap 142 for dual-wield special attacks). The other stats are from your import, 28 Sep.";
+  if(note)note.textContent=`Hit rating follows the gear below (gear, gems and enchants). The cap follows Precision in the Talents tab: ${cap} rating ${prec?`with ${prec}/3`:"without it"}. Past the cap, extra hit still stops white swings missing. The other stats are from your import, 28 Sep.`;
   const setEl=document.querySelector(".charline .who .prov .q-epic");
   if(setEl){const n=setCounts(st)["destroyer-battlegear"]||0;setEl.textContent=`Destroyer Battlegear (${n}/5)`;}
   return hit;
@@ -173,5 +180,6 @@ const todo=(slotKey,st)=>{const x=status(slotKey,st);return x.empty||!x.best||x.
 
 css();
 window.GearKit={D,SLOTS,SLOT,item,gem,enchant,iconUrl,qVar,esc,clone,listFor,rankOf,listSize,enchantable,enchantOptions,bestEnchant,
-  gemFits,gemMatches,gemOptions,socketBonusOn,recommended,empty,partGeared,status,todo,totals,setCounts,filledCount,updateHit,tooltipHTML,gemDots,store,HIT_CAP};
+  gemFits,gemMatches,gemOptions,socketBonusOn,recommended,empty,partGeared,status,todo,totals,setCounts,filledCount,updateHit,tooltipHTML,gemDots,store,hitCap,
+  get HIT_CAP(){return hitCap();}};
 })();

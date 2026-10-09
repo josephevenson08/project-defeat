@@ -1,7 +1,8 @@
 // Hands-on test of the three Compare designs (compare-a/b/c.html). Run from the repo root:
 //   node docs/design/prototypes/tabs/checks/compare-handson.mjs a|b|c|p   (WIDTH=400 for a phone, RM=1 for reduced motion)
 // p = planner.html, the chosen Compare tab (design A with design B's one-sentence summary).
-// Real numbers: Destroyer Battle-Helm → Furious Gizmatic Goggles is −8 hit (140 → 132 for the recommended set).
+// Real numbers: Destroyer Battle-Helm → Furious Gizmatic Goggles is −8 hit (140 → 132 for the recommended set). On the
+// planner the cap is 95 (the Fury preset's Precision 3/3), so the swap keeps you 37 over it.
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -33,7 +34,7 @@ await step("opens on Compare and shows the Head swap: −8 hit, 140 → 132", as
 });
 if (k === "p") await step("the summary says the trade in one sentence", async () => {
   const t = (await p.locator("#cmpui .ca-sum").innerText()).replace(/\s+/g, " ");
-  expect(/You gain \+6 Crit/.test(t) && /lose .*[−-]8 Hit/.test(t) && /leaves you 10 under the hit cap \(140 → 132\)/.test(t) && /example/i.test(t), "summary reads: " + t);
+  expect(/You gain \+6 Crit/.test(t) && /lose .*[−-]8 Hit/.test(t) && /keeps you 37 over the hit cap, where extra hit only helps white swings \(140 → 132\)/.test(t) && /example/i.test(t), "summary reads: " + t);
 });
 await step("switching slot to Main Hand shows its ranked items", async () => {
   await p.locator('#cmpui [data-cslot="Main Hand"]').click(); await settle();
