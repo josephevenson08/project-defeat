@@ -18,11 +18,11 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### The Talents tab is decided and built, waiting to be committed
+### Everything is committed and pushed
 
 The owner picked Talents design A (the talent window) with design C's "What's off" list, on 2026-10-09. It is built into
-`planner.html`, every check passes, and the gallery shows the decision. Nothing from this step is committed yet: the last
-commit on `main` is `795f39e`. Ask the owner before committing. The same uncommitted work includes:
+`planner.html`, every check passes, and the gallery shows the decision. It is committed and pushed: the work commit is
+`7e1bc21`, followed by a "Refresh the daily log" commit, so a fresh chat starts clean. The same commit includes:
 - **The hit cap now follows Precision on every planner tab:** 142 without it, 95 at 3/3. `gear-common.js` reads `TalentKit.precision()`.
 - **Compare's wording:** hit past the cap now "only helps white swings", instead of being "wasted".
 - **"Change character"** no longer opens on load.

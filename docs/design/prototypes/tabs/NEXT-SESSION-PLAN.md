@@ -5,7 +5,7 @@
 **The Talents tab is decided and built into `planner.html`:** design A, the talent window, with design C's "What's off" list (one-press fixes and "Show where").
 - The three design pages stay as references, and the gallery shows the decision.
 - Every check passes; details are in [`README.md`](README.md#character-planner-the-talents-tab-2026-10-09).
-- Waiting on the owner's go-ahead to commit and push.
+- Committed and pushed (work commit `7e1bc21`).
 
 **Also done in the same step:**
 - **The hit cap follows Precision:** 142 rating without it, 95 at 3/3, so the recommended set is 45 over the cap. The Compare tab no longer calls hit past the cap "wasted".
