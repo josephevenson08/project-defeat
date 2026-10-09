@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Project Defeat · Character Planner</title>
+<title>Project Defeat · Character Planner · Compare C</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -222,7 +222,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Character Planner. Gear is design B, the character sheet, with design C's checklist (picked 2026-10-09); Compare is design A, side-by-side tooltips, with design B's summary (picked 2026-10-09). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Character Planner · Compare design C: Shortlist table. It compares against the gear in the Gear tab. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -305,7 +305,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
     </div>
 
     <div class="panel" id="p-compare" role="tabpanel" aria-labelledby="t-compare">
-      <div id="cmpui"><p class="prov">The Compare tab needs JavaScript.</p></div>
+      <div id="cmpui"><p class="prov">The compare design needs JavaScript.</p></div>
     </div>
 
     <div class="panel" id="p-talents" role="tabpanel" aria-labelledby="t-talents">
@@ -839,9 +839,7 @@ setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach
 <script src="gear-planner.js"></script>
 <script src="gear-b.js"></script>
 <script src="gear-c.js"></script>
-<!-- the Compare tab: design A (side-by-side tooltips) with design B's one-sentence summary, over the Gear tab's character -->
-<script>window.COMPARE_IN_PLANNER=true;</script>
 <script src="compare-common.js"></script>
-<script src="compare-a.js"></script>
+<script src="compare-c.js"></script>
 </body>
 </html>

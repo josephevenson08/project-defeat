@@ -101,7 +101,9 @@ the top section says where things stand and what's next. In short:
    tabs first. The tabs no longer use a full-screen curtain between them.
 4. **Character Planner, Gear: done.** It's a character sheet with game-style tooltips, plus a
    "What's left" checklist that says which upgrades, enchants and gems are missing and where they drop.
-5. **Next:** continue the tab-by-tab walkthrough with the planner's Compare sub-tab. Professions comes later.
+5. **Character Planner, Compare: done.** Your item's tooltip sits next to another's, with the trade summed up in
+   one sentence.
+6. **Next:** continue the tab-by-tab walkthrough with the planner's Talents sub-tab. Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

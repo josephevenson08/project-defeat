@@ -1,99 +1,131 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-07 (per-tab backgrounds built).** Self-contained
-brief for picking this up in a fresh chat. If `git log` disagrees with this file, trust git.
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-09.** A self-contained brief for picking
+this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
-**Start here:** the section below is where things stand, and ["What is left, in one
-place"](#what-is-left-in-one-place) is everything outstanding. Nothing else in this file is needed to
-begin work; the rest is the record of how each decision was reached, newest first.
+**Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The exact
+next steps are also at the top of
+[`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md). Everything
+further down this file is the record of how earlier decisions were reached, newest first.
 
 ---
 
-## Where this is right now (2026-10-08, latest — READ THIS FIRST)
+## Where this is right now (2026-10-09, latest — READ THIS FIRST)
 
-> **2026-10-09: the Character Planner's Gear tab is decided.**
-> - The owner picked design B, the character sheet, with C's checklist added as "What's left". It is built into `tabs/planner.html` and every check passes.
-> - The A, B and C pages stay as references in the gallery.
-> - Next is the planner's Compare sub-tab, the next Step 2 walkthrough step. See the top of `tabs/NEXT-SESSION-PLAN.md`.
->
-> **2026-10-08: Raid Composition, the tab curtain and the gallery are done.**
-> - Raid Composition is dark like the other tabs, over the white-gold water, with one light per group that brightens as the group's buffs are covered. A click-to-fill palette of spec icons fills group 1 first, and a pencil names players.
-> - The full-screen curtain between tabs is removed at the owner's request; tab links are plain links.
-> - The gallery shows the current tabs first, then the dropped designs.
-> - **Next is the Step 2 walkthrough,** starting at the Character Planner's sub-tabs. See the top of `tabs/NEXT-SESSION-PLAN.md`.
-> - To view prototypes in the browser pane, use the `prototypes` server in `.claude/launch.json`. Local files open there as static snapshots, without icons.
->
-> **Night of 2026-10-07: Raid Composition is decided.**
-> - The owner picked design A, the Terrace of Light, which is now `raid-composition.html`.
-> - Design C was dropped, and B is kept for reference.
-> - **Next is the owner's feedback on A.** Bring back the live app's click-to-fill palette of every class and spec, which fills group 1 first through group 5, and add a pencil icon on each player's tag for their name. Also make the page **dark** like the other tabs, still warm white-gold; A is light only because of its "Terrace of Light" concept. Then the gallery.
->
-> The exact place to resume is the top of
-> [`tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md).
+### In short
 
-**Between 2026-09-30 and 2026-10-05 the work was repo cleanup, research and design prototypes. The app
-itself (`src/`) is unchanged since 2026-09-30.** The next task is in the prototypes, and its exact
-starting point is the top of
-[`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md).
-Read that first.
+- **The live app** (`src/`) is unchanged since 2026-09-30. It deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/
+- **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
+- **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### What was done
+### Uncommitted work: check `git status` first
 
-- **Repo cleanup (2026-09-30).**
-  - Docs moved into `docs/` (architecture, design, research, dev-log, images). The README became a short front page.
-  - `CHANGELOG.md` became `docs/dev-log/daily-log.md`, and `npm run changelog` writes there.
-  - The doc-figures test reads `docs/features.md`, `docs/ROADMAP.md`, this file and `docs/known-limitations.md`.
-- **Data fix:** weapon enchants and ranged scopes are now recommended for Warrior and Rogue. `tools/ingest/ingest-bis-recommendations.mjs` maps the guides' "Main Hand Weapon", "Off Hand Weapon" and "Ranged" rows, and a generic "Weapon" row now fills dual-wield off hands.
-- **Discord bot:** planned only, in `discord-bot/PLAN.md`. Its commands are `/bis`, `/whodrops`, `/loot`, `/attune`, `/farm` and `/import`. Not built.
-- **Research, every claim cited:**
-  - `docs/research/gaming-ui/` covers 25 platforms.
-  - `docs/research/wow-tbc-motion/` covers TBC's look, Blizzard's fan-content rules, techniques, and the approved "TBC motion kit".
-- **Design prototypes** (`docs/design/prototypes/`, static HTML, gallery at `index.html`):
-  - Rounds 1–4 explored directions. The chosen style is Round 4: a Three.js crystal-and-water scene with GSAP motion.
-  - Step 1 built all seven tabs in that style on real app data: `tabs/home.html`, `planner.html`, `simulation.html`, `raid-composition.html`, `tier-lists.html`, `raids.html` and `professions.html`.
-  - `tabs/tbc-kit.js` is a shared motion kit. Its `window.SCENE` contract is documented at the top of the file, and it uses GSAP 3.13.0 and Three.js r128.
-  - Owner review changes since then:
-    - The Planner has a row hover highlight.
-    - Raids has a loot search.
-    - Three Dark Portal Home designs were built (`home-a`, `home-b`, `home-c`) and then **dropped**.
-    - Raid Composition had designs A and B, each with a working planning table. The owner picked A on 2026-10-07.
+The **Compare tab** work from late 2026-10-09 is **not committed yet**. All of its checks pass. It consists of:
+- new files: `tabs/compare-a/b/c.html`, `compare-a/b/c.js`, `compare-common.js`, `make-compare-pages.mjs` and `checks/compare-handson.mjs`;
+- edits to `tabs/planner.html`, the gallery `index.html`, `tabs/README.md`, `tabs/NEXT-SESSION-PLAN.md`, `docs/design/prototypes/README.md`, the root `README.md`, and this file.
 
-### What is next (in order)
+Commit and push once the owner says so; they always confirm first. Commits end with the Co-Authored-By line, then
+`npm run changelog` and a separate "Refresh the daily log" commit. `DarkSoulsFightAI/` and `adaptive_boss_demo.py`
+are unrelated untracked files, so leave them alone.
 
-1. ~~**Backgrounds:**~~ **Done 2026-10-07.** Every tab has its own colour over the original crystal and water:
-   - Home teal, Planner deep sea blue, Simulation gold over violet, Raid Composition warm white-gold (design A's own terrace scene), Tier Lists emerald, Raids per raid, and Professions amber.
-   - Planner, Tier Lists and Professions are themes in `tabs/tbc-kit.js`, each with one small signature detail.
-   - Home's portal ignition became a crystal swell, and its backdrop switch is gone.
-   - Details are in `tabs/README.md` ("Per-tab backgrounds") and at the top of the next-session plan.
-2. ~~**Raid Composition:**~~ **Done 2026-10-07.**
-   - Both tables passed a hands-on browser test of every control. Move works; the earlier timeout was the test's own fault.
-   - Phone tap targets were raised to 44px on both.
-   - The owner picked **A**, which replaced `raid-composition.html`, keeping A's own white-gold terrace scene. The unused `raidcomp` kit theme was removed.
-   - B is kept for reference, and C was dropped.
-   - The test scripts are now in `tabs/checks/`.
-3. **Gallery and walkthrough:** update the gallery, then continue the tab-by-tab walkthrough. Professions comes later.
-4. **Fix-it tasks** found while prototyping, offered as separate tasks:
+### Where each prototype tab stands (`docs/design/prototypes/tabs/`)
+
+| Tab | Page | State |
+| --- | --- | --- |
+| Home | `home.html` | Original teal crystal over water. The Dark Portal designs were dropped. A soft crystal swell plays once per session. |
+| Character Planner | `planner.html` | Deep sea blue. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. Talents, Buffs, Ranked Gear and Build are still the Step 1 baseline: **next**. |
+| Simulation | `simulation.html` | Gold over violet. Step 1 baseline (later in the walkthrough). |
+| Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
+| Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline. |
+| Raids | `raids.html` | The scene follows the raid; loot search across all five raids. Step 1 baseline. |
+| Professions | `professions.html` | Amber with ore veins. Waits for a later update. |
+
+- **Moving between tabs:** plain links. The full-screen curtain was removed 2026-10-08 at the owner's request.
+- **The gallery** ([`docs/design/prototypes/index.html`](../design/prototypes/index.html)) lists the current tabs first, then each decision's designs, including the dropped ones. Its live previews load only near the screen, because too many 3D previews make the browser drop scenes.
+
+### Next, in order
+
+1. **The Character Planner's Talents sub-tab:** three designs, the owner picks, then build the pick into `planner.html`. After it come Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+2. **Four small fixes in the real app** (`src/`), offered as separate tasks:
    - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
    - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points, and takes Flurry without Enrage.
-   - Lady Vashj's loot lists Destroyer Greathelm (tank) tagged for DPS.
+   - Lady Vashj's loot lists Destroyer Greathelm (a tank helm) tagged for DPS.
    - The zone-map credit cites Microsoft's "Game Content Usage Rules".
+3. **Open questions for the owner, asked but not answered yet:**
+   - Should text accents follow each tab's colour, as Raid Composition's gold does? The other tabs are teal.
+   - Should the gallery always be dark?
+   - Should the prototypes be published on GitHub Pages at `/prototypes/`? The owner said to wait, so plan it first.
+   - Should the Obsidian vault get notes on the prototype work and the Discord bot plan?
 
-### Owner decisions to keep
+### How a walkthrough step is done (the pattern Gear and Compare followed)
 
-- **Phase 2 on purpose.** Phase 3 went live 2026-08-27, but the app stays on Phase 2 until the owner moves it.
-- **Plan before structural changes,** and ask before pushing unless told to push.
-- **Motion:** no sound. The portal intro played once per visit, but that design is now dropped.
-- **No Blizzard assets in prototypes.** The owner's reference screenshots are described in words, never committed.
+1. **Research:** read the prototype's current version of the sub-tab and the live app's feature (`src/features/...`), and find the real data in `src/domain`.
+2. **Propose three distinct directions** in chat, with an AskUserQuestion to confirm. So far the owner has chosen "Build all three".
+3. **Build** each design as a full copy of `planner.html` with only that sub-tab swapped.
+   - Shared logic goes in `<name>-common.js`, and each design in `<name>-a/b/c.js`.
+   - A builder, `make-<name>-pages.mjs` (copy `make-compare-pages.mjs`), makes the pages and refuses to run once the pick is in `planner.html`.
+4. **Test:** write `checks/<name>-handson.mjs a|b|c|p` (copy `compare-handson.mjs`).
+   - Run it at 1280px, at 400px (`WIDTH=400`) and with reduced motion (`RM=1`).
+   - Then run `checks/check-bg.mjs` for all seven tabs.
+   - Check real numbers (for example, hit rating), 44px tap targets at phone width, and no sideways scroll.
+5. **Show the owner:**
+   - Add the designs to the top of the gallery as "pick one".
+   - Send a side-by-side screenshot, a short comparison table and a recommendation, then ask an AskUserQuestion. The owner has picked the recommended merge both times.
+6. **Build the pick into `planner.html`.** Then:
+   - Move the gallery section to "decided".
+   - Update `tabs/README.md`, the next-session plan, this file and the READMEs.
+   - Ask to commit and push.
 
-### How the prototypes were checked
+### Key files
 
-Playwright on system Edge, because Playwright's own browsers aren't installed:
-- at 1280px, at 400px, with reduced motion, and with WebGL disabled;
-- checking for script errors, failed loads, sideways scroll and invisible content;
-- plus screenshots.
+- **Motion kit:** `tabs/tbc-kit.js` is the shared motion kit, plus the per-tab scene themes (`planner`, `raidcomp`, `tiers` and `profs`).
+- **Gear data:** `gear-data.js` holds real Fury Warrior Phase 2 data. It is generated by `gen-gear-data.mjs` (run from the repo root) from `src/domain`: rankings, recommendations, catalogues, icons and the raid loot tables.
+- **Gear tab:**
+  - `gear-common.js` holds the shared rules and the **shared character**. It uses one store per page (`window.GEAR_STORE_KEY = "planner"`) and fires `gear:change` when the character changes. Every planner tab should read gear from it.
+  - `gear-planner.js` handles the Gear tab's buttons and its view switch.
+  - `gear-b.js` and `gear-c.js` draw the two views.
+- **Compare tab:** `compare-common.js` holds the shared rules, and `compare-a.js` draws the tab. `window.COMPARE_IN_PLANNER` turns on design B's summary.
+- **Icons:** real item, gem and spec icons come from `public/icons`, via `../../../../public/icons/`. The owner approved this on 2026-10-08.
+- **Checks:** `tabs/checks/` holds `check-bg.mjs`, `rc-handson.mjs`, `rc-taps.mjs`, `gear-handson.mjs`, `compare-handson.mjs` and `scene-only.mjs`.
+  - They run from the repo root with Playwright on system Edge (`channel: "msedge"`), because Playwright's own browsers aren't installed.
+  - Run `npx playwright install chromium` to use `npm run test` normally.
 
-The check scripts were temporary and are not in the repo; recreate them from these notes if needed. Run
-`npx playwright install chromium` to use `npm run test` normally.
+### Viewing the prototypes
+
+The in-app browser pane opens local files as static snapshots, without icons or scripts.
+- Start the `prototypes` entry in `.claude/launch.json` (`python -m http.server 8765`; `launch.json` is gitignored, so it exists only on this machine).
+- Open http://localhost:8765/docs/design/prototypes/index.html.
+- The pane is sometimes hidden on the owner's side. They open it from the app's toolbar.
+
+### Owner preferences (keep)
+
+- **Phase 2 on purpose.** Don't flag Phase 2 copy as stale.
+- **Plan before structural changes**, and ask before committing and pushing. The owner usually answers "commit and push".
+- **Every page is dark.** A tab's identity comes from its scene colour, never from a light page.
+- **No sound.** No full-screen curtain between tabs.
+- **Real WoW icons from `public/icons` are fine.** No other Blizzard art. Reference screenshots are described in words, never committed.
+- **Likes clicking icons** (direct manipulation) and a game-like look. Often picks one design plus a feature from another.
+- **Often stops mid-task** ("stop for now, note where you left off"). Before stopping, update the top of `NEXT-SESSION-PLAN.md` and this file.
+- **Plain, short updates.** Explain in words, not code.
+
+### Known quirks
+
+- **Slow page loads:** CDN scripts sometimes load slowly in automated runs. The tests use a 30s navigation timeout, and a single timeout that passes on a re-run is a slow load, not a bug.
+- **Redrawn tables:** some pages redraw on every click. In tests, click and then re-read the page, rather than calling `uncheck()` or `check()` on the old element.
+- **Pointer parallax:** it is off below 700px on every tab, because it pushed panels 1px past the screen edge.
+- **Type checking:** `tsc --noEmit` checks nothing in this repo. `tsc -b` is the real check, and `npm run build` runs it.
+- **Obsidian vault:** `brain/` matches the code (`npm run brain` changes nothing), but it has no notes on the prototype work.
+- **Discord bot:** planned only, in `discord-bot/PLAN.md`.
+
+### Earlier, 2026-09-30 to 2026-10-05
+
+- **Repo cleanup:**
+  - Docs moved into `docs/`, and the README became a short front page.
+  - `npm run changelog` writes `docs/dev-log/daily-log.md`.
+  - The doc-figures test reads `docs/features.md`, `docs/ROADMAP.md`, this file and `docs/known-limitations.md`.
+- **Data fix:** weapon enchants and ranged scopes are recommended for Warrior and Rogue (`tools/ingest/ingest-bis-recommendations.mjs`).
+- **Research, every claim cited:** `docs/research/gaming-ui/` (25 platforms) and `docs/research/wow-tbc-motion/` (TBC's look, fan-content rules, and the motion kit).
+- **Design rounds 1–4** picked the style: Round 4's Three.js crystal-and-water scene with GSAP motion. Step 1 then built all seven tabs in it on real app data.
 
 ---
 

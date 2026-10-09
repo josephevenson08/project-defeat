@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear tab is decided (see [below](#character-planner-the-gear-tab-2026-10-09)). Next is the planner's Compare sub-tab.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). Next is the planner's Talents sub-tab.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,37 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## Character Planner: the Compare tab (2026-10-09)
+
+The second Step 2 walkthrough step. Three designs were built, each as the whole planner (with its new Gear tab) with
+only its Compare tab changed. All three compare against the gear in the Gear tab, through the same shared character, so
+equipping from Compare updates the Gear tab and a Gear change shows in Compare. **The owner picked A with B's
+one-sentence summary on top.** That is now the Compare tab of `planner.html`.
+
+| Design | Page | What it is | Outcome |
+| --- | --- | --- | --- |
+| A · Side-by-side tooltips | [compare-a.html](compare-a.html) | The in-game shift-compare: both item tooltips, then each stat change in green or red and what the swap does to the hit cap | **Picked** |
+| B · Change chart | [compare-b.html](compare-b.html) | One bar per stat, gains right and losses left, a one-sentence summary and a hit gauge against the cap | **Summary merged in** |
+| C · Shortlist table | [compare-c.html](compare-c.html) | Every ranked item for the slot in one table against what you wear, then any two pinned head-to-head | Not picked |
+
+- **Shared rules** live in `compare-common.js`, over `gear-common.js`:
+  - An item you don't wear counts with Wowhead's gem for each socket colour and your current enchant, as in the live app.
+  - Hit is cap-aware, with rating past 142 wasted.
+  - The hit-cap wording is written as full clauses ("leaves you 10 under the hit cap").
+  - The slot picker is the icons of your own gear.
+- **The example score:** any single score is labelled **example**. It uses the prototype's illustrative weights, and stops counting hit at the cap, because the prototype has no simulator. The stat differences are real.
+- **In the planner:**
+  - `window.COMPARE_IN_PLANNER` switches on the summary sentence, and moves the hit and example lines into it.
+  - It also keeps the page opening on the Gear tab.
+  - `make-compare-pages.mjs` built the three pages and now refuses to run, since `planner.html` holds the chosen tab.
+- **Checks:** `checks/compare-handson.mjs a|b|c|p` passes for every design and the planner at 1280px, at 400px and with reduced motion. It covers:
+  - the real −8 hit (140 → 132) for the helm swap, and the summary's exact wording;
+  - switching slots;
+  - equipping from Compare showing in the Gear tab, and a Gear change showing in Compare;
+  - C's pinning;
+  - phone tap sizes. C's pin checkboxes sit in 44px labels.
+- `gear-handson.mjs p` and `check-bg.mjs` still pass.
 
 ## Character Planner: the Gear tab (2026-10-09)
 
@@ -146,7 +177,7 @@ at 400px and with reduced motion.
 | Page | Size | What it shows, all from the app's real data |
 | --- | --- | --- |
 | [Home](home.html) | 55 KB | The front door. It covers what the app is, Phase 2 at a glance (all five T5 token bosses), a feed of real data changes from the project log, a card for each tab, and character import. |
-| [Character Planner](planner.html) | 77 KB, plus the shared Gear scripts | The character line, the stat bar with the hit cap (now live: it follows the gear), and all six sub-tabs. **Gear** (picked 2026-10-09) is a character sheet with game-style tooltips and a flyout to swap items, enchants and gems, plus a "What's left" checklist with one-press fixes and where each upgrade drops. **Compare:** the next-ranked alternative from the BiS rankings. **Talents:** real Warrior trees. **Buffs:** real buffs, debuffs and consumables. **Ranked Gear:** six slots. **Build:** the real share-link format and the paste box. |
+| [Character Planner](planner.html) | 77 KB, plus the shared Gear scripts | The character line, the stat bar with the hit cap (now live: it follows the gear), and all six sub-tabs. **Gear** (picked 2026-10-09) is a character sheet with game-style tooltips and a flyout to swap items, enchants and gems, plus a "What's left" checklist with one-press fixes and where each upgrade drops. **Compare** (picked 2026-10-09): your item's tooltip next to another's from the slot's ranked list, with the trade summed up in one sentence. **Talents:** real Warrior trees. **Buffs:** real buffs, debuffs and consumables. **Ranked Gear:** six slots. **Build:** the real share-link format and the paste box. |
 | [Simulation](simulation.html) | 63 KB | The fixed level-73 boss, the 20 DPS specs with real archon.gg reference DPS, the upgrade finder's method, and an honest "what is and isn't modelled" panel. The estimate and weights are labelled example. The scene uses Tempest Keep's arcane light. |
 | [Raid Composition](raid-composition.html) | 80 KB | Design A's planning table on the dark site. **Adding:** a palette of all 29 builds with the live app's spec icons, grouped by class. A click seats the build in the next open seat, filling group 1 first, or into a group you aim at by pressing its name. **Seats:** a pencil on each tag for the player's name; Move and drag (a taken seat swaps); Remove. **Raid:** 10/25 with Undo, load or reset the example, Clear with Undo, raid details for the export, an Export stub, and the roster kept for the browser session. **Results,** live from the real buff-scope data: each group's party buffs, role balance, "what one more seat would add" with a one-press seat, "missing, and who fixes it", and raid-wide and boss coverage. |
 | [Spec Tier Lists](tier-lists.html) | 55 KB | All three Wowhead Phase 2 lists, with all 28 placements. Fury Warrior is marked. The DPS list has 3D shelves with a List view and animated class filters. |

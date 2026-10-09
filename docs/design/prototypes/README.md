@@ -56,6 +56,7 @@ session are in [`tabs/NEXT-SESSION-PLAN.md`](tabs/NEXT-SESSION-PLAN.md).
 - **Home** keeps its original look. The three Dark Portal designs were dropped.
 - **Raid Composition** is design A's planning table, now dark, with a click-to-fill spec palette. B was not picked, and C was dropped before it was built.
 - **Character Planner, Gear** is design B, the character sheet, with design C's checklist as "What's left". A was not picked.
+- **Character Planner, Compare** is design A, side-by-side tooltips, with design B's one-sentence summary. C was not picked.
 - **Moving between tabs** is a plain link. The full-screen curtain is gone.
 - **The gallery** shows the current tabs first, then each step's designs, including the dropped ones. Its live previews load only near the screen.
 

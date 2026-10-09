@@ -1,21 +1,17 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-09): start here
+## ▶ Where we left off (2026-10-09, later): start here
 
-**The Character Planner's Gear tab is decided and built.** The owner picked B, the character sheet, with C's
-checklist as a second view, "What's left". It is now the Gear tab of `planner.html`.
-- A, B and C stay as reference pages, and the gallery shows them under "Gear designs".
-- Every check passes: `checks/gear-handson.mjs p` at 1280px, at 400px and with reduced motion, and `check-bg.mjs` for all seven tabs.
-- Full details are in [`README.md`](README.md#character-planner-the-gear-tab-2026-10-09).
-
-**Also done today:**
-- The pointer parallax is off below 700px on every tab. It caused a 1px sideways scroll with a mouse.
-- The gallery loads its live 3D previews only near the screen, which stops the browser from running out of 3D contexts.
+**The Character Planner's Gear and Compare tabs are both decided and built into `planner.html`.**
+- **Gear:** B, the character sheet, with C's "What's left" checklist.
+- **Compare:** A, side-by-side tooltips, with B's one-sentence summary.
+- The design pages stay as references, and the gallery shows both decisions.
+- Every check passes, with full details in [`README.md`](README.md).
 
 **Next:**
-1. **The Step 2 walkthrough continues with the Character Planner's Compare sub-tab:** three designs, then the owner picks. After that come Talents, Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions waits until later.
-   - The new Gear tab already holds the equipped gear, in `gear-common.js`'s shared store.
-   - Compare and Ranked Gear could read it instead of the hidden legacy list. Worth doing as part of their designs.
+1. **The Step 2 walkthrough continues with the planner's Talents sub-tab:** three designs, then the owner picks. Then Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions waits until later.
+   - The pattern so far: copy `planner.html` with only that sub-tab swapped (see `make-compare-pages.mjs`), test with a `checks/*-handson.mjs`, show the three side by side, then build the pick into `planner.html`.
+   - Ranked Gear could read the shared character too, as Compare does.
 2. **The fix-it tasks** (see the list further down).
 3. **Open question:** should the text accents follow each tab's colour, as Raid Composition's gold does?
 

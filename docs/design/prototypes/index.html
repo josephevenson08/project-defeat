@@ -85,11 +85,12 @@
   <header>
     <span class="eyebrow">Design study · Oct 2026</span>
     <h1>What Project Defeat could look like</h1>
-    <p>Clickable prototypes of the whole site, on the app's real data. The current version of every tab comes first, then the Step 2 designs behind each decision, including the ones that were dropped, then the rounds that led here, newest first. They are mockups, not the live app.</p>
+    <p>Clickable prototypes of the whole site, on the app's real data. The current version of every tab comes first, then the Step 2 designs behind each decision, newest first, including the ones that were dropped, then the rounds that led here, newest first. They are mockups, not the live app.</p>
   </header>
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#compare">Compare designs</a>
     <a href="#gear">Gear designs</a>
     <a href="#dropped">Tried and dropped</a>
     <a href="#round-4">Round 4: the chosen direction</a>
@@ -112,7 +113,7 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/planner.html" title="Preview of Character Planner" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data. Gear is a character sheet with game-style tooltips and a "What's left" checklist with one-press fixes and where each upgrade drops. Deep sea blue, with slow rising bubbles.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data. Gear is a character sheet with game-style tooltips and a "What's left" checklist with one-press fixes and where each upgrade drops. Compare holds your item's tooltip next to another's, with the trade summed up in one sentence. Deep sea blue, with slow rising bubbles.</p></div>
       <a class="open" href="tabs/planner.html">Open Character Planner <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
@@ -139,6 +140,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="compare">
+    <span class="eyebrow">Step 2 · Character Planner · Compare · decided 2026-10-09</span>
+    <h2 class="subhead">Compare: side-by-side tooltips, with a summary</h2>
+    <p>The owner picked A, the in-game side-by-side tooltips, with B's one-sentence summary of the trade on top. That is now the Compare tab of the Character Planner above. It compares against the gear in the Gear tab, and equipping from it updates the Gear tab. The three designs stay here for reference.</p>
+  </header>
+  <section aria-label="Compare designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/compare-a.html#cmpui" title="Preview of Side-by-side tooltips" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Compare A · Side-by-side tooltips</h2></div><p>The in-game shift-compare: your item's tooltip next to the other one, then each stat change in green or red and what the swap does to the hit cap. Pick the other item from an icon strip of the slot's ranked list.</p></div>
+      <a class="open" href="tabs/compare-a.html">Open Compare A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/compare-b.html#cmpui" title="Preview of Change chart" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">SUMMARY MERGED IN</span><h2>Compare B · Change chart</h2></div><p>One bar per stat, gains to the right and losses to the left, with a one-sentence summary of the trade and a gauge showing your hit before and after against the 142 cap.</p></div>
+      <a class="open" href="tabs/compare-b.html">Open Compare B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/compare-c.html#cmpui" title="Preview of Shortlist table" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Compare C · Shortlist table</h2></div><p>Every ranked item for the slot in one table against what you wear: stat changes, hit after the swap and an example score. Pin any two for a head-to-head underneath.</p></div>
+      <a class="open" href="tabs/compare-c.html">Open Compare C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 
