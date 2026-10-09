@@ -2,7 +2,7 @@
 
 ## ▶ Where we left off (2026-10-09, later): start here
 
-**The Character Planner's Gear and Compare tabs are both decided and built into `planner.html`.**
+**The Character Planner's Gear and Compare tabs are both decided and built into `planner.html`.** Everything is committed and pushed (last work commit `3659a74`).
 - **Gear:** B, the character sheet, with C's "What's left" checklist.
 - **Compare:** A, side-by-side tooltips, with B's one-sentence summary.
 - The design pages stay as references, and the gallery shows both decisions.

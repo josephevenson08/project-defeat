@@ -18,15 +18,16 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Uncommitted work: check `git status` first
+### Everything is committed and pushed
 
-The **Compare tab** work from late 2026-10-09 is **not committed yet**. All of its checks pass. It consists of:
-- new files: `tabs/compare-a/b/c.html`, `compare-a/b/c.js`, `compare-common.js`, `make-compare-pages.mjs` and `checks/compare-handson.mjs`;
-- edits to `tabs/planner.html`, the gallery `index.html`, `tabs/README.md`, `tabs/NEXT-SESSION-PLAN.md`, `docs/design/prototypes/README.md`, the root `README.md`, and this file.
+As of 2026-10-09, all work is on `main` and pushed. The last work commit is `3659a74` (the Compare tab), followed by
+a "Refresh the daily log" commit. Nothing is waiting to be committed, so a fresh chat starts clean.
 
-Commit and push once the owner says so; they always confirm first. Commits end with the Co-Authored-By line, then
-`npm run changelog` and a separate "Refresh the daily log" commit. `DarkSoulsFightAI/` and `adaptive_boss_demo.py`
-are unrelated untracked files, so leave them alone.
+**How commits are done here:**
+- Commit and push only when the owner says so; they always confirm first.
+- Each commit message ends with the Co-Authored-By line.
+- After each work commit, run `npm run changelog` and make a separate "Refresh the daily log" commit.
+- `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files. Leave them alone.
 
 ### Where each prototype tab stands (`docs/design/prototypes/tabs/`)
 
