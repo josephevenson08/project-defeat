@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**449 commits across 71 days**, from 2026-06-25 to 2026-10-09.
+**451 commits across 71 days**, from 2026-06-25 to 2026-10-09.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,14 +13,16 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_22 commits_
+_24 commits_
 
-### Friday 9 October — 4 commits
+### Friday 9 October — 6 commits
 
 - Give the Character Planner its Gear tab: a character sheet with a "What's left" checklist — [`eb07d9e`](https://github.com/josephevenson08/project-defeat/commit/eb07d9e3a623e7735b8aca586f8f61d8f9b57e13)
 - Give the Character Planner its Compare tab: side-by-side tooltips with a one-line summary — [`3659a74`](https://github.com/josephevenson08/project-defeat/commit/3659a7458fee827a951d0a08162ea8038138a946)
 - Note in the handoff that everything is committed — [`795f39e`](https://github.com/josephevenson08/project-defeat/commit/795f39ebf07946cfd0ddbbcb97cde329cba3ae6b)
 - Give the Character Planner its Talents tab: the game's talent window with a fix list — [`7e1bc21`](https://github.com/josephevenson08/project-defeat/commit/7e1bc215e42ec0745fafa8cf9d28eef79ad5d63a)
+- Note in the handoff that the Talents tab is committed — [`ffc2e21`](https://github.com/josephevenson08/project-defeat/commit/ffc2e21a350e31088a4bc9725f299cf4a8f99665)
+- Give the Character Planner its Buffs tab: buffs from your raid, as clickable icons — [`cd78079`](https://github.com/josephevenson08/project-defeat/commit/cd78079471f0aa9f61b72778bdc294428bcc6650)
 
 ### Thursday 8 October — 2 commits
 
