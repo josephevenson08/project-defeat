@@ -51,12 +51,13 @@ clickable site, on the app's real data. See [`tabs/README.md`](tabs/README.md). 
 through them one at a time, three designs per step. The owner's review and the plan for the next
 session are in [`tabs/NEXT-SESSION-PLAN.md`](tabs/NEXT-SESSION-PLAN.md).
 
-**Where Step 2 stands (2026-10-08):**
+**Where Step 2 stands (2026-10-09):**
 - **Every tab has its own colour** over the crystal and water.
 - **Home** keeps its original look. The three Dark Portal designs were dropped.
 - **Raid Composition** is design A's planning table, now dark, with a click-to-fill spec palette. B was not picked, and C was dropped before it was built.
+- **Character Planner, Gear** is design B, the character sheet, with design C's checklist as "What's left". A was not picked.
 - **Moving between tabs** is a plain link. The full-screen curtain is gone.
-- **The gallery** shows the current tabs first, then the dropped designs.
+- **The gallery** shows the current tabs first, then each step's designs, including the dropped ones. Its live previews load only near the screen.
 
 To view the prototypes in the in-app browser pane, serve them over HTTP (the `prototypes` entry in `.claude/launch.json` runs `python -m http.server 8765`). The pane shows local files as static snapshots, without their icons and scripts.
 

@@ -88,6 +88,7 @@ main{padding:0 0 48px}
 @media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
 .col{display:grid;gap:16px;align-content:start}
 .layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+@media (max-width:699px){.layer{transform:none!important}} /* no pointer parallax at phone width: it only nudged panels past the screen edge */
 .box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
 .box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
 .box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}

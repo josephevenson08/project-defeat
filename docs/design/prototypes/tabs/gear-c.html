@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Project Defeat · Character Planner</title>
+<title>Project Defeat · Character Planner · Gear C</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -222,7 +222,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Character Planner. The Gear tab is design B, the character sheet, with design C's checklist as "What's left" (picked 2026-10-09). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Character Planner · Gear design C: Upgrade checklist. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -281,8 +281,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
     </div>
 
     <div class="panel" id="p-gear" role="tabpanel" aria-labelledby="t-gear">
-      <div id="gearui"><p class="prov">The Gear tab needs JavaScript.</p></div>
-      <!-- the original list stays, hidden: the Compare and Ranked Gear sub-tabs read "what is equipped" from it -->
+      <div id="gearui"><p class="prov">The gear design needs JavaScript.</p></div>
       <ol class="gear" id="gear" hidden style="display:none" aria-label="Equipped gear, 17 slots">
         <li><span class="glyph" aria-hidden="true">HD</span><span><span class="slot">Head</span><span class="q-epic">Destroyer Battle-Helm</span></span><span class="meta">Glyph of Ferocity</span><span class="meta prov">T5 token · Lady Vashj, Serpentshrine Cavern</span></li>
         <li><span class="glyph" aria-hidden="true">NK</span><span><span class="slot">Neck</span><span class="q-epic">Pendant of the Perilous</span></span><span class="meta">No enchant</span><span class="meta prov">Trash drop · per Wowhead BiS guide</span></li>
@@ -849,11 +848,8 @@ taintHit(); /* after motion is decided, so the K10 tint eases in with motion on 
 setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
 })();
 </script>
-<!-- the Gear tab: real data, shared rules, the page wrapper (buttons and view switch), then the two views -->
 <script src="gear-data.js"></script>
 <script src="gear-common.js"></script>
-<script src="gear-planner.js"></script>
-<script src="gear-b.js"></script>
 <script src="gear-c.js"></script>
 </body>
 </html>

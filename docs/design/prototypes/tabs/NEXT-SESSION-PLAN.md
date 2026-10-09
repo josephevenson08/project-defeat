@@ -1,6 +1,32 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-08): start here
+## ▶ Where we left off (2026-10-09): start here
+
+**The Character Planner's Gear tab is decided and built.** The owner picked B, the character sheet, with C's
+checklist as a second view, "What's left". It is now the Gear tab of `planner.html`.
+- A, B and C stay as reference pages, and the gallery shows them under "Gear designs".
+- Every check passes: `checks/gear-handson.mjs p` at 1280px, at 400px and with reduced motion, and `check-bg.mjs` for all seven tabs.
+- Full details are in [`README.md`](README.md#character-planner-the-gear-tab-2026-10-09).
+
+**Also done today:**
+- The pointer parallax is off below 700px on every tab. It caused a 1px sideways scroll with a mouse.
+- The gallery loads its live 3D previews only near the screen, which stops the browser from running out of 3D contexts.
+
+**Next:**
+1. **The Step 2 walkthrough continues with the Character Planner's Compare sub-tab:** three designs, then the owner picks. After that come Talents, Buffs, Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions waits until later.
+   - The new Gear tab already holds the equipped gear, in `gear-common.js`'s shared store.
+   - Compare and Ranked Gear could read it instead of the hidden legacy list. Worth doing as part of their designs.
+2. **The fix-it tasks** (see the list further down).
+3. **Open question:** should the text accents follow each tab's colour, as Raid Composition's gold does?
+
+**Offered, not yet answered: Obsidian notes for the newer work.** The owner asked on 2026-10-08 whether the vault (`brain/`) is up to date. Running `npm run brain` changed nothing: it matches the code. It has no notes on the design prototypes, the UI refresh plan or the Discord bot plan, though. Add those (with the brain-sync skill) if the owner wants them.
+
+**Waiting on the owner's go-ahead: publish the prototypes on GitHub Pages.**
+- **Today:** the live site (`josephevenson08.github.io/project-defeat/`) is only the real app, which is unchanged since 2026-09-30. The prototypes aren't published, and github.com shows them as code.
+- **The idea:** have the deploy build copy `docs/design/prototypes/` to `/prototypes/`, and point the prototypes' icon path at the site's own `/icons/` instead of `../../../../public/icons/`.
+- **Status:** the owner asked to wait (2026-10-08). Plan it and get approval before changing the build.
+
+## Where we left off (2026-10-08)
 
 **Done on 2026-10-08:**
 - **Raid Composition** is dark, adds players from a click-to-fill palette of spec icons, and names them with a pencil. See the [README](README.md#raid-composition-the-planning-table-2026-10-07).

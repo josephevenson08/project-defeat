@@ -11,6 +11,11 @@ begin work; the rest is the record of how each decision was reached, newest firs
 
 ## Where this is right now (2026-10-08, latest — READ THIS FIRST)
 
+> **2026-10-09: the Character Planner's Gear tab is decided.**
+> - The owner picked design B, the character sheet, with C's checklist added as "What's left". It is built into `tabs/planner.html` and every check passes.
+> - The A, B and C pages stay as references in the gallery.
+> - Next is the planner's Compare sub-tab, the next Step 2 walkthrough step. See the top of `tabs/NEXT-SESSION-PLAN.md`.
+>
 > **2026-10-08: Raid Composition, the tab curtain and the gallery are done.**
 > - Raid Composition is dark like the other tabs, over the white-gold water, with one light per group that brightens as the group's buffs are covered. A click-to-fill palette of spec icons fills group 1 first, and a pencil names players.
 > - The full-screen curtain between tabs is removed at the owner's request; tab links are plain links.

@@ -85,11 +85,12 @@
   <header>
     <span class="eyebrow">Design study · Oct 2026</span>
     <h1>What Project Defeat could look like</h1>
-    <p>Clickable prototypes of the whole site, on the app's real data. The current version of every tab comes first, then the designs that were tried and dropped, then the rounds that led here, newest first. They are mockups, not the live app.</p>
+    <p>Clickable prototypes of the whole site, on the app's real data. The current version of every tab comes first, then the Step 2 designs behind each decision, including the ones that were dropped, then the rounds that led here, newest first. They are mockups, not the live app.</p>
   </header>
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#gear">Gear designs</a>
     <a href="#dropped">Tried and dropped</a>
     <a href="#round-4">Round 4: the chosen direction</a>
     <a href="#round-3">Round 3: 3D, motion, neumorphism</a>
@@ -111,7 +112,7 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/planner.html" title="Preview of Character Planner" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data: Gear, Compare, Talents, Buffs, Ranked Gear and Build. Deep sea blue, with slow rising bubbles.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data. Gear is a character sheet with game-style tooltips and a "What's left" checklist with one-press fixes and where each upgrade drops. Deep sea blue, with slow rising bubbles.</p></div>
       <a class="open" href="tabs/planner.html">Open Character Planner <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
@@ -138,6 +139,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="gear">
+    <span class="eyebrow">Step 2 · Character Planner · Gear · decided 2026-10-09</span>
+    <h2 class="subhead">Gear: the character sheet, with the checklist</h2>
+    <p>The owner picked B, the character sheet, with C's checklist as a second view, "What's left". Together they are now the Gear tab of the Character Planner above, sharing one character, so a fix made in the checklist shows on the sheet. The three designs stay here for reference. Each is the whole planner with only its Gear tab, on real Phase 2 data and the item icons the app already ships.</p>
+  </header>
+  <section aria-label="Gear designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/gear-a.html#gearui" title="Preview of List and side pane" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Gear A · List and side pane</h2></div><p>Two columns of slots with icon, item level, enchant, gems and rank. Click a slot and a pane opens beside the list with that slot's ranked items to click, its enchants and its gems. The closest to the live app.</p></div>
+      <a class="open" href="tabs/gear-a.html">Open Gear A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/gear-b.html#gearui" title="Preview of Character sheet" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Gear B · Character sheet</h2></div><p>Laid out like the in-game character window: armour on the left, the rest on the right, weapons along the bottom, the gear's stats in the middle. Hover for a game-style tooltip; click to swap from a flyout of icons.</p></div>
+      <a class="open" href="tabs/gear-b.html">Open Gear B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/gear-c.html#gearui" title="Preview of Upgrade checklist" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">MERGED IN</span><h2>Gear C · Upgrade checklist</h2></div><p>What's done and what's left: every slot marked best in slot, upgrade (and which boss drops it), missing enchant or empty socket, each with a one-press fix. 'Where it drops' groups the upgrades by raid and boss.</p></div>
+      <a class="open" href="tabs/gear-c.html">Open Gear C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 
@@ -295,6 +319,16 @@
     });
   }
 
+  // Each live preview is a whole page with its own 3D scene, and a browser keeps only about sixteen 3D (WebGL) contexts
+  // alive; past that, older scenes are dropped mid-render. So a preview loads when it comes near the screen and is
+  // unloaded again once it is well away from it, which keeps only a handful running at a time.
+  const frames = [...document.querySelectorAll('.thumb iframe')];
+  frames.forEach((f) => { f.dataset.src = f.getAttribute('src'); f.removeAttribute('loading'); f.src = 'about:blank'; });
+  const io = new IntersectionObserver((entries) => entries.forEach(({ target: f, isIntersecting }) => {
+    if (isIntersecting && f.dataset.live !== '1') { f.dataset.live = '1'; f.src = f.dataset.src; }
+    else if (!isIntersecting && f.dataset.live === '1') { f.dataset.live = '0'; f.src = 'about:blank'; }
+  }), { rootMargin: '400px 0px' });
+  frames.forEach((f) => io.observe(f));
   // Scale each 1280×800 preview to its card width.
   const fit = () => document.querySelectorAll('.thumb').forEach((thumb) => {
     const frame = thumb.querySelector('iframe');
