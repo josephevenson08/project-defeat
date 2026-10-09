@@ -10,6 +10,9 @@ const { chromium } = createRequire(path.resolve("package.json"))("playwright");
 const k = (process.argv[2] || "a").toLowerCase(), WIDTH = +(process.env.WIDTH || 1280);
 const b = await chromium.launch({ channel: "msedge", args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const ctx = await b.newContext({ viewport: { width: WIDTH, height: WIDTH < 700 ? 860 : 900 }, reducedMotion: process.env.RM ? "reduce" : "no-preference" });
+/* the planner's Buffs tab fills the example 25-man raid on a first visit, and that raid's Balance Druid lowers the hit cap
+   to 48; this test checks its own numbers against the example buff setup (cap 95), so the Buffs tab starts "by hand" */
+await ctx.addInitScript(() => { try { if (!sessionStorage.getItem("pd-buffs-c")) sessionStorage.setItem("pd-buffs-c", JSON.stringify({ src: "hand", seat: null, edits: 0 })); } catch (e) {} });
 const p = await ctx.newPage();
 const errs = []; p.on("pageerror", e => errs.push("pageerror: " + e.message)); p.on("console", m => { if (m.type() === "error" && !/WebGL/.test(m.text())) errs.push("console: " + m.text()); });
 p.setDefaultTimeout(4000); p.setDefaultNavigationTimeout(30000);

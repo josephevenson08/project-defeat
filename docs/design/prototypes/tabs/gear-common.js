@@ -17,7 +17,9 @@ const ICON_DIR="../../../../public/icons/";
    Past the cap extra hit isn't wasted for a dual-wielder: it still stops white swings missing. Raid help (Improved
    Faerie Fire, a Draenei's Heroic Presence) would lower the cap further; the Buffs tab doesn't feed it yet. */
 const precisionRank=()=>{const T=window.TalentKit;return T&&T.precision?T.precision():0;};
-const hitCap=()=>Math.ceil((9-precisionRank())*15.7692);
+/* Improved Faerie Fire on the boss (the Buffs tab, buff-common.js) is +3% hit for melee and ranged attacks */
+const buffHitPct=()=>{const B=window.BuffKit;return B&&B.hitPct?B.hitPct():0;};
+const hitCap=()=>Math.ceil(Math.max(0,9-precisionRank()-buffHitPct())*15.7692);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const SLOTS=D.slots, SLOT=Object.fromEntries(SLOTS.map(s=>[s.key,s]));
@@ -97,16 +99,18 @@ const filledCount=st=>SLOTS.filter(({key})=>st[key]&&st[key].item).length;
 
 /* the stat bar's hit row follows the gear (the other stat-bar numbers stay as imported) */
 function updateHit(st){
-  const hit=totals(st).Hit,row=document.getElementById("hitwarn"),cap=hitCap(),prec=precisionRank();
+  const hit=totals(st).Hit,row=document.getElementById("hitwarn"),cap=hitCap(),prec=precisionRank(),ff=buffHitPct();
+  const parts=[prec?`${prec}% of it from Precision`:"",ff?`${ff}% from Improved Faerie Fire`:""].filter(Boolean);
   if(row){const b=row.querySelector("b"),spans=row.querySelectorAll("span");
     const diff=hit-cap,txt=diff<0?`${-diff} under`:diff>0?`${diff} over`:"exactly at the cap";
-    if(spans[0])spans[0].textContent=prec?`Hit cap for special attacks (9%, ${prec}% of it from Precision)`:"Hit cap for special attacks (9%)";
+    if(spans[0])spans[0].textContent=`Hit cap for special attacks (9%${parts.length?", "+parts.join(", "):""})`;
     if(spans[1])spans[1].innerHTML=`<b>${hit} / ${cap}</b> rating · ${txt}`;else if(b)b.textContent=`${hit} / ${cap}`;}
   const g=document.querySelector(".statbar .gauge");
   if(g){g.setAttribute("aria-label",`Hit rating ${hit} of ${cap}`);const i=g.querySelector("i");if(i)i.style.width=Math.min(100,hit/cap*100).toFixed(1)+"%";}
   const K=window.TBCKit;if(K&&row)K.taint(row,hit<cap);
   const note=document.getElementById("statnote");
-  if(note)note.textContent=`Hit rating follows the gear below (gear, gems and enchants). The cap follows Precision in the Talents tab: ${cap} rating ${prec?`with ${prec}/3`:"without it"}. Past the cap, extra hit still stops white swings missing. The other stats are from your import, 28 Sep.`;
+  const less=[prec?`${prec}% from Precision (Talents tab)`:"",ff?`${ff}% from Improved Faerie Fire (Buffs tab)`:""].filter(Boolean);
+  if(note)note.textContent=`Hit rating follows the gear below (gear, gems and enchants). The cap is ${cap} rating: 9% hit${less.length?`, less ${less.join(" and ")}`:""}. Past the cap, extra hit still stops white swings missing. The other stats are from your import, 28 Sep.`;
   const setEl=document.querySelector(".charline .who .prov .q-epic");
   if(setEl){const n=setCounts(st)["destroyer-battlegear"]||0;setEl.textContent=`Destroyer Battlegear (${n}/5)`;}
   return hit;

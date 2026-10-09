@@ -1,6 +1,20 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-09, evening): start here
+## ▶ Where we left off (2026-10-09, night): start here
+
+**The Buffs tab is decided and built into `planner.html`:** design C, from your raid, with design A's icon tiles. Waiting on the owner's go-ahead to commit.
+- **A · Buff bar** (`buffs-a.html`): icons you click on and off, a row of Paladins with their Blessings, and four consumable slots.
+- **B · What it adds up to** (`buffs-b.html`): switches beside a running total (attack power, crit, haste, the boss's armor, the hit cap).
+- **C · From your raid** (`buffs-c.html`): pick the raid and your seat; every buff says who brings it or what's missing.
+- The gallery shows the decision. Every check passes; details are in [`README.md`](README.md#character-planner-the-buffs-tab-2026-10-09).
+- A fresh planner now opens at 140 / 48: the example 25-man raid's Balance Druid brings Improved Faerie Fire.
+- **The owner's rules, built into all three:**
+  - Heroism is raid-wide (Anniversary patch 2.5.5).
+  - Shamans bring totems by spec.
+  - Each Paladin is assigned a Blessing on this screen.
+- **Next: the live-app fixes,** now nine (see the README's data corrections). The Raid Composition prototype also needs the three reach and totem fixes.
+
+## Where we left off (2026-10-09, evening)
 
 **The Talents tab is decided and built into `planner.html`:** design A, the talent window, with design C's "What's off" list (one-press fixes and "Show where").
 - The three design pages stay as references, and the gallery shows the decision.
@@ -15,7 +29,12 @@
 1. **The Step 2 walkthrough continues with the planner's Buffs sub-tab:** three designs, then the owner picks. Then Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
    - Same pattern: copy `make-talent-pages.mjs` and `checks/talents-handson.mjs`.
    - Buffs could feed the hit cap too: Improved Faerie Fire and a Draenei's Heroic Presence each lower it.
-2. **The other open questions** further down (text accents, the gallery always dark, GitHub Pages, Obsidian notes).
+2. **The owner's answers (2026-10-09), to do after the Buffs design:**
+   - **The five live-app fixes:** start them once the Buffs tab is done.
+   - **Text accents follow each tab's colour:** yes.
+   - **The gallery is always dark:** yes.
+   - **Publish the prototypes on GitHub Pages:** yes. Plan the build change first and show the plan.
+   - **Obsidian notes on the prototype work:** yes, with the brain-sync skill.
 3. **The fix-it tasks in the live app** now number five. The two talent ones:
    - The stored presets skip Enrage and the filler points, so they break the game's row rules (it's not just Flurry).
    - `canRemovePoint` lets a point out from under a deeper talent.

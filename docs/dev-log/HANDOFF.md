@@ -10,7 +10,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ---
 
-## Where this is right now (2026-10-09, evening — READ THIS FIRST)
+## Where this is right now (2026-10-09, night — READ THIS FIRST)
 
 ### In short
 
@@ -18,7 +18,29 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Everything is committed and pushed
+### The Buffs tab is decided and built (waiting to be committed)
+
+The owner picked Buffs design C (from your raid) with design A's icon tiles on 2026-10-09. It is built into
+`planner.html`, every check passes, and the gallery shows the decision. Nothing from the Buffs step is committed: the last
+commit on `main` is `ffc2e21`. Ask the owner before committing. A fresh planner opens at 140 / 48, because the
+example raid's Balance Druid brings Improved Faerie Fire. The step also
+changed `gear-common.js`: the hit cap now takes Improved Faerie Fire off as well as Precision.
+
+**The owner's rules from this step (2026-10-09):**
+- Heroism/Bloodlust is raid-wide (Anniversary patch 2.5.5).
+- Shamans bring totems by spec (Enhancement: Strength of Earth, Grace of Air, Windfury).
+- Paladins are assigned a Blessing each on the Buffs screen.
+
+**After Buffs, in order:**
+1. The live-app fixes.
+2. Text accents follow each tab's colour.
+3. The gallery always dark.
+4. The prototypes on GitHub Pages (plan the build change first).
+5. Obsidian notes on the prototype work.
+
+The owner said yes to all of these on 2026-10-09.
+
+### Before that: the Talents tab (committed and pushed)
 
 The owner picked Talents design A (the talent window) with design C's "What's off" list, on 2026-10-09. It is built into
 `planner.html`, every check passes, and the gallery shows the decision. It is committed and pushed: the work commit is
@@ -39,7 +61,7 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 | Tab | Page | State |
 | --- | --- | --- |
 | Home | `home.html` | Original teal crystal over water. The Dark Portal designs were dropped. A soft crystal swell plays once per session. |
-| Character Planner | `planner.html` | Deep sea blue. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. The hit cap follows its Precision (95 at 3/3). Buffs, Ranked Gear and Build are still the Step 1 baseline: **next**. |
+| Character Planner | `planner.html` | Deep sea blue. **Buffs (decided 2026-10-09):** design C, from your raid, with design A's icons; a Blessing per Paladin. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. The hit cap follows its Precision (95 at 3/3). Buffs, Ranked Gear and Build are still the Step 1 baseline: **next**. |
 | Simulation | `simulation.html` | Gold over violet. Step 1 baseline (later in the walkthrough). |
 | Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
 | Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline. |
@@ -51,8 +73,8 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 
 ### Next, in order
 
-1. **The Character Planner's Buffs sub-tab:** three designs, the owner picks, then build the pick into `planner.html`. After it come Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
-2. **Five small fixes in the real app** (`src/`), offered as separate tasks:
+1. **The live-app fixes,** then the other answered items (above), then Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+2. **Nine small fixes in the real app** (`src/`). The four from the Buffs step are in `tabs/README.md` under "Data corrections". The rest, offered as separate tasks:
    - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
    - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points and takes Flurry without Enrage. It also skips the filler points that open its deeper rows, and so does the Arms preset: wowsims lists only the talents its simulator reads.
    - `canRemovePoint` in `talentTypes.ts` counts all points in the tree, so it lets a point out from under a deeper talent. With 41 in Fury, Cruelty can drop while Rampage stays.

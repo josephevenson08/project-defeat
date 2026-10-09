@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Project Defeat · Character Planner</title>
+<title>Project Defeat · Character Planner · Buffs C</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -160,6 +160,16 @@ td.d-up{color:var(--tier-b)} td.d-dn{color:var(--tier-s)} td.d-eq{color:var(--in
 .score .bar{height:8px;background:var(--rim-2);border-radius:4px;overflow:hidden}
 .score .bar i{display:block;height:100%;background:var(--glow);transform-origin:left;border-radius:4px}
 .score .bar.b i{background:var(--q-epic)}
+/* buffs */
+.bgrid{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:760px){.bgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1100px){.bgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+fieldset.bset{margin:0;border:1px solid var(--rim-2);border-radius:10px;background:var(--scrim);padding:8px 12px 10px;min-width:0}
+fieldset.bset legend{font:400 var(--t-md) var(--f-head);padding:0 6px}
+.bopt{display:grid;grid-template-columns:18px 1fr;gap:2px 8px;align-items:start;padding:5px 0;border-top:1px solid var(--rim-2);font-size:var(--t-sm);cursor:pointer}
+.bopt:first-of-type{border-top:0}
+.bopt input{margin:3px 0 0;accent-color:var(--glow)}
+.bopt small{grid-column:2;color:var(--ink-3);font-size:var(--t-xs)}
 /* ranked gear */
 ol.rank{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
 ol.rank li{display:grid;grid-template-columns:30px 1fr;gap:2px 10px;align-items:center;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;padding:7px 10px;font-size:var(--t-sm)}
@@ -181,11 +191,11 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.layer{transform:none!important}}
 /* Row highlight (owner review 2026-10-04): the row under the pointer, or holding keyboard focus,
    lifts out of the list with a brighter ground and an accent edge. */
-.gear li,.rank li,tbody tr{transition:background-color .15s ease,box-shadow .15s ease,border-color .15s ease}
-.gear li:hover,.gear li:focus-within,.rank li:hover,.rank li:focus-within{
+.gear li,.rank li,.bopt,tbody tr{transition:background-color .15s ease,box-shadow .15s ease,border-color .15s ease}
+.gear li:hover,.gear li:focus-within,.rank li:hover,.rank li:focus-within,.bopt:hover,.bopt:focus-within{
   background:rgba(79,216,200,.10);border-color:var(--glow);box-shadow:inset 3px 0 0 var(--glow),0 0 14px rgba(79,216,200,.12)}
 tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:inset 3px 0 0 var(--glow)}
-@media (prefers-reduced-motion:reduce){.gear li,.rank li,tbody tr{transition:none}}
+@media (prefers-reduced-motion:reduce){.gear li,.rank li,.bopt,tbody tr{transition:none}}
 </style>
 </head>
 <body>
@@ -193,7 +203,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Character Planner. Gear is design B, the character sheet, with design C's checklist (picked 2026-10-09); Compare is design A, side-by-side tooltips, with design B's summary (picked 2026-10-09); Talents is design A, the talent window, with design C's "What's off" list (picked 2026-10-09); Buffs is design C, from your raid, with design A's icons (picked 2026-10-09). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Character Planner · Buffs design C: From your raid. Improved Faerie Fire moves the stat bar's hit cap. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -284,7 +294,7 @@ tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:
     </div>
 
     <div class="panel" id="p-buffs" role="tabpanel" aria-labelledby="t-buffs">
-      <div id="bufui"><p class="prov">The Buffs tab needs JavaScript.</p></div>
+      <div id="bufui"><p class="prov">The buffs design needs JavaScript.</p></div>
     </div>
 
     <div class="panel" id="p-ranked" role="tabpanel" aria-labelledby="t-ranked">
@@ -453,7 +463,7 @@ size();still();
 </script>
 <script src="tbc-kit.js"></script>
 <script>
-/* Planner page script: sub-tabs, compare, ranked gear, build; then the motion layer.
+/* Planner page script: sub-tabs, compare, buffs, ranked gear, build; then the motion layer.
    Every lookup is guarded, so a missing element or library leaves the static page in place. */
 (function(){
 "use strict";
@@ -560,6 +570,14 @@ function renderCompare(slot){
 const cmpslot=$("#cmpslot");
 on(cmpslot,"change",()=>{renderCompare(cmpslot.value);say(live,"Comparing "+cmpslot.value);});
 if(cmpslot)renderCompare(cmpslot.value);
+
+/* ---------- buffs: a running count of what is applied ---------- */
+function countBuffs(){
+  const sets=$$("#buffs fieldset"),n=sets.map(f=>$$("input:checked",f).length);
+  if(sets.length===3)say($("#bcount"),`${n[0]} raid buffs · ${n[1]} debuffs · ${n[2]} consumables applied`);
+}
+$$("#buffs input").forEach(i=>on(i,"change",countBuffs));
+countBuffs();
 
 /* ---------- ranked gear: slot picker re-renders the real list ---------- */
 const rlist=$("#rlist"),rpick=$("#rpick");
@@ -716,7 +734,7 @@ taintHit(); /* after motion is decided, so the K10 tint eases in with motion on 
 setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
 })();
 </script>
-<!-- the talent build and the buffs first: the stat bar's hit cap follows Precision and Improved Faerie Fire -->
+<!-- the talent build first: the stat bar's hit cap follows its Precision rank -->
 <script src="talent-data.js"></script>
 <script src="talent-common.js"></script>
 <script src="buff-data.js"></script>
@@ -734,8 +752,6 @@ setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach
 <!-- the Talents tab: design A (the talent window) with design C's "What's off" list, over the shared build that the hit cap reads -->
 <script>window.TALENTS_IN_PLANNER=true;</script>
 <script src="talents-a.js"></script>
-<!-- the Buffs tab: design C (from your raid) with design A's icon tiles, and a Blessing for each Paladin -->
-<script>window.BUFFS_IN_PLANNER="c";</script>
 <script src="buffs-c.js"></script>
 </body>
 </html>
