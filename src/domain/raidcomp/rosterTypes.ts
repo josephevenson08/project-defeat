@@ -53,8 +53,8 @@ export const PARTY_SIZE = 5
 /**
  * A planned raid, as groups rather than a flat list.
  *
- * **The group structure is not presentation, it is the model.** 24 of the 33 raid buffs are
- * party-scoped in TBC — every totem, every aura, both shouts — so which group a Shaman sits in
+ * **The group structure is not presentation, it is the model.** Most raid buffs reach only the
+ * caster's group in TBC — every totem, every aura, both shouts — so which group a Shaman sits in
  * decides who actually gets Strength of Earth. A flat roster cannot answer the question the tool
  * exists to answer, which is why this changed shape once the scopes were sourced.
  *

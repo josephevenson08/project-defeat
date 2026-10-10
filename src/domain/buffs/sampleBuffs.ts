@@ -2,7 +2,8 @@ import { RATING_PER_PERCENT } from '../simulation/combatConstants'
 import type { Buff } from './buffTypes'
 
 /**
- * The thirty-three raid buffs of TBC Phase 2.
+ * The raid buffs of TBC Phase 2: thirty-two, after Tranquil Air Totem was taken out on 2026-10-09 (no
+ * Shaman spec runs it in a raid, the owner's call).
  *
  * Every number below was read by hand off the Wowhead tooltip of the spell rank named in `spellId`,
  * then cross-checked against wowsims/tbc `sim/core/buffs.go` @3301fca5 — the same commit the item,
@@ -17,6 +18,12 @@ import type { Buff } from './buffTypes'
  * page first, which carries rank, level and required class — enough to pick the max rank a raid
  * actually uses and to reject the NPC copies that made id selection ambiguous before.
  *
+ * **Shaman totems come from the spec that runs them** (the owner's call, 2026-10-09). Any Shaman can
+ * drop any of these, but a raid gets Strength of Earth, Grace of Air and Windfury from the
+ * Enhancement Shaman in a melee group, Totem of Wrath and Wrath of Air from the Elemental, and Mana
+ * Spring and Mana Tide from the Restoration Shaman. An Enhancement Shaman keeps both air totems up by
+ * twisting them, which is why Windfury and Grace of Air are credited together.
+ *
  * **Where the two sources disagree, the tooltip wins.** wowsims models Blessing of Wisdom at 42 mp5;
  * spells 27142 and 27143 both say "restoring 41 mana every 5 seconds". 41 is used here. That is the
  * only outright conflict — everything else agreed to the digit.
@@ -25,7 +32,7 @@ import type { Buff } from './buffTypes'
  * cited. Where a talent or an idol raises it, the improved value is named in `notes` and attributed,
  * rather than being silently baked into a number nobody can check.
  *
- * **Fifteen of the thirty-three carry `notModelled` instead of stats** — threat, maximum health,
+ * **Some carry `notModelled` instead of stats** (`unmodelledBuffs` counts them) — threat, maximum health,
  * resistances, damage multipliers, weapon procs and timed cooldowns have nowhere to go in
  * `StatBlock`. They are listed anyway, with their real effect, because a raid planner that silently
  * omits Bloodlust reads as an oversight rather than a stated limit.
@@ -269,6 +276,7 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'strength-of-earth-totem',
     name: 'Strength of Earth Totem',
     providedByClass: 'Shaman',
+    providedBySpec: 'Enhancement',
     spellId: 25528,
     roles: ['Physical DPS', 'Tank'],
     stats: { strength: 86 },
@@ -279,6 +287,7 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'grace-of-air-totem',
     name: 'Grace of Air Totem',
     providedByClass: 'Shaman',
+    providedBySpec: 'Enhancement',
     spellId: 25359,
     roles: ['Physical DPS'],
     stats: { agility: 77 },
@@ -289,6 +298,7 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'mana-spring-totem',
     name: 'Mana Spring Totem',
     providedByClass: 'Shaman',
+    providedBySpec: 'Restoration',
     spellId: 25570,
     roles: ['Caster DPS', 'Healer'],
     stats: { mp5: 50 },
@@ -313,6 +323,7 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'wrath-of-air-totem',
     name: 'Wrath of Air Totem',
     providedByClass: 'Shaman',
+    providedBySpec: 'Elemental',
     spellId: 3738,
     roles: ['Caster DPS', 'Healer'],
     stats: { spellPower: 101 },
@@ -323,6 +334,7 @@ export const sampleBuffs: readonly Buff[] = [
     id: 'windfury-totem',
     name: 'Windfury Totem',
     providedByClass: 'Shaman',
+    providedBySpec: 'Enhancement',
     spellId: 25587,
     roles: ['Physical DPS'],
     notModelled:
@@ -337,15 +349,6 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Caster DPS', 'Healer'],
     notModelled:
       'Restores 6% of total mana every 3 seconds for 12 sec — 24% in total — on a 5 min cooldown. A timed mana cooldown, and this simulator does not model mana as a constraint.',
-  },
-  {
-    id: 'tranquil-air-totem',
-    name: 'Tranquil Air Totem',
-    providedByClass: 'Shaman',
-    spellId: 25908,
-    roles: ['Physical DPS', 'Caster DPS', 'Healer'],
-    notModelled:
-      'Reduces the threat caused by all party members within 20 yards by 20%. This simulator does not model threat. Shares the air totem slot with Wrath of Air and Grace of Air.',
   },
   {
     id: 'unleashed-rage',

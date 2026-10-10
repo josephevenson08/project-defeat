@@ -59,14 +59,17 @@ export const exclusiveGroups: readonly ExclusiveGroup[] = [
     label: 'Air totem',
     /*
      * Windfury first: it is the reason a melee group wants a Shaman at all. Wrath of Air next, for
-     * the caster groups. Grace of Air is the fallback where neither applies, and Tranquil Air is a
-     * threat tool a raid almost never gives up a slot for.
+     * the caster groups. Grace of Air is the fallback where neither applies. Tranquil Air was in this
+     * list until 2026-10-09, when it left the buffs: no spec runs it in a raid.
+     *
+     * The slot is a game rule, but an Enhancement Shaman keeps Windfury and Grace of Air both up by
+     * twisting the two totems, and `sampleBuffs` credits both to that spec for that reason.
      *
      * That order is a convention; the *slot* is not. Which is why this is a game rule with a
      * conventional priority, exactly like the Blessings — and why a raid leader can override it per
      * Shaman rather than argue with the list.
      */
-    buffIds: ['windfury-totem', 'wrath-of-air-totem', 'grace-of-air-totem', 'tranquil-air-totem'],
+    buffIds: ['windfury-totem', 'wrath-of-air-totem', 'grace-of-air-totem'],
     basis: 'game rule',
     evidence:
       "A Shaman may have one totem of each element active at a time, and all four of these are Air. wowsims encodes it as a single-valued AirTotem enum at the pinned commit — NoAirTotem, GraceOfAirTotem, TranquilAirTotem, WindfuryTotem, WrathOfAirTotem — and Tranquil Air's own tooltip says it \"shares the air totem slot\".",

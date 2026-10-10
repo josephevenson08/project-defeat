@@ -21,15 +21,43 @@
 // the repo owner's call on 2026-08-27. The generated file records which specs are sourced so the
 // calibration table can say so rather than mixing two methodologies silently.
 //
+// **They are simulator presets, not builds you could put in the game.** wowsims lists only the talents
+// its simulator reads, so every preset leaves out the filler points that open its deeper rows (and
+// Fury leaves out Enrage, which Flurry needs). Each build records `legal` and its `gaps`, read with the
+// app's own rules (`ruleBreaks` in talentTypes.ts), rather than being filled in: filling them would
+// mean choosing talents upstream never chose. The repo owner's call on 2026-10-09.
+//
 // Run: node tools/ingest/ingest-talent-builds.mjs [--refetch]
 // Writes: src/domain/talents/talentBuilds.json
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
+/* talentTypes.ts imports nothing, so node can load it directly, stripping its types */
+const { ruleBreaks } = await import(pathToFileURL(resolve(REPO, 'src/domain/talents/talentTypes.ts')).href)
+
+/** A build's rule breaks, in words: one line per missing prerequisite, one per tree short of points. */
+function gapsOf(trees, points) {
+  const breaks = ruleBreaks(trees, points)
+  const lines = breaks
+    .filter((b) => b.kind === 'prerequisite')
+    .map((b) => `${b.talent} needs ${b.needs} at ${b.rank}/${b.max}; it has ${b.has}.`)
+  for (const tree of trees) {
+    const rows = breaks.filter((b) => b.kind === 'row' && b.tree === tree.spec)
+    if (rows.length === 0) continue
+    const first = Math.min(...rows.map((b) => b.row))
+    const last = Math.max(...rows.map((b) => b.row))
+    const short = Math.max(...rows.map((b) => b.needs - b.has))
+    const names = [...new Set(rows.map((b) => b.talent))]
+    const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]
+    const above = first - 1 > 1 ? `rows 1-${first - 1}` : 'row 1'
+    lines.push(`${tree.spec} is ${short} point${short > 1 ? 's' : ''} short in ${above}: ${list} ${names.length > 1 ? 'sit' : 'sits'} in row${last > first ? `s ${first}-${last}` : ` ${first}`} without enough points above.`)
+  }
+  return lines
+}
 const CACHE = resolve(HERE, '.cache/talent-builds')
 const UPSTREAM_SHA = '3301fca59306a747e521274c36e073e69acc7b77'
 const refetch = process.argv.includes('--refetch')
@@ -162,7 +190,8 @@ for (const entry of BUILDS) {
 
   // A level-70 character has 61 points. More than that means the block was parsed wrong.
   if (spent > 61) failures.push(`${entry.className} ${entry.spec}: ${spent} points spent, over the 61 cap`)
-  builds.push({ ...entry, pointsSpent: spent, points })
+  const gaps = gapsOf(tree.trees, points)
+  builds.push({ ...entry, pointsSpent: spent, legal: gaps.length === 0, gaps, points })
 }
 
 if (failures.length > 0) {
@@ -175,12 +204,15 @@ const out = {
   $schema: 'wowsims talent-build extraction',
   upstream: { repo: 'wowsims/tbc', sha: UPSTREAM_SHA },
   generatedBy: 'tools/ingest/ingest-talent-builds.mjs',
+  note: 'Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps.',
   buildCount: builds.length,
-  builds: builds.map(({ className, spec, path, variable, pointsSpent, points }) => ({
+  builds: builds.map(({ className, spec, path, variable, pointsSpent, legal, gaps, points }) => ({
     className,
     spec,
     source: `${path}:${variable}`,
     pointsSpent,
+    legal,
+    gaps,
     points,
   })),
   unsourced: UNSOURCED,
@@ -197,7 +229,7 @@ if (previous === next) {
 }
 
 for (const b of builds) {
-  console.log(`  ${b.className.padEnd(8)} ${b.spec.padEnd(14)} ${String(b.pointsSpent).padStart(2)} points`)
+  console.log(`  ${b.className.padEnd(8)} ${b.spec.padEnd(14)} ${String(b.pointsSpent).padStart(2)} points${b.legal ? '' : `, ${b.gaps.length} gap${b.gaps.length > 1 ? 's' : ''}`}`)
 }
 if (clamped.length > 0) {
   console.log(`

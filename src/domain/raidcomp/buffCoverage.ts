@@ -95,8 +95,8 @@ export type CoverageReport = {
 /**
  * What a roster is missing, phrased as something to go and find.
  *
- * A class-wide buff says "any" because that is the useful distinction — any Shaman brings Strength of
- * Earth, but only an Elemental one brings Totem of Wrath.
+ * A class-wide buff says "any" because that is the useful distinction — any Shaman brings Heroism, but
+ * only an Enhancement one brings Strength of Earth.
  */
 function describeNeed(provider: BuffProvider): string {
   const who = describeProvider(provider)
@@ -168,10 +168,10 @@ function coverageForGroup(group: RaidGroup, groupIndex: number): GroupCoverage {
 /**
  * Buff and debuff coverage for a planned roster, split by how far each buff actually reaches.
  *
- * **Every buff counts here, including the fifteen marked `notModelled`.** That flag means the
+ * **Every buff counts here, including the ones marked `notModelled`.** That flag means the
  * *simulator* cannot express the effect as a stat change; it says nothing about whether the buff
  * matters, and to a raid leader Bloodlust matters enormously. This is the surface where that dataset
- * is worth all 33 entries rather than the 18 `calculateStats` can apply.
+ * is worth every entry rather than only the ones `calculateStats` can apply.
  *
  * Nothing here is invented: the buffs, the debuffs and their scopes are all read from Wowhead spell
  * tooltips, each entry carrying the spell id its numbers came from.

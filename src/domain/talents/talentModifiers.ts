@@ -161,7 +161,7 @@ export type TalentModifiers = {
    * The warlock's demon, which is a **third** actor this record has to reach — after the hunter's pet
    * and the character themselves. Same principle as the `pet*` fields: name the actor, not the effect.
    */
-  /** Multiplies the demon's damage. Soul Link, Unholy Power, Master Demonologist. 1 when untalented. */
+  /** Multiplies the demon's damage. Unholy Power only so far (Soul Link and Master Demonologist are not read). 1 when untalented. */
   demonDamageMultiplier: number
   /** Added to the demon's crit chance, as a fraction. Demonic Tactics, +1% a rank. */
   demonCritChance: number

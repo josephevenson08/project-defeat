@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-09.** A self-contained brief for picking
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-10.** A self-contained brief for picking
 this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The exact
@@ -10,33 +10,68 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ---
 
-## Where this is right now (2026-10-09, night — READ THIS FIRST)
+## Where this is right now (2026-10-10 — READ THIS FIRST)
 
 ### In short
 
-- **The live app** (`src/`) is unchanged since 2026-09-30. It deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/
+- **The live app** (`src/`) changed on 2026-10-09 for the first time since 2026-09-30: the data and rule fixes the prototype work found (below). It deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### The Buffs tab is decided and built (waiting to be committed)
+### The live-app fixes are committed and pushed (2026-10-10)
 
-The owner picked Buffs design C (from your raid) with design A's icon tiles on 2026-10-09. It is built into
-`planner.html`, every check passes, and the gallery shows the decision. Nothing from the Buffs step is committed: the last
-commit on `main` is `ffc2e21`. Ask the owner before committing. A fresh planner opens at 140 / 48, because the
-example raid's Balance Druid brings Improved Faerie Fire. The step also
-changed `gear-common.js`: the hit cap now takes Improved Faerie Fire off as well as Precision.
+All the fixes the prototype work found are in the live app, with tests, and committed and pushed on 2026-10-10 (the
+work commit right after `58652aa`). They are listed in `docs/design/prototypes/tabs/README.md` under "Data
+corrections". In short:
+- **Talents:** `canRemovePoint` follows the game's rule (`pointsAboveRow`), and `ruleBreaks` lists what a build breaks. The 17 stored presets record `legal` and `gaps`. The live app never shows them, so nothing on screen changed.
+- **Text:** the stale Felguard text is fixed, and so are the Soul Link and Master Demonologist comments.
+- **Raid reach** (`buffScope.ts`):
+  - Gift of the Wild, Fortitude, Arcane Brilliance and Prayer of Spirit reach any group (`castOnAnyGroup`).
+  - Heroism is raid-wide (`anniversaryRaidWide`).
+  - Totems come from the Shaman spec (`sampleBuffs.ts`), and Tranquil Air is gone (32 buffs).
+  - The Raid Composition intro computes its count.
+- **Data:** Vashj's helms and Leotheras' tank gloves, the elixir notes (`ingest-consumables.mjs`), and the zone-map credit.
+- **The Raid Composition prototype** has the same reach and totem rules, with an "Any group" tag.
+
+**How it was checked:**
+- **The app's whole Playwright suite: 297 of 297 passed on Edge (2026-10-10).** The first run, on 2026-10-09, failed 4 tests that pinned the old rules: Gift of the Wild in a group row (2), one Shaman listing every air totem, and `features.md`'s 719, now 720. All 4 were updated.
+- `tsc -b`, `npm run lint` and `npm run build` are clean.
+- `rc-handson.mjs a` passes at 1280px and 400px, and `buffs-handson.mjs p` passes (11 of 11).
+
+**To run the app's suite here:** Playwright's own Chromium isn't installed, so run it on Edge with the
+config in the repo: `npx playwright test -c playwright.edge.config.ts`. It takes about 7 minutes on one worker.
+Or install Chromium with `npx playwright install chromium` and run `npm run test`.
+
+**Next, in order** (the owner said yes to all of these on 2026-10-09):
+1. **Text accents follow each tab's colour.** Only three prototype tabs still use Home's teal: the Character
+   Planner, Spec Tier Lists and Professions. Simulation is already gold, Raids already follows the raid, and
+   Raid Composition is gold. Each needs one override of `--glow`, `--glow-ink`, `--glow-soft`, `--rim`, `--rim-2`
+   and `--focus`, taken from its scene colour in `tbc-kit.js` (`EXTRA_HEX` / `AUC`).
+2. **The gallery is always dark:** `../design/prototypes/index.html` lines 11–32. Make the dark values the
+   only ones; nothing on the page switches the theme.
+3. **The prototypes on GitHub Pages:** plan the build change first and show it. The prototypes reach outside
+   their folder only for `../../../../public/icons/` (4 places: `buff-common.js`, `gear-common.js`,
+   `talent-common.js`, `raid-composition.html`); nothing else is root-relative.
+4. **Obsidian notes on the prototype work,** with the brain-sync skill.
+5. **Then the walkthrough:** Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
+
+### Before that: the Buffs tab (committed and pushed, `cd78079`)
+
+The owner picked Buffs design C (from your raid) with design A's icon tiles on 2026-10-09. A fresh planner opens at
+140 / 48, because the example raid's Balance Druid brings Improved Faerie Fire. The step also changed
+`gear-common.js`: the hit cap now takes Improved Faerie Fire off as well as Precision.
 
 **The owner's rules from this step (2026-10-09):**
 - Heroism/Bloodlust is raid-wide (Anniversary patch 2.5.5).
 - Shamans bring totems by spec (Enhancement: Strength of Earth, Grace of Air, Windfury).
 - Paladins are assigned a Blessing each on the Buffs screen.
 
-**After Buffs, in order:**
-1. The live-app fixes.
-2. Text accents follow each tab's colour.
-3. The gallery always dark.
-4. The prototypes on GitHub Pages (plan the build change first).
-5. Obsidian notes on the prototype work.
+**Next, in order:**
+1. Text accents follow each tab's colour.
+2. The gallery always dark.
+3. The prototypes on GitHub Pages (plan the build change first).
+4. Obsidian notes on the prototype work.
+5. Then the walkthrough: Ranked Gear and Build.
 
 The owner said yes to all of these on 2026-10-09.
 
@@ -73,18 +108,18 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 
 ### Next, in order
 
-1. **The live-app fixes,** then the other answered items (above), then Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
-2. **Nine small fixes in the real app** (`src/`). The four from the Buffs step are in `tabs/README.md` under "Data corrections". The rest, offered as separate tasks:
+1. **The answered items** (listed at the top), then Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+2. **The fixes in the real app are done (2026-10-09) and committed (2026-10-10)**. They are listed in `tabs/README.md` under "Data corrections". The ones found earlier were:
    - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
    - The Fury talent preset in `talentBuilds.json` spends 48 of 61 points and takes Flurry without Enrage. It also skips the filler points that open its deeper rows, and so does the Arms preset: wowsims lists only the talents its simulator reads.
    - `canRemovePoint` in `talentTypes.ts` counts all points in the tree, so it lets a point out from under a deeper talent. With 41 in Fury, Cruelty can drop while Rampage stays.
    - Lady Vashj's loot lists Destroyer Greathelm (a tank helm) tagged for DPS.
    - The zone-map credit cites Microsoft's "Game Content Usage Rules".
-3. **Open questions for the owner, asked but not answered yet:**
-   - Should text accents follow each tab's colour, as Raid Composition's gold does? The other tabs are teal.
-   - Should the gallery always be dark?
-   - Should the prototypes be published on GitHub Pages at `/prototypes/`? The owner said to wait, so plan it first.
-   - Should the Obsidian vault get notes on the prototype work and the Discord bot plan?
+3. **The owner's answers (2026-10-09), yes to all four:**
+   - Text accents follow each tab's colour.
+   - The gallery is always dark.
+   - The prototypes go on GitHub Pages at `/prototypes/`; plan the build change first.
+   - The Obsidian vault gets notes on the prototype work.
 
 ### How a walkthrough step is done (the pattern Gear, Compare and Talents followed)
 

@@ -434,7 +434,7 @@
       "extraStats": {
         "Health": 250
       },
-      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+      "notes": "Grants only maximum health, which the stat totals do not yet carry."
     },
     {
       "id": "elixir-of-major-mageblood",
@@ -462,7 +462,7 @@
       "extraStats": {
         "ShadowResistance": 10
       },
-      "notes": "Grants only school-specific spell power, which the stat totals do not yet carry."
+      "notes": "Grants only resistances, which the stat totals do not yet carry."
     }
   ]
 }

@@ -5,6 +5,7 @@
     "sha": "3301fca59306a747e521274c36e073e69acc7b77"
   },
   "generatedBy": "tools/ingest/ingest-talent-builds.mjs",
+  "note": "Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps.",
   "buildCount": 17,
   "builds": [
     {
@@ -12,6 +13,11 @@
       "spec": "Beast Mastery",
       "source": "sim/hunter/presets.go:BMTalents",
       "pointsSpent": 55,
+      "legal": false,
+      "gaps": [
+        "Bestial Wrath needs Intimidation at 1/1; it has 0.",
+        "Beast Mastery is 6 points short in rows 1-2: Unleashed Fury, Ferocity, Bestial Discipline, Animal Handler, Frenzy, Ferocious Inspiration, Bestial Wrath, Serpent's Swiftness and The Beast Within sit in rows 3-9 without enough points above."
+      ],
       "points": {
         "1342": 5,
         "1344": 5,
@@ -37,6 +43,10 @@
       "spec": "Survival",
       "source": "sim/hunter/presets.go:SVTalents",
       "pointsSpent": 56,
+      "legal": false,
+      "gaps": [
+        "Survival is 5 points short in rows 1-2: Clever Traps, Survivalist, Surefooted, Survival Instincts, Killer Instinct, Lightning Reflexes, Thrill of the Hunt, Expose Weakness, Master Tactician and Readiness sit in rows 3-9 without enough points above."
+      ],
       "points": {
         "1301": 3,
         "1303": 5,
@@ -64,6 +74,12 @@
       "spec": "Arms",
       "source": "sim/warrior/dps/presets.go:ArmsSlamTalents",
       "pointsSpent": 53,
+      "legal": false,
+      "gaps": [
+        "Flurry needs Enrage at 5/5; it has 0.",
+        "Arms is 3 points short in rows 1-2: Anger Management, Deep Wounds, Two-Handed Weapon Specialization, Impale, Death Wish, Sword Specialization, Blood Frenzy and Mortal Strike sit in rows 3-7 without enough points above.",
+        "Fury is 5 points short in rows 1-4: Improved Slam, Sweeping Strikes, Weapon Mastery and Flurry sit in rows 5-6 without enough points above."
+      ],
       "points": {
         "121": 3,
         "123": 5,
@@ -91,6 +107,12 @@
       "spec": "Fury",
       "source": "sim/warrior/dps/presets.go:FuryTalents",
       "pointsSpent": 48,
+      "legal": false,
+      "gaps": [
+        "Flurry needs Enrage at 5/5; it has 0.",
+        "Arms is 8 points short in rows 1-2: Anger Management, Deep Wounds and Impale sit in rows 3-4 without enough points above.",
+        "Fury is 2 points short in rows 1-5: Flurry, Precision, Bloodthirst, Improved Whirlwind, Improved Berserker Stance and Rampage sit in rows 6-9 without enough points above."
+      ],
       "points": {
         "121": 3,
         "124": 3,
@@ -115,6 +137,11 @@
       "spec": "Destruction",
       "source": "sim/warlock/presets.go:defaultDestroTalents",
       "pointsSpent": 54,
+      "legal": false,
+      "gaps": [
+        "Demonology is 5 points short in rows 1-2: Fel Stamina, Demonic Aegis and Demonic Sacrifice sit in rows 3-5 without enough points above.",
+        "Destruction is 2 points short in rows 1-4: Improved Immolate, Ruin, Emberstorm, Backlash, Conflagrate and Shadow and Flame sit in rows 5-8 without enough points above."
+      ],
       "points": {
         "943": 5,
         "944": 5,
@@ -140,6 +167,10 @@
       "spec": "Combat",
       "source": "sim/rogue/presets.go:CombatTalents",
       "pointsSpent": 55,
+      "legal": false,
+      "gaps": [
+        "Combat is 6 points short in row 1: Improved Slice and Dice, Precision, Dual Wield Specialization, Blade Flurry, Sword Specialization, Weapon Expertise, Aggression, Vitality, Adrenaline Rush, Combat Potency and Surprise Attacks sit in rows 2-9 without enough points above."
+      ],
       "points": {
         "181": 5,
         "201": 2,
@@ -167,6 +198,10 @@
       "spec": "Assassination",
       "source": "sim/rogue/presets.go:MutilateTalents",
       "pointsSpent": 56,
+      "legal": false,
+      "gaps": [
+        "Combat is 5 points short in row 1: Improved Slice and Dice, Precision and Dual Wield Specialization sit in rows 2-4 without enough points above."
+      ],
       "points": {
         "181": 5,
         "201": 2,
@@ -193,6 +228,11 @@
       "spec": "Subtlety",
       "source": "sim/rogue/presets.go:HemoTalents",
       "pointsSpent": 38,
+      "legal": false,
+      "gaps": [
+        "Combat is 6 points short in row 1: Improved Slice and Dice, Precision, Dual Wield Specialization, Blade Flurry, Sword Specialization, Weapon Expertise, Aggression, Vitality, Adrenaline Rush and Combat Potency sit in rows 2-8 without enough points above.",
+        "Subtlety is 17 points short in rows 1-3: Serrated Blades and Hemorrhage sit in rows 4-5 without enough points above."
+      ],
       "points": {
         "181": 5,
         "201": 2,
@@ -214,6 +254,10 @@
       "spec": "Fire",
       "source": "sim/mage/presets.go:FireTalents",
       "pointsSpent": 57,
+      "legal": false,
+      "gaps": [
+        "Fire is 2 points short in rows 1-3: Improved Scorch, Master of Elements, Playing with Fire, Critical Mass and Blast Wave sit in rows 4-5 without enough points above."
+      ],
       "points": {
         "25": 3,
         "26": 5,
@@ -241,6 +285,11 @@
       "spec": "Frost",
       "source": "sim/mage/presets.go:FrostTalents",
       "pointsSpent": 56,
+      "legal": false,
+      "gaps": [
+        "Arcane is 2 points short in rows 1-3: Arcane Meditation sits in row 4 without enough points above.",
+        "Frost is 2 points short in rows 1-5: Ice Floes, Winter's Chill, Arctic Winds, Empowered Frostbolt and Summon Water Elemental sit in rows 6-9 without enough points above."
+      ],
       "points": {
         "37": 5,
         "61": 3,
@@ -266,6 +315,10 @@
       "spec": "Arcane",
       "source": "sim/mage/presets.go:ArcaneTalents",
       "pointsSpent": 57,
+      "legal": false,
+      "gaps": [
+        "Arcane is 4 points short in rows 1-3: Arcane Meditation, Presence of Mind, Arcane Mind, Arcane Instability, Arcane Potency, Arcane Power, Spell Power and Mind Mastery sit in rows 4-8 without enough points above."
+      ],
       "points": {
         "37": 5,
         "61": 3,
@@ -292,6 +345,10 @@
       "spec": "Balance",
       "source": "sim/druid/balance/presets.go:StandardTalents",
       "pointsSpent": 58,
+      "legal": false,
+      "gaps": [
+        "Balance is 2 points short in rows 1-2: Brambles, Insect Swarm, Vengeance, Lunar Guidance, Nature's Grace and Moonglow sit in rows 3-5 without enough points above."
+      ],
       "points": {
         "762": 5,
         "763": 2,
@@ -320,6 +377,10 @@
       "spec": "Feral",
       "source": "sim/druid/feral/presets.go:StandardTalents",
       "pointsSpent": 52,
+      "legal": false,
+      "gaps": [
+        "Feral is 7 points short in rows 1-2: Sharpened Claws, Shredding Attacks, Predatory Strikes, Primal Fury, Savage Fury, Faerie Fire (Feral), Heart of the Wild, Survival of the Fittest, Leader of the Pack, Improved Leader of the Pack, Predatory Instincts and Mangle sit in rows 3-9 without enough points above."
+      ],
       "points": {
         "796": 5,
         "798": 3,
@@ -346,6 +407,12 @@
       "spec": "Retribution",
       "source": "sim/paladin/retribution/presets.go:defaultRetTalents",
       "pointsSpent": 49,
+      "legal": false,
+      "gaps": [
+        "Fanaticism needs Repentance at 1/1; it has 0.",
+        "Protection is 5 points short in row 1: Precision sits in row 2 without enough points above.",
+        "Retribution is 1 point short in rows 1-4: Two-Handed Weapon Specialization, Sanctity Aura and Improved Sanctity Aura sit in row 5 without enough points above."
+      ],
       "points": {
         "1402": 5,
         "1407": 5,
@@ -370,6 +437,11 @@
       "spec": "Shadow",
       "source": "sim/priest/shadow/presets.go:StandardTalents",
       "pointsSpent": 45,
+      "legal": false,
+      "gaps": [
+        "Discipline is 10 points short in rows 1-2: Inner Focus and Meditation sit in row 3 without enough points above.",
+        "Shadow is 5 points short in row 1: Shadow Affinity, Improved Shadow Word: Pain and Shadow Focus sit in row 2 without enough points above."
+      ],
       "points": {
         "347": 3,
         "348": 1,
@@ -393,6 +465,11 @@
       "spec": "Elemental",
       "source": "sim/shaman/elemental/presets.go:StandardTalents",
       "pointsSpent": 48,
+      "legal": false,
+      "gaps": [
+        "Elemental is 6 points short in rows 1-4: Elemental Fury, Unrelenting Storm, Elemental Precision, Lightning Mastery, Elemental Mastery, Lightning Overload and Totem of Wrath sit in rows 5-9 without enough points above.",
+        "Restoration is 7 points short in row 1: Totemic Focus, Nature's Guidance and Tidal Mastery sit in rows 2-4 without enough points above."
+      ],
       "points": {
         "562": 5,
         "563": 5,
@@ -415,6 +492,11 @@
       "spec": "Enhancement",
       "source": "sim/shaman/enhancement/presets.go:StandardTalents",
       "pointsSpent": 58,
+      "legal": false,
+      "gaps": [
+        "Dual Wield Specialization needs Dual Wield at 1/1; it has 0.",
+        "Enhancement is 2 points short in rows 1-3: Flurry, Improved Weapon Totems, Spirit Weapons, Elemental Weapons, Mental Quickness and Weapon Mastery sit in rows 4-6 without enough points above."
+      ],
       "points": {
         "561": 3,
         "563": 5,

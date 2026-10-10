@@ -61,7 +61,7 @@ behind every claim of its that quotes a number.
   drops here", and a fight guide is a different question asked at a different time
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
   profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
-  can say, and 719 of the 1,427 rows name an encounter. This is a join across the guides' own Source
+  can say, and 720 of the 1,427 rows name an encounter. This is a join across the guides' own Source
   column, the raid loot tables and the item catalogue rather than a new dataset — and it stops at
   *where*. **The cost half landed 2026-09-13**: 117 of the 119 crafted and bought picks now carry a
   price — reagents from Wowhead's `created-by-spell` data, vendor prices from `sold-by`, so a robe
@@ -72,9 +72,11 @@ behind every claim of its that quotes a number.
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
 - **Raid Composition section**: a seating chart for a 10 or 25-player raid — five groups of five,
-  with the buffs each group actually receives listed underneath it. **24 of the 33 raid buffs are
-  party-scoped in TBC**, so totems, auras and shouts reach only the caster's group; every scope is
-  read from the spell's own Wowhead tooltip. Role balance, a ranked list of what one more seat would
+  with the buffs each group actually receives listed underneath it. **Most raid buffs reach only the
+  caster's group in TBC** (totems, auras and shouts); every scope is read from the spell's own Wowhead
+  tooltip. Gift of the Wild, Fortitude, Arcane Brilliance and Prayer of Spirit reach any group, one
+  cast each, and Heroism is raid-wide on Anniversary realms. Shaman totems come from the spec that runs
+  them (Enhancement: Strength of Earth, Grace of Air, Windfury). Role balance, a ranked list of what one more seat would
   buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
   persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
   spec and buff, **two ways to move a player between groups** — press Move on their seat and then the
@@ -135,7 +137,7 @@ behind every claim of its that quotes a number.
   zone's extent and that is exactly the space the art covers. The circuit is computed here rather than
   copied from anyone's guide — density, snapped onto nodes that actually exist, then 2-opt to uncross
   it — and the caption says it is a strong starting line rather than a proven optimum. Zone maps are
-  Blizzard artwork used under the Game Content Usage Rules, credited on every map; the one zone with
+  Blizzard artwork used in a free, non-commercial fan project, credited on every map; the one zone with
   no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools

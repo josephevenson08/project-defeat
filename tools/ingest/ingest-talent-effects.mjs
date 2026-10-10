@@ -991,7 +991,7 @@ const WARLOCK_DEMON_EXTRACTORS = [
 ]
 
 const WARLOCK_SKIPPED = [
-  ['Master Demonologist', 'Gated on which demon is summoned. No pet model here.'],
+  ['Master Demonologist', 'Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet.'],
   ['Fel Intellect / Fel Stamina', 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
   ['Improved Shadow Bolt / Ruin / Emberstorm', 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
   ['Soul Leech / Nightfall', 'Proc-driven, needing a timeline.'],

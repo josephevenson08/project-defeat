@@ -1,8 +1,19 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-09, night): start here
+## ▶ Where we left off (2026-10-10): start here
 
-**The Buffs tab is decided and built into `planner.html`:** design C, from your raid, with design A's icon tiles. Waiting on the owner's go-ahead to commit.
+**The live-app fixes are committed and pushed.** They cover talents, raid reach and totems, loot, notes and the credit, and are listed in the README's "Data corrections". The app's whole Playwright suite passed 297 of 297 on Edge first. To run it again: `npx playwright test -c playwright.edge.config.ts`.
+
+**Next, the owner's answered items, in order:**
+1. **Text accents follow each tab's colour** (yes): links, headings and buttons, as Raid Composition's gold does. Only Planner, Tier Lists and Professions are still teal; Simulation and Raids already follow their scene (see the handoff).
+2. **The gallery is always dark** (yes).
+3. **Publish the prototypes on GitHub Pages** (yes): plan the build change first and show the plan.
+4. **Obsidian notes on the prototype work** (yes), with the brain-sync skill.
+5. **Then the walkthrough:** Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
+
+## Where we left off (2026-10-09, night)
+
+**The Buffs tab is decided and built into `planner.html`:** design C, from your raid, with design A's icon tiles. Committed and pushed (`cd78079`).
 - **A · Buff bar** (`buffs-a.html`): icons you click on and off, a row of Paladins with their Blessings, and four consumable slots.
 - **B · What it adds up to** (`buffs-b.html`): switches beside a running total (attack power, crit, haste, the boss's armor, the hit cap).
 - **C · From your raid** (`buffs-c.html`): pick the raid and your seat; every buff says who brings it or what's missing.
@@ -12,7 +23,7 @@
   - Heroism is raid-wide (Anniversary patch 2.5.5).
   - Shamans bring totems by spec.
   - Each Paladin is assigned a Blessing on this screen.
-- **Next: the live-app fixes,** now nine (see the README's data corrections). The Raid Composition prototype also needs the three reach and totem fixes.
+- **Next (as of then): the live-app fixes,** now done.
 
 ## Where we left off (2026-10-09, evening)
 

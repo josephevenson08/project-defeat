@@ -197,6 +197,7 @@ label.who{display:block}
 .scope{display:inline-block;font:700 9px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px;border:1px solid var(--rim-3);color:var(--ink-2);background:rgba(0,0,0,.3)}
 .scope.party{color:var(--glow);border-color:var(--rim)}
 .scope.raid{color:var(--sky);border-color:rgba(156,200,240,.4)}
+.scope.any{color:var(--sky);border-color:rgba(156,200,240,.4);border-style:dashed}
 .scope.single{color:var(--violet);border-color:rgba(185,166,255,.4)}
 .scope.target{color:var(--rose);border-color:rgba(255,159,182,.4)}
 /* results under the table */
@@ -260,7 +261,7 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
     <div class="hero-in">
       <div class="eyebrow">Raid Composition · Groups of five</div>
       <h1 id="h-rc">Seat your raid so <em>every group gets its buffs</em>.</h1>
-      <p>In TBC, 24 of the 33 raid buffs reach only the caster's own party: every totem, every aura, both shouts. Click specs to fill the seats, move people between groups, and watch what each group receives.</p>
+      <p>In TBC, most raid buffs reach only the caster's own party: every totem, every aura, both shouts. Gift of the Wild, Fortitude and Arcane Brilliance can be cast on any group, and Heroism reaches the whole raid on Anniversary realms. Click specs to fill the seats, move people between groups, and watch what each group receives.</p>
     </div>
   </div>
 
@@ -329,7 +330,7 @@ footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);bord
   </div>
 </section>
 </main>
-<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips); classes, specs and builds from <code>tbcClasses.ts</code> and <code>raidBuilds.ts</code>. Spec icons are the files the live app ships in <code>public/icons</code> (<code>raidcompIcons.json</code>). The example roster is invented seating of real specs. The scene is drawn in code. World of Warcraft® and its icons are trademarks of Blizzard Entertainment; no affiliation.</div></footer>
+<footer><div class="wrap">Prototype content for design review. Buff names, providers and Party / Raid scope come from the app's data (<code>sampleBuffs.ts</code>, <code>sampleTargetDebuffs.ts</code>, <code>buffScope.json</code>, read from Wowhead spell tooltips), with three rules from 2026-10-09: four buffs reach any group ("the target's party"), Heroism is raid-wide on Anniversary realms, and Shaman totems come from the spec that runs them; classes, specs and builds from <code>tbcClasses.ts</code> and <code>raidBuilds.ts</code>. Spec icons are the files the live app ships in <code>public/icons</code> (<code>raidcompIcons.json</code>). The example roster is invented seating of real specs. The scene is drawn in code. World of Warcraft® and its icons are trademarks of Blizzard Entertainment; no affiliation.</div></footer>
 </div>
 <p class="sr" id="live" aria-live="polite"></p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
@@ -500,7 +501,12 @@ if(KIT)KIT.theme("raidcomp",{instant:true});
 
 /* ---- core:begin (pure data + roster logic; no DOM, so it can be tested in node) ---- */
 /* real data: src/domain/buffs/sampleBuffs.ts + sampleTargetDebuffs.ts (who provides),
-   src/domain/buffs/buffScope.json (Party / Raid / Single / Target, read from Wowhead tooltips) */
+   src/domain/buffs/buffScope.json (Party / Raid / Single / Target, read from Wowhead tooltips).
+   Three rules from 2026-10-09, as in the live app (buffScope.ts isPartyScoped, sampleBuffs.ts):
+   - "Any": Gift of the Wild, Prayer of Fortitude, Arcane Brilliance and Prayer of Spirit say "the target's party", so
+     the caster picks the group and one caster covers every group, a cast each.
+   - Heroism/Bloodlust is raid-wide on Anniversary realms (Blizzard's patch 2.5.5 notes).
+   - Shaman totems come from the spec that runs them; Tranquil Air is left out (no spec runs it in a raid). */
 const B=(id,name,scope,cls,spec)=>({id,name,scope,cls,spec});
 const BUFFS=[
  B("battle-shout","Battle Shout","Party","Warrior"),B("commanding-shout","Commanding Shout","Party","Warrior"),
@@ -508,17 +514,17 @@ const BUFFS=[
  B("blessing-of-wisdom","Greater Blessing of Wisdom","Raid","Paladin"),B("blessing-of-salvation","Greater Blessing of Salvation","Raid","Paladin"),
  B("blessing-of-sanctuary","Greater Blessing of Sanctuary","Raid","Paladin"),
  B("devotion-aura","Devotion Aura","Party","Paladin"),B("retribution-aura","Retribution Aura","Party","Paladin"),B("sanctity-aura","Sanctity Aura","Party","Paladin"),
- B("arcane-intellect","Arcane Brilliance","Party","Mage"),
- B("prayer-of-fortitude","Prayer of Fortitude","Party","Priest"),B("prayer-of-spirit","Prayer of Spirit","Party","Priest"),
+ B("arcane-intellect","Arcane Brilliance","Any","Mage"),
+ B("prayer-of-fortitude","Prayer of Fortitude","Any","Priest"),B("prayer-of-spirit","Prayer of Spirit","Any","Priest"),
  B("shadow-protection","Shadow Protection","Single","Priest"),B("power-infusion","Power Infusion","Single","Priest","Discipline"),
- B("mark-of-the-wild","Gift of the Wild","Party","Druid"),B("thorns","Thorns","Single","Druid"),B("innervate","Innervate","Single","Druid"),
+ B("mark-of-the-wild","Gift of the Wild","Any","Druid"),B("thorns","Thorns","Single","Druid"),B("innervate","Innervate","Single","Druid"),
  B("leader-of-the-pack","Leader of the Pack","Party","Druid","Feral"),B("moonkin-aura","Moonkin Aura","Party","Druid","Balance"),
  B("trueshot-aura","Trueshot Aura","Party","Hunter","Marksmanship"),B("ferocious-inspiration","Ferocious Inspiration","Party","Hunter","Beast Mastery"),
- B("strength-of-earth-totem","Strength of Earth Totem","Party","Shaman"),B("grace-of-air-totem","Grace of Air Totem","Party","Shaman"),
- B("mana-spring-totem","Mana Spring Totem","Party","Shaman"),B("totem-of-wrath","Totem of Wrath","Party","Shaman","Elemental"),
- B("wrath-of-air-totem","Wrath of Air Totem","Party","Shaman"),B("windfury-totem","Windfury Totem","Party","Shaman"),
- B("mana-tide-totem","Mana Tide Totem","Party","Shaman","Restoration"),B("tranquil-air-totem","Tranquil Air Totem","Party","Shaman"),
- B("unleashed-rage","Unleashed Rage","Party","Shaman","Enhancement"),B("bloodlust","Bloodlust","Party","Shaman"),
+ B("strength-of-earth-totem","Strength of Earth Totem","Party","Shaman","Enhancement"),B("grace-of-air-totem","Grace of Air Totem","Party","Shaman","Enhancement"),
+ B("mana-spring-totem","Mana Spring Totem","Party","Shaman","Restoration"),B("totem-of-wrath","Totem of Wrath","Party","Shaman","Elemental"),
+ B("wrath-of-air-totem","Wrath of Air Totem","Party","Shaman","Elemental"),B("windfury-totem","Windfury Totem","Party","Shaman","Enhancement"),
+ B("mana-tide-totem","Mana Tide Totem","Party","Shaman","Restoration"),
+ B("unleashed-rage","Unleashed Rage","Party","Shaman","Enhancement"),B("bloodlust","Bloodlust","Raid","Shaman"),
  B("blood-pact","Blood Pact","Party","Warlock")];
 const DEBUFFS=[
  B("sunder-armor","Sunder Armor","Target","Warrior"),B("curse-of-recklessness","Curse of Recklessness","Target","Warlock"),
@@ -608,7 +614,7 @@ function bestFor(row){
 /* raid-wide gaps (party buffs nobody brings, wide buffs, boss debuffs) and per-group party gaps grouped by fixer */
 function missing(groups){
   const all=filled(groups).map(bOf);
-  const raid=[...PARTY.map(b=>[b,"party buff"]),...WIDE.map(b=>[b,"raid or single-target"]),...DEBUFFS.map(b=>[b,"on the boss"])]
+  const raid=[...PARTY.map(b=>[b,"party buff"]),...WIDE.map(b=>[b,"raid-wide, any group or single-target"]),...DEBUFFS.map(b=>[b,"on the boss"])]
     .filter(([b])=>!all.some(bd=>provides(bd,b)));
   const perGroup=groups.map((row,gi)=>{
     const lack=PARTY.filter(b=>!row.some(s=>provides(bOf(s),b))),by={};
@@ -648,7 +654,8 @@ const firstOpen=()=>st.groups.findIndex(r=>r.includes(null));
 const targetGroup=()=>aim!=null&&st.groups[aim]&&st.groups[aim].includes(null)?aim:firstOpen();
 
 /* ---------- rendering ---------- */
-const tag=sc=>`<span class="scope ${sc.toLowerCase()}">${sc}</span>`;
+const TAG={Any:"Any group"};
+const tag=sc=>`<span class="scope ${sc.toLowerCase()}">${TAG[sc]||sc}</span>`;
 const where=(g,i)=>`group ${g+1}, seat ${i+1}`;
 /* our own pencil (drawn here, not an icon font) */
 const PEN=`<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.2 2.3l2.5 2.5-7.9 7.9-3.2.7.7-3.2z M9.8 3.7l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
@@ -690,7 +697,7 @@ function renderGroups(){
       `<ol class="seats" aria-label="Group ${gi+1} seats">${row.map((s,i)=>seatHTML(s,gi,i,gi===tg&&i===ti)).join("")}</ol>`+
       `<div class="gets"><h4>This group receives ${tag("Party")}</h4><ul class="chips">`+
       (gets.length?gets.map(b=>`<li>${b.name}</li>`).join(""):`<li class="none">No party buffs yet</li>`)+
-      `</ul><p>Plus ${wideN} ${tag("Raid")} or ${tag("Single")} buffs, which do not depend on seating.</p></div></section>`;
+      `</ul><p>Plus ${wideN} ${tag("Raid")}, ${tag("Any")} or ${tag("Single")} buffs, which do not depend on seating.</p></div></section>`;
   }).join("");
   if(SC.setGroups)SC.setGroups(st.groups.map(row=>({f:groupGets(row).length/PARTY.length,n:row.filter(Boolean).length})),st.groups.length);
 }

@@ -99,9 +99,25 @@ export function whyBlocked(
 }
 
 /**
+ * Points spent in the rows *above* a row, in one tree.
+ *
+ * Learning a point is gated on the whole tree (the game's "Requires 25 points in Fury Talents"), but a
+ * build is only legal if every spent talent has its row's worth of points **above** it: the deep point
+ * cannot count towards its own gate. The two agree for any build put together a point at a time, and
+ * part ways the moment a point is taken back out from above a deep talent.
+ */
+export function pointsAboveRow(tree: TalentTree, row: number, points: TalentPoints): number {
+  return tree.talents.reduce((total, talent) => total + (talent.row < row ? points[talent.id] ?? 0 : 0), 0)
+}
+
+/**
  * Whether a point can be removed. Taking one out from under a talent that depends on it — either by
- * prerequisite or by dropping the tree below a deeper talent's row requirement — has to be refused,
- * or the tree ends up in a state the game would never allow.
+ * prerequisite or by leaving a deeper talent without its row's worth of points above it — has to be
+ * refused, or the tree ends up in a state the game would never allow.
+ *
+ * **Refused only when the removal breaks something that holds now.** A build that already breaks a
+ * rule (every stored wowsims preset does, see `ruleBreaks`) would otherwise refuse every removal above
+ * the broken talent, and the only way out would be Reset.
  */
 export function canRemovePoint(tree: TalentTree, talent: Talent, points: TalentPoints): boolean {
   const current = points[talent.id] ?? 0
@@ -113,18 +129,55 @@ export function canRemovePoint(tree: TalentTree, talent: Talent, points: TalentP
   for (const other of tree.talents) {
     if ((next[other.id] ?? 0) === 0) continue
     const requirement = other.requires.find((entry) => entry.id === talent.id)
-    if (requirement && next[talent.id] < requirement.rank) return false
+    if (requirement && current >= requirement.rank && next[talent.id] < requirement.rank) return false
   }
 
   /*
-   * And no spent talent may end up below its row requirement.
+   * And no deeper talent may be left short of the points above its row.
    *
-   * Kept as a guard, but note it cannot currently fire: a row needs `row * 5` points *in the tree*,
-   * counting the deep point itself, so placing one always leaves the total at least one above the
-   * requirement — and removing a single point therefore always leaves exactly enough. It would start
-   * mattering the moment the requirement counted only points in shallower rows, or if removal ever
-   * took more than one point at a time.
+   * Until 2026-10-09 this counted every point in the tree after the removal, which counts the deep
+   * talent towards its own gate. With exactly 40 points in Fury's first eight rows and Rampage in the
+   * ninth, it let a Cruelty point out — 39 above Rampage, one short — where the game's calculators
+   * refuse. The old comment here noted the guard "cannot currently fire" for exactly that reason.
    */
-  const spentAfter = pointsInTree(tree, next)
-  return !tree.talents.some((other) => (next[other.id] ?? 0) > 0 && spentAfter < other.row * POINTS_PER_ROW)
+  return !tree.talents.some((other) => {
+    if (other.row <= talent.row || (next[other.id] ?? 0) === 0) return false
+    const gate = other.row * POINTS_PER_ROW
+    return pointsAboveRow(tree, other.row, points) >= gate && pointsAboveRow(tree, other.row, next) < gate
+  })
+}
+
+/** One rule a build breaks: a prerequisite below its rank, or a talent short of the points above its row. */
+export type TalentRuleBreak =
+  | { kind: 'prerequisite'; tree: string; talent: string; needs: string; rank: number; max: number; has: number }
+  | { kind: 'row'; tree: string; talent: string; row: number; needs: number; has: number }
+
+/**
+ * Every rule a set of points breaks, in tree and row order. Empty for any build put together a point
+ * at a time through `whyBlocked` and `canRemovePoint`.
+ *
+ * It exists for the stored wowsims presets: they list only the talents wowsims' simulator reads, so
+ * each leaves out the filler points that open its deeper rows (and Fury leaves out Enrage, which Flurry
+ * needs). They are kept as they are and their breaks recorded, not filled in — filling them would mean
+ * choosing talents upstream never chose.
+ */
+export function ruleBreaks(trees: readonly TalentTree[], points: TalentPoints): TalentRuleBreak[] {
+  const breaks: TalentRuleBreak[] = []
+  for (const tree of trees) {
+    for (const talent of [...tree.talents].sort((a, b) => a.row - b.row || a.column - b.column)) {
+      if ((points[talent.id] ?? 0) === 0) continue
+      for (const requirement of talent.requires) {
+        const prerequisite = tree.talents.find((entry) => entry.id === requirement.id)
+        const has = points[requirement.id] ?? 0
+        if (prerequisite && has < requirement.rank) {
+          breaks.push({ kind: 'prerequisite', tree: tree.spec, talent: talent.name, needs: prerequisite.name, rank: requirement.rank, max: prerequisite.maxRank, has })
+        }
+      }
+      const above = pointsAboveRow(tree, talent.row, points)
+      if (above < talent.row * POINTS_PER_ROW) {
+        breaks.push({ kind: 'row', tree: tree.spec, talent: talent.name, row: talent.row + 1, needs: talent.row * POINTS_PER_ROW, has: above })
+      }
+    }
+  }
+  return breaks
 }

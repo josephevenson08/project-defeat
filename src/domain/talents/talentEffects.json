@@ -1166,7 +1166,7 @@
     {
       "className": "Warlock",
       "talent": "Master Demonologist",
-      "reason": "Gated on which demon is summoned. No pet model here."
+      "reason": "Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet."
     },
     {
       "className": "Warlock",

@@ -304,7 +304,17 @@ for (const { prefix, enumName, stats, extra } of parsed.values()) {
   if (Object.keys(stats).length === 0 && Object.keys(extra).length === 0) {
     consumable.notes = 'No flat stats; its value is an effect the stat model does not represent.'
   } else if (Object.keys(stats).length === 0) {
-    consumable.notes = 'Grants only school-specific spell power, which the stat totals do not yet carry.'
+    /*
+     * Say what the extra stats are. Until 2026-10-09 every one of these read "school-specific spell
+     * power", which was wrong for Elixir of Major Fortitude (health) and Gift of Arthas (resistance).
+     */
+    const keys = Object.keys(extra)
+    const kinds = [
+      keys.some((stat) => /SpellPower$/.test(stat)) && 'school-specific spell power',
+      keys.includes('Health') && 'maximum health',
+      keys.some((stat) => /Resistance$/.test(stat)) && 'resistances',
+    ].filter(Boolean)
+    consumable.notes = `Grants only ${kinds.join(' and ')}, which the stat totals do not yet carry.`
   }
 
   consumables.push(consumable)

@@ -92,7 +92,7 @@ export const WARLOCK_PET_UNMODELLED =
   'the demon contributes white damage only. Cleave and Intercept are not modelled, and neither is Demonic Frenzy as a real stacking aura — upstream pre-stacks it as a flat multiplier and this carries that across. Affliction and Destruction get no demon at all here, because the standard build sacrifices it for a school-scoped damage multiplier — which is modelled, so those two specs gain the multiplier instead of the pet rather than losing both.'
 
 export type WarlockPetTalents = {
-  /** Multiplies the demon's damage. Soul Link 1.05, Unholy Power +4% a rank, Master Demonologist +1%. */
+  /** Multiplies the demon's damage. Only Unholy Power (+4% a rank) is read; Soul Link's 1.05 and Master Demonologist would land here too, and neither is read yet. */
   damageMultiplier: number
   /** Added to the demon's crit chance, as a fraction. Demonic Tactics, +1% a rank. */
   critChance: number

@@ -34,6 +34,7 @@ import { factions } from '../src/domain/character/races'
 import { racesByClass, getClassesForRace, getRacesForClassAndFaction } from '../src/domain/character/races'
 import type { BisList } from '../src/domain/bis'
 import { getClassDefinition, getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
+import { anniversaryRaidWide, castOnAnyGroup, isPartyScoped } from '../src/domain/buffs/buffScope'
 import {
   addToGroup,
   computeCoverage,
@@ -474,7 +475,7 @@ import { getGemById, sampleGems, socketBonusIsActive } from '../src/domain/gems/
 import { countGemColors, metaGemIsActive } from '../src/domain/gems/gemTypes'
 import type { SocketColor } from '../src/domain/gear/itemTypes'
 import { classesWithTalents, getTalentData, talentIconNames } from '../src/domain/talents/sampleTalents'
-import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsInTree, pointsSpent, whyBlocked } from '../src/domain/talents/talentTypes'
+import { POINTS_PER_ROW, TALENT_POINTS_AT_70, canRemovePoint, pointsAboveRow, pointsInTree, pointsSpent, ruleBreaks, whyBlocked } from '../src/domain/talents/talentTypes'
 import {
   classHasTalentEffects,
   deriveTalentModifiers,
@@ -2039,11 +2040,10 @@ test('the Warrior talent trees are complete and their spending rules hold', asyn
   const deepestFilled = [...arms.talents].filter((talent) => (allSpent[talent.id] ?? 0) > 0).sort((a, b) => b.row - a.row)[0]
   expect(canRemovePoint(arms, deepestFilled, allSpent), 'the deepest spent talent is always removable').toBe(true)
 
-  // Removing a single point can never strand a deeper talent below its row requirement, because the
-  // requirement counts points in the whole tree — including the deep point itself. Placing one
-  // therefore always leaves the total at least one above the gate, so taking one back leaves exactly
-  // enough. Asserted rather than assumed: `canRemovePoint` guards against it anyway, and this pins
-  // the reasoning so the guard is not mistaken for something that fires.
+  // A point can't come out from above a deeper talent that needs it. Five points in row 1 and one in
+  // row 2: taking a row-1 point back leaves six in the tree, but only four *above* row 2, and the deep
+  // point can't count towards its own gate. Until 2026-10-09 this asserted the opposite ("five points
+  // remain"), which counted the row-2 point itself; the game's calculators refuse it.
   const rowZero = arms.talents.filter((talent) => talent.row === 0)
   const tight: Record<number, number> = {}
   let toPlace = POINTS_PER_ROW
@@ -2054,7 +2054,9 @@ test('the Warrior talent trees are complete and their spending rules hold', asyn
   }
   tight[secondRow.id] = 1
   expect(pointsInTree(arms, tight)).toBe(POINTS_PER_ROW + 1)
-  expect(canRemovePoint(arms, rowZero[0], tight), 'five points remain, which is what row 1 needs').toBe(true)
+  expect(pointsAboveRow(arms, secondRow.row, tight)).toBe(POINTS_PER_ROW)
+  expect(canRemovePoint(arms, rowZero[0], tight), 'only four would be left above row 2').toBe(false)
+  expect(canRemovePoint(arms, secondRow, tight), 'the row-2 point itself can always come out').toBe(true)
 
   // And a prerequisite cannot be emptied while the talent it gates is still spent into.
   const gated = arms.talents.find((talent) => talent.requires.length > 0)
@@ -2063,6 +2065,59 @@ test('the Warrior talent trees are complete and their spending rules hold', asyn
     const holding = { ...allSpent, [prerequisite.id]: prerequisite.maxRank, [gated.id]: 1 }
     expect(canRemovePoint(arms, prerequisite, holding), `${prerequisite.name} still holds up ${gated.name}`).toBe(false)
   }
+})
+
+test('a point cannot come out from above a 41-point talent', () => {
+  // The case the old rule let through: 40 points in Fury's first eight rows and Rampage in the ninth.
+  // Counting the whole tree after the removal (40) says Rampage still has its 40; counting the rows
+  // above it (39) says it doesn't, and the game refuses the removal.
+  const data = getTalentData('Warrior')!
+  const fury = data.trees.find((tree) => tree.spec === 'Fury')!
+  const named = (name: string) => fury.talents.find((talent) => talent.name === name)!
+  const ranks: [string, number][] = [
+    ['Cruelty', 5], ['Unbridled Wrath', 5], ['Commanding Presence', 5], ['Enrage', 5], ['Dual Wield Specialization', 5],
+    ['Sweeping Strikes', 1], ['Weapon Mastery', 2], ['Improved Slam', 2], ['Flurry', 5], ['Improved Berserker Rage', 2],
+    ['Precision', 3], ['Bloodthirst', 1], ['Improved Whirlwind', 2], ['Improved Berserker Stance', 5], ['Rampage', 1],
+  ]
+  const points = Object.fromEntries(ranks.map(([name, rank]) => [named(name).id, rank]))
+  const rampage = named('Rampage')
+  expect(ruleBreaks(data.trees, points), 'a legal 49-point Fury tree').toEqual([])
+  expect(pointsAboveRow(fury, rampage.row, points)).toBeGreaterThanOrEqual(40)
+
+  // Take points out of the top rows until exactly 40 sit above Rampage, then try one more.
+  const trimmed = { ...points }
+  for (const name of ['Dual Wield Specialization', 'Improved Whirlwind', 'Improved Berserker Rage']) {
+    while (pointsAboveRow(fury, rampage.row, trimmed) > 40 && trimmed[named(name).id] > 0) trimmed[named(name).id] -= 1
+  }
+  expect(pointsAboveRow(fury, rampage.row, trimmed)).toBe(40)
+  expect(pointsInTree(fury, trimmed), 'the whole tree still reads 41').toBe(41)
+  // Improved Berserker Stance sits in row 8, just above Rampage, so nothing else rides on its points.
+  expect(canRemovePoint(fury, named('Improved Berserker Stance'), trimmed), 'Rampage would be left with 39 above it').toBe(false)
+  expect(canRemovePoint(fury, rampage, trimmed), 'Rampage itself can come out').toBe(true)
+})
+
+test('the stored wowsims presets are simulator presets, and record what they leave out', () => {
+  // wowsims lists only the talents its simulator reads, so every stored preset leaves out the filler
+  // points that open its deeper rows. They are kept as upstream wrote them (the simulator reads the
+  // same talents either way) and each records its gaps, which must match the rules exactly.
+  for (const build of talentBuilds.builds) {
+    const data = getTalentData(build.className)!
+    const points = Object.fromEntries(Object.entries(build.points).map(([id, rank]) => [Number(id), rank]))
+    const breaks = ruleBreaks(data.trees, points)
+    expect(build.legal, `${build.className} ${build.spec} is marked as a simulator preset`).toBe(breaks.length === 0)
+    expect(build.gaps.length, `${build.className} ${build.spec} lists a gap per tree or prerequisite`).toBeGreaterThan(breaks.length ? 0 : -1)
+    for (const brk of breaks) {
+      const named = build.gaps.some((gap: string) => gap.includes(brk.talent))
+      expect(named, `${build.className} ${build.spec}: the gaps name ${brk.talent}`).toBe(true)
+    }
+    // Removing a point from a preset must never be blocked by a rule the preset already breaks.
+    for (const tree of data.trees) {
+      const deepest = [...tree.talents].filter((talent) => (points[talent.id] ?? 0) > 0).sort((a, b) => b.row - a.row)[0]
+      if (deepest) expect(canRemovePoint(tree, deepest, points), `${build.spec}: ${deepest.name} can come out`).toBe(true)
+    }
+  }
+  const fury = talentBuilds.builds.find((build) => build.spec === 'Fury')!
+  expect(fury.gaps.some((gap: string) => /Flurry needs Enrage at 5\/5/.test(gap)), 'Fury records Flurry without Enrage').toBe(true)
 })
 
 test('a hybrid gem earns the socket bonus it satisfies', async () => {
@@ -2186,7 +2241,8 @@ test('every raid buff is sourced to a spell rank and is either applied or explic
 
   expect(problems, problems.join(' | ')).toEqual([])
   expect(modelledBuffs.length + unmodelledBuffs.length).toBe(sampleBuffs.length)
-  expect(sampleBuffs.length, 'TBC Phase 2 has 33 raid buffs').toBe(33)
+  // 33 until 2026-10-09, when Tranquil Air Totem came out: no Shaman spec runs it in a raid.
+  expect(sampleBuffs.length, 'TBC Phase 2 has 32 raid buffs here').toBe(32)
 })
 
 test('the percentage auras are stored as the rating that actually buys that percentage', async () => {
@@ -2251,7 +2307,8 @@ test('every unmodelled buff carries text a panel could render', async () => {
   // would put 15 rows on screen with a name and nothing else.
   // 15 until Unleashed Rage was modelled on 2026-08-23: its own note said an attack-power multiplier
   // would land before attack power was derived, and `statMultipliersAfterConversion` answered that.
-  expect(unmodelledBuffs.length, '12 of the 33 cannot be expressed as stats').toBe(12)
+  // 12 until Tranquil Air Totem came out on 2026-10-09.
+  expect(unmodelledBuffs.length, '11 of the 32 cannot be expressed as stats').toBe(11)
 
   for (const buff of unmodelledBuffs) {
     expect(buff.stats, `${buff.id} must contribute no stats`).toBeUndefined()
@@ -7746,7 +7803,9 @@ test('buff scope is sourced for every entry, and party scope dominates', () => {
   // Target went 6 to 7 when Expose Weakness was added, and 7 to 8 when Improved Faerie Fire was split
   // off the base debuff. Kept exact rather than loosened: this pins the *sourced split*, which is the
   // claim the test is making, and party scope dominating is the point.
-  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 8 })
+  // Party went 24 to 23 when Tranquil Air Totem came out on 2026-10-09. This is the *tooltip* scope;
+  // how far a buff reaches in a raid is `isPartyScoped`, pinned in the test after next.
+  expect(counts).toEqual({ Party: 23, Raid: 5, Single: 4, Target: 8 })
 
   /*
    * The five Raid-scoped buffs are exactly the Greater Blessings, which is what "Greater" buys — the
@@ -7775,10 +7834,11 @@ test('a party buff reaches its own group and no other', () => {
   /*
    * The behaviour that separates this from a checklist, and the bug the first version shipped: a
    * Shaman in group 1 buffs group 1. Asserting the *absence* in groups 2-5 matters more than the
-   * presence in group 1, because treating buffs as raid-wide passes the presence check too.
+   * presence in group 1, because treating buffs as raid-wide passes the presence check too. The
+   * Shaman is Enhancement because totems come from the spec that runs them (2026-10-09).
    */
   let roster = emptyRoster(25)
-  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Enhancement' })
 
   const report = computeCoverage(roster)
   const totemIn = (index: number) =>
@@ -7795,6 +7855,40 @@ test('a party buff reaches its own group and no other', () => {
    * the panel shows both.
    */
   expect(report.partyScoped.covered.some((entry) => entry.entry.name === 'Strength of Earth Totem')).toBe(true)
+})
+
+test('a buff cast on a chosen group reaches every group, and Heroism the whole raid', () => {
+  /*
+   * Gift of the Wild, Prayer of Fortitude, Arcane Brilliance and Prayer of Spirit are party-scoped by
+   * their tooltips, but each says "the target's party": the caster picks the group, so one caster
+   * covers every group with a cast each. Until 2026-10-09 the planner treated them as reaching only
+   * the caster's group, and told a raid it lacked Fortitude in four groups with a Priest in one.
+   *
+   * Heroism and Bloodlust are raid-wide on the Anniversary realms (Blizzard's patch 2.5.5 notes),
+   * although the original tooltip says party.
+   */
+  for (const id of ['mark-of-the-wild', 'prayer-of-fortitude', 'arcane-intellect', 'prayer-of-spirit']) {
+    expect(getBuffScope(id), `${id}: the tooltip says party`).toBe('Party')
+    expect(castOnAnyGroup(id), `${id}: "the target's party"`).toBe(true)
+    expect(isPartyScoped(id), `${id} reaches any group`).toBe(false)
+  }
+  expect(isPartyScoped('bloodlust'), 'Heroism reaches the whole raid').toBe(false)
+  expect(anniversaryRaidWide.bloodlust).toMatch(/2\.5\.5/)
+  for (const id of ['battle-shout', 'strength-of-earth-totem', 'devotion-aura', 'leader-of-the-pack']) {
+    expect(isPartyScoped(id), `${id} still reaches only the caster's group`).toBe(true)
+  }
+
+  let roster = addToGroup(emptyRoster(25), 0, { className: 'Druid', spec: 'Balance' })
+  roster = addToGroup(roster, 0, { className: 'Shaman', spec: 'Restoration' })
+  const report = computeCoverage(roster)
+  const raidWide = report.raidWide.covered.map((entry) => entry.entry.name)
+  expect(raidWide, 'one Druid covers the raid').toContain('Gift of the Wild')
+  expect(raidWide, 'one Shaman gives the raid Heroism').toContain('Bloodlust')
+  for (const group of report.groups) expect(group.partyBuffs.map((buff) => buff.name)).not.toContain('Gift of the Wild')
+
+  // And a Restoration Shaman brings Mana Spring, not Strength of Earth: totems come from the spec.
+  expect(report.groups[0].partyBuffs.map((buff) => buff.name)).toContain('Mana Spring Totem')
+  expect(report.partyScoped.covered.map((entry) => entry.entry.name)).not.toContain('Strength of Earth Totem')
 })
 
 test('raid coverage is exact, and an empty roster covers nothing', () => {
@@ -7850,8 +7944,8 @@ test('raid coverage is exact, and an empty roster covers nothing', () => {
 
 test('a missing buff names who would bring it, at the right specificity', () => {
   /*
-   * The difference that decides a recruitment message. Any Shaman brings Strength of Earth; only an
-   * Elemental one brings Totem of Wrath.
+   * The difference that decides a recruitment message. Any Shaman brings Heroism; only an Enhancement
+   * one brings Strength of Earth (totems come from the spec that runs them, since 2026-10-09).
    */
   let roster = emptyRoster(25)
   let seat = 0
@@ -7867,7 +7961,8 @@ test('a missing buff names who would bring it, at the right specificity', () => 
   const report = computeCoverage(roster)
   const needFor = (name: string) => report.partyScoped.missing.find((entry) => entry.entry.name === name)?.needs
 
-  expect(needFor('Strength of Earth Totem'), 'class-wide reads "any"').toBe('any Shaman')
+  expect(needFor('Strength of Earth Totem'), 'a totem names the spec that runs it').toBe('an Enhancement Shaman')
+  expect(report.raidWide.missing.find((entry) => entry.entry.name === 'Bloodlust')?.needs, 'class-wide reads "any"').toBe('any Shaman')
   expect(needFor('Totem of Wrath'), 'spec-specific names the spec').toBe('an Elemental Shaman')
   expect(needFor('Mana Tide Totem')).toBe('a Restoration Shaman')
 })
@@ -7904,9 +7999,10 @@ test('the raid composition planner seats a raid, and buffs land per group', asyn
 
   /*
    * A Shaman in group 1 gives group 1 its totems and gives group 2 nothing. Asserted through the UI
-   * as well as the domain because this is the claim the whole screen makes.
+   * as well as the domain because this is the claim the whole screen makes. Enhancement, because
+   * totems come from the spec that runs them.
    */
-  await page.getByTestId('raidcomp-add-shaman-restoration').click()
+  await page.getByTestId('raidcomp-add-shaman-enhancement').click()
   await expect(page.getByTestId('raidcomp-filled')).toContainText('1 of 25')
 
   /*
@@ -7921,7 +8017,7 @@ test('the raid composition planner seats a raid, and buffs land per group', asyn
   await expect(group2.getByText('Empty group')).toBeVisible()
 
   // Removing the seat takes the buffs with it.
-  await page.getByRole('button', { name: /Remove Restoration Shaman/ }).click()
+  await page.getByRole('button', { name: /Remove Enhancement Shaman/ }).click()
   await expect(page.getByTestId('raidcomp-filled')).toContainText('0 of 25')
   await expect(group1.getByAltText('Strength of Earth Totem')).toHaveCount(0)
 })
@@ -8336,7 +8432,9 @@ test('Dreamstate heals and does not bring Moonkin Aura', () => {
     addToGroup(emptyRoster(25), 0, { className: 'Druid', spec: dreamstate.spec, buildId: dreamstate.id }),
   )
   const names = report.groups[0].partyBuffs.map((buff) => buff.name)
-  expect(names, 'the class-wide druid buffs still come').toContain('Gift of the Wild')
+  // Gift of the Wild is cast on any group (its tooltip says "the target's party"), so it is raid-wide
+  // here rather than in the group row, since 2026-10-09.
+  expect(report.raidWide.covered.map((row) => row.entry.name), 'the class-wide druid buffs still come').toContain('Gift of the Wild')
   expect(names, 'but not the one that needs Moonkin Form').not.toContain('Moonkin Aura')
   expect(names, 'nor the one that needs cat or bear form').not.toContain('Leader of the Pack')
 })
@@ -8508,8 +8606,9 @@ test('a seat shows everything that player brings, including what the group row c
    */
   const dreamstate = seatContributions({ className: 'Druid', spec: 'Restoration', buildId: 'druid-dreamstate' })
 
-  expect(dreamstate.party.map((buff) => buff.name)).toContain('Gift of the Wild')
-  expect(dreamstate.raidWide.map((buff) => buff.name)).toEqual(expect.arrayContaining(['Thorns', 'Innervate']))
+  // Gift of the Wild reaches any group, so it sits with the raid-wide buffs since 2026-10-09.
+  expect(dreamstate.raidWide.map((buff) => buff.name)).toEqual(expect.arrayContaining(['Gift of the Wild', 'Thorns', 'Innervate']))
+  expect(dreamstate.party.map((buff) => buff.name)).not.toContain('Gift of the Wild')
   expect(
     dreamstate.debuffs.map((debuff) => debuff.name),
     'Faerie Fire is the one that went looking for a home',
@@ -9033,9 +9132,9 @@ test('no talent is refused for a reason the code no longer has', async () => {
    * refused for reasons about the *ability rate*, which genuinely does not exist yet. So no Hunter
    * refusal may still claim the model has no pet.
    *
-   * **Scoped to Hunter deliberately.** Warlock's Master Demonologist is refused with "No pet model
-   * here" and that is still true — there is no demon in this model — so a blanket search on the
-   * phrase would fail on an honest sentence.
+   * **Scoped to Hunter deliberately** when written, because Warlock's Master Demonologist was refused
+   * with "No pet model here". That went stale the same way on 2026-08-29, when the Felguard landed,
+   * and was reworded on 2026-10-09; the Warlock check below pins it.
    */
   const noPet = rawTalentEffects.skipped.filter(
     (entry) => entry.className === 'Hunter' && /no pet/i.test(entry.reason),
@@ -9044,6 +9143,9 @@ test('no talent is refused for a reason the code no longer has', async () => {
     noPet.map((entry) => `${entry.className}/${entry.talent}: ${entry.reason}`),
     'a hunter has a pet now, so no Hunter talent may be refused for the model not having one',
   ).toEqual([])
+
+  const warlockNoPet = rawTalentEffects.skipped.filter((entry) => entry.className === 'Warlock' && /no pet/i.test(entry.reason))
+  expect(warlockNoPet.map((entry) => entry.talent), 'the Felguard is a pet, so no Warlock talent may be refused for the model not having one').toEqual([])
 
   const ingestedNames = new Set(rawTalentEffects.effects.map((effect) => `${effect.className}/${effect.talent}`))
   for (const talent of ['Ferocity', 'Animal Handler', 'Unleashed Fury', "Serpent's Swiftness"]) {
@@ -9687,7 +9789,10 @@ test('every zone a route draws has map art, or is recorded as having none', () =
 
   // Blizzard's artwork is credited, and the credit travels with the data rather than living in CSS.
   expect(zoneMaps.attribution).toMatch(/Blizzard/)
-  expect(zoneMaps.attribution).toMatch(/Game Content Usage Rules/)
+  // "Game Content Usage Rules" is Microsoft's policy, not Blizzard's: the credit must not cite it
+  expect(zoneMaps.attribution).not.toMatch(/Game Content Usage Rules/)
+  expect(zoneMaps.attribution).toMatch(/non-commercial/)
+  expect(zoneMaps.attribution).toMatch(/not affiliated with or endorsed by Blizzard/)
 })
 
 test('a route stop is a node that exists, not the average of a cluster', () => {
@@ -10427,10 +10532,12 @@ test('raid coverage counts who could cast a buff, not what will be up at once', 
   const blessings = coveredIds(paladin.raidWide).filter((id) => id.startsWith('blessing-of-'))
   expect(blessings.length, 'one Paladin lights up every Greater Blessing').toBeGreaterThan(3)
 
-  // One Shaman, every air totem — the case a previous test pinned the other way round.
+  // One Shaman, both of its spec's air totems — the case a previous test pinned the other way round.
+  // Since 2026-10-09 totems come from the spec that runs them: an Enhancement Shaman twists Windfury
+  // and Grace of Air, and Wrath of Air belongs to the Elemental.
   const shaman = oneOfEach('Shaman', 'Enhancement')
-  const airTotems = coveredIds(shaman.partyScoped).filter((id) => id.includes('air-totem'))
-  expect(airTotems.length, 'one Shaman lists every air totem').toBeGreaterThan(1)
+  const airTotems = coveredIds(shaman.partyScoped).filter((id) => ['windfury-totem', 'grace-of-air-totem', 'wrath-of-air-totem'].includes(id))
+  expect(airTotems.sort(), 'one Enhancement Shaman lists both of its air totems').toEqual(['grace-of-air-totem', 'windfury-totem'])
 
   // One Warrior, both shouts.
   const warrior = oneOfEach('Warrior', 'Fury')

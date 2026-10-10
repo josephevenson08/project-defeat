@@ -76,7 +76,7 @@ export type Buff = BuffProvider & {
    * maximum health, resistances, damage multipliers, weapon procs and timed raid cooldowns. Holds
    * the real effect, so the buff can be listed and read without pretending it is being applied.
    *
-   * Fifteen of the thirty-three are like this, and leaving them out entirely was worse: a raid
+   * `unmodelledBuffs` counts them, and leaving them out entirely was worse: a raid
    * planner with no Bloodlust in it reads as an oversight rather than a stated limit. Same treatment
    * `Enchant.notModelled` and `ItemEffect.notModelled` already get.
    */

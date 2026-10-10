@@ -57,9 +57,11 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
  *   *above* its reference — a spec that does is double-counting something, caught twice.
  *
- *   **The worst spec is Warlock Demonology now, not Feral**, and what it is missing is the same thing
- *   the hunter was: a pet. Its demon is unmodelled, which is why Master Demonologist is still refused
- *   with "No pet model here" — the one place that phrase is still true.
+ *   **Warlock Demonology was the worst spec, and what it was missing is the same thing the hunter
+ *   was: a pet.** The Felguard has been modelled since 2026-08-29 (`warlockPet.ts`), for the one spec
+ *   that keeps its demon. Master Demonologist is still refused, because its bonus depends on which
+ *   demon is out and the Felguard model doesn't read it yet. This paragraph said "Its demon is
+ *   unmodelled" until 2026-10-09, contradicting `docs/known-limitations.md`.
  *
  *   **Marksmanship is now within 5% of its reference, and that is worth reading carefully.** It is
  *   the spec with the least left to model — auto shot, Steady Shot and a pet, all three of which are

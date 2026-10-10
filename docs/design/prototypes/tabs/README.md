@@ -294,17 +294,20 @@ problems in the app's own data:
   - Destroyer Shoulderblades drop from **Void Reaver**, not Kael'thas.
   - Pendant of the Perilous is **Serpentshrine Cavern trash**, not a Karazhan drop.
   - Tier 5 tokens drop from **five** bosses: Lady Vashj, Void Reaver, Kael'thas Sunstrider, Leotheras the Blind and Fathom-Lord Karathress.
-- **The app's data:** each of these was raised as a separate fix-it task.
-  - `docs/known-limitations.md` and `src/featureFlags.ts` disagree on whether the Felguard is modelled.
-  - The stored Fury Warrior talent preset spends 48 of 61 points, and takes Flurry without Enrage. The Talents step found it is also short of the filler points that open its deeper rows, in both Arms and Fury, and the Arms preset has the same problem. wowsims lists only the talents its simulator reads.
-  - The live app's `canRemovePoint` counts all points in the tree, so it allows a removal the game refuses. For example, with 41 points in Fury it lets a Cruelty point out from under Rampage. The prototype checks the points above the deeper talent's row instead.
+- **The app's data: all fixed in the live app on 2026-10-09** (`src/`, with tests):
+  - **Felguard:** `featureFlags.ts` said the demon was unmodelled. It has been modelled since 2026-08-29, so the text now says so. Master Demonologist's skip reason no longer says "No pet model here", and a test pins it. The demon-damage comments in `warlockPet.ts` and `talentModifiers.ts` claimed Soul Link and Master Demonologist were read; only Unholy Power is.
+  - **The stored talent presets:** all 17 wowsims presets break the game's row rules, because wowsims lists only the talents its simulator reads. Two more turned up: Retribution takes Fanaticism without Repentance, and Enhancement takes Dual Wield Specialization without Dual Wield. They stay as upstream wrote them, which the simulator reads the same either way. The ingest now records `legal` and `gaps` per build, using the app's own `ruleBreaks`. The live Talents tab never shows them, so nothing on screen changed (the owner's choice: label them and show the gaps).
+  - **`canRemovePoint`** now checks the points above a deeper talent's row (`pointsAboveRow`). It refuses only a removal that breaks something that holds now, so a broken preset can't trap you. The old test that asserted the wrong rule now asserts the right one, plus the Rampage case.
+  - **Raid reach:**
+    - Gift of the Wild, Prayer of Fortitude, Arcane Brilliance and Prayer of Spirit reach any group (`castOnAnyGroup`).
+    - Heroism/Bloodlust is raid-wide on Anniversary realms (`anniversaryRaidWide`, citing patch 2.5.5).
+    - Shaman totems come from the spec that runs them, and Tranquil Air Totem is gone (32 buffs now).
+    - The Raid Composition intro now computes its count instead of saying "24 of the 33".
+    - The Raid Composition prototype has the same rules, with an "Any group" tag.
+  - **Elixir notes:** the consumables ingest says what each item grants. Elixir of Major Fortitude now reads "maximum health" and Gift of Arthas "resistances".
+  - **Lady Vashj's loot:** Destroyer Greathelm is the tank helm, and the DPS Destroyer Battle-Helm was added. Leotheras also gained the tank gloves (Destroyer Handguards). The prototype's raids page still shows its own copy of the loot.
+  - **The zone-map credit** no longer cites Microsoft's "Game Content Usage Rules". It's in `zoneMaps.json`, its ingest, `features.md` and the test.
   - The prototype's hit cap ignored Precision (fixed in the prototype; the live app shows no cap line).
-  - **From the Buffs step:**
-    - Gift of the Wild, Prayer of Fortitude, Arcane Brilliance and Prayer of Spirit buff "the target's party", so one caster covers every group. The live app's raid coverage, and the Raid Composition prototype, treat them as the caster's group only.
-    - Heroism/Bloodlust is raid-wide on Anniversary realms (patch 2.5.5). The app treats it as party-only.
-    - The owner's totems-by-spec rule (Enhancement: Strength of Earth, Grace of Air, Windfury) isn't in the app's raid coverage, which credits any Shaman with every totem and one air totem each.
-    - Elixir of Major Fortitude and Gift of Arthas carry a note saying they "grant only school-specific spell power". One gives health, the other Shadow resistance.
-  - Lady Vashj's loot lists **Destroyer Greathelm**, the tank helm, tagged for physical DPS. The DPS helm is Destroyer Battle-Helm.
 - **Also noted:** `craftingPaths.json` marks some starter recipes, such as Rough Sharpening Stone, as not trainer-taught. That looks wrong.
 
 ## Known gaps

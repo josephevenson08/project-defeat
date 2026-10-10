@@ -21,6 +21,8 @@ import {
 } from '../../domain/raidcomp'
 import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
 import { describeProvider } from '../../domain/buffs/buffTypes'
+import { isPartyScoped } from '../../domain/buffs/buffScope'
+import { sampleBuffs } from '../../domain/buffs/sampleBuffs'
 import { describeStats } from '../../domain/stats/describeStats'
 import { downloadRosterImage } from './exportRosterImage'
 import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
@@ -28,13 +30,16 @@ import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
 /**
  * The raid-composition planner: a seating chart in, buff coverage out.
  *
- * **Built around groups because in TBC composition *is* group assignment.** 24 of the 33 raid buffs
- * are party-scoped — every totem, every aura, both Warrior shouts — so which group the Shaman sits in
+ * **Built around groups because in TBC composition *is* group assignment.** Most raid buffs reach only
+ * the caster's group — every totem, every aura, both Warrior shouts — so which group the Shaman sits in
  * decides who actually receives Strength of Earth. The first version treated everything as raid-wide
  * and told a raid leader Battle Shout was covered when five of twenty-five players had it.
  */
 
 const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 'Caster DPS']
+
+/** For the intro, and computed so it cannot go stale the way the hard-coded "24 of the 33" did. */
+const PARTY_ONLY_COUNT = sampleBuffs.filter((buff) => isPartyScoped(buff.id)).length
 
 /*
  * There used to be a "usually 2-3 tanks, 5-7 healers" band here, in amber when a roster fell outside
@@ -170,7 +175,7 @@ function SeatContributionCard({ slot }: { slot: RosterSlot }) {
  *
  * The effect is **derived from the same fields the stat totals read**, not written again here, so the
  * card cannot describe something the planner is not applying. A buff whose value this app cannot
- * express as a stat change says so in its own words instead — 15 of the 33 are like that, and
+ * express as a stat change says so in its own words instead — `unmodelledBuffs` counts them, and
  * Bloodlust reading "not modelled" is more use than Bloodlust reading nothing.
  */
 function BuffCard({ buff }: { buff: Buff }) {
@@ -350,9 +355,12 @@ export function RaidCompositionPanel() {
       <header className="panel-head">
         <h2>Raid Composition</h2>
         <p className="panel-copy">
-          Seat a raid and see what each group receives. <strong>24 of the 33 raid buffs are party-scoped
-          in TBC</strong> — totems, auras and shouts reach only the caster's group of five — so where
-          someone sits matters as much as whether they are in the raid.{' '}
+          Seat a raid and see what each group receives.{' '}
+          <strong>
+            {PARTY_ONLY_COUNT} of the {sampleBuffs.length} raid buffs reach only the caster's group
+          </strong>{' '}
+          — totems, auras and shouts — so where someone sits matters as much as whether they are in the
+          raid.{' '}
           <strong>To move a player, press Move on their seat and then the seat you want them in</strong>
           {' '}— or drag them there. Click a name to label the seat.
         </p>
