@@ -85,25 +85,30 @@ upgrades from your in-game export. It will run on a Raspberry Pi. See the
 Research into how 25 gaming companies and player tools design their sites in 2024–2026
 ([findings](docs/research/gaming-ui/README.md)) led to a [plan](docs/design/UI-REFRESH-PLAN.md),
 then to clickable [design prototypes](docs/design/prototypes/README.md) of every tab. Their animation
-is tuned to TBC by [this research](docs/research/wow-tbc-motion/README.md).
+is tuned to TBC by [this research](docs/research/wow-tbc-motion/README.md). **Try them:** the
+[prototype gallery](https://josephevenson08.github.io/project-defeat/prototypes/) is published beside the app.
 
 ### Picking the work back up
 
-The prototype work was last updated on 2026-10-07. **Continue from
+The prototype work was last updated on 2026-10-10. **Continue from
 [`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md)**:
 the top section says where things stand and what's next. In short:
 
 1. **Backgrounds: done.** Every tab now has its own colour over the original crystal and water, and
    the Dark Portal designs are dropped.
-2. **Raid Composition: done.** Design A, the Terrace of Light, was picked and is now the Raid
-   Composition page. It has a full planning table that was browser-tested control by control.
+2. **Raid Composition: done.** Design A's planning table was picked, made dark, and given a
+   click-to-fill palette of spec icons. It was browser-tested control by control.
 3. **Gallery: done.** The [prototype gallery](docs/design/prototypes/index.html) shows the current
    tabs first. The tabs no longer use a full-screen curtain between them.
 4. **Character Planner, Gear: done.** It's a character sheet with game-style tooltips, plus a
    "What's left" checklist that says which upgrades, enchants and gems are missing and where they drop.
 5. **Character Planner, Compare: done.** Your item's tooltip sits next to another's, with the trade summed up in
    one sentence.
-6. **Next:** continue the tab-by-tab walkthrough with the planner's Talents sub-tab. Professions comes later.
+6. **Character Planner, Talents and Buffs: done.** The game's talent window with a list of what a build
+   breaks, and the buffs your raid actually brings, as clickable icons.
+7. **Each tab's text accents follow its colour, and the gallery is always dark.**
+8. **Next:** notes on the prototype work in the Obsidian vault, then the planner's Ranked Gear and Build
+   sub-tabs. Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

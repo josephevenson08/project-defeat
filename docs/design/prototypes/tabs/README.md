@@ -73,6 +73,16 @@ WebGL-off fallback gradient uses the same colour.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
 
+## Published on GitHub Pages (2026-10-10)
+
+The owner approved this on 2026-10-10. The deploy publishes the prototypes beside the app, so the gallery is at
+https://josephevenson08.github.io/project-defeat/prototypes/ and each tab is under `/prototypes/tabs/`. The app
+stays at `/project-defeat/`, unchanged, and doesn't link to them.
+
+- **The copy:** `tools/publish/copy-prototypes.mjs` runs in `deploy.yml` after `npm run build`. It copies this folder into `dist/prototypes/` (about 3.2 MB), leaving out `tabs/checks/`, the `.mjs` generators, the `.md` notes and hidden folders.
+- **Icons:** the four places that load icons (`buff-common.js`, `gear-common.js`, `talent-common.js`, `raid-composition.html`) pick their folder from where the page is opened: `../../../../public/icons/` in the repo, and the app's own published `/icons/` on the site. No icons are copied twice.
+- **Checking it:** `checks/published.mjs` opens the gallery and every page it links to (53), as the site serves them. It checks each page loads with no script errors or failed requests, that every icon comes back as an image (618), and that the app still loads. Run it after `npm run build && node tools/publish/copy-prototypes.mjs` with the `project-defeat-preview` server up. Set `BASE=https://josephevenson08.github.io/project-defeat/` to check the live site.
+
 ## Text accents follow each tab (2026-10-10)
 
 The owner said yes on 2026-10-09: links, headings and buttons take each tab's colour, as Raid Composition's gold does.

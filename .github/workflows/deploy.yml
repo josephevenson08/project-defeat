@@ -51,9 +51,14 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
+      # The design prototypes are published beside the app, at /prototypes/. This runs after the
+      # build because `vite build` empties dist/. They use the app's own icons from dist/icons/.
+      - run: node tools/publish/copy-prototypes.mjs
+
       - uses: actions/configure-pages@v6
-      # v4 stopped including dotfiles in the artifact. Checked against this build: `dist` holds
-      # index.html, favicon.svg, icons.svg, icons/ and assets/ — no dotfiles, so nothing is lost.
+      # v4 stopped including dotfiles in the artifact. Checked against this build (2026-10-10): `dist`
+      # holds index.html, the app's assets, fonts, icons, maps and raid images, and prototypes/ — no
+      # dotfiles, so nothing is lost.
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

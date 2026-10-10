@@ -15,7 +15,7 @@ further down this file is the record of how earlier decisions were reached, newe
 ### In short
 
 - **The live app** (`src/`) changed on 2026-10-09 for the first time since 2026-09-30: the data and rule fixes the prototype work found (below). It deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/
-- **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/). It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
+- **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published beside the app at https://josephevenson08.github.io/project-defeat/prototypes/. It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
 ### The live-app fixes are committed and pushed (2026-10-10)
@@ -47,9 +47,9 @@ Or install Chromium with `npx playwright install chromium` and run `npm run test
    emerald and Professions amber; the rest already followed their scene. See `tabs/README.md`, "Text accents
    follow each tab".
 2. ~~**The gallery is always dark.**~~ **Done 2026-10-10.**
-3. **The prototypes on GitHub Pages:** the plan is approved (2026-10-10). A copy script puts the prototypes
-   at `/prototypes/` in the build (without `tabs/checks/`, `*.mjs` or `*.md`), the 4 icon paths pick their
-   folder from where the page is opened, and `deploy.yml` runs the copy after `npm run build`. The prototypes reach outside
+3. ~~**The prototypes on GitHub Pages.**~~ **Done 2026-10-10:** https://josephevenson08.github.io/project-defeat/prototypes/.
+   `tools/publish/copy-prototypes.mjs` runs in `deploy.yml` after the build, and the 4 icon paths pick their folder
+   from where the page is opened. `tabs/checks/published.mjs` checks the built site (see `tabs/README.md`). The prototypes reach outside
    their folder only for `../../../../public/icons/` (4 places: `buff-common.js`, `gear-common.js`,
    `talent-common.js`, `raid-composition.html`); nothing else is root-relative.
 4. **Obsidian notes on the prototype work,** with the brain-sync skill.

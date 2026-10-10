@@ -11,7 +11,8 @@
 "use strict";
 const D=window.GEAR_DATA;
 if(!D){if(window.console)console.warn("gear-common: GEAR_DATA missing");return;}
-const ICON_DIR="../../../../public/icons/";
+/* the app's own icons: public/icons/ in the repo, /icons/ beside /prototypes/ on the published site */
+const ICON_DIR=location.pathname.indexOf("/docs/design/prototypes/")>=0?"../../../../public/icons/":"../../icons/";
 /* the special-attack hit cap against a level-73 boss: 9% at 15.77 rating per 1% = 142 rating. Each Precision rank in the
    Talents tab (talent-common.js, when the page loads it) is 1% the gear doesn't have to supply, so 3/3 makes it 95.
    Past the cap extra hit isn't wasted for a dual-wielder: it still stops white swings missing. Raid help (Improved

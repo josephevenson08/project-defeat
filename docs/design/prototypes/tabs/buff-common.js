@@ -18,7 +18,8 @@
 "use strict";
 const D=window.BUFF_DATA;
 if(!D){if(window.console)console.warn("buff-common: BUFF_DATA missing");return;}
-const ICON_DIR="../../../../public/icons/";
+/* the app's own icons: public/icons/ in the repo, /icons/ beside /prototypes/ on the published site */
+const ICON_DIR=location.pathname.indexOf("/docs/design/prototypes/")>=0?"../../../../public/icons/":"../../icons/";
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const iconUrl=n=>n?ICON_DIR+n+".jpg":"";
 const BY={},CON={};
