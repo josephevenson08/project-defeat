@@ -43,13 +43,13 @@ config in the repo: `npx playwright test -c playwright.edge.config.ts`. It takes
 Or install Chromium with `npx playwright install chromium` and run `npm run test`.
 
 **Next, in order** (the owner said yes to all of these on 2026-10-09):
-1. **Text accents follow each tab's colour.** Only three prototype tabs still use Home's teal: the Character
-   Planner, Spec Tier Lists and Professions. Simulation is already gold, Raids already follows the raid, and
-   Raid Composition is gold. Each needs one override of `--glow`, `--glow-ink`, `--glow-soft`, `--rim`, `--rim-2`
-   and `--focus`, taken from its scene colour in `tbc-kit.js` (`EXTRA_HEX` / `AUC`).
-2. **The gallery is always dark:** `../design/prototypes/index.html` lines 11–32. Make the dark values the
-   only ones; nothing on the page switches the theme.
-3. **The prototypes on GitHub Pages:** plan the build change first and show it. The prototypes reach outside
+1. ~~**Text accents follow each tab's colour.**~~ **Done 2026-10-10:** the Planner is sky blue, Tier Lists
+   emerald and Professions amber; the rest already followed their scene. See `tabs/README.md`, "Text accents
+   follow each tab".
+2. ~~**The gallery is always dark.**~~ **Done 2026-10-10.**
+3. **The prototypes on GitHub Pages:** the plan is approved (2026-10-10). A copy script puts the prototypes
+   at `/prototypes/` in the build (without `tabs/checks/`, `*.mjs` or `*.md`), the 4 icon paths pick their
+   folder from where the page is opened, and `deploy.yml` runs the copy after `npm run build`. The prototypes reach outside
    their folder only for `../../../../public/icons/` (4 places: `buff-common.js`, `gear-common.js`,
    `talent-common.js`, `raid-composition.html`); nothing else is root-relative.
 4. **Obsidian notes on the prototype work,** with the brain-sync skill.

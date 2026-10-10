@@ -8,27 +8,19 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Barlow+Semi+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
   /* Layout: a studio contact sheet. One intro block, then a 2-column grid of live thumbnails. */
+  /* Always dark, like every tab (owner, 2026-10-09). */
   :root {
-    --bg: #f3f1ec;
-    --surface: #fbfaf7;
-    --ink: #1c1b19;
-    --ink-dim: #5b5850;
-    --line: #d9d4c8;
-    --brass: #8a6a2f;
-    --epic: #7b2fb8;
+    color-scheme: dark;
+    --bg: #121315;
+    --surface: #1a1b1e;
+    --ink: #ebe7de;
+    --ink-dim: #a39e93;
+    --line: #2e2f33;
+    --brass: #c9a35a;
+    --epic: #b77cf0;
     --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
     --font-ui: 'Barlow Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #121315; --surface: #1a1b1e; --ink: #ebe7de; --ink-dim: #a39e93;
-      --line: #2e2f33; --brass: #c9a35a; --epic: #b77cf0; color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #121315; --surface: #1a1b1e; --ink: #ebe7de; --ink-dim: #a39e93;
-    --line: #2e2f33; --brass: #c9a35a; --epic: #b77cf0; color-scheme: dark;
   }
   * { box-sizing: border-box; }
   body {

@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09). Next come the live-app fixes and the owner's other answered items (see the next-session plan), then Ranked Gear.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next come the owner's other answered items (see the next-session plan), then Ranked Gear.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,23 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## Text accents follow each tab (2026-10-10)
+
+The owner said yes on 2026-10-09: links, headings and buttons take each tab's colour, as Raid Composition's gold does.
+Simulation (gold) and Raids (per raid) already did. Home keeps its own teal. Three tabs changed, each taking the
+colour from its scene in `tbc-kit.js`:
+
+| Tab | Accent | Note |
+| --- | --- | --- |
+| Character Planner | Sky blue `#7cc4ff` | Paler than rare-item blue (`#4ba3ff`), so links don't read as item names. Also on the twelve Gear, Compare, Talents and Buffs design pages, which are copies of the planner. |
+| Spec Tier Lists | Emerald `#3ee0a0` | |
+| Professions | Amber `#ffb547` | The map's spawn-density cells stay teal (`--map-cell`), so they still read apart from the amber route. |
+
+- **What changed:** each page's `--glow`, `--glow-ink`, `--glow-soft`, `--rim`, `--rim-2` and `--focus`. The planner's row highlights and two design-B scripts had teal written in directly; those now mix from `--glow`.
+- **Unchanged:** panels and body text keep their neutral colours.
+- **Contrast:** the accent is at least 7:1 on the panels and on its own soft chips, and button text on it is at least 9.8:1.
+- **Checks:** `gear`, `compare`, `talents` and `buffs-handson.mjs p` all pass, and so does `check-bg.mjs` (its only messages are the expected WebGL-off ones).
 
 ## Character Planner: the Buffs tab (2026-10-09)
 

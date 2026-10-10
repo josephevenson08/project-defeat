@@ -34,9 +34,9 @@ css.textContent=`
 .tb-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:6px 8px;border-radius:8px;border:1px solid transparent}
 .tb-line b{font:600 var(--t-sm) var(--f-body);color:var(--ink)}
 .tb-line .cv{grid-column:1/-1;font-size:var(--t-xs);color:var(--ink-3)}
-.tb-line.chg{background:rgba(79,216,200,.12);border-color:var(--glow)}
+.tb-line.chg{background:color-mix(in srgb,var(--glow) 12%,transparent);border-color:var(--glow)}
 html.motion .tb-line.chg{animation:tbGlow 1.6s ease-out}
-@keyframes tbGlow{0%{box-shadow:0 0 0 0 rgba(79,216,200,.6)}100%{box-shadow:0 0 0 10px rgba(79,216,200,0)}}
+@keyframes tbGlow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--glow) 60%,transparent)}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--glow) 0%,transparent)}}
 .tb-from{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
 .tb-chip{display:inline-flex;align-items:center;gap:5px;font:600 var(--t-xs) var(--f-body);color:var(--ink-2);background:var(--glass-2);border:1px solid var(--rim-2);border-radius:999px;padding:2px 9px 2px 2px;cursor:pointer;white-space:nowrap}
 .tb-chip img{width:20px;height:20px;border-radius:50%}

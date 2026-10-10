@@ -37,9 +37,9 @@ css.textContent=`
 .bb-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;padding:7px 8px;border-radius:8px;border:1px solid transparent}
 .bb-line b{font:600 var(--t-sm) var(--f-body)}.bb-line .v{font:700 var(--t-md) var(--f-body);font-variant-numeric:tabular-nums;color:var(--glow);text-align:right}
 .bb-line small{grid-column:1/-1;color:var(--ink-3);font-size:var(--t-xs)}
-.bb-line.chg{background:rgba(79,216,200,.12);border-color:var(--glow)}
+.bb-line.chg{background:color-mix(in srgb,var(--glow) 12%,transparent);border-color:var(--glow)}
 html.motion .bb-line.chg{animation:bbGlow 1.6s ease-out}
-@keyframes bbGlow{0%{box-shadow:0 0 0 0 rgba(79,216,200,.6)}100%{box-shadow:0 0 0 10px rgba(79,216,200,0)}}
+@keyframes bbGlow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--glow) 60%,transparent)}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--glow) 0%,transparent)}}
 .bb-armor{position:relative;height:10px;margin:8px 0 4px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden}
 .bb-armor i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#8a95a5,#c9d2de)}
 .bb-armor i.off{left:auto;background:repeating-linear-gradient(45deg,rgba(255,143,134,.55) 0 6px,rgba(255,143,134,.2) 6px 12px)}

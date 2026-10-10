@@ -9,16 +9,17 @@
 <style>
 :root{
   color-scheme:dark;
-  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(124,196,255,.22); --rim-2:rgba(124,196,255,.12);
   --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
-  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  /* text accents follow the tab's deep sea blue scene (owner, 2026-10-09) */
+  --glow:#7cc4ff; --glow-ink:#031427; --glow-soft:rgba(124,196,255,.14);
   --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
   --amber:#ffb547; --amber-ink:#1a1204;
   --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
   --scrim:rgba(3,10,14,.8);
   --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
   --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
-  --focus:#9ff3ea;
+  --focus:#c2e4ff;
   --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
   --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
@@ -212,8 +213,8 @@ html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62
    lifts out of the list with a brighter ground and an accent edge. */
 .gear li,.rank li,.bopt,tbody tr{transition:background-color .15s ease,box-shadow .15s ease,border-color .15s ease}
 .gear li:hover,.gear li:focus-within,.rank li:hover,.rank li:focus-within,.bopt:hover,.bopt:focus-within{
-  background:rgba(79,216,200,.10);border-color:var(--glow);box-shadow:inset 3px 0 0 var(--glow),0 0 14px rgba(79,216,200,.12)}
-tbody tr:hover,tbody tr:focus-within{background:rgba(79,216,200,.08);box-shadow:inset 3px 0 0 var(--glow)}
+  background:color-mix(in srgb,var(--glow) 10%,transparent);border-color:var(--glow);box-shadow:inset 3px 0 0 var(--glow),0 0 14px color-mix(in srgb,var(--glow) 12%,transparent)}
+tbody tr:hover,tbody tr:focus-within{background:color-mix(in srgb,var(--glow) 8%,transparent);box-shadow:inset 3px 0 0 var(--glow)}
 @media (prefers-reduced-motion:reduce){.gear li,.rank li,.bopt,tbody tr{transition:none}}
 </style>
 </head>

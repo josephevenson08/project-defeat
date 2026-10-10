@@ -4,10 +4,10 @@
 
 **The live-app fixes are committed and pushed.** They cover talents, raid reach and totems, loot, notes and the credit, and are listed in the README's "Data corrections". The app's whole Playwright suite passed 297 of 297 on Edge first. To run it again: `npx playwright test -c playwright.edge.config.ts`.
 
-**Next, the owner's answered items, in order:**
-1. **Text accents follow each tab's colour** (yes): links, headings and buttons, as Raid Composition's gold does. Only Planner, Tier Lists and Professions are still teal; Simulation and Raids already follow their scene (see the handoff).
-2. **The gallery is always dark** (yes).
-3. **Publish the prototypes on GitHub Pages** (yes): plan the build change first and show the plan.
+**The owner's answered items, in order:**
+1. ~~**Text accents follow each tab's colour**~~ **Done 2026-10-10:** Planner sky blue, Tier Lists emerald, Professions amber. See the [README](README.md#text-accents-follow-each-tab-2026-10-10).
+2. ~~**The gallery is always dark**~~ **Done 2026-10-10.**
+3. **Publish the prototypes on GitHub Pages:** the plan is approved (2026-10-10). A script copies `docs/design/prototypes/` into the build at `/prototypes/`, leaving out `tabs/checks/`, `*.mjs` and `*.md`. The 4 icon paths pick their folder from where the page is opened. Test with the `project-defeat-preview` server before pushing.
 4. **Obsidian notes on the prototype work** (yes), with the brain-sync skill.
 5. **Then the walkthrough:** Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
 

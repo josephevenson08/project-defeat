@@ -9,16 +9,17 @@
 <style>
 :root{
   color-scheme:dark;
-  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(255,181,71,.24); --rim-2:rgba(255,181,71,.12);
   --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
-  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  /* text accents follow the tab's amber scene (owner, 2026-10-09) */
+  --glow:#ffb547; --glow-ink:#1a1204; --glow-soft:rgba(255,181,71,.14);
   --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
   --amber:#ffb547; --amber-ink:#1a1204;
   --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
   --scrim:rgba(3,10,14,.8);
   --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
   --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
-  --focus:#9ff3ea;
+  --focus:#ffdca3; --map-cell:#4fd8c8;
   --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
   --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
@@ -159,13 +160,13 @@ table.climb tbody tr.sel{background:var(--glow-soft)}
 table.climb .rng{font:500 var(--t-sm) var(--f-mono);background:none;border:1px solid var(--rim);color:var(--glow);border-radius:999px;padding:3px 9px;cursor:pointer;white-space:nowrap}
 table.climb tr.sel .rng{background:var(--glow);color:var(--glow-ink);border-color:var(--glow)}
 .train{display:block;margin-top:6px;font-size:var(--t-xs);color:var(--warn);background:var(--warn-soft);border:1px solid rgba(255,207,122,.25);border-radius:6px;padding:4px 7px}
-.ore{display:inline-block;margin:0 4px 3px 0;font-size:var(--t-xs);padding:1px 7px;border-radius:999px;background:rgba(79,216,200,.08);border:1px solid var(--rim-2);white-space:nowrap}
+.ore{display:inline-block;margin:0 4px 3px 0;font-size:var(--t-xs);padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--glow) 8%,transparent);border:1px solid var(--rim-2);white-space:nowrap}
 .zl{font-size:var(--t-xs);color:var(--ink-2)}
 .zl .nm{color:var(--ink-3)}
 .gd{margin:12px 0 0;font-size:var(--t-sm);color:var(--ink-2);border-left:3px solid var(--glow);padding:4px 0 4px 12px}
 /* farming map */
 .map{width:100%;height:auto;display:block;border-radius:10px;background:radial-gradient(80% 80% at 50% 50%,#0a2a33,#041218);border:1px solid var(--rim-2)}
-.map .cell{fill:var(--glow)}
+.map .cell{fill:var(--map-cell)}
 .map .pts{stroke:#d7fff9;stroke-linecap:round;stroke-width:.9;opacity:.75}
 .map .route{fill:none;stroke:var(--amber);stroke-width:.7;stroke-linejoin:round;filter:drop-shadow(0 0 1.2px var(--amber))}
 .map .gridl{stroke:rgba(120,220,215,.08);stroke-width:.2}
@@ -533,7 +534,7 @@ function mapBox(){
   return box("b-map","Farming map · 300–325","Fel Iron, Hellfire Peninsula",
     `<p class="note" style="margin:0 0 10px" id="mapnote"><strong>A computed circuit, not a published route.</strong> Nearest-neighbour from the densest cell, each stop snapped to a real spawn, then uncrossed with 2-opt. A heuristic loop through the busy places, not the shortest possible one.</p>
      <div class="mapwrap">${svg}<span class="mapring" id="mapring" aria-hidden="true"></span></div>
-     <div class="maplegend"><span><i style="background:var(--glow);opacity:.6"></i>Spawn density (16 × 16)</span><span><i style="background:#d7fff9;border-radius:50%"></i>Recorded node</span><span><i style="background:var(--amber)"></i>Computed loop · ${R.stops.length} stops</span></div>
+     <div class="maplegend"><span><i style="background:var(--map-cell);opacity:.6"></i>Spawn density (16 × 16)</span><span><i style="background:#d7fff9;border-radius:50%"></i>Recorded node</span><span><i style="background:var(--amber)"></i>Computed loop · ${R.stops.length} stops</span></div>
      <p class="prov" style="margin:0">${R.pts.length} of <b class="num">${R.count}</b> recorded Fel Iron Deposits plotted (thinned for the bundle; the shape is kept, the count is not). Every mining node in Hellfire is Fel Iron at this skill. Loop length about ${(R.len/100).toFixed(1)}× the zone's width. Zone art is not drawn in this prototype. Source: Wowhead object=181555, <code>farmingRoutes.ts</code>.</p>`,6);
 }
 function zonesBox(){
