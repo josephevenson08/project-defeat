@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next come the owner's other answered items (see the next-session plan), then Ranked Gear.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so is [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the planner's Build tab.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,24 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## Character Planner: the Ranked Gear tab (2026-10-10)
+
+The fifth Step 2 walkthrough step. Three designs were built, each as the whole planner (with its chosen Gear, Compare,
+Talents and Buffs tabs) with only its Ranked Gear tab changed, over `ranked-common.js`. **The owner picked A, the guide
+slot by slot, with C as a second view, "Where it drops".** That is now the Ranked Gear tab of `planner.html`, behind a
+"Slot by slot" / "Where it drops" switch like the Gear tab's.
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| **A · The guide, slot by slot (picked)** | [`ranked-a.html`](ranked-a.html) | Pick a slot from your gear; its ranked items stand in Wowhead's order as the game's tooltips, fitted out with the gems and enchant the guide uses, each with the guide's note, where it drops, and Equip. Rings and trinkets share one list, and a unique one can't go in twice. |
+| B · What each one does for you (not picked) | [`ranked-b.html`](ranked-b.html) | Every ranked item you don't wear, sorted by Compare's example score, with what it replaces, the stats traded and the hit against the cap. Left out: its order rests on illustrative weights, which can't price procs (Tsunami Talisman, Wowhead's #4 trinket, topped the list at +92 because the trinket it replaces has only a proc), and the Simulation tab already ranks swaps with the simulator. |
+| **C · Where to get it (merged in as a view)** | [`ranked-c.html`](ranked-c.html) | The 56 items grouped by where they come from: Serpentshrine Cavern and Tempest Keep boss by boss in kill order, last tier's raids, world bosses, crafted, everything else. What you wear is ticked, upgrades are tagged, and "Only upgrades" hides the rest. |
+
+- **Every design reads the Gear tab's character** (the shared `planner` store), so what you wear is always marked correctly, and Equip changes the Gear tab too. The Step 1 list, which read "equipped" from the old hidden list and covered six slots, is gone, along with the old Compare code that read the same data.
+- **In the planner:** `ranked-planner.js` owns the heading and the view switch (kept for the browser session), and the switch shows how many upgrades are left. A and C draw into `#rkui-a` and `#rkui-c`.
+- **On a fresh planner you wear the top pick everywhere,** so C (and B) offer the Gear tab's part-geared example, which leaves 13 upgrades.
+- **Checks:** `checks/ranked-handson.mjs a|b|c|p` pass at 1280px, at 400px (44px targets) and with reduced motion; `p` runs both views and checks the switch is remembered. The Gear, Compare, Talents and Buffs checks still pass, and so does `check-bg.mjs`.
 
 ## Published on GitHub Pages (2026-10-10)
 
@@ -335,6 +353,8 @@ problems in the app's own data:
   - **Lady Vashj's loot:** Destroyer Greathelm is the tank helm, and the DPS Destroyer Battle-Helm was added. Leotheras also gained the tank gloves (Destroyer Handguards). The prototype's raids page still shows its own copy of the loot.
   - **The zone-map credit** no longer cites Microsoft's "Game Content Usage Rules". It's in `zoneMaps.json`, its ingest, `features.md` and the test.
   - The prototype's hit cap ignored Precision (fixed in the prototype; the live app shows no cap line).
+- **The prototype's own gear data (found 2026-10-10, fixed):** `gen-gear-data.mjs` read boss names only in single quotes, so Al'ar and Kael'thas Sunstrider (written in double quotes for their apostrophes) were missed. Al'ar's three drops had no boss, and five Kael'thas drops were credited to Solarian (Thalassian Wildercloak, Leggings of Murderous Intent, Telonicus's Pendant of Mayhem, Band of the Ranger-General, Rod of the Sun King). The Gear tab's checklist and the tooltips now name the right boss.
+- **To check, not changed:** `tempestKeepBosses.ts` tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both, much like the Vashj helm. Warbringer Battle-Helm (Karazhan) has no boss in the app's data; the guide only says "Karazhan".
 - **Also noted:** `craftingPaths.json` marks some starter recipes, such as Rough Sharpening Stone, as not trainer-taught. That looks wrong.
 
 ## Known gaps

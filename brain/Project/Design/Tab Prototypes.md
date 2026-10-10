@@ -13,7 +13,7 @@ Each page shares one scene, a naaru-like crystal over water, and gives it its ow
 | Tab | Page | Scene | Accent | Where it stands |
 | --- | --- | --- | --- | --- |
 | Home | `home.html` | Teal, the original; one soft crystal swell per session | Teal | Settled |
-| Character Planner | `planner.html` | Deep sea blue, rising bubbles | Sky blue | Gear, Compare, Talents and Buffs decided; Ranked Gear and Build next |
+| Character Planner | `planner.html` | Deep sea blue, rising bubbles | Sky blue | Gear, Compare, Talents, Buffs and Ranked Gear decided; Build next |
 | Simulation | `simulation.html` | Gold over violet, crystal pillars | Gold | Step 1 baseline |
 | Raid Composition | `raid-composition.html` | Warm white-gold, one light per raid group | Gold | Decided |
 | Spec Tier Lists | `tier-lists.html` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |

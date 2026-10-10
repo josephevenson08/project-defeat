@@ -161,14 +161,6 @@ td.d-up{color:var(--tier-b)} td.d-dn{color:var(--tier-s)} td.d-eq{color:var(--in
 .score .bar{height:8px;background:var(--rim-2);border-radius:4px;overflow:hidden}
 .score .bar i{display:block;height:100%;background:var(--glow);transform-origin:left;border-radius:4px}
 .score .bar.b i{background:var(--q-epic)}
-/* ranked gear */
-ol.rank{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
-ol.rank li{display:grid;grid-template-columns:30px 1fr;gap:2px 10px;align-items:center;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;padding:7px 10px;font-size:var(--t-sm)}
-ol.rank li.eq{border-color:var(--glow)}
-ol.rank .n{grid-row:span 2;font:400 var(--t-lg) var(--f-head);color:var(--glow);text-align:center}
-ol.rank .m{color:var(--ink-3);font-size:var(--t-xs)}
-@media (min-width:900px){ol.rank li{grid-template-columns:30px 1.4fr .5fr .7fr 1.3fr}ol.rank .n{grid-row:auto}}
-@media (max-width:899px){ol.rank li>:not(.n){grid-column:2}}
 /* dense sub-tabs: the scene dims a step further and slows */
 #scene,.fallback{transition:filter .6s ease}
 html[data-dense="1"] #scene,html[data-dense="1"] .fallback{filter:brightness(.62) saturate(.8)}
@@ -194,7 +186,7 @@ tbody tr:hover,tbody tr:focus-within{background:color-mix(in srgb,var(--glow) 8%
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Step 2 · Character Planner. Gear is design B, the character sheet, with design C's checklist (picked 2026-10-09); Compare is design A, side-by-side tooltips, with design B's summary (picked 2026-10-09); Talents is design A, the talent window, with design C's "What's off" list (picked 2026-10-09); Buffs is design C, from your raid, with design A's icons (picked 2026-10-09). Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Character Planner. Gear is design B, the character sheet, with design C's checklist (picked 2026-10-09); Compare is design A, side-by-side tooltips, with design B's summary (picked 2026-10-09); Talents is design A, the talent window, with design C's "What's off" list (picked 2026-10-09); Buffs is design C, from your raid, with design A's icons (picked 2026-10-09); Ranked Gear is design A, the guide slot by slot, with design C's "Where it drops" view (picked 2026-10-10). Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -289,15 +281,7 @@ tbody tr:hover,tbody tr:focus-within{background:color-mix(in srgb,var(--glow) 8%
     </div>
 
     <div class="panel" id="p-ranked" role="tabpanel" aria-labelledby="t-ranked">
-      <h3>Ranked gear</h3>
-      <p class="lead">Wowhead's Fury Warrior Phase 2 order for each slot. Your equipped item is outlined.</p>
-      <div class="subtabs" id="rpick" role="group" aria-label="Slot" hidden style="padding:0 0 10px;border:0"><button type="button" aria-pressed="true">Head</button><button type="button" aria-pressed="false">Chest</button><button type="button" aria-pressed="false">Legs</button><button type="button" aria-pressed="false">Trinket 1</button><button type="button" aria-pressed="false">Main Hand</button><button type="button" aria-pressed="false">Off Hand</button></div>
-      <ol class="rank" id="rlist" aria-label="Head, ranked">
-        <li class="eq"><span class="n">1</span><span class="q-epic">Destroyer Battle-Helm</span><span class="m num">ilvl 133</span><span class="m">Best · equipped</span><span class="m">Drop: Serpentshrine Cavern</span></li>
-        <li><span class="n">2</span><span class="q-epic">Furious Gizmatic Goggles</span><span class="m num">ilvl 127</span><span class="m">Great</span><span class="m">Profession: Engineering BoP</span></li>
-        <li><span class="n">3</span><span class="q-epic">Warbringer Battle-Helm</span><span class="m num">ilvl 120</span><span class="m">P1 BiS</span><span class="m">Drop: Karazhan</span></li>
-      </ol>
-      <p class="prov" style="margin:0"><a href="https://www.wowhead.com/tbc/guide/classes/warrior/fury/dps-bis-gear-pve-phase-2">Wowhead Fury Warrior DPS BiS, Phase 2</a> · item levels: wowsims/tbc catalogue</p>
+      <div id="rkui"><div id="rkui-a"><p class="prov">The Ranked Gear tab needs JavaScript.</p></div><div id="rkui-c" hidden></div></div>
     </div>
 
     <div class="panel" id="p-build" role="tabpanel" aria-labelledby="t-build">
@@ -454,7 +438,8 @@ size();still();
 </script>
 <script src="tbc-kit.js"></script>
 <script>
-/* Planner page script: sub-tabs, compare, ranked gear, build; then the motion layer.
+/* Planner page script: sub-tabs, build; then the motion layer. Gear, Compare, Talents, Buffs and Ranked Gear draw
+   themselves from their own scripts at the end of the page.
    Every lookup is guarded, so a missing element or library leaves the static page in place. */
 (function(){
 "use strict";
@@ -474,13 +459,7 @@ if(KIT)KIT.theme("planner",{instant:true}); /* the tab's own colour: deep sea bl
 /* K10: the hit-cap warning takes a slow sickly-green tint while hit is under cap (the text stays the cue) */
 const HIT={have:140,cap:95}; /* the special-attack cap with the Fury preset's Precision 3/3; gear-common.js keeps it live */
 const taintHit=()=>{const el=$("#hitwarn");if(KIT&&el)KIT.taint(el,HIT.have<HIT.cap);};
-/* real data, generated from src/domain: Wowhead Fury Warrior Phase 2 rankings resolved through the
-   wowsims/tbc item catalogue (RK). The Talents tab has its own data (talent-data.js). */
-const RK={"Head":[[1,"Destroyer Battle-Helm","E",133,"Best","Drop: Serpentshrine Cavern",{"Str":47,"Sta":45,"Hit":21,"Crit":36}],[2,"Furious Gizmatic Goggles","E",127,"Great","Profession: Engineering BoP",{"Str":48,"Sta":28,"Hit":13,"Crit":38}],[3,"Warbringer Battle-Helm","E",120,"P1 BiS","Drop: Karazhan",{"Str":45,"Sta":45,"Hit":14,"Crit":24}]],"Chest":[[1,"Destroyer Breastplate","E",133,"Best","Drop: Tempest keep",{"Str":50,"Sta":48,"Hit":15,"Crit":33}],[2,"Bloodsea Brigand's Vest","E",128,"Best","Drop: Serpentshrine Cavern",{"Sta":24,"AP":92,"Hit":27,"Crit":36}],[3,"Krakken-Heart Breastplate","E",138,"Great","Drop: Serpentshrine Cavern",{"Str":61,"Agi":43,"Sta":42,"Hit":30}],[4,"Terrorweave Tunic","E",120,"Great (World Boss)","Drop: World Boss",{"AP":96,"Hit":21,"Crit":25}]],"Legs":[[1,"Leggings of Murderous Intent","E",138,"Best","Drop: Tempest Keep",{"Agi":45,"Sta":31,"AP":92,"Crit":37}],[2,"Greaves of the Bloodwarder","E",128,"Great","Drop: Tempest Keep",{"Str":49,"Sta":46,"Crit":31}],[3,"Destroyer Greaves","E",133,"Great","Drop: Serpentshrine Cavern",{"Str":52,"Sta":57,"Hit":22,"Crit":32}],[4,"Scaled Greaves of the Marksman","E",120,"Great (World Boss)","Drop: Hellfire Peninsula",{"Agi":37,"AP":76,"Hit":16}]],"Trinket 1":[[1,"Dragonspine Trophy","E",125,"Best","Drop: Gruul's Lair",{"AP":40}],[2,"Badge of the Swarmguard","E",76,"Best","Drop: Ahn'Qiraj",{}],[3,"Bloodlust Brooch","E",110,"Best","Vendor: 41 Badges of Justice",{"AP":72}],[4,"Tsunami Talisman","E",128,"Best","Drop: Serpentshrine Cavern",{"Hit":10,"Crit":38}]],"Main Hand":[[1,"Dragonstrike","E",136,"Best","Profession: Master Hammersmith Blacksmithing BoP",{"Sta":19}],[2,"Dragonmaw","E",123,"Best","Profession: Master Hammersmith Blacksmithing BoP",{"Sta":9}],[3,"Rod of the Sun King","E",141,"Great","Drop: Tempest Keep",{"AP":52}],[4,"Talon of the Phoenix","E",134,"Great","Drop: Tempest Keep",{"AP":52,"Hit":15,"Crit":19}]],"Off Hand":[[1,"Talon of Azshara","E",134,"Best","Drop: Serpentshrine Cavern",{"Agi":15,"AP":40,"Hit":20}],[2,"Rod of the Sun King","E",141,"Great","Drop: Tempest Keep",{"AP":52}],[3,"Merciless Gladiator's Slicer","E",136,"Great","PvP: 2175",{"Sta":27,"AP":30,"Hit":10,"Crit":19}],[4,"Netherbane","E",134,"Great (Orc)","Drop: Tempest Keep",{"Agi":25,"Sta":21,"AP":40}]]};
-const EQ=new Set($$("#gear .q-epic").map(e=>e.textContent));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const qc=q=>q==="E"?"q-epic":q==="R"?"q-rare":q==="U"?"q-unc":"q-leg";
-const GL={"Head":"HD","Chest":"CH","Legs":"LG","Main Hand":"MH","Off Hand":"OH","Trinket 1":"T1"};
 
 /* ---------- planner sub-tabs (roving tabindex, arrow keys, Home/End) ---------- */
 const tabs=$$(".subtabs[role=tablist] [role=tab]");
@@ -534,48 +513,6 @@ on(resetBtn,"click",()=>{
   if(M.on&&M.deal)M.deal();
   if(KIT){const b=resetBtn.getBoundingClientRect();KIT.rebirth(b.left+b.width/2,b.top+b.height/2);}
 });
-
-/* ---------- compare: equipped item vs the next item on the list for that slot ---------- */
-const STN={Str:"Strength",Agi:"Agility",Sta:"Stamina",AP:"Attack Power",Hit:"Hit Rating",Crit:"Crit Rating",Exp:"Expertise Rating",Haste:"Haste Rating",ArP:"Armor Pen",Int:"Intellect"};
-/* illustrative weights for the example bars only; the app's real weights come from its simulator */
-const XW={Str:2.2,Agi:1.6,AP:1,Hit:2.4,Crit:2.1,Exp:2.5,Haste:1.6,ArP:.4};
-const xs=st=>Object.entries(st).reduce((a,[k,v])=>a+(XW[k]||0)*v,0);
-function renderCompare(slot){
-  const list=(typeof RK!=="undefined"&&RK[slot])||[],body=$("#cmpbody"),sc=$("#cmpscore");
-  if(!body||list.length<2)return;
-  const a=list.find(r=>EQ.has(r[1]))||list[0],b=list.find(r=>r!==a);
-  const card=(r,lab,cls)=>`<div class="icard${cls}"><span class="itemcell"><span class="glyph" aria-hidden="true">${GL[slot]||"··"}</span><span class="${qc(r[2])}">${esc(r[1])}</span></span><span class="prov">${lab} · rank ${r[0]} (${esc(r[4])}) · item level ${r[3]} · ${esc(r[5])}</span></div>`;
-  const keys=Object.keys(STN).filter(k=>k in a[6]||k in b[6]);
-  const rows=keys.map(k=>{const x=a[6][k]||0,y=b[6][k]||0,d=y-x;
-    return `<tr><th scope="row">${STN[k]}</th><td class="num">${x}</td><td class="num">${y}</td><td class="num ${d>0?"d-up":d<0?"d-dn":"d-eq"}">${d>0?"+":d<0?"−":"±"}${Math.abs(d)}</td></tr>`;}).join("");
-  body.innerHTML=`<div class="cmp">${card(a,"Equipped"," a")}${card(b,"Alternative","")}</div>`+
-    (rows?`<div class="scroll"><table><caption class="sr">Stat difference, ${esc(slot)}</caption><thead><tr><th scope="col">Stat</th><th scope="col">Equipped</th><th scope="col">Alternative</th><th scope="col">Change</th></tr></thead><tbody>${rows}</tbody></table></div>`
-      :`<p class="lead">Neither item has flat stats; both are valued by their on-use or proc effect, which the simulator models.</p>`);
-  if(sc){
-    const sa=xs(a[6]),sb=xs(b[6]),mx=Math.max(sa,sb,1);
-    sc.innerHTML=sa||sb?`<span>Equipped</span><span class="bar"><i style="width:${(sa/mx*100).toFixed(1)}%"></i></span><span class="num">${Math.round(sa)}</span>`+
-      `<span>Alternative</span><span class="bar b"><i style="width:${(sb/mx*100).toFixed(1)}%"></i></span><span class="num">${Math.round(sb)}</span>`:"";
-    if(M.on&&M.bars)M.bars(sc);
-  }
-}
-const cmpslot=$("#cmpslot");
-on(cmpslot,"change",()=>{renderCompare(cmpslot.value);say(live,"Comparing "+cmpslot.value);});
-if(cmpslot)renderCompare(cmpslot.value);
-
-/* ---------- ranked gear: slot picker re-renders the real list ---------- */
-const rlist=$("#rlist"),rpick=$("#rpick");
-function renderRanked(slot){
-  if(!rlist||typeof RK==="undefined"||!RK[slot])return;
-  rlist.setAttribute("aria-label",slot+", ranked");
-  rlist.innerHTML=RK[slot].map(r=>{const eq=EQ.has(r[1]);
-    return `<li${eq?' class="eq"':""}><span class="n">${r[0]}</span><span class="${qc(r[2])}">${esc(r[1])}</span><span class="m num">ilvl ${r[3]}</span><span class="m">${esc(r[4])}${eq?" · equipped":""}</span><span class="m">${esc(r[5])}</span></li>`;}).join("");
-  if(M.on&&M.rank)M.rank(rlist);
-}
-if(rpick&&rlist&&typeof RK!=="undefined"){
-  rpick.hidden=false;
-  $$("button",rpick).forEach(b=>on(b,"click",()=>{
-    $$("button",rpick).forEach(x=>x.setAttribute("aria-pressed",x===b));renderRanked(b.textContent);say(live,b.textContent+" ranking shown");}));
-}
 
 /* ---------- build: copy the share link, import a pasted build ---------- */
 const link=$("#sharelink");
@@ -668,9 +605,8 @@ M.panel=(p,k)=>A(()=>{
   safe(gsap.fromTo(kids,{y:16,autoAlpha:0},{y:0,autoAlpha:1,duration:.4,stagger:.04,ease:"power3.out",clearProps:"transform,opacity,visibility"}));
   if(k==="compare")M.bars($("#cmpscore"));
 });
-/* 4. example score bars grow; ranked rows stack in */
+/* 4. example score bars grow */
 M.bars=sc=>A(()=>{if(sc&&$("i",sc))safe(gsap.fromTo($$("i",sc),{scaleX:0},{scaleX:1,duration:.8,stagger:.12,ease:"power3.out"}));});
-M.rank=el=>A(()=>{const li=$$("li",el);if(li.length)safe(gsap.fromTo(li,{x:30,autoAlpha:0},{x:0,autoAlpha:1,duration:.4,stagger:.05,ease:"power3.out",clearProps:"transform,opacity,visibility"}));});
 /* 5. magnetic primary buttons (fine pointers only) */
 function magnets(){
   const offs=[];
@@ -738,5 +674,11 @@ setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach
 <!-- the Buffs tab: design C (from your raid) with design A's icon tiles, and a Blessing for each Paladin -->
 <script>window.BUFFS_IN_PLANNER="c";</script>
 <script src="buffs-c.js"></script>
+<!-- the Ranked Gear tab: design A (the guide, slot by slot) with design C (where it drops) as a second view -->
+<script>window.RANKED_IN_PLANNER="a+c";</script>
+<script src="ranked-common.js"></script>
+<script src="ranked-planner.js"></script>
+<script src="ranked-a.js"></script>
+<script src="ranked-c.js"></script>
 </body>
 </html>

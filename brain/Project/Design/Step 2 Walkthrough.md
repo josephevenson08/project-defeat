@@ -17,8 +17,9 @@ _Three designs per step, built as the whole page with one part swapped; the owne
 - **Planner · Compare (2026-10-09):** A, side-by-side tooltips, with B's one-sentence summary.
 - **Planner · Talents (2026-10-09):** A, the game's talent window, with C's "What's off" list.
 - **Planner · Buffs (2026-10-09):** C, the buffs your raid brings, with A's icon tiles and a Blessing per Paladin.
+- **Planner · Ranked Gear (2026-10-10):** A, Wowhead's order slot by slot as tooltips, with C's "Where it drops" (by raid and boss, upgrades marked) as a second view. B, sorted by an example score, was left out: illustrative weights can't price procs, and the Simulation tab already ranks swaps with the simulator.
 
-**Next:** the planner's Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+**Next:** the planner's Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
 
 **Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed.
 

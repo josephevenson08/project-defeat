@@ -106,8 +106,10 @@ the top section says where things stand and what's next. In short:
    one sentence.
 6. **Character Planner, Talents and Buffs: done.** The game's talent window with a list of what a build
    breaks, and the buffs your raid actually brings, as clickable icons.
-7. **Each tab's text accents follow its colour, and the gallery is always dark.**
-8. **Next:** the planner's Ranked Gear and Build sub-tabs. Professions comes later.
+7. **Character Planner, Ranked Gear: done.** Wowhead's order slot by slot as tooltips, or by where each
+   item drops with your upgrades marked.
+8. **Each tab's text accents follow its colour, and the gallery is always dark.**
+9. **Next:** the planner's Build sub-tab. Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

@@ -17,7 +17,8 @@ const bossOf = {};
 for (const [file, raid] of [["karazhanBosses", "Karazhan"], ["gruulsLairBosses", "Gruul's Lair"], ["magtheridonsLairBosses", "Magtheridon's Lair"],
   ["serpentshrineCavernBosses", "Serpentshrine Cavern"], ["tempestKeepBosses", "Tempest Keep"]]) {
   const t = fs.readFileSync(D + "raids/" + file + ".ts", "utf8");
-  const starts = [...t.matchAll(/name: '((?:[^'\\]|\\.)+)',\s*raidId: '[^']+',\s*encounterOrder: (\d+)/g)].map(m => ({ i: m.index, name: m[1].replace(/\\'/g, "'"), order: +m[2] }));
+  /* a name with an apostrophe may be double-quoted (name: "Al'ar"), so both quote styles count */
+  const starts = [...t.matchAll(/name: (?:'((?:[^'\\]|\\.)+)'|"([^"]+)"),\s*raidId: '[^']+',\s*encounterOrder: (\d+)/g)].map(m => ({ i: m.index, name: (m[1] || m[2]).replace(/\\'/g, "'"), order: +m[3] }));
   for (const m of t.matchAll(/wowItemId: (\d+)/g)) {
     const b = [...starts].reverse().find(s => s.i < m.index);
     if (b && !bossOf[m[1]]) bossOf[m[1]] = { boss: b.name, raid, order: b.order };
