@@ -29,10 +29,10 @@ Full chain: [[The Cudgel of Kar'desh]] (4 steps) · [[Attunement]]
 
 - [[Hydross the Unstable]] — encounter 1 · 22 notable drops
 - [[The Lurker Below]] — encounter 2 · 17 notable drops
-- [[Leotheras the Blind]] — encounter 3 · 24 notable drops
+- [[Leotheras the Blind]] — encounter 3 · 25 notable drops
 - [[Fathom-Lord Karathress]] — encounter 4 · 26 notable drops
 - [[Morogrim Tidewalker]] — encounter 5 · 21 notable drops
-- [[Lady Vashj]] — encounter 6 · 36 notable drops
+- [[Lady Vashj]] — encounter 6 · 37 notable drops
 
 ## Notable trash drops
 

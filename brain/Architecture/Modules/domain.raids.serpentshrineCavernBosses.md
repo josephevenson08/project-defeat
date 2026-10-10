@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raids/serpentshrineCavernBosses.ts
-lines: 248
+lines: 250
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.serpentshrineCavernBosses
 
-`src/domain/raids/serpentshrineCavernBosses.ts` · **domain** layer · 248 lines
+`src/domain/raids/serpentshrineCavernBosses.ts` · **domain** layer · 250 lines
 
 From the top of the file:
 
@@ -35,7 +35,7 @@ From the top of the file:
 
 ## Concepts & phases
 
-_None._
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 

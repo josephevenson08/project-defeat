@@ -2,18 +2,19 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleBuffs.ts
-lines: 423
+lines: 426
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleBuffs
 
-`src/domain/buffs/sampleBuffs.ts` · **domain** layer · 423 lines
+`src/domain/buffs/sampleBuffs.ts` · **domain** layer · 426 lines
 
 From the top of the file:
 
-> The thirty-three raid buffs of TBC Phase 2.
+> The raid buffs of TBC Phase 2: thirty-two, after Tranquil Air Totem was taken out on 2026-10-09 (no
+> Shaman spec runs it in a raid, the owner's call).
 > 
 > Every number below was read by hand off the Wowhead tooltip of the spell rank named in `spellId`,
 > then cross-checked against wowsims/tbc `sim/core/buffs.go` @3301fca5 — the same commit the item,
@@ -28,6 +29,12 @@ From the top of the file:
 > page first, which carries rank, level and required class — enough to pick the max rank a raid
 > actually uses and to reject the NPC copies that made id selection ambiguous before.
 > 
+> **Shaman totems come from the spec that runs them** (the owner's call, 2026-10-09). Any Shaman can
+> drop any of these, but a raid gets Strength of Earth, Grace of Air and Windfury from the
+> Enhancement Shaman in a melee group, Totem of Wrath and Wrath of Air from the Elemental, and Mana
+> Spring and Mana Tide from the Restoration Shaman. An Enhancement Shaman keeps both air totems up by
+> twisting them, which is why Windfury and Grace of Air are credited together.
+> 
 > **Where the two sources disagree, the tooltip wins.** wowsims models Blessing of Wisdom at 42 mp5;
 > spells 27142 and 27143 both say "restoring 41 mana every 5 seconds". 41 is used here. That is the
 > only outright conflict — everything else agreed to the digit.
@@ -36,7 +43,7 @@ From the top of the file:
 > cited. Where a talent or an idol raises it, the improved value is named in `notes` and attributed,
 > rather than being silently baked into a number nobody can check.
 > 
-> **Fifteen of the thirty-three carry `notModelled` instead of stats** — threat, maximum health,
+> **Some carry `notModelled` instead of stats** (`unmodelledBuffs` counts them) — threat, maximum health,
 > resistances, damage multipliers, weapon procs and timed cooldowns have nowhere to go in
 > `StatBlock`. They are listed anyway, with their real effect, because a raid planner that silently
 > omits Bloodlust reads as an oversight rather than a stated limit.
@@ -56,6 +63,7 @@ From the top of the file:
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
@@ -63,6 +71,7 @@ From the top of the file:
 
 - [[Buffs Debuffs and Consumables]]
 - [[Phase 3 - Character Systems]]
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 

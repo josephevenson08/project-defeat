@@ -20,7 +20,7 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
 - [[Physical DPS]] — Phase 2 is entirely about the Tainted Core relay; assign core runners in advance and do not improvise.
 - [[Healer]] — Phase 3 spore bat poison stacks on everyone; dispel priority is the tank, then core runners.
 
-## Notable drops (36)
+## Notable drops (37)
 
 - **Belt of One-Hundred Deaths** (Boss) — [[Physical DPS]]
 - **Cobra-Lash Boots** (Boss) — [[Physical DPS]]
@@ -60,8 +60,10 @@ Three phases and the hardest fight in Serpentshrine Cavern. Phase 1 is a spread-
   Real drop; not in the item catalogue, so it is listed by name only.
 - **Serpent Spine Longbow** (Boss) — [[Physical DPS]]
 - **Vestments of the Sea-Witch** (Boss) — [[Caster DPS]]
-- **Destroyer Greathelm** (Tier Token) — [[Physical DPS]]
-  Warrior T5 helm, redeemed from Helm of the Vanquished Defender.
+- **Destroyer Battle-Helm** (Tier Token) — [[Physical DPS]]
+  Warrior T5 helm (Destroyer Battlegear), redeemed from Helm of the Vanquished Defender.
+- **Destroyer Greathelm** (Tier Token) — [[Tank]]
+  Warrior T5 tanking helm (Destroyer Armor), redeemed from Helm of the Vanquished Defender. It was listed for physical DPS until 2026-10-09, with the DPS helm missing.
 - **Crystalforge Greathelm** (Tier Token) — [[Physical DPS]]
   Paladin T5 helm, redeemed from Helm of the Vanquished Champion.
 - **Crystalforge Faceguard** (Tier Token) — [[Tank]]

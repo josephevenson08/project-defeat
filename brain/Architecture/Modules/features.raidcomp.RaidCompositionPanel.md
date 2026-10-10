@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/RaidCompositionPanel.tsx
-lines: 765
+lines: 773
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.RaidCompositionPanel
 
-`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 765 lines
+`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 773 lines
 
 _No doc comment at the top of this file._
 
@@ -19,7 +19,9 @@ _No doc comment at the top of this file._
 
 ## Imports
 
+- [[domain.buffs.buffScope]] — `src/domain/buffs/buffScope.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
+- [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
@@ -33,7 +35,7 @@ _No doc comment at the top of this file._
 
 ## Concepts & phases
 
-_None._
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 

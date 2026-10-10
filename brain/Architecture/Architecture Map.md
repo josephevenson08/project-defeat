@@ -135,10 +135,10 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.index]] · 3 importers
 - [[domain.bis.rankedSource]] · 2 importers
 - [[domain.buffs.buffExclusivity]] · 1 importers
-- [[domain.buffs.buffScope]] · 1 importers
+- [[domain.buffs.buffScope]] · 2 importers
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
 - [[domain.buffs.buffTypes]] · 5 importers
-- [[domain.buffs.sampleBuffs]] · 4 importers
+- [[domain.buffs.sampleBuffs]] · 5 importers
 - [[domain.buffs.sampleTargetDebuffs]] · 3 importers
 - [[domain.builds.addonImport]] · 2 importers
 - [[domain.builds.buildSerialization]] · 4 importers

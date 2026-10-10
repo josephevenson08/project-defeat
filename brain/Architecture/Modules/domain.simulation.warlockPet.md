@@ -57,7 +57,7 @@ _None._
 
 ## Concepts & phases
 
-_None._
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 

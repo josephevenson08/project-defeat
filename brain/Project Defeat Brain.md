@@ -8,11 +8,12 @@ tags: [brain/home, moc]
 
 A local-first TBC Classic Anniversary simulator and gear planner, mapped as a graph. Start here.
 
-## The three maps
+## The maps
 
 - [[Architecture Map]] — 195 modules with their real import edges. The dependency graph, browsable.
 - [[TBC Knowledge Map]] — 9 classes, 27 specs, 5 raids, 24 bosses, 13 professions, and the mechanics behind them.
 - [[Roadmap Board]] — six phases, what is done, and what is honestly still missing.
+- [[UI Refresh]] — the redesign, still in prototypes: research, a plan, and every tab walked through with the owner.
 
 ## Orientation
 

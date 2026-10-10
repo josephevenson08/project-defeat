@@ -5,7 +5,7 @@
  *
  * Three layers, cross-linked:
  *   Architecture/  one note per source module, with real import/importer edges
- *   Project/       roadmap phases, decisions, provenance, session log
+ *   Project/       roadmap phases, decisions, provenance, session log, and the UI refresh prototypes (Design/)
  *   Domain/        TBC knowledge derived from the actual domain data (classes, specs, raids, bosses,
  *                  professions) plus curated concept notes
  *
@@ -638,9 +638,137 @@ const PHASES = [
   },
 ]
 
+/**
+ * The UI redesign lives in docs/, not src/: research, a plan, and static HTML prototypes the owner walks through
+ * tab by tab. None of it can be read off the source tree, so it is curated here, and each note links to the
+ * documents that hold the detail rather than restating them. `docs` are repo paths to Markdown files, linked as
+ * path wikilinks so they join the graph; `modules` are the live-app files the prototype work changed. Both are
+ * checked: a path that does not exist fails the run.
+ */
+const PROTOTYPES_URL = 'https://josephevenson08.github.io/project-defeat/prototypes/'
+const DESIGN_NOTES = [
+  {
+    title: 'UI Refresh',
+    summary: 'The redesign: research into 25 gaming platforms, a plan, then clickable prototypes of every tab, walked through with the owner.',
+    body: `**The live app has not changed its look yet.** Everything here is static HTML in \`docs/design/prototypes/\`, published beside the app at ${PROTOTYPES_URL} (2026-10-10). What has reached the app are the data and rule fixes the prototype work turned up (see ${link('Step 2 Walkthrough')}).
+
+**How it got here:**
+1. **Research (2026-10-02):** how 25 gaming companies and player tools design their sites, 2024 to 2026. The strongest trend: print the phase, the source and the data's age beside the numbers.
+2. **A plan** that turns the research's twelve recommendations (R1–R12) into work on the app. Its own status still reads "planned, not started"; the prototypes are where the design is being settled first.
+3. **Four rounds of prototypes (2026-10-03):** ten directions, of which the owner picked Launcher and Portal; those two in six styles; then 3D, motion and neumorphism pushed as far as they go. Round 4 combined the 3D Portal's Serpentshrine scene with the Motion Portal's motion, and is the style every tab is built in.
+4. **Step 1 (2026-10-04):** one page per tab of the site, seven in all, linked as one clickable site (${link('Tab Prototypes')}).
+5. **Step 2:** tab by tab, three designs per step, and the owner picks (${link('Step 2 Walkthrough')}).
+
+**The owner's standing rules for the prototypes:**
+- Every page is dark. A tab's identity comes from its scene colour, never from a light page.
+- No Blizzard art except the spell and item icons the live app already ships. No sound.
+- Motion and 3D can each be switched off, reduced motion gets a still frame, and every page works without WebGL.
+- The app targets TBC Anniversary Phase 2 on purpose, even though Phase 3 is live.`,
+    docs: [
+      ['docs/research/gaming-ui/README', 'Gaming UI research'],
+      ['docs/design/UI-REFRESH-PLAN', 'UI refresh plan'],
+      ['docs/design/prototypes/README', 'Prototype rounds 1–3'],
+      ['docs/design/prototypes/round4/README', 'Round 4, the chosen style'],
+      ['docs/design/prototypes/tabs/NEXT-SESSION-PLAN', 'Where the prototype work picks up'],
+    ],
+    modules: [],
+    related: ['Tab Prototypes', 'Step 2 Walkthrough', 'TBC Motion Kit', 'Prototype Publishing', 'Roadmap Board'],
+  },
+  {
+    title: 'Tab Prototypes',
+    summary: 'Seven pages, one per tab of the site, each with its own scene colour over the same crystal and water.',
+    body: `Each page shares one scene, a naaru-like crystal over water, and gives it its own colour and one small detail (decided 2026-10-05, built 2026-10-07). The Dark Portal designs for Home were dropped that day. Since 2026-10-10 each page's links, headings and buttons take its own colour too.
+
+| Tab | Page | Scene | Accent | Where it stands |
+| --- | --- | --- | --- | --- |
+| Home | \`home.html\` | Teal, the original; one soft crystal swell per session | Teal | Settled |
+| Character Planner | \`planner.html\` | Deep sea blue, rising bubbles | Sky blue | Gear, Compare, Talents and Buffs decided; Ranked Gear and Build next |
+| Simulation | \`simulation.html\` | Gold over violet, crystal pillars | Gold | Step 1 baseline |
+| Raid Composition | \`raid-composition.html\` | Warm white-gold, one light per raid group | Gold | Decided |
+| Spec Tier Lists | \`tier-lists.html\` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |
+| Raids | \`raids.html\` | Follows the chosen raid | Follows the raid | Step 1 baseline |
+| Professions | \`professions.html\` | Amber, ore veins up the pillars | Amber | Waits for a later update |
+
+Moving between tabs is a plain link. A full-screen curtain was tried and removed at the owner's request (2026-10-08).`,
+    docs: [
+      ['docs/design/prototypes/tabs/README', 'Tab prototypes: every decision and check'],
+      ['docs/design/prototypes/tabs/TABS-BRIEF', 'The brief for the seven pages'],
+    ],
+    modules: [],
+    related: ['UI Refresh', 'TBC Motion Kit', 'Step 2 Walkthrough'],
+  },
+  {
+    title: 'Step 2 Walkthrough',
+    summary: 'Three designs per step, built as the whole page with one part swapped; the owner picks one, often borrowing from another.',
+    body: `**How a step is done:** research the live app's version and its real data; build three designs, each a copy of the whole page with only that part swapped (\`make-*-pages.mjs\`); test each hands-on in a browser (\`checks/*-handson.mjs\`); show them side by side; then build the pick into the tab's page. The designs that lost stay as references, and the gallery shows the decision.
+
+**Decided so far:**
+- **Home (2026-10-05):** none of the three Dark Portal designs. Back to the original crystal over teal water, with every tab getting its own colour.
+- **Raid Composition (2026-10-07, 08):** design A's planning table, made dark, filled from a palette of spec icons, with a pencil to name players. B is kept for reference; C was dropped unbuilt.
+- **Planner · Gear (2026-10-09):** B, the character sheet, with C's "What's left" checklist.
+- **Planner · Compare (2026-10-09):** A, side-by-side tooltips, with B's one-sentence summary.
+- **Planner · Talents (2026-10-09):** A, the game's talent window, with C's "What's off" list.
+- **Planner · Buffs (2026-10-09):** C, the buffs your raid brings, with A's icon tiles and a Blessing per Paladin.
+
+**Next:** the planner's Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists. Professions comes later.
+
+**Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed.`,
+    docs: [
+      ['docs/design/prototypes/tabs/README', 'Each decision, with its checks'],
+      ['docs/dev-log/HANDOFF', 'Handoff: where this is right now'],
+    ],
+    modules: [
+      'domain/talents/talentTypes.ts',
+      'domain/buffs/buffScope.ts',
+      'domain/buffs/sampleBuffs.ts',
+      'domain/raidcomp/buffCoverage.ts',
+      'domain/raids/serpentshrineCavernBosses.ts',
+      'domain/simulation/warlockPet.ts',
+      'features/raidcomp/RaidCompositionPanel.tsx',
+    ],
+    related: ['UI Refresh', 'Tab Prototypes', 'Buffs Debuffs and Consumables', 'Content Phases'],
+  },
+  {
+    title: 'TBC Motion Kit',
+    summary: 'tbc-kit.js: the shared crystal-and-water scene and every animation, all procedural, shared by all seven tab pages.',
+    body: `Built once and exposed as \`window.TBCKit\`; each page hands it its Three.js scene through the \`window.SCENE\` contract written at the top of the file. Its motion is tuned to TBC by the motion research.
+
+- **Themes:** the five raid scenes (Serpentshrine, Tempest Keep, Hellfire, Blade's Edge, Karazhan) and the four tab themes, each with its detail: bubbles, one light per raid group, rank rings and ore glints. Themes crossfade over 1.2s.
+- **Effects:** a crystal swell, embers, a rune ring, entry rings, a rebirth burst, a taint tint and a lift, each tied to a real action (equip, import, simulate).
+- **Fallbacks:** a Motion switch and a 3D switch, a still frame for reduced motion, a CSS gradient in each tab's colour when WebGL is off, and performance tiers that settle after about two seconds of real frames.
+- **No Blizzard art and no sound.** Everything is drawn in code.`,
+    docs: [
+      ['docs/research/wow-tbc-motion/README', 'TBC motion research'],
+      ['docs/research/wow-tbc-motion/recommendations', 'What the kit was built from'],
+    ],
+    modules: [],
+    related: ['UI Refresh', 'Tab Prototypes'],
+  },
+  {
+    title: 'Prototype Publishing',
+    summary: `The prototypes are published beside the app on GitHub Pages, and checked in a real browser.`,
+    body: `**Published (2026-10-10):** the deploy copies the prototypes into the built site after \`npm run build\` (\`tools/publish/copy-prototypes.mjs\`), so the gallery is at ${PROTOTYPES_URL}. It leaves out the checks, the page generators and the notes. The pages pick their icon folder from where they are opened: the repo's \`public/icons/\`, or the app's own published \`/icons/\`. The app does not link to the prototypes.
+
+**Checks** live in \`docs/design/prototypes/tabs/checks/\` and run Playwright on the system's Edge, from the repo root:
+- \`published.mjs\` opens the gallery and every page it links to as the site serves them, and checks every icon comes back as an image. \`BASE=\` points it at the live site.
+- \`check-bg.mjs\` runs every tab at 1280px, at 400px, with reduced motion and with WebGL off.
+- \`gear\`, \`compare\`, \`talents\` and \`buffs-handson.mjs\` press every control of each design (\`p\` for the planner's chosen tab); \`rc-handson.mjs\` and \`rc-taps.mjs\` do Raid Composition, including phone tap sizes.
+
+**To look at them locally:** the \`prototypes\` server in \`.claude/launch.json\` serves the repo on port 8765; open \`/docs/design/prototypes/index.html\`.`,
+    docs: [['docs/design/prototypes/tabs/README', 'Tab prototypes, with the publishing details']],
+    modules: [],
+    related: ['UI Refresh', 'Tab Prototypes'],
+  },
+]
+
 // ---------------------------------------------------------------------------------------------
 // Note writers
 // ---------------------------------------------------------------------------------------------
+
+/** A wikilink to a Markdown file elsewhere in the repo, by its path, so it shows up in the graph. */
+function docLink(repoPath, display) {
+  return `[[${repoPath}|${display}]]`
+}
 
 function moduleLinks(relatives, modules) {
   return relatives
@@ -665,6 +793,7 @@ async function writeModuleNotes(modules) {
       link(concept.title),
     )
     const phaseLinks = PHASES.filter((phase) => phase.modules.includes(module.relative)).map((phase) => link(phase.title))
+    const designLinks = DESIGN_NOTES.filter((note) => note.modules.includes(module.relative)).map((note) => link(note.title))
 
     const body = [
       frontmatter({
@@ -698,7 +827,7 @@ async function writeModuleNotes(modules) {
       '',
       '## Concepts & phases',
       '',
-      bullets([...conceptLinks, ...phaseLinks]),
+      bullets([...conceptLinks, ...phaseLinks, ...designLinks]),
       '',
       `Up: ${link('Architecture Map')}`,
     ].join('\n')
@@ -1711,7 +1840,7 @@ async function writeProjectNotes(modules, counts) {
       '',
       '- **Architecture/Modules** — the dependency graph. Hubs are visible as high-degree nodes; a `domain → features` edge here is a layering regression.',
       '- **Domain** — the TBC knowledge wiki. Class → spec → role → raid → boss chains, plus concept notes for the mechanics.',
-      '- **Project** — roadmap phases, decisions, provenance, limitations.',
+      '- **Project** — roadmap phases, decisions, provenance, limitations, and under Project/Design the UI refresh prototypes, which link out to the design docs in `docs/` by path.',
       '',
       'Graph colour groups are configured in `.obsidian/graph.json` so each layer reads at a glance.',
       '',
@@ -1726,6 +1855,50 @@ async function writeProjectNotes(modules, counts) {
   return counts
 }
 
+/**
+ * Fails the run on a curated note that names a module or document that does not exist. `moduleLinks` would
+ * otherwise drop a mistyped path without a word, and the note would quietly lose its link to the code.
+ */
+function checkCuratedPaths(modules) {
+  const missing = []
+  for (const note of [...CONCEPTS, ...PHASES, ...DESIGN_NOTES]) {
+    for (const relative of note.modules) if (!modules.has(relative)) missing.push(`${note.title}: src/${relative}`)
+  }
+  for (const note of DESIGN_NOTES) {
+    for (const [repoPath] of note.docs) {
+      if (!existsSync(path.join(REPO_ROOT, `${repoPath}.md`))) missing.push(`${note.title}: ${repoPath}.md`)
+    }
+  }
+  return missing
+}
+
+async function writeDesignNotes(modules) {
+  for (const note of DESIGN_NOTES) {
+    const isMap = note.title === 'UI Refresh'
+    const body = [
+      frontmatter({ type: isMap ? 'moc' : 'design', generated: true, tags: ['brain/project', 'project/design', ...(isMap ? ['moc'] : [])] }),
+      '',
+      `# ${note.title}`,
+      '',
+      `_${note.summary}_`,
+      '',
+      note.body,
+      '',
+      '## Documents',
+      '',
+      bullets(note.docs.map(([repoPath, display]) => `${docLink(repoPath, display)} — \`${repoPath}.md\``)),
+      ...(note.modules.length > 0 ? ['', '## Live-app code it changed', '', bullets(moduleLinks(note.modules, modules))] : []),
+      '',
+      '## Related',
+      '',
+      bullets(note.related.map((title) => link(title))),
+      '',
+      `Up: ${link(isMap ? 'Project Defeat Brain' : 'UI Refresh')}`,
+    ].join('\n')
+    await writeNote(path.join('Project', 'Design', `${safeTitle(note.title)}.md`), body)
+  }
+}
+
 async function writeHome(modules, counts) {
   const body = [
     frontmatter({ type: 'moc', generated: true, tags: ['brain/home', 'moc'] }),
@@ -1734,11 +1907,12 @@ async function writeHome(modules, counts) {
     '',
     'A local-first TBC Classic Anniversary simulator and gear planner, mapped as a graph. Start here.',
     '',
-    '## The three maps',
+    '## The maps',
     '',
     `- ${link('Architecture Map')} — ${modules.size} modules with their real import edges. The dependency graph, browsable.`,
     `- ${link('TBC Knowledge Map')} — ${counts.classes} classes, ${counts.specs} specs, ${counts.raids} raids, ${counts.bosses} bosses, ${counts.professions} professions, and the mechanics behind them.`,
     `- ${link('Roadmap Board')} — six phases, what is done, and what is honestly still missing.`,
+    `- ${link('UI Refresh')} — the redesign, still in prototypes: research, a plan, and every tab walked through with the owner.`,
     '',
     '## Orientation',
     '',
@@ -1845,7 +2019,9 @@ async function checkLinks() {
     const content = await readFile(file, 'utf8')
     for (const match of content.matchAll(/\[\[([^\]|#]+)(?:\|[^\]]*)?\]\]/g)) {
       const target = match[1].trim()
-      if (!titles.has(target)) {
+      // a path link (see docLink) names a Markdown file by its place in the repo
+      const resolves = target.includes('/') ? existsSync(path.join(REPO_ROOT, `${target}.md`)) : titles.has(target)
+      if (!resolves) {
         broken.push(`${path.relative(VAULT_ROOT, file)} -> [[${target}]]`)
       }
     }
@@ -1859,10 +2035,19 @@ async function main() {
   const modules = await scanModules()
   const data = await loadDomainData()
 
+  const missingPaths = checkCuratedPaths(modules)
+  if (missingPaths.length > 0) {
+    console.error(`brain: ${missingPaths.length} curated path(s) that do not exist:`)
+    for (const entry of missingPaths) console.error(`  ${entry}`)
+    process.exitCode = 1
+    return
+  }
+
   await writeModuleNotes(modules)
   await writeArchitectureMap(modules)
   const counts = await writeDomainNotes(data, modules)
   await writeProjectNotes(modules, counts)
+  await writeDesignNotes(modules)
   await writeHome(modules, counts)
   await updateGraphConfig()
   await updateAppConfig()

@@ -32,6 +32,7 @@ gratuitous mtime changes cause real sync noise.
 | Anything **below** `<!-- brain:manual -->` | Yes — preserved verbatim forever |
 | `CONCEPTS` in the generator | Yes — this is where curated prose lives |
 | `PHASES` in the generator | Yes — status text is authored, module links are generated |
+| `DESIGN_NOTES` in the generator | Yes — the UI refresh prototypes (`brain/Project/Design/`). Keep them current when a walkthrough step is decided |
 | `.obsidian/graph.json` colour groups | Generated. Edit the generator's `updateGraphConfig` |
 
 So: **project knowledge that cannot be derived from code goes in the generator, not in a note.**
@@ -53,7 +54,17 @@ about it that is counter-intuitive or that this project gets wrong.`,
 ```
 
 Every `modules` entry must be a real path under `src/` and every `related` entry must be a real note
-title or an alias, or `npm run brain` fails. That is the point.
+title or an alias, or `npm run brain` fails. That is the point. (Until 2026-10-10 a wrong `modules` path was
+silently dropped; `checkCuratedPaths` now fails the run on one, for concepts, phases and design notes alike.)
+
+## Adding or updating a design note
+
+The UI refresh lives in `docs/`, not `src/`, so its notes are curated in `DESIGN_NOTES`. Each entry has the
+same `title`, `summary`, `body`, `modules` and `related` as a concept, plus `docs`: pairs of a repo path to a
+Markdown file (without `.md`) and a label, written as path wikilinks (`[[docs/design/UI-REFRESH-PLAN|…]]`) so the
+design docs join the graph. A `docs` path that does not exist fails the run too. When a walkthrough step is
+decided, update `Step 2 Walkthrough` and the `Tab Prototypes` table, and link to the README section rather than
+restating it.
 
 ## When source structure changes
 

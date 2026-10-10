@@ -52,8 +52,9 @@ Or install Chromium with `npx playwright install chromium` and run `npm run test
    from where the page is opened. `tabs/checks/published.mjs` checks the built site (see `tabs/README.md`). The prototypes reach outside
    their folder only for `../../../../public/icons/` (4 places: `buff-common.js`, `gear-common.js`,
    `talent-common.js`, `raid-composition.html`); nothing else is root-relative.
-4. **Obsidian notes on the prototype work,** with the brain-sync skill.
-5. **Then the walkthrough:** Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
+4. ~~**Obsidian notes on the prototype work.**~~ **Done 2026-10-10:** five generated notes under
+   `brain/Project/Design/`, curated in `DESIGN_NOTES` in the brain generator. Update them when a step is decided.
+5. **Next: the walkthrough,** with the planner's Ranked Gear, then Build, then Simulation, Raids and Spec Tier Lists.
 
 ### Before that: the Buffs tab (committed and pushed, `cd78079`)
 

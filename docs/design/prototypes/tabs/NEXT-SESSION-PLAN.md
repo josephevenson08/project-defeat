@@ -8,8 +8,8 @@
 1. ~~**Text accents follow each tab's colour**~~ **Done 2026-10-10:** Planner sky blue, Tier Lists emerald, Professions amber. See the [README](README.md#text-accents-follow-each-tab-2026-10-10).
 2. ~~**The gallery is always dark**~~ **Done 2026-10-10.**
 3. ~~**Publish the prototypes on GitHub Pages**~~ **Done 2026-10-10:** the gallery is at https://josephevenson08.github.io/project-defeat/prototypes/. See the [README](README.md#published-on-github-pages-2026-10-10); `checks/published.mjs` checks it.
-4. **Obsidian notes on the prototype work** (yes), with the brain-sync skill.
-5. **Then the walkthrough:** Ranked Gear and Build, then Simulation, Raids and Spec Tier Lists.
+4. ~~**Obsidian notes on the prototype work**~~ **Done 2026-10-10:** five notes under `brain/Project/Design/` (UI Refresh, Tab Prototypes, Step 2 Walkthrough, TBC Motion Kit, Prototype Publishing), written from `DESIGN_NOTES` in `tools/brain/generate-brain.mjs`. When a step is decided, update `Step 2 Walkthrough` and the `Tab Prototypes` table there and run `npm run brain`.
+5. **Next: the walkthrough,** with the planner's Ranked Gear, then Build, then Simulation, Raids and Spec Tier Lists.
 
 ## Where we left off (2026-10-09, night)
 

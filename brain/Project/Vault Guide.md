@@ -24,7 +24,7 @@ Every note ends with a `<!-- brain:manual -->` marker. Anything you write below 
 
 - **Architecture/Modules** — the dependency graph. Hubs are visible as high-degree nodes; a `domain → features` edge here is a layering regression.
 - **Domain** — the TBC knowledge wiki. Class → spec → role → raid → boss chains, plus concept notes for the mechanics.
-- **Project** — roadmap phases, decisions, provenance, limitations.
+- **Project** — roadmap phases, decisions, provenance, limitations, and under Project/Design the UI refresh prototypes, which link out to the design docs in `docs/` by path.
 
 Graph colour groups are configured in `.obsidian/graph.json` so each layer reads at a glance.
 

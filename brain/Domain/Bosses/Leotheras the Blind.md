@@ -20,7 +20,7 @@ Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes th
 - [[Caster DPS]] — Kill your own Inner Demon fast — nobody else can help, and a survivor mind-controls you for the rest of the fight.
 - [[Physical DPS]] — Stop damage entirely during Whirlwind; the threat wipe afterwards kills whoever pushed through it.
 
-## Notable drops (24)
+## Notable drops (25)
 
 - **Coral-Barbed Shoulderpads** (Boss) — [[Physical DPS]]
 - **Fang of the Leviathan** (Boss) — [[Physical DPS]]
@@ -53,6 +53,8 @@ Alternates every 45 seconds between a humanoid form that Whirlwinds and wipes th
   One of the strongest Phase 2 physical DPS trinkets.
 - **Destroyer Gauntlets** (Tier Token) — [[Physical DPS]]
   Warrior T5 gloves, redeemed from Gloves of the Vanquished Defender.
+- **Destroyer Handguards** (Tier Token) — [[Tank]]
+  Warrior T5 tanking gloves, redeemed from Gloves of the Vanquished Defender.
 - **Crystalforge Handguards** (Tier Token) — [[Healer]]
   Paladin T5 gloves, redeemed from Gloves of the Vanquished Champion.
 - **Gloves of the Avatar** (Tier Token) — [[Healer]]

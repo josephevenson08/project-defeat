@@ -2,24 +2,24 @@
 type: module
 layer: domain
 source: src/domain/talents/talentTypes.ts
-lines: 131
+lines: 184
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentTypes
 
-`src/domain/talents/talentTypes.ts` · **domain** layer · 131 lines
+`src/domain/talents/talentTypes.ts` · **domain** layer · 184 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `canRemovePoint`, `pointsInTree`, `pointsSpent`, `whyBlocked`
+**function** — `canRemovePoint`, `pointsAboveRow`, `pointsInTree`, `pointsSpent`, `ruleBreaks`, `whyBlocked`
 
 **const** — `POINTS_PER_ROW`, `TALENT_POINTS_AT_70`
 
-**type** — `Talent`, `TalentData`, `TalentPoints`, `TalentTree`
+**type** — `Talent`, `TalentData`, `TalentPoints`, `TalentRuleBreak`, `TalentTree`
 
 ## Imports
 
@@ -39,7 +39,7 @@ _None._
 
 ## Concepts & phases
 
-_None._
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 
