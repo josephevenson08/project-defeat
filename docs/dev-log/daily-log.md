@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**453 commits across 72 days**, from 2026-06-25 to 2026-10-10.
+**454 commits across 72 days**, from 2026-06-25 to 2026-10-10.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_26 commits_
+_27 commits_
 
-### Saturday 10 October — 2 commits
+### Saturday 10 October — 3 commits
 
 - Fix the talent rules, raid buff reach and data the prototypes turned up — [`9be91c1`](https://github.com/josephevenson08/project-defeat/commit/9be91c14b086a728a221d917db1a8fc52ba7e0d8)
 - Let each prototype tab's text accents follow its colour, and keep the gallery dark — [`0b69bbc`](https://github.com/josephevenson08/project-defeat/commit/0b69bbc6aa5c117bf6cf84eb62db5214f23871d9)
+- Publish the design prototypes on GitHub Pages, beside the app — [`4a61eae`](https://github.com/josephevenson08/project-defeat/commit/4a61eaeb14550846c29be940e9b81d04a5bbcb85)
 
 ### Friday 9 October — 6 commits
 
