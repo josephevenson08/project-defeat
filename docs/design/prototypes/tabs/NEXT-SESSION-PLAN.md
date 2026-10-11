@@ -1,6 +1,18 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-10, late night): start here
+## ▶ Where we left off (2026-10-11): start here
+
+**The Simulation tab is decided and built into `simulation.html`:** design C, what to do next (stat priority, best upgrades, then the estimate with how far to trust it), with design A's damage-source table and breakdown under the estimate. Details are in the [README](README.md#simulation-what-to-do-next-on-the-real-model-2026-10-11).
+- **It runs the live app's real simulator** in the page: `gen-sim-engine.mjs` bundles it from `src/` into `sim-engine.js` and writes `sim-data.js`. Regenerate both after the simulator or its data change.
+- `checks/sim-handson.mjs a|b|c|p` pass; with the dev server up (`APP=`), the app gives the same estimate to the decimal.
+
+**A live-app fix with it:** the upgrade finder (`findUpgrades.ts`) scored two-handers with the off hand still equipped (Twinblade of the Phoenix promised +145.8 DPS and cost 177). Each trial swap now goes through `applyWeaponSlotRules`, with a test.
+
+**Next: the live app's front door** (the owner asked on 2026-10-11): the 5-card section picker in `src/components/layout/SectionPicker.tsx` (Character Planner, Raid Composition, Spec Tier Lists, Raids, Professions, plus "Already playing? Import your character"). Three prototype designs, the owner picks, then build the pick into the live app's `SectionPicker` (with its tests). Then Raids and Spec Tier Lists. Professions comes later.
+
+**Still to check with the tbc-researcher, not changed:** the live app tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both.
+
+## Where we left off (2026-10-10, late night)
 
 **Every Character Planner sub-tab is now decided and built into `planner.html`.** Today added the last two:
 - **Ranked Gear** (committed, `4a49d96`): design A, the guide slot by slot as tooltips, with design C's "Where it drops" view behind a switch. See the [README](README.md#character-planner-the-ranked-gear-tab-2026-10-10).

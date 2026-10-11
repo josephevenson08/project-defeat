@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the Simulation tab.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the live app's front door (the 5-card section picker), then Raids and Spec Tier Lists.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,24 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## Simulation: what to do next, on the real model (2026-10-11)
+
+The first whole-tab step after the Character Planner. Three designs were built from `simulation.html` with only the
+result area swapped, over `sim-common.js`. **The owner picked C, guidance first, with A's damage-source table and
+breakdown under the estimate.** That is now `simulation.html`.
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| A · The log (table merged in) | [`sim-a.html`](sim-a.html) | Press Run: the estimate against what Fury warriors average, the damage sources as a table with bars, how the number was computed, and what it misses for you; stat priority and the upgrade finder in tabs underneath. |
+| B · The workbench (not picked) | [`sim-b.html`](sim-b.html) | Your character as the baseline; switch buffs, debuffs and consumables or try the finder's upgrades on a copy, and the model re-runs on every change with the difference in DPS, % and per damage source. |
+| **C · What to do next (picked)** | [`sim-c.html`](sim-c.html) | Your stat priority from the real weights, your best upgrades by real DPS gain with Equip, then the estimate with a panel on how far to trust it: every DPS spec's best case by this model against what players average. |
+
+- **The numbers are the live app's.** `gen-sim-engine.mjs` bundles the app's own simulator from `src/` (stats, the estimate, stat weights, the upgrade finder) into `sim-engine.js`, about 2.2 MB with the item catalogue, using the rolldown Vite ships. It also writes `sim-data.js`: archon.gg's observed averages and each DPS spec's best case by the same model, the way the app's tests measure it (1.05× to 2.13× low, as the tests pin). The page loads the planner's shared stores and `build-common.js`, so it simulates the planner's character: the recommended set with the default buffs reads **1,106.4 DPS**, 1.86× below Fury's 2,053.
+- **Checked against the app:** with the dev server up, the planner character's share link opened in the app and simulated there gives the same estimate to the decimal.
+- **An upgrade can be equipped here** when it is on Wowhead's Fury list (the planner's catalogue); any other opens the live app with the swap made, through a share link.
+- **The Step 1 page's example machinery is gone:** the hand-written per-spec notes (the engine supplies the real ones), the spec picker and the fake 1,480 DPS run.
+- **Checks:** `checks/sim-handson.mjs a|b|c|p` pass at 1280px, at 400px and with reduced motion (`APP=` the dev server's address for the app comparison, or `APP=off`).
 
 ## Character Planner: the Build tab (2026-10-10)
 
@@ -372,6 +390,7 @@ problems in the app's own data:
   - **The zone-map credit** no longer cites Microsoft's "Game Content Usage Rules". It's in `zoneMaps.json`, its ingest, `features.md` and the test.
   - The prototype's hit cap ignored Precision (fixed in the prototype; the live app shows no cap line).
 - **The prototype's own gear data (found 2026-10-10, fixed):** `gen-gear-data.mjs` read boss names only in single quotes, so Al'ar and Kael'thas Sunstrider (written in double quotes for their apostrophes) were missed. Al'ar's three drops had no boss, and five Kael'thas drops were credited to Solarian (Thalassian Wildercloak, Leggings of Murderous Intent, Telonicus's Pendant of Mayhem, Band of the Ranger-General, Rod of the Sun King). The Gear tab's checklist and the tooltips now name the right boss.
+- **The live app's upgrade finder (found 2026-10-11, fixed in `src/`):** `findUpgrades.ts` scored a two-hander in the main hand with the off-hand weapon still equipped, a pairing the game doesn't allow and equipping undoes. For a Fury warrior it listed Twinblade of the Phoenix as +145.8 DPS; equipping it took the estimate from 1,106.4 to 929.1. Each trial swap now goes through `applyWeaponSlotRules`, and a test equips every listed candidate and checks it delivers the gain it promised (it failed before the fix). The Simulation workbench (design B) found it by trying the swap.
 - **To check, not changed:** `tempestKeepBosses.ts` tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both, much like the Vashj helm. Warbringer Battle-Helm (Karazhan) has no boss in the app's data; the guide only says "Karazhan".
 - **Also noted:** `craftingPaths.json` marks some starter recipes, such as Rough Sharpening Stone, as not trainer-taught. That looks wrong.
 

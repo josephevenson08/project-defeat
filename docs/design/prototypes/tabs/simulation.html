@@ -234,7 +234,7 @@ dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Tab prototype · Simulation · Step 1 baseline. Prototype only, not the live app.</div>
+<div class="dirline">Step 2 · Simulation: design C, what to do next, with design A's damage sources and breakdown (picked 2026-10-11). It runs the live app's own simulator on the Character Planner's character. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -277,112 +277,7 @@ dl.kv dt:first-of-type,dl.kv dd:first-of-type{border-top:0}
   </div>
 
   <div class="simgrid">
-    <div class="col">
-      <div class="layer" style="--z:6"><section class="box" id="b-run" aria-labelledby="h-run">
-        <h2 id="h-run">Simulate <small>shown for the 20 DPS specs</small></h2>
-        <div class="in">
-          <div class="specpick" id="specpick">
-            <fieldset><legend>Physical DPS · 11 specs</legend><div class="row" data-role="Physical DPS"><button type="button" aria-pressed="true" data-spec="Fury Warrior" data-ref="2053" data-multi="1">Fury Warrior<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Arms Warrior" data-ref="1706" data-multi="1">Arms Warrior<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Beast Mastery Hunter" data-ref="2068" data-multi="0">Beast Mastery Hunter</button><button type="button" aria-pressed="false" data-spec="Survival Hunter" data-ref="1696" data-multi="0">Survival Hunter</button><button type="button" aria-pressed="false" data-spec="Marksmanship Hunter" data-ref="1341" data-multi="0">Marksmanship Hunter</button><button type="button" aria-pressed="false" data-spec="Combat Rogue" data-ref="1731" data-multi="0">Combat Rogue</button><button type="button" aria-pressed="false" data-spec="Assassination Rogue" data-ref="1362" data-multi="0">Assassination Rogue</button><button type="button" aria-pressed="false" data-spec="Subtlety Rogue" data-ref="1292" data-multi="0">Subtlety Rogue</button><button type="button" aria-pressed="false" data-spec="Enhancement Shaman" data-ref="1693" data-multi="0">Enhancement Shaman</button><button type="button" aria-pressed="false" data-spec="Retribution Paladin" data-ref="1785" data-multi="0">Retribution Paladin</button><button type="button" aria-pressed="false" data-spec="Feral Druid" data-ref="1655" data-multi="0">Feral Druid</button></div></fieldset>
-            <fieldset><legend>Caster DPS · 9 specs</legend><div class="row" data-role="Caster DPS"><button type="button" aria-pressed="false" data-spec="Arcane Mage" data-ref="2084" data-multi="0">Arcane Mage</button><button type="button" aria-pressed="false" data-spec="Fire Mage" data-ref="1413" data-multi="0">Fire Mage</button><button type="button" aria-pressed="false" data-spec="Frost Mage" data-ref="1120" data-multi="0">Frost Mage</button><button type="button" aria-pressed="false" data-spec="Destruction Warlock" data-ref="1838" data-multi="1">Destruction Warlock<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Affliction Warlock" data-ref="1629" data-multi="1">Affliction Warlock<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Demonology Warlock" data-ref="1619" data-multi="0">Demonology Warlock</button><button type="button" aria-pressed="false" data-spec="Shadow Priest" data-ref="1330" data-multi="1">Shadow Priest<span class="rot" aria-hidden="true"></span></button><button type="button" aria-pressed="false" data-spec="Elemental Shaman" data-ref="1422" data-multi="0">Elemental Shaman</button><button type="button" aria-pressed="false" data-spec="Balance Druid" data-ref="1401" data-multi="0">Balance Druid</button></div></fieldset>
-            <p class="legend"><span class="rot" aria-hidden="true"></span>Multi-ability rotation (5 specs of 27). Every other spec is a single-ability approximation. Healer and Tank specs do not get this tab.</p>
-          </div>
-                    <div class="runbar">
-            <button class="btn big magnet" id="runbtn" type="button">Run Simulation</button>
-            <span class="simrune" id="simrune" aria-hidden="true"></span>
-            <span class="prov" id="runfor">Human Fury Warrior · Alliance · Phase 2 planner set</span>
-          </div>
-          <div class="empty" id="simempty" hidden>No run yet. Press Run Simulation to estimate DPS for the planner set.</div>
-          <div class="result" id="result">
-            <div class="score">
-              <span class="lbl">Estimated DPS <span class="ex">example output</span></span>
-              <strong class="num" id="score">1,480</strong>
-              <span class="vs">vs. <b class="num" id="refdps">2,053</b> observed average <span class="real">archon.gg</span></span>
-              <div class="refbar" aria-hidden="true"><i id="refbar" style="width:72%"></i></div>
-              <span class="prov" id="scoreprov">Prototype value, not computed here. The live model reads 1.05x to 2.15x low against archon.gg's observed averages, and never above them.</span>
-            </div>
-            <p class="note" id="specnote"><strong>What this estimate misses for your spec:</strong> rage income. A talented Fury warrior makes more than the 3.4/sec an untalented one does but less than the 7.5/sec Bloodthirst and Whirlwind want, so the Heroic Strike dump stays unfunded and contributes nothing. Rage from damage taken is pinned at 0.</p>
-          </div>
-        </div>
-      </section></div>
-      <div class="layer" style="--z:4"><section class="box" id="b-src" aria-labelledby="h-src">
-        <h2 id="h-src">Damage sources <span class="ex">example</span></h2>
-        <div class="in">
-          <p class="prov" style="margin:0 0 10px">Shaped like a Warcraft Logs damage table. Post-mitigation DPS; the rows sum to the estimate. Source names are the app's; the shares are example values. <span id="srcwhich"></span></p>
-          <div class="src" id="srcs" aria-label="Damage sources, example values">
-            <span class="h">Source</span><span class="h" aria-hidden="true"></span><span class="h n">Share</span><span class="h n">DPS</span>
-            <span>Melee main hand</span><span class="bar" aria-hidden="true"><i style="width:38%"></i></span><span class="n">38.0%</span><span class="n">562.4</span>
-            <span>Bloodthirst</span><span class="bar" aria-hidden="true"><i style="width:26%"></i></span><span class="n">26.0%</span><span class="n">384.8</span>
-            <span>Melee off hand</span><span class="bar" aria-hidden="true"><i style="width:19%"></i></span><span class="n">19.0%</span><span class="n">281.2</span>
-            <span>Whirlwind</span><span class="bar" aria-hidden="true"><i style="width:17%"></i></span><span class="n">17.0%</span><span class="n">251.6</span>
-            <span class="zero">Heroic Strike</span><span class="bar" aria-hidden="true"><i style="width:0"></i></span><span class="n zero">0.0%</span><span class="n zero">0</span>
-          </div>
-          <p class="prov" style="margin:10px 0 0">Heroic Strike is carried in the ability data and contributes 0: a rage-costed ability with no cooldown is excluded rather than given a guessed rate.</p>
-        </div>
-      </section></div>
-      <div class="layer" style="--z:3"><section class="box" aria-labelledby="h-brk">
-        <h2 id="h-brk">How the number was computed <small>inputs</small></h2>
-        <div class="in">
-          <dl class="kv">
-            <dt>Target armor</dt><dd>7,700</dd>
-            <dt>Armor mitigation, no debuffs <span class="real">derived</span></dt><dd>42.2%</dd>
-            <dt>With Sunder Armor, Faerie Fire, Curse of Recklessness (−4,010 armor) <span class="real">derived</span></dt><dd>25.9%</dd>
-            <dt>Attack Power</dt><dd>1,788</dd>
-            <dt>Hit Rating (cap 142, 9% for dual-wield specials)</dt><dd>140</dd>
-            <dt>Crit Rating</dt><dd>536</dd>
-            <dt>Rage income, talented Fury <span class="ex">about</span></dt><dd>5.4 / sec</dd>
-          </dl>
-          <p class="prov" style="margin:8px 0 0">Mitigation from the TBC armor formula for a level 70 attacker; stats from the Phase 2 planner set. Rage figure from <code>featureFlags.ts</code> notes (only the 3.4 to 7.5 band is asserted). Holy damage, bleeds and poisons skip armor.</p>
-        </div>
-      </section></div>
-    </div>
-    <div class="col">
-      <div class="layer" style="--z:8"><section class="box" id="b-sw" aria-labelledby="h-sw">
-        <h2 id="h-sw">Stat priority <span class="ex">example values</span></h2>
-        <div class="in">
-          <p class="prov" style="margin:0 0 10px">Each stat is probed by adding 100 of it, re-running the simulation and measuring the change. Per single point, normalized so 1 Attack Power = 1.00.</p>
-          <div class="sw" id="sw" role="list" aria-label="Stat weights, example values">
-            <span role="listitem" class="sr">Strength 2.20</span><span aria-hidden="true">Strength</span><span class="bar" aria-hidden="true"><i style="width:100%"></i></span><span class="n" aria-hidden="true">2.20</span>
-            <span role="listitem" class="sr">Hit Rating 1.90</span><span aria-hidden="true">Hit Rating</span><span class="bar" aria-hidden="true"><i style="width:86%"></i></span><span class="n" aria-hidden="true">1.90</span>
-            <span role="listitem" class="sr">Expertise 1.75</span><span aria-hidden="true">Expertise</span><span class="bar" aria-hidden="true"><i style="width:80%"></i></span><span class="n" aria-hidden="true">1.75</span>
-            <span role="listitem" class="sr">Crit Rating 1.60</span><span aria-hidden="true">Crit Rating</span><span class="bar" aria-hidden="true"><i style="width:73%"></i></span><span class="n" aria-hidden="true">1.60</span>
-            <span role="listitem" class="sr">Haste Rating 1.45</span><span aria-hidden="true">Haste Rating</span><span class="bar" aria-hidden="true"><i style="width:66%"></i></span><span class="n" aria-hidden="true">1.45</span>
-            <span role="listitem" class="sr">Agility 1.15</span><span aria-hidden="true">Agility</span><span class="bar" aria-hidden="true"><i style="width:52%"></i></span><span class="n" aria-hidden="true">1.15</span>
-            <span role="listitem" class="sr">Attack Power 1.00</span><span aria-hidden="true">Attack Power</span><span class="bar" aria-hidden="true"><i style="width:45%"></i></span><span class="n" aria-hidden="true">1.00</span>
-          </div>
-          <div class="score" style="margin-top:12px;padding:10px 12px">
-            <span class="lbl">Highest value stat <span class="ex">example</span></span>
-            <b id="swbest">Strength</b>
-            <span class="prov" style="width:100%">Re-check after large gear changes: crossing the hit cap in particular reshuffles this list. Measured in the app's notes: haste is worth 0.059 DPS per point on the default Fury set.</span>
-          </div>
-          <div class="unmod">
-            <h3>Not modeled by the simulator yet</h3>
-            <p>These score zero because the engine doesn't read them, <strong>not</strong> because they're worthless in TBC.</p>
-            <span class="spec" style="display:inline-block;background:var(--scrim);border:1px solid rgba(255,207,122,.3);border-radius:999px;padding:2px 9px;font-size:var(--t-sm)">Armor Penetration</span>
-          </div>
-        </div>
-      </section></div>
-      <div class="layer" style="--z:5"><section class="box" id="b-up" aria-labelledby="h-up">
-        <h2 id="h-up">Upgrade finder <small>concept</small></h2>
-        <div class="in">
-          <ol class="steps">
-            <li>Every legal item for every slot is tried as a straight swap against the planner set.</li>
-            <li>Sockets are filled with the best colour-matched gem for this character, and the slot's enchant carries over while it stays legal, so a gain is what the item is worth <strong>once gemmed</strong>.</li>
-            <li>Each swap re-runs the simulation; the list is ranked by how far the estimate moves, at most 2 per slot and 12 in all.</li>
-          </ol>
-          <div class="uprow" aria-label="Example upgrade row">
-            <div>
-              <span class="slot">Slot</span>
-              <span class="ph">Candidate item from the catalog</span>
-              <small>replaces your equipped item · instance · boss</small>
-              <small>Assumes the gems it was scored with</small>
-            </div>
-            <div class="delta"><b>+DPS</b><span>+%</span> <span class="ex">example</span></div>
-            <button class="btn ghost" type="button" disabled title="Prototype only">Equip</button>
-          </div>
-          <p class="prov" style="margin:10px 0 0">Equip applies exactly the gems and enchant the score assumed. About 3% of catalog items still carry estimated stats; a row says so when its comparison rests on one, because a sourced item measured against an estimated one reads high. Rule source: <code>findUpgrades.ts</code>, <code>UpgradesPanel.tsx</code>.</p>
-        </div>
-      </section></div>
-    </div>
+    <div class="layer full" style="--z:6"><section class="box" id="b-sim" aria-label="Simulation"><div class="in" id="simui"><p class="prov">The Simulation tab needs JavaScript: it runs the live app's simulator in the page.</p></div></section></div>
 
     <div class="layer full" style="--z:2"><section class="box" id="b-model" aria-labelledby="h-model">
       <h2 id="h-model">What is and isn't modelled <small>docs/known-limitations.md · featureFlags.ts</small></h2>
@@ -590,67 +485,6 @@ const M={on:false};
 const moving=()=>!RMQ.matches&&(G?M.on:true);
 const fmt=n=>Math.round(n).toLocaleString("en-US");
 
-/* ---------- per-spec notes, paraphrased from docs/known-limitations.md and featureFlags.ts ---------- */
-const NOTE={
- "Fury Warrior":"rage income. A talented Fury warrior makes more than the 3.4/sec an untalented one does but less than the 7.5/sec Bloodthirst and Whirlwind want, so the Heroic Strike dump stays unfunded and contributes nothing. Rage from damage taken is pinned at 0.",
- "Arms Warrior":"rage income. Rage-costed abilities with no cooldown are excluded, so Heroic Strike contributes nothing, and rage from damage taken is pinned at 0.",
- "Beast Mastery Hunter":"Bestial Wrath, which needs a cooldown usage policy. The pet is modelled, but the estimate assumes one pet family; the eight families span 0.91 to 1.1 on damage and there is no picker.",
- "Survival Hunter":"a multi-ability rotation: this spec is a single-ability approximation (auto shot plus Steady Shot and the pet). No mana cap is enforced; the readout reports mana per second instead.",
- "Marksmanship Hunter":"very little: auto shot, Steady Shot and a pet are all in, and this spec reads within about 5% of its archon.gg reference.",
- "Combat Rogue":"a full rotation. Slice and Dice, Combat Potency and Instant and Deadly poisons are modelled, but the rest is a single-ability approximation.",
- "Assassination Rogue":"a full rotation. Slice and Dice and poisons are modelled (Nature damage on the spell table), but the rest is a single-ability approximation.",
- "Subtlety Rogue":"a full rotation. Slice and Dice and poisons are modelled, but the rest is a single-ability approximation.",
- "Enhancement Shaman":"mana. Stormstrike is not capped by mana, and Shamanistic Rage is unmodelled. Windfury assumes the main hand carries the imbue; Flametongue and Elemental Weapons are not applied.",
- "Retribution Paladin":"little on the Holy side: seals and the judgement are modelled and faction-split, Seal of Blood being Horde-only in Phase 2. Judgement of Wisdom and mana are unmodelled.",
- "Feral Druid":"Mangle. Rake and Rip are modelled and their ticks ignore armor, and Feral Attack Power is read from 26 catalogued weapons. Bear and cat modes are not split yet.",
- "Arcane Mage":"cooldowns, procs, downranking and multi-spell priority: casters model one signature ability.",
- "Fire Mage":"Ignite and the other per-spell talents, plus cooldowns and procs: casters model one signature ability.",
- "Frost Mage":"cooldowns, procs and multi-spell priority: casters model one signature ability. Winter's Chill is not modelled.",
- "Destruction Warlock":"talent effects that are refused by name, such as Ruin. Immolate is maintained and Incinerate fills; Demonic Sacrifice applies per spell school.",
- "Affliction Warlock":"talent effects that are refused by name. Four DoTs are maintained under a Shadow Bolt filler.",
- "Demonology Warlock":"the most of any spec: it is the worst-reading spec against its reference today. See the limitations panel.",
- "Shadow Priest":"Shadow Weaving and other per-spell talents. Two DoTs are kept up, Mind Blast on cooldown, Mind Flay in the gaps.",
- "Elemental Shaman":"cooldowns, procs and multi-spell priority: casters model one signature ability.",
- "Balance Druid":"cooldowns, procs and multi-spell priority: casters model one signature ability (Starfire, recorded as Arcane)."
-};
-
-/* ---------- spec picker (20 DPS specs, archon.gg reference per button) ---------- */
-const specBtns=$$("#specpick button[data-spec]");
-let spec=(specBtns.find(b=>b.getAttribute("aria-pressed")==="true")||specBtns[0]||{dataset:{}}).dataset;
-function exampleFor(ref){return Math.round(ref*.7209);} /* illustrative only: about 1.39x low, inside the measured 1.05x-2.15x band; Fury lands on the 1,480 the example sources sum to */
-function renderSpec(){
-  const ref=+spec.ref||0, ex=exampleFor(ref);
-  const runfor=$("#runfor");if(runfor)runfor.textContent=(spec.spec||"")+" · Phase 2 planner set";
-  const r=$("#refdps");if(r)r.textContent=fmt(ref);
-  const s=$("#score");if(s){s.dataset.to=ex;s.textContent=fmt(ex);}
-  const bar=$("#refbar");if(bar)bar.style.width=(ref?Math.min(100,ex/ref*100):0).toFixed(1)+"%";
-  const n=$("#specnote");if(n)n.innerHTML="<strong>What this estimate misses for your spec:</strong> "+(NOTE[spec.spec]||"see the limitations panel below.");
-  const srcp=$("#srcwhich");if(srcp)srcp.textContent=spec.spec==="Fury Warrior"?"":"Shown for Fury Warrior; other specs list their own sources.";
-}
-specBtns.forEach(b=>on(b,"click",()=>{
-  specBtns.forEach(x=>x.setAttribute("aria-pressed",x===b));
-  spec=b.dataset;renderSpec();
-  say(spec.spec+" selected. Reference "+fmt(+spec.ref)+" DPS.");
-  if(M.on&&M.flash)M.flash();
-}));
-renderSpec();
-/* with JS the result waits for a run; without JS it stays visible as a static example */
-{const r0=$("#result"),e0=$("#simempty");if(r0&&e0){r0.hidden=true;e0.hidden=false;}}
-
-/* ---------- Simulate ---------- */
-const runbtn=$("#runbtn"), result=$("#result"), empty=$("#simempty");
-let running=false;
-function reveal(){
-  if(result)result.hidden=false;
-  if(empty)empty.hidden=true;
-  say("Estimated DPS for "+(spec.spec||"")+": "+fmt(exampleFor(+spec.ref||0))+", example output. Observed average "+fmt(+spec.ref||0)+".");
-}
-on(runbtn,"click",()=>{
-  if(running)return;
-  if(M.on&&M.run){running=true;runbtn.setAttribute("aria-busy","true");M.run(()=>{running=false;runbtn.removeAttribute("aria-busy");},reveal);}
-  else reveal();
-});
-
 /* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
 const rs=root.style;
 function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
@@ -811,5 +645,19 @@ else enable(true);
 setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
 })();
 </script>
+<!-- design C (what to do next) with design A's damage sources and breakdown, picked 2026-10-11: the planner's shared
+     character, the live app's own simulator (gen-sim-engine.mjs), then the page -->
+<script>window.SIM_PICKED="c+a";</script>
+<script src="talent-data.js"></script>
+<script src="talent-common.js"></script>
+<script src="buff-data.js"></script>
+<script src="buff-common.js"></script>
+<script src="gear-data.js"></script>
+<script src="gear-common.js"></script>
+<script src="build-common.js"></script>
+<script src="sim-engine.js"></script>
+<script src="sim-data.js"></script>
+<script src="sim-common.js"></script>
+<script src="sim-c.js"></script>
 </body>
 </html>

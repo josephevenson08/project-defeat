@@ -683,7 +683,7 @@ const DESIGN_NOTES = [
 | --- | --- | --- | --- | --- |
 | Home | \`home.html\` | Teal, the original; one soft crystal swell per session | Teal | Settled |
 | Character Planner | \`planner.html\` | Deep sea blue, rising bubbles | Sky blue | All six sub-tabs decided |
-| Simulation | \`simulation.html\` | Gold over violet, crystal pillars | Gold | Step 1 baseline |
+| Simulation | \`simulation.html\` | Gold over violet, crystal pillars | Gold | Decided; runs the live app's real simulator |
 | Raid Composition | \`raid-composition.html\` | Warm white-gold, one light per raid group | Gold | Decided |
 | Spec Tier Lists | \`tier-lists.html\` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |
 | Raids | \`raids.html\` | Follows the chosen raid | Follows the raid | Step 1 baseline |
@@ -711,10 +711,11 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
 - **Planner · Buffs (2026-10-09):** C, the buffs your raid brings, with A's icon tiles and a Blessing per Paladin.
 - **Planner · Ranked Gear (2026-10-10):** A, Wowhead's order slot by slot as tooltips, with C's "Where it drops" (by raid and boss, upgrades marked) as a second view. B, sorted by an example score, was left out: illustrative weights can't price procs, and the Simulation tab already ranks swaps with the simulator.
 - **Planner · Build (2026-10-10):** A, the share card, with C's read-first "What came in" report on its paste box. It speaks the live app's own build format, so its share link opens the same character in the live app.
+- **Simulation (2026-10-11):** C, what to do next (stat priority, best upgrades, then the estimate and how far to trust it), with A's damage-source table. It runs the live app's own simulator in the page (\`gen-sim-engine.mjs\` bundles it from \`src/\`), so its numbers match the app's to the decimal.
 
-**Next:** the Simulation tab, then Raids and Spec Tier Lists. Professions comes later.
+**Next:** the live app's front door (the 5-card section picker, asked for on 2026-10-11), then Raids and Spec Tier Lists. Professions comes later.
 
-**Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed.`,
+**Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed. The Simulation workbench then found the upgrade finder scoring two-handers with the off hand still equipped (fixed 2026-10-11).`,
     docs: [
       ['docs/design/prototypes/tabs/README', 'Each decision, with its checks'],
       ['docs/dev-log/HANDOFF', 'Handoff: where this is right now'],
@@ -727,8 +728,9 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
       'domain/raids/serpentshrineCavernBosses.ts',
       'domain/simulation/warlockPet.ts',
       'features/raidcomp/RaidCompositionPanel.tsx',
+      'features/simulator/findUpgrades.ts',
     ],
-    related: ['UI Refresh', 'Tab Prototypes', 'Buffs Debuffs and Consumables', 'Content Phases'],
+    related: ['UI Refresh', 'Tab Prototypes', 'Buffs Debuffs and Consumables', 'Content Phases', 'Stat Weights'],
   },
   {
     title: 'TBC Motion Kit',

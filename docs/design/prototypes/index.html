@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#sim">Simulation designs</a>
     <a href="#build">Build designs</a>
     <a href="#ranked">Ranked Gear designs</a>
     <a href="#buffs">Buffs designs</a>
@@ -114,7 +115,7 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/simulation.html" title="Preview of Simulation" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Simulation</h2></div><p>The fixed level-73 boss, 20 DPS specs, the upgrade finder's method, and what is and isn't modelled. Gold over violet, with crystal pillars.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Simulation</h2></div><p>Runs the live app's own simulator on your planner character: your stat priority, your best upgrades by real DPS gain, then the estimate with its damage sources and how far to trust it, against what players average for all 20 DPS specs. Gold over violet, with crystal pillars.</p></div>
       <a class="open" href="tabs/simulation.html">Open Simulation <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
@@ -136,6 +137,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="sim">
+    <span class="eyebrow">Step 2 · Simulation · decided 2026-10-11</span>
+    <h2 class="subhead">Simulation: what to do next, on the real model</h2>
+    <p>The owner picked C, guidance first (stat priority, then the best upgrades, then the estimate with how far to trust it), with A's damage-source table and breakdown under the estimate. That is now the Simulation tab above. B, the workbench, was not picked. The three designs stay here for reference. They are three designs for the Simulation tab. All three run the live app's own simulator in the page (bundled from <code>src/</code>) on the Character Planner's character, so every number is the app's: checked against it, they give the same estimate to the decimal. They compare it with what Fury warriors actually average (2,053 DPS, archon.gg). Building them found a bug in the live app's upgrade finder: it scored a two-hander with the off hand still equipped, so it promised a gain that equipping took away. That is fixed in the app.</p>
+  </header>
+  <section aria-label="Simulation designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/sim-a.html#simui" title="Preview of The log" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">TABLE MERGED IN</span><h2>Simulation A · The log</h2></div><p>Press Run and the result reads like a Warcraft Logs report: the estimate against what Fury warriors average, the damage sources as a table with bars, how the number was computed, and what it misses for you. Stat priority and the upgrade finder sit in tabs underneath.</p></div>
+      <a class="open" href="tabs/sim-a.html">Open Simulation A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/sim-b.html#simui" title="Preview of The workbench" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Simulation B · The workbench</h2></div><p>For trying things: your character is the baseline; switch buffs and debuffs, pick consumables or try the finder's upgrades on a copy, and the model re-runs on every change with the difference in DPS, % and per damage source. Keep what you like on the planner.</p></div>
+      <a class="open" href="tabs/sim-b.html">Open Simulation B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/sim-c.html#simui" title="Preview of What to do next" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Simulation C · What to do next</h2></div><p>Guidance first: your stat priority from the real weights and your best upgrades by real DPS gain, with Equip. Then the estimate, with a panel on how far to trust it: every DPS spec's best case by this model against what players average.</p></div>
+      <a class="open" href="tabs/sim-c.html">Open Simulation C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

@@ -14,7 +14,7 @@ Each page shares one scene, a naaru-like crystal over water, and gives it its ow
 | --- | --- | --- | --- | --- |
 | Home | `home.html` | Teal, the original; one soft crystal swell per session | Teal | Settled |
 | Character Planner | `planner.html` | Deep sea blue, rising bubbles | Sky blue | All six sub-tabs decided |
-| Simulation | `simulation.html` | Gold over violet, crystal pillars | Gold | Step 1 baseline |
+| Simulation | `simulation.html` | Gold over violet, crystal pillars | Gold | Decided; runs the live app's real simulator |
 | Raid Composition | `raid-composition.html` | Warm white-gold, one light per raid group | Gold | Decided |
 | Spec Tier Lists | `tier-lists.html` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |
 | Raids | `raids.html` | Follows the chosen raid | Follows the raid | Step 1 baseline |

@@ -18,16 +18,17 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published beside the app at https://josephevenson08.github.io/project-defeat/prototypes/. It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Latest: every Character Planner sub-tab is decided (2026-10-10, late night)
+### Latest: the Simulation tab, and a fix to the live app's upgrade finder (2026-10-11)
 
-- **Ranked Gear** (`4a49d96`): design A, the guide slot by slot as tooltips, with design C's "Where it drops" view
-  (by raid and boss) behind a switch. On the way, `gen-gear-data.mjs` was fixed: it had credited five Kael'thas drops
-  to Solarian and given Al'ar's drops no boss.
-- **Build**: design A, the share card, with design C's read-first "What came in" report on its paste box. It speaks
-  the live app's own build format: its share link opens the same character in the live app, and its example
-  `/pdexport` loads in the app's own importer, both checked against the dev server.
-- Full details, and the next step (the Simulation tab), are at the top of
+- **Simulation** is decided: design C, what to do next, with design A's damage-source table, built into
+  `simulation.html`. It runs the live app's real simulator in the page (`gen-sim-engine.mjs` bundles it into
+  `sim-engine.js`), on the planner's character, and matches the app's estimate to the decimal.
+- **The live app's upgrade finder** scored two-handers with the off hand still equipped, so it promised a Fury warrior
+  +145.8 DPS for Twinblade of the Phoenix, which cost 177 once equipped. Fixed in `src/features/simulator/findUpgrades.ts`
+  (each trial swap goes through `applyWeaponSlotRules`), with a test that equips every listed upgrade.
+- **Next: the live app's front door,** the 5-card section picker; see the top of
   `docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`.
+- Before that, every Character Planner sub-tab was decided (Ranked Gear `4a49d96`, Build `f8d9f93`).
 
 ### The live-app fixes are committed and pushed (2026-10-10)
 
@@ -65,7 +66,8 @@ Or install Chromium with `npx playwright install chromium` and run `npm run test
    `brain/Project/Design/`, curated in `DESIGN_NOTES` in the brain generator. Update them when a step is decided.
 5. ~~**Ranked Gear.**~~ **Done 2026-10-10:** design A with design C as a second view.
 6. ~~**Build.**~~ **Done 2026-10-10:** design A with design C's report. Every planner sub-tab is now decided.
-7. **Next: the walkthrough,** with the Simulation tab, then Raids and Spec Tier Lists.
+7. ~~**Simulation.**~~ **Done 2026-10-11:** design C with design A's table, on the live app's real simulator.
+8. **Next: the live app's front door** (the 5-card section picker, asked for on 2026-10-11), then Raids and Spec Tier Lists.
 
 ### Before that: the Buffs tab (committed and pushed, `cd78079`)
 
@@ -109,7 +111,7 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 | --- | --- | --- |
 | Home | `home.html` | Original teal crystal over water. The Dark Portal designs were dropped. A soft crystal swell plays once per session. |
 | Character Planner | `planner.html` | Deep sea blue. **Buffs (decided 2026-10-09):** design C, from your raid, with design A's icons; a Blessing per Paladin. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. **Ranked Gear (decided 2026-10-10):** design A, the guide slot by slot as tooltips, with design C's "Where it drops" view. The hit cap follows Precision and Improved Faerie Fire (48 with the example raid). **Build (decided 2026-10-10):** design A, the share card, with design C's "What came in" report; its link opens the same character in the live app. Every sub-tab is decided. |
-| Simulation | `simulation.html` | Gold over violet. Step 1 baseline (later in the walkthrough). |
+| Simulation | `simulation.html` | Gold over violet. **Decided 2026-10-11:** design C, what to do next, with design A's damage-source table; runs the live app's real simulator (`sim-engine.js`) on the planner's character. |
 | Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
 | Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline. |
 | Raids | `raids.html` | The scene follows the raid; loot search across all five raids. Step 1 baseline. |

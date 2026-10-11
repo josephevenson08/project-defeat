@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/findUpgrades.ts
-lines: 248
+lines: 255
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.findUpgrades
 
-`src/features/simulator/findUpgrades.ts` · **features** layer · 248 lines
+`src/features/simulator/findUpgrades.ts` · **features** layer · 255 lines
 
 _No doc comment at the top of this file._
 
@@ -43,6 +43,7 @@ _No doc comment at the top of this file._
 ## Concepts & phases
 
 - [[Phase 5 - Planner Workflows]]
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 
