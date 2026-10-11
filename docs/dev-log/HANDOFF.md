@@ -18,14 +18,16 @@ further down this file is the record of how earlier decisions were reached, newe
 - **All work since then is a UI redesign,** done as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published beside the app at https://josephevenson08.github.io/project-defeat/prototypes/. It is being walked through tab by tab: for each step there are three designs, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Latest: the Ranked Gear tab (2026-10-10, night)
+### Latest: every Character Planner sub-tab is decided (2026-10-10, late night)
 
-The owner picked Ranked Gear design A (the guide, slot by slot, as tooltips) with design C ("Where it drops", by raid
-and boss) as a second view, switched like the Gear tab's views. It is built into `planner.html`, its checks pass, and
-the gallery shows the decision. Design B (sorted by the example score) was left out: illustrative weights can't price
-procs, and the Simulation tab already ranks swaps. On the way, `gen-gear-data.mjs` was fixed: it had credited five
-Kael'thas drops to Solarian and given Al'ar's drops no boss. Full details and the next step (the Build sub-tab) are at
-the top of `docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`.
+- **Ranked Gear** (`4a49d96`): design A, the guide slot by slot as tooltips, with design C's "Where it drops" view
+  (by raid and boss) behind a switch. On the way, `gen-gear-data.mjs` was fixed: it had credited five Kael'thas drops
+  to Solarian and given Al'ar's drops no boss.
+- **Build**: design A, the share card, with design C's read-first "What came in" report on its paste box. It speaks
+  the live app's own build format: its share link opens the same character in the live app, and its example
+  `/pdexport` loads in the app's own importer, both checked against the dev server.
+- Full details, and the next step (the Simulation tab), are at the top of
+  `docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`.
 
 ### The live-app fixes are committed and pushed (2026-10-10)
 
@@ -62,7 +64,8 @@ Or install Chromium with `npx playwright install chromium` and run `npm run test
 4. ~~**Obsidian notes on the prototype work.**~~ **Done 2026-10-10:** five generated notes under
    `brain/Project/Design/`, curated in `DESIGN_NOTES` in the brain generator. Update them when a step is decided.
 5. ~~**Ranked Gear.**~~ **Done 2026-10-10:** design A with design C as a second view.
-6. **Next: the walkthrough,** with the planner's Build sub-tab, then Simulation, Raids and Spec Tier Lists.
+6. ~~**Build.**~~ **Done 2026-10-10:** design A with design C's report. Every planner sub-tab is now decided.
+7. **Next: the walkthrough,** with the Simulation tab, then Raids and Spec Tier Lists.
 
 ### Before that: the Buffs tab (committed and pushed, `cd78079`)
 
@@ -105,7 +108,7 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 | Tab | Page | State |
 | --- | --- | --- |
 | Home | `home.html` | Original teal crystal over water. The Dark Portal designs were dropped. A soft crystal swell plays once per session. |
-| Character Planner | `planner.html` | Deep sea blue. **Buffs (decided 2026-10-09):** design C, from your raid, with design A's icons; a Blessing per Paladin. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. **Ranked Gear (decided 2026-10-10):** design A, the guide slot by slot as tooltips, with design C's "Where it drops" view. The hit cap follows Precision and Improved Faerie Fire (48 with the example raid). Build is still the Step 1 baseline: **next**. |
+| Character Planner | `planner.html` | Deep sea blue. **Buffs (decided 2026-10-09):** design C, from your raid, with design A's icons; a Blessing per Paladin. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. **Ranked Gear (decided 2026-10-10):** design A, the guide slot by slot as tooltips, with design C's "Where it drops" view. The hit cap follows Precision and Improved Faerie Fire (48 with the example raid). **Build (decided 2026-10-10):** design A, the share card, with design C's "What came in" report; its link opens the same character in the live app. Every sub-tab is decided. |
 | Simulation | `simulation.html` | Gold over violet. Step 1 baseline (later in the walkthrough). |
 | Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
 | Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline. |

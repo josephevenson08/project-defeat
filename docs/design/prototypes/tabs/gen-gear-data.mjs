@@ -1,6 +1,7 @@
 // Generates docs/design/prototypes/tabs/gear-data.js for the three Gear designs, from the app's real data:
 // bisRankings.json (Fury Warrior Phase 2), bisRecommendations.json, itemCatalogue.json, enchantCatalogue.json,
 // gemCatalogue.json, icons.json and the raid boss loot tables. Run from the repo root.
+// Enchants carry the game's effect id (fx) and gems their item id (w), which is what the in-game addon's export names.
 import fs from "node:fs";
 const D = "src/domain/";
 const J = p => JSON.parse(fs.readFileSync(D + p, "utf8"));
@@ -84,13 +85,13 @@ for (const [slot] of SLOTS) {
   if (!opts.length) continue;
   const ordered = [...opts].sort((a, b) => (b.id === best) - (a.id === best));
   enchOpts[slot] = { best: best || null, ids: ordered.slice(0, 5).map(e => e.id) };
-  for (const e of ordered.slice(0, 5)) outEnch[e.id] = { id: e.id, name: e.name.replace(/^(Enchant \w+|Weapon|Bracer|Gloves|Chest|Ring|Cloak|Boots) - /, ""), stats: stats(e.stats), note: e.notModelled ? "proc" : "" };
+  for (const e of ordered.slice(0, 5)) outEnch[e.id] = { id: e.id, name: e.name.replace(/^(Enchant \w+|Weapon|Bracer|Gloves|Chest|Ring|Cloak|Boots) - /, ""), stats: stats(e.stats), note: e.notModelled ? "proc" : "", fx: e.effectId ?? (e.effectIds || [])[0] ?? null };
 }
 
 /* gems: the recommended four, plus the common physical-DPS alternatives that exist in the catalogue */
 const GEMS = [rec.gems.Meta, rec.gems.Red, rec.gems.Yellow, rec.gems.Blue, "delicate-living-ruby", "bright-living-ruby", "rigid-dawnstone", "smooth-dawnstone", "glinting-noble-topaz", "jagged-talasite"].filter(Boolean);
 const outGems = {};
-for (const id of GEMS) { const g = gemById.get(id); if (!g) continue; outGems[id] = { id, name: g.name, color: g.color, q: g.quality, icon: iconOf(g.wowItemId), stats: stats(g.stats) }; }
+for (const id of GEMS) { const g = gemById.get(id); if (!g) continue; outGems[id] = { id, name: g.name, color: g.color, q: g.quality, icon: iconOf(g.wowItemId), stats: stats(g.stats), w: g.wowItemId }; }
 const gemFor = { Meta: rec.gems.Meta, Red: rec.gems.Red, Yellow: rec.gems.Yellow, Blue: rec.gems.Blue };
 
 /* the recommended set: rank 1 per slot; the second ring and trinket take the next one down (unique-equipped) */

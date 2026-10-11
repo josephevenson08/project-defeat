@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#build">Build designs</a>
     <a href="#ranked">Ranked Gear designs</a>
     <a href="#buffs">Buffs designs</a>
     <a href="#talents">Talents designs</a>
@@ -108,7 +109,7 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/planner.html" title="Preview of Character Planner" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data. Gear is a character sheet with game-style tooltips and a "What's left" checklist with one-press fixes and where each upgrade drops. Compare holds your item's tooltip next to another's, with the trade summed up in one sentence. Talents is the game's talent window, with a "What's off" list of one-press fixes. Buffs fill in from your raid and seat as clickable icons, with a Blessing for each Paladin. Ranked Gear shows Wowhead's order slot by slot as tooltips, or by where each item drops with your upgrades marked. The hit cap follows Precision and Improved Faerie Fire. Deep sea blue, with slow rising bubbles.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Character Planner</h2></div><p>The stat bar with the hit cap, and all six sub-tabs on real data. Gear is a character sheet with game-style tooltips and a "What's left" checklist with one-press fixes and where each upgrade drops. Compare holds your item's tooltip next to another's, with the trade summed up in one sentence. Talents is the game's talent window, with a "What's off" list of one-press fixes. Buffs fill in from your raid and seat as clickable icons, with a Blessing for each Paladin. Ranked Gear shows Wowhead's order slot by slot as tooltips, or by where each item drops with your upgrades marked. Build makes a share link that opens the same character in the live app, keeps named builds, and reads a paste (or the addon's export) before loading it. The hit cap follows Precision and Improved Faerie Fire. Deep sea blue, with slow rising bubbles.</p></div>
       <a class="open" href="tabs/planner.html">Open Character Planner <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
@@ -135,6 +136,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="build">
+    <span class="eyebrow">Step 2 · Character Planner · Build · decided 2026-10-10</span>
+    <h2 class="subhead">Build: the share card, with a read-first import</h2>
+    <p>The owner picked A, the share card, with C's "What came in" report on its paste box: reading a paste changes nothing, the report shows what came in slot by slot and asks the spec when the talents can't say, and only "Load into the planner" wears it. That is now the Build tab of the Character Planner above. B, the character select, was not picked. The three designs stay here for reference. They are three designs for the Build sub-tab, each in the whole planner. All three use the live app's own build format: the share link opens the same character in the live app (checked against it), the build text pastes back in, and the in-game addon's <code>/pdexport</code> string is read the way the app reads it. This prototype only carries Wowhead's Fury Warrior list, so anything else is reported, never guessed. Nothing is saved automatically; named builds stay in your browser.</p>
+  </header>
+  <section aria-label="Build designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/build-a.html#bdui" title="Preview of Share card" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Build A · Share card</h2></div><p>The build you're about to share comes first, as a card: slots filled, item level, talents, hit against the cap, buffs, set pieces and the gear's icons. Then the link, Share… and the build text, named saves, and one box to load a link, build text or the addon's export.</p></div>
+      <a class="open" href="tabs/build-a.html">Open Build A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/build-b.html#bdui" title="Preview of Character select" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Build B · Character select</h2></div><p>Like the game's character select: your builds in a column (the one in the planner now, then every saved one), the selected one beside it with a paperdoll of its gear, and Load, Save over, Share and Delete. A paste becomes a new entry without touching the planner.</p></div>
+      <a class="open" href="tabs/build-b.html">Open Build B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/build-c.html#bdui" title="Preview of Bring your character in" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">REPORT MERGED IN</span><h2>Build C · Bring your character in</h2></div><p>Paste-first: the addon's export, a link or build text goes in one big box. Reading it changes nothing; a report shows what came in slot by slot and asks the spec when the talents can't say. Only "Load into the planner" wears it. Share and save sit to the side.</p></div>
+      <a class="open" href="tabs/build-c.html">Open Build C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

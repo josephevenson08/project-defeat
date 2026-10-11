@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so is [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the planner's Build tab.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the Simulation tab.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,24 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## Character Planner: the Build tab (2026-10-10)
+
+The sixth and last Character Planner step. Three designs were built, each as the whole planner with only its Build
+tab changed, over `build-common.js`. **The owner picked A, the share card, with C's "What came in" report on its paste
+box.** That is now the Build tab of `planner.html`, so every planner sub-tab is decided.
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| **A · Share card (picked)** | [`build-a.html`](build-a.html) | The build you're about to share comes first, as a card (slots, item level, talents, hit against the cap, buffs, set pieces, gear icons). Then the link, Share… and the build text, named saves in this browser, and one box to load a link, build text or the addon's export. |
+| B · Character select (not picked) | [`build-b.html`](build-b.html) | Your builds in a column like the game's character select, the selected one beside it with a paperdoll of its gear, and Load, Save over, Share and Delete. A paste becomes a new entry without touching the planner. |
+| **C · Bring your character in (report merged in)** | [`build-c.html`](build-c.html) | Paste-first: reading a paste changes nothing; a report shows what came in slot by slot and asks the spec when the talents can't say; only "Load into the planner" wears it. |
+
+- **The live app's own build format** (version 1, `src/domain/builds`): the share link is the app's `#build=1.` link on the live site, deflated exactly as `shareLink.ts` does it, and the build text is the app's export. The addon's `/pdexport` is read as `addonImport.ts` reads it (game slot numbers, item ids, enchant effect ids, gem item ids, talents as `[id, tree, row, column, rank]`). `gen-gear-data.mjs` now carries each enchant's effect id and each gem's item id for this.
+- **Checked against the real app:** with the dev server up, a link from the prototype opens in the app as a Human Fury Warrior wearing the same gear with no notes, and the example `/pdexport` (written from the Gear tab's part-geared example) loads in the app's own importer with "Every slot resolved cleanly".
+- **Only Wowhead's Fury list is known here,** so an item off it is reported and its slot left empty, never guessed, and a build for another class is refused by name. An addon export leaves the Buffs tab alone, since the addon doesn't read your raid's buffs; a link or build text sets the Buffs tab "By hand".
+- **The Step 1 Build panel's code** (a fake link and an Import button that only printed a message) is gone from `planner.html`. The Gear tab's "Import your character" now lands in the paste box.
+- **Checks:** `checks/build-handson.mjs a|b|c|p` pass at 1280px, at 400px and with reduced motion (with `APP=` the dev server's address for the two real-app steps, or `APP=off`). The other planner checks and `check-bg.mjs` still pass.
 
 ## Character Planner: the Ranked Gear tab (2026-10-10)
 

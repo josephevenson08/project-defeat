@@ -1,18 +1,18 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-10, night): start here
+## ▶ Where we left off (2026-10-10, late night): start here
 
-**The Ranked Gear tab is decided and built into `planner.html`:** design A, the guide slot by slot, with design C's "Where it drops" as a second view behind a switch. Details are in the [README](README.md#character-planner-the-ranked-gear-tab-2026-10-10).
-- **A · The guide, slot by slot** (`ranked-a.html`): Wowhead's order as tooltips, with Equip. Picked.
-- **B · What each one does for you** (`ranked-b.html`): sorted by the example score. Not picked: illustrative weights can't price procs, and the Simulation tab already ranks swaps.
-- **C · Where to get it** (`ranked-c.html`): by raid and boss, with upgrade tags. Merged in as the second view.
-- The gallery shows the decision, and the brain's design notes are updated.
-- **Fixed on the way:** the prototype's gear data credited five Kael'thas drops to Solarian and gave Al'ar's drops no boss (`gen-gear-data.mjs` only read single-quoted names).
-- **To check with the tbc-researcher, not changed:** the live app tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both.
+**Every Character Planner sub-tab is now decided and built into `planner.html`.** Today added the last two:
+- **Ranked Gear** (committed, `4a49d96`): design A, the guide slot by slot as tooltips, with design C's "Where it drops" view behind a switch. See the [README](README.md#character-planner-the-ranked-gear-tab-2026-10-10).
+- **Build**: design A, the share card, with design C's read-first "What came in" report on its paste box. B (character select) wasn't picked. See the [README](README.md#character-planner-the-build-tab-2026-10-10).
+  - It uses the live app's own build format, so its share link opens the same character in the live app, and the example `/pdexport` loads in the app's own importer. `checks/build-handson.mjs` checks both against the dev server (`APP=` its address, or `APP=off`).
+  - `gen-gear-data.mjs` now carries enchant effect ids and gem item ids, which the addon's export uses.
 
-**Next:** the planner's **Build** sub-tab (three designs, then the owner picks), then Simulation, Raids and Spec Tier Lists. Professions comes later.
-- Same pattern: copy `make-ranked-pages.mjs` and `checks/ranked-handson.mjs`.
-- After each pick, also update `DESIGN_NOTES` in `tools/brain/generate-brain.mjs` (Step 2 Walkthrough and the Tab Prototypes table) and run `npm run brain`.
+**To check with the tbc-researcher, not changed:** the live app tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both.
+
+**Next: the Simulation tab** (three designs, then the owner picks), then Raids and Spec Tier Lists. Professions comes later.
+- Same pattern: copy `make-build-pages.mjs` and `checks/build-handson.mjs`, but for a whole tab (`simulation.html`) rather than a planner sub-tab.
+- After each pick, update `DESIGN_NOTES` in `tools/brain/generate-brain.mjs` (Step 2 Walkthrough and the Tab Prototypes table) and run `npm run brain`.
 
 ## Where we left off (2026-10-10, afternoon)
 
