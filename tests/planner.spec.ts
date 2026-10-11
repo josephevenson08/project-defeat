@@ -61,6 +61,7 @@ import { sampleSignatureAbilities } from '../src/domain/abilities/sampleSignatur
 import iconMap from '../src/domain/icons/icons.json' with { type: 'json' }
 import { sampleItems } from '../src/domain/gear/sampleItems'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
+import { findUpgrades } from '../src/features/simulator/findUpgrades'
 import { calculateStatWeights } from '../src/features/simulator/calculateStatWeights'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
 import { deriveItemArmor } from '../src/domain/gear/armorValues'
@@ -1702,6 +1703,45 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
 
   expect(after - before).toBeGreaterThan(0)
   expect(Math.abs(after - before - topDelta)).toBeLessThan(0.5)
+})
+
+test('every upgrade the finder lists is worth what it promises once equipped, two-handers included', () => {
+  /*
+   * **The test above only equips the top pick on a fresh character, whose top pick is a one-hander.**
+   * A Fury warrior dual-wields, and the finder used to score a two-hander in the main hand with the
+   * off-hand weapon still in place — a pairing the game does not allow and equipping undoes
+   * (`applyWeaponSlotRules` empties the off hand). On rank-1 gear it listed Twinblade of the Phoenix
+   * as +145.8 DPS; equipping it cost 177. Found on 2026-10-11 by the Simulation prototype's
+   * workbench, which equips each swap and re-runs. So every listed candidate is equipped here the
+   * way the app equips it, and the gain it delivers has to be the gain it promised.
+   */
+  const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Fury' }
+  const role = getRoleForSpec('Warrior', 'Fury')
+  let gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Fury')
+  for (const entry of getBisListForSpec('Warrior', 'Fury')?.entries ?? []) {
+    const item = getItemById(entry.itemId)
+    if (entry.rank !== 1 || !item) continue
+    gear = { ...gear, [entry.slot]: { item, gemIds: entry.recommendedGemIds ?? [], ...(entry.recommendedEnchantId ? { enchantId: entry.recommendedEnchantId } : {}) } }
+  }
+  expect(gear['Off Hand'].item.handType, 'the rank-1 set dual-wields, which is the case that matters').toBe('One Hand')
+  expect(
+    getItemsForSlotAndCharacter('Main Hand', 'Warrior', 'Fury').some((item) => item.handType === 'Two Hand'),
+    'two-handers are among the main-hand options the finder considers',
+  ).toBe(true)
+
+  const buffIds = sampleBuffs.map((buff) => buff.id)
+  const scoreFor = (candidateGear: typeof gear) =>
+    calculateSimulation(character, candidateGear, calculateStats(character, candidateGear, buffIds, [], undefined, deriveStatTalents({})), role, [], undefined, {}, buffIds).scoreExact
+  const baseline = scoreFor(gear)
+  const report = findUpgrades(character, gear, role, buffIds)
+  expect(report.candidates.length, 'the rank-1 set still has something to chase').toBeGreaterThan(0)
+
+  for (const candidate of report.candidates) {
+    const equipped = applyWeaponSlotRules({ ...gear, [candidate.slot]: { item: candidate.item, gemIds: [...candidate.gemIds], ...(candidate.enchantId ? { enchantId: candidate.enchantId } : {}) } })
+    const delivered = scoreFor(equipped) - baseline
+    expect(Math.abs(delivered - candidate.scoreDelta), `${candidate.item.name} in ${candidate.slot}: promised ${candidate.scoreDelta.toFixed(1)}, delivers ${delivered.toFixed(1)}`).toBeLessThan(0.01)
+    expect(delivered, `${candidate.item.name} is listed, so equipping it has to help`).toBeGreaterThan(0)
+  }
 })
 
 test('a reload starts clean, and a named build is what brings one back', async ({ page }) => {

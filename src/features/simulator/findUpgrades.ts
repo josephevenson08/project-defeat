@@ -5,7 +5,7 @@ import { sampleGems } from '../../domain/gems/sampleGems'
 import type { SocketColor } from '../../domain/gear/itemTypes'
 import type { SimulationTarget } from '../../domain/simulation/encounterTypes'
 import type { CharacterProfile, CharacterRole } from '../character/characterTypes'
-import { getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from '../gear/gearData'
+import { applyWeaponSlotRules, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from '../gear/gearData'
 import { twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import type { EquippedGear, GearItem, GearSlot } from '../gear/gearTypes'
 import { calculateStats } from '../stats/calculateStats'
@@ -187,14 +187,21 @@ export function findUpgrades(
       const carriedEnchantId = enchantStillLegal ? currentEnchantId : undefined
 
       const gemIds = gemsForItem(item)
-      const candidateGear: EquippedGear = {
+      /*
+       * **Scored the way equipping it ends up, which for a two-hander means without the off hand.**
+       * Equipping runs `applyWeaponSlotRules`, which empties the off hand under a two-hander; scoring
+       * the swap without it valued a dual-wielder holding a two-hander *and* their off-hand weapon,
+       * a pairing the game does not allow. On Fury's rank-1 set that listed Twinblade of the Phoenix
+       * as an upgrade that lowered the estimate once equipped.
+       */
+      const candidateGear: EquippedGear = applyWeaponSlotRules({
         ...gear,
         [slot]: {
           item,
           gemIds,
           enchantId: carriedEnchantId,
         },
-      }
+      })
 
       const scoreDelta = scoreFor(candidateGear).scoreExact - baseline.scoreExact
       if (scoreDelta <= 0) continue
