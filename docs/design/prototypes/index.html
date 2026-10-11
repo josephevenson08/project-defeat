@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#front">Front door designs</a>
     <a href="#sim">Simulation designs</a>
     <a href="#build">Build designs</a>
     <a href="#ranked">Ranked Gear designs</a>
@@ -137,6 +138,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="front">
+    <span class="eyebrow">Step 2 · The live app's front door · decided 2026-10-11, built into the live app</span>
+    <h2 class="subhead">The front door: doors with a glimpse, and the job each does</h2>
+    <p>The owner picked A, doors with a glimpse, with B's goal line on each door ("Gear my character →"). It is built into the live app's <code>SectionPicker</code>, in the app's own look: Character Planner as the big door with Simulation and the import beside it, a real glimpse and a counted fact on every door, and each named by its title. C, the game menu, was not picked. The three designs stay here for reference. They are three designs for the live app's 5-card section picker (<code>SectionPicker.tsx</code>), asked for on 2026-10-11. The pick will be built into the live app. All three keep what the usability study found works (the cards say what they do), and fix what it found missing: each door is named by its title alone for screen readers, the simulator gets a way in, and there is a source link. They use the owner's own backdrop and raid art, real counts from <code>src/</code>, and no 3D, so they can go straight into the app. "Import your character" really works here: it reads the addon's export and opens the planner wearing it.</p>
+  </header>
+  <section aria-label="Front door designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/front-a.html" title="Preview of Doors with a glimpse" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Front door A · Doors with a glimpse</h2></div><p>The cards stay, each showing a real glimpse of what's behind it: the recommended set's icons, an example raid group, the top tier, the raids' own art, the professions. Character Planner is the big default door, with the simulator and the import beside it.</p></div>
+      <a class="open" href="tabs/front-a.html">Open front door A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/front-b.html" title="Preview of What are you here to do?" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">GOAL LINES MERGED IN</span><h2>Front door B · What are you here to do?</h2></div><p>Goal first, since the goal chose the first click in the usability study: gear my character, simulate my DPS, plan a raid, see where my spec stands, find what drops where, level a profession, or bring my character from the game. Each names the section it opens.</p></div>
+      <a class="open" href="tabs/front-b.html">Open front door B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/front-c.html" title="Preview of Game menu" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Front door C · Game menu</h2></div><p>Like a game's main menu over the backdrop: a rail of big entries on the left, and a large preview on the right that follows the entry you point at or move to with the arrow keys, with "Continue as your character" for the import.</p></div>
+      <a class="open" href="tabs/front-c.html">Open front door C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

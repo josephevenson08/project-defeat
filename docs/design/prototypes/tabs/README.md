@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). Next comes the live app's front door (the 5-card section picker), then Raids and Spec Tier Lists.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). So is the [live app's front door](#the-live-apps-front-door-2026-10-11-built-into-the-app), now built into the app. Next come Raids and Spec Tier Lists.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -72,6 +72,23 @@ WebGL-off fallback gradient uses the same colour.
 - **Contract change:** a page may list its pillars as `SCENE.three.pillars` (optional). Professions does this so the ore veins can follow them.
 - **Accessibility:** no detail flashes. Each glint, light and bubble moves on its own slow cycle, and reduced motion shows a still frame.
 - **Checks:** Playwright on Edge for all seven pages, at 1280px, at 400px, with reduced motion and with WebGL off. There were no script errors, failed loads or sideways scroll. The only console message is Three.js reporting that WebGL is off, in the WebGL-off runs, where it's expected. Scene-only screenshots were reviewed for every tab. In review, the bubbles and ore veins were too faint to see and were made larger, and Raid Composition read silver rather than gold and was warmed.
+
+## The live app's front door (2026-10-11, built into the app)
+
+The owner asked to rework the live app's front door, the 5-card section picker (`src/components/layout/SectionPicker.tsx`).
+Three standalone prototype pages were built (`make-front-pages.mjs`), over `front-common.js` and `front-data.js`
+(`gen-front-data.mjs` counts everything from `src/`). **The owner picked A, doors with a glimpse, with B's goal line on
+each door,** and it is built into the live app.
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| **A · Doors with a glimpse (picked)** | [`front-a.html`](front-a.html) | The cards stay, each with a real glimpse of what's behind it (the recommended set's icons, a raid's buffs, the top tier, the raids' own art, the professions) and a counted fact; Character Planner is the big door, with the simulator and the import beside it. |
+| B · What are you here to do? (goal lines merged in) | [`front-b.html`](front-b.html) | Goal first, since the goal chose the first click in the usability study: one list of jobs, each naming the section it opens, with the import as the seventh. |
+| C · Game menu (not picked) | [`front-c.html`](front-c.html) | A rail of big entries over the backdrop, with a large preview that follows the entry you point at or move to with the arrow keys. |
+
+- **What the study found, kept and fixed:** the cards say what they do (kept); each door is now named by its title alone, with its sentence, goal and fact as its description (the screen-reader user heard five paragraph-long names); Simulation has a door (the theorycrafter found nothing that mentioned it); there is a source link (the developer found none).
+- **In the live app** (`SectionPicker.tsx`, `src/styles/global.css`): the app's own metal-framed cards and muted section colours, Character Planner as the big door with Simulation and the import panel beside it, then the other four. Every glimpse and fact comes from the modules the sections read: the Fury rank-1 list's icons, the 21 raid buffs the app counts, Wowhead's S tier, the raids' art and 5 raids, 24 bosses and 464 drops, and the 13 professions' icons. The test ids are unchanged, so the suite's front-page tests still run; two new tests check the names, descriptions and counts, and that the Simulation door leads through character creation into the simulator.
+- **The prototypes:** the import really works there too (it reads the paste the way the Build tab does and opens the planner wearing it). They use the owner's own `backdrop.jpg` and raid art (ChatGPT generations, settled in the handoff); `backdrop.webp` is a different picture, the five-raid collage. `checks/front-handson.mjs a|b|c` pass at 1280px, at 400px and with reduced motion.
 
 ## Simulation: what to do next, on the real model (2026-10-11)
 

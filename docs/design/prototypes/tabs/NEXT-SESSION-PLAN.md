@@ -8,7 +8,9 @@
 
 **A live-app fix with it:** the upgrade finder (`findUpgrades.ts`) scored two-handers with the off hand still equipped (Twinblade of the Phoenix promised +145.8 DPS and cost 177). Each trial swap now goes through `applyWeaponSlotRules`, with a test.
 
-**Next: the live app's front door** (the owner asked on 2026-10-11): the 5-card section picker in `src/components/layout/SectionPicker.tsx` (Character Planner, Raid Composition, Spec Tier Lists, Raids, Professions, plus "Already playing? Import your character"). Three prototype designs, the owner picks, then build the pick into the live app's `SectionPicker` (with its tests). Then Raids and Spec Tier Lists. Professions comes later.
+**The live app's front door is decided and built into the app (2026-10-11):** design A, doors with a glimpse, with design B's goal line on each door, in `src/components/layout/SectionPicker.tsx` and `src/styles/global.css`. Details are in the [README](README.md#the-live-apps-front-door-2026-10-11-built-into-the-app). Two new tests in `tests/planner.spec.ts` cover it; the prototypes are `front-a/b/c.html`.
+
+**Next: the walkthrough,** with Raids, then Spec Tier Lists. Professions comes later.
 
 **Still to check with the tbc-researcher, not changed:** the live app tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both.
 

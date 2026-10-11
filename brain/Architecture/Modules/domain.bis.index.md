@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`

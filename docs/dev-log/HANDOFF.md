@@ -26,8 +26,10 @@ further down this file is the record of how earlier decisions were reached, newe
 - **The live app's upgrade finder** scored two-handers with the off hand still equipped, so it promised a Fury warrior
   +145.8 DPS for Twinblade of the Phoenix, which cost 177 once equipped. Fixed in `src/features/simulator/findUpgrades.ts`
   (each trial swap goes through `applyWeaponSlotRules`), with a test that equips every listed upgrade.
-- **Next: the live app's front door,** the 5-card section picker; see the top of
-  `docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`.
+- **The live app's front door** is reworked (the owner asked on 2026-10-11): design A, doors with a glimpse, with
+  design B's goal lines, built into `src/components/layout/SectionPicker.tsx`. Each door is named by its title, shows
+  a real glimpse and a counted fact, Simulation has its own door, and the import sits beside the Character Planner.
+- **Next:** Raids, then Spec Tier Lists; see the top of `docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`.
 - Before that, every Character Planner sub-tab was decided (Ranked Gear `4a49d96`, Build `f8d9f93`).
 
 ### The live-app fixes are committed and pushed (2026-10-10)
@@ -67,7 +69,8 @@ Or install Chromium with `npx playwright install chromium` and run `npm run test
 5. ~~**Ranked Gear.**~~ **Done 2026-10-10:** design A with design C as a second view.
 6. ~~**Build.**~~ **Done 2026-10-10:** design A with design C's report. Every planner sub-tab is now decided.
 7. ~~**Simulation.**~~ **Done 2026-10-11:** design C with design A's table, on the live app's real simulator.
-8. **Next: the live app's front door** (the 5-card section picker, asked for on 2026-10-11), then Raids and Spec Tier Lists.
+8. ~~**The live app's front door.**~~ **Done 2026-10-11:** design A with design B's goal lines, built into the app.
+9. **Next: the walkthrough,** with Raids, then Spec Tier Lists.
 
 ### Before that: the Buffs tab (committed and pushed, `cd78079`)
 

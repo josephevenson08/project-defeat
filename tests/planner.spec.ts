@@ -2189,6 +2189,49 @@ test('a hybrid gem earns the socket bonus it satisfies', async () => {
   expect(socketBonusIsActive(['Red', 'Yellow'], [orange!.id, pureRed!.id])).toBe(false)
 })
 
+test('the front door names each door by its title, and says its job and a counted fact', async ({ page }) => {
+  /*
+   * **A door's accessible name is its title alone.** In the 2026-09-21 usability study each card's
+   * name was the whole button — tagline, title and sentence run together — so the screen-reader user
+   * heard five paragraph-long names before anything else. The rest is the description now, which is
+   * also where the job in the visitor's words lives, since the study found the goal chose the first
+   * click. Simulation has a door of its own: the study's theorycrafter found nothing that mentioned it.
+   */
+  await page.goto('/')
+  const doors = [
+    ['Character Planner', 'Gear my character'],
+    ['Simulation', 'Simulate my DPS'],
+    ['Raid Composition', 'Plan a raid'],
+    ['Spec Tier Lists', 'See where my spec stands'],
+    ['Raids', 'Find what drops where'],
+    ['Professions', 'Level a profession'],
+  ] as const
+  for (const [name, goal] of doors) {
+    const door = page.getByRole('button', { name, exact: true })
+    await expect(door, `one door named exactly "${name}"`).toHaveCount(1)
+    await expect(door, `${name} says its job`).toHaveAccessibleDescription(new RegExp(goal))
+  }
+
+  // The facts are counted from the data, never written down, so they follow it.
+  const raidIds = ['serpentshrine-cavern', 'tempest-keep', 'karazhan', 'gruuls-lair', 'magtheridons-lair']
+  const bosses = sampleRaidBosses.filter((boss) => raidIds.includes(boss.raidId))
+  const drops = bosses.reduce((sum, boss) => sum + boss.loot.length, 0)
+  expect(sampleRaids.filter((raid) => raidIds.includes(raid.id)), 'every raid the door counts exists').toHaveLength(5)
+  await expect(page.getByTestId('section-raids')).toContainText(`5 raids · ${bosses.length} bosses · ${drops} drops`)
+
+  // A source link, which the study's developer looked for and found nowhere.
+  await expect(page.getByRole('link', { name: 'Source on GitHub' })).toHaveAttribute('href', /github\.com\/josephevenson08\/project-defeat/)
+})
+
+test('the Simulation door leads through character creation into the simulator', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('section-simulation').click()
+  // The estimate is about a character, so, as with the planner, there is one to make first.
+  await completeCharacterCreation(page)
+  await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
+  await expect(page.getByRole('button', { name: /run simulation/i })).toBeVisible()
+})
+
 test('the app opens on a section picker, and the planner names its character', async ({ page }) => {
   // The app used to land inside a tab. It now asks which of the four things you came to do, because
   // gearing a character, reading a tier list, reading a loot table and levelling a profession have

@@ -29,6 +29,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
 
 ## Concepts & phases

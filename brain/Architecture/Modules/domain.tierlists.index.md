@@ -24,6 +24,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

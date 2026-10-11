@@ -1,0 +1,73 @@
+// Builds front-a.html, front-b.html and front-c.html: three designs for the live app's front door, the 5-card section
+// picker (src/components/layout/SectionPicker.tsx). Unlike the tab steps these are standalone pages, since the live app's
+// front door has no 3D scene: one shared skeleton and base style here, the planner's data and shared code (so the
+// import really loads the planner's character), front-data.js (gen-front-data.mjs) and front-common.js, then the
+// design. Each door links to the prototype's tab pages. Run from the repo root:
+//   node docs/design/prototypes/tabs/make-front-pages.mjs
+import fs from "node:fs";
+import path from "node:path";
+const T = "docs/design/prototypes/tabs";
+const DESIGNS = { a: "Doors with a glimpse", b: "What are you here to do?", c: "Game menu" };
+if (!fs.existsSync(path.join(T, "front-data.js"))) throw new Error("front-data.js is missing: run gen-front-data.mjs first");
+const SCRIPTS = ["talent-data.js", "talent-common.js", "buff-data.js", "buff-common.js", "gear-data.js", "gear-common.js", "build-common.js", "front-data.js", "front-common.js"];
+const BASE = `
+:root{
+  color-scheme:dark;
+  --bg:#06080b;--ink:#ece6d8;--ink-2:#c3bbaa;--ink-3:#9a927f;--gold:#d9b46a;--gold-2:#f0d59a;--rim:rgba(217,180,106,.32);--rim-2:rgba(217,180,106,.16);
+  --glass:rgba(10,11,14,.78);--glass-2:rgba(18,19,24,.86);--focus:#ffe2a3;--alliance:#5aa7ff;--horde:#ff5a4f;--warn:#ffcf7a;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;--f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--f-mono:"JetBrains Mono",Consolas,monospace;
+  --t-xs:.75rem;--t-sm:.8125rem;--t-md:.9375rem;--t-lg:1.15rem;--t-xl:1.5rem;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body)}
+a{color:var(--gold-2)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fd-backdrop{position:fixed;inset:0;z-index:0;background:var(--fd-backdrop) center/cover no-repeat,linear-gradient(90deg,#0a1830,#06080b 50%,#2a0a08)}
+.fd-backdrop::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 25%,rgba(6,8,11,.32),rgba(6,8,11,.78) 75%),linear-gradient(180deg,rgba(6,8,11,.2),rgba(6,8,11,.7))}
+.dirline{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(6,8,11,.7)}
+main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:28px 16px 24px}
+.fd-head{text-align:center;margin:8px 0 22px}
+.fd-head h1{font:400 clamp(2.2rem,6vw,3.6rem)/1.05 var(--f-head);letter-spacing:.06em;margin:0;color:var(--gold);text-shadow:0 2px 24px rgba(0,0,0,.7);font-variant:small-caps}
+.fd-sub{font:500 var(--t-xs) var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);margin:8px 0 4px}
+.fd-sides{font:400 var(--t-md) var(--f-head);margin:0;letter-spacing:.04em;font-variant:small-caps}
+.side-alliance{color:var(--alliance)}.side-horde{color:var(--horde)}.side-and{color:var(--ink-2)}
+.fd-btn{font:600 var(--t-sm) var(--f-body);background:var(--glass-2);border:1px solid var(--rim);color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;min-height:40px}
+.fd-btn:hover,.fd-btn:focus-visible{border-color:var(--gold);color:var(--gold-2)}
+.fd-btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1204}
+.fd-btn:disabled{opacity:.5;cursor:default}
+.fd-import p{margin:0 0 8px;color:var(--ink-2);font-size:var(--t-sm)}
+.fd-import textarea{width:100%;min-height:84px;font:500 var(--t-xs) var(--f-mono);background:rgba(4,5,7,.85);color:var(--ink);border:1px solid var(--rim);border-radius:8px;padding:8px 10px;resize:vertical}
+.fd-import .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.fd-ex{font:700 10px/1.4 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--warn);border:1px solid rgba(255,207,122,.4);border-radius:4px;padding:1px 6px}
+.fd-err{color:var(--warn);font-size:var(--t-sm);margin:8px 0 0}
+.fd-foot{position:relative;z-index:1;max-width:1180px;margin:10px auto 0;padding:14px 16px 26px;color:var(--ink-3);font-size:var(--t-xs);border-top:1px solid var(--rim-2)}
+.fd-foot p{margin:4px 0}
+@media (max-width:699px),(pointer:coarse){.fd-btn{min-height:44px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+`;
+for (const [k, name] of Object.entries(DESIGNS)) {
+  if (!fs.existsSync(path.join(T, `front-${k}.js`))) { console.log(`front-${k}.js not written yet, skipped`); continue; }
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project Defeat · Front door ${k.toUpperCase()}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>${BASE}</style>
+</head>
+<body class="fd fd-${k}">
+<div class="fd-backdrop" aria-hidden="true"></div>
+<div class="dirline">Step 2 · The front door, design ${k.toUpperCase()}: ${name}. The live app's 5-card section picker, reworked; its doors open the prototype's tabs. Prototype only, not the live app.</div>
+<main id="front"><p>The front door needs JavaScript.</p></main>
+<p class="sr" id="live" aria-live="polite"></p>
+${SCRIPTS.map(f => `<script src="${f}"></script>`).join("\n")}
+<script src="front-${k}.js"></script>
+</body>
+</html>
+`;
+  fs.writeFileSync(path.join(T, `front-${k}.html`), html);
+  console.log(`front-${k}.html written (${Math.round(html.length / 1024)} KB)`);
+}

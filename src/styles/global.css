@@ -1093,19 +1093,23 @@ select {
 .section-picker-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(6, 1fr);
-  max-width: 1120px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1180px;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
-.section-picker-grid .section-card {
+/* Character Planner is the big door; Simulation and the import share the column beside it. */
+.section-picker-grid .section-card-main,
+.section-picker-side {
   grid-column: span 2;
 }
 
-.section-picker-grid .section-card:nth-child(4) {
-  grid-column: 2 / span 2;
+.section-picker-side {
+  align-content: start;
+  display: grid;
+  gap: 18px;
 }
 
 @media (max-width: 900px) {
@@ -1113,8 +1117,8 @@ select {
     grid-template-columns: 1fr;
   }
 
-  .section-picker-grid .section-card,
-  .section-picker-grid .section-card:nth-child(4) {
+  .section-picker-grid .section-card-main,
+  .section-picker-side {
     grid-column: auto;
   }
 }
@@ -1166,6 +1170,118 @@ select {
   color: var(--text-dim);
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* A glimpse of what is behind the door, drawn from the data the section reads. */
+.section-card-glimpse {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.section-card-glimpse img,
+.section-card-specs img {
+  background: #05080b;
+  border: 1px solid color-mix(in srgb, var(--section-accent) 55%, transparent);
+  border-radius: 5px;
+  height: 28px;
+  width: 28px;
+}
+
+.section-card-main .section-card-glimpse img {
+  height: 36px;
+  width: 36px;
+}
+
+.section-card-specs {
+  display: grid;
+  gap: 5px;
+}
+
+.section-card-specs > span {
+  align-items: center;
+  color: var(--text-dim);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.section-card-specs img {
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
+}
+
+.section-card-art {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.section-card-art > span {
+  aspect-ratio: 3 / 4;
+  background: #0b0d12 center / cover no-repeat;
+  border: 1px solid color-mix(in srgb, var(--section-accent) 45%, transparent);
+  border-radius: 5px;
+}
+
+/* The job the door does, in the visitor's words, and one counted fact. */
+.section-card-foot {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.section-card-goal {
+  color: color-mix(in srgb, var(--section-accent) 55%, var(--text-strong));
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.section-card-fact {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* Beside the planner the import is a panel of its own, not a line under the cards. */
+.section-picker-side .section-picker-import {
+  background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  justify-items: start;
+  margin: 0;
+  max-width: none;
+  padding: 16px 18px;
+}
+
+.section-picker-import-lead {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.section-picker-import-lead strong {
+  color: var(--text-strong);
+}
+
+.section-picker-credit {
+  color: var(--text-faint);
+  font-size: 12px;
+  margin: 0;
+  max-width: 760px;
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+
+.section-picker-credit a {
+  color: var(--text-dim);
 }
 
 /* Discord's persistent rail: it never navigates away, so the stat readout stays on screen while gear

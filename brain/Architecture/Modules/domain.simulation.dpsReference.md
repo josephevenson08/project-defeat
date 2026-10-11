@@ -52,7 +52,7 @@ From the top of the file:
 
 ## Imported by
 
-_None._
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 
 ## Concepts & phases
 

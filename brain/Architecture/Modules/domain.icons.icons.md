@@ -35,6 +35,7 @@ _None._
 
 ## Imported by
 
+- [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 
 ## Concepts & phases

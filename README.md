@@ -112,7 +112,9 @@ the top section says where things stand and what's next. In short:
 8. **Each tab's text accents follow its colour, and the gallery is always dark.**
 9. **Simulation: done.** It runs the app's own simulator on your planner character: stat priority, best upgrades,
    then the estimate and how far to trust it. Building it found (and fixed) a bug in the app's upgrade finder.
-10. **Next:** the front door (the 5-card section picker), then Raids and Spec Tier Lists. Professions comes later.
+10. **The live app's front door: done.** Each section's door shows a glimpse of what's inside and the job it does,
+    Simulation has its own door, and the import sits beside the Character Planner.
+11. **Next:** Raids, then Spec Tier Lists. Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

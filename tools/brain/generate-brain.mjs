@@ -713,7 +713,9 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
 - **Planner · Build (2026-10-10):** A, the share card, with C's read-first "What came in" report on its paste box. It speaks the live app's own build format, so its share link opens the same character in the live app.
 - **Simulation (2026-10-11):** C, what to do next (stat priority, best upgrades, then the estimate and how far to trust it), with A's damage-source table. It runs the live app's own simulator in the page (\`gen-sim-engine.mjs\` bundles it from \`src/\`), so its numbers match the app's to the decimal.
 
-**Next:** the live app's front door (the 5-card section picker, asked for on 2026-10-11), then Raids and Spec Tier Lists. Professions comes later.
+- **The live app's front door (2026-10-11):** A, doors with a glimpse, with B's goal line on each door ("Gear my character →"), built straight into the live app's section picker: each door named by its title, a real glimpse and a counted fact on each, Simulation with a door of its own, and the import beside the Character Planner.
+
+**Next:** Raids, then Spec Tier Lists. Professions comes later.
 
 **Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed. The Simulation workbench then found the upgrade finder scoring two-handers with the off hand still equipped (fixed 2026-10-11).`,
     docs: [
@@ -729,6 +731,7 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
       'domain/simulation/warlockPet.ts',
       'features/raidcomp/RaidCompositionPanel.tsx',
       'features/simulator/findUpgrades.ts',
+      'components/layout/SectionPicker.tsx',
     ],
     related: ['UI Refresh', 'Tab Prototypes', 'Buffs Debuffs and Consumables', 'Content Phases', 'Stat Weights'],
   },
