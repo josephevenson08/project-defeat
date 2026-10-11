@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**459 commits across 73 days**, from 2026-06-25 to 2026-10-11.
+**460 commits across 73 days**, from 2026-06-25 to 2026-10-11.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,14 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_32 commits_
+_33 commits_
 
-### Sunday 11 October — 3 commits
+### Sunday 11 October — 4 commits
 
 - Give the Character Planner its Build tab: a share card, with a read-first import — [`f8d9f93`](https://github.com/josephevenson08/project-defeat/commit/f8d9f93fe9e8835e4b507340ea5e7b37e0e2bcb6)
 - Fix the upgrade finder: score a two-hander the way equipping it ends up — [`260b92d`](https://github.com/josephevenson08/project-defeat/commit/260b92d8036132a669f0b506cd00d779ec370cce)
 - Give the Simulation tab what to do next, on the live app's real simulator — [`1c0b887`](https://github.com/josephevenson08/project-defeat/commit/1c0b88741befeead42e7a89900173ecf6f8dca49)
+- Rework the live app's front door: a glimpse and the job on every door — [`a8fb27b`](https://github.com/josephevenson08/project-defeat/commit/a8fb27bb4682cf2b28fc123013b7c5ba86a4a5a3)
 
 ### Saturday 10 October — 5 commits
 
