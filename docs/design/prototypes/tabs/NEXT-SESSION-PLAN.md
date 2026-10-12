@@ -1,8 +1,18 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-12): Raids decided, built, committed and pushed; start here
+## ▶ Where we left off (2026-10-12, later): Spec Tier Lists decided and built, start here
 
-**The Raids work is committed and pushed** (the owner said so on 2026-10-12): one work commit, then "Refresh the daily log". Next: Spec Tier Lists.
+**The Spec Tier Lists tab is decided and built into `tier-lists.html`:** design A, the tier board (Wowhead's three lists as rows of spec icons, a card for any spec), with design B's chart behind a "The board / Against the logs" switch (the 20 damage specs by archon.gg's observed DPS, with Wowhead's and archon's tiers; they agree on 9). C, what each spec brings, was not picked. Details are in the [README](README.md#spec-tier-lists-the-tier-board-and-the-logs-beside-it-2026-10-12).
+- **It reads the live app's data:** `gen-tier-data.mjs` → `tier-data.js`. No live-app change in this step.
+- `checks/tiers-handson.mjs a|b|c|p` pass at 1280px, 400px and reduced motion; `check-bg.mjs` is clean; the brain is updated; `published.mjs` passed every page on a local build (1,353 icons).
+- **Committed and pushed** (2026-10-12): one work commit, then "Refresh the daily log".
+- **To raise with the owner:** the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one).
+
+**Next: Professions,** the only tab left; the owner said it comes later, so ask first.
+
+## Where we left off (2026-10-12): Raids decided, built, committed and pushed
+
+**The Raids work is committed and pushed** (2026-10-12): the work commit `4ced560`, then "Refresh the daily log" `d30a8b8`. Next: Spec Tier Lists.
 
 **The Raids tab is decided and built into `raids.html`:** design A, the boss journal (one boss at a time with the owner's art, the loot as tooltips, your spec's picks ranked from Wowhead's Phase 2 lists), with design C's raid view behind a "For me / For my raid" switch (who in your Raid Composition raid wants each drop, contested drops marked). B, the attunement tracker, was not picked. Details are in the [README](README.md#raids-the-boss-journal-with-your-raids-loot-2026-10-11).
 - **It reads the live app's raid data:** `gen-raid-data.mjs` bundles it from `src/` into `raid-data.js` (469 drops, each with its rank on all 27 specs' lists). Regenerate after the raid data, the catalogue or the BiS rankings change.

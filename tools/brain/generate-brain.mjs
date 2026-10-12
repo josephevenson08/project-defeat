@@ -685,7 +685,7 @@ const DESIGN_NOTES = [
 | Character Planner | \`planner.html\` | Deep sea blue, rising bubbles | Sky blue | All six sub-tabs decided |
 | Simulation | \`simulation.html\` | Gold over violet, crystal pillars | Gold | Decided; runs the live app's real simulator |
 | Raid Composition | \`raid-composition.html\` | Warm white-gold, one light per raid group | Gold | Decided |
-| Spec Tier Lists | \`tier-lists.html\` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |
+| Spec Tier Lists | \`tier-lists.html\` | Emerald, rank rings under the crystal | Emerald | Decided; Wowhead's tiers beside the logs |
 | Raids | \`raids.html\` | Follows the chosen raid | Follows the raid | Decided; reads the live app's raid data |
 | Professions | \`professions.html\` | Amber, ore veins up the pillars | Amber | Waits for a later update |
 
@@ -715,8 +715,9 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
 
 - **The live app's front door (2026-10-11):** A, doors with a glimpse, with B's goal line on each door ("Gear my character →"), built straight into the live app's section picker: each door named by its title, a real glimpse and a counted fact on each, Simulation with a door of its own, and the import beside the Character Planner.
 - **Raids (2026-10-11):** A, the boss journal (one boss at a time with the owner's art, the loot as tooltips, your spec's picks ranked from Wowhead's Phase 2 lists), with C's raid view behind a switch ("For me / For my raid"): who in your Raid Composition raid wants each drop, and which drops are contested. B, an attunement tracker, was not picked. It reads the live app's raid data (\`gen-raid-data.mjs\` bundles it from \`src/\`) and every drop's rank on all 27 specs' lists.
+- **Spec Tier Lists (2026-10-12):** A, the tier board (Wowhead's three lists as rows of spec icons, a card for any spec with its place on every list, what the logs say and what it brings to a raid), with B's chart behind a switch: Wowhead's tiers against archon.gg's observed DPS for the 20 damage specs (they agree on 9). C, a raid-building view of what each spec brings, was not picked. It reads the live app's data (\`gen-tier-data.mjs\`).
 
-**Next:** Spec Tier Lists. Professions comes later.
+**Next:** Professions, when the owner is ready. Building the tier lists found that the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one); not changed yet.
 
 **Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed. The Simulation workbench then found the upgrade finder scoring two-handers with the off hand still equipped (fixed 2026-10-11), and the Raids step two Al'ar drops tagged caster and tank that are physical DPS gear, and Tempest Keep's heroic keys listed at Honored where Phase 2 needed Revered (fixed 2026-10-11).`,
     docs: [

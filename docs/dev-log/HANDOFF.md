@@ -10,20 +10,27 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ---
 
-## Where this is right now (2026-10-12 — READ THIS FIRST)
+## Where this is right now (2026-10-12, later — READ THIS FIRST)
 
 ### In short
 
-- **Everything is committed and pushed,** including the Raids step (committed 2026-10-12: one work commit, then "Refresh the daily log"). `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
+- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (2026-10-12: one work commit, then "Refresh the daily log"). `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
 - **The live app** (`src/`) deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/. It changed four times from 2026-10-10 to 12, all from the prototype work: the data and rule fixes (`9be91c1`), the upgrade finder's two-hander bug (`260b92d`), a new front door (`a8fb27b`), and with the Raids step two loot role tags and the attunement text (below).
 - **The rest of the work is a UI redesign,** as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published at https://josephevenson08.github.io/project-defeat/prototypes/. It is walked through tab by tab: three designs per step, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Next: Spec Tier Lists
+### Next: Professions, when the owner is ready
 
-The owner said Raids, then Spec Tier Lists; Professions comes later. Follow "How a walkthrough step is done" below. The prototype is `tabs/tier-lists.html` (Step 1 baseline: all three Wowhead Phase 2 lists, 3D shelves, class filters); find the live app's version under `src/features/` and its data in `src/domain`. Whole-tab steps build designs from the tab page with only its content area swapped (`make-sim-pages.mjs`, `make-raids-pages.mjs`).
+Every tab but Professions is decided. The owner has said Professions comes later, so ask before starting it. Follow "How a walkthrough step is done" below; whole-tab steps build designs from the tab page with only its content area swapped (`make-raids-pages.mjs`, `make-tier-pages.mjs`).
 
-### Raids (decided and built 2026-10-11, committed 2026-10-12)
+### Spec Tier Lists (decided, built and committed 2026-10-12)
+
+- **The pick:** design A, the tier board (Wowhead's three lists as rows of spec icons; a card for any spec with its place on every list, what the logs say, what it brings to a raid and its signature ability), with design B's chart behind a switch ("The board / Against the logs"): the 20 damage specs by archon.gg's observed DPS with both tier letters. C, what each spec brings, was not picked. It is now `tabs/tier-lists.html` (built with `make-tier-pages.mjs --tab`). Details are in `tabs/README.md`.
+- **New files:** `gen-tier-data.mjs` → `tier-data.js` (from `src/domain`: tier lists, `dpsReference.ts`, raid builds and their spec icons, `seatContributions`, signature abilities), `tiers-common.js` (`window.TierKit`), `tiers-a/b/c.js`, `make-tier-pages.mjs` and `checks/tiers-handson.mjs a|b|c|p`.
+- **No live-app change** in this step. **Found, not changed:** the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier card show only what it counts. Raise it with the owner; it would need the tbc-researcher.
+- **Checks run:** `tiers-handson.mjs a|b|c|p` pass at 1280px, 400px and reduced motion; all three designs work with WebGL off; `check-bg.mjs` passes all seven tabs; `npm run brain` is updated. `published.mjs` passed every page on a local build (1,353 icons).
+
+### Raids (decided and built 2026-10-11, committed 2026-10-12 as `4ced560`)
 
 - **The pick:** design A, the boss journal, with design C's raid view behind a switch ("For me / For my raid"). It is now `tabs/raids.html` (built with `make-raids-pages.mjs --tab`). B, an attunement tracker like the Attune addon, was not picked. Details are in `tabs/README.md` under "Raids".
 - **New files:** `gen-raid-data.mjs` → `raid-data.js` (the live app's raid data, bundled from `src/`, with every drop's rank on all 27 specs' Wowhead lists; regenerate after `src/domain/raids`, the catalogue or `bisRankings.json` change), `raids-common.js` (picker, scene, search, tooltips, motion), `raids-a/b/c.js`, `make-raids-pages.mjs` and `checks/raids-handson.mjs a|b|c|p`.
@@ -36,7 +43,8 @@ The owner said Raids, then Spec Tier Lists; Professions comes later. Follow "How
 
 | What | Commit | Notes |
 | --- | --- | --- |
-| **Raids** | 2026-10-12 | Design A (the boss journal) with design C's raid view, on the live app's raid data; plus the Al'ar role tags and attunement text in the live app. See "Raids" above. |
+| **Spec Tier Lists** | 2026-10-12 | Design A (the tier board) with design B's chart against the logs, on the live app's data. See "Spec Tier Lists" above. |
+| **Raids** | `4ced560` | Design A (the boss journal) with design C's raid view, on the live app's raid data; plus the Al'ar role tags and attunement text in the live app. See "Raids" above. |
 | **The live app's front door** | `a8fb27b` | The owner asked for it. Design A (doors with a glimpse) with design B's goal lines, built into `src/components/layout/SectionPicker.tsx`: Character Planner as the big door, a Simulation door, the import beside them, a real glimpse and counted fact on each, each named by its title. Prototypes `tabs/front-a/b/c.html`. |
 | **Simulation** | `1c0b887` | Design C (what to do next) with design A's damage-source table. Runs the live app's real simulator in the page (`gen-sim-engine.mjs` → `sim-engine.js`), matching the app to the decimal. |
 | **Upgrade finder fix (live app)** | `260b92d` | `findUpgrades.ts` scored two-handers with the off hand still equipped (Twinblade of the Phoenix: +145.8 promised, −177 delivered). Found by the Simulation workbench. |
@@ -59,7 +67,7 @@ Each work commit is followed by a "Refresh the daily log" commit.
 
 - **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 7–10 minutes, 300 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
 - **Prototype checks** (`tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs` for every tab's background; `published.mjs` against a local build (`npm run build && node tools/publish/copy-prototypes.mjs`, then the `project-defeat-preview` server) or the live site (`BASE=`). The Build and Simulation checks also compare against the real app when its dev server is up (`APP=http://localhost:5173/`, or `APP=off`).
-- **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`; and `npm run brain` for the vault.
+- **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`; and `npm run brain` for the vault.
 - **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.
 
 ### Earlier: the live-app fixes from the prototype work (committed 2026-10-10, `9be91c1`)
@@ -127,17 +135,17 @@ The owner picked Talents design A (the talent window) with design C's "What's of
 | Character Planner | `planner.html` | Deep sea blue. **Buffs (decided 2026-10-09):** design C, from your raid, with design A's icons; a Blessing per Paladin. **Gear (decided 2026-10-09):** design B, the character sheet, with design C's "What's left" checklist. **Compare (decided 2026-10-09):** design A, side-by-side tooltips, with design B's one-sentence summary. **Talents (decided 2026-10-09):** design A, the talent window, with design C's "What's off" list. **Ranked Gear (decided 2026-10-10):** design A, the guide slot by slot as tooltips, with design C's "Where it drops" view. The hit cap follows Precision and Improved Faerie Fire (48 with the example raid). **Build (decided 2026-10-10):** design A, the share card, with design C's "What came in" report; its link opens the same character in the live app. Every sub-tab is decided. |
 | Simulation | `simulation.html` | Gold over violet. **Decided 2026-10-11:** design C, what to do next, with design A's damage-source table; runs the live app's real simulator (`sim-engine.js`) on the planner's character. |
 | Raid Composition | `raid-composition.html` | **Decided 2026-10-07/08:** design A's table, made dark, with a click-to-fill palette of real spec icons (group 1 first, or press a group to aim) and a pencil to name players. White-gold water with one light per group. |
-| Spec Tier Lists | `tier-lists.html` | Emerald. Step 1 baseline: **next**. |
+| Spec Tier Lists | `tier-lists.html` | Emerald. **Decided 2026-10-12:** design A, the tier board, with design B's "Against the logs" chart behind a switch. Reads the live app's data (`tier-data.js`). |
 | Raids | `raids.html` | The scene follows the raid. **Decided 2026-10-11:** design A, the boss journal (one boss at a time, loot as tooltips, your spec's picks ranked), with design C's "For my raid" view behind a switch (who in your Raid Composition raid wants each drop). Reads the live app's raid data (`raid-data.js`). |
 | Front door (live app) | `front-a/b/c.html` | **Decided 2026-10-11 and built into the live app's `SectionPicker.tsx`:** design A, doors with a glimpse, with design B's goal lines. |
-| Professions | `professions.html` | Amber with ore veins. Waits for a later update. |
+| Professions | `professions.html` | Amber with ore veins. Waits for a later update: **the only tab left**. |
 
 - **Moving between tabs:** plain links. The full-screen curtain was removed 2026-10-08 at the owner's request.
 - **The gallery** ([`docs/design/prototypes/index.html`](../design/prototypes/index.html)) lists the current tabs first, then each decision's designs, including the dropped ones. Its live previews load only near the screen, because too many 3D previews make the browser drop scenes.
 
 ### Next, in order
 
-See "Next: Spec Tier Lists" at the top. Professions comes later.
+See "Next: Professions" at the top; ask the owner first.
 
 ### How a walkthrough step is done (the pattern Gear, Compare and Talents followed)
 
@@ -176,6 +184,7 @@ See "Next: Spec Tier Lists" at the top. Professions comes later.
   - `raid-data.js` is generated by `gen-raid-data.mjs` from `src/domain` (raids, the catalogue, icons, raid builds and `bisRankings.json`).
   - `raids-common.js` is the shell (`window.RaidKit`): picker and hash, scene, the cross-raid search, tooltips and motion. A design calls `RaidKit.start({render, annotate, open, sub})`.
   - `raids.html` loads `raids-c.js` then `raids-a.js` with `window.RAIDS_IN_TAB`: A starts the page and draws C (`window.RaidsC`) behind its "For me / For my raid" switch.
+- **Spec Tier Lists:** `tier-data.js` (from `gen-tier-data.mjs`), `tiers-common.js` (`window.TierKit`: scene, motion, spec chips, tooltip, card, the Raid Composition raid) and `tier-lists.html`, which loads `tiers-b.js` then `tiers-a.js` with `window.TIERS_IN_TAB`: A starts the page and draws B (`window.TiersB`) behind its switch.
 - **Icons:** real item, gem and spec icons come from `public/icons`, via `../../../../public/icons/`. The owner approved this on 2026-10-08.
 - **Checks:** `tabs/checks/` holds `check-bg.mjs`, `rc-handson.mjs`, `rc-taps.mjs`, a `<step>-handson.mjs` for each step since Gear (`raids-handson.mjs` is the newest), `published.mjs` and `scene-only.mjs`.
   - Run them one at a time. Several at once starve the software 3D, and the clicks time out.

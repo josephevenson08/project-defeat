@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#tiers">Spec Tier Lists designs</a>
     <a href="#raids">Raids designs</a>
     <a href="#front">Front door designs</a>
     <a href="#sim">Simulation designs</a>
@@ -102,7 +103,7 @@
   <header class="sub first" id="tabs">
     <span class="eyebrow">Current · the whole site, 7 tabs</span>
     <h2 class="subhead">Every tab, as it stands</h2>
-    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Next: Spec Tier Lists, then Professions later.</p>
+    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Next: Professions, when the owner is ready.</p>
   </header>
   <section aria-label="Tab prototypes"><div class="grid">
     <article class="card">
@@ -127,7 +128,7 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/tier-lists.html" title="Preview of Spec Tier Lists" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Spec Tier Lists</h2></div><p>All three Wowhead Phase 2 lists with your spec marked, 3D shelves and animated class filters. Emerald, with three rank rings under the crystal.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Spec Tier Lists</h2></div><p>The tier board: Wowhead's three Phase 2 lists as rows of spec icons, with a card for any spec (its place on every list, what the logs say, what it brings to a raid), or switch to Wowhead's tiers against what players actually parse. Emerald, with three rank rings under the crystal.</p></div>
       <a class="open" href="tabs/tier-lists.html">Open Spec Tier Lists <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
@@ -139,6 +140,29 @@
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="tiers">
+    <span class="eyebrow">Step 2 · Spec Tier Lists · decided 2026-10-12</span>
+    <h2 class="subhead">Spec Tier Lists: the tier board, and the logs beside it</h2>
+    <p>The owner picked A, the tier board, with B's chart behind a switch ("The board / Against the logs"). That is now the Spec Tier Lists tab above. C, what each spec brings, was not picked. The three designs stay here for reference. They are three designs for the Spec Tier Lists tab, each on the live app's own data (<code>gen-tier-data.mjs</code> reads it from <code>src/</code>): Wowhead's three Phase 2 lists (28 placements), archon.gg's observed DPS for the 20 damage specs from Serpentshrine and Tempest Keep logs, the live app's spec icons, and what every spec brings to a raid from the buff data Raid Composition counts. A is "where does my spec stand?", B is "is it actually good?", C is "who should we bring?". Hover, focus or tap any spec for a summary. The tier letters stay neutral, as in the live app.</p>
+  </header>
+  <section aria-label="Spec Tier Lists designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/tiers-a.html#tierui" title="Preview of The tier board" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Spec Tier Lists A · The tier board</h2></div><p>The familiar tier-list board: S to D rows of spec icons in class colours, damage on top and healing and tanking side by side. Press any spec for its card: its place on every list, what the logs say, what it brings to a raid and its signature ability. Your spec starts selected; a class filter dims the rest.</p></div>
+      <a class="open" href="tabs/tiers-a.html">Open Spec Tier Lists A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/tiers-b.html#tierui" title="Preview of Two opinions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">CHART MERGED IN</span><h2>Spec Tier Lists B · Two opinions</h2></div><p>Wowhead's tier against the logs: the 20 damage specs ranked by archon.gg's observed DPS, each with both tier letters, and the disagreements spelled out (they agree on 9). Sort by Wowhead's tier instead, or show only where they disagree. Healers and tanks are Wowhead's opinion alone, and say so.</p></div>
+      <a class="open" href="tabs/tiers-b.html">Open Spec Tier Lists B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/tiers-c.html#tierui" title="Preview of What each spec brings" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Spec Tier Lists C · What each spec brings</h2></div><p>The tier list as a raid-building tool: every spec as a card with its tier and the buffs and debuffs it brings. Pick one of the 40 to light who brings it; the specs in your Raid Composition raid are counted, and "Would add" names who would bring something your raid has nobody for.</p></div>
+      <a class="open" href="tabs/tiers-c.html">Open Spec Tier Lists C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

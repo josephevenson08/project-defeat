@@ -16,7 +16,7 @@ Each page shares one scene, a naaru-like crystal over water, and gives it its ow
 | Character Planner | `planner.html` | Deep sea blue, rising bubbles | Sky blue | All six sub-tabs decided |
 | Simulation | `simulation.html` | Gold over violet, crystal pillars | Gold | Decided; runs the live app's real simulator |
 | Raid Composition | `raid-composition.html` | Warm white-gold, one light per raid group | Gold | Decided |
-| Spec Tier Lists | `tier-lists.html` | Emerald, rank rings under the crystal | Emerald | Step 1 baseline |
+| Spec Tier Lists | `tier-lists.html` | Emerald, rank rings under the crystal | Emerald | Decided; Wowhead's tiers beside the logs |
 | Raids | `raids.html` | Follows the chosen raid | Follows the raid | Decided; reads the live app's raid data |
 | Professions | `professions.html` | Amber, ore veins up the pillars | Amber | Waits for a later update |
 

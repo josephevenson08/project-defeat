@@ -117,7 +117,9 @@ the top section says where things stand and what's next. In short:
 11. **Raids: done.** A boss journal, one boss at a time, with your spec's picks ranked from Wowhead's lists, and a
     switch to your raid: who in it wants each drop. Building it corrected two loot tags and an attunement
     requirement in the app.
-12. **Next:** Spec Tier Lists. Professions comes later.
+12. **Spec Tier Lists: done.** A board of spec icons from Wowhead's three lists, a card for any spec, and a switch
+    to Wowhead's tiers against what players actually parse (archon.gg's logs).
+13. **Next:** Professions, when the owner is ready.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

@@ -222,7 +222,7 @@ nav.sections a:hover{color:var(--ink)}
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <div class="page">
-<div class="dirline">Tab prototype · Spec Tier Lists · Step 1 baseline. Prototype only, not the live app.</div>
+<div class="dirline">Tab prototype · Spec Tier Lists · Step 2, decided 2026-10-12: design A, the tier board, with design B's chart against the logs. Prototype only, not the live app.</div>
 <header class="top">
   <div class="wrap bar">
     <a class="brand" href="home.html">Project <span>Defeat</span></a>
@@ -243,7 +243,7 @@ nav.sections a:hover{color:var(--ink)}
     <label for="flv">Game version</label>
     <select id="flv"><option>TBC Classic (Anniversary)</option></select>
     <span class="chip">TBC Classic · Phase 2</span>
-    <span class="prov">Source: Wowhead · Phase 2 PvE tier lists · <code>tierLists.json</code> · ingested 12 Aug 2026</span>
+    <span class="prov">Sources: Wowhead's Phase 2 PvE tier lists (<code>tierLists.json</code>, ingested 12 Aug 2026) · archon.gg logs (read 23 Aug 2026)</span>
     <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
   </div>
 </div>
@@ -251,9 +251,9 @@ nav.sections a:hover{color:var(--ink)}
 <section aria-labelledby="h-tl">
   <div class="hero tl">
     <div class="hero-in">
-      <div class="eyebrow">Spec Tier Lists · Phase 2 · Serpentshrine Cavern and Tempest Keep</div>
+      <div class="eyebrow">Spec Tier Lists · Phase 2 · the board and the logs</div>
       <h1 id="h-tl">Where every spec stands in <em>Tier 5 raiding</em>.</h1>
-      <p>Wowhead's three Phase 2 PvE rankings, damage, healing and tanking, on one page so you can compare them. Your spec is marked wherever it appears.</p>
+      <p>Wowhead's three Phase 2 rankings as a board of spec icons: press any spec for its place on every list, what the logs say and what it brings to a raid. Switch to the logs to see Wowhead's tiers against what players actually parse.</p>
       <div class="facts" aria-label="What is on this page">
         <span><b>Lists</b>3</span>
         <span><b>Placements</b>28</span>
@@ -264,63 +264,7 @@ nav.sections a:hover{color:var(--ink)}
     </div>
   </div>
 
-  <div class="lists">
-    <div class="layer" style="--z:6"><section class="box" id="b-dps" aria-labelledby="h-dps">
-      <h2 id="h-dps">DPS tier list <small>5 tiers · 20 specs</small></h2>
-      <div class="in tierwrap">
-        <div class="tierctl" id="tierctl" hidden><button class="tbtn" type="button" data-rot="-1" aria-label="Rotate shelves left">◀</button><button class="tbtn" type="button" data-rot="1" aria-label="Rotate shelves right">▶</button><button class="tbtn" type="button" id="listbtn" aria-pressed="false">List view</button></div>
-        <div class="chips" id="chips" role="group" aria-label="Filter the DPS list by class" hidden><button type="button" aria-pressed="true" data-c="all">All</button><button type="button" aria-pressed="false" data-c="Mage" class="cm">Mage</button><button type="button" aria-pressed="false" data-c="Warlock" class="cl">Warlock</button><button type="button" aria-pressed="false" data-c="Hunter" class="ch">Hunter</button><button type="button" aria-pressed="false" data-c="Warrior" class="cw">Warrior</button><button type="button" aria-pressed="false" data-c="Shaman" class="cs">Shaman</button><button type="button" aria-pressed="false" data-c="Paladin" class="cp">Paladin</button><button type="button" aria-pressed="false" data-c="Rogue" class="cr">Rogue</button><button type="button" aria-pressed="false" data-c="Priest" class="cpr">Priest</button><button type="button" aria-pressed="false" data-c="Druid" class="cd">Druid</button></div>
-        <div class="stage" id="stage" aria-hidden="true"><div class="runebase" id="runebase"></div><div class="rig" id="rig"></div></div>
-        <p class="stagehint">Drag or use the arrows to turn the shelves. The list view carries the same placements for screen readers.</p>
-        <ul class="tiers" id="dpslist">
-          <li data-depth="0"><span class="tl-l" aria-label="Tier S">S</span><ul class="specs"><li class="spec cm" data-c="Mage" data-slug="arcane-mage"><span class="sp">Arcane</span><span class="cn">Mage</span></li><li class="spec cl" data-c="Warlock" data-slug="destruction-warlock"><span class="sp">Destruction</span><span class="cn">Warlock</span></li><li class="spec ch" data-c="Hunter" data-slug="beast-mastery-hunter"><span class="sp">Beast Mastery</span><span class="cn">Hunter</span></li><li class="spec cw me" data-c="Warrior" data-slug="fury-warrior"><span class="sp">Fury</span><span class="cn">Warrior</span><span class="you">Your spec</span></li></ul></li>
-          <li data-depth="1"><span class="tl-l" aria-label="Tier A">A</span><ul class="specs"><li class="spec cw" data-c="Warrior" data-slug="arms-warrior"><span class="sp">Arms</span><span class="cn">Warrior</span></li><li class="spec cs" data-c="Shaman" data-slug="enhancement-shaman"><span class="sp">Enhancement</span><span class="cn">Shaman</span></li><li class="spec cl" data-c="Warlock" data-slug="affliction-warlock"><span class="sp">Affliction</span><span class="cn">Warlock</span></li><li class="spec ch" data-c="Hunter" data-slug="survival-hunter"><span class="sp">Survival</span><span class="cn">Hunter</span></li></ul></li>
-          <li data-depth="2"><span class="tl-l" aria-label="Tier B">B</span><ul class="specs"><li class="spec cp" data-c="Paladin" data-slug="retribution-paladin"><span class="sp">Retribution</span><span class="cn">Paladin</span></li><li class="spec cr" data-c="Rogue" data-slug="combat-rogue"><span class="sp">Combat</span><span class="cn">Rogue</span></li><li class="spec cpr" data-c="Priest" data-slug="shadow-priest"><span class="sp">Shadow</span><span class="cn">Priest</span></li><li class="spec cs" data-c="Shaman" data-slug="elemental-shaman"><span class="sp">Elemental</span><span class="cn">Shaman</span></li><li class="spec cd" data-c="Druid" data-slug="balance-druid"><span class="sp">Balance</span><span class="cn">Druid</span></li><li class="spec cm" data-c="Mage" data-slug="fire-mage"><span class="sp">Fire</span><span class="cn">Mage</span></li></ul></li>
-          <li data-depth="3"><span class="tl-l" aria-label="Tier C">C</span><ul class="specs"><li class="spec cd" data-c="Druid" data-slug="feral-druid"><span class="sp">Feral</span><span class="cn">Druid</span></li><li class="spec cm" data-c="Mage" data-slug="frost-mage"><span class="sp">Frost</span><span class="cn">Mage</span></li><li class="spec cl" data-c="Warlock" data-slug="demonology-warlock"><span class="sp">Demonology</span><span class="cn">Warlock</span></li></ul></li>
-          <li data-depth="4"><span class="tl-l" aria-label="Tier D">D</span><ul class="specs"><li class="spec ch" data-c="Hunter" data-slug="marksmanship-hunter"><span class="sp">Marksmanship</span><span class="cn">Hunter</span></li><li class="spec cr" data-c="Rogue" data-slug="assassination-rogue"><span class="sp">Assassination</span><span class="cn">Rogue</span></li><li class="spec cr" data-c="Rogue" data-slug="subtlety-rogue"><span class="sp">Subtlety</span><span class="cn">Rogue</span></li></ul></li>
-        </ul>
-        <p class="sr" id="tlive" aria-live="polite"></p>
-        <p class="src"><span class="srcbadge">Wowhead · Phase 2</span><a href="https://www.wowhead.com/tbc/guide/dps-rankings-tier-list-pve-burning-crusade-classic-wow" target="_blank" rel="noreferrer noopener">DPS Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead</a><br>Tier letters and placements only · ingested 12 Aug 2026 by <code>tools/ingest/ingest-tier-lists.mjs</code></p>
-      </div>
-    </section></div>
-    <div class="side">
-    <div class="layer" style="--z:5"><section class="box" id="b-healer" aria-labelledby="h-healer">
-      <h2 id="h-healer">Healer tier list <small>3 tiers · 5 specs</small></h2>
-      <div class="in">
-        <ul class="tiers">
-          <li data-depth="0"><span class="tl-l" aria-label="Tier S">S</span><ul class="specs"><li class="spec cpr" data-c="Priest" data-slug="holy-priest"><span class="sp">Holy</span><span class="cn">Priest</span></li><li class="spec cs" data-c="Shaman" data-slug="restoration-shaman"><span class="sp">Restoration</span><span class="cn">Shaman</span></li></ul></li>
-          <li data-depth="1"><span class="tl-l" aria-label="Tier A">A</span><ul class="specs"><li class="spec cd" data-c="Druid" data-slug="restoration-druid"><span class="sp">Restoration</span><span class="cn">Druid</span></li><li class="spec cp" data-c="Paladin" data-slug="holy-paladin"><span class="sp">Holy</span><span class="cn">Paladin</span></li></ul></li>
-          <li data-depth="2"><span class="tl-l" aria-label="Tier B">B</span><ul class="specs"><li class="spec cpr" data-c="Priest" data-slug="discipline-priest"><span class="sp">Discipline</span><span class="cn">Priest</span></li></ul></li>
-        </ul>
-        <p class="cross">Fury Warrior is not on this list: it ranks damage dealers only on the DPS list.</p>
-        <p class="src"><span class="srcbadge">Wowhead · Phase 2</span><a href="https://www.wowhead.com/tbc/guide/healer-rankings-tier-list-pve-burning-crusade-classic-wow" target="_blank" rel="noreferrer noopener">Healer Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead</a><br>Tier letters and placements only · ingested 12 Aug 2026 by <code>tools/ingest/ingest-tier-lists.mjs</code></p>
-      </div>
-    </section></div>
-    <div class="layer" style="--z:4"><section class="box" id="b-tank" aria-labelledby="h-tank">
-      <h2 id="h-tank">Tank tier list <small>3 tiers · 3 specs</small></h2>
-      <div class="in">
-        <ul class="tiers">
-          <li data-depth="0"><span class="tl-l" aria-label="Tier S">S</span><ul class="specs"><li class="spec cd" data-c="Druid" data-slug="feral-druid"><span class="sp">Feral</span><span class="cn">Druid</span></li></ul></li>
-          <li data-depth="1"><span class="tl-l" aria-label="Tier A">A</span><ul class="specs"><li class="spec cp" data-c="Paladin" data-slug="protection-paladin"><span class="sp">Protection</span><span class="cn">Paladin</span></li></ul></li>
-          <li data-depth="2"><span class="tl-l" aria-label="Tier B">B</span><ul class="specs"><li class="spec cw" data-c="Warrior" data-slug="protection-warrior"><span class="sp">Protection</span><span class="cn">Warrior</span></li></ul></li>
-        </ul>
-        <p class="cross">Fury Warrior is not on this list: it ranks damage dealers only on the DPS list.</p>
-        <p class="src"><span class="srcbadge">Wowhead · Phase 2</span><a href="https://www.wowhead.com/tbc/guide/tank-rankings-tier-list-pve-burning-crusade-classic-wow" target="_blank" rel="noreferrer noopener">Tank Tier List for The Burning Crusade Classic (Phase 2) - PvE Rankings - Wowhead</a><br>Tier letters and placements only · ingested 12 Aug 2026 by <code>tools/ingest/ingest-tier-lists.mjs</code></p>
-      </div>
-    </section></div>
-    </div>
-    <div class="layer full" style="--z:2"><section class="box" id="b-read" aria-labelledby="h-read">
-      <h2 id="h-read">Reading the lists <small>tierLists.json · TierListsPanel.tsx</small></h2>
-      <div class="in">
-        <div class="honest">
-          <div><h3>Specs, not items</h3><p>A placement says how a spec performs in Tier 5 content. It does not rank gear, and the planner's per-slot gear rankings are not built from it.</p></div>
-          <div><h3>Wowhead's words stay on Wowhead</h3><p>Only tier letters and spec placements are stored. The per-spec analysis and tier definitions are Wowhead's authored prose and are deliberately not copied; each list links to its source page.</p></div>
-          <div><h3>Across the lists</h3><p>Feral Druid is the one spec on two lists: <b>C</b> for damage and <b>S</b> for tanking. Warriors appear twice too: Fury at <b>S</b> for damage, Protection at <b>B</b> for tanking.</p></div>
-        </div>
-        <p class="prov" style="margin:10px 0 0">Tier letters are drawn neutral rather than in Wowhead's quality colours, because quality colour means "this item is epic" everywhere else in the app. Rank reads through letter weight and rule strength; the coloured edge on each spec is its Blizzard class colour.</p>
-      </div>
-    </section></div>
-  </div>
+  <div id="tierui"><p class="prov">The Spec Tier Lists design needs JavaScript.</p></div>
 </section>
 </main>
 <footer><div class="wrap">Prototype content for design review. Tier lists: Wowhead, The Burning Crusade Classic Phase 2 PvE rankings (DPS, healer, tank), placements only, ingested 2026-08-12. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
@@ -467,243 +411,11 @@ size();still();
 })();
 </script>
 <script src="tbc-kit.js"></script>
-<script>
-(function(){
-"use strict";
-/* Every lookup is guarded: a missing element turns its feature off instead of throwing. */
-const $=(s,r=document)=>r?r.querySelector(s):null, $$=(s,r=document)=>r?Array.from(r.querySelectorAll(s)):[];
-const on=(el,ev,fn,o)=>{if(el)el.addEventListener(ev,fn,o);};
-const root=document.documentElement, live=$("#live");
-const say=t=>{if(live)live.textContent=t;};
-const SC=window.SCENE||{cam:{},mix:{},setMotion(){},render(){},pointer(){}};
-if(SC.mix&&SC.mix.charge===undefined)SC.mix.charge=0;
-const RMQ=matchMedia("(prefers-reduced-motion: reduce)");
-const G=typeof gsap!=="undefined";
-const M={on:false};
-const moving=()=>!RMQ.matches&&(G?M.on:true);
-/* the shared TBC motion kit (tbc-kit.js); every call is a no-op when it is missing or motion is off.
-   This tab stays calm: K2 sky over K5 Coilfang water; K7 rune base under the shelves; K8 on filter / view changes; no K1 here. */
-const KIT=window.TBCKit||null;
-if(KIT)KIT.theme("tiers",{instant:true}); /* the tab's own colour: emerald, three stacked rank rings */
-/* K7: (re)mount the rune base. Called with motion on it draws in and turns slowly; otherwise it is drawn static at rest. */
-let rune=null;
-function mountRune(){
-  const host=$("#runebase");if(!KIT||!host)return;
-  if(rune)rune.remove();
-  rune=KIT.runeRing(host,{size:340,glyphs:16,seed:5,spin:true,spinDur:60});
-}
-mountRune();
-/* K8: the DPS list or the shelves, whichever is showing, opens through a ring of light */
-function enterTiers(){
-  if(!KIT||!M.on)return;
-  const w=$(".tierwrap"),shelves=w&&w.classList.contains("is3d")&&!w.classList.contains("listmode");
-  const el=shelves?$("#stage"):$("#dpslist");if(el)KIT.enter(el);
-}
-
-/* ---------- rotatable 3D tier shelves for the DPS list, built from the visible specs of the real list ---------- */
-const wrap=$(".tierwrap"),rig=$("#rig"),stage=$("#stage"),dps=$("#dpslist");
-let ry=-20,drag=null,vis=true,hold=false,spinRaf=0;
-const setRy=()=>{if(rig)rig.style.setProperty("--ry",ry.toFixed(2));};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function buildShelves(){
-  if(!rig||!dps)return;
-  /* five tiers stacked top to bottom, S on the smallest, brightest ring */
-  const RAD=[96,112,150,110,110],Y=[-150,-72,6,84,150];let h="";
-  $$(":scope>li",dps).forEach((li,t)=>{
-    const L=($(".tl-l",li)||{textContent:""}).textContent,specs=$$(".spec",li).filter(s=>!s.hidden);
-    const r=RAD[t]||110,y=Y[t]||0;
-    h+=`<div class="shelf" style="transform:translate3d(0,${y}px,0)"><div class="disc" style="width:${r*2}px;height:${r*2}px;left:${-r}px;top:${-r+24}px"></div>`;
-    specs.forEach((s,i)=>{const a=i*360/specs.length+t*17,me=s.classList.contains("me");
-      const cc=s.className.split(" ").find(c=>/^c[a-z]+$/.test(c))||"";
-      h+=`<div class="card3 d${t} ${cc}${me?" me":""}" style="top:-18px;transform:rotateY(${a.toFixed(1)}deg) translateZ(${r}px)"><i>${esc(L)}</i>${esc(($(".sp",s)||{}).textContent||"")} ${esc(s.dataset.c||"")}${me?"<small>Your spec</small>":""}</div>`;});
-    h+=`</div>`;
-  });
-  rig.innerHTML=h;
-}
-if(wrap&&rig&&stage&&dps){
-  buildShelves();wrap.classList.add("is3d");setRy();
-  const ctl=$("#tierctl");if(ctl)ctl.hidden=false;
-  if("IntersectionObserver" in window)new IntersectionObserver(es=>{vis=es[0].isIntersecting;},{threshold:0}).observe(stage);
-  on(stage,"pointerdown",e=>{drag={x:e.clientX,r:ry};try{stage.setPointerCapture(e.pointerId);}catch(_){}rig.style.transition="none";});
-  on(stage,"pointermove",e=>{if(drag){ry=drag.r+(e.clientX-drag.x)*.5;setRy();}});
-  const endDrag=()=>{drag=null;};on(stage,"pointerup",endDrag);on(stage,"pointercancel",endDrag);
-  on(stage,"pointerenter",()=>hold=true);on(stage,"pointerleave",()=>hold=false);
-  $$("[data-rot]").forEach(b=>on(b,"click",()=>{
-    rig.style.transition=moving()?"transform .6s cubic-bezier(.2,.8,.2,1)":"none";ry+=(+b.dataset.rot||0)*45;setRy();}));
-  const lb=$("#listbtn");
-  on(lb,"click",()=>{const v=lb.getAttribute("aria-pressed")!=="true";lb.setAttribute("aria-pressed",v);wrap.classList.toggle("listmode",v);
-    say(v?"DPS list shown as a list.":"DPS list shown as 3D shelves.");enterTiers();});
-}
-/* slow auto-turn only while motion is on */
-function spin(){spinRaf=0;if(!moving()||!rig)return;if(vis&&!hold&&!drag&&!document.hidden){rig.style.transition="none";ry+=.12;setRy();}spinRaf=requestAnimationFrame(spin);}
-function startSpin(){if(!spinRaf&&moving()&&rig)spinRaf=requestAnimationFrame(spin);}
-function stopSpin(){if(spinRaf){cancelAnimationFrame(spinRaf);spinRaf=0;}}
-
-/* ---------- class filter: re-flows the DPS list (Flip) and re-seats the shelves ---------- */
-function applyTiers(){
-  if(!dps)return;
-  const c=($("#chips [aria-pressed=true]")||{dataset:{c:"all"}}).dataset.c;let n=0;
-  $$(".specs",dps).forEach(ul=>{
-    const items=$$(".spec",ul);
-    items.forEach(li=>{const v=c==="all"||li.dataset.c===c;li.hidden=!v;if(v)n++;});
-    let e=$(".empty",ul);const none=!items.some(li=>!li.hidden);
-    if(none&&!e){e=document.createElement("li");e.className="empty";e.textContent="No "+c+" spec in this tier";ul.appendChild(e);}
-    if(!none&&e)e.remove();
-  });
-  buildShelves();
-  const t=$("#tlive");if(t)t.textContent=n+" DPS specs shown"+(c==="all"?"":", "+c);
-}
-const chips=$("#chips");
-if(chips&&dps){
-  chips.hidden=false;
-  $$("[data-c]",chips).forEach(b=>on(b,"click",()=>{
-    if(b.getAttribute("aria-pressed")==="true")return;
-    const fn=()=>{$$("[data-c]",chips).forEach(x=>x.setAttribute("aria-pressed",x===b));applyTiers();};
-    if(M.on&&M.flipTiers)M.flipTiers(fn);else fn();
-    if(M.on&&M.flash)M.flash();
-    enterTiers();
-  }));
-}
-
-/* ---------- pointer parallax on the depth cards + scene pointer drift (motion on, fine pointers) ---------- */
-const rs=root.style;
-function resetParallax(){rs.setProperty("--px","0");rs.setProperty("--py","0");}
-if(matchMedia("(pointer:fine)").matches){
-  let praf=0,nx=0,ny=0;
-  addEventListener("pointermove",e=>{if(!moving())return;nx=e.clientX/innerWidth*2-1;ny=e.clientY/innerHeight*2-1;
-    SC.pointer(nx,ny);
-    if(!praf)praf=requestAnimationFrame(()=>{praf=0;if(!moving())return;rs.setProperty("--px",(-nx*.6).toFixed(3));rs.setProperty("--py",(-ny*.6).toFixed(3));});},{passive:true});
-}
-
-/* ================= MOTION LAYER ================= */
-const tog=$("#mtoggle"), mstate=$("#mstate");
-const ST=G&&typeof ScrollTrigger!=="undefined", FL=G&&typeof Flip!=="undefined";
-if(tog)tog.hidden=false;
-function label(v,why){if(tog)tog.setAttribute("aria-pressed",v);if(mstate)mstate.textContent=why||(v?"on":"off");}
-function safe(a){
-  if(!a)return a;
-  const ms=Math.max(1500,a.totalDuration()*1000+400);
-  setTimeout(()=>{if(a.progress()<1&&!a.scrollTrigger)a.progress(1);},ms);
-  return a;
-}
-if(!G){ /* no GSAP: static page, scene and shelves drift on their own unless reduced motion */
-  if(tog)tog.disabled=true;label(false,"unavailable");
-  const sync=()=>{SC.setMotion(moving());if(moving())startSpin();else{stopSpin();resetParallax();}};
-  if(RMQ.addEventListener)RMQ.addEventListener("change",sync);
-  sync();return;
-}
-{const DS=typeof DrawSVGPlugin!=="undefined",SPL=typeof SplitText!=="undefined";
- gsap.registerPlugin(...[ST&&ScrollTrigger,FL&&Flip,DS&&DrawSVGPlugin,SPL&&SplitText].filter(Boolean));}
-let ctx=null, mm=null;
-const A=fn=>ctx?ctx.add(fn):fn();
-function finishAll(){
-  gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{
-    if(t.scrollTrigger)return;
-    if(t.repeat&&t.repeat()===-1)t.kill();else t.progress(1);
-  });
-}
-function restoreStatic(){
-  $$(".spec, #rig .card3, #rig .disc").forEach(el=>{el.style.opacity="";el.style.visibility="";el.style.transform="";});
-  Object.assign(SC.cam,{depth:0,dip:0,rise:0,dive:0,intro:0});
-  SC.mix.charge=0;SC.render();
-}
-function enable(first){
-  if(M.on)return;
-  M.on=true;root.classList.add("motion");
-  ctx=gsap.context(()=>{
-    if(first)intro();
-    if(ST)scrollStory();
-  });
-  mm=gsap.matchMedia();
-  mm.add("(hover:hover) and (pointer:fine)",()=>magnets());
-  if(ST)ScrollTrigger.refresh();
-  label(true);SC.setMotion(true);startSpin();mountRune();
-}
-function disable(){
-  if(!M.on)return;
-  finishAll();
-  if(mm){mm.revert();mm=null;}
-  if(ctx){ctx.revert();ctx=null;}
-  M.on=false;root.classList.remove("motion");stopSpin();
-  restoreStatic();resetParallax();
-  label(false);SC.setMotion(false);mountRune(); /* the kit has ended its spin; redraw the ring at rest */
-}
-function store(v){try{localStorage.setItem("pd-motion",v?"1":"0");}catch(e){}}
-function stored(){try{return localStorage.getItem("pd-motion");}catch(e){return null;}}
-on(tog,"click",()=>{if(M.on){disable();store(false);}else{enable(false);store(true);}});
-function syncRM(){
-  if(RMQ.matches){disable();stopSpin();SC.setMotion(false);resetParallax();if(tog)tog.disabled=true;label(false,"off (reduced motion)");}
-  else{if(tog)tog.disabled=false;label(M.on);}
-}
-if(RMQ.addEventListener)RMQ.addEventListener("change",syncRM);else if(RMQ.addListener)RMQ.addListener(syncRM);
-/* split the hero headline into masked words (screen readers keep the sentence via aria-label) */
-function splitHero(){
-  const h=$("#h-tl");if(!h||h.dataset.split)return false;
-  h.dataset.split="1";h.setAttribute("aria-label",h.textContent.replace(/\s+/g," ").trim());
-  const words=t=>t.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="w" aria-hidden="true"><span>${w}</span></span>`).join("");
-  h.innerHTML=Array.from(h.childNodes).map(n=>n.nodeType===3?words(n.textContent):`<em>${words(n.textContent)}</em>`).join("");
-  return true;
-}
-/* 1. Intro: the scene settles, words rise out of masks, fact chips land, the lists rise and the shelves spin in. ~1.4s */
-function intro(){
-  const split=splitHero();
-  const inView=$$(".lists .box").filter(b=>b.getBoundingClientRect().top<innerHeight);
-  inView.forEach(b=>b.dataset.introd="1");
-  const tl=gsap.timeline({defaults:{ease:"power4.out"}});
-  tl.fromTo(SC.cam,{intro:1},{intro:0,duration:1.4,ease:"expo.out"},0)
-    .from("#scene, .fallback",{autoAlpha:0,duration:.8,ease:"power1.out"},0);
-  if(split&&$("#h-tl .w>span"))tl.from("#h-tl .w>span",{yPercent:115,rotate:7,duration:.7,stagger:.04},.1);
-  if($(".facts span"))tl.from(".facts span",{y:14,scale:.85,autoAlpha:0,duration:.4,stagger:.07,ease:"back.out(2.6)"},.45);
-  if($(".flavor .chip"))tl.from(".flavor .chip",{scale:.6,autoAlpha:0,duration:.35,ease:"back.out(3)"},.3);
-  if(inView.length)tl.from(inView,{y:70,rotationX:-16,transformOrigin:"50% 100%",duration:.8,stagger:.08,ease:"expo.out",clearProps:"transform"},.35);
-  if(rig&&$("#rig .card3")){const o={r:ry-120};tl.to(o,{r:ry,duration:1.3,ease:"expo.out",onUpdate:()=>{ry=o.r;rig.style.transition="none";setRy();}},.4);}
-  safe(tl);
-}
-/* 2. Scroll: the camera drifts down into the pool; cards rise and spec chips land row by row as they arrive */
-function scrollStory(){
-  gsap.fromTo(SC.cam,{depth:0},{depth:1,ease:"none",immediateRender:false,scrollTrigger:{trigger:"main",start:"top top",end:"bottom bottom",scrub:.8}});
-  $$(".lists .box").filter(b=>!b.dataset.introd).forEach(b=>ScrollTrigger.create({trigger:b,start:"top 92%",once:true,onEnter:()=>A(()=>
-    safe(gsap.fromTo(b,{y:50,rotationX:-12,skewY:2,transformOrigin:"50% 100%"},{y:0,rotationX:0,skewY:0,duration:.8,ease:"expo.out",clearProps:"transform"})))}));
-  $$(".tiers>li").forEach(row=>ScrollTrigger.create({trigger:row,start:"top 94%",once:true,onEnter:()=>A(()=>{
-    const s=$$(".spec",row);if(s.length)safe(gsap.from(s,{x:-18,autoAlpha:0,duration:.45,stagger:.04,ease:"power3.out",clearProps:"all"}));})}));
-}
-/* 3. Magnetic toggle and controls (fine pointers only) */
-function magnets(){
-  const offs=[];
-  $$(".mtoggle, #listbtn").forEach(b=>{
-    const xTo=gsap.quickTo(b,"x",{duration:.4,ease:"power3"}),yTo=gsap.quickTo(b,"y",{duration:.4,ease:"power3"});
-    const mv=e=>{const r=b.getBoundingClientRect();xTo((e.clientX-r.left-r.width/2)*.35);yTo((e.clientY-r.top-r.height/2)*.45);};
-    const lv=()=>{xTo(0);yTo(0);};
-    b.addEventListener("pointermove",mv);b.addEventListener("pointerleave",lv);
-    offs.push(()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerleave",lv);gsap.set(b,{clearProps:"transform"});});
-  });
-  return ()=>offs.forEach(f=>f());
-}
-/* 4. Flip: class chips re-flow the List view; the 3D shelves are re-seated with a turn and fade-in */
-if(FL){
-  M.flipTiers=fn=>A(()=>{
-    const listShown=!wrap||!wrap.classList.contains("is3d")||wrap.classList.contains("listmode");
-    const st=listShown?Flip.getState("#dpslist .spec, #dpslist .empty"):null;
-    fn();
-    if(st)safe(Flip.from(st,{duration:.6,ease:"power3.inOut",absolute:true,stagger:.025,
-      onEnter:els=>gsap.fromTo(els,{autoAlpha:0,scale:.5},{autoAlpha:1,scale:1,duration:.4,ease:"back.out(2)"}),
-      onLeave:els=>gsap.to(els,{autoAlpha:0,scale:.5,duration:.3})}));
-    else if(rig){
-      const o={r:ry-60};
-      safe(gsap.to(o,{r:ry,duration:.8,ease:"power3.out",onUpdate:()=>{ry=o.r;rig.style.transition="none";setRy();}}));
-      if($("#rig .card3"))safe(gsap.fromTo("#rig .card3, #rig .disc",{autoAlpha:0},{autoAlpha:1,duration:.45,stagger:.025,ease:"power1.out"}));
-    }
-  });
-}
-/* a short teal pulse in the scene when the filter changes */
-M.flash=()=>A(()=>safe(gsap.timeline().to(SC.mix,{charge:.45,duration:.2,onUpdate:SC.render}).to(SC.mix,{charge:0,duration:.6,ease:"power2.out",onUpdate:SC.render})));
-/* 5. Tab links are plain links: no curtain between tabs (the owner's call, 2026-10-08). The next tab plays its own intro. */
-/* start: motion on unless the system asks for reduced motion or the viewer turned it off */
-if(RMQ.matches)syncRM();
-else if(stored()==="0"){label(false);SC.setMotion(false);}
-else enable(true);
-setTimeout(()=>{if(M.on)gsap.globalTimeline.getChildren(false,true,true).forEach(t=>{if(!t.scrollTrigger&&t.repeat()!==-1&&t.progress()<1&&t.totalDuration()<2)t.progress(1);});},1500);
-})();
-</script>
+<!-- the live app's data, the shared shell, design B (the "Against the logs" view), then design A, which starts the page -->
+<script>window.TIERS_IN_TAB=true;</script>
+<script src="tier-data.js"></script>
+<script src="tiers-common.js"></script>
+<script src="tiers-b.js"></script>
+<script src="tiers-a.js"></script>
 </body>
 </html>
