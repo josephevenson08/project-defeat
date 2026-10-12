@@ -33,7 +33,7 @@
         "vendorCopper": 1220,
         "creates": "Elixir of Lion's Strength",
         "createsIcon": "inv_potion_56",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2337,
@@ -75,7 +75,7 @@
         "vendorCopper": 0,
         "creates": "Lesser Healing Potion",
         "createsIcon": "inv_potion_50",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 8240,
@@ -107,7 +107,7 @@
         "vendorCopper": 720,
         "creates": "Elixir of Giant Growth",
         "createsIcon": "inv_potion_10",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 3173,
@@ -139,58 +139,58 @@
         "vendorCopper": 520,
         "creates": "Lesser Mana Potion",
         "createsIcon": "inv_potion_71",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 3188,
-        "name": "Elixir of Ogre's Strength",
+        "spellId": 3177,
+        "name": "Elixir of Defense",
         "skillRange": [
           151,
-          181
+          161
         ],
-        "crafts": 31,
+        "crafts": 11,
         "materials": [
           {
-            "name": "Earthroot",
-            "quantity": 31,
-            "icon": "inv_misc_herb_07"
+            "name": "Wild Steelbloom",
+            "quantity": 11,
+            "icon": "inv_misc_flower_01"
           },
           {
-            "name": "Kingsblood",
-            "quantity": 31,
-            "icon": "inv_misc_herb_03"
+            "name": "Stranglekelp",
+            "quantity": 11,
+            "icon": "inv_misc_herb_11"
           },
           {
             "name": "Leaded Vial",
-            "quantity": 31,
+            "quantity": 11,
             "icon": "inv_drink_06",
             "vendorOnly": true,
             "unitCopper": 200
           }
         ],
-        "vendorCopper": 6200,
-        "creates": "Elixir of Ogre's Strength",
-        "createsIcon": "inv_potion_57",
+        "vendorCopper": 2200,
+        "creates": "Elixir of Defense",
+        "createsIcon": "inv_potion_64",
         "trainerTaught": true
       },
       {
-        "spellId": 3451,
-        "name": "Mighty Troll's Blood Potion",
+        "spellId": 3452,
+        "name": "Mana Potion",
         "skillRange": [
-          181,
-          206
+          161,
+          186
         ],
         "crafts": 26,
         "materials": [
           {
-            "name": "Liferoot",
+            "name": "Stranglekelp",
             "quantity": 26,
-            "icon": "inv_misc_root_02"
+            "icon": "inv_misc_herb_11"
           },
           {
-            "name": "Bruiseweed",
+            "name": "Kingsblood",
             "quantity": 26,
-            "icon": "inv_misc_herb_01"
+            "icon": "inv_misc_herb_03"
           },
           {
             "name": "Leaded Vial",
@@ -201,77 +201,77 @@
           }
         ],
         "vendorCopper": 5200,
-        "creates": "Mighty Troll's Blood Potion",
-        "createsIcon": "inv_potion_79",
+        "creates": "Mana Potion",
+        "createsIcon": "inv_potion_72",
         "trainerTaught": true
       },
       {
-        "spellId": 3453,
-        "name": "Elixir of Detect Lesser Invisibility",
+        "spellId": 11449,
+        "name": "Elixir of Agility",
         "skillRange": [
-          206,
-          221
+          186,
+          211
         ],
-        "crafts": 16,
+        "crafts": 26,
         "materials": [
           {
-            "name": "Khadgar's Whisker",
-            "quantity": 16,
-            "icon": "inv_misc_herb_08"
-          },
-          {
-            "name": "Fadeleaf",
-            "quantity": 16,
-            "icon": "inv_misc_herb_12"
-          },
-          {
-            "name": "Leaded Vial",
-            "quantity": 16,
-            "icon": "inv_drink_06",
-            "vendorOnly": true,
-            "unitCopper": 200
-          }
-        ],
-        "vendorCopper": 3200,
-        "creates": "Elixir of Detect Lesser Invisibility",
-        "createsIcon": "inv_potion_01",
-        "trainerTaught": true
-      },
-      {
-        "spellId": 4942,
-        "name": "Lesser Stoneshield Potion",
-        "skillRange": [
-          221,
-          225
-        ],
-        "crafts": 4,
-        "materials": [
-          {
-            "name": "Mithril Ore",
-            "quantity": 4,
-            "icon": "inv_ore_mithril_02"
+            "name": "Stranglekelp",
+            "quantity": 26,
+            "icon": "inv_misc_herb_11"
           },
           {
             "name": "Goldthorn",
-            "quantity": 4,
+            "quantity": 26,
             "icon": "inv_misc_herb_15"
           },
           {
             "name": "Leaded Vial",
-            "quantity": 4,
+            "quantity": 26,
             "icon": "inv_drink_06",
             "vendorOnly": true,
             "unitCopper": 200
           }
         ],
-        "vendorCopper": 800,
-        "creates": "Lesser Stoneshield Potion",
-        "createsIcon": "inv_potion_67",
-        "trainerTaught": false
+        "vendorCopper": 5200,
+        "creates": "Elixir of Agility",
+        "createsIcon": "inv_potion_93",
+        "trainerTaught": true
       },
       {
-        "spellId": 11479,
-        "name": "Transmute: Iron to Gold",
+        "spellId": 12609,
+        "name": "Catseye Elixir",
+        "skillRange": [
+          211,
+          225
+        ],
+        "crafts": 15,
+        "materials": [
+          {
+            "name": "Goldthorn",
+            "quantity": 15,
+            "icon": "inv_misc_herb_15"
+          },
+          {
+            "name": "Fadeleaf",
+            "quantity": 15,
+            "icon": "inv_misc_herb_12"
+          },
+          {
+            "name": "Leaded Vial",
+            "quantity": 15,
+            "icon": "inv_drink_06",
+            "vendorOnly": true,
+            "unitCopper": 200
+          }
+        ],
+        "vendorCopper": 3000,
+        "creates": "Catseye Elixir",
+        "createsIcon": "inv_potion_36",
+        "trainerTaught": true
+      },
+      {
+        "spellId": 11480,
+        "name": "Transmute: Mithril to Truesilver",
         "skillRange": [
           225,
           247
@@ -279,15 +279,15 @@
         "crafts": 23,
         "materials": [
           {
-            "name": "Iron Bar",
+            "name": "Mithril Bar",
             "quantity": 23,
-            "icon": "inv_ingot_iron"
+            "icon": "inv_ingot_06"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Gold Bar",
-        "createsIcon": "inv_ingot_03",
-        "trainerTaught": false
+        "creates": "Truesilver Bar",
+        "createsIcon": "inv_ingot_08",
+        "trainerTaught": true
       },
       {
         "spellId": 11460,
@@ -314,11 +314,11 @@
         "vendorCopper": 92500,
         "creates": "Elixir of Detect Undead",
         "createsIcon": "inv_potion_53",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 11477,
-        "name": "Elixir of Demonslaying",
+        "spellId": 11478,
+        "name": "Elixir of Detect Demon",
         "skillRange": [
           270,
           275
@@ -327,13 +327,8 @@
         "materials": [
           {
             "name": "Gromsblood",
-            "quantity": 7,
+            "quantity": 14,
             "icon": "inv_misc_herb_16"
-          },
-          {
-            "name": "Ghost Mushroom",
-            "quantity": 7,
-            "icon": "inv_mushroom_08"
           },
           {
             "name": "Crystal Vial",
@@ -344,13 +339,13 @@
           }
         ],
         "vendorCopper": 17500,
-        "creates": "Elixir of Demonslaying",
-        "createsIcon": "inv_potion_27",
-        "trainerTaught": false
+        "creates": "Elixir of Detect Demon",
+        "createsIcon": "inv_potion_53",
+        "trainerTaught": true
       },
       {
-        "spellId": 17566,
-        "name": "Transmute: Earth to Life",
+        "spellId": 17559,
+        "name": "Transmute: Air to Fire",
         "skillRange": [
           275,
           286
@@ -358,19 +353,19 @@
         "crafts": 19,
         "materials": [
           {
-            "name": "Essence of Earth",
+            "name": "Essence of Air",
             "quantity": 19,
-            "icon": "spell_nature_strengthofearthtotem02"
+            "icon": "spell_nature_earthbind"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Living Essence",
-        "createsIcon": "spell_nature_abolishmagic",
-        "trainerTaught": true
+        "creates": "Essence of Fire",
+        "createsIcon": "spell_fire_volcano",
+        "trainerTaught": false
       },
       {
-        "spellId": 17570,
-        "name": "Greater Stoneshield Potion",
+        "spellId": 17556,
+        "name": "Major Healing Potion",
         "skillRange": [
           286,
           290
@@ -378,26 +373,14 @@
         "crafts": 4,
         "materials": [
           {
-            "name": "Stonescale Oil",
+            "name": "Golden Sansam",
             "quantity": 8,
-            "icon": "inv_potion_68",
-            "craftedFrom": [
-              {
-                "name": "Stonescale Eel",
-                "quantity": 8,
-                "icon": "inv_misc_fish_11"
-              },
-              {
-                "name": "Leaded Vial",
-                "quantity": 8,
-                "icon": "inv_drink_06"
-              }
-            ]
+            "icon": "inv_misc_herb_sansamroot"
           },
           {
-            "name": "Thorium Ore",
+            "name": "Mountain Silversage",
             "quantity": 4,
-            "icon": "inv_ore_thorium_02"
+            "icon": "inv_misc_herb_mountainsilversage"
           },
           {
             "name": "Crystal Vial",
@@ -408,8 +391,8 @@
           }
         ],
         "vendorCopper": 10000,
-        "creates": "Greater Stoneshield Potion",
-        "createsIcon": "inv_potion_69",
+        "creates": "Major Healing Potion",
+        "createsIcon": "inv_potion_54",
         "trainerTaught": true
       },
       {
@@ -442,7 +425,7 @@
         "vendorCopper": 25000,
         "creates": "Greater Arcane Protection Potion",
         "createsIcon": "inv_potion_83",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 25146,
@@ -465,8 +448,8 @@
         "trainerTaught": false
       },
       {
-        "spellId": 28543,
-        "name": "Elixir of Camouflage",
+        "spellId": 28544,
+        "name": "Elixir of Major Strength",
         "skillRange": [
           307,
           322
@@ -474,9 +457,9 @@
         "crafts": 16,
         "materials": [
           {
-            "name": "Ragveil",
+            "name": "Mountain Silversage",
             "quantity": 16,
-            "icon": "inv_misc_herb_ragveil"
+            "icon": "inv_misc_herb_mountainsilversage"
           },
           {
             "name": "Felweed",
@@ -492,9 +475,9 @@
           }
         ],
         "vendorCopper": 320000,
-        "creates": "Elixir of Camouflage",
-        "createsIcon": "inv_potion_150",
-        "trainerTaught": false
+        "creates": "Elixir of Major Strength",
+        "createsIcon": "inv_potion_147",
+        "trainerTaught": true
       },
       {
         "spellId": 39638,
@@ -526,7 +509,7 @@
         "vendorCopper": 320000,
         "creates": "Elixir of Draenic Wisdom",
         "createsIcon": "inv_potion_155",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 39639,
@@ -610,7 +593,7 @@
         "vendorCopper": 20000,
         "creates": "Elixir of Empowerment",
         "createsIcon": "inv_potion_136",
-        "trainerTaught": true
+        "trainerTaught": false
       }
     ],
     "Blacksmithing": [
@@ -632,7 +615,7 @@
         "vendorCopper": 0,
         "creates": "Rough Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3320,
@@ -652,7 +635,7 @@
         "vendorCopper": 0,
         "creates": "Rough Grinding Stone",
         "createsIcon": "inv_stone_grindingstone_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2665,
@@ -672,7 +655,7 @@
         "vendorCopper": 0,
         "creates": "Coarse Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3326,
@@ -692,11 +675,11 @@
         "vendorCopper": 0,
         "creates": "Coarse Grinding Stone",
         "createsIcon": "inv_stone_grindingstone_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 3325,
-        "name": "Gemmed Copper Gauntlets",
+        "spellId": 2666,
+        "name": "Runed Copper Belt",
         "skillRange": [
           96,
           100
@@ -705,23 +688,13 @@
         "materials": [
           {
             "name": "Copper Bar",
-            "quantity": 32,
+            "quantity": 40,
             "icon": "inv_ingot_02"
-          },
-          {
-            "name": "Tigerseye",
-            "quantity": 4,
-            "icon": "inv_misc_gem_opal_03"
-          },
-          {
-            "name": "Malachite",
-            "quantity": 4,
-            "icon": "inv_misc_gem_emerald_03"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Gemmed Copper Gauntlets",
-        "createsIcon": "inv_gauntlets_05",
+        "creates": "Runed Copper Belt",
+        "createsIcon": "inv_belt_03",
         "trainerTaught": true
       },
       {
@@ -754,7 +727,7 @@
         "vendorCopper": 0,
         "creates": "Silver Skeleton Key",
         "createsIcon": "inv_misc_key_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2668,
@@ -774,7 +747,7 @@
         "vendorCopper": 0,
         "creates": "Rough Bronze Leggings",
         "createsIcon": "inv_pants_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2674,
@@ -794,7 +767,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2668,
@@ -814,7 +787,7 @@
         "vendorCopper": 0,
         "creates": "Rough Bronze Leggings",
         "createsIcon": "inv_pants_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 8768,
@@ -834,7 +807,7 @@
         "vendorCopper": 0,
         "creates": "Iron Buckle",
         "createsIcon": "inv_misc_armorkit_12",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19667,
@@ -866,7 +839,7 @@
         "vendorCopper": 0,
         "creates": "Golden Skeleton Key",
         "createsIcon": "inv_misc_key_13",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3501,
@@ -893,7 +866,7 @@
         "vendorCopper": 3400,
         "creates": "Green Iron Bracers",
         "createsIcon": "inv_bracer_06",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 7223,
@@ -925,7 +898,7 @@
         "vendorCopper": 0,
         "creates": "Golden Scale Bracers",
         "createsIcon": "inv_bracer_10",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 9918,
@@ -945,7 +918,7 @@
         "vendorCopper": 0,
         "creates": "Solid Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_04",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19668,
@@ -977,7 +950,7 @@
         "vendorCopper": 0,
         "creates": "Truesilver Skeleton Key",
         "createsIcon": "inv_misc_key_11",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 11454,
@@ -1059,7 +1032,7 @@
         "vendorCopper": 0,
         "creates": "Mithril Spurs",
         "createsIcon": "ability_rogue_sprint",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 16641,
@@ -1079,7 +1052,7 @@
         "vendorCopper": 0,
         "creates": "Dense Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 9964,
@@ -1111,7 +1084,7 @@
         "vendorCopper": 0,
         "creates": "Mithril Spurs",
         "createsIcon": "ability_rogue_sprint",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 16645,
@@ -1136,7 +1109,7 @@
         "vendorCopper": 0,
         "creates": "Radiant Belt",
         "createsIcon": "inv_belt_11",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 19669,
@@ -1168,7 +1141,7 @@
         "vendorCopper": 0,
         "creates": "Arcanite Skeleton Key",
         "createsIcon": "inv_misc_key_08",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 15295,
@@ -1193,7 +1166,7 @@
         "vendorCopper": 0,
         "creates": "Dark Iron Shoulders",
         "createsIcon": "inv_shoulder_09",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 29654,
@@ -1218,7 +1191,7 @@
         "vendorCopper": 0,
         "creates": "Fel Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_06",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 29547,
@@ -1238,7 +1211,7 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Plate Belt",
         "createsIcon": "inv_belt_21",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 29553,
@@ -1258,7 +1231,7 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Chain Bracers",
         "createsIcon": "inv_bracer_13",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 32284,
@@ -1278,7 +1251,7 @@
         "vendorCopper": 0,
         "creates": "Lesser Rune of Warding",
         "createsIcon": "inv_misc_rune_11",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 29568,
@@ -1323,7 +1296,7 @@
         "vendorCopper": 0,
         "creates": "Adamantite Weapon Chain",
         "createsIcon": "spell_frost_chainsofice",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 29728,
@@ -1368,7 +1341,7 @@
         "vendorCopper": 0,
         "creates": "Adamantite Weapon Chain",
         "createsIcon": "spell_frost_chainsofice",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 32285,
@@ -1408,7 +1381,7 @@
         "vendorCopper": 0,
         "creates": "Felsteel Gloves",
         "createsIcon": "inv_gauntlets_29",
-        "trainerTaught": true
+        "trainerTaught": false
       }
     ],
     "Enchanting": [
@@ -1442,7 +1415,7 @@
         "vendorCopper": 1984,
         "creates": "Runed Copper Rod",
         "createsIcon": "inv_staff_goldfeathered_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 14293,
@@ -1469,7 +1442,7 @@
         "vendorCopper": 2736,
         "creates": "Lesser Magic Wand",
         "createsIcon": "inv_staff_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 14807,
@@ -1496,7 +1469,7 @@
         "vendorCopper": 1368,
         "creates": "Greater Magic Wand",
         "createsIcon": "inv_staff_07",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 13419,
@@ -1514,26 +1487,21 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
-        "spellId": 13522,
-        "name": "Enchant Cloak - Lesser Shadow Resistance",
+        "spellId": 13622,
+        "name": "Enchant Bracer - Lesser Intellect",
         "skillRange": [
           158,
           165
         ],
-        "crafts": 8,
+        "crafts": 7,
         "materials": [
           {
             "name": "Greater Astral Essence",
-            "quantity": 8,
+            "quantity": 14,
             "icon": "inv_enchant_essenceastrallarge"
-          },
-          {
-            "name": "Shadow Protection Potion",
-            "quantity": 8,
-            "icon": "inv_potion_44"
           }
         ],
         "vendorCopper": 0,
@@ -1555,7 +1523,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 13663,
@@ -1573,7 +1541,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 13794,
@@ -1591,11 +1559,11 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 13933,
-        "name": "Enchant Shield - Frost Resistance",
+        "spellId": 13935,
+        "name": "Enchant Boots - Agility",
         "skillRange": [
           248,
           272
@@ -1603,14 +1571,9 @@
         "crafts": 29,
         "materials": [
           {
-            "name": "Large Radiant Shard",
-            "quantity": 29,
-            "icon": "inv_enchant_shardradientlarge"
-          },
-          {
-            "name": "Frost Oil",
-            "quantity": 29,
-            "icon": "inv_potion_20"
+            "name": "Greater Nether Essence",
+            "quantity": 58,
+            "icon": "inv_enchant_essencenetherlarge"
           }
         ],
         "vendorCopper": 0,
@@ -1655,7 +1618,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 42613,
@@ -1675,7 +1638,7 @@
         "vendorCopper": 0,
         "creates": "Small Prismatic Shard",
         "createsIcon": "inv_enchant_shardprismaticsmall",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 20024,
@@ -1698,7 +1661,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 34001,
@@ -1716,7 +1679,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 33990,
@@ -1734,7 +1697,7 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 28028,
@@ -1754,7 +1717,7 @@
         "vendorCopper": 0,
         "creates": "Void Sphere",
         "createsIcon": "inv_enchant_voidsphere",
-        "trainerTaught": false
+        "trainerTaught": true
       }
     ],
     "Engineering": [
@@ -1776,7 +1739,7 @@
         "vendorCopper": 0,
         "creates": "Rough Blasting Powder",
         "createsIcon": "inv_misc_dust_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3922,
@@ -1796,7 +1759,7 @@
         "vendorCopper": 0,
         "creates": "Handful of Copper Bolts",
         "createsIcon": "inv_misc_gear_06",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3924,
@@ -1823,7 +1786,7 @@
         "vendorCopper": 2100,
         "creates": "Copper Tube",
         "createsIcon": "inv_gizmo_pipe_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3929,
@@ -1843,7 +1806,7 @@
         "vendorCopper": 0,
         "creates": "Coarse Blasting Powder",
         "createsIcon": "inv_misc_dust_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3973,
@@ -1863,7 +1826,7 @@
         "vendorCopper": 0,
         "creates": "Silver Contact",
         "createsIcon": "inv_ingot_04",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3945,
@@ -1883,7 +1846,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Blasting Powder",
         "createsIcon": "classic_inv_misc_dust_06",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3978,
@@ -1920,7 +1883,7 @@
         "vendorCopper": 0,
         "creates": "Standard Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3944,
@@ -1957,7 +1920,7 @@
         "vendorCopper": 0,
         "creates": "Flame Deflector",
         "createsIcon": "inv_gizmo_01",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 12584,
@@ -1977,7 +1940,7 @@
         "vendorCopper": 0,
         "creates": "Gold Power Core",
         "createsIcon": "inv_battery_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3957,
@@ -2093,7 +2056,7 @@
         "vendorCopper": 0,
         "creates": "Mechanical Repair Kit",
         "createsIcon": "inv_gizmo_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 12596,
@@ -2125,7 +2088,7 @@
         "vendorCopper": 0,
         "creates": "Hi-Impact Mithril Slugs",
         "createsIcon": "inv_ammo_bullet_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 26423,
@@ -2157,7 +2120,7 @@
         "vendorCopper": 0,
         "creates": "Blue Rocket Cluster",
         "createsIcon": "inv_misc_missilesmallcluster_blue",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 12620,
@@ -2194,7 +2157,7 @@
         "vendorCopper": 0,
         "creates": "Sniper Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 19788,
@@ -2214,7 +2177,7 @@
         "vendorCopper": 0,
         "creates": "Dense Blasting Powder",
         "createsIcon": "inv_misc_ammo_gunpowder_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 12620,
@@ -2251,7 +2214,7 @@
         "vendorCopper": 0,
         "creates": "Sniper Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 19791,
@@ -2276,7 +2239,7 @@
         "vendorCopper": 0,
         "creates": "Thorium Widget",
         "createsIcon": "inv_gizmo_04",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 26426,
@@ -2308,7 +2271,7 @@
         "vendorCopper": 0,
         "creates": "Large Blue Rocket Cluster",
         "createsIcon": "inv_misc_missilelargecluster_blue",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 19791,
@@ -2333,7 +2296,7 @@
         "vendorCopper": 0,
         "creates": "Thorium Widget",
         "createsIcon": "inv_gizmo_04",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19815,
@@ -2378,7 +2341,7 @@
         "vendorCopper": 0,
         "creates": "Handful of Fel Iron Bolts",
         "createsIcon": "inv_gizmo_felironbolts",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19815,
@@ -2459,7 +2422,7 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Bomb",
         "createsIcon": "inv_gizmo_felironbomb",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 30337,
@@ -2527,7 +2490,7 @@
         "vendorCopper": 0,
         "creates": "Crashin' Thrashin' Robot",
         "createsIcon": "inv_misc_idol_02",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 30341,
@@ -2584,7 +2547,7 @@
         "vendorCopper": 0,
         "creates": "Felsteel Stabilizer",
         "createsIcon": "inv_gizmo_felstabilizer",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 30332,
@@ -2621,7 +2584,7 @@
         "vendorCopper": 0,
         "creates": "Khorium Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": true
+        "trainerTaught": false
       }
     ],
     "Jewelcrafting": [
@@ -2655,7 +2618,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Copper Ring",
         "createsIcon": "inv_jewelry_ring_12",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 32178,
@@ -2687,7 +2650,7 @@
         "vendorCopper": 0,
         "creates": "Malachite Pendant",
         "createsIcon": "inv_jewelry_necklace_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 25280,
@@ -2707,7 +2670,7 @@
         "vendorCopper": 0,
         "creates": "Elegant Silver Ring",
         "createsIcon": "inv_jewelry_ring_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 25317,
@@ -2727,7 +2690,7 @@
         "vendorCopper": 0,
         "creates": "Ring of Silver Might",
         "createsIcon": "inv_jewelry_ring_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 25610,
@@ -2762,27 +2725,47 @@
         "trainerTaught": false
       },
       {
+        "spellId": 25615,
+        "name": "Mithril Filigree",
+        "skillRange": [
+          154,
+          173
+        ],
+        "crafts": 20,
+        "materials": [
+          {
+            "name": "Mithril Bar",
+            "quantity": 40,
+            "icon": "inv_ingot_06"
+          }
+        ],
+        "vendorCopper": 0,
+        "creates": "Mithril Filigree",
+        "createsIcon": "inv_jewelcrafting_mithrilfiligree",
+        "trainerTaught": true
+      },
+      {
         "spellId": 25617,
         "name": "Blazing Citrine Ring",
         "skillRange": [
-          154,
+          173,
           193
         ],
-        "crafts": 43,
+        "crafts": 24,
         "materials": [
           {
             "name": "Citrine",
-            "quantity": 43,
+            "quantity": 24,
             "icon": "inv_misc_gem_opal_02"
           },
           {
             "name": "Mithril Filigree",
-            "quantity": 43,
+            "quantity": 24,
             "icon": "inv_jewelcrafting_mithrilfiligree",
             "craftedFrom": [
               {
                 "name": "Mithril Bar",
-                "quantity": 86,
+                "quantity": 48,
                 "icon": "inv_ingot_06"
               }
             ]
@@ -2823,7 +2806,7 @@
         "vendorCopper": 0,
         "creates": "Engraved Truesilver Ring",
         "createsIcon": "inv_jewelry_ring_35",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 25622,
@@ -2865,7 +2848,7 @@
         "vendorCopper": 0,
         "creates": "Citrine Pendant of Golden Healing",
         "createsIcon": "inv_jewelry_necklace_06",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 26876,
@@ -2897,7 +2880,7 @@
         "vendorCopper": 0,
         "creates": "Aquamarine Pendant of the Warrior",
         "createsIcon": "inv_jewelry_necklace_16",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 26880,
@@ -2917,62 +2900,94 @@
         "vendorCopper": 0,
         "creates": "Thorium Setting",
         "createsIcon": "inv_jewelcrafting_thoriumsetting",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 26887,
-        "name": "The Aquamarine Ward",
+        "spellId": 26883,
+        "name": "Ruby Pendant of Fire",
         "skillRange": [
           247,
-          274
+          264
         ],
-        "crafts": 28,
+        "crafts": 18,
         "materials": [
           {
-            "name": "Aquamarine",
-            "quantity": 28,
-            "icon": "inv_misc_gem_crystal_02"
+            "name": "Star Ruby",
+            "quantity": 18,
+            "icon": "inv_misc_gem_ruby_02"
           },
           {
             "name": "Thorium Setting",
-            "quantity": 28,
+            "quantity": 18,
             "icon": "inv_jewelcrafting_thoriumsetting",
             "craftedFrom": [
               {
                 "name": "Thorium Bar",
-                "quantity": 28,
+                "quantity": 18,
                 "icon": "inv_ingot_07"
               }
             ]
           }
         ],
         "vendorCopper": 0,
-        "creates": "The Aquamarine Ward",
-        "createsIcon": "inv_jewelry_ring_29",
+        "creates": "Ruby Pendant of Fire",
+        "createsIcon": "inv_jewelry_necklace_15",
+        "trainerTaught": true
+      },
+      {
+        "spellId": 26902,
+        "name": "Simple Opal Ring",
+        "skillRange": [
+          264,
+          283
+        ],
+        "crafts": 20,
+        "materials": [
+          {
+            "name": "Large Opal",
+            "quantity": 20,
+            "icon": "inv_misc_gem_opal_01"
+          },
+          {
+            "name": "Thorium Setting",
+            "quantity": 20,
+            "icon": "inv_jewelcrafting_thoriumsetting",
+            "craftedFrom": [
+              {
+                "name": "Thorium Bar",
+                "quantity": 20,
+                "icon": "inv_ingot_07"
+              }
+            ]
+          }
+        ],
+        "vendorCopper": 0,
+        "creates": "Simple Opal Ring",
+        "createsIcon": "inv_jewelry_ring_17",
         "trainerTaught": true
       },
       {
         "spellId": 36526,
         "name": "Diamond Focus Ring",
         "skillRange": [
-          274,
+          283,
           294
         ],
-        "crafts": 23,
+        "crafts": 14,
         "materials": [
           {
             "name": "Azerothian Diamond",
-            "quantity": 23,
+            "quantity": 14,
             "icon": "inv_misc_gem_diamond_01"
           },
           {
             "name": "Thorium Setting",
-            "quantity": 23,
+            "quantity": 14,
             "icon": "inv_jewelcrafting_thoriumsetting",
             "craftedFrom": [
               {
                 "name": "Thorium Bar",
-                "quantity": 23,
+                "quantity": 14,
                 "icon": "inv_ingot_07"
               }
             ]
@@ -2981,7 +2996,7 @@
         "vendorCopper": 0,
         "creates": "Diamond Focus Ring",
         "createsIcon": "inv_jewelry_ring_42",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 34961,
@@ -3013,7 +3028,7 @@
         "vendorCopper": 0,
         "creates": "Emerald Lion Ring",
         "createsIcon": "inv_jewelry_ring_18",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 28938,
@@ -3056,8 +3071,8 @@
         "trainerTaught": false
       },
       {
-        "spellId": 28955,
-        "name": "Stormy Azure Moonstone",
+        "spellId": 28918,
+        "name": "Enduring Deep Peridot",
         "skillRange": [
           315,
           325
@@ -3065,15 +3080,15 @@
         "crafts": 12,
         "materials": [
           {
-            "name": "Azure Moonstone",
+            "name": "Deep Peridot",
             "quantity": 12,
-            "icon": "inv_misc_gem_azuredraenite_03"
+            "icon": "inv_misc_gem_deepperidot_03"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Stormy Azure Moonstone",
-        "createsIcon": "inv_misc_gem_azuredraenite_02",
-        "trainerTaught": true
+        "creates": "Enduring Deep Peridot",
+        "createsIcon": "inv_misc_gem_deepperidot_02",
+        "trainerTaught": false
       },
       {
         "spellId": 39455,
@@ -3093,7 +3108,7 @@
         "vendorCopper": 0,
         "creates": "Balanced Shadow Draenite",
         "createsIcon": "inv_misc_gem_ebondraenite_02",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 31052,
@@ -3130,7 +3145,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Adamantite Ring",
         "createsIcon": "inv_jewelry_ring_59",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 39463,
@@ -3150,7 +3165,7 @@
         "vendorCopper": 0,
         "creates": "Balanced Nightseye",
         "createsIcon": "inv_jewelcrafting_nightseye_03",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 42592,
@@ -3173,8 +3188,8 @@
         "trainerTaught": false
       },
       {
-        "spellId": 32869,
-        "name": "Brutal Earthstorm Diamond",
+        "spellId": 32867,
+        "name": "Bracing Earthstorm Diamond",
         "skillRange": [
           367,
           375
@@ -3188,9 +3203,9 @@
           }
         ],
         "vendorCopper": 0,
-        "creates": "Brutal Earthstorm Diamond",
+        "creates": "Bracing Earthstorm Diamond",
         "createsIcon": "inv_misc_gem_diamond_06",
-        "trainerTaught": true
+        "trainerTaught": false
       }
     ],
     "Leatherworking": [
@@ -3219,7 +3234,7 @@
         "vendorCopper": 0,
         "creates": "Light Armor Kit",
         "createsIcon": "inv_misc_armorkit_17",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3816,
@@ -3246,7 +3261,7 @@
         "vendorCopper": 2350,
         "creates": "Cured Light Hide",
         "createsIcon": "inv_misc_pelt_wolf_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3756,
@@ -3280,7 +3295,7 @@
         "vendorCopper": 720,
         "creates": "Embossed Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3817,
@@ -3307,7 +3322,7 @@
         "vendorCopper": 1450,
         "creates": "Cured Medium Hide",
         "createsIcon": "inv_misc_pelt_bear_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3765,
@@ -3380,7 +3395,7 @@
         "vendorCopper": 11700,
         "creates": "Dark Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 3818,
@@ -3407,7 +3422,7 @@
         "vendorCopper": 3750,
         "creates": "Cured Heavy Hide",
         "createsIcon": "inv_misc_pelt_wolf_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3765,
@@ -3480,7 +3495,7 @@
         "vendorCopper": 5850,
         "creates": "Dark Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 3780,
@@ -3514,7 +3529,7 @@
         "vendorCopper": 700,
         "creates": "Heavy Armor Kit",
         "createsIcon": "inv_misc_armorkit_16",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3775,
@@ -3570,7 +3585,7 @@
         "vendorCopper": 1200,
         "creates": "Guardian Belt",
         "createsIcon": "inv_belt_03",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 7156,
@@ -3621,7 +3636,7 @@
         "vendorCopper": 12000,
         "creates": "Guardian Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 10487,
@@ -3655,7 +3670,7 @@
         "vendorCopper": 5500,
         "creates": "Thick Armor Kit",
         "createsIcon": "inv_misc_armorkit_07",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 10507,
@@ -3689,7 +3704,7 @@
         "vendorCopper": 23000,
         "creates": "Nightscape Headband",
         "createsIcon": "inv_belt_24",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 10529,
@@ -3794,7 +3809,7 @@
         "vendorCopper": 24000,
         "creates": "Thick Leather Ammo Pouch",
         "createsIcon": "inv_misc_bag_09_black",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19047,
@@ -3819,7 +3834,7 @@
         "vendorCopper": 0,
         "creates": "Cured Rugged Hide",
         "createsIcon": "inv_misc_pelt_bear_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 19048,
@@ -3902,7 +3917,7 @@
         "vendorCopper": 105000,
         "creates": "Volcanic Leggings",
         "createsIcon": "inv_pants_06",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 19076,
@@ -3946,7 +3961,7 @@
         "vendorCopper": 15000,
         "creates": "Volcanic Breastplate",
         "createsIcon": "inv_chest_leather_07",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 32482,
@@ -4069,7 +4084,7 @@
         "vendorCopper": 0,
         "creates": "Drums of War",
         "createsIcon": "inv_misc_drum_03",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 35524,
@@ -4101,7 +4116,7 @@
         "vendorCopper": 0,
         "creates": "Arcane Armor Kit",
         "createsIcon": "spell_shadow_sealofkings",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 44970,
@@ -4128,7 +4143,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Knothide Armor Kit",
         "createsIcon": "inv_misc_armorkit_25",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 32461,
@@ -4270,7 +4285,7 @@
         "vendorCopper": 390,
         "creates": "Brown Linen Shirt",
         "createsIcon": "inv_shirt_02",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 8776,
@@ -4304,7 +4319,7 @@
         "vendorCopper": 400,
         "creates": "Linen Belt",
         "createsIcon": "inv_belt_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2397,
@@ -4338,7 +4353,7 @@
         "vendorCopper": 150,
         "creates": "Reinforced Linen Cape",
         "createsIcon": "inv_misc_cape_07",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 2402,
@@ -4372,7 +4387,7 @@
         "vendorCopper": 6800,
         "creates": "Woolen Cape",
         "createsIcon": "inv_misc_cape_10",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3848,
@@ -4406,7 +4421,7 @@
         "vendorCopper": 2000,
         "creates": "Double-stitched Woolen Shoulders",
         "createsIcon": "inv_shoulder_06",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3869,
@@ -4488,7 +4503,7 @@
         "vendorCopper": 1400,
         "creates": "Azure Silk Hood",
         "createsIcon": "inv_helmet_29",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3870,
@@ -4570,7 +4585,7 @@
         "vendorCopper": 1950,
         "creates": "Formal White Shirt",
         "createsIcon": "inv_shirt_08",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 8786,
@@ -4645,7 +4660,7 @@
         "vendorCopper": 15000,
         "creates": "Black Mageweave Leggings",
         "createsIcon": "inv_pants_09",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 12059,
@@ -4686,7 +4701,7 @@
         "vendorCopper": 28350,
         "creates": "White Bandit Mask",
         "createsIcon": "inv_misc_cape_11",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 12053,
@@ -4720,7 +4735,7 @@
         "vendorCopper": 36000,
         "creates": "Black Mageweave Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 12075,
@@ -4795,7 +4810,7 @@
         "vendorCopper": 28000,
         "creates": "Black Mageweave Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 12072,
@@ -4829,7 +4844,7 @@
         "vendorCopper": 32000,
         "creates": "Black Mageweave Headband",
         "createsIcon": "inv_misc_bandana_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 18560,
@@ -4883,7 +4898,7 @@
         "vendorCopper": 85000,
         "creates": "Netherweave Belt",
         "createsIcon": "inv_belt_04",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 26747,
@@ -4949,7 +4964,7 @@
         "vendorCopper": 10000,
         "creates": "Netherweave Pants",
         "createsIcon": "inv_pants_09",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 31430,
@@ -5184,7 +5199,7 @@
         "vendorCopper": 200000,
         "creates": "Soulcloth Shoulders",
         "createsIcon": "inv_shoulder_02",
-        "trainerTaught": true
+        "trainerTaught": false
       }
     ],
     "Cooking": [
@@ -5215,60 +5230,80 @@
         "vendorCopper": 2065,
         "creates": "Spice Bread",
         "createsIcon": "inv_misc_food_95_grainbread",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
-        "spellId": 8607,
-        "name": "Smoked Bear Meat",
+        "spellId": 2538,
+        "name": "Charred Wolf Meat",
         "skillRange": [
           40,
-          86
+          51
         ],
-        "crafts": 47,
+        "crafts": 12,
         "materials": [
           {
-            "name": "Bear Meat",
-            "quantity": 47,
-            "icon": "inv_misc_food_71"
+            "name": "Stringy Wolf Meat",
+            "quantity": 12,
+            "icon": "inv_misc_food_14"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Smoked Bear Meat",
-        "createsIcon": "inv_misc_food_13",
-        "trainerTaught": false
+        "creates": "Charred Wolf Meat",
+        "createsIcon": "inv_misc_food_18",
+        "trainerTaught": true
       },
       {
-        "spellId": 28267,
-        "name": "Crunchy Spider Surprise",
+        "spellId": 2541,
+        "name": "Coyote Steak",
         "skillRange": [
-          86,
-          106
+          51,
+          96
         ],
-        "crafts": 21,
+        "crafts": 46,
         "materials": [
           {
-            "name": "Crunchy Spider Leg",
-            "quantity": 21,
-            "icon": "inv_misc_ahnqirajtrinket_02"
+            "name": "Coyote Meat",
+            "quantity": 46,
+            "icon": "inv_misc_food_69"
           }
         ],
         "vendorCopper": 0,
-        "creates": "Crunchy Spider Surprise",
-        "createsIcon": "inv_misc_food_88_ravagernuggets",
+        "creates": "Coyote Steak",
+        "createsIcon": "inv_misc_food_65",
+        "trainerTaught": true
+      },
+      {
+        "spellId": 6417,
+        "name": "Dig Rat Stew",
+        "skillRange": [
+          96,
+          136
+        ],
+        "crafts": 41,
+        "materials": [
+          {
+            "name": "Dig Rat",
+            "quantity": 41,
+            "icon": "inv_misc_pelt_bear_ruin_04"
+          }
+        ],
+        "vendorCopper": 0,
+        "creates": "Dig Rat Stew",
+        "createsIcon": "inv_misc_bowl_01",
         "trainerTaught": false
       },
       {
         "spellId": 7755,
         "name": "Bristle Whisker Catfish",
         "skillRange": [
-          106,
+          136,
           146
         ],
-        "crafts": 41,
+        "crafts": 11,
         "materials": [
           {
             "name": "Raw Bristle Whisker Catfish",
-            "quantity": 41,
+            "quantity": 11,
             "icon": "inv_misc_fish_30"
           }
         ],
@@ -5392,8 +5427,8 @@
         "trainerTaught": false
       },
       {
-        "spellId": 22761,
-        "name": "Runn Tum Tuber Surprise",
+        "spellId": 18247,
+        "name": "Baked Salmon",
         "skillRange": [
           278,
           304
@@ -5401,9 +5436,9 @@
         "crafts": 27,
         "materials": [
           {
-            "name": "Runn Tum Tuber",
+            "name": "Raw Whitescale Salmon",
             "quantity": 27,
-            "icon": "inv_misc_food_55"
+            "icon": "inv_misc_fish_20"
           },
           {
             "name": "Soothing Spices",
@@ -5414,9 +5449,9 @@
           }
         ],
         "vendorCopper": 4320,
-        "creates": "Runn Tum Tuber Surprise",
-        "createsIcon": "inv_misc_food_63",
-        "trainerTaught": true
+        "creates": "Baked Salmon",
+        "createsIcon": "inv_misc_fish_20",
+        "trainerTaught": false
       },
       {
         "spellId": 43772,
@@ -5436,7 +5471,7 @@
         "vendorCopper": 0,
         "creates": "Kibler's Bits",
         "createsIcon": "inv_misc_food_49",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 38868,
@@ -5498,7 +5533,7 @@
         "vendorCopper": 0,
         "creates": "Linen Bandage",
         "createsIcon": "inv_misc_bandage_15",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3276,
@@ -5518,7 +5553,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Linen Bandage",
         "createsIcon": "inv_misc_bandage_18",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 7934,
@@ -5538,7 +5573,7 @@
         "vendorCopper": 0,
         "creates": "Anti-Venom",
         "createsIcon": "inv_misc_slime_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 3278,
@@ -5558,7 +5593,7 @@
         "vendorCopper": 0,
         "creates": "Heavy Wool Bandage",
         "createsIcon": "inv_misc_bandage_17",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 7935,
@@ -5578,7 +5613,7 @@
         "vendorCopper": 0,
         "creates": "Strong Anti-Venom",
         "createsIcon": "inv_misc_slime_01",
-        "trainerTaught": true
+        "trainerTaught": false
       },
       {
         "spellId": 7928,
@@ -5598,7 +5633,7 @@
         "vendorCopper": 0,
         "creates": "Silk Bandage",
         "createsIcon": "inv_misc_bandage_01",
-        "trainerTaught": false
+        "trainerTaught": true
       },
       {
         "spellId": 7929,

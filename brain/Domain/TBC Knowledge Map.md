@@ -16,7 +16,7 @@ Everything the app knows about The Burning Crusade, as notes. Generated from the
 - **24** bosses
 - **13** professions
 - **203** items
-- **120** itemsFlagged
+- **119** itemsFlagged
 - **2** itemsStatsEstimated
 - **4531** itemsTotal
 - **80** talentEffects

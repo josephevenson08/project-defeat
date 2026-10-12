@@ -56,7 +56,23 @@ const OUT_PATH = resolve(REPO, 'src/domain/professions/craftingPaths.json')
 
 const SKILL_CAP = 375
 /** Wowhead's source code for "taught by a trainer". */
-const TRAINER = 2
+const TRAINER = 6
+
+/**
+ * Whether a trainer teaches this recipe.
+ *
+ * **Wowhead's source code alone gets this wrong, and did until 2026-10-12.** This file read code 2 as
+ * "trainer", which is a drop: it labelled Sniper Scope trainer-taught and Linen Bandage "found
+ * elsewhere", and broke ties toward drops. The ingested data shows what the codes mean — every recipe
+ * with code 6 has a training cost, and only 45 of the 604 with code 2 do — and that most recipes a
+ * trainer teaches carry no source code at all, only the training cost. So a recipe counts as
+ * trainer-taught when it has a training cost (only a trainer charges one), carries code 6, or has no
+ * source and is learned at skill 1: the starters you learn with the profession, which cost nothing.
+ */
+const isTrainerTaught = (recipe) =>
+  Boolean(recipe.trainingCost) ||
+  (Array.isArray(recipe.source) && recipe.source.includes(TRAINER)) ||
+  (!recipe.source && recipe.learnedAt <= 1)
 
 const { professions } = JSON.parse(readFileSync(IN_PATH, 'utf8'))
 
@@ -220,8 +236,8 @@ function bestAt(recipes, skill, staying, profession) {
 
     const raw = reagentCost(recipe) / chance / (recipe.skillUpsPerCraft || 1)
     const cost = staying && recipe.spellId === staying.spellId ? raw / STAY_MARGIN : raw
-    const trainer = Array.isArray(recipe.source) && recipe.source.includes(TRAINER)
-    const bestTrainer = best && Array.isArray(best.source) && best.source.includes(TRAINER)
+    const trainer = isTrainerTaught(recipe)
+    const bestTrainer = best && isTrainerTaught(best)
 
     /*
      * **Vendor copper breaks ties and never joins the total**, because there is no honest exchange
@@ -282,6 +298,8 @@ function computePath(recipes, profession) {
         reagents: recipe.reagents,
         creates: recipe.creates,
         source: recipe.source,
+        trainingCost: recipe.trainingCost,
+        learnedAt: recipe.learnedAt,
       }
     }
 
@@ -323,7 +341,7 @@ function computePath(recipes, profession) {
         0,
       ),
       ...(step.creates ? { creates: step.creates.name, createsIcon: step.creates.icon } : {}),
-      trainerTaught: Array.isArray(step.source) && step.source.includes(TRAINER),
+      trainerTaught: isTrainerTaught(step),
     }
   })
 }

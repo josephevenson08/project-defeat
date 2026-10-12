@@ -10339,6 +10339,37 @@ test('a levelling path names things you end up holding', () => {
   expect(enchantSteps.some((step) => !producing('Enchanting', step)), 'enchants still level enchanting').toBe(true)
 })
 
+test('a recipe a trainer teaches is labelled trainer-taught, and one you loot or buy is not', () => {
+  /*
+   * Until 2026-10-12 the path read Wowhead's source code 2 as "taught by a trainer". It is a drop:
+   * every recipe with code 6 has a training cost and only 45 of the 604 with code 2 do, and most
+   * recipes a trainer teaches carry no code at all, only the cost. So 152 of 198 steps said "Recipe
+   * found elsewhere" — Linen Bandage and Lesser Healing Potion among them — while Sniper Scope, a
+   * drop, said "Trainer-taught", and ties went to the drop.
+   */
+  const recipe = (profession: string, spellId: number) =>
+    (professionRecipes.professions[profession] ?? []).find((r) => r.spellId === spellId) as
+      | { trainingCost?: number; source?: number[]; learnedAt: number }
+      | undefined
+  const step = (profession: string, name: string) => craftingPathFor(profession as Profession).find((s) => s.name === name)
+
+  // A training cost is charged only by a trainer, so every step whose recipe has one says so.
+  for (const [profession, steps] of Object.entries(craftingPathsAll)) {
+    for (const s of steps) {
+      const r = recipe(profession, s.spellId)
+      if (r?.trainingCost) expect(craftingPathFor(profession as Profession).find((x) => x.spellId === s.spellId)?.trainerTaught, `${profession}: ${s.name}`).toBe(true)
+    }
+  }
+
+  // The starters you learn with the profession, and plain trainer recipes.
+  expect(step('Blacksmithing', 'Rough Sharpening Stone')?.trainerTaught).toBe(true)
+  expect(step('First Aid', 'Linen Bandage')?.trainerTaught).toBe(true)
+  expect(step('Alchemy', 'Lesser Healing Potion')?.trainerTaught).toBe(true)
+  // A drop and a reputation-vendor recipe are not.
+  expect(step('Engineering', 'Sniper Scope')?.trainerTaught).toBe(false)
+  expect(step('Leatherworking', 'Drums of Battle')?.trainerTaught).toBe(false)
+})
+
 test('the numbers the hand-written docs quote are the numbers the data holds', () => {
   /*
    * **This repo's named recurring failure is prose that was true when written.** The Decision Log

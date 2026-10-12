@@ -2,7 +2,7 @@
 //   node docs/design/prototypes/tabs/checks/profs-handson.mjs a|b|c|p   (WIDTH=400 for a phone, RM=1 for reduced motion)
 // p = professions.html once a design is built into it (it sets window.PROFS_DESIGN, and window.PROFS_ALSO for a
 // design merged into it), and runs those designs' steps.
-// Real numbers from prof-data.js: 13 professions, 9 crafting paths (198 steps), 4 gathering guides (32 ranges). Rough
+// Real numbers from prof-data.js: 13 professions, 9 crafting paths (201 steps), 4 gathering guides (32 ranges). Rough
 // Sharpening Stone is orange at 1 and green at 40 (its colours are 1/15/35/55). Blacksmithing from 1 buys 34s from
 // vendors; Mining feeds 97% of its farmed materials; for Fury, Blacksmithing makes Dragonstrike, the #1 main hand.
 import { createRequire } from "node:module";
@@ -35,9 +35,9 @@ const runs = d => k === d || also.includes(d);
 const setSkill = async (sel, v) => { await ui.locator(sel).fill(String(v)); await ui.locator(sel).press("Enter"); await ui.locator(sel).blur().catch(() => {}); await settle(); };
 
 /* ---------- every design ---------- */
-await step("the live app's data: 13 professions, 9 crafting paths (198 steps), 4 gathering guides (32 ranges)", async () => {
+await step("the live app's data: 13 professions, 9 crafting paths (201 steps), 4 gathering guides (32 ranges)", async () => {
   const c = await p.evaluate(() => { const P = window.PROF_DATA.profs; return [P.length, P.filter(x => x.craft).length, P.reduce((a, x) => a + (x.craft ? x.craft.length : 0), 0), P.filter(x => x.gather).length, P.reduce((a, x) => a + (x.gather ? x.gather.length : 0), 0)].join(","); });
-  expect(c === "13,9,198,4,32", c);
+  expect(c === "13,9,201,4,32", c);
 });
 await step("the tab keeps its amber scene", async () => {
   const t = await p.evaluate(() => document.documentElement.dataset.tbcTheme || "");
@@ -57,7 +57,7 @@ if (runs("a")) {
     expect(/Rough Grinding Stone/.test(await text(ui.locator('.pa-r[aria-current="true"]'))), "current: " + await text(ui.locator('.pa-r[aria-current="true"]')));
   });
   await step("a recipe shows its reagents, who gathers them, and its colours", async () => {
-    await ui.locator(".pa-r", { hasText: "Gemmed Copper Gauntlets" }).click(); await settle();
+    await ui.locator(".pa-r", { hasText: "Runed Copper Belt" }).click(); await settle();
     const t = await text(ui.locator(".pa-detail"));
     expect(/Copper Bar/.test(t) && /Farmed: Mining/.test(t) && /yellow/i.test(t), "detail: " + t.slice(0, 300));
   });

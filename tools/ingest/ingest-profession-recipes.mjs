@@ -194,7 +194,8 @@ for (const { name, path, skillId } of PROFESSIONS) {
             },
           }
         : {}),
-      // Wowhead's source codes: 2 = trainer-taught, 5 = drop, 16 = vendor, 21 = quest.
+      // Wowhead's source codes, as this data bears out: 2 a drop, 4 a quest, 5 a vendor, 6 a trainer. Most recipes a
+      // trainer teaches carry no code at all, only `trainingcost` (see isTrainerTaught in compute-leveling-paths.mjs).
       ...(Array.isArray(row.source) ? { source: row.source } : {}),
       ...(row.trainingcost ? { trainingCost: row.trainingcost } : {}),
     })

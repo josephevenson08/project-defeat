@@ -14,16 +14,18 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### In short
 
-- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (`0b6e00f`, then "Refresh the daily log" `e509e9e`). **Professions is committed and pushed too** (2026-10-12: one work commit, then "Refresh the daily log"). With it, every tab of the walkthrough is decided. `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
+- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (`0b6e00f`, then "Refresh the daily log" `e509e9e`). **Professions is committed and pushed too** (`206c0a7`, then "Refresh the daily log" `9b0e0e9`, the last commit on `main`). With it, every tab of the walkthrough is decided. `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
 - **The live app** (`src/`) deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/. It changed four times from 2026-10-10 to 12, all from the prototype work: the data and rule fixes (`9be91c1`), the upgrade finder's two-hander bug (`260b92d`), a new front door (`a8fb27b`), and with the Raids step two loot role tags and the attunement text (below).
 - **The rest of the work is a UI redesign,** as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published at https://josephevenson08.github.io/project-defeat/prototypes/. It is walked through tab by tab: three designs per step, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
 ### Next: ask the owner
 
+**Two data cleanups are done, committed and pushed (2026-10-12):** Gloves of the Searing Grip's stale note, flag and made-up stats are gone from `sampleItems.ts` (the counted comments now read 119 and 141), and the crafting paths now know which recipes a trainer teaches (`compute-leveling-paths.mjs`: Wowhead's code 2 is a drop, not a trainer; a training cost, code 6 or a skill-1 starter counts), which changed a few recipes in five paths. Tests added (the full suite passed 302 of 302); details in `tabs/README.md` under "Data corrections".
+
 **Every tab of the walkthrough is decided** (Professions was the last, 2026-10-12). What comes next is the owner's call. Open items they could pick from are listed under "Open items, not started" below.
 
-### Professions (decided, built and committed 2026-10-12)
+### Professions (decided, built and committed 2026-10-12 as `206c0a7`)
 
 - **The pick:** design A, the profession window (set your skill and every recipe on the path to 375 takes its colour, orange, yellow, green or grey; a recipe shows its reagents, who gathers them and what a vendor charges; a gathering profession shows its ranges with the route on a plain grid), with design B's comparison behind a switch ("Level it / Which two"): every profession by what it gives a level 70 character, led by what it makes for your spec, and a pair to pick. C, the road to 375, was not picked. It is now `tabs/professions.html` (built with `make-prof-pages.mjs --tab`). Details are in `tabs/README.md`.
 - **The owner's rule from this step:** routes are drawn on a plain grid; the prototypes don't use the live app's Blizzard zone maps.
@@ -51,7 +53,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 | What | Commit | Notes |
 | --- | --- | --- |
-| **Professions** | 2026-10-12 | Design A (the profession window) with design B's Which two, on the live app's data. See "Professions" above. |
+| **Professions** | `206c0a7` | Design A (the profession window) with design B's Which two, on the live app's data. See "Professions" above. |
 | **Spec Tier Lists** | `0b6e00f` | Design A (the tier board) with design B's chart against the logs, on the live app's data. See "Spec Tier Lists" above. |
 | **Raids** | `4ced560` | Design A (the boss journal) with design C's raid view, on the live app's raid data; plus the Al'ar role tags and attunement text in the live app. See "Raids" above. |
 | **The live app's front door** | `a8fb27b` | The owner asked for it. Design A (doors with a glimpse) with design B's goal lines, built into `src/components/layout/SectionPicker.tsx`: Character Planner as the big door, a Simulation door, the import beside them, a real glimpse and counted fact on each, each named by its title. Prototypes `tabs/front-a/b/c.html`. |
@@ -68,9 +70,8 @@ Each work commit is followed by a "Refresh the daily log" commit.
 
 ### Open items, not started
 
-- **The gloves' catalogue overlay:** `sampleItems.ts` (Gloves of the Searing Grip) still says its stats are approximate and carries `needsVerification`, though its boss and stats now check out (tbc-researcher, 2026-10-11). The ingested stats already override the overlay's. Clear it if the owner agrees.
 - **A timing-sensitive test:** "no image in the app is painted larger than the file it comes from" failed once while other browser tests ran at the same time, and passed on its own. The full suite passed 300 of 300 after.
-- **Older:** `craftingPaths.json` marks some starter recipes (Rough Sharpening Stone) as not trainer-taught, which looks wrong.
+- **The app's buff data** leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier cards show only what it counts. Fixing it needs the tbc-researcher.
 
 ### How to check things
 

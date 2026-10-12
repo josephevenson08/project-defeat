@@ -13,7 +13,7 @@ import type { GearItem } from './itemTypes'
  *
  * ## What `needsVerification` means on an entry here
  *
- * **It is about the provenance, not the stats.** All 120 flagged entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
+ * **It is about the provenance, not the stats.** All 119 flagged entries match an ingested row, so `itemCatalogue.ts` builds the item from the ingest and overlays
  * only `PROVENANCE_FIELDS`; their stat blocks are dead weight that never reaches the app. Most of
  * their notes still say "stats are approximate pending final Wowhead audit", which described a real
  * risk when this file *was* the catalogue and describes unused data now. Read such a note as "the
@@ -1348,11 +1348,11 @@ export const sampleItems: readonly GearItem[] = [
     phase: 2,
     itemLevel: 128,
     roles: ['Tank', 'Physical DPS'],
-    stats: { stamina: 30, defenseRating: 20, hitRating: 12 },
+    stats: { agility: 33, stamina: 37, attackPower: 66, expertiseRating: 18 },
     instance: 'Tempest Keep',
     boss: "Al'ar",
-    needsVerification: true,
-    notes: 'Stats are approximate pending final Wowhead audit.',
+    notes:
+      "Leather hands from Al'ar, checked 2026-10-11 against Wowhead's TBC item page and Warcraft Wiki's Tempest Keep loot table. Feral, Retribution, Arms, Enhancement and Fury rank them, and Protection Warriors for threat.",
   },
   {
     id: 'destroyer-greaves',
