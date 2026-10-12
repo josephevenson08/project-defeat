@@ -1,11 +1,20 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-12, later): Spec Tier Lists decided and built, start here
+## ▶ Where we left off (2026-10-12, late): Professions decided and built, the walkthrough complete; start here
+
+**The Professions tab is decided and built into `professions.html`:** design A, the profession window (every recipe on the path to 375 coloured at your skill, its reagents and vendor prices; each gathering range with its route on a plain grid), with design B's comparison behind a "Level it / Which two" switch (every profession by what it gives a level 70 character and makes for your spec, and a pair to pick). C, the road to 375, was not picked. Details are in the [README](README.md#professions-the-profession-window-and-which-two-to-take-2026-10-12).
+- **It reads the live app's data:** `gen-prof-data.mjs` → `prof-data.js`. No live-app change. Routes on a plain grid, no zone map art (the owner's choice).
+- `checks/profs-handson.mjs a|b|c|p` pass at 1280px, 400px and reduced motion; `check-bg.mjs` is clean; the brain is updated; `published.mjs` passed every page on a local build (1,563 icons).
+- **Committed and pushed** (2026-10-12): one work commit, then "Refresh the daily log".
+
+**With it, every tab of the walkthrough is decided.** Next is the owner's call. Open items: the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one); the gloves' stale "approximate" note in `sampleItems.ts`; `craftingPaths.json` marking starter recipes as not trainer-taught.
+
+## Where we left off (2026-10-12, later): Spec Tier Lists decided and built
 
 **The Spec Tier Lists tab is decided and built into `tier-lists.html`:** design A, the tier board (Wowhead's three lists as rows of spec icons, a card for any spec), with design B's chart behind a "The board / Against the logs" switch (the 20 damage specs by archon.gg's observed DPS, with Wowhead's and archon's tiers; they agree on 9). C, what each spec brings, was not picked. Details are in the [README](README.md#spec-tier-lists-the-tier-board-and-the-logs-beside-it-2026-10-12).
 - **It reads the live app's data:** `gen-tier-data.mjs` → `tier-data.js`. No live-app change in this step.
 - `checks/tiers-handson.mjs a|b|c|p` pass at 1280px, 400px and reduced motion; `check-bg.mjs` is clean; the brain is updated; `published.mjs` passed every page on a local build (1,353 icons).
-- **Committed and pushed** (2026-10-12): one work commit, then "Refresh the daily log".
+- **Committed and pushed** (2026-10-12): `0b6e00f`, then "Refresh the daily log" `e509e9e`.
 - **To raise with the owner:** the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one).
 
 **Next: Professions,** the only tab left; the owner said it comes later, so ask first.

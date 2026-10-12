@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#profs">Professions designs</a>
     <a href="#tiers">Spec Tier Lists designs</a>
     <a href="#raids">Raids designs</a>
     <a href="#front">Front door designs</a>
@@ -103,7 +104,7 @@
   <header class="sub first" id="tabs">
     <span class="eyebrow">Current · the whole site, 7 tabs</span>
     <h2 class="subhead">Every tab, as it stands</h2>
-    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Next: Professions, when the owner is ready.</p>
+    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Every tab is decided.</p>
   </header>
   <section aria-label="Tab prototypes"><div class="grid">
     <article class="card">
@@ -138,8 +139,31 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>The profession window: set your skill and every recipe on the path to 375 takes its colour, with reagents, vendor prices and routes for the gatherers; or switch to Which two, every profession by what it gives a level 70 character and makes for your spec. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="profs">
+    <span class="eyebrow">Step 2 · Professions · decided 2026-10-12</span>
+    <h2 class="subhead">Professions: the profession window, and which two to take</h2>
+    <p>The owner picked A, the profession window, with B's comparison behind a switch ("Level it / Which two"). That is now the Professions tab above, and with it every tab of the walkthrough is decided. C, the road to 375, was not picked. The three designs stay here for reference. They are three designs for the Professions tab, the last one, each on the live app's own data (<code>gen-prof-data.mjs</code> reads it from <code>src/</code>): the 13 professions' trainer stops and payoffs, the nine crafting paths (198 recipes with counts, reagents, vendor prices and each recipe's skill colours), the four gathering guides (32 ranges with routes computed from recorded nodes, drawn on a plain grid), and the 165 places on Wowhead's lists that a profession makes. A is "what do I make or gather now?", B is "which two should I take?", C is "what's left, and what do I need?". Your skill in each profession is shared between them.</p>
+  </header>
+  <section aria-label="Professions designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/profs-a.html#profui" title="Preview of The profession window" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Professions A · The profession window</h2></div><p>Like the game's own: pick a profession's icon, set your skill on the bar (trainer stops marked), and every recipe on the path to 375 takes its colour at that skill. Pick one for its reagents, what it makes and what a vendor charges; a gathering profession shows its ranges and the route instead.</p></div>
+      <a class="open" href="tabs/profs-a.html">Open Professions A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/profs-b.html#profui" title="Preview of Which two to take" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">VIEW MERGED IN</span><h2>Professions B · Which two to take</h2></div><p>Every profession by what it gives a level 70 character, led by what it makes for your spec from Wowhead's lists (for Fury: Blacksmithing's Dragonstrike, the #1 main hand). Pick two to see the pair: what you get, and whether one feeds the other (Mining supplies 97% of Blacksmithing's farmed materials).</p></div>
+      <a class="open" href="tabs/profs-b.html">Open Professions B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/profs-c.html#profui" title="Preview of The road to 375" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Professions C · The road to 375</h2></div><p>Set your skill and see the rest of the climb as one road, trainer stops as waypoints and passed steps folded away, beside the shopping list from here: what a vendor sells, priced, and what you farm, counted, with who gathers it.</p></div>
+      <a class="open" href="tabs/profs-c.html">Open Professions C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

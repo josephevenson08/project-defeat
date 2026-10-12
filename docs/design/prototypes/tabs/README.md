@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). So is the [live app's front door](#the-live-apps-front-door-2026-10-11-built-into-the-app), now built into the app. So is [Raids](#raids-the-boss-journal-with-your-raids-loot-2026-10-11), and so is [Spec Tier Lists](#spec-tier-lists-the-tier-board-and-the-logs-beside-it-2026-10-12). Professions comes later, when the owner is ready.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). So is the [live app's front door](#the-live-apps-front-door-2026-10-11-built-into-the-app), now built into the app. So is [Raids](#raids-the-boss-journal-with-your-raids-loot-2026-10-11), so is [Spec Tier Lists](#spec-tier-lists-the-tier-board-and-the-logs-beside-it-2026-10-12), and so is [Professions](#professions-the-profession-window-and-which-two-to-take-2026-10-12): **every tab of the walkthrough is decided.**
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -38,7 +38,7 @@ sound. Each page connects its Three.js scene through a documented `window.SCENE`
 | Raid Composition | Calm warm white-gold water. One light per raid group circles the crystal and brightens as that group's party buffs are covered, through `TBCKit.groups()`. Entry rings on placed and swapped seats and on 10/25. A swell when a change gives a group a buff it was missing. |
 | Spec Tier Lists | Emerald water with rank rings (originally Coilfang teal). Entry rings on the boards and panels as they arrive, and the spec tiles land row by row. (Step 1 had 3D shelves on a rune-ring base; the 2026-10-12 design replaced them with the tier board.) |
 | Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on the boss page and the raid's panels as they arrive. (Step 1 also drew a rune ring beside each attunement chain; the 2026-10-11 design moved the chain into "About the raid" without it.) |
-| Professions | Calm amber water with ore veins (originally teal). On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
+| Professions | Calm amber water with ore veins (originally teal). Entry rings on the panels as they arrive, and a gathering route draws itself along its circuit. (Step 1 had fel embers and a rune ring behind Mining's Fel Iron route; the 2026-10-12 design draws every range's route without them.) |
 
 **Kit fixes made during the rollout:**
 - Motion off now ends embers that a user action started, while a raid theme's embers stay in the still frame.
@@ -89,6 +89,26 @@ each door,** and it is built into the live app.
 - **What the study found, kept and fixed:** the cards say what they do (kept); each door is now named by its title alone, with its sentence, goal and fact as its description (the screen-reader user heard five paragraph-long names); Simulation has a door (the theorycrafter found nothing that mentioned it); there is a source link (the developer found none).
 - **In the live app** (`SectionPicker.tsx`, `src/styles/global.css`): the app's own metal-framed cards and muted section colours, Character Planner as the big door with Simulation and the import panel beside it, then the other four. Every glimpse and fact comes from the modules the sections read: the Fury rank-1 list's icons, the 21 raid buffs the app counts, Wowhead's S tier, the raids' art and 5 raids, 24 bosses and 464 drops, and the 13 professions' icons. The test ids are unchanged, so the suite's front-page tests still run; two new tests check the names, descriptions and counts, and that the Simulation door leads through character creation into the simulator.
 - **The prototypes:** the import really works there too (it reads the paste the way the Build tab does and opens the planner wearing it). They use the owner's own `backdrop.jpg` and raid art (ChatGPT generations, settled in the handoff); `backdrop.webp` is a different picture, the five-raid collage. `checks/front-handson.mjs a|b|c` pass at 1280px, at 400px and with reduced motion.
+
+## Professions: the profession window, and which two to take (2026-10-12)
+
+The last step of the walkthrough. Three designs were built from `professions.html` with only the picker and profession
+page swapped (`make-prof-pages.mjs`), over `profs-common.js`: the amber scene and motion, profession icons, payoff tags,
+each recipe's skill colour at a skill, routes on a plain grid, the shopping-list maths and your skill in each profession
+for the session. **The owner picked A, the profession window, with B's comparison behind a switch ("Level it / Which
+two").** That is now `professions.html` (built with `make-prof-pages.mjs --tab`).
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| **A · The profession window (picked)** | [`profs-a.html`](profs-a.html) | Like the game's own: pick a profession's icon, set your skill on the bar (trainer stops marked) and every recipe on the path to 375 takes its colour at that skill, orange, yellow, green or grey. Pick one for its reagents (who gathers them, what a vendor charges), what it makes and its colour thresholds. A gathering profession lists its ranges, with the zones, the guidance and the computed route. The hash carries the profession. |
+| B · Which two to take (merged in as "Which two") | [`profs-b.html`](profs-b.html) | Every profession by what it gives a level 70 character, led by what it makes for your spec from Wowhead's lists (for Fury: Blacksmithing's Dragonstrike, the #1 main hand, bind on pickup). Pick two primary professions to see the pair: places on your list, the one stat bonus, and whether one feeds the other (Mining supplies 97% of Blacksmithing's farmed materials). |
+| C · The road to 375 (not picked) | [`profs-c.html`](profs-c.html) | From your skill to 375 as one road, trainer stops as waypoints and passed steps folded away, beside the shopping list from the start of your step: vendor reagents priced, farmed ones counted with who gathers them. |
+
+- **The data is the live app's.** `gen-prof-data.mjs` bundles `src/domain/professions` into `prof-data.js`: the 13 profiles, trainer stops and payoffs, the nine crafting paths (198 recipes with counts, reagents, vendor prices, and each recipe's skill colours from `tools/ingest/data/professionRecipes.json`, the source the paths were computed from), the four gathering guides (32 ranges with up to three zone routes each, as zone percentages), the 165 profession-made places on Wowhead's lists, and a material-to-gatherer map.
+- **No zone map art:** the live app ships Blizzard's zone maps, but the owner kept the prototypes to icons only (2026-10-12), so routes are drawn on a plain grid.
+- **In the tab,** the switch is remembered for the session (`pd-prof-view`); `#which` opens the comparison and a profession's name (`#mining`) the window. Your skill in each profession (`pd-prof-skill:<name>`) is shared with the other designs.
+- **Real numbers the checks pin:** Rough Sharpening Stone is orange at 1 and green at 40 (its colours are 1/15/35/55); Blacksmithing has 33 path recipes and four trainer stops; Mining has 9 ranges, with Adamantite at 325-350; Blacksmithing from 1 needs 34s from vendors.
+- **Checks:** `checks/profs-handson.mjs a|b|c|p` pass at 1280px, at 400px (44px targets) and with reduced motion; `p` runs A's steps, the switch, then B's. All three work with WebGL off, and `check-bg.mjs` passes all seven tabs.
 
 ## Spec Tier Lists: the tier board, and the logs beside it (2026-10-12)
 
@@ -413,7 +433,7 @@ at 400px and with reduced motion.
 | [Raid Composition](raid-composition.html) | 80 KB | Design A's planning table on the dark site. **Adding:** a palette of all 29 builds with the live app's spec icons, grouped by class. A click seats the build in the next open seat, filling group 1 first, or into a group you aim at by pressing its name. **Seats:** a pencil on each tag for the player's name; Move and drag (a taken seat swaps); Remove. **Raid:** 10/25 with Undo, load or reset the example, Clear with Undo, raid details for the export, an Export stub, and the roster kept for the browser session. **Results,** live from the real buff-scope data: each group's party buffs, role balance, "what one more seat would add" with a one-press seat, "missing, and who fixes it", and raid-wide and boss coverage. |
 | [Spec Tier Lists](tier-lists.html) | 32 KB, plus `tier-data.js` (20 KB) and the Tier Lists scripts | **Decided 2026-10-12:** the tier board (design A), Wowhead's three lists as rows of spec icons with a card for any spec (every list it is on, what the logs say, what it brings to a raid), with a switch to Wowhead's tiers against archon.gg's observed DPS (design B). Fury Warrior is marked. |
 | [Raids](raids.html) | 34 KB, plus `raid-data.js` (161 KB) and the Raids scripts | **Decided 2026-10-11:** the boss journal (design A), one boss at a time with the owner's art, the loot as icons with tooltips and your spec's picks ranked, with a switch to your raid's loot plan (design C): who in it wants each drop. All five raids, 24 bosses and 469 drops from the live app's data, a search across all five, and the scene follows the raid. |
-| [Professions](professions.html) | 88 KB | All 13 professions with real trainer stops and what each is worth at 70. Mining is built out in full, with a climb table, zones and a computed Fel Iron route drawn from 320 real spawn points. Blacksmithing shows its 33-step path to 375 and a bought-vs-farmed shopping list. |
+| [Professions](professions.html) | 30 KB, plus `prof-data.js` (223 KB) and the Professions scripts | **Decided 2026-10-12:** the profession window (design A), every recipe on the path coloured at your skill with its reagents and vendor prices, and every gathering range with its route on a grid; with a switch to Which two (design B), every profession by what it gives a level 70 character and makes for your spec. |
 
 ## How they were made
 
@@ -461,7 +481,7 @@ problems in the app's own data:
 - Without JavaScript:
   - The Raids page needs it (it shows a note).
   - Raid Composition's per-group buffs don't appear.
-  - Profession pages don't open.
+  - The Professions page needs it (it shows a note).
 - Change character, Export image and paste-import are stubs in the prototype.
-- Only Mining has a drawn route, and only for the 300–325 range.
+- Routes are drawn on a plain grid, not the live app's zone maps (the owner's choice).
 - Nobody has clicked through every control by hand, and contrast is estimated.

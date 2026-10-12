@@ -18,7 +18,7 @@ Each page shares one scene, a naaru-like crystal over water, and gives it its ow
 | Raid Composition | `raid-composition.html` | Warm white-gold, one light per raid group | Gold | Decided |
 | Spec Tier Lists | `tier-lists.html` | Emerald, rank rings under the crystal | Emerald | Decided; Wowhead's tiers beside the logs |
 | Raids | `raids.html` | Follows the chosen raid | Follows the raid | Decided; reads the live app's raid data |
-| Professions | `professions.html` | Amber, ore veins up the pillars | Amber | Waits for a later update |
+| Professions | `professions.html` | Amber, ore veins up the pillars | Amber | Decided; the profession window and which two to take |
 
 Moving between tabs is a plain link. A full-screen curtain was tried and removed at the owner's request (2026-10-08).
 

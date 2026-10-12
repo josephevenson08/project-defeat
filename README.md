@@ -119,7 +119,9 @@ the top section says where things stand and what's next. In short:
     requirement in the app.
 12. **Spec Tier Lists: done.** A board of spec icons from Wowhead's three lists, a card for any spec, and a switch
     to Wowhead's tiers against what players actually parse (archon.gg's logs).
-13. **Next:** Professions, when the owner is ready.
+13. **Professions: done.** The game's profession window, with every recipe on the path to 375 coloured at your
+    skill, and a switch to which two to take, led by what each makes for your spec.
+14. **Every tab of the walkthrough is decided.** What comes next is the owner's call.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 
