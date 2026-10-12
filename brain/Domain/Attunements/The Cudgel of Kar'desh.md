@@ -14,7 +14,7 @@ A short chain by TBC standards — two raid items and a walk back to a heroic du
 ## Before you start
 
 - Level 70.
-- Revered with Cenarion Expedition, or a guild member who is, to obtain the Reservoir Key for Heroic Coilfang dungeons.
+- Revered with Cenarion Expedition, for the Reservoir Key that opens the Heroic Coilfang dungeons. On Anniversary realms the key is shared across your account: once one character is Revered, the others buy it at Friendly.
 - A raid group able to kill Gruul the Dragonkiller (25-player).
 - A Karazhan group with someone who holds the Blackened Urn, which requires Honored with The Violet Eye and the Medivh's Journal quest chain.
 
@@ -33,7 +33,7 @@ A short chain by TBC standards — two raid items and a walk back to a heroic du
 
 ## Reward
 
-The Mark of Vashj — permanent access to Serpentshrine Cavern.
+The Mark of Vashj — permanent access to Serpentshrine Cavern. On Anniversary realms it counts for every character on your account.
 
 Related: [[Attunement]]
 

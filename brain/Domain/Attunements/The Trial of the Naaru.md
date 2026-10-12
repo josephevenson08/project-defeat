@@ -16,7 +16,7 @@ The long one. Four heroic dungeon trials plus a Magtheridon kill, all gated behi
 - Level 70.
 - The Cipher of Damnation questline in Shadowmoon Valley completed — A'dal will not offer the trials until it is done.
 - Key to the Arcatraz, which itself requires the Shattered Halls, Steamvault, and Botanica/Mechanar key chains.
-- Heroic keys for Hellfire Citadel, Coilfang Reservoir, Auchindoun, and Tempest Keep (Honored or better with the relevant factions).
+- Heroic keys for Hellfire Citadel, Coilfang Reservoir, Auchindoun, and Tempest Keep (Revered with each of the relevant factions in Phase 2).
 - A raid group able to kill Magtheridon (25-player).
 
 ## Steps
@@ -39,7 +39,7 @@ The long one. Four heroic dungeon trials plus a Magtheridon kill, all gated behi
 
 ## Reward
 
-The Tempest Key (access to The Eye), the Phoenix-fire Band, and the "Hand of A'dal" title.
+The Tempest Key (access to The Eye), the Phoenix-fire Band, and the "Hand of A'dal" title. On Anniversary realms the attunement counts for every character on your account.
 
 Related: [[Attunement]]
 

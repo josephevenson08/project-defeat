@@ -1,6 +1,28 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-11): start here
+## ▶ Where we left off (2026-10-12): Raids decided, built, committed and pushed; start here
+
+**The Raids work is committed and pushed** (the owner said so on 2026-10-12): one work commit, then "Refresh the daily log". Next: Spec Tier Lists.
+
+**The Raids tab is decided and built into `raids.html`:** design A, the boss journal (one boss at a time with the owner's art, the loot as tooltips, your spec's picks ranked from Wowhead's Phase 2 lists), with design C's raid view behind a "For me / For my raid" switch (who in your Raid Composition raid wants each drop, contested drops marked). B, the attunement tracker, was not picked. Details are in the [README](README.md#raids-the-boss-journal-with-your-raids-loot-2026-10-11).
+- **It reads the live app's raid data:** `gen-raid-data.mjs` bundles it from `src/` into `raid-data.js` (469 drops, each with its rank on all 27 specs' lists). Regenerate after the raid data, the catalogue or the BiS rankings change.
+- **Live-app fixes with it,** checked by the tbc-researcher, with a test: Al'ar's Gloves of the Searing Grip are Physical DPS and Tank, Netherbane is Physical DPS, Tempest Keep's heroic keys need Revered, and the attunements say they are account-wide on Anniversary realms.
+- `checks/raids-handson.mjs a|b|c|p` pass at 1280px, 400px and reduced motion; `check-bg.mjs`, `tsc -b`, lint and build are clean; the brain is updated. **The app's whole Playwright suite passed 301 of 301 on Edge** (2026-10-11, with the new test), and `published.mjs` passed every page against a local build, with all 1,304 icon requests returning images.
+
+**Next: Spec Tier Lists** (`tier-lists.html`, Step 1 baseline), then Professions later.
+
+**Still open:** the gloves' overlay in `sampleItems.ts` keeps a stale "stats are approximate" note and its `needsVerification` flag; clear it if the owner agrees.
+
+## Where we left off (2026-10-11, later): Raids research half done
+
+**The owner stopped the session mid-research ("stop for now, I have to leave").** Nothing was built then; the step was finished later the same day (above). The notes from then:
+- **Read so far:** the prototype `raids.html` (its loot is a hand-pasted `DATA` blob; no generator exists yet) and the live app's `src/features/raids/` plus `raidTypes.ts`.
+- **Real data the designs can use:** `bisRankings.json` holds all 27 specs' Wowhead Phase 2 lists by `wowItemId`, so each drop can say which specs rank it and how high. The Raid Composition roster is in sessionStorage `pd-raidcomp-a:v1`, read by `savedRoster()` in `buff-common.js`, which also has the example rosters (`EX`).
+- **Three directions, drafted but not yet put to the owner:** A · the Adventure Guide (one boss at a time, art, loot as tooltips, a spec filter); B · the way in (an attunement tracker like the Attune addon); C · from your raid (who in your roster wants each drop).
+- **Next steps, in order:** (1) ask the tbc-researcher about the two role tags and whether SSC and TK still need attunement on Anniversary realms (design B depends on the answer); (2) put the three directions to the owner with an AskUserQuestion; (3) the rest of "How a walkthrough step is done".
+- **Role tags, found in our own data (nothing changed):** the Wowhead lists rank Gloves of the Searing Grip (29947) only for physical specs: Feral #1, Retribution #1, Arms #1, Protection Warrior #2, Enhancement #2, Fury #3. Netherbane (29924) is ranked for Survival Hunter #1, Beast Mastery and Marksmanship #4, and Fury off hand #4 (Orc), with no tank. So "Caster DPS" and "Tank" both look wrong. Check with the tbc-researcher before changing anything.
+
+## Where we left off (2026-10-11)
 
 **The Simulation tab is decided and built into `simulation.html`:** design C, what to do next (stat priority, best upgrades, then the estimate with how far to trust it), with design A's damage-source table and breakdown under the estimate. Details are in the [README](README.md#simulation-what-to-do-next-on-the-real-model-2026-10-11).
 - **It runs the live app's real simulator** in the page: `gen-sim-engine.mjs` bundles it from `src/` into `sim-engine.js` and writes `sim-data.js`. Regenerate both after the simulator or its data change.
@@ -10,7 +32,9 @@
 
 **The live app's front door is decided and built into the app (2026-10-11):** design A, doors with a glimpse, with design B's goal line on each door, in `src/components/layout/SectionPicker.tsx` and `src/styles/global.css`. Details are in the [README](README.md#the-live-apps-front-door-2026-10-11-built-into-the-app). Two new tests in `tests/planner.spec.ts` cover it; the prototypes are `front-a/b/c.html`.
 
-**Next: the walkthrough,** with Raids, then Spec Tier Lists. Professions comes later.
+**Everything is committed and pushed (last commit `442bc3c`).** The handoff's top section was rewritten on 2026-10-11 as one current brief; read it first.
+
+**Next: the walkthrough,** with Raids (research only just begun, nothing built; what's known is in the handoff), then Spec Tier Lists. Professions comes later.
 
 **Still to check with the tbc-researcher, not changed:** the live app tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both.
 

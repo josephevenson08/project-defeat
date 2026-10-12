@@ -114,7 +114,10 @@ the top section says where things stand and what's next. In short:
    then the estimate and how far to trust it. Building it found (and fixed) a bug in the app's upgrade finder.
 10. **The live app's front door: done.** Each section's door shows a glimpse of what's inside and the job it does,
     Simulation has its own door, and the import sits beside the Character Planner.
-11. **Next:** Raids, then Spec Tier Lists. Professions comes later.
+11. **Raids: done.** A boss journal, one boss at a time, with your spec's picks ranked from Wowhead's lists, and a
+    switch to your raid: who in it wants each drop. Building it corrected two loot tags and an attunement
+    requirement in the app.
+12. **Next:** Spec Tier Lists. Professions comes later.
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

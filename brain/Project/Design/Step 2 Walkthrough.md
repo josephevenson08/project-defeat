@@ -22,10 +22,11 @@ _Three designs per step, built as the whole page with one part swapped; the owne
 - **Simulation (2026-10-11):** C, what to do next (stat priority, best upgrades, then the estimate and how far to trust it), with A's damage-source table. It runs the live app's own simulator in the page (`gen-sim-engine.mjs` bundles it from `src/`), so its numbers match the app's to the decimal.
 
 - **The live app's front door (2026-10-11):** A, doors with a glimpse, with B's goal line on each door ("Gear my character →"), built straight into the live app's section picker: each door named by its title, a real glimpse and a counted fact on each, Simulation with a door of its own, and the import beside the Character Planner.
+- **Raids (2026-10-11):** A, the boss journal (one boss at a time with the owner's art, the loot as tooltips, your spec's picks ranked from Wowhead's Phase 2 lists), with C's raid view behind a switch ("For me / For my raid"): who in your Raid Composition raid wants each drop, and which drops are contested. B, an attunement tracker, was not picked. It reads the live app's raid data (`gen-raid-data.mjs` bundles it from `src/`) and every drop's rank on all 27 specs' lists.
 
-**Next:** Raids, then Spec Tier Lists. Professions comes later.
+**Next:** Spec Tier Lists. Professions comes later.
 
-**Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed. The Simulation workbench then found the upgrade finder scoring two-handers with the off hand still equipped (fixed 2026-10-11).
+**Rules the owner set along the way,** now in the live app too (2026-10-10): Heroism is raid-wide (Anniversary patch 2.5.5); Shamans bring totems by spec; Gift of the Wild, Fortitude and Arcane Brilliance reach any group. Building against real data also found wrong data in the app: talent presets that break the game's row rules, a point that could be removed from under a deeper talent, tank loot tagged for DPS, and stale Felguard text. All are fixed. The Simulation workbench then found the upgrade finder scoring two-handers with the off hand still equipped (fixed 2026-10-11), and the Raids step two Al'ar drops tagged caster and tank that are physical DPS gear, and Tempest Keep's heroic keys listed at Honored where Phase 2 needed Revered (fixed 2026-10-11).
 
 ## Documents
 
@@ -39,6 +40,8 @@ _Three designs per step, built as the whole page with one part swapped; the owne
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[domain.raids.serpentshrineCavernBosses]] — `src/domain/raids/serpentshrineCavernBosses.ts`
+- [[domain.raids.tempestKeepBosses]] — `src/domain/raids/tempestKeepBosses.ts`
+- [[domain.raids.sampleAttunements]] — `src/domain/raids/sampleAttunements.ts`
 - [[domain.simulation.warlockPet]] — `src/domain/simulation/warlockPet.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

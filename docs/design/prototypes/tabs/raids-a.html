@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en" data-raid="ssc" data-phase="2">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project Defeat · Raids A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>/* pick the backdrop before first paint from the #raid hash, so the scene starts in the right light */
+(function(){try{var h=decodeURIComponent(location.hash.slice(1)).split("/")[0],d=document.documentElement;
+if(h==="karazhan"||h==="gruuls-lair"||h==="magtheridons-lair"){d.dataset.raid="p1";d.dataset.phase="1";}else if(h==="tempest-keep"){d.dataset.raid="tk";}}catch(e){}})();</script>
+<style>
+:root{
+  color-scheme:dark;
+  --abyss:#03090d; --deep:#071820; --glass:rgba(8,26,34,.72); --glass-2:rgba(12,38,48,.78); --rim:rgba(120,220,215,.22); --rim-2:rgba(120,220,215,.12);
+  --ink:#e4f3f1; --ink-2:#a9c6c4; --ink-3:#86a6a5;
+  --glow:#4fd8c8; --glow-ink:#03161a; --glow-soft:rgba(79,216,200,.14);
+  --p1:#f2a65a; --p2:#4fd8c8; --tk:#ecc06a;
+  --amber:#ffb547; --amber-ink:#1a1204;
+  --warn:#ffcf7a; --warn-soft:rgba(255,190,90,.12);
+  --scrim:rgba(3,10,14,.8);
+  --q-epic:#c08cff; --q-rare:#4ba3ff; --q-unc:#4be03c; --q-leg:#ff9a2e;
+  --tier-s:#ff8f86; --tier-a:#f7bd66; --tier-b:#8fdc9a;
+  --focus:#9ff3ea;
+  --f-head:"Marcellus","Palatino Linotype",Georgia,serif;
+  --f-body:"Figtree","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.15rem; --t-xl:1.5rem; --t-hero:clamp(2rem,6vw,3.6rem);
+  --px:0; --py:0;
+}
+/* Tempest Keep backdrop: arcane gold over violet (selected in the hero) */
+:root[data-raid="tk"]{--glow:var(--tk);--glow-soft:rgba(236,192,106,.14);--rim:rgba(200,160,255,.24);--rim-2:rgba(200,160,255,.12);--focus:#ffe2a3}
+:root[data-phase="1"]{--glow:var(--p1);--glow-soft:rgba(242,166,90,.14);--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12);--focus:#ffd9a8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--abyss);color:var(--ink);font:400 var(--t-md)/1.5 var(--f-body);overflow-x:hidden}
+a{color:var(--glow)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* scene + fallback */
+#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(60% 40% at 50% 78%,color-mix(in srgb,var(--glow) 28%,transparent),transparent 70%),
+  radial-gradient(30% 18% at 30% 70%,rgba(160,255,240,.10),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(160,255,240,.08),transparent 70%),
+  linear-gradient(180deg,#02070a 0%,#06202a 55%,#0a3440 100%)}
+html[data-raid="tk"] .fallback{background:
+  radial-gradient(40% 30% at 64% 26%,rgba(236,192,106,.30),transparent 70%),
+  radial-gradient(60% 40% at 50% 80%,rgba(150,100,255,.18),transparent 70%),
+  linear-gradient(180deg,#07040f 0%,#160c2a 55%,#1f1236 100%)}
+html[data-phase="1"] .fallback{background:
+  radial-gradient(60% 40% at 50% 78%,rgba(242,166,90,.26),transparent 70%),
+  radial-gradient(26% 16% at 72% 82%,rgba(217,84,43,.14),transparent 70%),
+  linear-gradient(180deg,#070504 0%,#1a120b 55%,#24170c 100%)}
+html.gl .fallback{display:none}
+html:not(.gl) #scene{display:none}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,9,13,.35),rgba(3,9,13,0) 30%,rgba(3,9,13,.55))}
+.page{position:relative;z-index:2}
+/* chrome */
+.dirline{font-size:var(--t-xs);color:var(--ink-3);padding:6px 16px;border-bottom:1px solid var(--rim-2);background:rgba(3,9,13,.6)}
+header.top{background:rgba(3,12,16,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--rim);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:20px;min-height:54px;flex-wrap:wrap}
+.brand{font:400 var(--t-xl)/1 var(--f-head);letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.brand span{color:var(--glow)}
+nav.sections{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0}
+nav.sections button{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;cursor:pointer;white-space:nowrap}
+nav.sections button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections button:hover{color:var(--ink)}
+.flavor{background:rgba(3,12,16,.55);border-bottom:1px solid var(--rim-2)}
+.flavor .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font-size:var(--t-sm)}
+.flavor label{font-weight:600;color:var(--ink-2)}
+select,.tbtn{font:inherit;color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);padding:5px 9px;border-radius:999px}
+.tbtn{cursor:pointer;font-size:var(--t-xs);font-weight:600}
+.tbtn[aria-pressed="true"]{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.chip{display:inline-block;font-size:var(--t-xs);font-weight:700;padding:3px 9px;border-radius:999px;background:var(--glow-soft);color:var(--glow);border:1px solid var(--rim)}
+.prov{font-size:var(--t-xs);color:var(--ink-3)}
+/* hero */
+.hero{min-height:min(62vh,560px);display:grid;align-content:end;padding:48px 0 28px}
+.hero .eyebrow{font:500 var(--t-xs) var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--glow)}
+.hero-in{max-width:760px;padding:20px 18px;border-radius:14px;background:linear-gradient(90deg,var(--scrim) 0%,var(--scrim) 72%,rgba(3,10,14,.35) 100%)}
+@media (max-width:640px){.hero-in{background:var(--scrim)}}
+.hero h1{font:400 var(--t-hero)/1.02 var(--f-head);margin:8px 0 10px;max-width:18ch;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+/* SplitText masks (wordsClass "w", mask:"words" adds the "-mask" wrappers; the no-SplitText fallback builds the same shape) */
+.hero h1 [class$="-mask"]{display:inline-block;overflow:clip;vertical-align:bottom;padding-bottom:.08em}
+.hero h1 .w{display:inline-block}
+.hero h1 em{font-style:normal;color:var(--glow)}
+.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 16px}
+/* hit-cap gauge */
+/* motion toggle + curtain */
+.mtoggle{font:600 var(--t-xs) var(--f-mono);background:var(--glass-2);color:var(--ink);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.mtoggle i{width:26px;height:14px;border-radius:999px;background:var(--rim);position:relative;transition:background .2s}
+.mtoggle i::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3);transition:transform .2s}
+.mtoggle[aria-pressed="true"] i{background:var(--glow)}
+.mtoggle[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--glow-ink)}
+.mtoggle[disabled]{opacity:.7;cursor:not-allowed}
+/* depth cards */
+main{padding:0 0 48px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+.col{display:grid;gap:16px;align-content:start}
+.layer{transform:translate3d(calc(var(--px)*var(--z,0)*1px),calc(var(--py)*var(--z,0)*1px),0);transition:transform .25s ease-out;will-change:transform}
+@media (max-width:699px){.layer{transform:none!important}} /* no pointer parallax at phone width: it only nudged panels past the screen edge */
+.box{position:relative;background:var(--glass);border:1px solid var(--rim);border-radius:14px;backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.box::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,var(--glow-soft),transparent 40%);opacity:.9}
+.box>h2{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head);letter-spacing:.02em}
+.box>h2 a,.box>h2 small{font:400 var(--t-xs) var(--f-body);color:var(--ink-3)}
+.box>h2 a{color:var(--glow)}
+.box .in{position:relative;padding:12px 14px}
+ul.plain{list-style:none;margin:0;padding:0;position:relative}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm);position:relative}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--rim-2);vertical-align:top}
+thead th{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);border-top:0}
+tbody th{font-weight:600;color:var(--ink-2)}
+.scroll{overflow-x:auto;position:relative}
+.btn{display:inline-block;font:700 var(--t-sm) var(--f-body);background:var(--glow);color:var(--glow-ink);border:0;padding:9px 16px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 0 24px -4px var(--glow)}
+.btn.ghost{background:none;color:var(--glow);border:1px solid var(--rim);box-shadow:none}
+.warnline{font-size:var(--t-xs);background:var(--warn-soft);color:var(--warn);padding:5px 9px;border-radius:6px;border:1px solid rgba(255,207,122,.25)}
+footer{position:relative;z-index:2;font-size:var(--t-xs);color:var(--ink-3);border-top:1px solid var(--rim-2);padding:14px 0;background:rgba(3,9,13,.75)}
+/* ---------- Tempest Keep arcane light (gold over violet), shared with Simulation ---------- */
+html[data-raid="tk"]{--glass:rgba(18,11,34,.74);--glass-2:rgba(28,18,48,.82);--scrim:rgba(10,6,20,.84);--ink:#efe9f8;--ink-2:#cbc0de;--ink-3:#a99cc2;--glow-ink:#1a1204;--violet:#b48cff;--violet-soft:rgba(180,140,255,.14)}
+html[data-raid="tk"] header.top{background:rgba(10,6,20,.74)}
+html[data-raid="tk"] .flavor,html[data-raid="tk"] .dirline{background:rgba(10,6,20,.6)}
+html[data-raid="tk"] .veil{background:linear-gradient(180deg,rgba(8,4,16,.4),rgba(8,4,16,0) 30%,rgba(8,4,16,.6))}
+nav.sections a{font:600 var(--t-sm) var(--f-body);letter-spacing:.03em;border-bottom:2px solid transparent;color:var(--ink-2);padding:15px 10px 13px;white-space:nowrap;text-decoration:none}
+nav.sections a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--glow);text-shadow:0 0 12px var(--glow)}
+nav.sections a:hover{color:var(--ink)}
+/* ---------- Raids tab: the backdrop follows the selected raid ---------- */
+html[data-phase="1"]{--glass:rgba(26,18,12,.76);--glass-2:rgba(40,28,18,.82);--scrim:rgba(16,11,7,.84);--ink:#f5ece2;--ink-2:#d6c6b4;--ink-3:#b3a08b;--glow-ink:#1a1204;--rim:rgba(242,180,120,.24);--rim-2:rgba(242,180,120,.12)}
+html[data-phase="1"] header.top{background:rgba(16,11,7,.76)}
+html[data-phase="1"] .flavor,html[data-phase="1"] .dirline{background:rgba(16,11,7,.6)}
+html[data-phase="1"] .veil{background:linear-gradient(180deg,rgba(12,8,5,.4),rgba(12,8,5,0) 30%,rgba(12,8,5,.6))}
+html{transition:background-color .4s}
+.hero.raids{min-height:min(44vh,400px)}
+.hero.raids h1{max-width:20ch}
+/* raid picker */
+.rpick{display:grid;gap:8px;margin:4px 0 0}
+.rpick fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rpick legend{float:left;font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-right:6px;padding:0}
+.rpick button{font:600 var(--t-sm) var(--f-body);background:var(--glass-2);color:var(--ink-2);border:1px solid var(--rim);border-radius:999px;padding:6px 12px;cursor:pointer}
+.rpick button small{font:500 10px var(--f-mono);color:var(--ink-3);margin-left:6px}
+.rpick button[aria-pressed="true"]{background:var(--glow);border-color:var(--glow);color:var(--glow-ink)}
+.rpick button[aria-pressed="true"] small{color:var(--glow-ink)}
+.rpick button:hover{color:var(--ink)}
+/* raid summary + attunement */
+.rgrid{display:grid;grid-template-columns:1fr;gap:16px;perspective:1400px;margin-bottom:16px}
+@media (min-width:900px){.rgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;padding:0;list-style:none}
+.facts li{font:500 var(--t-xs) var(--f-mono);background:var(--glow-soft);border:1px solid var(--rim);border-radius:999px;padding:3px 10px}
+.facts b{font-family:var(--f-body);color:var(--ink-3);margin-right:5px;font-weight:600}
+.box p{margin:0 0 8px;font-size:var(--t-sm);color:var(--ink-2)}
+.box p strong{color:var(--ink)}
+.box .verify{font-size:var(--t-sm);background:var(--warn-soft);color:var(--ink);border:1px solid rgba(255,207,122,.25);border-left:3px solid var(--warn);border-radius:8px;padding:8px 11px;margin:0 0 10px}
+.verify strong{color:var(--warn)}
+.pre{margin:0 0 10px;padding:0 0 0 18px;font-size:var(--t-sm);color:var(--ink-2)}
+.pre li{margin:2px 0}
+ol.att{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:7px}
+ol.att li{position:relative;padding:8px 10px 8px 42px;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;font-size:var(--t-sm)}
+ol.att li .n{position:absolute;left:11px;top:9px;font:500 var(--t-xs) var(--f-mono);color:var(--glow)}
+ol.att li b{display:block;font-weight:600}
+ol.att li .qn{font-size:var(--t-xs);color:var(--ink-3)}
+ol.att li p{margin:3px 0 0;font-size:var(--t-xs);color:var(--ink-2)}
+.diff{display:inline-block;font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--rim);border-radius:4px;padding:0 5px;margin-left:6px;color:var(--ink-2);vertical-align:1px}
+.diff.Heroic{color:var(--warn);border-color:rgba(255,207,122,.4)}
+.diff.Raid{color:var(--glow)}
+/* boss cards */
+.bosshead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:8px 0 10px}
+.bosshead h2{margin:0;font:400 var(--t-xl)/1.2 var(--f-head)}
+.legend2{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:var(--t-xs);color:var(--ink-3);margin:0;padding:0;list-style:none}
+.bosses{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));perspective:1400px}
+.boss>h3{position:relative;display:flex;gap:10px;align-items:baseline;margin:0;padding:11px 14px;border-bottom:1px solid var(--rim-2);font:400 var(--t-lg)/1.2 var(--f-head)}
+.boss>h3 .o{font:500 var(--t-xs) var(--f-mono);color:var(--glow);min-width:2ch}
+.boss>h3 small{margin-left:auto;font:500 var(--t-xs) var(--f-mono);color:var(--ink-3);white-space:nowrap}
+.opt{font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--warn);border:1px solid rgba(255,207,122,.4);border-radius:4px;padding:0 5px}
+.mech{font-size:var(--t-xs)!important;color:var(--ink-3)!important}
+ul.loot{list-style:none;margin:0;padding:0;display:grid;gap:1px;position:relative}
+ul.loot li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:5px 0;border-top:1px solid var(--rim-2);font-size:var(--t-sm);min-width:0}
+ul.loot li:first-child{border-top:0}
+ul.loot .nm{font-weight:600;overflow-wrap:anywhere}
+.q-e{color:var(--q-epic)}.q-r{color:var(--q-rare)}.q-u{color:var(--q-unc)}.q-l{color:var(--q-leg)}.q-n{color:var(--ink-2)}
+.tag{font:600 10px/1.5 var(--f-body);text-transform:uppercase;letter-spacing:.06em;border-radius:4px;padding:0 5px;border:1px solid var(--rim);color:var(--ink-3)}
+.tag.t,.tag.s{color:var(--glow);border-color:var(--glow)}
+.tag.m{color:var(--q-leg);border-color:rgba(255,154,46,.5)}
+.tag.q{color:var(--warn);border-color:rgba(255,207,122,.4)}
+.tag.f{color:var(--glow-ink);background:var(--glow);border-color:var(--glow)}
+.tag.d{color:var(--ink-2)}
+details.more{border-top:1px solid var(--rim-2);position:relative}
+details.more>summary{cursor:pointer;font:600 var(--t-xs) var(--f-body);color:var(--glow);padding:7px 0;list-style:none}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"+ ";font-family:var(--f-mono)}
+details.more[open]>summary::before{content:"− "}
+.trash{margin-top:16px}
+/* K7 rune ring beside the attunement chain heading (tbc-kit.js fills the slot) */
+#h-att.has-rune{justify-content:flex-start;align-items:center;gap:10px}
+#h-att.has-rune small{margin-left:auto}
+#h-att .rslot{flex:none;display:inline-flex;width:22px;height:22px;line-height:0}
+.static-note{font-size:var(--t-xs);color:var(--ink-3)}
+/* loot search: a field under the raid picker; results replace the single-raid view while a query is active */
+.lsearch{display:grid;gap:4px;margin:14px 0 0;max-width:520px}
+.lsearch label{font:600 var(--t-xs) var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.lsf{position:relative;display:flex}
+.lsf input{flex:1;min-width:0;font:400 var(--t-md) var(--f-body);color:var(--ink);background:var(--glass-2);border:1px solid var(--rim);border-radius:999px;padding:8px 44px 8px 14px}
+.lsf input::placeholder{color:var(--ink-3)}
+.lsf input:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-color:var(--glow)}
+.lsf input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.lqx{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:0;background:none;color:var(--ink-2);font:400 1.3rem/1 var(--f-body);cursor:pointer}
+.lqx:hover{color:var(--ink);background:var(--glow-soft)}
+.lqh{font-size:var(--t-xs);color:var(--ink-3)}
+kbd{font:500 var(--t-xs) var(--f-mono);border:1px solid var(--rim);border-radius:4px;padding:0 5px;background:var(--glass-2);color:var(--ink-2)}
+mark{background:color-mix(in srgb,var(--glow) 32%,transparent);color:inherit;border-radius:2px;padding:0 1px;text-decoration:underline 2px;text-underline-offset:2px}
+.lhead{position:relative;margin:8px 0 14px;padding:10px 14px;background:var(--scrim);border:1px solid var(--rim);border-radius:12px}
+.lhead h2{margin:0;font:400 var(--t-xl)/1.2 var(--f-head)}
+.lhead p{margin:2px 0 0}
+.rgroup{margin:0 0 22px;scroll-margin-top:76px}
+.ghead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 10px;padding:8px 12px;background:var(--scrim);border:1px solid var(--rim-2);border-radius:10px;font:400 var(--t-xl)/1.2 var(--f-head)}
+.ghead small{font:500 var(--t-xs) var(--f-mono);color:var(--ink-3)}
+.ghead .chip{font-family:var(--f-body)}
+#lresults .mech,#lresults details.more>summary{display:none}
+#lresults details.more{border-top:0}
+#lresults ul.loot li{border-top:0}
+#lresults ul.loot li:not([hidden])~li{border-top:1px solid var(--rim-2)}
+.lempty{margin:8px 0 16px}
+.box.lempty p{font-size:var(--t-md)}
+@media (min-width:900px){.simgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="fallback" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="page">
+<div class="dirline">Step 2 · Raids design A: The Adventure Guide. On the live app's own raid data. Prototype only, not the live app.</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="home.html">Project <span>Defeat</span></a>
+    <nav class="sections" aria-label="Sections">
+      <a href="home.html">Home</a>
+      <a href="planner.html">Character Planner</a>
+      <a href="simulation.html">Simulation</a>
+      <a href="raid-composition.html">Raid Composition</a>
+      <a href="tier-lists.html">Spec Tier Lists</a>
+      <a href="raids.html" aria-current="page">Raids</a>
+      <a href="professions.html">Professions</a>
+    </nav>
+    <button class="mtoggle" id="mtoggle" type="button" aria-pressed="false" hidden><i aria-hidden="true"></i>Motion <span id="mstate">off</span></button>
+  </div>
+</header>
+<div class="flavor">
+  <div class="wrap">
+    <label for="flv">Game version</label>
+    <select id="flv"><option>TBC Classic (Anniversary)</option></select>
+    <span class="chip">TBC Classic · Phase 2</span>
+    <span class="prov">Raids, bosses, loot, attunements: <code>src/domain/raids</code> · ranks: Wowhead's Phase 2 lists for 27 specs · Phase 2</span>
+    <button class="tbtn" id="scenebtn" type="button" aria-pressed="true">3D scene: on</button>
+  </div>
+</div>
+<main class="wrap">
+<section aria-labelledby="h-raids">
+  <div class="hero raids">
+    <div class="hero-in">
+      <div class="eyebrow">Raids · the boss journal</div>
+      <h1 id="h-raids">Every boss, <em>every drop</em>, one at a time.</h1>
+      <p>Pick a raid, then a boss: its loot as the game shows it, with your spec's picks marked from Wowhead's Phase 2 lists. Fury Warrior first, or any of 27 specs.</p>
+      <div class="rpick" id="rpick" role="group" aria-label="Choose a raid">
+        <fieldset><legend>Phase 1</legend>
+          <button type="button" data-raid="karazhan" aria-pressed="false">Karazhan<small>10</small></button>
+          <button type="button" data-raid="gruuls-lair" aria-pressed="false">Gruul's Lair<small>25</small></button>
+          <button type="button" data-raid="magtheridons-lair" aria-pressed="false">Magtheridon's Lair<small>25</small></button>
+        </fieldset>
+        <fieldset><legend>Phase 2</legend>
+          <button type="button" data-raid="serpentshrine-cavern" aria-pressed="true">Serpentshrine Cavern<small>25</small></button>
+          <button type="button" data-raid="tempest-keep" aria-pressed="false">Tempest Keep<small>25</small></button>
+        </fieldset>
+      </div>
+      <div class="lsearch" id="lsearch" role="search" hidden>
+        <label for="lq">Search loot</label>
+        <div class="lsf"><input type="search" id="lq" placeholder="Dragonspine Trophy, Destroyer, Mongoose…" autocomplete="off" spellcheck="false" aria-describedby="lq-hint"><button type="button" class="lqx" id="lqx" aria-label="Clear search" hidden>×</button></div>
+        <span class="lqh" id="lq-hint">Searches the drops of all five raids · press <kbd>/</kbd> to jump here, <kbd>Esc</kbd> to clear</span>
+      </div>
+      <noscript><p class="static-note">The Raids designs need JavaScript.</p></noscript>
+    </div>
+  </div>
+  <div id="raidui"><p class="prov">The Raids design needs JavaScript.</p></div>
+</section>
+</main>
+<footer><div class="wrap">Prototype content for design review. Loot tables from Wowhead via tools/ingest/ingest-raid-loot.mjs; item quality from the wowsims/tbc item catalogue; attunement steps from Wowhead quest pages and Icy Veins, as recorded in src/domain/raids. World of Warcraft is a trademark of Blizzard Entertainment; no affiliation.</div></footer>
+</div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Serpentshrine Cavern / Tempest Keep scene (WebGL, Three.js r128), ported from 3d-portal.
+   The page's motion layer drives it through window.SCENE: camera values (cam), palette mix (mix)
+   and setMotion(on); tbc-kit.js attaches through the hooks below. Any failure leaves the CSS fallback backdrop in place. */
+(function(){
+"use strict";
+const root=document.documentElement,cv=document.getElementById("scene"),btn=document.getElementById("scenebtn");
+/* Raids tab: the palette follows the selected raid. With tbc-kit.js the motion script routes it through TBCKit.theme()
+   (ssc / tk / hellfire / bladesedge / karazhan: the kit tweens mix.tk and lerps the other three through onTint);
+   without the kit, mix.tk / mix.warm pick Serpentshrine teal, Tempest Keep gold/violet or Phase 1 warm torchlight.
+   The naaru crystal only rises for Tempest Keep; "charge" pulses it on a raid change when the kit is missing. */
+const sel0=root.dataset.raid, MIX0={tk:sel0==="tk"?1:0,warm:root.dataset.phase==="1"?1:0};
+const CAM={depth:0,dip:0,rise:0,dive:0,intro:0}, MIX={tk:MIX0.tk,warm:MIX0.warm,charge:0};
+/* hooks for tbc-kit.js (contract documented at the top of that file) */
+const HK={frame:[],tint:[],state:[]};let mv=false,vis=true;
+const each=(list,a)=>list.forEach(f=>{try{f(a[0],a[1]);}catch(e){}});
+const emit=()=>each(HK.state,[S]);
+const S=window.SCENE={ok:false,cam:CAM,mix:MIX,speed:1,three:null,
+  setMotion(on){mv=!!on;emit();},render(){},pointer(){},setVisible(){},setDpr(){},
+  isMoving:()=>mv,isEnabled:()=>false,
+  onFrame:f=>{HK.frame.push(f);},onTint:f=>{HK.tint.push(f);},onState:f=>{HK.state.push(f);}};
+const off=msg=>{root.classList.remove("gl");S.ok=false;if(btn){btn.disabled=true;btn.setAttribute("aria-pressed","false");btn.textContent=msg;}emit();};
+if(!window.THREE||!cv){off("3D scene: unavailable");return;}
+let R;try{R=new THREE.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"low-power"});}catch(e){off("3D scene: unavailable");return;}
+if(!R.getContext()){off("3D scene: unavailable");return;}
+root.classList.add("gl");S.ok=true;
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,100);
+const C=h=>new THREE.Color(h);
+/* three places: Serpentshrine (naga-blue water, coral in the troughs), Tempest Keep (arcane gold over violet), Phase 1 (warm torchlight) */
+const PAL={ssc:{light:C("#4fd8c8"),deep:C("#03161d"),fog:C("#030c11"),acc:C("#ff7a5c")},
+           tk:{light:C("#ecc06a"),deep:C("#140b26"),fog:C("#0b0616"),acc:C("#9b6bff")},
+           p1:{light:C("#f2a65a"),deep:C("#120f0b"),fog:C("#0b0806"),acc:C("#d9542b")}};
+const cur={light:PAL.tk.light.clone(),deep:PAL.tk.deep.clone(),fog:PAL.tk.fog.clone(),acc:PAL.tk.acc.clone()};
+const U={uTime:{value:0},uLight:{value:cur.light},uDeep:{value:cur.deep},uFog:{value:cur.fog},uAcc:{value:cur.acc},uDpr:{value:R.getPixelRatio()}};
+/* water: waves in the vertex shader, caustics + fog in the fragment shader; double-sided so the dive can pass under it */
+const water=new THREE.Mesh(new THREE.PlaneGeometry(70,70,160,160),new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`uniform float uTime;varying vec2 vUv;varying float vH;varying float vD;
+  void main(){vUv=uv;vec3 p=position;
+    float h=sin(p.x*.35+uTime*.6)*.18+sin(p.y*.5-uTime*.8)*.12+sin((p.x+p.y)*.9+uTime*1.3)*.05;
+    p.z+=h;vH=h;vec4 mv=modelViewMatrix*vec4(p,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uTime;uniform vec3 uLight,uDeep,uFog,uAcc;varying vec2 vUv;varying float vH;varying float vD;
+  float caustic(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.;vec2 i=p;float c=1.;float k=.005;
+    for(int n=0;n<4;n++){float t=uTime*.3*(1.-(3.5/float(n+1)));
+      i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+      c+=1./length(vec2(p.x/(sin(i.x+t)/k),p.y/(cos(i.y+t)/k)));}
+    c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+  void main(){float k=caustic(vUv*5.);
+    float g=1.-smoothstep(0.,.22,distance(vUv,vec2(.5,.47)));
+    vec3 col=uDeep+uLight*(k*.5+vH*.5+g*.22);
+    col+=uAcc*(1.-smoothstep(-.32,-.05,vH))*.12;
+    col=mix(col,uFog,smoothstep(6.,34.,vD));gl_FragColor=vec4(col,1.);}`}));
+water.rotation.x=-Math.PI/2;scene.add(water);
+/* bioluminescent motes: drift and bob entirely on the GPU */
+const N=innerWidth<700?260:520,pos=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*36;pos[i*3+1]=Math.random()*7;pos[i*3+2]=(Math.random()-.5)*30-4;seed[i]=Math.random();}
+const pg=new THREE.BufferGeometry();pg.setAttribute("position",new THREE.BufferAttribute(pos,3));pg.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+scene.add(new THREE.Points(pg,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`uniform float uTime,uDpr;attribute float aSeed;varying float vA;
+  void main(){vec3 p=position;p.y=mod(p.y+uTime*(.08+aSeed*.18),7.)+.05;
+    p.x+=sin(uTime*.3+aSeed*40.)*.5;p.z+=cos(uTime*.25+aSeed*30.)*.4;
+    vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
+    gl_PointSize=(1.5+aSeed*3.5)*uDpr*(14./-mv.z);
+    vA=(1.-smoothstep(8.,30.,-mv.z))*(.45+.55*sin(uTime*1.7+aSeed*60.)*.5+.275);}`,
+  fragmentShader:`uniform vec3 uLight;varying float vA;
+  void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,0.,d)*vA;
+    gl_FragColor=vec4(mix(uLight,vec3(.85,1.,.96),.35),a);}`})));
+/* lights: phase lamp over the pool, ambient, a cool rim and a low accent (coral / violet / ember) */
+const lamp=new THREE.PointLight(cur.light.clone(),2.2,18);lamp.position.set(0,3.4,-1);scene.add(lamp);
+scene.add(new THREE.AmbientLight(0x2a1a40,.6));
+const rim=new THREE.DirectionalLight(0xc8a0ff,.35);rim.position.set(-4,6,6);scene.add(rim);
+const acc=new THREE.PointLight(cur.acc.clone(),1.1,16);acc.position.set(-5,1.2,-4);scene.add(acc);
+/* a naaru-like arcane crystal: faceted prism, halo ring and three orbiting shards */
+const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x24163a,emissive:cur.light.clone(),emissiveIntensity:.18,metalness:.35,roughness:.18,flatShading:true}));
+crystal.scale.set(.8,1.5,.8);crystal.position.set(2.6,2.4,-3);scene.add(crystal);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.7,.02,6,90),new THREE.MeshBasicMaterial({color:cur.light.clone(),transparent:true,opacity:.45}));
+halo.position.copy(crystal.position);halo.rotation.x=Math.PI/2.3;scene.add(halo);
+const shardMat=new THREE.MeshStandardMaterial({color:0x1c1230,emissive:cur.light.clone(),emissiveIntensity:.5,flatShading:true});
+const shards=[0,1,2].map(()=>{const m=new THREE.Mesh(new THREE.TetrahedronGeometry(.16,0),shardMat);scene.add(m);return m;});
+/* The Eye's pillars receding into the violet fog */
+const pm=new THREE.MeshStandardMaterial({color:0x150d24,roughness:.9,flatShading:true});
+[[-7,-6],[-4.5,-12],[6.5,-8],[9,-15],[-10,-18],[2,-20],[13,-11],[-13,-9]].forEach(([x,z],i)=>{
+  const c=new THREE.Mesh(new THREE.CylinderGeometry(.5,.75,9,7),pm);c.position.set(x,3.6,z);c.rotation.y=i;scene.add(c);});
+scene.fog=new THREE.Fog(cur.fog.clone(),8,30);
+R.setClearColor(cur.fog);
+/* camera: time sway + pointer, plus the values GSAP drives (scroll depth, glance dip, rise, curtain dive, intro) */
+const ptr={x:0,y:0,sx:0,sy:0},look=new THREE.Vector3(0,.8,-2);
+let t=0,moving=false,enabled=true,lost=false,raf=0,last=0;
+function place(){
+  const c=CAM,lift=c.dip*(1-c.rise);
+  cam.position.set(Math.sin(t*.05)*1.2+ptr.sx*1.4,
+    3.4+c.intro*2.2-c.depth*.6-lift*2.1-c.dive*4.6-ptr.sy*.5,
+    11-c.depth*2.5-lift*3-c.dive*3.5);
+  cam.lookAt(look.x+ptr.sx*.6,look.y-lift*.45-c.dive*1.4+c.intro*.6,look.z);
+  scene.fog.near=8-c.dive*6;scene.fog.far=30-c.dive*18;
+}
+let charged=0; /* the legacy charge only writes intensities while it moves, so it never fights the kit's K3 swell */
+function tint(){
+  ["light","deep","fog","acc"].forEach(n=>{cur[n].copy(PAL.ssc[n]).lerp(PAL.tk[n],MIX.tk).lerp(PAL.p1[n],MIX.warm);});
+  each(HK.tint,[cur]);
+  lamp.color.copy(cur.light);crystal.material.emissive.copy(cur.light);halo.material.color.copy(cur.light);
+  shardMat.emissive.copy(cur.light);acc.color.copy(cur.acc);
+  const k=Math.max(0,MIX.tk*(1-MIX.warm));crystal.visible=halo.visible=k>.02;shards.forEach(m=>{m.visible=k>.02;});crystal.scale.set(.8*k,1.5*k,.8*k);halo.scale.setScalar(Math.max(k,.01));
+  const ch=MIX.charge||0;
+  if(ch||charged){crystal.material.emissiveIntensity=.18+ch*.9;halo.material.opacity=.45+ch*.5;lamp.intensity=2.2+ch*2.4;charged=ch;}
+  scene.fog.color.copy(cur.fog);R.setClearColor(cur.fog);
+}
+function pose(){
+  crystal.position.y=2.4+Math.sin(t*.8)*.18;halo.position.y=crystal.position.y;
+  shards.forEach((m,i)=>{const a=t*.6+i*2.094;m.position.set(crystal.position.x+Math.cos(a)*1.25,crystal.position.y+Math.sin(a*1.3)*.35,crystal.position.z+Math.sin(a)*1.25);m.rotation.set(a,a*.7,0);});
+}
+function size(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<700?62:50;cam.updateProjectionMatrix();}
+function frame(dt){
+  dt*=S.speed;t+=dt;U.uTime.value=t;
+  ptr.sx+=(ptr.x-ptr.sx)*.04;ptr.sy+=(ptr.y-ptr.sy)*.04;
+  crystal.rotation.y+=dt*(.25+MIX.charge*2.2);halo.rotation.z+=dt*(.1+MIX.charge*1.4);pose();
+  each(HK.frame,[dt,t]);tint();place();R.render(scene,cam);
+}
+/* one static frame (Motion off, reduced motion, or a re-light while frozen) */
+function still(){if(lost||!enabled)return;pose();each(HK.frame,[0,t]);tint();place();R.render(scene,cam);}
+function loop(now){raf=0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;frame(dt);kick();}
+function kick(){if(!raf&&moving&&enabled&&vis&&!lost&&!document.hidden)raf=requestAnimationFrame(loop);else if(!raf)last=0;}
+function stop(){if(raf){cancelAnimationFrame(raf);raf=0;}last=0;}
+addEventListener("resize",()=>{size();if(!raf)still();},{passive:true});
+document.addEventListener("visibilitychange",()=>document.hidden?stop():kick());
+cv.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();lost=true;off("3D scene: lost");});
+if(btn)btn.addEventListener("click",()=>{enabled=!enabled;btn.setAttribute("aria-pressed",enabled);btn.textContent="3D scene: "+(enabled?"on":"off");
+  root.classList.toggle("gl",enabled);if(enabled){moving?kick():still();}else stop();emit();});
+/* hooks used by the page script and tbc-kit.js */
+S.setMotion=on=>{moving=mv=!!on;if(moving)kick();else{stop();ptr.x=ptr.y=ptr.sx=ptr.sy=0;still();}emit();};
+S.render=()=>{if(!raf)still();};
+S.pointer=(x,y)=>{if(moving){ptr.x=x;ptr.y=y;}};
+S.isEnabled=()=>enabled&&!lost;
+S.setVisible=v=>{vis=!!v;if(vis)kick();else stop();};
+S.setDpr=v=>{R.setPixelRatio(v);U.uDpr.value=R.getPixelRatio();size();if(!raf)still();};
+S.three={scene,camera:cam,renderer:R,uniforms:U,crystal,halo,lamp,water};
+size();still();
+})();
+</script>
+<script src="tbc-kit.js"></script>
+<!-- the live app's raid data, the shared shell, then the design -->
+<script src="raid-data.js"></script>
+<script src="raids-common.js"></script>
+<script src="raids-a.js"></script>
+</body>
+</html>

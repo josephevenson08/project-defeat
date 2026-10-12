@@ -82,6 +82,7 @@
 
   <nav class="jump" aria-label="Jump to">
     <a href="#tabs">The site now, tab by tab</a>
+    <a href="#raids">Raids designs</a>
     <a href="#front">Front door designs</a>
     <a href="#sim">Simulation designs</a>
     <a href="#build">Build designs</a>
@@ -101,7 +102,7 @@
   <header class="sub first" id="tabs">
     <span class="eyebrow">Current · the whole site, 7 tabs</span>
     <h2 class="subhead">Every tab, as it stands</h2>
-    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Next: three designs per step for the Character Planner's sub-tabs, then the rest.</p>
+    <p>The chosen style: a crystal over water, drawn live in 3D, with each tab in its own colour and one small detail of its own. The tabs link to each other, so start at Home and click through the top navigation. Next: Spec Tier Lists, then Professions later.</p>
   </header>
   <section aria-label="Tab prototypes"><div class="grid">
     <article class="card">
@@ -131,13 +132,36 @@
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/raids.html" title="Preview of Raids" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
-      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Raids</h2></div><p>All five raids, 24 bosses, 462 drops, attunements and a loot search across every raid. The scene changes with the raid.</p></div>
+      <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Raids</h2></div><p>The boss journal: pick a raid, then a boss, and see its loot as the game shows it with your spec's picks ranked from Wowhead's Phase 2 lists, or switch to your raid and see who in it wants each drop. All five raids, 24 bosses and 469 drops from the live app, a search across every raid, and the scene follows the raid.</p></div>
       <a class="open" href="tabs/raids.html">Open Raids <span aria-hidden="true">→</span></a>
     </article>
     <article class="card">
       <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/professions.html" title="Preview of Professions" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
       <div class="meta"><div class="meta-top"><span class="num">TAB</span><h2>Professions</h2></div><p>13 professions and what each is worth at 70, a full Mining guide with a real Fel Iron route, and Blacksmithing to 375. Amber, with veins of ore up the pillars.</p></div>
       <a class="open" href="tabs/professions.html">Open Professions <span aria-hidden="true">→</span></a>
+    </article>
+  </div></section>
+
+  <header class="sub" id="raids">
+    <span class="eyebrow">Step 2 · Raids · decided 2026-10-11</span>
+    <h2 class="subhead">Raids: the boss journal, with your raid's loot</h2>
+    <p>The owner picked A, the boss journal, with C's raid view behind a switch ("For me / For my raid"). That is now the Raids tab above. B, the way in, was not picked. The three designs stay here for reference. They are three designs for the Raids tab, each on the live app's own raid data (469 drops, read from <code>src/</code> by <code>gen-raid-data.mjs</code> rather than pasted in), with every drop's rank on each of the 27 specs' Wowhead Phase 2 lists. All three keep the scene that follows the raid, the owner's raid and boss art, and the loot search across all five raids, whose results now open a drop where it drops. Hover or tap any item for its tooltip. A is "what does this boss drop for me?", B is "can I get in, and what's next?", C is "who in my raid wants this?". Building them corrected the live app's data: Al'ar's Gloves of the Searing Grip and Netherbane are physical DPS drops (they were tagged caster and tank), and Tempest Keep's heroic keys needed Revered, not Honored.</p>
+  </header>
+  <section aria-label="Raids designs"><div class="grid">
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/raids-a.html#raidui" title="Preview of The Adventure Guide" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">PICKED</span><h2>Raids A · The Adventure Guide</h2></div><p>One boss at a time, like the game's boss journal: the raid's bosses down the side with their art, the chosen boss's loot as icons with tooltips, and "Loot for" any of 27 specs (Fury Warrior first) putting that spec's picks on top with their rank. About the raid holds the way in; The fight holds the mechanics.</p></div>
+      <a class="open" href="tabs/raids-a.html">Open Raids A <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/raids-b.html#raidui" title="Preview of The way in" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">NOT PICKED</span><h2>Raids B · The way in</h2></div><p>Progression first, like the Attune addon: five doors that open as you tick off the attunement steps you've done, the next step for the chosen raid and which other raid it needs (Serpentshrine's Blazing Signet waits on Karazhan), then what's waiting inside for your spec, boss by boss. The ticks are kept in your browser.</p></div>
+      <a class="open" href="tabs/raids-b.html">Open Raids B <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="card">
+      <div class="thumb"><span class="fallback">Loading preview…</span><iframe src="tabs/raids-c.html#raidui" title="Preview of From your raid" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="meta"><div class="meta-top"><span class="num">RAID VIEW MERGED IN</span><h2>Raids C · From your raid</h2></div><p>A loot plan for the raid you built on Raid Composition (or its example): every drop with who in your raid wants it, as spec icons with their rank, most wanted first, and contested drops marked. Tier tokens count for whoever wants a set piece they buy. Press a raider for their wishlist.</p></div>
+      <a class="open" href="tabs/raids-c.html">Open Raids C <span aria-hidden="true">→</span></a>
     </article>
   </div></section>
 

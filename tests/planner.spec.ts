@@ -2020,10 +2020,48 @@ test('every attunement step says where it happens and cites what it was read fro
 
   /*
    * And it stays flagged. Two things these sources do not settle: the level the chain requires, and
-   * whether Anniversary realms drop the attunement in 2.4 as previous Classic runs did.
+   * when Anniversary realms dropped it (secondary sources say Phase 3; no Blizzard text names Karazhan).
    */
   expect(karazhan.needsVerification, 'sourced is not the same as verified').toBe(true)
   expect(karazhan.notes ?? '').toMatch(/Wowhead/)
+})
+
+test('Al’ar’s agility drops are tagged for the specs that rank them, and Tempest Keep’s heroic keys need Revered', () => {
+  /*
+   * Until 2026-10-11 Gloves of the Searing Grip were tagged Caster DPS and Netherbane Tank. Neither
+   * carries a caster or tank stat: the gloves are leather with Agility, Attack Power and Expertise, and
+   * Netherbane is an Agility axe. Wowhead's Phase 2 lists agree, so the tags are checked against them:
+   * every list that ranks either item belongs to a role its tag names. The gloves are ranked by Feral,
+   * Retribution, Arms, Enhancement and Fury, and by Protection Warriors for threat; Netherbane by the
+   * three Hunter specs and by Fury as an off hand, and by no tank. (Checked by the tbc-researcher.)
+   */
+  const alar = getBossesForRaid('tempest-keep').find((boss) => boss.id === 'alar')!
+  const specs = rawRankings.specs as Record<string, { className: string; spec: string; slots: Record<string, { wowItemId: number }[]> }>
+  for (const [itemId, roles] of [
+    ['gloves-of-the-searing-grip', ['Physical DPS', 'Tank']],
+    ['netherbane', ['Physical DPS']],
+  ] as const) {
+    const entry = alar.loot.find((drop) => drop.itemId === itemId)!
+    expect(entry.roles, itemId).toEqual(roles)
+    const rankedBy = Object.values(specs).filter((list) =>
+      Object.values(list.slots).some((places) => places.some((place) => place.wowItemId === entry.wowItemId)),
+    )
+    expect(rankedBy.length, `${itemId} is on Wowhead lists`).toBeGreaterThan(0)
+    for (const list of rankedBy) {
+      const role = getRoleForSpec(list.className as TbcClass, list.spec as TbcSpec)
+      expect(roles as readonly string[], `${list.spec} ${list.className} ranks ${itemId}`).toContain(role)
+    }
+  }
+
+  /*
+   * The heroic keys the Trial of the Naaru runs through needed Revered with each faction for all of
+   * Phase 2; this said Honored until 2026-10-11. And every chain now says it is account-wide on
+   * Anniversary realms, which is the first thing an alt asks.
+   */
+  const tempestKeep = getAttunementChainForRaid('tempest-keep')!
+  expect(tempestKeep.prerequisites.join(' ')).toMatch(/Revered/)
+  expect(tempestKeep.prerequisites.join(' ')).not.toMatch(/Honored or better/)
+  for (const chain of sampleAttunements) expect(chain.reward, chain.name).toMatch(/every character on your account/)
 })
 
 test('the Warrior talent trees are complete and their spending rules hold', async () => {

@@ -26,9 +26,9 @@ Phase 1 has Al'ar cycling clockwise between four platforms every 30 seconds, dro
 - **Band of Al'ar** (Boss) — [[Caster DPS]]
 - **Claw of the Phoenix** (Boss) — [[Physical DPS]]
 - **Fire Crest Breastplate** (Boss) — [[Physical DPS]]
-- **Gloves of the Searing Grip** (Boss) — [[Caster DPS]]
+- **Gloves of the Searing Grip** (Boss) — [[Physical DPS]], [[Tank]]
 - **Mindstorm Wristbands** (Boss) — [[Caster DPS]]
-- **Netherbane** (Boss) — [[Tank]]
+- **Netherbane** (Boss) — [[Physical DPS]]
 - **Pattern: Belt of Blasting** (Boss) _(not in item catalog — [[Needs Verification]])_
   Real drop; not in the item catalogue, so it is listed by name only.
 - **Pattern: Belt of Deep Shadow** (Boss) _(not in item catalog — [[Needs Verification]])_

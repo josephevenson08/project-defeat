@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/raids/sampleAttunements.ts
-lines: 247
+lines: 251
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.sampleAttunements
 
-`src/domain/raids/sampleAttunements.ts` · **domain** layer · 247 lines
+`src/domain/raids/sampleAttunements.ts` · **domain** layer · 251 lines
 
 From the top of the file:
 
@@ -26,8 +26,10 @@ From the top of the file:
 > Gruul's Lair and Magtheridon's Lair have no chains here because they have none in the game — both
 > open to any level 70 raid, which is why they are where a fresh 25-player group starts.
 > 
-> Blizzard removed these attunements in patch 2.4 on previous Classic runs. They are required during
-> Phase 2, but the exact patch where they are dropped on Anniversary realms is flagged as unverified.
+> All three are required during Phase 2, the phase this app targets (2026-05-14 on Anniversary realms).
+> Blizzard staff confirmed that the SSC and TK attunements stopped being required when Phase 3 opened on
+> 2026-08-27; secondary sources say Karazhan's went at the same time, but no Blizzard text names it. On
+> Anniversary realms an attunement counts for every character on the Battle.net account.
 
 ## Exports
 
@@ -46,6 +48,7 @@ From the top of the file:
 ## Concepts & phases
 
 - [[Attunement]]
+- [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]
 

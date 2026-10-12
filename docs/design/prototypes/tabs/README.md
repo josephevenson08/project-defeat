@@ -5,7 +5,7 @@
 one clickable prototype of the whole site. Start at [`home.html`](home.html). Brief:
 [`TABS-BRIEF.md`](TABS-BRIEF.md).
 
-**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). So is the [live app's front door](#the-live-apps-front-door-2026-10-11-built-into-the-app), now built into the app. Next come Raids and Spec Tier Lists.
+**Next session:** start from the top of [`NEXT-SESSION-PLAN.md`](NEXT-SESSION-PLAN.md). The Character Planner's Gear and Compare tabs are decided (see [Compare](#character-planner-the-compare-tab-2026-10-09) and [Gear](#character-planner-the-gear-tab-2026-10-09)). So is [Talents](#character-planner-the-talents-tab-2026-10-09). So is [Buffs](#character-planner-the-buffs-tab-2026-10-09), and so are [Ranked Gear](#character-planner-the-ranked-gear-tab-2026-10-10) and [Build](#character-planner-the-build-tab-2026-10-10), so every planner sub-tab is decided. So is [Simulation](#simulation-what-to-do-next-on-the-real-model-2026-10-11). The live-app fixes are committed, and [the text accents follow each tab](#text-accents-follow-each-tab-2026-10-10). So is the [live app's front door](#the-live-apps-front-door-2026-10-11-built-into-the-app), now built into the app. So is [Raids](#raids-the-boss-journal-with-your-raids-loot-2026-10-11). Next comes Spec Tier Lists; Professions comes later.
 
 **Step 2.** Go tab by tab, with three parallel designs per step. The owner picks one per step.
 Agreed order:
@@ -37,7 +37,7 @@ sound. Each page connects its Three.js scene through a documented `window.SCENE`
 | Simulation | Crystalline fortress (Tempest Keep). On Simulate: fel embers and a rune ring while it charges, then a swell and entry rings when the result lands. |
 | Raid Composition | Calm warm white-gold water. One light per raid group circles the crystal and brightens as that group's party buffs are covered, through `TBCKit.groups()`. Entry rings on placed and swapped seats and on 10/25. A swell when a change gives a group a buff it was missing. |
 | Spec Tier Lists | Emerald water with rank rings (originally Coilfang teal). A rune-ring base under the 3D shelves. Entry rings on filter and view changes. |
-| Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on boss cards. A rune ring beside each attunement chain. |
+| Raids | The scene follows the raid: Serpentshrine water, Tempest Keep crystal, Magtheridon's Hellfire embers and red sky, Gruul's Blade's Edge dusk, Karazhan arcane violet. Entry rings on the boss page and the raid's panels as they arrive. (Step 1 also drew a rune ring beside each attunement chain; the 2026-10-11 design moved the chain into "About the raid" without it.) |
 | Professions | Calm amber water with ore veins (originally teal). On Mining's Fel Iron range, fel embers behind the route, which draws itself with DrawSVG alongside a rune ring. Entry rings on opening a profession or picking a range. |
 
 **Kit fixes made during the rollout:**
@@ -89,6 +89,27 @@ each door,** and it is built into the live app.
 - **What the study found, kept and fixed:** the cards say what they do (kept); each door is now named by its title alone, with its sentence, goal and fact as its description (the screen-reader user heard five paragraph-long names); Simulation has a door (the theorycrafter found nothing that mentioned it); there is a source link (the developer found none).
 - **In the live app** (`SectionPicker.tsx`, `src/styles/global.css`): the app's own metal-framed cards and muted section colours, Character Planner as the big door with Simulation and the import panel beside it, then the other four. Every glimpse and fact comes from the modules the sections read: the Fury rank-1 list's icons, the 21 raid buffs the app counts, Wowhead's S tier, the raids' art and 5 raids, 24 bosses and 464 drops, and the 13 professions' icons. The test ids are unchanged, so the suite's front-page tests still run; two new tests check the names, descriptions and counts, and that the Simulation door leads through character creation into the simulator.
 - **The prototypes:** the import really works there too (it reads the paste the way the Build tab does and opens the planner wearing it). They use the owner's own `backdrop.jpg` and raid art (ChatGPT generations, settled in the handoff); `backdrop.webp` is a different picture, the five-raid collage. `checks/front-handson.mjs a|b|c` pass at 1280px, at 400px and with reduced motion.
+
+## Raids: the boss journal, with your raid's loot (2026-10-11)
+
+Three designs were built from `raids.html` with only the content area swapped (`make-raids-pages.mjs`), over
+`raids-common.js`, which keeps the shell every design shares: the raid picker that re-lights the scene and keeps the
+raid in the hash, the loot search across all five raids (whose results now open a drop where it drops), game-style
+item tooltips and the motion. **The owner picked A, the boss journal, with C's raid view behind a switch ("For me /
+For my raid").** That is now `raids.html` (built with `make-raids-pages.mjs --tab`).
+
+| Design | Page | What it is |
+| --- | --- | --- |
+| **A · The Adventure Guide (picked)** | [`raids-a.html`](raids-a.html) | One boss at a time, like the game's boss journal: the raid's bosses down the side with the owner's art, the chosen boss's loot as icons with tooltips, and "Loot for" any of 27 specs (Fury Warrior first) putting that spec's picks on top with their rank. "About the raid" holds the facts, the way in and the attunement chain; "The fight" holds the mechanics. The hash carries the boss. |
+| B · The way in (not picked) | [`raids-b.html`](raids-b.html) | Progression first, like the Attune addon: five doors that open as you tick off the attunement steps you've done (kept in the browser), the chosen raid's next step and which other raid it needs, then what waits inside for your spec. |
+| C · From your raid (merged in as "For my raid") | [`raids-c.html`](raids-c.html) | A loot plan for the raid built on Raid Composition (or its example): every drop with who in the raid wants it, as spec icons with their rank, most wanted first, contested drops marked (three or more raiders rank it first). A tier token counts for whoever wants a set piece it buys. Press a raider for their wishlist. |
+
+- **The data is the live app's.** `gen-raid-data.mjs` bundles `src/domain` (raids, the item catalogue, icons, the raid builds and `bisRankings.json`) into `raid-data.js`: 5 raids, 24 bosses, 469 drops (399 distinct items, 345 with stats, 228 on at least one Wowhead list). The Step 1 page's pasted copy of the loot (462 drops) is gone. Regenerate after any of those change.
+- **The ranks:** every drop carries its rank on each of the 27 specs' Wowhead Phase 2 lists. Rogue's three specs share one guide and so do Priest's two healers. Wowhead's Feral list is cat DPS, so a Feral (Bear) tank has no list, and the raid view says so rather than guessing.
+- **In the tab,** the switch is remembered for the browser session (`pd-raids-view`), `#raid/raid` links to the raid view and `#raid/boss` to a boss, and the search opens a drop in whichever view is showing. The raid view reads Raid Composition's raid for the session (`pd-raidcomp-a:v1`) when it is the raid's size, and the example 25 or 10 otherwise, and says which.
+- **Real numbers the checks pin:** Hydross has 2 drops on the Fury list; Gloves of the Searing Grip are #1 on the Feral list; Dragonspine Trophy is on 10 lists, wanted by 9 of the example 25, all as their first pick; Belt of One-Hundred Deaths is wanted by 11 (8 first).
+- **Live-app fixes from this step** (in `src/`, with a test): see "Data corrections" below.
+- **Checks:** `checks/raids-handson.mjs a|b|c|p` pass at 1280px, at 400px (44px targets) and with reduced motion; `p` runs A's steps, the switch, then C's. All three work with WebGL off, and `check-bg.mjs` passes all seven tabs (its only messages are the expected WebGL-off ones).
 
 ## Simulation: what to do next, on the real model (2026-10-11)
 
@@ -371,7 +392,7 @@ at 400px and with reduced motion.
 | [Simulation](simulation.html) | 63 KB | The fixed level-73 boss, the 20 DPS specs with real archon.gg reference DPS, the upgrade finder's method, and an honest "what is and isn't modelled" panel. The estimate and weights are labelled example. The scene uses Tempest Keep's arcane light. |
 | [Raid Composition](raid-composition.html) | 80 KB | Design A's planning table on the dark site. **Adding:** a palette of all 29 builds with the live app's spec icons, grouped by class. A click seats the build in the next open seat, filling group 1 first, or into a group you aim at by pressing its name. **Seats:** a pencil on each tag for the player's name; Move and drag (a taken seat swaps); Remove. **Raid:** 10/25 with Undo, load or reset the example, Clear with Undo, raid details for the export, an Export stub, and the roster kept for the browser session. **Results,** live from the real buff-scope data: each group's party buffs, role balance, "what one more seat would add" with a one-press seat, "missing, and who fixes it", and raid-wide and boss coverage. |
 | [Spec Tier Lists](tier-lists.html) | 55 KB | All three Wowhead Phase 2 lists, with all 28 placements. Fury Warrior is marked. The DPS list has 3D shelves with a List view and animated class filters. |
-| [Raids](raids.html) | 86 KB | All five raids, 24 bosses and 462 drops with quality colors and token, recipe and mount labels. The three attunement chains are marked "not yet confirmed for Anniversary realms". The scene changes with the selected raid. |
+| [Raids](raids.html) | 34 KB, plus `raid-data.js` (161 KB) and the Raids scripts | **Decided 2026-10-11:** the boss journal (design A), one boss at a time with the owner's art, the loot as icons with tooltips and your spec's picks ranked, with a switch to your raid's loot plan (design C): who in it wants each drop. All five raids, 24 bosses and 469 drops from the live app's data, a search across all five, and the scene follows the raid. |
 | [Professions](professions.html) | 88 KB | All 13 professions with real trainer stops and what each is worth at 70. Mining is built out in full, with a climb table, zones and a computed Fel Iron route drawn from 320 real spawn points. Blacksmithing shows its 33-step path to 375 and a bought-vs-farmed shopping list. |
 
 ## How they were made
@@ -408,13 +429,16 @@ problems in the app's own data:
   - The prototype's hit cap ignored Precision (fixed in the prototype; the live app shows no cap line).
 - **The prototype's own gear data (found 2026-10-10, fixed):** `gen-gear-data.mjs` read boss names only in single quotes, so Al'ar and Kael'thas Sunstrider (written in double quotes for their apostrophes) were missed. Al'ar's three drops had no boss, and five Kael'thas drops were credited to Solarian (Thalassian Wildercloak, Leggings of Murderous Intent, Telonicus's Pendant of Mayhem, Band of the Ranger-General, Rod of the Sun King). The Gear tab's checklist and the tooltips now name the right boss.
 - **The live app's upgrade finder (found 2026-10-11, fixed in `src/`):** `findUpgrades.ts` scored a two-hander in the main hand with the off-hand weapon still equipped, a pairing the game doesn't allow and equipping undoes. For a Fury warrior it listed Twinblade of the Phoenix as +145.8 DPS; equipping it took the estimate from 1,106.4 to 929.1. Each trial swap now goes through `applyWeaponSlotRules`, and a test equips every listed candidate and checks it delivers the gain it promised (it failed before the fix). The Simulation workbench (design B) found it by trying the swap.
-- **To check, not changed:** `tempestKeepBosses.ts` tags Gloves of the Searing Grip as Caster DPS and Netherbane as Tank, yet Wowhead's Fury list ranks both, much like the Vashj helm. Warbringer Battle-Helm (Karazhan) has no boss in the app's data; the guide only says "Karazhan".
+- **Raid data (found 2026-10-11, fixed in `src/` with a test, checked by the tbc-researcher):**
+  - `tempestKeepBosses.ts` tagged Al'ar's Gloves of the Searing Grip as Caster DPS and Netherbane as Tank. The gloves are leather with Agility, Attack Power and Expertise (Feral, Retribution, Arms, Enhancement and Fury rank them, and Protection Warriors for threat), so they are now Physical DPS and Tank; Netherbane is an Agility axe only Hunters and Fury rank, so it is Physical DPS.
+  - `sampleAttunements.ts`: Tempest Keep's heroic keys needed **Revered** in Phase 2, not "Honored or better". Every chain now says it counts for the whole account on Anniversary realms, and the notes record that Blizzard staff ended the SSC and TK attunements when Phase 3 opened on 2026-08-27 (Karazhan's removal is reported only by secondary sources). Serpentshrine's Reservoir Key line drops the unsupported "or a guild member who is".
+- **To check, not changed:** Warbringer Battle-Helm (Karazhan) has no boss in the app's data; the guide only says "Karazhan". The gloves' overlay in `sampleItems.ts` still carries a stale "stats are approximate" note and its `needsVerification` flag, though its boss and stats now check out.
 - **Also noted:** `craftingPaths.json` marks some starter recipes, such as Rough Sharpening Stone, as not trainer-taught. That looks wrong.
 
 ## Known gaps
 
 - Without JavaScript:
-  - The Raids page shows only Serpentshrine Cavern.
+  - The Raids page needs it (it shows a note).
   - Raid Composition's per-group buffs don't appear.
   - Profession pages don't open.
 - Change character, Export image and paste-import are stubs in the prototype.

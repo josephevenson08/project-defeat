@@ -14,8 +14,10 @@ import type { AttunementChain } from './raidTypes'
  * Gruul's Lair and Magtheridon's Lair have no chains here because they have none in the game — both
  * open to any level 70 raid, which is why they are where a fresh 25-player group starts.
  *
- * Blizzard removed these attunements in patch 2.4 on previous Classic runs. They are required during
- * Phase 2, but the exact patch where they are dropped on Anniversary realms is flagged as unverified.
+ * All three are required during Phase 2, the phase this app targets (2026-05-14 on Anniversary realms).
+ * Blizzard staff confirmed that the SSC and TK attunements stopped being required when Phase 3 opened on
+ * 2026-08-27; secondary sources say Karazhan's went at the same time, but no Blizzard text names it. On
+ * Anniversary realms an attunement counts for every character on the Battle.net account.
  */
 export const sampleAttunements: readonly AttunementChain[] = [
   {
@@ -113,10 +115,11 @@ export const sampleAttunements: readonly AttunementChain[] = [
         notes: 'Wowhead quest 9837, rewarding item 24490.',
       },
     ],
-    reward: "The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on.",
+    reward:
+      "The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on. On Anniversary realms it counts for every character on your account.",
     needsVerification: true,
     notes:
-      'Quest names, ids, givers and objectives read from Wowhead\'s TBC Classic quest pages (9824, 9825, 9826, 9829, 9831, 9832, 9836, 9837) and cross-checked against the Icy Veins attunement guide, which agrees on the order and the fragment locations. Flagged because two things are not settled by those sources: the exact level the chain requires (Karazhan opens at 68, and the quests are listed as level 70), and whether Anniversary realms drop this attunement in 2.4 as previous Classic runs did.',
+      'Quest names, ids, givers and objectives read from Wowhead\'s TBC Classic quest pages (9824, 9825, 9826, 9829, 9831, 9832, 9836, 9837) and cross-checked against the Icy Veins attunement guide, which agrees on the order and the fragment locations. Flagged because two things are not settled by those sources: the exact level the chain requires (Karazhan opens at 68, and the quests are listed as level 70), and when Anniversary realms dropped it. It was required in Phase 2; secondary sources report it removed when Phase 3 opened on 2026-08-27, but no Blizzard text names Karazhan.',
   },
   {
     id: 'serpentshrine-cavern-attunement',
@@ -126,7 +129,7 @@ export const sampleAttunements: readonly AttunementChain[] = [
       'A short chain by TBC standards — two raid items and a walk back to a heroic dungeon — but it is expensive because both items come from Phase 1 raid bosses, one of which (Nightbane) needs its own quest chain and Violet Eye reputation before it can even be summoned.',
     prerequisites: [
       'Level 70.',
-      'Revered with Cenarion Expedition, or a guild member who is, to obtain the Reservoir Key for Heroic Coilfang dungeons.',
+      'Revered with Cenarion Expedition, for the Reservoir Key that opens the Heroic Coilfang dungeons. On Anniversary realms the key is shared across your account: once one character is Revered, the others buy it at Friendly.',
       'A raid group able to kill Gruul the Dragonkiller (25-player).',
       'A Karazhan group with someone who holds the Blackened Urn, which requires Honored with The Violet Eye and the Medivh\'s Journal quest chain.',
     ],
@@ -167,10 +170,10 @@ export const sampleAttunements: readonly AttunementChain[] = [
         difficulty: 'Heroic',
       },
     ],
-    reward: 'The Mark of Vashj — permanent access to Serpentshrine Cavern.',
+    reward: 'The Mark of Vashj — permanent access to Serpentshrine Cavern. On Anniversary realms it counts for every character on your account.',
     needsVerification: true,
     notes:
-      'Step order and requirements are cross-checked against two guide sources. The one point not verified for Anniversary realms specifically is whether Blizzard has changed the Reservoir Key reputation requirement from its original Revered gate.',
+      "Step order and requirements are cross-checked against two guide sources. The Reservoir Key stayed at Revered with Cenarion Expedition through Phase 2 (Warcraft Tavern's attunement and Cenarion Expedition guides). Blizzard staff confirmed this attunement stopped being required when Phase 3 opened on 2026-08-27.",
   },
   {
     id: 'tempest-keep-attunement',
@@ -182,7 +185,7 @@ export const sampleAttunements: readonly AttunementChain[] = [
       'Level 70.',
       'The Cipher of Damnation questline in Shadowmoon Valley completed — A\'dal will not offer the trials until it is done.',
       'Key to the Arcatraz, which itself requires the Shattered Halls, Steamvault, and Botanica/Mechanar key chains.',
-      'Heroic keys for Hellfire Citadel, Coilfang Reservoir, Auchindoun, and Tempest Keep (Honored or better with the relevant factions).',
+      'Heroic keys for Hellfire Citadel, Coilfang Reservoir, Auchindoun, and Tempest Keep (Revered with each of the relevant factions in Phase 2).',
       'A raid group able to kill Magtheridon (25-player).',
     ],
     steps: [
@@ -230,10 +233,11 @@ export const sampleAttunements: readonly AttunementChain[] = [
         notes: 'Completing this step also grants the "Hand of A\'dal" title.',
       },
     ],
-    reward: "The Tempest Key (access to The Eye), the Phoenix-fire Band, and the \"Hand of A'dal\" title.",
+    reward:
+      "The Tempest Key (access to The Eye), the Phoenix-fire Band, and the \"Hand of A'dal\" title. On Anniversary realms the attunement counts for every character on your account.",
     needsVerification: true,
     notes:
-      "Step order and objectives are cross-checked against two guide sources. Unverified for Anniversary realms: whether the Cipher of Damnation prerequisite is still enforced before A'dal offers the trials, and whether the Hand of A'dal title is still awarded on this patch.",
+      "Step order and objectives are cross-checked against two guide sources. The heroic keys needed Revered with each faction through Phase 2, not Honored as this file said until 2026-10-11. Blizzard staff confirmed this attunement stopped being required when Phase 3 opened on 2026-08-27. Unverified for Anniversary realms: whether the Cipher of Damnation prerequisite is still enforced before A'dal offers the trials, and whether the Hand of A'dal title is still awarded on this patch.",
   },
 ]
 

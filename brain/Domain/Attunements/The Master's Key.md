@@ -48,7 +48,7 @@ Eight quests that cross two continents and four dungeons, and the longest attune
 
 ## Reward
 
-The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on.
+The Master's Key — permanent access to Karazhan, and the gate every later Phase 2 attunement is built on. On Anniversary realms it counts for every character on your account.
 
 Related: [[Attunement]]
 
