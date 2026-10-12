@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**462 commits across 74 days**, from 2026-06-25 to 2026-10-12.
+**463 commits across 74 days**, from 2026-06-25 to 2026-10-12.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_35 commits_
+_36 commits_
 
-### Monday 12 October — 2 commits
+### Monday 12 October — 3 commits
 
 - Make the Raids tab a boss journal, with who in your raid wants each drop — [`4ced560`](https://github.com/josephevenson08/project-defeat/commit/4ced560086d100e5c86a131ef6a5080323320b20)
 - Make the Spec Tier Lists tab a tier board, with the logs beside it — [`0b6e00f`](https://github.com/josephevenson08/project-defeat/commit/0b6e00f68b3bb42256ed724b09cfaf96a4b985f1)
+- Make the Professions tab the game's profession window, with which two to take — [`206c0a7`](https://github.com/josephevenson08/project-defeat/commit/206c0a7b27561e64cd94a1d585e66ca19285c9a1)
 
 ### Sunday 11 October — 4 commits
 
