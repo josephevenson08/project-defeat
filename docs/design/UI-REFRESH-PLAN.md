@@ -1,7 +1,7 @@
 # UI refresh: plan
 
-**Status: planned, not started.** Written 2026-10-02 and waiting on the owner's go-ahead. Nothing in
-the app has changed yet.
+**Status: folded into [`PORT-PLAN.md`](PORT-PLAN.md) on 2026-10-12.** Written 2026-10-02 and never started. The port
+plan says which items it takes up and which it drops; read that instead.
 
 This plan turns the [gaming UI research](../research/gaming-ui/README.md) (25 platforms, 2024 to
 2026, every claim cited) into work on Project Defeat. Each item names the recommendation it comes

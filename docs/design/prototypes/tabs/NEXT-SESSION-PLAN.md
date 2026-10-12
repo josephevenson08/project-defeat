@@ -1,6 +1,17 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-12, late): Professions decided and built, the walkthrough complete; start here
+## ▶ Where we left off (2026-10-12, end of day): the port plan is approved; start here
+
+**Next: build step 0 of [`docs/design/PORT-PLAN.md`](../../PORT-PLAN.md)**, the foundation, then Spec Tier Lists. The owner approved the plan on 2026-10-12:
+- **Look:** option C. The prototypes' look comes first (glass panels, Marcellus and Figtree, a colour per tab, game tooltips) with a still backdrop in each tab's colour. The 3D scene is the last step, as an optional lazy-loaded layer.
+- **Order:** step 0 foundation, then Spec Tier Lists, Raids, Professions, Simulation, Raid Composition, the Character Planner (one sub-tab per commit), then the scene.
+- **Pushing:** ask before each push.
+- **Maps:** the owner wants the zone maps reworked to show current TBC maps and nodes, and the route algorithm redone. Write that as its own plan before step 3 (the port plan's Decision 2 lists what to research).
+- The old `UI-REFRESH-PLAN.md` is folded into the port plan.
+
+Nothing was built from the plan: the owner was close to their usage limit.
+
+## Where we left off (2026-10-12, late): Professions decided and built, the walkthrough complete
 
 **The Professions tab is decided and built into `professions.html`:** design A, the profession window (every recipe on the path to 375 coloured at your skill, its reagents and vendor prices; each gathering range with its route on a plain grid), with design B's comparison behind a "Level it / Which two" switch (every profession by what it gives a level 70 character and makes for your spec, and a pair to pick). C, the road to 375, was not picked. Details are in the [README](README.md#professions-the-profession-window-and-which-two-to-take-2026-10-12).
 - **It reads the live app's data:** `gen-prof-data.mjs` → `prof-data.js`. No live-app change. Routes on a plain grid, no zone map art (the owner's choice).
@@ -9,7 +20,7 @@
 
 **With it, every tab of the walkthrough is decided.** Next is the owner's call.
 
-**Then two data cleanups (2026-10-12, committed and pushed):** the gloves' stale note, flag and made-up stats are gone from `sampleItems.ts`, and the crafting paths now know which recipes a trainer teaches (Wowhead's code 2 is a drop; a training cost, code 6 or a skill-1 starter counts), which swapped a few recipes in five paths. Tests added; the full suite passed 302 of 302.
+**Then two data cleanups (2026-10-12, committed and pushed as `b806f06`, then "Refresh the daily log" `40bc023`):** the gloves' stale note, flag and made-up stats are gone from `sampleItems.ts`, and the crafting paths now know which recipes a trainer teaches (Wowhead's code 2 is a drop; a training cost, code 6 or a skill-1 starter counts), which swapped a few recipes in five paths. Tests added; the full suite passed 302 of 302.
 
 **Still open:** the app's buff data leaves out caster-side debuffs and mana (Shadow Priest's, for one).
 

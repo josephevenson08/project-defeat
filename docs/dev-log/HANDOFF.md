@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-11.** A self-contained brief for picking
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-12.** A self-contained brief for picking
 this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The exact
@@ -10,18 +10,32 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ---
 
-## Where this is right now (2026-10-12, late — READ THIS FIRST)
+## Where this is right now (2026-10-12, end of day — READ THIS FIRST)
+
+### For the next chat, in one paragraph
+
+**The prototype walkthrough is finished:** every tab has a decided design, and all of it is committed and pushed. The last commit on `main` is `40bc023`. **The next job is bringing those designs into the live app,** following [`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), which the owner approved on 2026-10-12:
+- **Look:** option C, the prototypes' look first with a still backdrop per tab, and the 3D scene last as an optional layer.
+- **Order:** step 0 (the foundation) first, then Spec Tier Lists.
+- **Pushing:** ask before each push.
+- **The owner's suggestion for the maps:** rework the Professions zone maps to show current TBC maps and node locations, and redo the route algorithm. Write that as its own plan (the port plan's Decision 2 lists what to research) before the port reaches Professions.
+
+**Not committed yet:** `docs/design/PORT-PLAN.md` (new), the "folded into the port plan" status line in `docs/design/UI-REFRESH-PLAN.md`, this file and `NEXT-SESSION-PLAN.md`. Ask the owner whether to commit and push them; they usually say yes.
 
 ### In short
 
-- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (`0b6e00f`, then "Refresh the daily log" `e509e9e`). **Professions is committed and pushed too** (`206c0a7`, then "Refresh the daily log" `9b0e0e9`, the last commit on `main`). With it, every tab of the walkthrough is decided. `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
+- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (`0b6e00f`, then "Refresh the daily log" `e509e9e`). **Professions is committed and pushed too** (`206c0a7`, then "Refresh the daily log" `9b0e0e9`). With it, every tab of the walkthrough is decided. `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
 - **The live app** (`src/`) deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/. It changed four times from 2026-10-10 to 12, all from the prototype work: the data and rule fixes (`9be91c1`), the upgrade finder's two-hander bug (`260b92d`), a new front door (`a8fb27b`), and with the Raids step two loot role tags and the attunement text (below).
 - **The rest of the work is a UI redesign,** as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published at https://josephevenson08.github.io/project-defeat/prototypes/. It is walked through tab by tab: three designs per step, and the owner picks one, often with a feature borrowed from another.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 
-### Next: ask the owner
+### Next: the port to the live app (approved 2026-10-12)
 
-**Two data cleanups are done, committed and pushed (2026-10-12):** Gloves of the Searing Grip's stale note, flag and made-up stats are gone from `sampleItems.ts` (the counted comments now read 119 and 141), and the crafting paths now know which recipes a trainer teaches (`compute-leveling-paths.mjs`: Wowhead's code 2 is a drop, not a trainer; a training cost, code 6 or a skill-1 starter counts), which changed a few recipes in five paths. Tests added (the full suite passed 302 of 302); details in `tabs/README.md` under "Data corrections".
+**The plan is [`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), approved by the owner on 2026-10-12.** Option C for the look (the prototypes' look first with a still backdrop, the 3D scene last as an optional lazy-loaded layer), then the tabs in order: step 0 the foundation, then Spec Tier Lists, Raids, Professions, Simulation, Raid Composition and the Character Planner (one sub-tab per commit), and last the scene. Ask before each push. **Start with step 0.** Before step 3, write a separate plan for the owner's maps rework: current TBC zone maps and nodes, and a redone route algorithm (see the plan's Decision 2). The old `UI-REFRESH-PLAN.md` is folded into the port plan.
+
+**The owner was close to their usage limit when this was written (2026-10-12),** so nothing was built from the plan.
+
+**Two data cleanups are done, committed and pushed (2026-10-12, `b806f06`, then "Refresh the daily log" `40bc023`, the last commit on `main`):** Gloves of the Searing Grip's stale note, flag and made-up stats are gone from `sampleItems.ts` (the counted comments now read 119 and 141), and the crafting paths now know which recipes a trainer teaches (`compute-leveling-paths.mjs`: Wowhead's code 2 is a drop, not a trainer; a training cost, code 6 or a skill-1 starter counts), which changed a few recipes in five paths. Tests added (the full suite passed 302 of 302); details in `tabs/README.md` under "Data corrections".
 
 **Every tab of the walkthrough is decided** (Professions was the last, 2026-10-12). What comes next is the owner's call. Open items they could pick from are listed under "Open items, not started" below.
 
