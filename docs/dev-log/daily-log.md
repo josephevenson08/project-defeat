@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**465 commits across 74 days**, from 2026-06-25 to 2026-10-12.
+**467 commits across 74 days**, from 2026-06-25 to 2026-10-12.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,15 +13,17 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_38 commits_
+_40 commits_
 
-### Monday 12 October — 5 commits
+### Monday 12 October — 7 commits
 
 - Make the Raids tab a boss journal, with who in your raid wants each drop — [`4ced560`](https://github.com/josephevenson08/project-defeat/commit/4ced560086d100e5c86a131ef6a5080323320b20)
 - Make the Spec Tier Lists tab a tier board, with the logs beside it — [`0b6e00f`](https://github.com/josephevenson08/project-defeat/commit/0b6e00f68b3bb42256ed724b09cfaf96a4b985f1)
 - Make the Professions tab the game's profession window, with which two to take — [`206c0a7`](https://github.com/josephevenson08/project-defeat/commit/206c0a7b27561e64cd94a1d585e66ca19285c9a1)
 - Tell the crafting paths which recipes a trainer teaches, and clear the gloves' stale note — [`b806f06`](https://github.com/josephevenson08/project-defeat/commit/b806f063243ae436cee45170f38f9e4f66e67a2b)
 - Plan the port of the decided designs into the live app — [`0a9f90f`](https://github.com/josephevenson08/project-defeat/commit/0a9f90f21c2f7ac909840863ed0e4fe3d322db50)
+- Plan the rework of the gathering maps and routes — [`9ee4d7f`](https://github.com/josephevenson08/project-defeat/commit/9ee4d7ffa9da1ed24e6e522e54bd15bb0b1ef167)
+- Give the app the decided look: glass, new type and a colour per tab — [`fca3cfe`](https://github.com/josephevenson08/project-defeat/commit/fca3cfeeb385b9774915e08b3358f7c3091df75b)
 
 ### Sunday 11 October — 4 commits
 
