@@ -111,8 +111,10 @@ The original plan:
   Outland zones and Quel'Danas (it said three); Ragveil's reason is spelled out; Dark Iron, Ghost Mushroom, Gromsblood,
   Plaguebloom and Bloodthistle are named in their ranges, marked as not in our node data.
 
-**Ways to get the data, for the owner to choose:**
-1. **Wait and retry** the ingest now and then; nothing else changes until it works.
+**Ways to get the data.** **The owner chose the first (2026-10-13): wait and retry**, keeping today's data, and carry on
+with other work in the meantime. The other two stay here in case retrying keeps failing.
+1. **Wait and retry** the ingest now and then (`node tools/ingest/ingest-node-spawns.mjs`; it writes nothing unless
+   every node resolves); nothing else changes until it works.
 2. **Use pfQuest-tbc's CMaNGOS data** (`shagu/pfQuest`, `db/objects-tbc.lua`, on raw.githubusercontent.com). The
    addon is MIT, but its TBC data comes from CMaNGOS's `tbc-db`, which is GPL-3.0, and this repo is MIT, so the licence
    question has to be settled first. It has fewer points (no near-duplicates) and no Ragveil, Flame Cap or Ancient Lichen
