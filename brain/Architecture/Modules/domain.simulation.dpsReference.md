@@ -53,6 +53,9 @@ From the top of the file:
 ## Imported by
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
+- [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
+- [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 
 ## Concepts & phases
 

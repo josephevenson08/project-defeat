@@ -7,6 +7,7 @@
     "note": "Tier letters and spec placements only. Wowhead's per-spec analysis and tier definitions are their authored prose and are deliberately not copied; each list carries sourceUrl instead."
   },
   "generatedBy": "tools/ingest/ingest-tier-lists.mjs",
+  "fetchedAt": "2026-08-12",
   "listCount": 3,
   "placementCount": 28,
   "specsCovered": 27,

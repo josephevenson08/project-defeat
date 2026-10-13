@@ -15,7 +15,7 @@ _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `getPlacementsForSpec`, `getTierList`, `SpecPlacement`, `SpecTierList`, `specTierLists`, `SpecTierPlacement`, `TierListRole`, `tierListRoles`, `TierRow`
+**re-export** — `getPlacementsForSpec`, `getTierList`, `SpecPlacement`, `SpecTierList`, `specTierLists`, `SpecTierPlacement`, `TierListRole`, `tierListRoles`, `tierListsFetchedAt`, `TierRow`
 
 ## Imports
 
@@ -25,6 +25,10 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
+- [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
+- [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
+- [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
+- [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

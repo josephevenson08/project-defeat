@@ -25,7 +25,8 @@ _None._
 
 ## Imported by
 
-_None._
+- [[App]] — `src/App.tsx`
+- [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 
 ## Concepts & phases
 

@@ -40,7 +40,10 @@ From the top of the file:
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
-- [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
+- [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
+- [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
+- [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
+- [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases
 

@@ -41,6 +41,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.abilities.index]] — `src/domain/abilities/index.ts`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 
 ## Concepts & phases
 

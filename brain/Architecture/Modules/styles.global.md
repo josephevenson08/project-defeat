@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/styles/global.css
-lines: 7849
+lines: 8505
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # styles.global
 
-`src/styles/global.css` · **app** layer · 7849 lines
+`src/styles/global.css` · **app** layer · 8505 lines
 
 _No doc comment at the top of this file._
 

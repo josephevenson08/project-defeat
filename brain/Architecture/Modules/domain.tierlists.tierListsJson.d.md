@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/tierlists/tierListsJson.d.ts
-lines: 17
+lines: 19
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.tierlists.tierListsJson.d
 
-`src/domain/tierlists/tierListsJson.d.ts` · **domain** layer · 17 lines
+`src/domain/tierlists/tierListsJson.d.ts` · **domain** layer · 19 lines
 
 _No doc comment at the top of this file._
 

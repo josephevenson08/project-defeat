@@ -19,6 +19,13 @@ const ROLE_ORDER: readonly TierListRole[] = ['DPS', 'Healer', 'Tank']
 
 export const specTierLists = rawTierLists.lists as readonly SpecTierList[]
 
+/**
+ * When the three pages were fetched, as an ISO date: what the source line under the top bar prints.
+ * The ingest writes it from its cached pages' dates; the lists committed on 2026-08-12 carry that
+ * day, the date of the commit that generated them.
+ */
+export const tierListsFetchedAt: string | undefined = rawTierLists.fetchedAt
+
 export function getTierList(role: TierListRole): SpecTierList | undefined {
   return specTierLists.find((list) => list.role === role)
 }

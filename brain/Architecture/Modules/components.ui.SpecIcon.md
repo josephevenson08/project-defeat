@@ -25,7 +25,9 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
-_None._
+- [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
+- [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
+- [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases
 

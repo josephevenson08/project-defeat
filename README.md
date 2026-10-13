@@ -80,48 +80,27 @@ spec's BiS list, `/whodrops`, `/loot karazhan`, `/attune`, `/farm fel iron`, and
 upgrades from your in-game export. It will run on a Raspberry Pi. See the
 [plan](discord-bot/PLAN.md).
 
-## Coming next: a UI refresh
+## The redesign: being brought into the app
 
 Research into how 25 gaming companies and player tools design their sites in 2024–2026
-([findings](docs/research/gaming-ui/README.md)) led to a [plan](docs/design/UI-REFRESH-PLAN.md),
-then to clickable [design prototypes](docs/design/prototypes/README.md) of every tab. Their animation
-is tuned to TBC by [this research](docs/research/wow-tbc-motion/README.md). **Try them:** the
+([findings](docs/research/gaming-ui/README.md)) led to clickable [design prototypes](docs/design/prototypes/README.md)
+of every tab, walked through with the owner one tab at a time, three designs per step. Their animation is tuned to
+TBC by [this research](docs/research/wow-tbc-motion/README.md). **Try them:** the
 [prototype gallery](https://josephevenson08.github.io/project-defeat/prototypes/) is published beside the app.
 
-### Picking the work back up
+**Every tab's design is decided** (2026-10-12), and the decided designs are now going into the live app, following
+the [port plan](docs/design/PORT-PLAN.md):
 
-The prototype work was last updated on 2026-10-10. **Continue from
-[`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md)**:
-the top section says where things stand and what's next. In short:
+| Step | What | State |
+| --- | --- | --- |
+| 0 | **The look:** dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase on every screen | Done, 2026-10-12 |
+| 1 | **Spec Tier Lists:** a board of spec icons from Wowhead's three lists, a card for any spec, and a switch to Wowhead's tiers against what players actually parse (archon.gg) | Done, 2026-10-12 |
+| 2 | **Raids:** a boss journal with your spec's picks, and who in your raid wants each drop | Next |
+| 3 | **Professions:** the game's profession window, and which two to take | After a [maps rework](docs/design/MAPS-PLAN.md): the zone maps are post-Cataclysm art under TBC coordinates |
+| 4–6 | Simulation, Raid Composition, then the Character Planner one sub-tab at a time | Planned |
+| 7 | The 3D crystal-and-water scene, as an optional layer | Last |
 
-1. **Backgrounds: done.** Every tab now has its own colour over the original crystal and water, and
-   the Dark Portal designs are dropped.
-2. **Raid Composition: done.** Design A's planning table was picked, made dark, and given a
-   click-to-fill palette of spec icons. It was browser-tested control by control.
-3. **Gallery: done.** The [prototype gallery](docs/design/prototypes/index.html) shows the current
-   tabs first. The tabs no longer use a full-screen curtain between them.
-4. **Character Planner, Gear: done.** It's a character sheet with game-style tooltips, plus a
-   "What's left" checklist that says which upgrades, enchants and gems are missing and where they drop.
-5. **Character Planner, Compare: done.** Your item's tooltip sits next to another's, with the trade summed up in
-   one sentence.
-6. **Character Planner, Talents and Buffs: done.** The game's talent window with a list of what a build
-   breaks, and the buffs your raid actually brings, as clickable icons.
-7. **Character Planner, Ranked Gear and Build: done.** Wowhead's order slot by slot as tooltips, or by where
-   each item drops with your upgrades marked; and a share link that opens the same character in the live app, with
-   a paste box that shows what came in before it loads anything.
-8. **Each tab's text accents follow its colour, and the gallery is always dark.**
-9. **Simulation: done.** It runs the app's own simulator on your planner character: stat priority, best upgrades,
-   then the estimate and how far to trust it. Building it found (and fixed) a bug in the app's upgrade finder.
-10. **The live app's front door: done.** Each section's door shows a glimpse of what's inside and the job it does,
-    Simulation has its own door, and the import sits beside the Character Planner.
-11. **Raids: done.** A boss journal, one boss at a time, with your spec's picks ranked from Wowhead's lists, and a
-    switch to your raid: who in it wants each drop. Building it corrected two loot tags and an attunement
-    requirement in the app.
-12. **Spec Tier Lists: done.** A board of spec icons from Wowhead's three lists, a card for any spec, and a switch
-    to Wowhead's tiers against what players actually parse (archon.gg's logs).
-13. **Professions: done.** The game's profession window, with every recipe on the path to 375 coloured at your
-    skill, and a switch to which two to take, led by what each makes for your spec.
-14. **Every tab of the walkthrough is decided.** What comes next is the owner's call.
+**To pick the work back up,** read the top of [`docs/dev-log/HANDOFF.md`](docs/dev-log/HANDOFF.md).
 
 The app stays on Phase 2 on purpose, even though Phase 3 is live.
 

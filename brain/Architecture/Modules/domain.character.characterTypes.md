@@ -56,6 +56,7 @@ _No doc comment at the top of this file._
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
 - [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 - [[domain.tierlists.tierListTypes]] — `src/domain/tierlists/tierListTypes.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
@@ -70,6 +71,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
+- [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases
 

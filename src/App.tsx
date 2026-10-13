@@ -35,7 +35,10 @@ import { calculateStats } from './features/stats/calculateStats'
 import { StatBar } from './features/stats/StatBar'
 import { ProfessionsPanel } from './features/professions/ProfessionsPanel'
 import { RaidCompositionPanel } from './features/raidcomp/RaidCompositionPanel'
-import { TierListsPanel } from './features/tierlists/TierListsPanel'
+import { TierListsPanel, type TierListsView } from './features/tierlists/TierListsPanel'
+import { tierListSources } from './features/tierlists/tierFormat'
+import type { SpecRef } from './domain/tierlists/specStanding'
+import { Provenance } from './components/ui/Provenance'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import { RaidPicker } from './features/raids/RaidPicker'
 import { RaidRail } from './features/raids/RaidRail'
@@ -171,6 +174,9 @@ function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('planner')
   // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
   const [plannerView, setPlannerView] = useState<PlannerView>('gear')
+  // The same for Spec Tier Lists: its view and the spec whose card is open survive a visit elsewhere.
+  const [tierListsView, setTierListsView] = useState<TierListsView>('board')
+  const [tierListsSpec, setTierListsSpec] = useState<SpecRef>()
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
 
   const [gear, setGear] = useState<EquippedGear>(emptyGear)
@@ -504,6 +510,8 @@ function App() {
       tabs={visibleTabs(simulationEnabled)}
       activeTab={currentTab}
       onTabChange={changeSection}
+      // Each ported tab names where its numbers come from, on the line under the top bar.
+      provenance={currentTab === 'tierlists' ? <Provenance sources={tierListSources} /> : undefined}
       onHome={() => {
         // Back to the front door, keeping everything: the character, the gear and which section you
         // were in are session state, and the doors lead straight back to them.
@@ -566,7 +574,15 @@ function App() {
           Warrior on the lists for someone who never picked it would answer "where do I stand" with a
           spec they never named. */}
       {currentTab === 'raidcomp' && <RaidCompositionPanel />}
-      {currentTab === 'tierlists' && <TierListsPanel highlight={characterChosen ? character : undefined} />}
+      {currentTab === 'tierlists' && (
+        <TierListsPanel
+          highlight={characterChosen ? character : undefined}
+          view={tierListsView}
+          onViewChange={setTierListsView}
+          selected={tierListsSpec}
+          onSelect={setTierListsSpec}
+        />
+      )}
       {currentTab === 'raids' &&
         (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
       {currentTab === 'professions' && (

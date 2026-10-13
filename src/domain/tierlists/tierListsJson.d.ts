@@ -1,6 +1,8 @@
 
 declare module "*/tierLists.json" {
   const tierLists: {
+    /** When the three pages were fetched from Wowhead, as an ISO date. */
+    fetchedAt?: string
     listCount: number
     placementCount: number
     specsCovered: number

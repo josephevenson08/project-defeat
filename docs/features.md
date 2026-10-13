@@ -66,8 +66,12 @@ behind every claim of its that quotes a number.
   price — reagents from Wowhead's `created-by-spell` data, vendor prices from `sold-by`, so a robe
   reads "15x Primal Fire" and a trinket reads "41x Badge of Justice" on the row that recommends it.
   The two that do not are the Violet Signet rings, which no vendor sells
-- Spec Tier Lists section: Wowhead's Phase 2 DPS, healer and tank rankings, 28 placements covering all
-  27 specs, with the current character's spec marked on every list it appears on. Tier letters and
+- **Spec Tier Lists section** (the decided design, ported 2026-10-12): Wowhead's Phase 2 DPS, healer and
+  tank rankings as a board of spec icons in class colours, 28 placements covering all 27 specs, with
+  your spec marked on every list it appears on. Press any spec for its card: its place on every list,
+  archon.gg's observed DPS and tier, what it brings to a raid (the same counting Raid Composition uses),
+  its signature ability, and how many of it are in your saved raid. A switch shows Wowhead's tiers
+  against the logs for the 20 damage specs (they agree on 9), sortable either way. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
 - **Raid Composition section**: a seating chart for a 10 or 25-player raid — five groups of five,

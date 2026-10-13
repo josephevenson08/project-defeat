@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/tierlists/tierLists.ts
-lines: 48
+lines: 55
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.tierlists.tierLists
 
-`src/domain/tierlists/tierLists.ts` · **domain** layer · 48 lines
+`src/domain/tierlists/tierLists.ts` · **domain** layer · 55 lines
 
 From the top of the file:
 
@@ -28,7 +28,7 @@ From the top of the file:
 
 **function** — `getPlacementsForSpec`, `getTierList`
 
-**const** — `specTierLists`, `tierListRoles`
+**const** — `specTierLists`, `tierListRoles`, `tierListsFetchedAt`
 
 ## Imports
 
@@ -38,6 +38,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.tierlists.index]] — `src/domain/tierlists/index.ts`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 
 ## Concepts & phases
 

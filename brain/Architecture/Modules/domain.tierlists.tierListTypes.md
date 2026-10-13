@@ -32,6 +32,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.tierlists.index]] — `src/domain/tierlists/index.ts`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[domain.tierlists.tierLists]] — `src/domain/tierlists/tierLists.ts`
 
 ## Concepts & phases

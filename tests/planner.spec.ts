@@ -3188,14 +3188,15 @@ test('the tier list view shows all three lists and marks the current spec on eve
   await expect(page.getByRole('region', { name: 'Tank tier list' })).toBeVisible()
 
   // Marked twice, at two different tiers, which is the whole point of the (role, spec) keying.
-  const marked = page.locator('.tier-spec[data-current]')
+  const marked = page.locator('.tier-tile[data-current]')
   await expect(marked).toHaveCount(2)
-  await expect(page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-row[data-depth="3"] .tier-spec[data-current]')).toHaveCount(1)
-  await expect(page.getByRole('region', { name: 'Tank tier list' }).locator('.tier-row[data-depth="0"] .tier-spec[data-current]')).toHaveCount(1)
+  await expect(page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-row[data-depth="3"] .tier-tile[data-current]')).toHaveCount(1)
+  await expect(page.getByRole('region', { name: 'Tank tier list' }).locator('.tier-row[data-depth="0"] .tier-tile[data-current]')).toHaveCount(1)
 
-  // Named in words, not signalled by the accent alone — the role hues are muted enough that an 11px
-  // label set in one would miss AA, and a colour-only mark would fail SC 1.4.1 regardless.
-  await expect(marked.first().locator('.tier-spec-you')).toHaveText('Your spec')
+  // Named in words, not signalled by the accent alone: a "You" tag on the tile, and "your spec" in its
+  // name, since a colour-only mark would fail SC 1.4.1.
+  await expect(marked.first().locator('.tier-you')).toHaveText('You')
+  await expect(marked.first()).toHaveAccessibleName(/, your spec$/)
 
 })
 
@@ -3211,8 +3212,8 @@ test('no spec is marked on the tier lists until a character has been chosen', as
   await page.getByTestId('section-tierlists').click()
 
   await expect(page.getByRole('region', { name: 'DPS tier list' })).toBeVisible()
-  await expect(page.locator('.tier-spec[data-current]')).toHaveCount(0)
-  await expect(page.locator('.tier-spec-you')).toHaveCount(0)
+  await expect(page.locator('.tier-tile[data-current]')).toHaveCount(0)
+  await expect(page.locator('.tier-you')).toHaveCount(0)
 })
 
 test('tier letters stay out of the item quality palette', async ({ page }) => {
@@ -3264,17 +3265,16 @@ test('tier letters stay out of the item quality palette', async ({ page }) => {
     expect(saturation, `${name} must stay well clear of the neutral bound`).toBeGreaterThan(NEUTRAL_MAX)
   }
 
-  // And the ramp has to actually distinguish all five tiers. Five tiers against four text tokens is
-  // why the rule beside each row steps down half a beat after the ink does; without that, B and C
-  // rendered identically, which a measurement of the running page is what caught.
+  // And the ramp has to actually distinguish all five tiers. Since the 2026-10-12 board the letter's
+  // box carries the rank with its ink: the top tier boldest, each step lighter, the bottom two dashed
+  // and dotted. Without the last step, C and D would draw identically.
   const steps = await page
     .getByRole('region', { name: 'DPS tier list' })
     .locator('.tier-row')
     .evaluateAll((rows) =>
       rows.map((row) => {
-        const ink = getComputedStyle(row.querySelector('.tier-letter')!).color
-        const rule = getComputedStyle(row.querySelector('.tier-row-label')!).borderLeftColor
-        return `${ink}|${rule}`
+        const box = getComputedStyle(row.querySelector('.tier-letter')!)
+        return `${box.color}|${box.borderTopColor}|${box.borderTopStyle}|${box.borderTopWidth}`
       }),
     )
   expect(new Set(steps).size, 'each tier should be visually distinct from the others').toBe(5)

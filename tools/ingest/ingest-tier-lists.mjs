@@ -23,7 +23,7 @@
 // publishes one shared Priest healing guide — trusting the hash would file Discipline under Holy and
 // silently lose a spec.
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { registerHooks } from 'node:module'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -149,6 +149,13 @@ const placementCount = lists.reduce((n, l) => n + l.tiers.reduce((m, t) => m + t
 const covered = new Set(lists.flatMap((l) => l.tiers.flatMap((t) => t.placements.map((p) => `${p.className}|${p.spec}`))))
 const missing = tbcClasses.flatMap((c) => c.specs.map((s) => `${c.className}|${s}`)).filter((key) => !covered.has(key))
 
+// When the pages were fetched: the oldest of the three cached files, so a run over an old cache keeps
+// the old date rather than claiming the data is new. This is what the app's source line prints.
+const fetchedAt = PAGES.map((page) => statSync(resolve(CACHE, `${page.slug}.html`)).mtime)
+  .sort((a, b) => a - b)[0]
+  .toISOString()
+  .slice(0, 10)
+
 const payload = {
   $schema: 'wowhead tbc spec tier-list ingestion',
   upstream: {
@@ -158,6 +165,7 @@ const payload = {
     note: 'Tier letters and spec placements only. Wowhead\'s per-spec analysis and tier definitions are their authored prose and are deliberately not copied; each list carries sourceUrl instead.',
   },
   generatedBy: 'tools/ingest/ingest-tier-lists.mjs',
+  fetchedAt,
   listCount: lists.length,
   placementCount,
   specsCovered: covered.size,

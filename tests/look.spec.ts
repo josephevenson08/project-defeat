@@ -115,7 +115,7 @@ test('the type is the prototypes’ — Marcellus headings, Figtree text — and
 
   const family = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).fontFamily)
   expect(await family('.panel h2')).toMatch(/^"?Marcellus"?,/)
-  expect(await family('.panel-copy')).toMatch(/^"?Figtree"?,/)
+  expect(await family('body')).toMatch(/^"?Figtree"?,/)
 
   // The faces actually load, rather than the fallbacks standing in for them.
   await page.evaluate(() => document.fonts.ready)

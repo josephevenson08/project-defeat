@@ -686,6 +686,8 @@ const DESIGN_NOTES = [
 - **The top bar:** the wordmark (back to the front door, keeping the character), the sections, and under the bar the phase chip and each tab's sources.
 - **Shared parts:** \`PhaseChip\`, \`Provenance\`, \`ViewSwitch\`, \`SpecIcon\`.
 
+**Step 1, Spec Tier Lists (2026-10-12):** the tier board with a card for any spec (its place on every list, archon.gg's DPS, what it brings to a raid, its signature ability, how many are in your saved raid), and "Against the logs" behind a switch. The standings come from \`domain/tierlists/specStanding.ts\`; the tier lists now record when they were fetched.
+
 **The maps rework** has a plan of its own (\`docs/design/MAPS-PLAN.md\`): the Professions maps are retail, post-Cataclysm art under TBC coordinates, and Wowhead serves the TBC art at its own path.`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
@@ -700,6 +702,10 @@ const DESIGN_NOTES = [
       'components/ui/ViewSwitch.tsx',
       'components/ui/SpecIcon.tsx',
       'domain/phase.ts',
+      'domain/tierlists/specStanding.ts',
+      'features/tierlists/TierListsPanel.tsx',
+      'features/tierlists/TierBoard.tsx',
+      'features/tierlists/AgainstTheLogs.tsx',
     ],
     related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },

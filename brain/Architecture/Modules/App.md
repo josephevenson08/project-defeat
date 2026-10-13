@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 584
+lines: 600
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 584 lines
+`src/App.tsx` · **app** layer · 600 lines
 
 From the top of the file:
 
@@ -34,6 +34,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+- [[components.ui.Provenance]] — `src/components/ui/Provenance.tsx`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
@@ -42,6 +43,7 @@ _Nothing exported (side-effect or style module)._
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
+- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
@@ -71,6 +73,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
+- [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Imported by

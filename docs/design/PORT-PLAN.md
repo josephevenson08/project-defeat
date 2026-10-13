@@ -1,6 +1,6 @@
 # Bringing the decided designs into the live app: plan
 
-**Status: approved 2026-10-12; step 0 (the foundation) done 2026-10-12.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** ([`MAPS-PLAN.md`](MAPS-PLAN.md), see Decision 2). With step 0 the owner also chose: **the tab's colour replaces the faction theme**, **every tab takes the new look at once** (the old token names point at the new values until each tab is ported), and **the fonts are vendored** (Marcellus, Figtree and JetBrains Mono, with their licences).
+**Status: approved 2026-10-12; step 0 (the foundation) and step 1 (Spec Tier Lists) done 2026-10-12. Next: step 2, Raids.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** ([`MAPS-PLAN.md`](MAPS-PLAN.md), see Decision 2). With step 0 the owner also chose: **the tab's colour replaces the faction theme**, **every tab takes the new look at once** (the old token names point at the new values until each tab is ported), and **the fonts are vendored** (Marcellus, Figtree and JetBrains Mono, with their licences).
 
 **What step 0 put in** (see "Step 0, as built" below): the tokens and a colour and still backdrop per tab (`data-tab` on `<html>`), glass panels, the three faces, a top bar with the wordmark (back to the front door), the phase chip on every screen and a line for each tab's sources, the shared `PhaseChip`, `Provenance`, `ViewSwitch` and `SpecIcon`, the page title and link previews, and character creation fitting a phone. The game-style item tooltip moved to step 2, where its first user (the Raids loot) is.
 
@@ -95,6 +95,18 @@ Character Planner. One commit per step (one per sub-tab in step 6).
 | Fixes on the way | `global.css` | Character creation stacks on a phone (it scrolled sideways by 77px before); talent names keep to two lines; buttons are the prototypes' outlined pills; the phone top bar keeps every target at 44px. |
 
 **Tests:** `tests/look.spec.ts` (each screen's colour, the phase on every screen, the wordmark's way home, the faces and their licences, the page's title and preview, creation on a phone). The keyboard test now passes the wordmark on its way to the sections. The full suite passed 308 of 308 on Edge.
+
+## Step 1, Spec Tier Lists, as built (2026-10-12)
+
+| Part | Where | Notes |
+| --- | --- | --- |
+| Standings | `src/domain/tierlists/specStanding.ts` | Per spec: its place on each Wowhead list, archon.gg's observed DPS, rank and tier, its signature ability, and what it brings to a raid (`seatContributions`, as Raid Composition counts). "Against the logs": each disagreement in a sentence, the counts (agree 9 of 20, logs higher 3, Wowhead higher 5, Wowhead's D-tier 3) and the two notes (Feral 10th by DPS in Wowhead's C; Elemental 13th yet archon A). |
+| The tab | `src/features/tierlists/` | `TierListsPanel` (the hero, the facts, "These rank specs, not items", the switch), `TierBoard` (the three boards, a class filter, arrow keys, the sticky card), `SpecCard`, `SpecTip` with `useSpecTip` (hover, focus, Escape; a sheet on a phone), `AgainstTheLogs` (the summary, the chart sortable either way, only the disagreements, healers and tanks as Wowhead's opinion alone), `tierFormat.ts`. |
+| State | `App.tsx` | The view and the open card are kept for the session (a visit to another tab keeps them); the card opens on your spec when you have one, and waits to be asked when you don't. Your saved Raid Composition roster is counted on the card; without one the line is left out. |
+| Sources | `tierLists.json` `fetchedAt`, `ingest-tier-lists.mjs` | The line under the top bar: Wowhead's lists (ingested 12 Aug 2026, the commit that generated them; the ingest now writes the date from its cached pages) and archon.gg (read 23 Aug 2026). |
+| Letters | `global.css` | Still neutral: rank reads through the letter box (boldest at the top; C dashed, D dotted). |
+
+**Not ported:** the prototype's motion (tiles landing row by row) waits for step 7 with the scene. **Tests:** `tests/tierlists.spec.ts` (the prototype's hands-on check with its numbers, plus the roster count, the tooltip, arrow keys and a phone check), and the three older tier tests in `planner.spec.ts` follow the new markup.
 
 ## What carries over from the 2 October plan
 
