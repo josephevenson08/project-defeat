@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**471 commits across 75 days**, from 2026-06-25 to 2026-10-13.
+**472 commits across 75 days**, from 2026-06-25 to 2026-10-13.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_44 commits_
+_45 commits_
 
-### Tuesday 13 October — 2 commits
+### Tuesday 13 October — 3 commits
 
 - Make Raids the boss journal, with your raid's loot and a search — [`65d84b0`](https://github.com/josephevenson08/project-defeat/commit/65d84b08dd3c36bf2cee5465e016d9383133d815)
 - Bring the handoff up to Raids: steps 0 to 2 done, the maps decisions next — [`b094e94`](https://github.com/josephevenson08/project-defeat/commit/b094e9498464e9ccc849d08fa984da4256f1b97e)
+- Draw the gathering routes on the TBC zones, not the post-Cataclysm ones — [`4d83fd3`](https://github.com/josephevenson08/project-defeat/commit/4d83fd3b662221a95968a78722de00c94324f5b8)
 
 ### Monday 12 October — 9 commits
 
