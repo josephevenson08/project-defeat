@@ -25,11 +25,14 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[components.ui.ItemTooltip]] — `src/components/ui/ItemTooltip.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
-- [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
+- [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 
 ## Concepts & phases

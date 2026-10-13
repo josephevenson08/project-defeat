@@ -17,7 +17,7 @@ _No doc comment at the top of this file._
 
 **const** — `afflictionWarlockPhase2Bis`, `arcaneMagePhase2Bis`, `armsWarriorPhase2Bis`, `assassinationRoguePhase2Bis`, `balanceDruidPhase2Bis`, `beastMasteryHunterPhase2Bis`, `combatRoguePhase2Bis`, `demonologyWarlockPhase2Bis`, `destructionWarlockPhase2Bis`, `disciplinePriestPhase2Bis`, `elementalShamanPhase2Bis`, `enhancementShamanPhase2Bis`, `feralDruidPhase2Bis`, `fireMagePhase2Bis`, `frostMagePhase2Bis`, `furyWarriorPhase2Bis`, `holyPaladinPhase2Bis`, `holyPriestPhase2Bis`, `marksmanshipHunterPhase2Bis`, `protectionPaladinPhase2Bis`, `protectionWarriorPhase2Bis`, `restorationDruidPhase2Bis`, `restorationShamanPhase2Bis`, `retributionPaladinPhase2Bis`, `shadowPriestPhase2Bis`, `subtletyRoguePhase2Bis`, `survivalHunterPhase2Bis`
 
-**re-export** — `BisList`, `bisLists`, `excludedByPhase`, `findRaidDrop`, `getBisListForSpec`, `ItemAcquisition`, `parseRankedSource`, `raidDropIndexSize`, `RankedGearEntry`, `RankedGearSource`, `requireBisList`, `resolveAcquisition`, `UNCLASSIFIED_INSTANCES`
+**re-export** — `BisList`, `bisLists`, `bisRankingsFetchedAt`, `excludedByPhase`, `findRaidDrop`, `getBisListForSpec`, `ItemAcquisition`, `parseRankedSource`, `raidDropIndexSize`, `RankedGearEntry`, `RankedGearSource`, `requireBisList`, `resolveAcquisition`, `UNCLASSIFIED_INSTANCES`
 
 ## Imports
 
@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
 
 ## Concepts & phases
 

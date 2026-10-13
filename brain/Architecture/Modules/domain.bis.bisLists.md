@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisLists.ts
-lines: 236
+lines: 239
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisLists
 
-`src/domain/bis/bisLists.ts` · **domain** layer · 236 lines
+`src/domain/bis/bisLists.ts` · **domain** layer · 239 lines
 
 From the top of the file:
 
@@ -28,7 +28,7 @@ From the top of the file:
 
 **function** — `getBisListForSpec`, `requireBisList`
 
-**const** — `bisLists`
+**const** — `bisLists`, `bisRankingsFetchedAt`
 
 ## Imports
 

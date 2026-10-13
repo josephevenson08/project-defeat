@@ -26,7 +26,8 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
-- [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
 
 ## Concepts & phases
 

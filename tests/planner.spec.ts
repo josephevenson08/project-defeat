@@ -1877,74 +1877,48 @@ test('melee specials are layered onto white damage, and unmodelled ones say so',
   expect(hunter.result.summary, 'and it says which ceiling set the rate').toMatch(/woven one per auto shot/i)
 })
 
-test('Raids opens on a picker, then shows one raid’s loot with the rest in the rail', async ({ page }) => {
-  // The raids panel is one of three things this repo has historically shipped that nothing rendered,
-  // so this covers that it still renders — and now that it renders the right thing. The tab used to
-  // stack five raids' loot behind a boss-by-boss accordion; it now asks which raid first.
+test('Raids opens on the boss journal, one boss at a time, with every raid a press away', async ({ page }) => {
+  /*
+   * The raids panel is one of three things this repo has historically shipped that nothing rendered,
+   * so this covers that it still renders, and that it renders the decided design (2026-10-11, ported
+   * 2026-10-13): the boss journal. It replaced a picker screen, a rail of raids and a card per boss
+   * whose loot sat behind a click; the five raids are now one row of buttons in the tab's header,
+   * and the page shows one boss with its loot laid out.
+   */
   await openApp(page)
   await page.getByRole('button', { name: 'Raids', exact: true }).click()
 
-  // Picker first, and no rail yet — there is nothing to switch between until something is chosen.
-  await expect(page.getByTestId('raid-pick-serpentshrine-cavern')).toBeVisible()
-  await expect(page.locator('.rail')).toHaveCount(0)
+  const journal = page.getByTestId('journal-page')
+  await expect(journal).toBeVisible()
+  await expect(page.locator('aside.rail'), 'no rail any more').toHaveCount(0)
 
-  await page.getByTestId('raid-pick-serpentshrine-cavern').click()
+  await page.getByTestId('journal-page-lady-vashj').click()
+  await expect(page.locator('#journal-title')).toHaveText('Lady Vashj')
 
-  const detail = page.getByTestId('raid-detail')
-  await expect(detail).toBeVisible()
-  await expect(detail).toContainText('Lady Vashj')
-
-  /*
-   * **A card per encounter, and the loot behind a click on it.**
-   *
-   * This asserted the opposite until 2026-09-12, and the reversal is deliberate. Loot was expanded on
-   * arrival because the accordion before it showed nothing but a stack of identical grey headers —
-   * the page's whole subject was one click away behind rows that gave you no reason to pick any of
-   * them. The cards carry artwork, so a closed page now tells you which encounters a raid holds; what
-   * costs a click is one loot table rather than the entire point of the tab.
-   */
-  await expect(detail.locator('.raid-loot-row')).toHaveCount(0)
-  const vashj = page.getByTestId('boss-card-lady-vashj')
-  await expect(vashj).toBeVisible()
-  await expect(vashj).toHaveAttribute('aria-expanded', 'false')
-
-  await vashj.click()
-  await expect(vashj).toHaveAttribute('aria-expanded', 'true')
-
-  const opened = page.getByTestId('boss-loot-lady-vashj')
-  const firstDrop = opened.locator('.raid-loot-row').first()
+  // A loot table of names alone says what drops but not whether you want it: each drop has its
+  // icon in a quality frame and its stat line.
+  const firstDrop = journal.locator('.journal-item').first()
   await expect(firstDrop).toBeVisible()
-  await expect(firstDrop.locator('.raid-loot-frame')).toBeVisible()
-  // A loot table of names alone says what drops but not whether you want it.
-  await expect(opened.locator('.raid-loot-stats').first()).toBeVisible()
+  await expect(firstDrop.locator('.loot-icon')).toBeVisible()
+  await expect(journal.locator('.journal-item-stats').first()).toBeVisible()
 
-  // And it closes again, so the card is a toggle rather than a one-way reveal.
-  await vashj.click()
-  await expect(page.getByTestId('boss-loot-lady-vashj')).toHaveCount(0)
+  // The fight is a tab of its own, beside the loot.
+  await page.getByRole('tab', { name: 'The fight' }).click()
+  await expect(page.locator('#journal-body')).not.toBeEmpty()
+  await page.getByRole('tab', { name: 'Loot' }).click()
 
-  // Explicitly not a fight guide any more.
-  await expect(detail.locator('.raid-boss-mechanics')).toHaveCount(0)
-  await expect(detail.locator('.raid-boss-role-notes')).toHaveCount(0)
+  // Another raid is one press, and switching never leaves the page.
+  await page.getByTestId('raid-pick-tempest-keep').click()
+  await expect(page.locator('#journal-title')).toHaveText(/Al'ar|Void Reaver|Kael/)
 
-  // The other raids move to the rail, so switching never leaves the page.
-  await expect(page.getByTestId('rail-raid-tempest-keep')).toBeVisible()
-  await page.getByTestId('rail-raid-tempest-keep').click()
-  await expect(page.getByTestId('raid-detail')).toContainText(/Al'ar|Void Reaver|Kael/)
-
-  // Attunement chains are access information rather than a fight guide, so they survive the
-  // loot-only rework. Karazhan, Serpentshrine and Tempest Keep have one; the two that open to any
-  // level 70 raid do not, and the test below walks that split.
-  await page.getByRole('button', { name: 'Attunement', exact: true }).click()
-  const attunement = page.getByTestId('raid-attunement')
-  await expect(attunement).toBeVisible()
-  await expect(attunement.locator('li').first()).toBeVisible()
-
-  // And the picker is reachable again.
-  await page.getByTestId('raids-back-to-picker').click()
-  await expect(page.getByTestId('raid-pick-karazhan')).toBeVisible()
+  // Attunement chains are access information, on the raid's About page.
+  await page.getByTestId('journal-page-about').click()
+  const chain = page.getByTestId('attunement-chain')
+  await expect(chain).toBeVisible()
+  await expect(chain.locator('.journal-steps li').first()).toBeVisible()
 })
 
-test('the raid every character attunes for first has its chain, and the ones with none show no tab', async ({
+test('the raid every character attunes for first has its chain, and the ones with none say so', async ({
   page,
 }) => {
   /*
@@ -1954,18 +1928,19 @@ test('the raid every character attunes for first has its chain, and the ones wit
    * Serpentshrine's own prerequisites already assumed you had done it.
    *
    * Gruul's Lair and Magtheridon's Lair have no chain because they have none in the game. That is a
-   * fact about TBC rather than missing data, and the absence of the tab is how the app says so.
+   * fact about TBC rather than missing data, and the journal says "no attunement" rather than showing
+   * an empty chain.
    */
   await openApp(page, 'raids')
   await page.getByTestId('raid-pick-karazhan').click()
+  await page.getByTestId('journal-page-about').click()
 
-  await page.getByRole('button', { name: 'Attunement', exact: true }).click()
-  const chain = page.getByTestId('raid-attunement')
+  const chain = page.getByTestId('attunement-chain')
   await expect(chain).toBeVisible()
   await expect(chain).toContainText("The Master's Key")
 
   // Eight steps, and the ones that decide whether a group can start at all.
-  await expect(chain.locator('.raid-attunement-step')).toHaveCount(8)
+  await expect(chain.locator('.journal-steps li')).toHaveCount(8)
   await expect(chain).toContainText('Arcane Disturbances')
   await expect(chain).toContainText('Return to Khadgar')
 
@@ -1973,13 +1948,14 @@ test('the raid every character attunes for first has its chain, and the ones wit
    * The prerequisites are the point of listing them separately: the eight quests are not what makes
    * this long, the three keys you must already hold are.
    */
-  await expect(chain.locator('.raid-attunement-prereqs')).toContainText('Arcatraz')
+  await expect(chain.locator('.journal-before')).toContainText('Arcatraz')
 
-  // A raid with no attunement offers no tab at all, rather than an empty one.
-  await page.getByTestId('raids-back-to-picker').click()
+  // A raid with no attunement says so, and shows no chain at all rather than an empty one.
   await page.getByTestId('raid-pick-gruuls-lair').click()
-  await expect(page.getByRole('button', { name: 'Attunement', exact: true })).toHaveCount(0)
-  await expect(page.getByTestId('raid-detail')).toBeVisible()
+  await expect(page.getByTestId('journal-page-about')).toContainText('Getting in · no attunement')
+  await page.getByTestId('journal-page-about').click()
+  await expect(page.getByTestId('raid-about')).toBeVisible()
+  await expect(page.getByTestId('attunement-chain')).toHaveCount(0)
 })
 
 test('every attunement step says where it happens and cites what it was read from', () => {
@@ -3382,22 +3358,25 @@ test('the gear list renders real item icons rather than the placeholder glyphs',
 test('a raid loot row with no catalogued item still renders a frame', async ({ page }) => {
   await openApp(page, 'raids')
   await page.getByTestId('raid-pick-karazhan').click()
-  // Every encounter opened: the drops live behind a click on their card now, so a page left closed
-  // has no loot rows to check and this test would pass over an empty set.
-  const bossCards = page.locator('.raid-boss-card')
-  for (let index = 0; index < (await bossCards.count()); index += 1) await bossCards.nth(index).click()
 
   // 124 of the 272 raid loot entries across all five raids name an item the catalogue does not carry,
-  // which predates icons entirely — those rows have always shown "??". Real icons make the gap
-  // visible rather than causing it, and the fallback is what keeps an unresolved row from collapsing
-  // to an empty box. Not pinned to an exact count: supplementing the catalogue should lower it, and
-  // this test should track the fallback working, not the size of the backlog.
-  const rows = page.locator('.raid-loot-row')
-  expect(await rows.count()).toBeGreaterThan(0)
-
-  const icons = await page.locator('.raid-loot-frame img.item-icon').count()
-  const fallbacks = await page.locator('.raid-loot-frame .item-icon-fallback').count()
-  expect(icons + fallbacks, 'every loot row gets exactly one of the two').toBe(await rows.count())
+  // which predates icons entirely. Real icons make the gap visible rather than causing it, and the
+  // empty quality frame is what keeps an unresolved row from collapsing. Not pinned to an exact count:
+  // supplementing the catalogue should lower it, and this test should track the frame working, not
+  // the size of the backlog. Every page of the journal is walked, since it shows one boss at a time.
+  const pages = page.getByRole('navigation', { name: 'Karazhan: bosses' }).getByRole('button')
+  let rows = 0
+  let frames = 0
+  let icons = 0
+  for (let index = 1; index < (await pages.count()); index += 1) {
+    await pages.nth(index).click()
+    const loot = page.getByTestId('journal-page').locator('.journal-item')
+    rows += await loot.count()
+    frames += await loot.locator('.loot-icon').count()
+    icons += await loot.locator('.loot-icon img').count()
+  }
+  expect(rows).toBeGreaterThan(0)
+  expect(frames, 'every loot row gets exactly one frame').toBe(rows)
   expect(icons, 'the catalogued ones should show real art').toBeGreaterThan(0)
 })
 
@@ -11012,31 +10991,22 @@ test('no image in the app is painted larger than the file it comes from', async 
 
   /** What each screen has to have actually measured before its "nothing magnified" means anything. */
   const screens = [
-    { name: 'raid picker', needs: { raids: 5 }, open: async () => await openApp(page, 'raids') },
+    /*
+     * The boss journal (2026-10-13) replaced the raid picker and the boss cards. Its banner draws a
+     * boss's art across the page column, which is the one place in the app a fixed-resolution image is
+     * sized by the room available — so this is the screen the rule exists for. Karazhan is the raid
+     * with art for ten of its eleven encounters: its rail portraits, the banner and the raid's own art
+     * all have to be measured, and Prince Malchezaar's page has a long loot table to check icons on
+     * (13 of its drops have catalogued art; the floor sits under that so a catalogue fix cannot trip it).
+     */
     {
-      // Karazhan is the raid with art for ten of its eleven encounters, so it is the one that proves
-      // the boss cards are drawing their panels at a size those panels can actually fill.
-      name: 'raid loot',
-      needs: { icons: 30, raids: 10 },
-      /*
-       * **This used to declare `/raids/bosses/nightbane.jpg` as a tolerated 404**, on the reasoning
-       * that a boss card whose panel is absent "simply has no background" and so reads as unfinished
-       * rather than broken. The study's twelfth participant disagreed with that reasoning in front
-       * of the Serpentshrine page, and he was right: eleven cards were 400px of black over eleven
-       * failed requests.
-       *
-       * The app no longer asks for art it does not have — `hasBossArt` is checked first — so there
-       * is no broken path left to tolerate, and this screen expects none. Which makes the assertion
-       * stronger than the version it replaces: *any* failing image here now fails the test.
-       */
+      name: 'raid journal',
+      needs: { icons: 10, raids: 10 },
       open: async () => {
         await openApp(page, 'raids')
         await page.getByTestId('raid-pick-karazhan').click()
-        await expect(page.getByTestId('raid-detail')).toBeVisible()
-        // Every card opened, because the loot icons only exist once their table does — the encounters
-        // are cards now and the drops are behind a click on each.
-        const cards = page.locator('.raid-boss-card')
-        for (let index = 0; index < (await cards.count()); index += 1) await cards.nth(index).click()
+        await page.getByTestId('journal-page-prince-malchezaar').click()
+        await expect(page.locator('#journal-title')).toHaveText('Prince Malchezaar')
         await walkThePage()
       },
     },
@@ -11113,33 +11083,27 @@ test('no image in the app is painted larger than the file it comes from', async 
   expect(magnified, 'no image is drawn larger than its own file').toEqual([])
 })
 
-test('the raid picker fits a phone, and still never magnifies its art', async ({ page }) => {
+test('the boss journal fits a phone, and still never magnifies its art', async ({ page }) => {
   /*
-   * The narrow half of the rule above, kept separate because the failure is a different shape.
-   *
-   * `aspect-ratio` on the card plus a `min-height` floor is secretly a `min-width`: the ratio reads
-   * the height and works backwards, so a 240px floor meant a 444px minimum width and a 390px phone
-   * got a card hanging off the side of the screen. The grid track inherited the same phantom minimum
-   * before the card did. Neither shows up as magnification — the art was fine, the layout was not —
-   * so overflow is asserted here rather than folded into the scale check.
+   * The narrow half of the rule above, kept separate because the failure is a different shape: on a
+   * phone the banner is narrow and short, and the risk is the layout (a box wider than the screen),
+   * not the scale. Both are asserted.
    */
   await page.setViewportSize({ width: 390, height: 844 })
   await openApp(page, 'raids')
+  await page.getByTestId('raid-pick-karazhan').click()
+  await page.getByTestId('journal-page-attumen-the-huntsman').click()
 
   const painted = (await paintedImages(page)).filter((row) => row.src.includes('/raids/'))
-  expect(painted, 'every raid still has a card on a phone').toHaveLength(5)
+  expect(painted.length, 'the banner, the portraits and the raid art are all measured').toBeGreaterThan(3)
   expect(
     painted.filter((row) => !row.nat || row.scale! > 1.01).map((row) => `${row.what} at ${row.scale?.toFixed(2)}x`),
-    'no raid panel is magnified at 390px',
+    'no raid art is magnified at 390px',
   ).toEqual([])
 
-  const overflows = await page.evaluate(() => {
-    const room = document.documentElement.clientWidth
-    return [...document.querySelectorAll('.raid-picker-card')]
-      .filter((card) => card.getBoundingClientRect().width > room + 1)
-      .map((card) => (card as HTMLElement).dataset.testid ?? '(unnamed)')
-  })
-  expect(overflows, 'no raid card is wider than the phone it is on').toEqual([])
+  const room = await page.evaluate(() => document.documentElement.clientWidth)
+  const banner = await page.locator('.journal-banner').boundingBox()
+  expect(banner!.x + banner!.width, 'the banner is no wider than the phone it is on').toBeLessThanOrEqual(room + 1)
 })
 
 test('the guide’s source column is parsed rather than left as prose, and never guessed at', () => {
@@ -12392,14 +12356,14 @@ test('a section opens at its top, and choosing the section you are in returns to
 
   const main = page.getByRole('navigation', { name: 'Main sections' })
   await main.getByRole('button', { name: 'Raids', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Which raid?' })).toBeVisible()
+  await expect(page.locator('#journal-title')).toHaveText('Hydross the Unstable')
   expect(await page.evaluate(() => window.scrollY), 'Raids opens at its top, not where the tier lists were left').toBe(0)
 
-  // Raids keeps its chosen raid in the app; choosing Raids again goes back to the picker.
-  await page.locator('.raid-picker-card').first().click()
-  await expect(page.getByRole('heading', { name: 'Which raid?' })).toHaveCount(0)
+  // Raids keeps its chosen raid in the app; choosing Raids again goes back to its first raid's first boss.
+  await page.getByTestId('raid-pick-karazhan').click()
+  await expect(page.locator('#journal-title')).toHaveText('Attumen the Huntsman')
   await main.getByRole('button', { name: 'Raids', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Which raid?' })).toBeVisible()
+  await expect(page.locator('#journal-title')).toHaveText('Hydross the Unstable')
 
   // Professions keeps its chosen guide inside the panel; the same tap returns to the grid.
   await main.getByRole('button', { name: 'Professions', exact: true }).click()
@@ -12433,56 +12397,54 @@ test('keyboard focus on the character selects can be seen', async ({ page }) => 
   expect(focused.width).toBeGreaterThanOrEqual(2)
 })
 
-test('a boss with no art gets a row, not an empty black panel', async ({ page }) => {
+test('a boss with no art gets its raid’s art and a number, not an empty black panel', async ({ page }) => {
   /*
    * The study's finding 7, from the participant who read the Serpentshrine page as broken: those
-   * cards were 400px of black under a gradient, because `RaidsPanel` built every card's background
-   * from `raids/bosses/<id>.jpg` whether the file existed or not. Eleven encounters are still
-   * waiting on art, and eleven 404s looked exactly like a failed page.
+   * cards were 400px of black under a gradient, because the page built every card's background from
+   * `raids/bosses/<id>.jpg` whether the file existed or not. Eleven encounters are still waiting on
+   * art, and eleven 404s looked exactly like a failed page.
+   *
+   * In the boss journal (2026-10-13) a boss without art gets the raid's own art behind its banner,
+   * under a heavier scrim, and its number in the portrait; nothing is requested that does not exist.
    */
   await page.goto('/?simulation=1')
   await page.getByTestId('section-raids').click()
-  await page.getByRole('button', { name: /Serpentshrine/ }).first().click()
+  await expect(page.getByTestId('raid-pick-serpentshrine-cavern')).toHaveAttribute('aria-pressed', 'true')
 
-  const cards = page.locator('.raid-boss-card')
-  await expect(cards.first()).toBeVisible()
+  await page.getByTestId('journal-page-the-lurker-below').click()
+  await expect(page.locator('.journal-banner')).toHaveClass(/journal-banner-plain/)
+  await expect(page.locator('.journal-banner')).toHaveAttribute('style', /raids\/serpentshrine-cavern\.jpg/)
 
-  const shapes = await cards.evaluateAll((nodes) =>
-    nodes.map((node) => ({
-      art: (node as HTMLElement).dataset.art ?? 'yes',
-      height: Math.round(node.getBoundingClientRect().height),
-    })),
-  )
-  expect(shapes.every((card) => card.art === 'none'), 'no Serpentshrine boss has art yet').toBe(true)
-  expect(Math.max(...shapes.map((card) => card.height)), 'so none of them holds a picture-sized space').toBeLessThan(90)
-
-  // It keeps everything it said. A collapsed card is shorter, not quieter.
-  const lurker = page.getByTestId('boss-card-the-lurker-below')
+  // It keeps everything it said: the portrait carries the encounter's number instead of a picture.
+  const lurker = page.getByTestId('journal-page-the-lurker-below')
   await expect(lurker).toContainText('The Lurker Below')
   await expect(lurker).toContainText(/\d+ drops/)
-  await expect(lurker).toContainText('See the loot')
+  await expect(lurker.locator('.journal-portrait')).toHaveText('02')
 
   // And nothing is requested for art that does not exist, which is what made this look broken.
   const requested = await page.evaluate(() =>
     performance.getEntriesByType('resource').filter((entry) => entry.name.includes('/raids/bosses/')).length,
   )
-  expect(requested, 'no 404s behind the cards').toBe(0)
+  expect(requested, 'no 404s behind the bosses').toBe(0)
 })
 
-test('a raid with some art shows it, and collapses only the bosses without', async ({ page }) => {
-  // Karazhan is the mixed case: ten encounters have panels, Nightbane and Trash do not.
+test('a raid with some art shows it, and only the bosses without fall back', async ({ page }) => {
+  // Karazhan is the mixed case: ten encounters have panels, Nightbane does not.
   await page.goto('/?simulation=1')
   await page.getByTestId('section-raids').click()
-  await page.getByRole('button', { name: /Karazhan/ }).first().click()
+  await page.getByTestId('raid-pick-karazhan').click()
 
-  await expect(page.getByTestId('boss-card-attumen-the-huntsman')).not.toHaveAttribute('data-art', 'none')
-  await expect(page.getByTestId('boss-card-nightbane')).toHaveAttribute('data-art', 'none')
+  await page.getByTestId('journal-page-attumen-the-huntsman').click()
+  await expect(page.locator('.journal-banner')).not.toHaveClass(/journal-banner-plain/)
+  await expect(page.locator('.journal-banner')).toHaveAttribute('style', /raids\/bosses\/attumen-the-huntsman\.jpg/)
+  await expect(page.getByTestId('journal-page-attumen-the-huntsman').locator('.journal-portrait')).toHaveAttribute(
+    'style',
+    /attumen-the-huntsman\.jpg/,
+  )
 
-  const heights = await page
-    .locator('.raid-boss-card')
-    .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().height)))
-  expect(Math.max(...heights), 'the ones with art keep their card').toBeGreaterThan(300)
-  expect(Math.min(...heights), 'the ones without do not').toBeLessThan(90)
+  await page.getByTestId('journal-page-nightbane').click()
+  await expect(page.locator('.journal-banner')).toHaveClass(/journal-banner-plain/)
+  await expect(page.getByTestId('journal-page-nightbane').locator('.journal-portrait')).not.toHaveAttribute('style', /.+/)
 })
 
 test('the boss art manifest matches the files on disk', () => {
@@ -12880,17 +12842,15 @@ test('a keyboard reaches the section tabs without walking the page', async ({ pa
   await expect(plannerTab, 'so three presses reach the navigation').toBeFocused()
 
   /*
-   * On Raids the bypass still earns its place: that section keeps its rail, so the skip link is what
-   * stands between the top of the document and five raid buttons.
+   * Raids kept a rail of raids in front of the main pane until 2026-10-13; the ported Raids tab picks
+   * its raid in its own header, so on Raids too nothing tabbable stands before the main pane but the
+   * skip link.
    */
   await sectionTab(page, 'Raids').click()
-  await page.getByRole('button', { name: /Karazhan/ }).first().click()
-  await expect(page.locator('aside.rail')).toBeVisible()
-
+  await expect(page.locator('aside.rail')).toHaveCount(0)
   await page.locator('#app-main').focus()
   await page.keyboard.press('Shift+Tab')
-  await expect(page.locator('aside.rail').getByRole('button').last(), 'the rail is what main follows').toBeFocused()
-  await expect(skip, 'and the skip link is still in front of it all').toHaveCount(1)
+  await expect(skip, 'the skip link is still what precedes the content').toBeFocused()
 })
 
 test('swapping the whole screen takes focus with it', async ({ page }) => {

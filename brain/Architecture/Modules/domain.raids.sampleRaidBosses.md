@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 
 ## Concepts & phases
 

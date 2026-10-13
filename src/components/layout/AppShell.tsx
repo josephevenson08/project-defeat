@@ -5,12 +5,6 @@ import { TabNav, type TabDefinition } from './TabNav'
 
 type AppShellProps<T extends string> = {
   children: ReactNode
-  /**
-   * Persistent left-rail content. Only Raids has one now — the list of other raids, which is the
-   * thing you keep returning to while reading one. A raid loot table and a profession guide have no
-   * stats to keep glancing at, and a rail of numbers belonging to nothing is worse than no rail.
-   */
-  rail?: ReactNode
   tabs: readonly TabDefinition<T>[]
   activeTab: T
   onTabChange: (tab: T) => void
@@ -21,34 +15,30 @@ type AppShellProps<T extends string> = {
 }
 
 /**
- * Discord's skeleton: a persistent left rail that never navigates away, one main pane that swaps
- * content, and detail shown beside what it belongs to rather than as modes you travel between.
+ * The page's frame: the top bar and one main pane that swaps content.
  *
  * The top bar is the prototypes' header (2026-10-12, `docs/design/PORT-PLAN.md` step 0): the
  * wordmark, the sections, and under them the line every screen carries — the game and phase every
- * number is for, and, once a tab is ported, where its numbers come from.
+ * number is for, and, once a tab is ported, where its numbers come from. There used to be a left
+ * rail too, last for the list of raids; the ported Raids tab picks its raid from its own header.
  */
-export function AppShell<T extends string>({ children, rail, tabs, activeTab, onTabChange, onHome, provenance }: AppShellProps<T>) {
+export function AppShell<T extends string>({ children, tabs, activeTab, onTabChange, onHome, provenance }: AppShellProps<T>) {
   const mainRef = useRef<HTMLElement>(null)
   // Arriving here from the front page or from character creation moves focus into the main pane; see
   // `useScreenFocus` for why that is a mount-time question rather than a tab-change one.
   useScreenFocus(mainRef)
 
   return (
-    <div className={`app-shell${rail ? '' : ' app-shell-no-rail'}`}>
+    <div className="app-shell app-shell-no-rail">
       {/*
-        The first thing a keyboard reaches. The Raids rail comes before the section tabs in the
-        source, and the keyboard-only participant in the usability study spent a session's worth of
-        presses inside a rail and never reached the tab he came for. Two keystrokes clear it.
+        The first thing a keyboard reaches, landing on the main pane. It was the way past a rail of
+        controls in front of the sections (the usability study's keyboard-only participant spent a
+        session's worth of presses in one); the rail is gone, and the link stays as the standard
+        bypass for anyone whose traversal starts at the top of the document.
       */}
       <a className="skip-link" href="#app-main">
         Skip to the main content
       </a>
-      {rail && (
-        <aside className="rail" aria-label="Character summary">
-          {rail}
-        </aside>
-      )}
       {/* `tabIndex={-1}` so the skip link and the focus effect above can land on it, not to put it in
           the tab order. */}
       <main className="app-main" id="app-main" ref={mainRef} tabIndex={-1}>

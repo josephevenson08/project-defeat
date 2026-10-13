@@ -3,7 +3,7 @@
 // Kept separate so importing them does not drag in another script's top-level report as a side
 // effect — which is exactly what happened when the ingester imported the discovery pass.
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { GUIDE_BASE } from './bis-guides.mjs'
@@ -18,6 +18,12 @@ const CACHE = resolve(HERE, '.cache/bis')
  */
 export function unescapePage(raw) {
   return raw.replaceAll('\\/', '/').replaceAll('\\"', '"').replaceAll('\\r\\n', '\n').replaceAll('\\n', '\n')
+}
+
+/** When a guide's cached copy was fetched, or undefined if it is not cached. */
+export function cachedAt(path) {
+  const file = resolve(CACHE, `${path.replaceAll('/', '_')}.html`)
+  return existsSync(file) ? statSync(file).mtime : undefined
 }
 
 /** Fetches a guide, caching to disk so re-runs and re-parses do not re-hit the site. */

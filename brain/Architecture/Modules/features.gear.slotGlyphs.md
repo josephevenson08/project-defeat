@@ -33,7 +33,6 @@ From the top of the file:
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
-- [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
 
 ## Concepts & phases
 

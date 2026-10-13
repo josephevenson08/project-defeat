@@ -1,29 +1,28 @@
 ---
 type: module
 layer: features
-source: src/features/raids/RaidLootList.tsx
-lines: 66
+source: src/features/raids/LootSearchResults.tsx
+lines: 99
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.raids.RaidLootList
+# features.raids.LootSearchResults
 
-`src/features/raids/RaidLootList.tsx` · **features** layer · 66 lines
+`src/features/raids/LootSearchResults.tsx` · **features** layer · 99 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `RaidLootList`
+**function** — `LootSearchResults`
 
 ## Imports
 
+- [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
-- [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
-- [[features.gear.gearData]] — `src/features/gear/gearData.ts`
-- [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
-- [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
+- [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`
+- [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
 
 ## Imported by
 

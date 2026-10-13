@@ -42,22 +42,28 @@ behind every claim of its that quotes a number.
   - Healer
   - Tank
 - Result breakdown panel
-- Raids tab: all five Phase 1/2 raids, **a card per encounter** — with its own artwork where that art
-  exists; Nightbane, Serpentshrine Cavern and Tempest Keep are still waiting on theirs, and their cards
-  are bare until it arrives — and that encounter's drops behind a click on it — colour-coded by item quality where the drop exists in the
-  catalog. **All five raids' tables are complete**: 467 drops across twenty-four encounters, read from
+- **Raids tab** (the decided design, ported 2026-10-13): all five Phase 1/2 raids, picked from the
+  tab's own header, which takes each raid's colour (Serpentshrine teal, Tempest Keep gold over violet,
+  the Phase 1 raids torchlight). **The boss journal** shows one boss at a time, like the game's
+  Adventure Guide: the raid's bosses down the side with their art where it exists (Karazhan bar
+  Nightbane, Gruul's Lair, Magtheridon; the rest show their number and the raid's own art), the boss's
+  loot as icons in quality frames with game-style tooltips, and **"Loot for" any of the 27 specs**,
+  which puts that spec's picks first with their rank on its Wowhead Phase 2 list (your spec by
+  default once you have made a character). "The fight" holds the mechanics and per-role callouts;
+  "About the raid" holds the facts, the way in and the step-by-step attunement chains for Karazhan,
+  Serpentshrine Cavern and Tempest Keep. **"For my raid"** shows who in the raid you saved on Raid
+  Composition (or a clearly labelled example raid until you have one) wants each drop, most wanted
+  first, a drop three or more raiders rank first marked contested, and a tier token counted through
+  the set pieces it buys; press a raider for their wishlist. **A search** finds any drop across all
+  five raids and opens it where it drops. **All five raids' tables are complete**: 467 drops across
+  twenty-four encounters plus notable trash, read from
   Wowhead's own drop data by `tools/ingest/ingest-raid-loot.mjs` rather than curated by hand, so every
   row carries a real item id and the ingest re-runs. 344 resolve to a catalogued item; the other 123
   are 80 recipes, 30 tier tokens, and a handful of quest items and mounts — real drops that are not
   equippable gear, each flagged and saying so rather than rendering as an item with nothing on it.
   The merge is a **union**, because a boss's drop table cannot see the tier set pieces a token is
   traded for, the quest rewards an encounter hands out, or Kael'thas's seven encounter weapons — 32
-  curated Tempest Keep rows a replace would have deleted. Thirteen of the twenty-four encounters have art so far (Karazhan bar
-  Nightbane, Gruul's Lair, Magtheridon); the rest keep their card and simply have no picture, so a
-  raid without art reads as unfinished rather than broken. Step-by-step attunement chains for
-  Karazhan, Serpentshrine Cavern and Tempest Keep — the three that have one. Boss mechanics and per-role
-  callouts are still in the domain data but are deliberately not rendered: the tab answers "what
-  drops here", and a fight guide is a different question asked at a different time
+  curated Tempest Keep rows a replace would have deleted
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
   profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
   can say, and 720 of the 1,427 rows name an encounter. This is a join across the guides' own Source

@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { SpecIcon } from '../../components/ui/SpecIcon'
+import { useHoverTip } from '../../components/ui/useHoverTip'
 import { getClassColor } from '../../domain/character/classColors'
 import type { TbcClass } from '../../domain/character/characterTypes'
 import { tbcClasses } from '../../domain/character/tbcClasses'
@@ -9,7 +10,6 @@ import { getSpecStanding, sameSpec, type SpecRef } from '../../domain/tierlists/
 import { SpecCard } from './SpecCard'
 import { SpecTip } from './SpecTip'
 import { plural, specName } from './tierFormat'
-import { useSpecTip } from './useSpecTip'
 
 type TierBoardProps = {
   /** The character's spec, when one has been made; it is marked on every list it appears on. */
@@ -31,7 +31,7 @@ type TierBoardProps = {
  */
 export function TierBoard({ yours, selected, onSelect, raidCount }: TierBoardProps) {
   const [classFilter, setClassFilter] = useState<TbcClass>()
-  const tip = useSpecTip()
+  const tip = useHoverTip<SpecRef>()
   const [dps, healer, tank] = (['DPS', 'Healer', 'Tank'] as const).map(getTierList)
   const standing = selected ? getSpecStanding(selected) : undefined
 
@@ -84,7 +84,7 @@ type BoardProps = {
   onSelect: (spec: SpecRef) => void
   classFilter?: TbcClass
   onClassFilter?: (className: TbcClass | undefined) => void
-  bindTip: ReturnType<typeof useSpecTip>['bind']
+  bindTip: ReturnType<typeof useHoverTip<SpecRef>>['bind']
 }
 
 function Board({ list, yours, selected, onSelect, classFilter, onClassFilter, bindTip }: BoardProps) {

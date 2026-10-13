@@ -21,6 +21,7 @@ _No doc comment at the top of this file._
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
+- [[components.ui.useHoverTip]] — `src/components/ui/useHoverTip.ts`
 - [[components.ui.ViewSwitch]] — `src/components/ui/ViewSwitch.tsx`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
@@ -29,7 +30,6 @@ _No doc comment at the top of this file._
 - [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
-- [[features.tierlists.useSpecTip]] — `src/features/tierlists/useSpecTip.ts`
 
 ## Imported by
 

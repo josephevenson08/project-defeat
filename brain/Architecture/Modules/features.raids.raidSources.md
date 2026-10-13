@@ -1,24 +1,26 @@
 ---
 type: module
 layer: features
-source: src/features/raids/RaidRail.tsx
-lines: 51
+source: src/features/raids/raidSources.ts
+lines: 11
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.raids.RaidRail
+# features.raids.raidSources
 
-`src/features/raids/RaidRail.tsx` · **features** layer · 51 lines
+`src/features/raids/raidSources.ts` · **features** layer · 11 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `RaidRail`
+**const** — `raidSources`
 
 ## Imports
 
+- [[components.ui.Provenance]] — `src/components/ui/Provenance.tsx`
+- [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
 
 ## Imported by

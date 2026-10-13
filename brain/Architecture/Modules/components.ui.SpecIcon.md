@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/ui/SpecIcon.tsx
-lines: 40
+lines: 42
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.ui.SpecIcon
 
-`src/components/ui/SpecIcon.tsx` · **components** layer · 40 lines
+`src/components/ui/SpecIcon.tsx` · **components** layer · 42 lines
 
 _No doc comment at the top of this file._
 
@@ -25,6 +25,8 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`

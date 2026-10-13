@@ -20,7 +20,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { BIS_GUIDES } from './bis-guides.mjs'
-import { fetchGuide, unescapePage } from './bis-fetch.mjs'
+import { cachedAt, fetchGuide, unescapePage } from './bis-fetch.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
@@ -167,9 +167,19 @@ for (const guide of guides) {
   }
 }
 
+// When the guides were fetched: the oldest of the cached pages, so a run over an old cache keeps the
+// old date rather than claiming the data is new. This is what the app's source lines print.
+const fetchedAt = guides
+  .map((guide) => cachedAt(guide.path))
+  .filter(Boolean)
+  .sort((a, b) => a - b)[0]
+  ?.toISOString()
+  .slice(0, 10)
+
 const payload = {
   $schema: 'wowhead tbc phase 2 bis rankings',
   generatedBy: 'tools/ingest/ingest-bis.mjs',
+  fetchedAt,
   guideCount: guides.length,
   specCount: Object.keys(bySpec).length,
   specs: Object.fromEntries(Object.entries(bySpec).sort(([a], [b]) => a.localeCompare(b))),

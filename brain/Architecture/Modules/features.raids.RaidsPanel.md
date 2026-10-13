@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/RaidsPanel.tsx
-lines: 199
+lines: 239
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.RaidsPanel
 
-`src/features/raids/RaidsPanel.tsx` · **features** layer · 199 lines
+`src/features/raids/RaidsPanel.tsx` · **features** layer · 239 lines
 
 _No doc comment at the top of this file._
 
@@ -19,13 +19,17 @@ _No doc comment at the top of this file._
 
 ## Imports
 
-- [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
-- [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
-- [[domain.raids.bossArt]] — `src/domain/raids/bossArt.ts`
+- [[components.ui.FloatingTip]] — `src/components/ui/FloatingTip.tsx`
+- [[components.ui.ItemTooltip]] — `src/components/ui/ItemTooltip.tsx`
+- [[components.ui.useHoverTip]] — `src/components/ui/useHoverTip.ts`
+- [[components.ui.ViewSwitch]] — `src/components/ui/ViewSwitch.tsx`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
-- [[features.gear.gearData]] — `src/features/gear/gearData.ts`
-- [[features.raids.RaidAttunementChain]] — `src/features/raids/RaidAttunementChain.tsx`
-- [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
+- [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
+- [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`
+- [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
+- [[features.raids.raidsSession]] — `src/features/raids/raidsSession.ts`
 
 ## Imported by
 
@@ -33,7 +37,7 @@ _No doc comment at the top of this file._
 
 ## Concepts & phases
 
-_None._
+- [[Port to the Live App]]
 
 Up: [[Architecture Map]]
 

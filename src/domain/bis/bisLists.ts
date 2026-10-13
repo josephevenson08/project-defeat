@@ -223,6 +223,9 @@ function buildLists(): BisList[] {
 
 export const bisLists: readonly BisList[] = buildLists()
 
+/** When Wowhead's 27 Phase 2 guides were fetched, as an ISO date, for the source lines under the top bar. */
+export const bisRankingsFetchedAt: string | undefined = rawRankings.fetchedAt
+
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {
   return bisLists.find((list) => list.className === className && list.spec === spec)
 }

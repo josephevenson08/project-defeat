@@ -49,7 +49,6 @@ From the top of the file:
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
-- [[features.tierlists.useSpecTip]] — `src/features/tierlists/useSpecTip.ts`
 
 ## Concepts & phases
 

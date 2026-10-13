@@ -8,6 +8,8 @@ type SpecIconProps = {
   spec: TbcSpec
   /** Rendered width and height in pixels, ring excluded. */
   size?: number
+  /** A raid build's own icon (the bear paw for a Feral tank), in place of the spec's. */
+  icon?: string
 }
 
 /**
@@ -17,8 +19,8 @@ type SpecIconProps = {
  * The ring is Blizzard's class colour, which is what a player scans a list of specs for. Decorative:
  * the spec's name is always written beside it, so the image carries no text alternative.
  */
-export function SpecIcon({ className, spec, size = 28 }: SpecIconProps) {
-  const icon = getSpecIcon(className, spec)
+export function SpecIcon({ className, spec, size = 28, icon: buildIcon }: SpecIconProps) {
+  const icon = buildIcon ?? getSpecIcon(className, spec)
   // Sized through a custom property rather than an inline width, so a layout can still resize it
   // (a phone's smaller tiles) without `!important`.
   const style = { '--spec-class': getClassColor(className), '--spec-icon-size': `${size}px` } as CSSProperties

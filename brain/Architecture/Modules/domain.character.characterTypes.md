@@ -52,6 +52,7 @@ _No doc comment at the top of this file._
 - [[domain.raidcomp.raidBuilds]] — `src/domain/raidcomp/raidBuilds.ts`
 - [[domain.raidcomp.raidcompIcons]] — `src/domain/raidcomp/raidcompIcons.ts`
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
 - [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`

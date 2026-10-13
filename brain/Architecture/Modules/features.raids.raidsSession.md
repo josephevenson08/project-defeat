@@ -1,21 +1,25 @@
 ---
 type: module
 layer: features
-source: src/features/raids/RaidAttunementChain.tsx
-lines: 51
+source: src/features/raids/raidsSession.ts
+lines: 40
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.raids.RaidAttunementChain
+# features.raids.raidsSession
 
-`src/features/raids/RaidAttunementChain.tsx` · **features** layer · 51 lines
+`src/features/raids/raidsSession.ts` · **features** layer · 40 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `RaidAttunementChain`
+**function** — `journalPages`, `raidLook`
+
+**const** — `defaultJournalPage`, `initialRaidsSession`
+
+**type** — `JournalPage`, `RaidsSession`, `RaidsView`
 
 ## Imports
 
@@ -23,11 +27,13 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[App]] — `src/App.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 
 ## Concepts & phases
 
-- [[Attunement]]
+_None._
 
 Up: [[Architecture Map]]
 

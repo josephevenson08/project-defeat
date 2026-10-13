@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { SpecIcon } from '../../components/ui/SpecIcon'
+import { useHoverTip } from '../../components/ui/useHoverTip'
 import { ViewSwitch } from '../../components/ui/ViewSwitch'
 import { getClassColor } from '../../domain/character/classColors'
 import type { DpsReference } from '../../domain/simulation/dpsReference'
@@ -21,7 +22,6 @@ import {
 import { SpecCard, TierLetter } from './SpecCard'
 import { SpecTip } from './SpecTip'
 import { LOGS_READ_ON, formatDps, ordinal, plural, specName } from './tierFormat'
-import { useSpecTip } from './useSpecTip'
 
 type Sort = 'by-logs' | 'by-wowhead'
 
@@ -43,7 +43,7 @@ export function AgainstTheLogs({ yours, raidCount }: AgainstTheLogsProps) {
   const [sort, setSort] = useState<Sort>('by-logs')
   const [onlyDisagreements, setOnlyDisagreements] = useState(false)
   const [open, setOpen] = useState<string>()
-  const tip = useSpecTip()
+  const tip = useHoverTip<SpecRef>()
   const dpsList = getTierList('DPS')
 
   const ordered = sort === 'by-logs' ? logsOrder : byWowheadTier()
@@ -194,7 +194,7 @@ type ChartRowProps = {
   isOpen: boolean
   onToggle: () => void
   card: (spec: SpecRef) => ReactNode
-  bindTip: ReturnType<typeof useSpecTip>['bind']
+  bindTip: ReturnType<typeof useHoverTip<SpecRef>>['bind']
 }
 
 function ChartRow({ entry, isYours, isOpen, onToggle, card, bindTip }: ChartRowProps) {

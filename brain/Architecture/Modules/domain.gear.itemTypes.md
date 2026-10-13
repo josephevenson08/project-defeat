@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
@@ -48,6 +49,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`

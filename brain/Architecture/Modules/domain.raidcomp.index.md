@@ -28,10 +28,13 @@ _No doc comment at the top of this file._
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
+- [[domain.raids.exampleRaids]] — `src/domain/raids/exampleRaids.ts`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

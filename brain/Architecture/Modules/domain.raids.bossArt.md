@@ -37,7 +37,8 @@ _None._
 
 ## Imported by
 
-- [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 
 ## Concepts & phases
 

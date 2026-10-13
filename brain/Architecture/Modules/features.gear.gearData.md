@@ -35,8 +35,6 @@ _No doc comment at the top of this file._
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
-- [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
-- [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 

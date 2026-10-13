@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisRankingsJson.d.ts
-lines: 15
+lines: 17
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisRankingsJson.d
 
-`src/domain/bis/bisRankingsJson.d.ts` · **domain** layer · 15 lines
+`src/domain/bis/bisRankingsJson.d.ts` · **domain** layer · 17 lines
 
 _No doc comment at the top of this file._
 

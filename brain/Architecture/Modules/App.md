@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 600
+lines: 605
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 600 lines
+`src/App.tsx` · **app** layer · 605 lines
 
 From the top of the file:
 
@@ -40,6 +40,7 @@ _Nothing exported (side-effect or style module)._
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
+- [[domain.raids.index]] — `src/domain/raids/index.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
@@ -60,9 +61,9 @@ _Nothing exported (side-effect or style module)._
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
-- [[features.raids.RaidPicker]] — `src/features/raids/RaidPicker.tsx`
-- [[features.raids.RaidRail]] — `src/features/raids/RaidRail.tsx`
+- [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.raids.raidsSession]] — `src/features/raids/raidsSession.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

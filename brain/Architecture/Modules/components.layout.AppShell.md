@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/AppShell.tsx
-lines: 82
+lines: 72
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.AppShell
 
-`src/components/layout/AppShell.tsx` · **components** layer · 82 lines
+`src/components/layout/AppShell.tsx` · **components** layer · 72 lines
 
 _No doc comment at the top of this file._
 

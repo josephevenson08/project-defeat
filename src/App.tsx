@@ -40,8 +40,9 @@ import { tierListSources } from './features/tierlists/tierFormat'
 import type { SpecRef } from './domain/tierlists/specStanding'
 import { Provenance } from './components/ui/Provenance'
 import { RaidsPanel } from './features/raids/RaidsPanel'
-import { RaidPicker } from './features/raids/RaidPicker'
-import { RaidRail } from './features/raids/RaidRail'
+import { initialRaidsSession, raidLook, type RaidsSession } from './features/raids/raidsSession'
+import { raidSources } from './features/raids/raidSources'
+import { getRaidById } from './domain/raids'
 import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
 
@@ -57,10 +58,14 @@ import { BuffsPanel } from './features/buffs/BuffsPanel'
  * then the whole app was themed by the character's faction, which made a Horde player's tier list
  * look different from an Alliance player's for no reason that had to do with tier lists.
  */
-function useScreenTheme(screen: 'home' | AppTab) {
+function useScreenTheme(screen: 'home' | AppTab, raid?: 'ssc' | 'tk' | 'p1') {
   useEffect(() => {
-    document.documentElement.dataset.tab = screen
-  }, [screen])
+    const root = document.documentElement
+    root.dataset.tab = screen
+    // Raids follows the raid it shows: Serpentshrine teal, Tempest Keep gold over violet, Phase 1 torchlight.
+    if (raid) root.dataset.raid = raid
+    else delete root.dataset.raid
+  }, [screen, raid])
 }
 
 const initialCharacter: CharacterProfile = {
@@ -185,10 +190,10 @@ function App() {
   const [activeTargetDebuffIds, setActiveTargetDebuffIds] = useState<readonly string[]>([])
   const [talentPoints, setTalentPoints] = useState<TalentPoints>({})
   /*
-   * Which raid's loot is being read. Undefined means the picker: five loot tables stacked on one page
-   * is several hundred rows, and nobody arrives wanting all five — they arrive wanting one.
+   * Where the Raids tab is: the raid, "For me" or "For my raid", the page open in each raid's
+   * journal and the spec its loot is ranked for. Session state, so a visit to another tab keeps it.
    */
-  const [selectedRaidId, setSelectedRaidId] = useState<string>()
+  const [raidsSession, setRaidsSession] = useState<RaidsSession>(initialRaidsSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -295,7 +300,11 @@ function App() {
   const simulationEnabled = isSimulationEnabled(role)
   const currentTab: AppTab = activeTab === 'simulation' && !simulationEnabled ? 'planner' : activeTab
   // Character creation takes the colour of the section it leads into; the way in takes Home's.
-  useScreenTheme(introComplete && !sharePending && sectionChosen ? currentTab : 'home')
+  const shownRaid = getRaidById(raidsSession.raidId)
+  useScreenTheme(
+    introComplete && !sharePending && sectionChosen ? currentTab : 'home',
+    sectionChosen && currentTab === 'raids' && shownRaid ? raidLook(shownRaid.id, shownRaid.phase) : undefined,
+  )
 
   /**
    * Moving between sections, from the tab bar.
@@ -307,13 +316,14 @@ function App() {
    * **Choosing the section you are already in takes you to its start.** A participant deep in the
    * Herbalism guide tapped Professions expecting the profession list, stayed exactly where she was,
    * and thought she had broken something. Professions keeps its choice inside the panel, so bumping
-   * `sectionVisit` remounts it on the grid. Raids keeps its choice here.
+   * `sectionVisit` remounts it on the grid. Raids keeps its place here, and goes back to its first
+   * raid's first boss.
    */
   const [sectionVisit, setSectionVisit] = useState(0)
   function changeSection(tab: AppTab) {
     if (tab === currentTab) {
       setSectionVisit((visit) => visit + 1)
-      if (tab === 'raids') setSelectedRaidId(undefined)
+      if (tab === 'raids') setRaidsSession((current) => ({ ...current, raidId: initialRaidsSession.raidId, pages: {} }))
     } else {
       setActiveTab(tab)
     }
@@ -490,28 +500,17 @@ function App() {
 
   return (
     <AppShell
-      /*
-       * **The planner no longer has a rail.** It carried the character as four labelled selects, ten
-       * profession toggles and a twenty-six-row stat list — fifteen controls plus a table, permanently
-       * on screen, on a page whose actual job is choosing gear. The owner's heuristic evaluation rated
-       * that density a major problem; the character is now one line at the top of the pane and the
-       * stats are one sticky bar under it.
-       *
-       * Raids keeps its rail, and for the original reason: the rail holds the thing you keep returning
-       * to while reading the main pane, which there is the list of other raids.
-       */
-      rail={
-        currentTab === 'raids' && selectedRaidId ? (
-          // Same argument as the planner's stat rail: the rail holds the thing you keep returning to
-          // while reading the main pane. Here that is the list of other raids.
-          <RaidRail selectedRaidId={selectedRaidId} onSelect={setSelectedRaidId} onBackToPicker={() => setSelectedRaidId(undefined)} />
-        ) : undefined
-      }
       tabs={visibleTabs(simulationEnabled)}
       activeTab={currentTab}
       onTabChange={changeSection}
       // Each ported tab names where its numbers come from, on the line under the top bar.
-      provenance={currentTab === 'tierlists' ? <Provenance sources={tierListSources} /> : undefined}
+      provenance={
+        currentTab === 'tierlists' ? (
+          <Provenance sources={tierListSources} />
+        ) : currentTab === 'raids' ? (
+          <Provenance sources={raidSources} />
+        ) : undefined
+      }
       onHome={() => {
         // Back to the front door, keeping everything: the character, the gear and which section you
         // were in are session state, and the doors lead straight back to them.
@@ -583,8 +582,14 @@ function App() {
           onSelect={setTierListsSpec}
         />
       )}
-      {currentTab === 'raids' &&
-        (selectedRaidId ? <RaidsPanel raidId={selectedRaidId} /> : <RaidPicker onSelect={setSelectedRaidId} />)}
+      {currentTab === 'raids' && (
+        <RaidsPanel
+          session={raidsSession}
+          onSession={setRaidsSession}
+          yours={characterChosen ? { className: character.className, spec: character.spec } : undefined}
+          onPlanRaid={() => changeSection('raidcomp')}
+        />
+      )}
       {currentTab === 'professions' && (
         <ProfessionsPanel
           key={sectionVisit}

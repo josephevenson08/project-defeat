@@ -1,6 +1,7 @@
 {
   "$schema": "wowhead tbc phase 2 bis rankings",
   "generatedBy": "tools/ingest/ingest-bis.mjs",
+  "fetchedAt": "2026-08-07",
   "guideCount": 24,
   "specCount": 27,
   "specs": {

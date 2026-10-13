@@ -1,6 +1,8 @@
 
 declare module "*/bisRankings.json" {
   const rankings: {
+    /** When the 27 guides were fetched from Wowhead, as an ISO date. */
+    fetchedAt?: string
     specs: Record<string, {
       className: string
       spec: string

@@ -1,32 +1,34 @@
 ---
 type: module
-layer: features
-source: src/features/tierlists/useSpecTip.ts
+layer: components
+source: src/components/ui/useHoverTip.ts
 lines: 55
 generated: true
-tags: [brain/architecture, layer/features]
+tags: [brain/architecture, layer/components]
 ---
 
-# features.tierlists.useSpecTip
+# components.ui.useHoverTip
 
-`src/features/tierlists/useSpecTip.ts` · **features** layer · 55 lines
+`src/components/ui/useHoverTip.ts` · **components** layer · 55 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `useSpecTip`
+**function** — `useHoverTip`
 
 **const** — `SHEET_BELOW`
 
-**type** — `SpecTipTarget`
+**type** — `HoverTipTarget`
 
 ## Imports
 
-- [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
+_None._
 
 ## Imported by
 
+- [[components.ui.FloatingTip]] — `src/components/ui/FloatingTip.tsx`
+- [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`

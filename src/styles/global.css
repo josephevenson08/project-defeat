@@ -174,7 +174,9 @@
     linear-gradient(180deg, rgba(3, 9, 13, 0.4), rgba(3, 9, 13, 0.25) 30%, rgba(3, 9, 13, 0.75));
 }
 
-:root[data-tab='simulation'] {
+/* Simulation, and Raids while it shows Tempest Keep: gold over violet. */
+:root[data-tab='simulation'],
+:root[data-tab='raids'][data-raid='tk'] {
   --glow: var(--tab-simulation);
   --glow-ink: #1a1204;
   --glow-soft: rgba(236, 192, 106, 0.14);
@@ -193,6 +195,29 @@
     radial-gradient(40% 30% at 64% 26%, rgba(236, 192, 106, 0.3), transparent 70%),
     radial-gradient(60% 40% at 50% 80%, rgba(150, 100, 255, 0.18), transparent 70%),
     linear-gradient(180deg, #07040f 0%, #160c2a 55%, #1f1236 100%);
+}
+
+/* Raids while it shows a Phase 1 raid (Karazhan, Gruul's Lair, Magtheridon's Lair): warm torchlight. */
+:root[data-tab='raids'][data-raid='p1'] {
+  --glow: #f2a65a;
+  --glow-ink: #1a1204;
+  --glow-soft: rgba(242, 166, 90, 0.14);
+  --rim: rgba(242, 180, 120, 0.24);
+  --rim-2: rgba(242, 180, 120, 0.12);
+  --focus: #ffd9a8;
+  --glass: rgba(26, 18, 12, 0.76);
+  --glass-2: rgba(40, 28, 18, 0.82);
+  --glass-3: rgba(54, 38, 24, 0.88);
+  --glass-solid: #1d140c;
+  --scrim: rgba(16, 11, 7, 0.84);
+  --ink: #f5ece2;
+  --ink-2: #d6c6b4;
+  --ink-3: #b3a08b;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(242, 166, 90, 0.26), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(217, 84, 43, 0.14), transparent 70%),
+    linear-gradient(180deg, #070504 0%, #1a120b 55%, #24170c 100%);
+  --veil: linear-gradient(180deg, rgba(12, 8, 5, 0.4), rgba(12, 8, 5, 0) 30%, rgba(12, 8, 5, 0.6));
 }
 
 :root[data-tab='raidcomp'] {
@@ -366,7 +391,7 @@ select {
 }
 
 /*
- * The keyboard's way past the rail.
+ * The keyboard's way to the main pane.
  *
  * Positioned out of the flow rather than hidden, because `display: none` would take it out of the tab
  * order and it exists only for the tab order. It is the shell's first child but must not become a
@@ -655,173 +680,6 @@ select {
   color: var(--text);
 }
 
-/* Which raid, chosen before any of its several hundred loot rows are rendered. */
-.raid-picker {
-  display: grid;
-  gap: 24px;
-  padding: 8px 0;
-}
-
-.raid-picker-head h2 {
-  font-size: 26px;
-  font-weight: 650;
-  letter-spacing: -0.4px;
-  margin: 6px 0 8px;
-}
-
-.raid-picker-tier,
-.raid-picker-count {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: var(--label-tracking);
-  text-transform: uppercase;
-}
-
-.raid-picker-count {
-  letter-spacing: normal;
-  text-transform: none;
-}
-
-.raid-picker-name {
-  color: var(--text-strong);
-  font-size: 17px;
-  font-weight: 650;
-}
-
-/* The other raids, in the rail, so switching never leaves the page. */
-.rail-raid-list {
-  display: grid;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.rail-raid {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  cursor: pointer;
-  display: grid;
-  font: inherit;
-  gap: 2px;
-  padding: 8px 10px;
-  text-align: left;
-  width: 100%;
-}
-
-.rail-raid:hover {
-  background: var(--surface-2);
-}
-
-.rail-raid-selected {
-  background: var(--surface-2);
-  border-color: #6a7fa8;
-  color: var(--text-strong);
-}
-
-.rail-raid-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.rail-raid-meta {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-/* A drop: square frame, then the name and the stats it carries. */
-.raid-loot-row {
-  align-items: start;
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  gap: 12px;
-  grid-template-columns: auto minmax(0, 1fr);
-  padding: 10px 0;
-}
-
-.raid-loot-row:last-child {
-  border-bottom: 0;
-}
-
-.raid-loot-frame {
-  align-items: center;
-  background: var(--surface-2);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  height: 40px;
-  justify-content: center;
-  width: 40px;
-}
-
-.raid-loot-frame .item-icon-fallback {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.raid-loot-ilvl {
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-.raid-loot-body {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.raid-loot-meta {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.raid-loot-stats {
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.45;
-}
-
-.raid-loot-stats-missing {
-  color: var(--text-faint);
-  font-family: var(--font-sans);
-  font-style: italic;
-}
-
-.raid-loot-note {
-  color: var(--text-dim);
-  font-size: 12px;
-}
-
-.raid-boss-header-static {
-  align-items: baseline;
-  border-bottom: 1px solid var(--line-strong);
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-}
-
-.raid-boss-header-static strong {
-  color: var(--text-strong);
-  font-size: 14px;
-}
-
-.raid-loot-empty {
-  color: var(--text-faint);
-  font-size: 12px;
-  margin: 0;
-}
-
 /*
  * Talents: three 4-wide grids side by side, as the game lays them out.
  *
@@ -1058,47 +916,8 @@ select {
   color: var(--text);
 }
 
-/*
- * Who the character is, above the numbers they produce.
- *
- * Carries the role accent on its top rule, the same way a panel does. That accent is the one piece
- * of colour tied to what the character *is* rather than to an item, so it belongs on the block that
- * states it — and it is the only thing on the rail that changes colour when the spec changes.
- */
-.rail-character {
-  border-bottom: 1px solid var(--line);
-  border-top: 2px solid var(--rail-accent);
-  display: grid;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  padding-top: 16px;
-}
-
-.rail-character-head {
-  align-items: baseline;
-  display: flex;
-  justify-content: space-between;
-}
-
-.rail-character-restart {
-  background: none;
-  border: none;
-  color: var(--text-faint);
-  cursor: pointer;
-  font: inherit;
-  font-size: 11px;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.rail-character-restart:hover {
-  color: var(--rail-accent);
-}
-
-/* Raids and Professions have no character in play, so no rail. The main pane takes the full width
-   rather than leaving a 288px gap where the stats used to be. */
+/* No section has a rail any more (Raids picks its raid in its own header since 2026-10-13), so the
+   main pane takes the full width. */
 .app-shell-no-rail {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -1450,52 +1269,6 @@ select {
 
 .section-picker-credit a {
   color: var(--text-dim);
-}
-
-/* Discord's persistent rail: it never navigates away, so the stat readout stays on screen while gear
-   is being changed. Sticky rather than fixed, so it scrolls independently of the main pane. */
-.rail {
-  background: var(--surface-1);
-  backdrop-filter: blur(14px);
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  height: 100vh;
-  overflow-y: auto;
-  padding: 26px 20px 40px;
-  position: sticky;
-  top: 0;
-}
-
-.rail-brand h1 {
-  color: var(--text);
-  font-size: 20px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  margin: 0;
-}
-
-.rail-brand-sub {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: var(--label-size);
-  letter-spacing: var(--label-tracking);
-  margin: 8px 0 0;
-  text-transform: uppercase;
-}
-
-.rail-heading {
-  border-bottom: 1px solid var(--line);
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: var(--label-size);
-  font-weight: 500;
-  letter-spacing: var(--label-tracking);
-  margin: 0 0 14px;
-  padding-bottom: 10px;
-  text-transform: uppercase;
 }
 
 .app-main {
@@ -4039,266 +3812,6 @@ input[type='number']:focus {
   }
 }
 
-.raids-panel-shell {
-  grid-column: 1 / -1;
-}
-
-.raids-picker,
-.raids-view-toggle {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.raids-picker {
-  margin-bottom: 20px;
-}
-
-.raids-view-toggle {
-  margin: 18px 0 14px;
-}
-
-.raids-view-toggle .tab-nav-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.raid-detail-header {
-  align-items: baseline;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.raid-detail-header h3 {
-  color: var(--text-strong);
-  font-size: var(--heading-detail);
-  margin: 0;
-}
-
-.raid-detail-header span {
-  color: var(--text-dim);
-  font-size: 12px;
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.raid-section-heading {
-  color: var(--text);
-  font-size: 15px;
-  margin: 20px 0 10px;
-}
-
-.raid-facts {
-  display: grid;
-  gap: 8px;
-  margin: 0 0 4px;
-}
-
-.raid-facts dt {
-  color: var(--text-dim);
-  font-size: 12px;
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.raid-facts dd {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.4;
-  margin: 2px 0 0;
-}
-
-.raid-boss-list {
-  display: grid;
-  gap: 10px;
-}
-
-.raid-boss {
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--panel-accent, var(--text-dim));
-  border-radius: var(--radius);
-  display: grid;
-  gap: 8px;
-  padding: 12px 14px;
-}
-
-.raid-boss-header {
-  align-items: baseline;
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: space-between;
-  padding: 0;
-  text-align: left;
-  width: 100%;
-}
-
-.raid-boss-header > div {
-  align-items: baseline;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.raid-boss-header strong {
-  color: var(--text-strong);
-  font-size: 15px;
-}
-
-.raid-boss-header span {
-  color: var(--text-dim);
-  font-size: 12px;
-}
-
-.raid-boss-loot-count {
-  color: var(--panel-accent, var(--text-dim));
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.raid-boss-mechanics,
-.raid-boss-note {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.raid-boss-role-notes {
-  display: grid;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.raid-boss-role-notes li {
-  display: grid;
-  gap: 2px;
-}
-
-.raid-boss-role-notes strong {
-  color: var(--text-dim);
-  font-size: 11px;
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.raid-boss-role-notes span {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.raid-loot-list {
-  display: grid;
-  gap: 6px;
-}
-
-.raid-loot-row {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  display: grid;
-  gap: 3px;
-  padding: 8px 10px;
-}
-
-.raid-loot-row > div {
-  align-items: baseline;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.raid-loot-row strong {
-  color: var(--text-strong);
-  font-size: 13px;
-}
-
-.raid-loot-row span {
-  color: var(--text-dim);
-  font-size: 11px;
-}
-
-.raid-loot-row p {
-  color: var(--text);
-  font-size: 12px;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.raid-attunement-prereqs {
-  color: var(--text);
-  display: grid;
-  font-size: 13px;
-  gap: 4px;
-  line-height: 1.4;
-  margin: 0;
-  padding-left: 18px;
-}
-
-.raid-attunement-steps {
-  display: grid;
-  gap: 10px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.raid-attunement-step {
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  display: grid;
-  gap: 4px;
-  padding: 10px 12px;
-}
-
-.raid-attunement-step > div {
-  align-items: baseline;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.raid-attunement-step strong {
-  color: var(--text-strong);
-  font-size: 14px;
-}
-
-.raid-attunement-step span {
-  color: var(--text-dim);
-  font-size: 12px;
-}
-
-.raid-attunement-step p {
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.raid-attunement-step p.raid-attunement-quest {
-  color: var(--panel-accent, var(--text-dim));
-  font-weight: 700;
-}
-
-.raid-attunement-step p.raid-attunement-step-note {
-  color: var(--text-dim);
-}
-
-.raids-empty {
-  color: var(--text-dim);
-}
-
 .build-panel-shell {
   grid-column: 1 / -1;
 }
@@ -5002,11 +4515,27 @@ input[type='text']:focus {
 
 /* ── The spec tooltip ── */
 
+/* `FloatingTip`: any tooltip's box, fixed over the page; a sheet along the bottom on a phone. */
+.floating-tip {
+  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  position: fixed;
+  z-index: 60;
+}
+
+.floating-tip-sheet {
+  bottom: 8px;
+  left: 8px;
+  max-height: 60vh;
+  max-width: none;
+  overflow: auto;
+  right: 8px;
+}
+
 .spec-tip {
   background: linear-gradient(180deg, color-mix(in srgb, var(--glass-solid) 97%, transparent), rgba(3, 10, 10, 0.97));
   border: 1px solid var(--rim);
   border-radius: 8px;
-  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.9);
   color: #ffffff;
   display: grid;
   font: 400 12.5px / 1.38 var(--f-body);
@@ -5014,16 +4543,6 @@ input[type='text']:focus {
   max-width: 300px;
   min-width: 200px;
   padding: 9px 11px;
-  pointer-events: none;
-  position: fixed;
-  z-index: 60;
-}
-
-.spec-tip-sheet {
-  bottom: 8px;
-  left: 8px;
-  max-width: none;
-  right: 8px;
 }
 
 .spec-tip-name {
@@ -5339,6 +4858,1421 @@ input[type='text']:focus {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Raids: the boss journal, with your raid's loot (port step 2, 2026-10-13).
+ *
+ * The decided design (`docs/design/prototypes/tabs/raids.html`): the raid picked in the page's own
+ * header with a search across all five raids, then design A's boss journal and design C's "For my
+ * raid" behind a switch. The tab takes the raid's colour (`data-raid` on <html>).
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.raids-hero,
+.raids-view {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/*
+ * **Capped at 1240px, the prototypes' page width, and the art is the reason.** The journal's banner
+ * is the boss's art drawn to cover the page column; the narrowest boss art is 1152px wide, so a
+ * column wider than that would magnify it, which this app does not do (see the image test).
+ */
+.raids-view {
+  max-width: 1240px;
+}
+
+.raids-hero {
+  max-width: 780px;
+}
+
+.raids-hero .eyebrow {
+  color: var(--glow);
+}
+
+.raids-hero h1 {
+  color: var(--ink);
+  font: 400 var(--t-hero) / 1.04 var(--f-head);
+  letter-spacing: 0.01em;
+  margin: 6px 0 12px;
+  max-width: 20ch;
+}
+
+.raids-hero h1 em {
+  color: var(--glow);
+  font-style: normal;
+}
+
+.raids-hero > p:not(.eyebrow) {
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin: 0 0 14px;
+  max-width: 60ch;
+}
+
+.raid-pick {
+  display: grid;
+  gap: 8px;
+}
+
+.raid-pick fieldset {
+  align-items: center;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.raid-pick legend {
+  color: var(--ink-3);
+  float: left;
+  font: 600 var(--t-xs) var(--f-body);
+  letter-spacing: 0.1em;
+  margin-right: 6px;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.raid-pick button {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.raid-pick button small {
+  color: var(--ink-3);
+  font: 500 10px var(--f-mono);
+  margin-left: 6px;
+}
+
+.raid-pick button:hover {
+  color: var(--ink);
+}
+
+.raid-pick button[aria-pressed='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.raid-pick button[aria-pressed='true'] small {
+  color: var(--glow-ink);
+}
+
+/* The loot search: a field under the picker; while a query is going its results replace the raid. */
+.loot-search-box {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0 0;
+  max-width: 520px;
+}
+
+.loot-search-box > label {
+  color: var(--ink-3);
+  font: 600 var(--t-xs) var(--f-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loot-search-field {
+  display: flex;
+  position: relative;
+}
+
+.loot-search-field input {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  flex: 1;
+  font: 400 var(--t-md) var(--f-body);
+  min-height: 44px;
+  min-width: 0;
+  padding: 8px 44px 8px 14px;
+}
+
+.loot-search-field input::placeholder {
+  color: var(--ink-3);
+}
+
+.loot-search-field input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.loot-search-clear {
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 400 1.3rem / 1 var(--f-body);
+  height: 36px;
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+}
+
+.loot-search-clear:hover {
+  background: var(--glow-soft);
+  color: var(--ink);
+}
+
+.loot-search-hint {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+/* ── The boss journal ── */
+
+.journal {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .journal {
+    align-items: start;
+    grid-template-columns: 290px minmax(0, 1fr);
+  }
+
+  .journal-rail {
+    max-height: calc(100vh - 80px);
+    overflow: auto;
+    position: sticky;
+    top: 70px;
+  }
+}
+
+.journal-rail,
+.journal-page,
+.raid-plan .panel,
+.loot-search .panel {
+  min-height: 0;
+}
+
+.journal-rail {
+  padding: 10px;
+}
+
+.journal-rail-raid {
+  align-items: center;
+  border-bottom: 1px solid var(--rim-2);
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 4px 4px 10px;
+}
+
+.journal-rail-raid img {
+  border: 1px solid var(--rim);
+  border-radius: 6px;
+  height: 40px;
+  object-fit: cover;
+  width: 64px;
+}
+
+.journal-rail-raid b {
+  display: block;
+  font: 400 var(--t-lg) / 1.15 var(--f-head);
+}
+
+.journal-rail-raid small {
+  color: var(--ink-3);
+  font: 500 var(--t-xs) var(--f-mono);
+}
+
+.journal-rail-list {
+  display: grid;
+  gap: 3px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.journal-rail-list button {
+  align-items: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--ink-2);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  min-height: 52px;
+  padding: 5px 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.journal-rail-list button:hover {
+  background: var(--glow-soft);
+  color: var(--ink);
+}
+
+.journal-rail-list button[aria-current='true'] {
+  background: var(--glow-soft);
+  border-color: var(--glow);
+  box-shadow: inset 3px 0 0 var(--glow);
+  color: var(--ink);
+}
+
+.journal-portrait {
+  background: #0a1418 center 22% / cover no-repeat;
+  border: 2px solid var(--rim);
+  border-radius: 50%;
+  color: var(--glow);
+  display: grid;
+  flex: none;
+  font: 500 var(--t-xs) var(--f-mono);
+  height: 42px;
+  place-items: center;
+  width: 42px;
+}
+
+.journal-rail-list button[aria-current='true'] .journal-portrait {
+  border-color: var(--glow);
+}
+
+.journal-portrait-info {
+  font: 400 1.1rem var(--f-head);
+}
+
+.journal-rail-text {
+  display: grid;
+  min-width: 0;
+}
+
+.journal-rail-text b {
+  color: inherit;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.journal-rail-text small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+.journal-rail-text em {
+  color: var(--glow);
+  font-style: normal;
+}
+
+.journal-optional {
+  border: 1px solid rgba(255, 207, 122, 0.4);
+  border-radius: 4px;
+  color: var(--warn);
+  font: 600 9px / 1.5 var(--f-body);
+  letter-spacing: 0.08em;
+  margin-left: 4px;
+  padding: 0 4px;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+/* On a phone the bosses are one row you swipe along, under the page they open. */
+@media (max-width: 899px) {
+  .journal-rail {
+    padding: 8px;
+  }
+
+  .journal-rail-raid {
+    display: none;
+  }
+
+  .journal-rail-list {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .journal-rail-list li {
+    flex: none;
+    scroll-snap-align: start;
+  }
+
+  .journal-rail-list button {
+    max-width: 210px;
+    min-width: 150px;
+    width: auto;
+  }
+}
+
+.journal-page {
+  overflow: hidden;
+  padding: 0;
+}
+
+.journal-banner {
+  align-items: flex-end;
+  background: #071014 var(--journal-art) center 28% / cover no-repeat;
+  border-bottom: 1px solid var(--rim);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 190px;
+  padding: 16px;
+  position: relative;
+}
+
+.journal-banner::after {
+  background: linear-gradient(180deg, rgba(3, 8, 12, 0.05) 0%, rgba(3, 8, 12, 0.55) 55%, rgba(3, 8, 12, 0.92) 100%);
+  content: '';
+  inset: 0;
+  position: absolute;
+}
+
+.journal-banner-plain::after {
+  background: linear-gradient(180deg, rgba(3, 8, 12, 0.55), rgba(3, 8, 12, 0.92));
+}
+
+.journal-banner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.journal-number {
+  color: var(--glow);
+  font: 500 var(--t-xs) var(--f-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.journal-banner h2 {
+  font: 400 var(--t-xl) / 1.1 var(--f-head);
+  margin: 2px 0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+}
+
+.journal-banner p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0;
+}
+
+.journal-step {
+  display: flex;
+  gap: 6px;
+}
+
+.journal-step button {
+  background: rgba(3, 10, 14, 0.7);
+  border: 1px solid var(--rim);
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+  font: 400 1.2rem / 1 var(--f-body);
+  height: 44px;
+  width: 44px;
+}
+
+.journal-step button:hover:not(:disabled) {
+  border-color: var(--glow);
+  color: var(--glow);
+}
+
+.journal-step button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.journal-tabs {
+  border-bottom: 1px solid var(--rim-2);
+  display: flex;
+  gap: 2px;
+  padding: 0 10px;
+}
+
+.journal-tabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 44px;
+  padding: 12px 12px 10px;
+}
+
+.journal-tabs button[aria-selected='true'] {
+  border-bottom-color: var(--glow);
+  color: var(--ink);
+}
+
+.journal-body {
+  padding: 12px 14px 14px;
+}
+
+.journal-filter {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+}
+
+.journal-filter label {
+  align-items: center;
+  color: var(--ink-3);
+  display: flex;
+  font: 600 var(--t-xs) var(--f-body);
+  gap: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.journal-filter select {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  font: 600 var(--t-sm) var(--f-body);
+  letter-spacing: 0;
+  min-height: 40px;
+  padding: 5px 10px;
+  text-transform: none;
+}
+
+.journal-count {
+  align-items: center;
+  color: var(--ink-2);
+  display: inline-flex;
+  font-size: var(--t-sm);
+  gap: 6px;
+}
+
+.journal-subhead,
+.raid-plan-label {
+  color: var(--ink-3);
+  font: 600 var(--t-xs) var(--f-body);
+  letter-spacing: 0.1em;
+  margin: 4px 0 8px;
+  text-transform: uppercase;
+}
+
+.journal-loot,
+.journal-steps,
+.journal-facts,
+.raid-plan-facts,
+.raid-plan-loot,
+.loot-search-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.journal-loot {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: 6px;
+}
+
+@media (min-width: 1100px) {
+  .journal-loot {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.journal-item {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  color: var(--ink);
+  cursor: default;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  min-height: 56px;
+  padding: 6px 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.journal-item:hover,
+.journal-item:focus-visible {
+  background: var(--glow-soft);
+  border-color: var(--glow);
+}
+
+.journal-item-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.journal-item-text b {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.journal-item-text small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+.journal-item-stats {
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loot-rank {
+  align-items: center;
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  display: inline-flex;
+  flex: none;
+  font: 600 11px / 1 var(--f-mono);
+  padding: 3px 6px;
+  white-space: nowrap;
+}
+
+.loot-rank-first {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+/* A drop's icon in a frame of its quality colour. */
+.loot-icon {
+  background: #0b1316;
+  border: 2px solid #6f7c7c;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  flex: none;
+  height: calc(var(--loot-icon-size, 36px) + 4px);
+  line-height: 0;
+  overflow: hidden;
+  width: calc(var(--loot-icon-size, 36px) + 4px);
+}
+
+.loot-icon img {
+  display: block;
+  height: var(--loot-icon-size, 36px);
+  width: var(--loot-icon-size, 36px);
+}
+
+.loot-icon-epic {
+  border-color: var(--q-epic);
+}
+
+.loot-icon-rare {
+  border-color: var(--q-rare);
+}
+
+.loot-icon-uncommon {
+  border-color: var(--q-uncommon);
+}
+
+.loot-icon-legendary {
+  border-color: var(--q-legendary);
+}
+
+/* A drop opened from a search: marked for a moment so the eye finds it. */
+.loot-flash {
+  animation: loot-flash 1.6s ease-out 1;
+}
+
+@keyframes loot-flash {
+  0%,
+  40% {
+    box-shadow:
+      0 0 0 2px var(--glow),
+      0 0 24px -2px var(--glow);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loot-flash {
+    animation: none;
+    outline: 2px solid var(--glow);
+    outline-offset: 2px;
+  }
+}
+
+.journal-more,
+.raid-plan-rest {
+  border-top: 1px solid var(--rim-2);
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.journal-more > summary,
+.raid-plan-rest > summary {
+  color: var(--glow);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  list-style: none;
+  min-height: 44px;
+  padding: 10px 0;
+}
+
+.journal-more > summary::-webkit-details-marker,
+.raid-plan-rest > summary::-webkit-details-marker {
+  display: none;
+}
+
+.journal-more > summary::before,
+.raid-plan-rest > summary::before {
+  content: '+ ';
+  font-family: var(--f-mono);
+}
+
+.journal-more[open] > summary::before,
+.raid-plan-rest[open] > summary::before {
+  content: '− ';
+}
+
+.journal-empty,
+.raid-plan-empty {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 10px;
+}
+
+.journal-fight p,
+.journal-about p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  max-width: 72ch;
+}
+
+.journal-about p strong {
+  color: var(--ink);
+}
+
+.journal-roles {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.journal-roles li {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  padding: 8px 10px;
+}
+
+.journal-roles b {
+  color: var(--glow);
+  display: inline-block;
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  min-width: 96px;
+  text-transform: uppercase;
+}
+
+/* Two classes, so it outranks the journal's own paragraph colour without `!important`. */
+.journal-body .journal-verify {
+  background: var(--warn-soft);
+  border: 1px solid rgba(255, 207, 122, 0.25);
+  border-left: 3px solid var(--warn);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 8px 11px;
+}
+
+.journal-verify strong {
+  color: var(--warn);
+}
+
+.journal-facts,
+.raid-plan-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.journal-facts li,
+.raid-plan-facts li {
+  background: var(--glow-soft);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  font: 500 var(--t-xs) var(--f-mono);
+  padding: 3px 10px;
+}
+
+.journal-facts b,
+.raid-plan-facts b {
+  color: var(--ink-3);
+  font-family: var(--f-body);
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.journal-about h3 {
+  font: 400 var(--t-lg) / 1.2 var(--f-head);
+  margin: 14px 0 6px;
+}
+
+.journal-about h3 small {
+  color: var(--ink-3);
+  font: 400 var(--t-xs) var(--f-body);
+}
+
+.journal-before {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.journal-steps {
+  display: grid;
+  gap: 6px;
+}
+
+.journal-steps li {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  font-size: var(--t-sm);
+  padding: 8px 10px 8px 42px;
+  position: relative;
+}
+
+.journal-step-number {
+  color: var(--glow);
+  font: 500 var(--t-xs) var(--f-mono);
+  left: 11px;
+  position: absolute;
+  top: 9px;
+}
+
+.journal-steps li b {
+  display: block;
+  font-weight: 600;
+}
+
+.journal-steps li small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+.journal-steps li p {
+  font-size: var(--t-xs);
+  margin: 3px 0 0;
+}
+
+.journal-difficulty {
+  border: 1px solid var(--rim);
+  border-radius: 4px;
+  color: var(--ink-2);
+  display: inline-block;
+  font: 600 10px / 1.5 var(--f-body);
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+  padding: 0 5px;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+.journal-difficulty-heroic {
+  border-color: rgba(255, 207, 122, 0.4);
+  color: var(--warn);
+}
+
+.journal-difficulty-raid {
+  color: var(--glow);
+}
+
+/* ── For my raid ── */
+
+.raid-plan {
+  display: grid;
+  gap: 16px;
+}
+
+.raid-plan-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.raid-plan .panel h2 {
+  margin-bottom: 0;
+}
+
+.raid-plan h2 small {
+  color: var(--ink-3);
+  font: 500 var(--t-xs) var(--f-mono);
+}
+
+.raid-plan-source,
+.raid-plan-note,
+.raid-plan-about {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0;
+}
+
+.raid-plan-about {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+.link-button {
+  background: none;
+  border: 0;
+  color: var(--glow);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.raid-plan-roster {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.raid-plan-roster-ten {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 640px;
+}
+
+@media (max-width: 760px) {
+  .raid-plan-roster,
+  .raid-plan-roster-ten {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+.raid-plan-group {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.raid-plan-group > span {
+  color: var(--ink-3);
+  display: block;
+  font: 500 10px var(--f-mono);
+  letter-spacing: 0.12em;
+  margin: 0 0 4px 2px;
+  text-transform: uppercase;
+}
+
+.raid-plan-group ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raid-plan-raider {
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  position: relative;
+  width: 44px;
+}
+
+.raid-plan-raider b {
+  background: var(--glow);
+  border-radius: 9px;
+  bottom: -3px;
+  color: var(--glow-ink);
+  font: 700 10px / 18px var(--f-mono);
+  height: 18px;
+  min-width: 18px;
+  padding: 0 4px;
+  position: absolute;
+  right: -3px;
+  text-align: center;
+}
+
+.raid-plan-raider-none {
+  opacity: 0.5;
+}
+
+.raid-plan-raider-none b {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  color: var(--ink-3);
+}
+
+.raid-plan-raider[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--glow),
+    0 0 18px -2px var(--glow);
+}
+
+.raid-plan-selected {
+  align-items: center;
+  background: var(--glow-soft);
+  border: 1px solid var(--glow);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--t-sm);
+  gap: 8px 12px;
+  padding: 8px 10px;
+}
+
+.raid-plan-selected button {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: 600 var(--t-xs) var(--f-body);
+  margin-left: auto;
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.raid-plan-top {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+.raid-plan-top-item {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.raid-plan-top-item:hover,
+.raid-plan-top-item:focus-visible {
+  border-color: var(--glow);
+}
+
+.raid-plan-top-item b,
+.raid-plan-item b {
+  display: block;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.raid-plan-top-item small,
+.raid-plan-item small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+
+.raid-plan-bosses {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .raid-plan-bosses {
+    align-items: start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.raid-plan-boss h2 {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.raid-plan-boss h2 small {
+  margin-left: auto;
+  text-align: right;
+}
+
+.raid-plan-boss .journal-portrait {
+  height: 34px;
+  width: 34px;
+}
+
+.raid-plan-loot {
+  display: grid;
+  gap: 4px;
+}
+
+.raid-plan-row {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  display: grid;
+  gap: 4px 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 6px 8px;
+}
+
+.raid-plan-row-hot {
+  border-color: color-mix(in srgb, var(--warn) 55%, transparent);
+}
+
+.raid-plan-item {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  cursor: default;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.raid-plan-count {
+  color: var(--ink-2);
+  font: 600 var(--t-xs) var(--f-mono);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.raid-plan-hot {
+  border: 1px solid rgba(255, 207, 122, 0.5);
+  border-radius: 4px;
+  color: var(--warn);
+  display: inline-block;
+  font: 700 10px / 1.5 var(--f-body);
+  letter-spacing: 0.06em;
+  margin-left: 6px;
+  padding: 0 5px;
+  text-transform: uppercase;
+}
+
+.raid-plan-who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  grid-column: 1 / -1;
+  padding-left: 2px;
+}
+
+.raid-plan-chip {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--rim-2);
+  border-radius: 999px;
+  color: var(--ink-2);
+  display: inline-flex;
+  font: 600 10px / 1 var(--f-mono);
+  gap: 3px;
+  padding: 2px 6px 2px 2px;
+}
+
+.raid-plan-chip .spec-icon {
+  border-width: 1.5px;
+}
+
+.raid-plan-chip-first {
+  color: var(--glow);
+}
+
+.raid-plan-chip-mine {
+  border-color: var(--glow);
+  color: var(--ink);
+}
+
+.raid-plan-rest ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.raid-plan-rest button {
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  cursor: default;
+  display: grid;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  place-items: center;
+}
+
+/* ── Search results ── */
+
+.loot-search {
+  display: grid;
+  gap: 14px;
+}
+
+.loot-search-head {
+  background: var(--scrim);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.loot-search-head h2 {
+  font: 400 var(--t-xl) / 1.2 var(--f-head);
+  margin: 0;
+}
+
+.loot-search-head p,
+.loot-search-empty p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 2px 0 0;
+}
+
+.loot-search-raid h2 small {
+  color: var(--ink-3);
+  font: 500 var(--t-xs) var(--f-mono);
+}
+
+.loot-search-boss {
+  color: var(--ink-3);
+  font: 600 var(--t-xs) var(--f-body);
+  letter-spacing: 0.08em;
+  margin: 8px 0 2px;
+  text-transform: uppercase;
+}
+
+.loot-search-hits {
+  display: grid;
+  gap: 2px;
+}
+
+.loot-search-hits li {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.loot-search-hit {
+  align-items: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 260px;
+  font: inherit;
+  gap: 10px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.loot-search-hit:hover,
+.loot-search-hit:focus-visible {
+  background: var(--glow-soft);
+  border-color: var(--rim);
+}
+
+.loot-search-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.loot-search-name mark {
+  background: var(--glow-soft);
+  border-radius: 3px;
+  color: inherit;
+}
+
+.loot-search-meta {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.loot-search-note {
+  color: var(--ink-2);
+  font: 600 var(--t-xs) var(--f-mono);
+}
+
+@media (max-width: 640px) {
+  .loot-search-meta {
+    display: none;
+  }
+}
+
+/* ── The game-style item tooltip ── */
+
+.item-tip-box {
+  background: linear-gradient(180deg, rgba(10, 16, 30, 0.97), rgba(4, 8, 18, 0.97));
+  border: 1px solid rgba(200, 210, 230, 0.45);
+  border-radius: 6px;
+  padding: 9px 11px;
+}
+
+.item-tip {
+  color: #ffffff;
+  display: grid;
+  font: 400 12.5px / 1.38 var(--f-body);
+  gap: 2px;
+  max-width: 310px;
+  min-width: 220px;
+}
+
+.floating-tip-sheet .item-tip {
+  max-width: none;
+}
+
+.item-tip-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.item-tip-ilvl,
+.item-tip-kind,
+.item-tip-ranks b {
+  color: #ffd100;
+}
+
+.item-tip-kind {
+  margin-top: 3px;
+}
+
+.item-tip-row {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.item-tip-green {
+  color: #1eff00;
+}
+
+.item-tip-grey {
+  color: #9d9d9d;
+}
+
+.item-tip-note {
+  color: #c8d3d2;
+  font-size: 11.5px;
+  margin-top: 4px;
+}
+
+.item-tip-where {
+  color: #a9c6c4;
+  font-size: 11.5px;
+  margin-top: 5px;
+}
+
+.item-tip-ranks {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e8dcbc;
+  font-size: 11.5px;
+  margin-top: 5px;
+  padding-top: 5px;
+}
+
+.item-tip-socket {
+  align-items: center;
+  color: #9d9d9d;
+  display: flex;
+  gap: 6px;
+}
+
+.item-tip-socket::before {
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  content: '';
+  height: 10px;
+  width: 10px;
+}
+
+.item-tip-socket-red {
+  color: #ff6b6b;
+}
+
+.item-tip-socket-blue {
+  color: #6ba8ff;
+}
+
+.item-tip-socket-yellow {
+  color: #ffe36b;
+}
+
+.item-tip-socket-meta {
+  color: #d8d8d8;
+}
+
+@media (max-width: 700px) {
+  .journal-filter select,
+  .raid-plan-selected button,
+  .raid-pick button {
+    min-height: 44px;
+  }
+
+  .loot-search-clear {
+    height: 44px;
+    right: 0;
+    width: 44px;
+  }
+}
+
+@media (max-width: 520px) {
+  .raid-plan-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .raid-plan-count {
+    text-align: left;
+  }
+}
+
 /*
  * Item icons.
  *
@@ -5364,8 +6298,7 @@ input[type='text']:focus {
  * border rather than sitting flush against it.
  */
 .gear-glyph .item-icon,
-.bis-item-frame .item-icon,
-.raid-loot-frame .item-icon {
+.bis-item-frame .item-icon {
   border-radius: 1px;
 }
 
@@ -7004,11 +7937,9 @@ h4,
  * The landing page's sections and the professions grid's thirteen are *front doors* — a card you
  * click to go somewhere, as opposed to a row in a list. They are glass like a panel, with the same
  * wash from the top-left in the colour of what is behind the door; each keeps its top-edge accent,
- * which is how you tell them apart at a glance. The raid picker's cards are doors too, but their two
- * layers carry the raid's art and its scrim (further down), so they take only the rounded edge.
+ * which is how you tell them apart at a glance.
  */
 .section-card,
-.raid-picker-card,
 .profession-card {
   position: relative;
   border-radius: 12px;
@@ -7489,475 +8420,6 @@ h4,
   line-height: 1.55;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * The raid reel: one raid per screen, scrolled through.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-/*
- * **Capped at the width of the artwork, and centred rather than run to the panel's edge.**
- *
- * This number is set by the images, not by taste. A card that filled the panel was 1353px across on
- * a 1440px window and 2706 device pixels on a 2x screen — so every panel was being magnified, the
- * two that only exist at 1180px by nearly 2x. That is what made those two look soft while the other
- * three, which are 1536px, looked fine.
- *
- * It is also what made the page lag. Repainting five 1.5-megapixel images across that much surface
- * on every scroll frame dropped 24 of 108 frames, the worst taking 67ms. At the sizes below, none.
- * The blur and the jank were the same fact measured two ways.
- *
- * 1180 is the width of the narrowest panel, so with two cards to a row each one is served at 1:1 on
- * a 2x display and downsampled everywhere else — the browser never invents a pixel. Raising this
- * puts both problems back. If the cards want to be bigger, the panels have to get bigger first;
- * `tools/ingest/upscale-raid-art.mjs` is where that happens.
- *
- * The cap goes on the whole picker rather than on the reel alone so the heading keeps the cards'
- * left edge. A centred reel under a full-width heading reads as two columns that failed to line up.
- *
- * A `width` rather than a `max-width`, which matters here: this is a grid item, and a grid item with
- * auto side margins is sized to fit-content instead of stretching — `max-width` left the reel 629px
- * across, the width of its longest line of plate text.
- */
-.raid-picker {
-  width: min(100%, 1180px);
-  margin-inline: auto;
-}
-
-.raid-picker-reel {
-  display: grid;
-  gap: 16px;
-  /*
-   * An explicit track rather than the implicit `auto` one.
-   *
-   * A card with both `aspect-ratio` and a `min-height` floor has a *minimum width* — the ratio
-   * transfers the floor across — and an `auto` track sizes itself to that. On a 390px phone the
-   * 300px floor became a 555px card and the reel ran off the side of the screen. `minmax(0, 1fr)`
-   * takes the track's width from the container instead, and leaves the floor doing only the job it
-   * was added for.
-   */
-  grid-template-columns: minmax(0, 1fr);
-  /*
-   * Proximity rather than mandatory snapping. Mandatory fights a trackpad — it hijacks a flick that
-   * was meant to carry past two raids — while proximity only tidies up a scroll that already stopped
-   * near an edge. A picker should not take the scroll wheel away from you.
-   */
-  scroll-snap-type: y proximity;
-}
-
-.raid-picker-card {
-  position: relative;
-  /*
-   * A fixed shape rather than a fixed height, and 1.85 rather than anything rounder.
-   *
-   * That is the aspect the two 1180px panels already are, so they fill the card with nothing cropped
-   * and nothing stretched; the three 1536x1024 ones can spare the 19% off the top and bottom that
-   * `background-position` then places. Deriving height from width also means the card shrinks with
-   * the window — a narrow window now asks *less* of the art, where `78vh` used to ask a short window
-   * for a wide letterbox, which is the crop that suits these images worst.
-   */
-  aspect-ratio: 1.85;
-  /* A floor so a narrow window gets a card rather than a 200px strip. Low enough that it never wins
-     against the ratio at the two-up sizes, where it would only squash the art into a taller crop. */
-  min-height: 240px;
-  /*
-   * The width has to be stated, or the floor above becomes a *width* floor.
-   *
-   * `aspect-ratio` with an auto width reads the height and works backwards, so `min-height: 240px`
-   * quietly meant `min-width: 444px` — and a 390px phone got a card hanging off the side of the
-   * screen. Taking the width from the grid area makes the ratio run the other way, height from
-   * width, and leaves the floor clamping only the thing it names.
-   */
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-1);
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  padding: 0;
-  text-align: left;
-  scroll-snap-align: start;
-  transition: border-color 140ms ease, transform 140ms ease;
-}
-
-/*
- * The art, and the scrim that keeps the plate readable over it.
- *
- * A pseudo-element rather than the card's own background so the two can be transformed
- * independently — the image lifts slightly on hover while the frame stays put, which reads as depth
- * rather than as the whole card jumping.
- */
-.raid-picker-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--raid-art);
-  background-size: cover;
-  background-position: center 35%;
-  transition: transform 400ms ease;
-}
-
-.raid-picker-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.35) 0%,
-    rgba(0, 0, 0, 0.1) 35%,
-    rgba(0, 0, 0, 0.72) 74%,
-    rgba(0, 0, 0, 0.92) 100%
-  );
-}
-
-.raid-picker-card:hover::before,
-.raid-picker-card:focus-visible::before {
-  transform: scale(1.03);
-}
-
-.raid-picker-card:hover,
-.raid-picker-card:focus-visible {
-  border-color: var(--metal-edge);
-  outline: none;
-}
-
-/*
- * The plate sits at the bottom, where the art is darkest and where a caption belongs.
- *
- * It carries its own faint ground as well as the gradient above, because a raid's art cannot be
- * relied on to be dark in the corner the text happens to land in — Tempest Keep is bright violet
- * exactly there.
- */
-/*
- * The plate needs its own ground, not just the card's gradient.
- *
- * A raid's art cannot be relied on to be dark where the text lands — Karazhan's moon and Tempest
- * Keep's violet both sit exactly there. The small type (boss count, the call to action) is the part
- * that fails first, so the plate carries a heavier wash than the card behind it does.
- */
-/*
- * `z-index` for the same reason the boss card's plate needs one: `::after` is a later sibling in tree
- * order, so this plate was being painted *under* the card's own scrim. The name declared
- * `rgb(255,255,255)` and reached the screen as `rgb(126,126,126)`; the drop count declared
- * `rgb(135,142,147)` and painted `rgb(56,59,61)`. It has read as washed-out since the reel shipped,
- * and the reason it survived a contrast pass is that the pass measured the ground rather than the ink.
- */
-.raid-picker-plate {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 5px;
-  padding: 26px 26px 26px;
-  width: 100%;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.62) 42%, rgba(0, 0, 0, 0.86));
-}
-
-.raid-picker-plate .raid-picker-tier,
-.raid-picker-plate .raid-picker-count {
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
-}
-
-.raid-picker-name {
-  color: var(--text-strong);
-  font-family: var(--font-display);
-  font-size: clamp(26px, 3.4vw, 40px);
-  font-weight: 700;
-  letter-spacing: 0.035em;
-  line-height: 1.05;
-  text-shadow: 0 2px 0 #000, 0 0 24px rgba(0, 0, 0, 0.9);
-}
-
-.raid-picker-go {
-  color: var(--metal-edge);
-  font-family: var(--font-display);
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 140ms ease, transform 140ms ease;
-}
-
-.raid-picker-card:hover .raid-picker-go,
-.raid-picker-card:focus-visible .raid-picker-go {
-  opacity: 1;
-  transform: none;
-}
-
-/* Touch has no hover, so the affordance has to be permanent there rather than revealed. */
-@media (hover: none) {
-  .raid-picker-go {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/*
- * **Two raids to a row once there is room for two.**
- *
- * Four tracks with every card spanning two, rather than two tracks — that is what lets the odd fifth
- * card sit centred in its own row instead of being orphaned against the left margin or stretched to
- * double width, which would undo everything above. The front door arranges its five section cards
- * the same way for the same reason.
- *
- * Halving the card again is what takes the two 1180px panels to 1:1 on a 2x screen. It is also the
- * point at which scrolling this page stops costing anything.
- */
-@media (min-width: 760px) {
-  .raid-picker-reel {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    /*
-     * Snapping belonged to a reel of one-per-screen panels. At this size three rows are in view at
-     * once, and a snap that tugs the scroll between them is friction with nothing left to gain.
-     */
-    scroll-snap-type: none;
-  }
-
-  .raid-picker-card {
-    grid-column: span 2;
-  }
-
-  .raid-picker-card:last-child {
-    grid-column: 2 / span 2;
-  }
-
-  /* The plate and its title were drawn for a card twice this wide. */
-  .raid-picker-plate {
-    padding: 18px 20px 20px;
-  }
-
-  .raid-picker-name {
-    font-size: clamp(21px, 2vw, 28px);
-  }
-}
-
-@media (max-width: 700px) {
-  .raid-picker-plate {
-    padding: 18px 18px 20px;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Inside a raid: a card per encounter, its loot behind a click.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-/*
- * **One card to a row, with its loot opening directly underneath it.**
- *
- * This was two across for a day and the two-column version had a real problem: a full-width table
- * had to break out of the grid to get its measure, so opening two bosses put their tables in a
- * stack that no longer sat under the picture they belonged to. One per row makes the relationship
- * structural instead — the table is simply the next element after its own card — and opening several
- * reads as several open cards rather than a pile of bars at the bottom.
- *
- * **1152 is the width of the narrowest boss panel** (Attumen's), so a full-width card is still never
- * asked to magnify its art. That is the same rule the raid picker's 1180 comes from, recalculated
- * for this set of images; raising it puts the blur back. The app-wide image test is the guard.
- */
-.raid-boss-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  width: min(100%, 1152px);
-  margin-inline: auto;
-}
-
-.raid-boss-card {
-  position: relative;
-  /*
-   * Wider than the raid cards' 1.85, because these run the full width and eleven of them at that
-   * shape would be six thousand pixels of Karazhan before you reached the bottom. 2.6 keeps a card
-   * that reads as artwork at roughly 400px tall, and still shows about half the height of the
-   * portrait-ish Karazhan panels — enough that the encounter is never cropped to its knees.
-   */
-  aspect-ratio: 2.6;
-  min-height: 190px;
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-1);
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  padding: 0;
-  text-align: left;
-  transition: border-color 140ms ease;
-}
-
-/*
- * The art. A pseudo-element rather than the button's own background so the picture can lift on hover
- * while the frame stays put, and so `--boss-art` being absent simply paints nothing.
- */
-.raid-boss-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--boss-art);
-  background-size: cover;
-  background-position: center 30%;
-  transition: transform 400ms ease;
-}
-
-.raid-boss-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.06) 38%, rgba(0, 0, 0, 0.74) 76%, rgba(0, 0, 0, 0.93) 100%);
-}
-
-.raid-boss-card:hover::before,
-.raid-boss-card:focus-visible::before {
-  transform: scale(1.03);
-}
-
-.raid-boss-card:hover,
-.raid-boss-card:focus-visible {
-  border-color: var(--metal-edge);
-  outline: none;
-}
-
-/* An open card keeps its lit edge, so which table belongs to which boss is never ambiguous. */
-.raid-boss-card[data-open] {
-  border-color: var(--metal-edge);
-}
-
-/*
- * The plate carries its own wash as well as the card's gradient, because a boss's art cannot be
- * relied on to be dark where the text lands — the Chess Event is a bright board and Netherspite is
- * lit from below.
- */
-/*
- * **`z-index` here is the whole reason this text was legible-in-theory and grey-on-screen.**
- *
- * `::after` is a child of the card in tree order and comes *after* the real children, so a positioned
- * plate with `z-index: auto` paints underneath it. The card's scrim — black at 0.93 where the plate
- * sits — was being drawn straight over the top of the name. The ink computed as `rgb(255,255,255)`
- * and the brightest pixel actually painted inside the heading was `rgb(57,57,57)`.
- *
- * Worth remembering how that was missed: the first contrast pass sampled the *ground* behind each
- * line and compared it to the declared colour, which measured a ratio the page never rendered.
- * Measuring the ground is not measuring the text.
- */
-/*
- * A boss with no picture yet.
- *
- * **It used to be the same 400px card with nothing in it**, because the panel handed every boss an
- * art URL whether the file existed or not: a black rectangle under a gradient, with a 404 behind it.
- * A participant in the 2026-09-21 usability study read it as a broken page, and they were right to.
- *
- * The card keeps everything it says and gives up the space it was holding for a picture. It is the
- * same rule as the gear list's empty slots: nothing is worth one line, not fifty.
- */
-.raid-boss-card[data-art='none'] {
-  aspect-ratio: auto;
-  background: var(--surface-2);
-  min-height: 0;
-}
-
-/* No artwork to lift, and no scrim needed over a plain surface. */
-.raid-boss-card[data-art='none']::before,
-.raid-boss-card[data-art='none']::after {
-  content: none;
-}
-
-.raid-boss-card[data-art='none'] .raid-boss-card-plate {
-  background: none;
-  grid-template-columns: 1fr auto auto;
-  align-items: baseline;
-  gap: 4px 16px;
-}
-
-/* The name carries no picture behind it, so it needs no shadow to lift off one. */
-.raid-boss-card[data-art='none'] .raid-boss-card-name {
-  font-size: 17px;
-  text-shadow: none;
-}
-
-.raid-boss-card-plate {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 3px;
-  padding: 14px 16px 15px;
-  width: 100%;
-  /*
-   * Enough wash to carry the ink and no more, checked against the pixels actually painted.
-   *
-   * An earlier version of this was far heavier, because the text looked grey and the wash was the
-   * suspect. It was not — the plate was being painted under the card's scrim, see the `z-index`
-   * above — and the extra darkness was buying nothing except less of the artwork. These numbers hold
-   * every line above 4.5:1 against the brightest ground under it, on all eleven Karazhan cards.
-   */
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.42) 26%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.9));
-}
-
-/*
- * **The ink was already `#ffffff` and the name still read grey — the shadow was doing it.**
- *
- * The raid picker draws its title at 40px, where `0 2px 0 #000` plus a 20px black glow is a halo
- * around heavy letterforms. At 22px the same shadow is proportionally enormous, and the display
- * face (Cinzel then, Marcellus now) is a serif with thin strokes: the glow bled through the antialiased edges of every stem until the
- * letters read as mid-grey. Copying a treatment across a size change is what went wrong, not the
- * colour choice.
- *
- * A tight, dark, small-radius shadow instead. It still lifts the name off a bright picture — that is
- * what it is for — without sitting inside the glyphs.
- */
-.raid-boss-card-name {
-  color: var(--text-strong);
-  font-family: var(--font-display);
-  font-size: clamp(19px, 1.8vw, 25px);
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1.1;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.8);
-}
-
-.raid-boss-card-count {
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
-}
-
-.raid-boss-card-cue {
-  color: var(--metal-edge);
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  margin-top: 2px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
-}
-
-/*
- * The loot table, sitting immediately under the card that opened it.
- *
- * The lit top edge and the negative margin are what tie it to that card rather than leaving it
- * looking like the next section down — it reads as the card having unfolded, which is what a reader
- * needs when three of them are open at once.
- */
-.raid-boss-drop {
-  margin-top: -14px;
-  border: 1px solid var(--metal-edge);
-  border-top: 0;
-  border-radius: 0 0 var(--radius) var(--radius);
-  background: var(--surface-0);
-  padding: 4px 16px 10px;
-}
-
-/* An open card meets its table, so the two read as one object rather than two stacked ones. */
-.raid-boss-card[data-open] {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
 /* --- Gear comparison ------------------------------------------------------------------------- */
 
 .compare-panel-shell {
@@ -8175,49 +8637,6 @@ h4,
   }
 }
 
-/*
- * The rail stops being a sticky full-height sidebar once it is a band above the content.
- *
- * `height: 100vh` with `position: sticky` is exactly right for a column beside the page and exactly
- * wrong stacked on top of one: it pinned the rail to a full screen regardless of what was in it, so
- * the content below started precisely one swipe down even after the stat readout collapsed to 464px
- * of actual content. The border moves with it — a right edge divides two columns, a bottom edge
- * divides two bands.
- *
- * This is the last of the mobile rules that had never actually run. The paperdoll's single-column
- * layout and its reordered summary above were written for this breakpoint and were dead until the
- * shell's own collapse was repaired, which is why none of them had been seen to be incomplete.
- */
-@media (max-width: 900px) {
-  .rail {
-    border-bottom: 1px solid var(--line);
-    border-right: 0;
-    height: auto;
-    overflow-y: visible;
-    position: static;
-  }
-}
-
-/*
- * The four character selects go two-up once the rail is a band rather than a column.
- *
- * Stacked single-file they were 378px of the rail on their own — more than the stat readout they sit
- * above, and the reason the content still began three quarters of the way down a 375px screen after
- * the stats collapsed. Two columns halve that without shrinking anything: at 375px each select still
- * gets about 160px, which fits the longest value any of them holds ("Specialization" over
- * "Protection"). The head keeps the full width so "Start over" stays at the far edge where it is on
- * desktop.
- */
-@media (max-width: 900px) {
-  .rail-character {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .rail-character-head {
-    grid-column: 1 / -1;
-  }
-}
-
 /* Names the profession a slot's missing enchants need, so an absent picker is a state rather than
    a gap. See professionsGatingEnchantsForSlot. */
 .pane-enchant-locked {
@@ -8240,36 +8659,6 @@ h4,
  * and the whole phone layout was dead because of it.
  */
 @media (max-width: 900px) {
-  /* The rail's spacing was sized for a full-height column with room to breathe. As a band above the
-     content, every pixel of it pushes the panel down. */
-  .rail {
-    gap: 16px;
-    padding: 16px 16px 18px;
-  }
-
-  .rail-character {
-    margin-bottom: 0;
-    padding-bottom: 12px;
-  }
-
-  /*
-   * The four selects keep their labels for assistive tech but not on screen. Their values name
-   * themselves — "Alliance", "Human", "Warrior", "Fury" — and the label row above each was 23px, four
-   * times over. Clipped rather than `display: none`, because a hidden label's text drops out of the
-   * select's accessible name and the combobox would be announced as nothing.
-   */
-  .rail-character .field > span {
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
-  }
-
-  .rail-character select {
-    min-height: 44px;
-  }
 
   /*
    * Both tab bars become a three-column grid. **Every tab stays visible**, which is the reason these
@@ -8317,19 +8706,6 @@ h4,
 
   .topbar .tab-nav {
     gap: 2px 6px;
-  }
-}
-
-@media (max-width: 900px) {
-
-  .rail-character-restart {
-    position: relative;
-  }
-
-  .rail-character-restart::after {
-    content: '';
-    inset: -16px -10px;
-    position: absolute;
   }
 }
 

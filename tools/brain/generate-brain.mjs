@@ -422,8 +422,8 @@ The distinction that trips people up: buffs multiply your own numbers, debuffs m
     summary: 'The quest chains that gate raid entry, and why they shape the raid week.',
     body: `TBC gates its raids behind attunement chains rather than item level. The chains run through heroic dungeons and earlier raids, which is why Karazhan, Gruul's Lair, and Magtheridon's Lair stay in the weekly rotation long after their loot stops mattering — they hold the keys to Serpentshrine Cavern and Tempest Keep.
 
-Two of the five raids here have their full ordered chain modelled step by step; the other three carry a one-line summary because their requirement is short enough to state in a sentence.`,
-    modules: ['domain/raids/raidTypes.ts', 'domain/raids/sampleAttunements.ts', 'features/raids/RaidAttunementChain.tsx'],
+Three of the five raids have their full ordered chain step by step (Karazhan, Serpentshrine Cavern and Tempest Keep), shown on each raid's "About the raid" page in the Raids tab; Gruul's Lair and Magtheridon's Lair need none, and their page says so.`,
+    modules: ['domain/raids/raidTypes.ts', 'domain/raids/sampleAttunements.ts', 'features/raids/RaidAbout.tsx'],
     related: ['Content Phases', 'Serpentshrine Cavern', 'Tempest Keep'],
   },
   {
@@ -688,6 +688,8 @@ const DESIGN_NOTES = [
 
 **Step 1, Spec Tier Lists (2026-10-12):** the tier board with a card for any spec (its place on every list, archon.gg's DPS, what it brings to a raid, its signature ability, how many are in your saved raid), and "Against the logs" behind a switch. The standings come from \`domain/tierlists/specStanding.ts\`; the tier lists now record when they were fetched.
 
+**Step 2, Raids (2026-10-13):** the boss journal (one boss at a time, "Loot for" any spec with its ranks, the fight, the raid's attunement), "For my raid" (who in your saved raid, or the labelled example, wants each drop, and what is contested), a search across all five raids, and the game-style item tooltip the planner tabs will share. The picker screen and the rail of raids are gone; the tab takes each raid's colour.
+
 **The maps rework** has a plan of its own (\`docs/design/MAPS-PLAN.md\`): the Professions maps are retail, post-Cataclysm art under TBC coordinates, and Wowhead serves the TBC art at its own path.`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
@@ -706,6 +708,11 @@ const DESIGN_NOTES = [
       'features/tierlists/TierListsPanel.tsx',
       'features/tierlists/TierBoard.tsx',
       'features/tierlists/AgainstTheLogs.tsx',
+      'domain/raids/raidLoot.ts',
+      'features/raids/RaidsPanel.tsx',
+      'features/raids/BossJournal.tsx',
+      'features/raids/ForMyRaid.tsx',
+      'components/ui/ItemTooltip.tsx',
     ],
     related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },

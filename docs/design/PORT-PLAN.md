@@ -1,6 +1,6 @@
 # Bringing the decided designs into the live app: plan
 
-**Status: approved 2026-10-12; step 0 (the foundation) and step 1 (Spec Tier Lists) done 2026-10-12. Next: step 2, Raids.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** ([`MAPS-PLAN.md`](MAPS-PLAN.md), see Decision 2). With step 0 the owner also chose: **the tab's colour replaces the faction theme**, **every tab takes the new look at once** (the old token names point at the new values until each tab is ported), and **the fonts are vendored** (Marcellus, Figtree and JetBrains Mono, with their licences).
+**Status: approved 2026-10-12; steps 0 (the foundation) and 1 (Spec Tier Lists) done 2026-10-12, step 2 (Raids) done 2026-10-13. Next: step 3, Professions, once the owner has made the maps plan's decisions.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** ([`MAPS-PLAN.md`](MAPS-PLAN.md), see Decision 2). With step 0 the owner also chose: **the tab's colour replaces the faction theme**, **every tab takes the new look at once** (the old token names point at the new values until each tab is ported), and **the fonts are vendored** (Marcellus, Figtree and JetBrains Mono, with their licences).
 
 **What step 0 put in** (see "Step 0, as built" below): the tokens and a colour and still backdrop per tab (`data-tab` on `<html>`), glass panels, the three faces, a top bar with the wordmark (back to the front door), the phase chip on every screen and a line for each tab's sources, the shared `PhaseChip`, `Provenance`, `ViewSwitch` and `SpecIcon`, the page title and link previews, and character creation fitting a phone. The game-style item tooltip moved to step 2, where its first user (the Raids loot) is.
 
@@ -107,6 +107,20 @@ Character Planner. One commit per step (one per sub-tab in step 6).
 | Letters | `global.css` | Still neutral: rank reads through the letter box (boldest at the top; C dashed, D dotted). |
 
 **Not ported:** the prototype's motion (tiles landing row by row) waits for step 7 with the scene. **Tests:** `tests/tierlists.spec.ts` (the prototype's hands-on check with its numbers, plus the roster count, the tooltip, arrow keys and a phone check), and the three older tier tests in `planner.spec.ts` follow the new markup.
+
+## Step 2, Raids, as built (2026-10-13)
+
+| Part | Where | Notes |
+| --- | --- | --- |
+| Loot helpers | `src/domain/raids/raidLoot.ts`, `exampleRaids.ts`, `raidSources.ts` | Each drop's rank on every spec's Wowhead list (from `bisRankings.json`), what kind of drop it is, where it drops, the set pieces a tier token buys, a search across all five raids, a raid's seats as raiders, and who wants a drop (a token through its set pieces; contested when three or more rank it first). The example raids are the prototype's. |
+| The tab | `src/features/raids/` | `RaidsPanel` (the hero with the raid buttons by phase and the loot search with its "/" shortcut, the "For me / For my raid" switch, the item tooltip), `BossJournal` (the rail, the banner with previous and next, the Loot and The fight tabs, "Loot for" any spec), `RaidAbout` (facts, the way in, the attunement chain, which other chain passes through), `ForMyRaid`, `LootSearchResults`, `LootIcon`, `raidLootTip.ts`, `raidsSession.ts`. |
+| Shared parts | `src/components/ui/` | The game-style item tooltip (`ItemTooltip`, `itemTipModel.ts`), and the tooltip base it shares with Spec Tier Lists (`FloatingTip`, `useHoverTip`), so the two tabs no longer each place their own. `SpecIcon` takes a raid build's own icon (the bear paw). |
+| Colour | `global.css`, `App.tsx` | Raids follows the raid: `data-raid` on `<html>` gives Serpentshrine teal, Tempest Keep the Simulation tab's gold over violet, and the Phase 1 raids warm torchlight. |
+| State | `App.tsx` | The raid, the view, the open page in each raid and the "Loot for" spec are kept for the session; choosing Raids again goes back to Serpentshrine's first boss. Without a character the journal shows every drop unranked. |
+| Gone | | The "Which raid?" picker screen, the rail of raids (the shell has no rail at all now) and the boss cards, with their styles. |
+| Sources | `bisRankings.json` `fetchedAt`, `ingest-bis.mjs`, `bis-fetch.mjs` | The line under the top bar: Wowhead's loot tables (ingested 13 Sept 2026, checked against the ingest's files by a test), the 27 lists (7 Aug 2026; the BiS ingest now writes the date from its cached guides), and the attunement sources. |
+
+**Not ported:** the scene that re-lights for each raid and the panels' motion wait for step 7; the link that carried the raid and boss in the address (the app's address does not change). **Tests:** `tests/raids.spec.ts` (the prototype's check with its numbers: 469 drops, Hydross 2 for Fury, Gloves of the Searing Grip #1 for Feral, the example 25's Belt of One-Hundred Deaths wanted by 11 with 8 first, Dragonspine Trophy contested 9 and 9; plus search, the tooltip, the saved roster, the phone), and the older Raids, image and keyboard tests follow the journal.
 
 ## What carries over from the 2 October plan
 

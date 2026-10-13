@@ -19,6 +19,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **Step 1, Spec Tier Lists (2026-10-12):** the tier board with a card for any spec (its place on every list, archon.gg's DPS, what it brings to a raid, its signature ability, how many are in your saved raid), and "Against the logs" behind a switch. The standings come from `domain/tierlists/specStanding.ts`; the tier lists now record when they were fetched.
 
+**Step 2, Raids (2026-10-13):** the boss journal (one boss at a time, "Loot for" any spec with its ranks, the fight, the raid's attunement), "For my raid" (who in your saved raid, or the labelled example, wants each drop, and what is contested), a search across all five raids, and the game-style item tooltip the planner tabs will share. The picker screen and the rail of raids are gone; the tab takes each raid's colour.
+
 **The maps rework** has a plan of its own (`docs/design/MAPS-PLAN.md`): the Professions maps are retail, post-Cataclysm art under TBC coordinates, and Wowhead serves the TBC art at its own path.
 
 ## Documents
@@ -40,6 +42,11 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
+- [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
+- [[components.ui.ItemTooltip]] — `src/components/ui/ItemTooltip.tsx`
 
 ## Related
 

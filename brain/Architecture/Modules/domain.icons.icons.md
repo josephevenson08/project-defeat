@@ -37,6 +37,7 @@ _None._
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
+- [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`
 
 ## Concepts & phases
 

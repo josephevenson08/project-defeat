@@ -21,6 +21,7 @@ _No doc comment at the top of this file._
 
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
+- [[components.ui.useHoverTip]] — `src/components/ui/useHoverTip.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
@@ -29,7 +30,6 @@ _No doc comment at the top of this file._
 - [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
-- [[features.tierlists.useSpecTip]] — `src/features/tierlists/useSpecTip.ts`
 
 ## Imported by
 

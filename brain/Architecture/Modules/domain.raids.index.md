@@ -2,23 +2,26 @@
 type: module
 layer: domain
 source: src/domain/raids/index.ts
-lines: 16
+lines: 41
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.raids.index
 
-`src/domain/raids/index.ts` · **domain** layer · 16 lines
+`src/domain/raids/index.ts` · **domain** layer · 41 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**re-export** — `AttunementChain`, `AttunementDifficulty`, `AttunementStep`, `getAttunementChainById`, `getAttunementChainForRaid`, `getBossesDroppingItem`, `getBossesForRaid`, `getRaidBossById`, `getRaidById`, `getRaidByInstanceName`, `Raid`, `RaidBoss`, `RaidBossRoleNote`, `RaidDropType`, `RaidLootEntry`, `RaidPlayerSize`, `RaidTier`, `sampleAttunements`, `sampleRaidBosses`, `sampleRaids`
+**re-export** — `AttunementChain`, `AttunementDifficulty`, `AttunementStep`, `exampleRaid`, `firstPicks`, `getAttunementChainById`, `getAttunementChainForRaid`, `getBossesDroppingItem`, `getBossesForRaid`, `getRaidBossById`, `getRaidById`, `getRaidByInstanceName`, `getWowheadList`, `isContested`, `listKey`, `lootItem`, `lootKind`, `LootKind`, `lootKindLabel`, `LootRank`, `lootRankFor`, `lootRanks`, `LootSearchResult`, `LootSource`, `lootSources`, `lootWowItemId`, `Raid`, `RaidBoss`, `RaidBossRoleNote`, `raidDropCount`, `RaidDropType`, `Raider`, `raidersFrom`, `RaidLootEntry`, `raidLootFetchedAt`, `RaidPlayerSize`, `RaidTier`, `sampleAttunements`, `sampleRaidBosses`, `sampleRaids`, `searchRaidLoot`, `setPiecesFor`, `sortLoot`, `SpecRef`, `Want`, `whereItDrops`, `whereItDropsText`, `whoWants`, `WowheadList`, `wowheadLists`
 
 ## Imports
 
+- [[domain.raids.exampleRaids]] — `src/domain/raids/exampleRaids.ts`
+- [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
+- [[domain.raids.raidSources]] — `src/domain/raids/raidSources.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.raids.sampleAttunements]] — `src/domain/raids/sampleAttunements.ts`
 - [[domain.raids.sampleRaidBosses]] — `src/domain/raids/sampleRaidBosses.ts`
@@ -26,12 +29,17 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[App]] — `src/App.tsx`
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
-- [[features.raids.RaidAttunementChain]] — `src/features/raids/RaidAttunementChain.tsx`
-- [[features.raids.RaidLootList]] — `src/features/raids/RaidLootList.tsx`
-- [[features.raids.RaidPicker]] — `src/features/raids/RaidPicker.tsx`
-- [[features.raids.RaidRail]] — `src/features/raids/RaidRail.tsx`
+- [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
+- [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
+- [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`
+- [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`
+- [[features.raids.RaidAbout]] — `src/features/raids/RaidAbout.tsx`
+- [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
+- [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.raids.raidsSession]] — `src/features/raids/raidsSession.ts`
 
 ## Concepts & phases
 

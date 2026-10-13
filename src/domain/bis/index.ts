@@ -1,5 +1,5 @@
 export type { BisList, RankedGearEntry, RankedGearSource } from './bisTypes'
-export { bisLists, excludedByPhase, getBisListForSpec, requireBisList } from './bisLists'
+export { bisLists, bisRankingsFetchedAt, excludedByPhase, getBisListForSpec, requireBisList } from './bisLists'
 export type { ItemAcquisition } from './acquisition'
 export { findRaidDrop, raidDropIndexSize, resolveAcquisition } from './acquisition'
 export { parseRankedSource, UNCLASSIFIED_INSTANCES } from './rankedSource'
