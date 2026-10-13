@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-12, night): the port has begun; start here
+## ▶ Where we left off (2026-10-13): Raids is in the app too; start here
+
+**Step 2, Raids** (`65d84b0`): this folder's `raids.html` (design A's boss journal with design C's "For my raid", the search, the item tooltip) is now the live app's Raids tab, and `checks/raids-handson.mjs` became `tests/raids.spec.ts`. **Next:** the owner's four decisions in [`docs/design/MAPS-PLAN.md`](../../MAPS-PLAN.md) before step 3 (Professions), or step 4 (Simulation), which does not wait on them. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-12, night): the port has begun
 
 **The decided designs are going into the live app** ([`docs/design/PORT-PLAN.md`](../../PORT-PLAN.md)). Done and pushed on 2026-10-12:
 - **Step 0, the look** (`fca3cfe`): glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase chip on every screen, the wordmark back to the front door, and the shared parts (`PhaseChip`, `Provenance`, `ViewSwitch`, `SpecIcon`). The tab's colour replaced the faction theme (the owner's call).
