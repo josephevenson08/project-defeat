@@ -1,8 +1,12 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-13): Raids is in the app too; start here
+## ▶ Where we left off (2026-10-13, later): the maps rework is half done; start here
 
-**Step 2, Raids** (`65d84b0`): this folder's `raids.html` (design A's boss journal with design C's "For my raid", the search, the item tooltip) is now the live app's Raids tab, and `checks/raids-handson.mjs` became `tests/raids.spec.ts`. **Next:** the owner's four decisions in [`docs/design/MAPS-PLAN.md`](../../MAPS-PLAN.md) before step 3 (Professions), or step 4 (Simulation), which does not wait on them. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+**The maps plan's decisions are made** ([`docs/design/MAPS-PLAN.md`](../../MAPS-PLAN.md)). Step A, the TBC-era zone maps (`4d83fd3`), is live. Step B, the gathering nodes (`151f12a`), is researched and its ingest is ready, but Wowhead now refuses scripted requests and we do not get around its bot check, so the node data waits for the owner to choose a source (the plan lists three). **Next:** that choice, then Step B's remaining steps and Step C (the route algorithm), then step 3 (Professions); step 4 (Simulation) can go at any point. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-13): Raids is in the app too
+
+**Step 2, Raids** (`65d84b0`): this folder's `raids.html` (design A's boss journal with design C's "For my raid", the search, the item tooltip) is now the live app's Raids tab, and `checks/raids-handson.mjs` became `tests/raids.spec.ts`.
 
 ## Where we left off (2026-10-12, night): the port has begun
 

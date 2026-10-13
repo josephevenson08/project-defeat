@@ -14,22 +14,24 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### For the next chat, in one paragraph
 
-**The port of the decided designs into the live app is under way** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), approved 2026-10-12). **Steps 0 (the look), 1 (Spec Tier Lists) and 2 (Raids) are built, tested and committed** (step 0 `fca3cfe`, step 1 `edfe2fb`, step 2 `65d84b0`; all pushed, and the live site has them). **Next: step 3, Professions, but only after the owner has made the four decisions in [`docs/design/MAPS-PLAN.md`](../design/MAPS-PLAN.md)**: the live app's zone maps are post-Cataclysm retail art drawn under TBC coordinates, so nodes land in the wrong places, and Wowhead serves the TBC art at its own path. The recommended first move (Step A, swapping in the TBC maps) is small and can be done on its own. If the owner wants to keep going without deciding, step 4 (Simulation) does not depend on the maps. **Ask before each push.**
+**The port of the decided designs into the live app is under way** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), approved 2026-10-12). **Steps 0 (the look), 1 (Spec Tier Lists) and 2 (Raids) are built, tested and committed** (step 0 `fca3cfe`, step 1 `edfe2fb`, step 2 `65d84b0`; all pushed, and the live site has them). **The maps rework ([`docs/design/MAPS-PLAN.md`](../design/MAPS-PLAN.md)) is decided and half done:** Step A (the TBC-era zone maps, `4d83fd3`) is live. Step B (complete the gathering nodes) is researched and its ingest rewritten and tested offline (`151f12a`), but **it is blocked on data**: since October 2026 Wowhead answers scripted requests for object pages with an empty 202 or a 403, and only a request disguised as a desktop browser gets through. That is a bot check and we do not get around it. The owner picks one of three ways forward, listed in the maps plan's Step B: wait and retry, pfQuest-tbc's CMaNGOS data (GPL-3.0 at its source, against this repo's MIT, so the licence comes first), or the owner saving about 70 pages from their own browser into the ingest's cache. The guide text that was wrong regardless is corrected. **Next:** the owner's data choice, then the rest of Step B and Step C (the route algorithm), then step 3 (Professions); or step 4 (Simulation), which does not wait on the maps. **Ask before each push.**
 
 ### In short
 
 - **The live app looks new since 2026-10-12** (step 0): dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the "TBC Classic · Phase 2" chip on every screen, and a wordmark that goes back to the front door. The owner chose: the tab's colour replaces the faction theme, every tab takes the new look at once (the old token names point at the new values until each tab is ported), and the fonts are vendored with their licences. Details: the port plan's "Step 0, as built".
 - **Spec Tier Lists is the decided design** (step 1): the tier board with a card for any spec, and "Against the logs" behind a switch. Details: the port plan's "Step 1, as built".
 - **Raids is the decided design** (step 2): the boss journal (one boss at a time, "Loot for" any spec with its ranks, the fight, the raid's attunement on its About page), "For my raid" (who in the saved raid, or a labelled example raid, wants each drop), a search across all five raids, and the game-style item tooltip the planner tabs will reuse. The "Which raid?" picker, the rail of raids and the boss cards are gone, and the shell has no rail at all now. Each raid has its own colour. Details: the port plan's "Step 2, as built".
-- **The maps finding** (see the maps plan): the 41 maps come from Wowhead's retail map path; the TBC art is at `wow.zamimg.com/images/wow/tbc/maps/enus/zoom/<areaId>.jpg`. The node list also misses Gromsblood, Ghost Mushroom and Plaguebloom, and has no spawns for Ragveil.
+- **The maps** (see the maps plan): all 42 zones now use Wowhead's TBC-era art (`wow.zamimg.com/images/wow/tbc/maps/enus/zoom/<areaId>.jpg`), and a test reads the map under the spawns to prove they land on land. The owner's decisions: maps fixed first, routes cover a skill window, ground routes are straight lines with a note, the tbc-researcher confirms nodes before ingest; and for Step B, Ragveil gets no map with the reason given, Dark Iron is in and marked optional, Nethercite is out.
+- **The node data is unchanged** (45 nodes) until Step B gets a data source. The research is in the maps plan: Felwood's and Blasted Lands' own object ids, the missing herbs (Bloodthistle, Ghost Mushroom, Gromsblood, Plaguebloom), the ooze-covered veins and Dark Iron, and a second-source check that agrees with Wowhead.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
 - `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
 
 ### Next, in order
 
-1. **The owner's four decisions in the maps plan.** With them, step 3 (Professions) can start: the profession window and "Which two" (prototype `docs/design/prototypes/tabs/professions.html`, scripts `profs-a.js` and `profs-b.js`, check `checks/profs-handson.mjs`), with the maps following the maps plan. `compute-leveling-paths.mjs` has to write each step's skill colours into `craftingPaths.json` first (they are only in the 2 MB ingest file today).
-2. **Or step 4, Simulation,** which does not wait on the maps: "What to do next" with the damage-source table (`simulation.html`, `sim-*.js`, `checks/sim-handson.mjs`). The engine does not change.
-3. Then steps 5 to 7 as the port plan lists them.
+1. **The owner's choice of data source for Step B** (maps plan, "Ways to get the data"). Then, in the order the plan's "When the data arrives" gives: the guides' new zones, the ingest, the new zones' maps, the tab cap, the tests and docs. Then Step C, the route algorithm (cluster the spawns, merging Wowhead's near-duplicate points; a prize-collecting loop with 2-opt and Or-opt; spawns per lap and lap length; straight lines with a note on the ground).
+2. **Step 3 (Professions)** after the maps rework: the profession window and "Which two" (prototype `docs/design/prototypes/tabs/professions.html`, scripts `profs-a.js` and `profs-b.js`, check `checks/profs-handson.mjs`), with the maps following the maps plan. `compute-leveling-paths.mjs` has to write each step's skill colours into `craftingPaths.json` first (they are only in the 2 MB ingest file today).
+3. **Or step 4, Simulation,** at any point, since it does not wait on the maps: "What to do next" with the damage-source table (`simulation.html`, `sim-*.js`, `checks/sim-handson.mjs`). The engine does not change.
+4. Then steps 5 to 7 as the port plan lists them.
 
 ### How each port step is done (what steps 0 to 2 did)
 
@@ -44,6 +46,8 @@ further down this file is the record of how earlier decisions were reached, newe
 
 | What | Commit | Notes |
 | --- | --- | --- |
+| **Maps Step B, part one** | `151f12a` | The node ingest rewritten for the research (extra ids, seven new nodes, zones kept by share or by a range naming them, no partial writes, no cached empty replies), tested offline; the guide text corrected. The data refresh itself is blocked: Wowhead refuses scripted requests. |
+| **Maps Step A: the TBC zone maps** | `4d83fd3` | All 42 zones on Wowhead's TBC-era art, Alterac Mountains included; a test that spawns land on land. Pushed and live. |
 | **Port step 2: Raids** | `65d84b0` | The boss journal, "For my raid", the search, the item tooltip and each raid's colour; the picker, the rail and the boss cards removed. The BiS rankings record their fetch date. 330 of 330 tests. |
 | **Port step 1: Spec Tier Lists** | `edfe2fb` | The tier board, the spec card, the tooltip and "Against the logs", on the app's own data. Also: the phone wordmark's missing space (from step 0), and the tier lists' fetch date. 318 of 318 tests. |
 | **Port step 0: the look** | `fca3cfe` | Tokens, a colour and backdrop per tab, glass, the three faces, the top bar, the shared parts, the page's title and preview, creation on a phone. 308 of 308 tests. |
@@ -56,13 +60,13 @@ Each work commit is followed by a "Refresh the daily log" commit.
 
 ### Open items, not started
 
-- **The maps plan's four decisions** (above).
+- **Step B's data source** (above): the owner's choice.
 - **The app's buff data** leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier cards show only what it counts. Fixing it needs the tbc-researcher.
 - **A timing-sensitive test:** "no image in the app is painted larger than the file it comes from" failed once while other browser tests ran at the same time, and passed on its own.
 
 ### How to check things
 
-- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 7–8 minutes, 330 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
+- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 7–8 minutes, 331 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
 - **Prototype checks** (`docs/design/prototypes/tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs`; `published.mjs` against a local build or the live site (`BASE=`).
 - **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`, `gen-prof-data.mjs`; and `npm run brain` for the vault.
 - **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.
