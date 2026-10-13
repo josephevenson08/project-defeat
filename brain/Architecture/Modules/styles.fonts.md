@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/styles/fonts.css
-lines: 51
+lines: 44
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # styles.fonts
 
-`src/styles/fonts.css` · **app** layer · 51 lines
+`src/styles/fonts.css` · **app** layer · 44 lines
 
 _No doc comment at the top of this file._
 

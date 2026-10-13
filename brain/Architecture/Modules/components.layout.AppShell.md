@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/AppShell.tsx
-lines: 62
+lines: 82
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.AppShell
 
-`src/components/layout/AppShell.tsx` · **components** layer · 62 lines
+`src/components/layout/AppShell.tsx` · **components** layer · 82 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
+- [[components.ui.PhaseChip]] — `src/components/ui/PhaseChip.tsx`
 - [[lib.useScreenFocus]] — `src/lib/useScreenFocus.ts`
 
 ## Imported by
@@ -28,7 +29,7 @@ _No doc comment at the top of this file._
 
 ## Concepts & phases
 
-_None._
+- [[Port to the Live App]]
 
 Up: [[Architecture Map]]
 

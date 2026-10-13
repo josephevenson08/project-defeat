@@ -3,136 +3,271 @@
 /*
  * Design tokens.
  *
- * **The visual language is Warcraft's character sheet, and it replaced a deliberately flat one.**
- * What was here before was monochrome and industrial — hairline rules, no gradients, system fonts,
- * item quality as the only colour in the interface. That was a coherent design and it is gone on
- * purpose: this is a tool for a game with a very specific look, and looking like the game is worth
- * more here than looking like an instrument.
+ * **The look is the Step 2 prototypes'**, decided tab by tab from 2026-10-04 to 2026-10-12
+ * (`docs/design/prototypes/tabs`) and brought into the app by `docs/design/PORT-PLAN.md`: dark glass
+ * panels over a still backdrop, Marcellus headings, Figtree for everything else, and **a colour per
+ * tab**. It replaced the 2026-09-11 retheme, which drew panels as metal-framed plates and coloured
+ * the whole app by faction. The 3D scene the prototypes draw behind the glass comes last, as an
+ * optional layer over the same backdrop.
  *
- * Three things survived the change because they were right for reasons that have nothing to do with
- * style:
+ * Three rules carried over from the old look unchanged, because they were never about style:
  *
  * 1. **Item quality is still the only colour the app assigns to data it did not choose.** Epic
- *    purple and rare blue carry meaning a player reads instantly. Every theme colour below was
- *    picked to sit beside them without competing.
- * 2. **Every ink still clears WCAG AA on every ground it lands on.** The old file recorded that
- *    `--text-faint` had once measured 3.88:1 and failed; each value here was measured before it was
- *    written, and the ratios are in the comments where they are close.
- * 3. **No third-party request.** The fonts are vendored in `public/fonts` rather than fetched from
- *    Google, so the app still loads with no external dependency — which is what the old "system
- *    stacks on purpose" note was actually protecting.
+ *    purple and rare blue carry meaning a player reads instantly. The tab colours sit beside them:
+ *    the Planner's sky blue is deliberately paler than rare blue, so a link never reads as an item.
+ * 2. **Every ink clears WCAG AA on the ground it lands on.** The prototypes measured each tab's
+ *    accent at 7:1 or better on the glass and on its own soft chips, and button text on the accent
+ *    at 9.8:1 or better; the inks are at 7:1 or better on the darkest glass.
+ * 3. **No third-party request.** The fonts are vendored in `public/fonts`; see `fonts.css`.
  *
- * **The faction is the theme.** Alliance is brass and steel with royal blue and gold; Horde is iron
- * and blood with steel and white. They are the same construction with different tokens, so the app
- * reads as one product either way, and switching is `data-faction` on `<html>` — see `App.tsx`,
- * which drives it from the character you already chose.
+ * **The tab is the theme.** `App.tsx` stamps `data-tab` on `<html>` for the screen you are on, and
+ * the rules below give each one its colour (`--glow` and what goes with it) and its backdrop. The
+ * faction no longer recolours the page (the owner's call, 2026-10-12): it belongs to the character,
+ * not to the screen.
+ *
+ * **The old token names stay, pointed at the new values.** About a thousand rules below read
+ * `--surface-*`, `--line`, `--text-*` and `--metal-*`; re-pointing them is what gives every tab the
+ * new look at once, before its own layout is ported. New rules use the new names. As each tab is
+ * ported its rules move to the new names, and once the last one has, the old names go.
  */
 :root {
-  /*
-   * Surfaces, darkest to lightest. Cool and slightly blue-black for Alliance, which is what makes
-   * brass read as warm metal against them rather than as yellow.
-   */
-  --surface-0: #08090a;
-  --surface-1: #0e1012;
-  --surface-2: #16191c;
-  --surface-3: #1f2327;
-
-  --line: #2a2f33;
-  --line-strong: #3d4348;
+  color-scheme: dark;
 
   /*
-   * Steel body text at 12.5:1 on the panel ground, and **white reserved for the two things that
-   * should win**: the active tab and the callout telling you to go and train. White outranks every
-   * item-quality colour in the app, so spending it anywhere else would flatten the hierarchy the
-   * quality colours depend on.
+   * One colour per tab, from the prototypes' scenes. Each tab's `--glow` is one of these, and the
+   * front door's cards wear all of them, so a door is the colour of the room behind it.
    */
-  --text: #cdd2d6;
-  --text-dim: #8b9196;
-  --text-strong: #ffffff;
-  /* 6.00:1 on --surface-0, 5.31:1 on --surface-2. The old file's 3.88:1 failure is the reason this
-     is measured rather than eyeballed. */
-  --text-faint: #878e93;
+  --tab-home: #4fd8c8; /* teal, the original crystal over water */
+  --tab-planner: #7cc4ff; /* deep sea blue's accent; paler than rare-item blue */
+  --tab-simulation: #ecc06a; /* gold over violet, Tempest Keep */
+  --tab-raidcomp: #f2c75c; /* warm white-gold */
+  --tab-tierlists: #3ee0a0; /* emerald */
+  --tab-raids: #4fd8c8; /* follows the raid once Raids is ported; Serpentshrine teal until then */
+  --tab-professions: #ffb547; /* amber */
+
+  /* Grounds: the page, the glass a panel is made of, a lighter glass inside it, and a scrim for text over art. */
+  --abyss: #03090d;
+  --glass: rgba(8, 26, 34, 0.72);
+  --glass-2: rgba(12, 38, 48, 0.78);
+  --glass-3: rgba(18, 52, 64, 0.86);
+  --scrim: rgba(3, 10, 14, 0.8);
+  /* For the few things that float over other content (popovers, the skip link): glass you cannot read through. */
+  --glass-solid: #0a1d25;
+
+  /* Ink, brightest to faintest. */
+  --ink: #e4f3f1;
+  --ink-2: #a9c6c4;
+  --ink-3: #86a6a5;
+
+  /* The tab's colour and what goes with it: ink on a filled accent, a soft wash, the panel rims, focus. */
+  --glow: var(--tab-home);
+  --glow-ink: #03161a;
+  --glow-soft: rgba(79, 216, 200, 0.14);
+  --rim: rgba(120, 220, 215, 0.22);
+  --rim-2: rgba(120, 220, 215, 0.12);
+  --focus: #9ff3ea;
 
   /* Reserved for genuine warnings — unverified data, unmodelled effects. Not decoration. */
-  --warn: #d4a017;
+  --warn: #ffcf7a;
+  --warn-soft: rgba(255, 190, 90, 0.12);
 
   /*
-   * The frame. Four stops of one metal, which the panel bevel interpolates between to read as a
-   * lit edge rather than a flat border.
+   * The still backdrop each tab sits on: its colour glowing low in the middle, two faint glints, over
+   * a gradient that deepens downwards, under a veil that keeps text off the brightest part. These are
+   * the prototypes' WebGL-off fallbacks, so the page already looks as it will with the scene off.
    */
-  --metal-0: #1b1811;
-  --metal-1: #4e432a;
-  --metal-2: #8b7648;
-  --metal-edge: #c6ad77;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(79, 216, 200, 0.28), transparent 70%),
+    radial-gradient(30% 18% at 30% 70%, rgba(160, 255, 240, 0.1), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(160, 255, 240, 0.08), transparent 70%),
+    linear-gradient(180deg, #02070a 0%, #06202a 55%, #0a3440 100%);
+  --veil: linear-gradient(180deg, rgba(3, 9, 13, 0.35), rgba(3, 9, 13, 0) 30%, rgba(3, 9, 13, 0.55));
 
   /*
-   * Faction accents. `--accent` carries structure — section rules, the nav underline — and
-   * `--accent-2` carries emphasis inside text, which is where gold does its work on the Alliance
-   * side. Both are measured: royal 6.47:1 and gold 12.17:1 on --surface-1.
+   * Typefaces, vendored latin-subset in `public/fonts`. Marcellus has one weight, and
+   * `font-synthesis: none` below stops the browser faking a bold, so headings are set at 400.
    */
-  --accent: #5b9bd8;
-  --accent-2: #e8cd72;
+  --f-head: 'Marcellus', 'Palatino Linotype', Georgia, serif;
+  --f-body: 'Figtree', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --f-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 
-  /*
-   * Typefaces, vendored latin-subset in `public/fonts`.
-   *
-   * Cinzel stands in for Friz Quadrata, which is the game's own UI face and is licensed — it is the
-   * closest free relative, epigraphic and Roman in the same way. Barlow Semi Condensed stands in for
-   * Arial Narrow, which the game uses for dense numbers, and is doing the same job here.
-   */
-  --font-display: Cinzel, 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Barlow Semi Condensed', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  /* The prototypes' type scale. */
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.15rem;
+  --t-xl: 1.5rem;
+  --t-hero: clamp(2rem, 6vw, 3.6rem);
 
-  /* Small uppercase tracked labels are still the main texture in this design. */
+  /* Item quality, the game's own colours. */
+  --q-uncommon: #1eff00;
+  --q-rare: #0070dd;
+  --q-epic: #a335ee;
+  --q-legendary: #ff8000;
+
+  /* ── The old names, pointed at the new values (see the note above). ── */
+  --surface-0: var(--abyss);
+  --surface-1: var(--glass);
+  --surface-2: var(--glass-2);
+  --surface-3: var(--glass-3);
+
+  --line: var(--rim-2);
+  --line-strong: var(--rim);
+
+  --text: var(--ink);
+  --text-dim: var(--ink-2);
+  /* White still wins over everything: the active tab and the one callout that says to go and train. */
+  --text-strong: #ffffff;
+  --text-faint: var(--ink-3);
+
+  /* The metal frame is gone; anything still reading these gets the tab's rims instead. */
+  --metal-0: transparent;
+  --metal-1: var(--rim-2);
+  --metal-2: var(--rim);
+  --metal-edge: var(--glow);
+
+  --accent: var(--glow);
+  --accent-2: var(--glow);
+
+  --font-display: var(--f-head);
+  --font-sans: var(--f-body);
+  --font-mono: var(--f-mono);
+
+  /* Small uppercase tracked labels are still the main texture. */
   --label-size: 11px;
   --label-tracking: 0.14em;
   --heading-detail: 20px;
   --heading-section: 15px;
   --heading-callout: 13px;
 
-  --radius: 2px;
+  /* Inner cards, inputs and tags; a panel is rounder (14px) and a pill is fully round. */
+  --radius: 8px;
 
   color: var(--text);
-  background: var(--surface-0);
+  background: var(--abyss);
   font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
 /*
- * Horde.
+ * Each tab's colour and backdrop, from its prototype page.
  *
- * **Iron and blood where Alliance has brass and steel**, and white doing exactly the same job in
- * both. Only the tokens change — no selector below this point knows which faction it is rendering,
- * which is what keeps a retheme from becoming a second stylesheet.
- *
- * `--accent` is blood at #df5647 rather than the #d94a3a it started as: the darker red measured
- * 4.28:1 on --surface-2 and failed AA, and it is used for section rules that sit on exactly that
- * ground. #df5647 measures 4.77:1.
+ * Home and Raids keep the defaults above (Raids takes each raid's own colour when it is ported).
+ * Simulation and Raid Composition also tint their glass and ink, as their prototypes do: violet under
+ * Simulation's gold, warm under Raid Composition's.
  */
-[data-faction='horde'] {
-  --surface-0: #0a0605;
-  --surface-1: #120c0a;
-  --surface-2: #1c1512;
-  --surface-3: #261d19;
+:root[data-tab='planner'] {
+  --glow: var(--tab-planner);
+  --glow-ink: #031427;
+  --glow-soft: rgba(124, 196, 255, 0.14);
+  --rim: rgba(124, 196, 255, 0.22);
+  --rim-2: rgba(124, 196, 255, 0.12);
+  --focus: #c2e4ff;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(90, 176, 255, 0.26), transparent 70%),
+    radial-gradient(30% 18% at 30% 70%, rgba(190, 228, 255, 0.1), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(190, 228, 255, 0.08), transparent 70%),
+    linear-gradient(180deg, #01040e 0%, #04133a 55%, #082054 100%);
+  --veil:
+    radial-gradient(90% 70% at 50% 40%, rgba(3, 9, 13, 0.42), rgba(3, 9, 13, 0.7)),
+    linear-gradient(180deg, rgba(3, 9, 13, 0.4), rgba(3, 9, 13, 0.25) 30%, rgba(3, 9, 13, 0.75));
+}
 
-  --line: #33251f;
-  --line-strong: #4a342c;
+:root[data-tab='simulation'] {
+  --glow: var(--tab-simulation);
+  --glow-ink: #1a1204;
+  --glow-soft: rgba(236, 192, 106, 0.14);
+  --rim: rgba(200, 160, 255, 0.24);
+  --rim-2: rgba(200, 160, 255, 0.12);
+  --focus: #ffe2a3;
+  --glass: rgba(18, 11, 34, 0.74);
+  --glass-2: rgba(28, 18, 48, 0.82);
+  --glass-3: rgba(40, 26, 66, 0.88);
+  --glass-solid: #160e28;
+  --scrim: rgba(10, 6, 20, 0.84);
+  --ink: #efe9f8;
+  --ink-2: #cbc0de;
+  --ink-3: #a99cc2;
+  --backdrop:
+    radial-gradient(40% 30% at 64% 26%, rgba(236, 192, 106, 0.3), transparent 70%),
+    radial-gradient(60% 40% at 50% 80%, rgba(150, 100, 255, 0.18), transparent 70%),
+    linear-gradient(180deg, #07040f 0%, #160c2a 55%, #1f1236 100%);
+}
 
-  --text: #ddd0ca;
-  --text-dim: #9a8a84;
-  --text-strong: #ffffff;
-  /* 5.36:1 on --surface-0, 4.78:1 on --surface-2. */
-  --text-faint: #8e817b;
+:root[data-tab='raidcomp'] {
+  --abyss: #0a0806;
+  --glow: var(--tab-raidcomp);
+  --glow-ink: #241801;
+  --glow-soft: rgba(242, 199, 92, 0.14);
+  --rim: rgba(242, 199, 92, 0.26);
+  --rim-2: rgba(242, 199, 92, 0.13);
+  --focus: #ffe2a3;
+  --glass: rgba(22, 18, 12, 0.76);
+  --glass-2: rgba(34, 28, 19, 0.82);
+  --glass-3: rgba(48, 40, 27, 0.88);
+  --glass-solid: #1d1810;
+  --scrim: rgba(12, 10, 7, 0.84);
+  --ink: #f3ecdd;
+  --ink-2: #cfc2a8;
+  --ink-3: #a99c84;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(255, 226, 166, 0.24), transparent 70%),
+    radial-gradient(30% 18% at 30% 70%, rgba(140, 200, 240, 0.08), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(255, 240, 210, 0.08), transparent 70%),
+    linear-gradient(180deg, #090806 0%, #1a1610 55%, #2a2318 100%);
+  --veil: linear-gradient(180deg, rgba(8, 6, 4, 0.5), rgba(8, 6, 4, 0.25) 30%, rgba(8, 6, 4, 0.72));
+}
 
-  --metal-0: #1a1412;
-  --metal-1: #40302a;
-  --metal-2: #6e5248;
-  --metal-edge: #b08a78;
+:root[data-tab='tierlists'] {
+  --glow: var(--tab-tierlists);
+  --glow-ink: #021a10;
+  --glow-soft: rgba(62, 224, 160, 0.14);
+  --rim: rgba(62, 224, 160, 0.22);
+  --rim-2: rgba(62, 224, 160, 0.12);
+  --focus: #a8f5d2;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(62, 224, 143, 0.24), transparent 70%),
+    radial-gradient(30% 18% at 30% 70%, rgba(232, 210, 90, 0.08), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(160, 255, 200, 0.08), transparent 70%),
+    linear-gradient(180deg, #010805 0%, #052516 55%, #08361f 100%);
+  --veil: linear-gradient(180deg, rgba(3, 9, 13, 0.5), rgba(3, 9, 13, 0.25) 30%, rgba(3, 9, 13, 0.7));
+}
 
-  --accent: #df5647;
-  --accent-2: #dbe2e8;
+:root[data-tab='professions'] {
+  --glow: var(--tab-professions);
+  --glow-ink: #1a1204;
+  --glow-soft: rgba(255, 181, 71, 0.14);
+  --rim: rgba(255, 181, 71, 0.24);
+  --rim-2: rgba(255, 181, 71, 0.12);
+  --focus: #ffdca3;
+  --backdrop:
+    radial-gradient(60% 40% at 50% 78%, rgba(255, 181, 71, 0.24), transparent 70%),
+    radial-gradient(30% 18% at 30% 70%, rgba(216, 236, 255, 0.07), transparent 70%),
+    radial-gradient(26% 16% at 72% 82%, rgba(255, 220, 150, 0.08), transparent 70%),
+    linear-gradient(180deg, #070401 0%, #1a1004 55%, #2a1906 100%);
+  --veil: linear-gradient(180deg, rgba(3, 9, 13, 0.5), rgba(3, 9, 13, 0.25) 30%, rgba(3, 9, 13, 0.7));
+}
+
+/*
+ * The still backdrop, behind every screen.
+ *
+ * A fixed layer under the page rather than a `background-attachment: fixed` on `body`, which phones
+ * ignore. It is the prototypes' WebGL-off fallback for the tab, and it is what the optional 3D scene
+ * (the port plan's last step) will paint over.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--veil), var(--backdrop);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 * {
@@ -170,9 +305,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Flat. The purple and pink radial gradients that used to live here were the loudest thing on the
-     page and competed directly with item quality colours, which are the only colours that mean something. */
-  background: var(--surface-0);
+  /* Transparent so the still backdrop (`body::before`, under the tokens) shows; `:root` paints the
+     page's own ground. A background here would paint over the backdrop. */
+  background: transparent;
 }
 
 button,
@@ -242,7 +377,7 @@ select {
  * section tabs — shows its own focus.
  */
 .skip-link {
-  background: var(--surface-3);
+  background: var(--glass-solid);
   border: 1px solid var(--accent);
   border-radius: var(--radius);
   color: var(--text-strong);
@@ -302,6 +437,30 @@ select {
 .creator-progress li {
   display: grid;
   gap: 2px;
+}
+
+/*
+ * On a phone the steps go above the stage as one wrapping row. Side by side, the 220px step column
+ * left the stage about 40px wide at 400px, so the prompt broke a word to a line and the options ran
+ * off the screen.
+ */
+@media (max-width: 700px) {
+  .creator {
+    padding: 20px 16px;
+  }
+
+  .creator-inner {
+    gap: 20px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .creator-progress {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+    flex-flow: row wrap;
+    gap: 10px 20px;
+    padding: 0 0 16px;
+  }
 }
 
 .creator-step-index {
@@ -758,8 +917,17 @@ select {
   border-color: var(--line-strong);
 }
 
+/*
+ * Two lines at most. Figtree is wider than the condensed face this was sized for, and the longest
+ * names ("Improved Demoralizing Shout") ran to a third line over the rank. The full name is in the
+ * tooltip and the aria-label, as it is when the name is hidden on a narrow screen.
+ */
 .talent-name {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
   font-size: 9px;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   line-height: 1.15;
   overflow: hidden;
 }
@@ -1288,6 +1456,7 @@ select {
    is being changed. Sticky rather than fixed, so it scrolls independently of the main pane. */
 .rail {
   background: var(--surface-1);
+  backdrop-filter: blur(14px);
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -1478,6 +1647,7 @@ select {
  */
 .stat-bar {
   background: var(--surface-1);
+  backdrop-filter: blur(12px); /* glass, so what scrolls under the sticky bar blurs rather than shows through */
   border-bottom: 1px solid var(--line);
   grid-column: 1 / -1;
   position: sticky;
@@ -2237,84 +2407,50 @@ select {
 }
 
 /*
- * A panel is a framed plate, the way the character sheet and the spellbook are.
+ * A panel is a pane of dark glass over the tab's backdrop, the prototypes' `.box`.
  *
- * **The metal frame sits inside the panel's own border rather than replacing it**, and that is a
- * correctness constraint rather than an aesthetic one. The role accent lives on `border-top` and a
- * test asserts its colour there; swapping the border for a `border-image` would leave
- * `border-top-color` computing correctly while the gradient painted over it — the test would pass
- * and the accent would be invisible, which is worse than either failing outright.
+ * **The role accent stays on `border-top`**, and that is a correctness constraint rather than an
+ * aesthetic one: a test asserts its colour there. Without an accent the top edge is the tab's rim
+ * like the other three.
  *
- * So the panel keeps its hairline border and its accent, and `::before` draws a 6px metal ring just
- * inside it. Padding went 20px → 26px to give the ring its room without moving the content.
+ * `::before` is the faint wash of the tab's colour from the top-left corner, which is what makes the
+ * glass read as lit rather than as a flat tint. It replaced the metal bevel and the corner brackets
+ * of the 2026-09-11 look.
  */
 .panel {
   position: relative;
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-top: 1px solid var(--panel-accent, var(--line-strong));
-  border-radius: var(--radius);
+  background: var(--glass);
+  border: 1px solid var(--rim);
+  border-top: 1px solid var(--panel-accent, var(--rim));
+  border-radius: 14px;
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 20px 50px -20px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   min-height: 260px;
-  padding: 26px;
+  padding: 22px;
+  /* So the wash below can sit under the content (z-index -1) without dropping behind the page. */
+  isolation: isolate;
 }
 
-/*
- * The bevel: one metal interpolated across five stops so the frame reads as a lit edge catching
- * light from the top-left, rather than as a flat coloured border.
- */
 .panel::before {
   content: '';
   position: absolute;
-  inset: 0;
+  z-index: -1;
+  inset: -1px;
+  border-radius: inherit;
   pointer-events: none;
-  border: 6px solid transparent;
-  border-image: linear-gradient(
-      135deg,
-      var(--metal-1),
-      var(--metal-0) 30%,
-      var(--metal-2) 50%,
-      var(--metal-0) 70%,
-      var(--metal-1)
-    )
-    1;
+  background: linear-gradient(135deg, var(--glow-soft), transparent 40%);
+  opacity: 0.9;
 }
 
-/*
- * Corner brackets.
- *
- * **These are what make a frame read as Warcraft rather than as a border**, more than the gold
- * does — the game's panels are cornered, not merely edged. Eight thin bars rather than an image, so
- * they take the faction's metal with everything else and cost no asset.
- */
-.panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
-  background:
-    var(--bracket) left 2px top 2px / 15px 2px no-repeat,
-    var(--bracket) left 2px top 2px / 2px 15px no-repeat,
-    var(--bracket) right 2px top 2px / 15px 2px no-repeat,
-    var(--bracket) right 2px top 2px / 2px 15px no-repeat,
-    var(--bracket) left 2px bottom 2px / 15px 2px no-repeat,
-    var(--bracket) left 2px bottom 2px / 2px 15px no-repeat,
-    var(--bracket) right 2px bottom 2px / 15px 2px no-repeat,
-    var(--bracket) right 2px bottom 2px / 2px 15px no-repeat;
-}
-
-/*
- * A panel title is the one place the display face earns its keep at size.
- *
- * Cinzel is an all-caps-feeling Roman face, so it wants letter-spacing and it wants to not be set
- * too large — 20px with tracking reads as carved, 22px unspaced read as a wedding invitation.
- */
+/* Marcellus has one weight, so a panel title is set at it and sized rather than bolded. */
 .panel h2 {
-  color: var(--text-strong);
+  color: var(--ink);
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 0.045em;
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   margin: 0 0 16px;
 }
 
@@ -2496,32 +2632,29 @@ select:focus-visible {
   font-size: 24px;
 }
 
-/* Buttons are outlined rather than filled with a magenta-to-violet gradient. In a tool where the
-   only meaningful colours are item quality and upgrade direction, a brightly filled button is the
-   loudest thing on screen and it is pointing at an action, not at information. */
+/* Buttons are the prototypes' outlined pill in the tab's colour (their `.btn.ghost`), not filled:
+   a brightly filled button is the loudest thing on screen and it points at an action, not at
+   information. A ported design that wants one filled primary action fills that one. */
 .button {
   align-items: center;
   background: transparent;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  color: var(--text);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--glow);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
+  font: 600 var(--t-sm) var(--f-body);
   gap: 8px;
   justify-content: center;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   min-height: 40px;
-  padding: 0 16px;
-  text-transform: uppercase;
+  padding: 0 18px;
   transition: background 120ms ease, border-color 120ms ease;
 }
 
 .button:hover {
-  background: var(--surface-3);
-  border-color: var(--text-faint);
+  background: var(--glow-soft);
+  border-color: var(--glow);
 }
 
 .button:hover {
@@ -5609,7 +5742,7 @@ input[type='text']:focus {
   min-width: 170px;
   max-width: 260px;
   padding: 8px 10px;
-  background: var(--surface-2);
+  background: var(--glass-solid); /* floats over the roster, so it must not be see-through */
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   /*
@@ -5674,7 +5807,7 @@ input[type='text']:focus {
   min-width: 190px;
   max-width: 260px;
   padding: 10px 12px;
-  background: var(--surface-2);
+  background: var(--glass-solid); /* floats over the roster, so it must not be see-through */
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.5);
@@ -6160,9 +6293,9 @@ input[type='text']:focus {
  *
  * Applied after every component rule so it wins on specificity rather than by `!important`.
  *
- * **The display face goes on structure, never on data.** Cinzel has no tabular figures, so a column
- * of stat values set in it would not line up — which is the whole reason the UI face is a condensed
- * grotesk. Headings, the two navs and the section cards are structure; everything numeric is not.
+ * **The display face goes on structure, never on data.** Marcellus has no tabular figures, so a
+ * column of stat values set in it would not line up; numbers go in the UI face or the mono face.
+ * Headings and the section cards are structure; everything numeric is not.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 h1,
@@ -6190,16 +6323,12 @@ h4,
 }
 
 /*
- * The wordmark and the landing page.
- *
- * These are the first thing anyone sees, so they carry the face at its largest and take the
- * faction's metal — which is also the only place in the app the metal is used as type colour rather
- * than as an edge.
+ * The front door's wordmark: the display face at its largest, in plain ink, standing off a busy
+ * backdrop with its own shadow.
  */
-.rail-brand h1,
 .section-picker-head h1 {
-  color: var(--metal-edge);
-  font-weight: 700;
+  color: var(--ink);
+  font-weight: 400;
 }
 
 /*
@@ -6216,28 +6345,25 @@ h4,
 }
 
 /*
- * Section cards get the frame too, at a smaller scale than a panel.
+ * The entry grids share one treatment, because they are the same object.
  *
- * The landing page is the app's front door and was the one surface with no chrome on it at all —
- * five flat rectangles on a black field. A 3px bevel and the same corner brackets tie it to every
- * page behind it without competing with the per-section accent on the top edge, which is doing real
- * work: it is how you tell the five apart at a glance.
- */
-/*
- * The three entry grids share one treatment, because they are the same object.
- *
- * The landing page's five sections, the raid picker's five raids and the professions grid's thirteen
- * are all *front doors* — a card you click to go somewhere, as opposed to a row in a list. Framing
- * exactly those and nothing else is what keeps the bevel meaningful: if every card in the app had
- * one, it would say nothing about which things are doors.
- *
- * Each keeps its own top-edge accent, which is doing real work underneath the frame — it is how you
- * tell five sections, five raids or thirteen professions apart at a glance.
+ * The landing page's sections and the professions grid's thirteen are *front doors* — a card you
+ * click to go somewhere, as opposed to a row in a list. They are glass like a panel, with the same
+ * wash from the top-left in the colour of what is behind the door; each keeps its top-edge accent,
+ * which is how you tell them apart at a glance. The raid picker's cards are doors too, but their two
+ * layers carry the raid's art and its scrim (further down), so they take only the rounded edge.
  */
 .section-card,
 .raid-picker-card,
 .profession-card {
   position: relative;
+  border-radius: 12px;
+  isolation: isolate;
+}
+
+.section-card,
+.profession-card {
+  backdrop-filter: blur(10px);
 }
 
 .section-card {
@@ -6245,147 +6371,256 @@ h4,
 }
 
 .section-card::before,
-.raid-picker-card::before,
 .profession-card::before {
   content: '';
   position: absolute;
-  inset: 0;
+  z-index: -1;
+  inset: -1px;
+  border-radius: inherit;
   pointer-events: none;
-  border: 3px solid transparent;
-  border-image: linear-gradient(
-      135deg,
-      var(--metal-1),
-      var(--metal-0) 30%,
-      var(--metal-2) 50%,
-      var(--metal-0) 70%,
-      var(--metal-1)
-    )
-    1;
-}
-
-.section-card::after,
-.raid-picker-card::after,
-.profession-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
-  opacity: 0.75;
-  background:
-    var(--bracket) left 1px top 1px / 10px 2px no-repeat,
-    var(--bracket) left 1px top 1px / 2px 10px no-repeat,
-    var(--bracket) right 1px top 1px / 10px 2px no-repeat,
-    var(--bracket) right 1px top 1px / 2px 10px no-repeat,
-    var(--bracket) left 1px bottom 1px / 10px 2px no-repeat,
-    var(--bracket) left 1px bottom 1px / 2px 10px no-repeat,
-    var(--bracket) right 1px bottom 1px / 10px 2px no-repeat,
-    var(--bracket) right 1px bottom 1px / 2px 10px no-repeat;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--section-accent, var(--profession-accent, var(--glow))) 16%, transparent),
+    transparent 45%
+  );
 }
 
 .slot-pane {
-  border-color: var(--metal-1);
+  border-color: var(--rim);
   box-shadow:
-    inset 0 0 0 1px var(--surface-0),
+    inset 0 0 0 1px var(--abyss),
     0 4px 18px rgba(0, 0, 0, 0.8);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * Colour, past the point where the theme tokens stop.
- *
- * The retheme made the chrome warm and left the *grounds* flat near-black, which is a lot of black
- * on a 1500px page. These four rules put the faction back into the surfaces the frame sits on,
- * without ever reaching the intensity where an item-quality colour stops winning.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
 /*
- * The page is lit from the top-left, the way the frames are.
- *
- * Two very low-alpha washes rather than a flat fill: the faction colour up in the corner where the
- * wordmark is, and its metal low and to the right. At 5% and 4% neither is nameable as a colour —
- * what they do is stop the background reading as switched-off, and make the frame's bevel look like
- * it is catching light from somewhere.
- */
-body {
-  background:
-    radial-gradient(1200px 700px at 8% -8%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 70%),
-    radial-gradient(900px 600px at 92% 100%, color-mix(in srgb, var(--metal-edge) 4%, transparent), transparent 70%),
-    var(--surface-0);
-  background-attachment: fixed;
-}
-
-/*
- * The creator is the app's first screen and had no chrome at all — a form floating on black.
- *
- * It gets the panel's own frame rather than a smaller one, because at this moment it *is* the page:
- * there is nothing else on screen to be subordinate to.
+ * The creator is the first screen after the front door, and at that moment it *is* the page, so it
+ * is a pane of glass at full size.
  */
 .creator-inner {
   position: relative;
-  background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  isolation: isolate;
+  background: var(--glass);
+  border: 1px solid var(--rim);
+  border-radius: 14px;
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 20px 50px -20px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   padding: 26px;
 }
 
 .creator-inner::before {
   content: '';
   position: absolute;
-  inset: 0;
+  z-index: -1;
+  inset: -1px;
+  border-radius: inherit;
   pointer-events: none;
-  border: 6px solid transparent;
-  border-image: linear-gradient(
-      135deg,
-      var(--metal-1),
-      var(--metal-0) 30%,
-      var(--metal-2) 50%,
-      var(--metal-0) 70%,
-      var(--metal-1)
-    )
-    1;
+  background: linear-gradient(135deg, var(--glow-soft), transparent 40%);
 }
 
-.creator-inner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  --bracket: linear-gradient(var(--metal-edge), var(--metal-edge));
-  background:
-    var(--bracket) left 2px top 2px / 15px 2px no-repeat,
-    var(--bracket) left 2px top 2px / 2px 15px no-repeat,
-    var(--bracket) right 2px top 2px / 15px 2px no-repeat,
-    var(--bracket) right 2px top 2px / 2px 15px no-repeat,
-    var(--bracket) left 2px bottom 2px / 15px 2px no-repeat,
-    var(--bracket) left 2px bottom 2px / 2px 15px no-repeat,
-    var(--bracket) right 2px bottom 2px / 15px 2px no-repeat,
-    var(--bracket) right 2px bottom 2px / 2px 15px no-repeat;
+@media (max-width: 700px) {
+  .creator-inner {
+    padding: 20px 18px;
+  }
 }
 
-/*
- * The rail's character block takes the class colour.
+/* ═══════════════════════════════════════════════════════════════════════════
+ * The top bar, and the shared parts every ported tab uses.
  *
- * It is the one place in the app that is *about* your class rather than about gear, and the colour
- * is already on screen everywhere else — the creator that chose it, the tier list, the raid planner.
- * Leaving the one panel that names your class as the only grey one was the inconsistency.
- */
-.rail-character,
-.rail-brand {
-  border-bottom: 1px solid var(--line);
-}
+ * From the prototypes' header and "flavor" line: the wordmark (which goes back to the front door),
+ * the sections, and under them the line every screen carries — which game and phase the numbers are
+ * for, and where they come from.
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-.rail-brand {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--metal-edge) 7%, transparent), transparent);
-}
-
-/*
- * The tab strip gets a ground and a lit bottom edge, so it reads as a frame member rather than as
- * text floating above the content.
- */
 .topbar {
-  background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
-  border-bottom: 1px solid var(--metal-0);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--metal-edge) 22%, transparent);
+  background: color-mix(in srgb, var(--abyss) 72%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rim);
+}
+
+.topbar-bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 22px;
+  min-height: 54px;
+}
+
+.brand {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+  font: 400 var(--t-xl) / 1 var(--f-head);
+  letter-spacing: 0.04em;
+  padding: 8px 0;
+  white-space: nowrap;
+}
+
+.brand span {
+  color: var(--glow);
+}
+
+.brand:hover {
+  text-shadow: 0 0 16px var(--glow);
+}
+
+.topbar .tab-nav {
+  border-bottom: 0;
+  flex: 1;
+  gap: 2px;
+  margin-top: 0;
+  min-width: 0;
+}
+
+.topbar .tab-nav-button {
+  color: var(--ink-2);
+  font: 600 var(--t-sm) var(--f-body);
+  letter-spacing: 0.03em;
+  padding: 17px 10px 15px;
+  text-transform: none;
+}
+
+.topbar .tab-nav-button:hover {
+  color: var(--ink);
+}
+
+.topbar .tab-nav-button-active {
+  border-bottom-color: var(--glow);
+  text-shadow: 0 0 12px var(--glow);
+}
+
+.topbar-line {
+  align-items: center;
+  background: color-mix(in srgb, var(--abyss) 55%, transparent);
+  border-bottom: 1px solid var(--rim-2);
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--t-xs);
+  gap: 6px 12px;
+  padding: 7px clamp(16px, 2.5vw, 40px) 8px;
+}
+
+/* The planner's own sections, as the prototypes' pills: a row of glass, the one you are on filled. */
+.tab-nav-sub {
+  border-bottom: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tab-nav-sub .tab-nav-button {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font: 600 var(--t-sm) var(--f-body);
+  letter-spacing: 0.02em;
+  padding: 7px 14px;
+  text-transform: none;
+}
+
+.tab-nav-sub .tab-nav-button:hover {
+  color: var(--ink);
+}
+
+.tab-nav-sub .tab-nav-button[aria-current='page'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+/* `PhaseChip`: which game and phase every number on the screen is for. */
+.phase-chip {
+  background: var(--glow-soft);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--glow);
+  display: inline-block;
+  font: 700 var(--t-xs) / 1.4 var(--f-body);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+/* `Provenance`: where the numbers on the screen come from, and when they were read. */
+.provenance {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  margin: 0;
+}
+
+.provenance a {
+  color: var(--glow);
+  font-weight: 600;
+}
+
+/* `ViewSwitch`: two or three views of one tab, as a pill with the current view filled. */
+.view-switch {
+  background: var(--scrim);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 4px;
+}
+
+.view-switch button {
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 44px;
+  padding: 6px 16px;
+}
+
+.view-switch button small {
+  color: var(--ink-3);
+  font: 500 var(--t-xs) var(--f-body);
+  margin-left: 4px;
+}
+
+.view-switch button[aria-pressed='true'] {
+  background: var(--glow);
+  color: var(--glow-ink);
+}
+
+.view-switch button[aria-pressed='true'] small {
+  color: var(--glow-ink);
+}
+
+.view-switch button:hover:not([aria-pressed='true']) {
+  color: var(--ink);
+}
+
+@media (max-width: 520px) {
+  .view-switch {
+    display: flex;
+  }
+
+  .view-switch button {
+    flex: 1;
+    padding: 6px 8px;
+  }
+
+  .view-switch button small {
+    display: none;
+  }
+}
+
+/* `SpecIcon`: a spec's icon in a ring of its class colour, the way the game frames a portrait. */
+.spec-icon {
+  background: #000;
+  border: 2px solid var(--spec-class, var(--ink-3));
+  border-radius: 50%;
+  box-sizing: content-box;
+  display: block;
+  flex: none;
+  height: var(--spec-icon-size, 28px);
+  width: var(--spec-icon-size, 28px);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6555,7 +6790,7 @@ body {
  * Both sides named, in their own colours.
  *
  * This is the only screen in the app that exists before a character does, so it is the only place
- * that can say "both" without picking one. Everything past it themes to whichever you choose.
+ * that can say "both" without picking one.
  */
 .section-picker-sides {
   align-items: baseline;
@@ -7013,8 +7248,8 @@ body {
  * **The ink was already `#ffffff` and the name still read grey — the shadow was doing it.**
  *
  * The raid picker draws its title at 40px, where `0 2px 0 #000` plus a 20px black glow is a halo
- * around heavy letterforms. At 22px the same shadow is proportionally enormous, and Cinzel is a
- * serif with thin strokes: the glow bled through the antialiased edges of every stem until the
+ * around heavy letterforms. At 22px the same shadow is proportionally enormous, and the display
+ * face (Cinzel then, Marcellus now) is a serif with thin strokes: the glow bled through the antialiased edges of every stem until the
  * letters read as mid-grey. Copying a treatment across a size change is what went wrong, not the
  * colour choice.
  *
@@ -7405,6 +7640,27 @@ body {
     min-height: 44px;
     padding: 4px 2px;
     text-align: center;
+  }
+
+  /* The wordmark takes its own row above the section grid, rather than squeezing it to one column. */
+  .topbar-bar {
+    align-items: stretch;
+    flex-direction: column;
+    padding-bottom: 4px;
+  }
+
+  /* A 44px target like every other control on a phone, and a size smaller so it costs one row. */
+  .brand {
+    align-items: center;
+    align-self: flex-start;
+    display: inline-flex;
+    font-size: var(--t-lg);
+    min-height: 44px;
+    padding: 0;
+  }
+
+  .topbar .tab-nav {
+    gap: 2px 6px;
   }
 }
 

@@ -650,7 +650,7 @@ const DESIGN_NOTES = [
   {
     title: 'UI Refresh',
     summary: 'The redesign: research into 25 gaming platforms, a plan, then clickable prototypes of every tab, walked through with the owner.',
-    body: `**The live app has not changed its look yet.** Everything here is static HTML in \`docs/design/prototypes/\`, published beside the app at ${PROTOTYPES_URL} (2026-10-10). What has reached the app are the data and rule fixes the prototype work turned up (see ${link('Step 2 Walkthrough')}).
+    body: `**The live app is taking the decided designs, tab by tab, since 2026-10-12** (${link('Port to the Live App')}): first the look (glass, Marcellus and Figtree, a colour per tab), then each tab's layout. The prototypes themselves are static HTML in \`docs/design/prototypes/\`, published beside the app at ${PROTOTYPES_URL} (2026-10-10). Before the port, what reached the app were the data and rule fixes the prototype work turned up (see ${link('Step 2 Walkthrough')}).
 
 **How it got here:**
 1. **Research (2026-10-02):** how 25 gaming companies and player tools design their sites, 2024 to 2026. The strongest trend: print the phase, the source and the data's age beside the numbers.
@@ -672,7 +672,36 @@ const DESIGN_NOTES = [
       ['docs/design/prototypes/tabs/NEXT-SESSION-PLAN', 'Where the prototype work picks up'],
     ],
     modules: [],
-    related: ['Tab Prototypes', 'Step 2 Walkthrough', 'TBC Motion Kit', 'Prototype Publishing', 'Roadmap Board'],
+    related: ['Tab Prototypes', 'Step 2 Walkthrough', 'Port to the Live App', 'TBC Motion Kit', 'Prototype Publishing', 'Roadmap Board'],
+  },
+  {
+    title: 'Port to the Live App',
+    summary: 'Bringing the decided designs into src/: the look first, then one tab per commit, and the 3D scene last as an optional layer.',
+    body: `The plan the owner approved on 2026-10-12 (\`docs/design/PORT-PLAN.md\`). **Option C:** the prototypes' look first, with a still backdrop per tab; the 3D scene comes last, lazy-loaded and optional. Then the tabs in order: the foundation, Spec Tier Lists, Raids, Professions, Simulation, Raid Composition, and the Character Planner one sub-tab per commit. Each step is a rewrite into React against the app's own state and domain functions, works for all 27 specs, turns the prototype's hands-on check into Playwright tests, and is pushed only after the owner says so.
+
+**Step 0, the foundation (2026-10-12):**
+- **The tab is the theme.** \`data-tab\` on \`<html>\` gives each screen its colour and its still backdrop: Home and Raids teal, Planner sky blue, Simulation gold over violet, Raid Composition warm gold, Tier Lists emerald, Professions amber. The faction no longer recolours the page (the owner's call).
+- **Every tab took the new look at once:** the old token names point at the new values, so un-ported tabs have glass panels and the new type before their layouts change.
+- **Type:** Marcellus, Figtree and JetBrains Mono, vendored with their licences (64 KB against the old 94 KB).
+- **The top bar:** the wordmark (back to the front door, keeping the character), the sections, and under the bar the phase chip and each tab's sources.
+- **Shared parts:** \`PhaseChip\`, \`Provenance\`, \`ViewSwitch\`, \`SpecIcon\`.
+
+**The maps rework** has a plan of its own (\`docs/design/MAPS-PLAN.md\`): the Professions maps are retail, post-Cataclysm art under TBC coordinates, and Wowhead serves the TBC art at its own path.`,
+    docs: [
+      ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
+      ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],
+    ],
+    modules: [
+      'App.tsx',
+      'components/layout/AppShell.tsx',
+      'components/layout/SectionPicker.tsx',
+      'components/ui/PhaseChip.tsx',
+      'components/ui/Provenance.tsx',
+      'components/ui/ViewSwitch.tsx',
+      'components/ui/SpecIcon.tsx',
+      'domain/phase.ts',
+    ],
+    related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },
   {
     title: 'Tab Prototypes',

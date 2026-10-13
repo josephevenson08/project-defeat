@@ -2,27 +2,27 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 577
+lines: 584
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 577 lines
+`src/App.tsx` · **app** layer · 584 lines
 
 From the top of the file:
 
-> The faction theme is stamped on `<html>`, not on a wrapper inside the app.
+> The screen's colour is stamped on `<html>` as `data-tab`, not on a wrapper inside the app.
 > 
 > **It has to be the root element or the page's own ground is the wrong colour.** `:root` paints the
-> body background, and a Horde character on an Alliance-blue ground would show a warm panel sitting
-> on a cool page — visible in exactly the gap the app does not control. Stamping the document
-> element means the background, the scrollbar and every panel change together.
+> page and the still backdrop behind it, so stamping the document element means the ground, the
+> backdrop, the scrollbar and every panel change together.
 > 
-> Driven from the character rather than from a separate control, because the app already asks which
-> faction you are before anything else, and a second switch for the same fact is a second thing to
-> keep in sync.
+> **The tab is the theme, not the faction** (the owner's call, 2026-10-12, with the Step 2 look):
+> each section has its colour, and the front door and the loading screen take Home's teal. Until
+> then the whole app was themed by the character's faction, which made a Horde player's tier list
+> look different from an Alliance player's for no reason that had to do with tier lists.
 
 ## Exports
 
@@ -79,7 +79,7 @@ _Nothing exported (side-effect or style module)._
 
 ## Concepts & phases
 
-_None._
+- [[Port to the Live App]]
 
 Up: [[Architecture Map]]
 

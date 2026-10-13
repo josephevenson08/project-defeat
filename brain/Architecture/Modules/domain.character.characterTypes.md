@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
 - [[domain.abilities.abilityTypes]] — `src/domain/abilities/abilityTypes.ts`
 - [[domain.abilities.sampleSignatureAbilities]] — `src/domain/abilities/sampleSignatureAbilities.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`

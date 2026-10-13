@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/layout/SectionPicker.tsx
-lines: 389
+lines: 391
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.layout.SectionPicker
 
-`src/components/layout/SectionPicker.tsx` · **components** layer · 389 lines
+`src/components/layout/SectionPicker.tsx` · **components** layer · 391 lines
 
 _No doc comment at the top of this file._
 
@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.icons.icons]] — `src/domain/icons/icons.ts`
+- [[domain.phase]] — `src/domain/phase.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
 - [[domain.raids.sampleRaidBosses]] — `src/domain/raids/sampleRaidBosses.ts`
@@ -38,6 +39,7 @@ _No doc comment at the top of this file._
 
 ## Concepts & phases
 
+- [[Port to the Live App]]
 - [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]

@@ -8,6 +8,7 @@ import { getBuffIcon, getSpecIcon } from '../../domain/raidcomp'
 import { sampleRaidBosses } from '../../domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../../domain/raids/sampleRaids'
 import { dpsReference } from '../../domain/simulation/dpsReference'
+import { PHASE_LABEL } from '../../domain/phase'
 import { getTierList } from '../../domain/tierlists'
 
 export type SectionId = 'planner' | 'simulation' | 'raidcomp' | 'tierlists' | 'raids' | 'professions'
@@ -24,7 +25,10 @@ type SectionDefinition = {
    * says its job in those words as well as its name.
    */
   goal: string
-  /** Accent for this section, carried through to its border and its rule. */
+  /**
+   * Accent for this section, carried through to its border and its rule: the colour of the tab
+   * behind the door (the `--tab-*` tokens in `global.css`), so a door looks like the room it opens.
+   */
   accent: string
 }
 
@@ -35,9 +39,8 @@ type SectionDefinition = {
  * The tab bar still exists once you are inside — this is a way *in*, not a replacement for moving
  * between sections afterwards.
  *
- * Each section owns a hue here. That is a deliberate loosening of the near-monochrome policy, which
- * exists so item quality reads first — a rule that only binds where item quality is on screen. The
- * glimpses below show item icons, but each one keeps its own quality-free frame, so nothing here
+ * Each section owns a hue here, the same one its tab is drawn in. Item quality still reads first:
+ * the glimpses below show item icons, but each one keeps its own quality-free frame, so nothing here
  * competes with a purple.
  *
  * **Simulation has a door of its own** since 2026-10-11. The usability study's theorycrafter came for
@@ -51,7 +54,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Gear, gems and talents',
     blurb: 'Build a character from faction to spec, fill every slot against real Phase 2 rankings, and see what the stats come to.',
     goal: 'Gear my character',
-    accent: '#9c7346',
+    accent: 'var(--tab-planner)',
   },
   {
     id: 'simulation',
@@ -59,7 +62,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Estimated DPS',
     blurb: 'Run the model on your character: your stat priority, your best upgrades, and the estimate against what players average.',
     goal: 'Simulate my DPS',
-    accent: '#a8924f',
+    accent: 'var(--tab-simulation)',
   },
   {
     id: 'raidcomp',
@@ -67,7 +70,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Buff coverage',
     blurb: 'Plan a 10 or 25-player roster and see which raid buffs and target debuffs it actually brings — and what one more seat would buy you.',
     goal: 'Plan a raid',
-    accent: '#9c6a6a',
+    accent: 'var(--tab-raidcomp)',
   },
   {
     id: 'tierlists',
@@ -75,7 +78,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Where specs stand',
     blurb: 'Wowhead’s Phase 2 rankings for damage, healing and tanking — all three lists on one page.',
     goal: 'See where my spec stands',
-    accent: '#856a9c',
+    accent: 'var(--tab-tierlists)',
   },
   {
     id: 'raids',
@@ -83,7 +86,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Loot tables',
     blurb: 'What drops where across Serpentshrine Cavern, Tempest Keep and the Phase 1 raids still worth running.',
     goal: 'Find what drops where',
-    accent: '#6a7fa8',
+    accent: 'var(--tab-raids)',
   },
   {
     id: 'professions',
@@ -91,7 +94,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     tagline: 'Levelling and payoffs',
     blurb: 'How to take a profession to 375 without wasting materials, and what each one is actually worth at 70.',
     goal: 'Level a profession',
-    accent: '#6f8f6a',
+    accent: 'var(--tab-professions)',
   },
 ]
 
@@ -277,11 +280,10 @@ export function SectionPicker({ onSelect, onImportCharacter }: SectionPickerProp
 
       <div className="section-picker-head">
         <h1>Project Defeat</h1>
-        <p className="section-picker-sub">TBC Classic · Phase 2</p>
+        <p className="section-picker-sub">{PHASE_LABEL}</p>
         {/*
           Both factions named, in their own colours, on the one screen that exists before a character
-          does. Everything past this point themes to whichever side you pick; this is the only place
-          the app can say it is for both without picking one.
+          does: the only place the app can say it is for both without picking one.
         */}
         <p className="section-picker-sides">
           <span className="side-alliance">For the Alliance</span>

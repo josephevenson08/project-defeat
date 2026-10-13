@@ -22,15 +22,14 @@ behind every claim of its that quotes a number.
 - Faction-aware race selection with real TBC race/class legality (e.g. Human can't be a Shaman, Blood Elf can't be a Warrior), every row checked against sources and pinned in a test. That check found the app refusing **Draenei Mage**, which TBC allowed from launch
 - 28 racial traits applied to your stats, including the weapon-conditional ones and the Draenei hit aura, which is melee hit for Warriors, Paladins and Hunters and spell hit for Mages, Priests and Shamans
 - Full TBC-style gear slot model
-- **The interface is the game's, and it changes with your faction** — framed panels with bevelled
-  metal and corner brackets, Cinzel carrying every heading and both navs, and a palette that follows
-  the character you built: brass and steel with royal blue and gold for Alliance, iron and blood for
-  Horde. It is one construction with two token sets, so the app reads as one product either way, and
-  the switch is driven by the faction you already picked rather than a second control. Item quality
-  is still the only colour the app assigns to data it did not choose, and every theme colour was
-  measured against WCAG AA on every ground it lands on before it was written. The two typefaces are
-  vendored latin-subset in `public/fonts` — 104 KB, no third-party request, so the app still loads
-  with no external dependency
+- **The look is the Step 2 prototypes'** (brought in from 2026-10-12, `docs/design/PORT-PLAN.md`):
+  dark glass panels over a still backdrop, Marcellus headings and Figtree text, and a colour per
+  tab: Home and Raids teal, Character Planner sky blue, Simulation gold over violet, Raid Composition
+  warm gold, Spec Tier Lists emerald, Professions amber. The front door's cards wear the colour of
+  the tab behind them. Every screen's top bar says which game and phase its numbers are for. Item
+  quality is still the only colour the app assigns to data it did not choose, and every ink clears
+  WCAG AA on the glass it lands on. The three typefaces are vendored latin-subset in `public/fonts`
+  with their licences (64 KB, no third-party request). Faction no longer recolours the page
 - **Phase 2 and only Phase 2.** 
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location

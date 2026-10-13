@@ -8,7 +8,7 @@ tags: [brain/project, project/design, moc]
 
 _The redesign: research into 25 gaming platforms, a plan, then clickable prototypes of every tab, walked through with the owner._
 
-**The live app has not changed its look yet.** Everything here is static HTML in `docs/design/prototypes/`, published beside the app at https://josephevenson08.github.io/project-defeat/prototypes/ (2026-10-10). What has reached the app are the data and rule fixes the prototype work turned up (see [[Step 2 Walkthrough]]).
+**The live app is taking the decided designs, tab by tab, since 2026-10-12** ([[Port to the Live App]]): first the look (glass, Marcellus and Figtree, a colour per tab), then each tab's layout. The prototypes themselves are static HTML in `docs/design/prototypes/`, published beside the app at https://josephevenson08.github.io/project-defeat/prototypes/ (2026-10-10). Before the port, what reached the app were the data and rule fixes the prototype work turned up (see [[Step 2 Walkthrough]]).
 
 **How it got here:**
 1. **Research (2026-10-02):** how 25 gaming companies and player tools design their sites, 2024 to 2026. The strongest trend: print the phase, the source and the data's age beside the numbers.
@@ -35,6 +35,7 @@ _The redesign: research into 25 gaming platforms, a plan, then clickable prototy
 
 - [[Tab Prototypes]]
 - [[Step 2 Walkthrough]]
+- [[Port to the Live App]]
 - [[TBC Motion Kit]]
 - [[Prototype Publishing]]
 - [[Roadmap Board]]

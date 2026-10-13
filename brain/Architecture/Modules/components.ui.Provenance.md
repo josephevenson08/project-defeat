@@ -1,0 +1,40 @@
+---
+type: module
+layer: components
+source: src/components/ui/Provenance.tsx
+lines: 51
+generated: true
+tags: [brain/architecture, layer/components]
+---
+
+# components.ui.Provenance
+
+`src/components/ui/Provenance.tsx` · **components** layer · 51 lines
+
+_No doc comment at the top of this file._
+
+## Exports
+
+**function** — `Provenance`
+
+**type** — `ProvenanceSource`
+
+## Imports
+
+_None._
+
+## Imported by
+
+_None._
+
+## Concepts & phases
+
+- [[Port to the Live App]]
+
+Up: [[Architecture Map]]
+
+<!-- brain:manual -->
+
+## Notes
+
+_Anything you write below the marker above is kept when the brain is regenerated._

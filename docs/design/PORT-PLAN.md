@@ -1,6 +1,8 @@
 # Bringing the decided designs into the live app: plan
 
-**Status: approved 2026-10-12, not started.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** (see Decision 2). Nothing has been built yet: the next step is step 0, the foundation.
+**Status: approved 2026-10-12; step 0 (the foundation) done 2026-10-12.** The owner's decisions: **option C** for the look (the new look first, the 3D scene last and optional); **Spec Tier Lists first** after the foundation; **ask before each push**; and the zone maps are to be **reworked, with a plan of their own** ([`MAPS-PLAN.md`](MAPS-PLAN.md), see Decision 2). With step 0 the owner also chose: **the tab's colour replaces the faction theme**, **every tab takes the new look at once** (the old token names point at the new values until each tab is ported), and **the fonts are vendored** (Marcellus, Figtree and JetBrains Mono, with their licences).
+
+**What step 0 put in** (see "Step 0, as built" below): the tokens and a colour and still backdrop per tab (`data-tab` on `<html>`), glass panels, the three faces, a top bar with the wordmark (back to the front door), the phase chip on every screen and a line for each tab's sources, the shared `PhaseChip`, `Provenance`, `ViewSwitch` and `SpecIcon`, the page title and link previews, and character creation fitting a phone. The game-style item tooltip moved to step 2, where its first user (the Raids loot) is.
 
 The Step 2 walkthrough decided a design for every tab (see
 [`prototypes/tabs/README.md`](prototypes/tabs/README.md)). Only one has reached the live app so far: the
@@ -77,6 +79,22 @@ Character Planner. One commit per step (one per sub-tab in step 6).
 | **5. Raid Composition** | The planning table as decided (dark, the palette, aiming at a group, the pencil). | `raidcomp/RaidCompositionPanel.tsx`: compare it with the prototype first. Much of the decided design came from the app, so this may be small. | About 176 lines touch it; most should hold. |
 | **6. Character Planner**, one sub-tab per commit | In order: Build, Ranked Gear, Compare, Buffs, Gear, Talents. Build first because it touches least; Talents last because it's the largest rewrite. Buffs needs "your raid and seat" from the saved roster. Gear's "What's left" and Ranked Gear's "Where it drops" need each spec's own list, not Fury's. | `builds/`, `bis/`, `gear/`, `buffs/`, `talents/`, `stats/`. Each design generalised from Fury to every spec. | The heaviest: gear, talents, buffs and builds touch over 1,500 lines of the suite. Keeping the existing `data-testid`s where the element survives cuts the churn. |
 | **7. The scene** (option C) | The crystal-and-water scene and motion as one optional, lazy-loaded layer, with each tab's colour and detail. | A `Scene` component loading `three` and `gsap` on demand; reduced motion and weak hardware get the static backdrop. | New tests: the backdrop renders with WebGL off, nothing moves with reduced motion, and the bundle without the scene is unchanged. |
+
+## Step 0, as built (2026-10-12)
+
+| Part | Where | Notes |
+| --- | --- | --- |
+| Tokens | `src/styles/global.css` (top) | The prototypes' names (`--glass`, `--ink`, `--glow`, `--rim`, `--f-head` and so on) and a `--tab-*` colour per tab. The old names (`--surface-*`, `--line`, `--text-*`, `--metal-*`, `--accent`, `--font-*`) point at the new values, so every tab looks new before its layout is ported. |
+| A colour per tab | `:root[data-tab=…]` rules; `useScreenTheme` in `App.tsx` | Home and Raids teal, Planner sky blue, Simulation gold over violet, Raid Composition warm gold, Tier Lists emerald, Professions amber. Creation takes the colour of the section it leads into. The faction theme is gone. |
+| Still backdrop | `body::before` | Each tab's prototype WebGL-off fallback and veil. Step 7's scene paints over it. |
+| Glass | `.panel`, the front door's cards, the professions grid, the creator | Rounded glass with the tab's rim and a wash from the top-left; the role accent still sits on a panel's top edge. |
+| Type | `src/styles/fonts.css`, `public/fonts`, `tools/ingest/vendor-fonts.mjs` | Marcellus, Figtree, JetBrains Mono, latin, 64 KB, each with its OFL licence. The first two are preloaded. |
+| Top bar | `AppShell.tsx` | The wordmark (a button back to the front door, keeping the character), the sections, and under the bar the phase chip and the tab's sources (the `provenance` prop). |
+| Shared parts | `src/components/ui/` | `PhaseChip` (from `src/domain/phase.ts`), `Provenance` (sources with their read dates), `ViewSwitch` (the prototypes' pill switch), `SpecIcon` (a spec's icon in a ring of its class colour). |
+| Page | `index.html`, `public/social-preview.jpg`, `tools/publish/readme-screenshots.mjs` | Title, description, Open Graph and Twitter tags; the README's screenshots and the link preview retaken from the new look. |
+| Fixes on the way | `global.css` | Character creation stacks on a phone (it scrolled sideways by 77px before); talent names keep to two lines; buttons are the prototypes' outlined pills; the phone top bar keeps every target at 44px. |
+
+**Tests:** `tests/look.spec.ts` (each screen's colour, the phase on every screen, the wordmark's way home, the faces and their licences, the page's title and preview, creation on a phone). The keyboard test now passes the wordmark on its way to the sections. The full suite passed 308 of 308 on Edge.
 
 ## What carries over from the 2 October plan
 

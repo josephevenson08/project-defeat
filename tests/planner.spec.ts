@@ -12851,9 +12851,12 @@ test('a keyboard reaches the section tabs without walking the page', async ({ pa
     .getByRole('navigation', { name: 'Main sections' })
     .getByRole('button', { name: 'Character Planner', exact: true })
 
-  // Arriving in the shell leaves focus in the main pane, so the tabs are one press away.
+  // Arriving in the shell leaves focus in the main pane, so the tabs are two presses away: the
+  // wordmark (the way back to the front door, since the 2026-10-12 top bar) and then the sections.
   await page.keyboard.press('Tab')
-  await expect(plannerTab, 'the first press after arriving is a section tab').toBeFocused()
+  await expect(page.getByTestId('brand-home'), 'the first press after arriving is the wordmark').toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(plannerTab, 'and the second a section tab').toBeFocused()
 
   // And nothing tabbable sits in front of the main pane except the way past it.
   await page.locator('#app-main').focus()
@@ -12872,7 +12875,9 @@ test('a keyboard reaches the section tabs without walking the page', async ({ pa
   await expect(page.locator('#app-main'), 'following it lands in the main pane').toBeFocused()
 
   await page.keyboard.press('Tab')
-  await expect(plannerTab, 'so two presses reach the navigation').toBeFocused()
+  await expect(page.getByTestId('brand-home'), 'then the wordmark').toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(plannerTab, 'so three presses reach the navigation').toBeFocused()
 
   /*
    * On Raids the bypass still earns its place: that section keeps its rail, so the skip link is what

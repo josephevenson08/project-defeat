@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/character/CharacterCreator.tsx
-lines: 262
+lines: 242
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.character.CharacterCreator
 
-`src/features/character/CharacterCreator.tsx` · **features** layer · 262 lines
+`src/features/character/CharacterCreator.tsx` · **features** layer · 242 lines
 
 _No doc comment at the top of this file._
 

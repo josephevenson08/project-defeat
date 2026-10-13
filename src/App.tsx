@@ -43,21 +43,21 @@ import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
 
 /**
- * The faction theme is stamped on `<html>`, not on a wrapper inside the app.
+ * The screen's colour is stamped on `<html>` as `data-tab`, not on a wrapper inside the app.
  *
  * **It has to be the root element or the page's own ground is the wrong colour.** `:root` paints the
- * body background, and a Horde character on an Alliance-blue ground would show a warm panel sitting
- * on a cool page — visible in exactly the gap the app does not control. Stamping the document
- * element means the background, the scrollbar and every panel change together.
+ * page and the still backdrop behind it, so stamping the document element means the ground, the
+ * backdrop, the scrollbar and every panel change together.
  *
- * Driven from the character rather than from a separate control, because the app already asks which
- * faction you are before anything else, and a second switch for the same fact is a second thing to
- * keep in sync.
+ * **The tab is the theme, not the faction** (the owner's call, 2026-10-12, with the Step 2 look):
+ * each section has its colour, and the front door and the loading screen take Home's teal. Until
+ * then the whole app was themed by the character's faction, which made a Horde player's tier list
+ * look different from an Alliance player's for no reason that had to do with tier lists.
  */
-function useFactionTheme(faction: CharacterProfile['faction']) {
+function useScreenTheme(screen: 'home' | AppTab) {
   useEffect(() => {
-    document.documentElement.dataset.faction = faction.toLowerCase()
-  }, [faction])
+    document.documentElement.dataset.tab = screen
+  }, [screen])
 }
 
 const initialCharacter: CharacterProfile = {
@@ -172,7 +172,6 @@ function App() {
   // Session state, like `activeTab`. Which panel you were last reading is not part of the build.
   const [plannerView, setPlannerView] = useState<PlannerView>('gear')
   const [character, setCharacter] = useState<CharacterProfile>(initialCharacter)
-  useFactionTheme(character.faction)
 
   const [gear, setGear] = useState<EquippedGear>(emptyGear)
   const [activeBuffIds, setActiveBuffIds] = useState<readonly string[]>([])
@@ -289,6 +288,8 @@ function App() {
    */
   const simulationEnabled = isSimulationEnabled(role)
   const currentTab: AppTab = activeTab === 'simulation' && !simulationEnabled ? 'planner' : activeTab
+  // Character creation takes the colour of the section it leads into; the way in takes Home's.
+  useScreenTheme(introComplete && !sharePending && sectionChosen ? currentTab : 'home')
 
   /**
    * Moving between sections, from the tab bar.
@@ -503,6 +504,12 @@ function App() {
       tabs={visibleTabs(simulationEnabled)}
       activeTab={currentTab}
       onTabChange={changeSection}
+      onHome={() => {
+        // Back to the front door, keeping everything: the character, the gear and which section you
+        // were in are session state, and the doors lead straight back to them.
+        setSectionChosen(false)
+        window.scrollTo(0, 0)
+      }}
     >
       {shareNoticeBanner}
       {currentTab === 'planner' && (
