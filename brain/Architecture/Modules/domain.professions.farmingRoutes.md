@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/farmingRoutes.ts
-lines: 368
+lines: 369
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.farmingRoutes
 
-`src/domain/professions/farmingRoutes.ts` · **domain** layer · 368 lines
+`src/domain/professions/farmingRoutes.ts` · **domain** layer · 369 lines
 
 From the top of the file:
 
@@ -28,8 +28,9 @@ From the top of the file:
 > extent. The owner has since decided to vendor the art under Blizzard's fan-content rules, and that
 > same percentage space is what makes the overlay register with no transform at all.
 > 
-> The design the constraint forced is still doing work: `zoneMaps.json` records the one zone with no
-> art on the CDN, and its map falls back to the bare square rather than to a hole.
+> The design the constraint forced is still the fallback: `zoneMaps.json` records any zone with no art,
+> and its map falls back to the bare square rather than to a hole. Since 2026-10-13 the art is the TBC
+> zones (docs/design/MAPS-PLAN.md, Step A) and every zone has some.
 
 ## Exports
 

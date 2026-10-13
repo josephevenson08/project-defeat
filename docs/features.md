@@ -8,7 +8,7 @@ a test in `tests/planner.spec.ts`, so if one drifts the suite fails.
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5, with all of P1 raids/gear available) and only Phase 2. The gear
-catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. Current profession maps need to be reworked to show current layout rather than retail zones with the same names.
+catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. The profession maps show the zones as they were in TBC (since 2026-10-13); the gathering nodes and the route algorithm are being reworked next ([`MAPS-PLAN.md`](design/MAPS-PLAN.md)).
 
 **This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
 neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab
@@ -143,11 +143,14 @@ behind every claim of its that quotes a number.
   maps, ordered by the range's recommendation rather than by spawn count — Silver's busiest zones are
   level 30-40 and a player mining Silver is around level 20. Every recorded spawn is plotted over the
   zone's own map art, which registers with no transform because coordinates are percentages of the
-  zone's extent and that is exactly the space the art covers. The circuit is computed here rather than
+  zone's extent and that is exactly the space the art covers. The art is Wowhead's TBC-era maps (since
+  2026-10-13): the retail maps it replaced were the post-Cataclysm zones, on which TBC spawns landed in
+  the sea or on a flooded Thousand Needles, and a test now checks the spawns land on land. The circuit is computed here rather than
   copied from anyone's guide — density, snapped onto nodes that actually exist, then 2-opt to uncross
   it — and the caption says it is a strong starting line rather than a proven optimum. Zone maps are
-  Blizzard artwork used in a free, non-commercial fan project, credited on every map; the one zone with
-  no art on file falls back to a bare density grid. Recommended zones the ingest has no coordinates
+  Blizzard artwork used in a free, non-commercial fan project, credited on every map; all 42 zones have
+  art (Alterac Mountains too, which the retail maps lacked), and a zone without would fall back to a bare
+  density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
 - **Laid out for a phone.** The character line, the stat bar and the gear list stack without a

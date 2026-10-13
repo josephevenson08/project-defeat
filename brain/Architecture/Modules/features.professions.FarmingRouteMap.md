@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/FarmingRouteMap.tsx
-lines: 129
+lines: 132
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.FarmingRouteMap
 
-`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 129 lines
+`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 132 lines
 
 _No doc comment at the top of this file._
 

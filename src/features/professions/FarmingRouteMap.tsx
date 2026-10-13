@@ -8,6 +8,9 @@ const ATTRIBUTION: string = zoneMapData.attribution
 /**
  * A farming route, drawn over the zone it happens in.
  *
+ * **The maps are the zones as they were in TBC** (Wowhead's TBC art since 2026-10-13; the retail art
+ * before that showed the post-Cataclysm zones, on which TBC spawns landed in the sea).
+ *
  * **The map went under this in September 2026, and the design above it barely changed.** For months
  * the art was treated as un-vendorable, so the node cloud *was* the picture — which turned out to be
  * the right groundwork rather than a compromise: spawn coordinates are percentages of a zone's own
@@ -58,8 +61,8 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
         >
           {/*
             The density grid only draws where there is no art to draw on. It was the whole picture
-            before and it is the fallback now — Alterac Mountains has no map at Wowhead's CDN, so
-            Wintersbite still gets the square it always had rather than an empty frame.
+            before and it is the fallback now: every zone has its TBC map since 2026-10-13, and a zone
+            that ever loses its art gets the square rather than an empty frame.
           */}
           {!art &&
             route.cells.map((density) => (

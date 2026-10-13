@@ -9866,15 +9866,22 @@ test('every zone a route draws has map art, or is recorded as having none', () =
   const covered = drawn.filter((zone) => zone in zoneMaps.zones)
   const missing = drawn.filter((zone) => !(zone in zoneMaps.zones))
 
-  expect(covered.length, 'nearly every zone has vendored art').toBeGreaterThanOrEqual(40)
+  expect(covered.length, 'every zone has vendored art').toBeGreaterThanOrEqual(42)
 
   /*
-   * **Named, not counted.** Alterac Mountains is a 404 at the CDN at every size while Alterac Valley
-   * next door is fine, so Wintersbite keeps the bare density square the maps used before. Listing it
-   * means a second zone losing its art fails this test rather than silently rendering an empty frame.
+   * **Named, not counted.** On Wowhead's retail map path Alterac Mountains was a 404, so Wintersbite
+   * kept the bare density square; the TBC path (2026-10-13) has it. A zone losing its art is listed
+   * in `withoutArt`, so it fails this test rather than silently rendering an empty frame.
    */
-  expect(missing.sort(), 'the only zone with no art is the known one').toEqual(['Alterac Mountains'])
-  expect(zoneMaps.withoutArt).toEqual(['Alterac Mountains'])
+  expect(missing, 'no zone a route draws is without art').toEqual([])
+  expect(zoneMaps.withoutArt).toEqual([])
+
+  /*
+   * **The TBC art, not the retail art.** The spawns are Wowhead's TBC coordinates; the retail maps are
+   * the post-Cataclysm zones (a flooded Thousand Needles, only the north of Stranglethorn), on which
+   * those coordinates land in the sea. See docs/design/MAPS-PLAN.md, Step A.
+   */
+  expect(zoneMaps.source).toBe('https://wow.zamimg.com/images/wow/tbc/maps/enus/zoom/<areaId>.jpg')
 
   /*
    * **The art is not square and the frame has to know it.** 772x515 and 772x579 are the two shapes.
@@ -9893,6 +9900,60 @@ test('every zone a route draws has map art, or is recorded as having none', () =
   expect(zoneMaps.attribution).not.toMatch(/Game Content Usage Rules/)
   expect(zoneMaps.attribution).toMatch(/non-commercial/)
   expect(zoneMaps.attribution).toMatch(/not affiliated with or endorsed by Blizzard/)
+})
+
+test('spawns land on land: the maps are the zones as they were in TBC', async ({ page }) => {
+  /*
+   * **Measured on the picture, because that is where the bug was.** Until 2026-10-13 the maps were
+   * Wowhead's retail art: the post-Cataclysm zones under TBC coordinates. Drawn on them, 20 of
+   * Stranglethorn's 163 Gold Veins sat in the sea (retail area 33 is only Northern Stranglethorn) and
+   * 60 of Thousand Needles' 189 Silver Veins on a lake the Cataclysm made. On the TBC art none do.
+   *
+   * The test reads the map pixel under each spawn. Land on these parchment maps is warm (red well above
+   * blue); water is grey. That holds for the old world, which is what Cataclysm reshaped; Outland's
+   * teal and green land would fool it, so only these two zones are measured.
+   */
+  await page.goto('/')
+  const onWater = async (zone: string, node: string) => {
+    const art = (zoneMaps.zones as Record<string, { file: string }>)[zone]
+    const coords = gatheringNodes.find((candidate) => candidate.name === node)!.zones.find((entry) => entry.zone === zone)!.coords
+    return page.evaluate(
+      async ({ file, coords }) => {
+        const image = new Image()
+        image.src = `/maps/${file}`
+        await image.decode()
+        const canvas = document.createElement('canvas')
+        canvas.width = image.naturalWidth
+        canvas.height = image.naturalHeight
+        const context = canvas.getContext('2d')!
+        context.drawImage(image, 0, 0)
+        let water = 0
+        for (const [x, y] of coords) {
+          const px = Math.round((x / 100) * canvas.width)
+          const py = Math.round((y / 100) * canvas.height)
+          const { data } = context.getImageData(Math.max(0, px - 2), Math.max(0, py - 2), 5, 5)
+          let red = 0
+          let blue = 0
+          for (let index = 0; index < data.length; index += 4) {
+            red += data[index]
+            blue += data[index + 2]
+          }
+          if ((red - blue) / (data.length / 4) < 30) water += 1
+        }
+        return { water, total: coords.length }
+      },
+      { file: art.file, coords },
+    )
+  }
+
+  for (const [zone, node] of [
+    ['Stranglethorn Vale', 'Gold Vein'],
+    ['Thousand Needles', 'Silver Vein'],
+  ] as const) {
+    const { water, total } = await onWater(zone, node)
+    expect(total, `${zone} has ${node} spawns to measure`).toBeGreaterThan(100)
+    expect(water, `${node} spawns on water in ${zone}`).toBeLessThanOrEqual(Math.floor(total * 0.02))
+  }
 })
 
 test('a route stop is a node that exists, not the average of a cluster', () => {

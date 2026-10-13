@@ -690,7 +690,7 @@ const DESIGN_NOTES = [
 
 **Step 2, Raids (2026-10-13):** the boss journal (one boss at a time, "Loot for" any spec with its ranks, the fight, the raid's attunement), "For my raid" (who in your saved raid, or the labelled example, wants each drop, and what is contested), a search across all five raids, and the game-style item tooltip the planner tabs will share. The picker screen and the rail of raids are gone; the tab takes each raid's colour.
 
-**The maps rework** has a plan of its own (\`docs/design/MAPS-PLAN.md\`): the Professions maps are retail, post-Cataclysm art under TBC coordinates, and Wowhead serves the TBC art at its own path.`,
+**The maps rework** has a plan of its own (\`docs/design/MAPS-PLAN.md\`). The Professions maps were retail, post-Cataclysm art under TBC coordinates, so nodes landed in the sea; the owner decided on 2026-10-13 to swap in Wowhead's TBC-era maps at once (Step A, done: all 42 zones, Alterac Mountains included, and a test that the spawns land on land), to keep routes covering a whole skill window, to draw ground routes as straight lines with a note, and to have the tbc-researcher confirm the missing nodes before they are ingested (Step B).`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
       ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],

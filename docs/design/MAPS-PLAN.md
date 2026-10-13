@@ -1,6 +1,7 @@
 # Reworking the gathering maps and routes: plan
 
-**Status: written 2026-10-12, waiting for the owner's decisions (below). Nothing is built.** The owner asked for it on
+**Status: written 2026-10-12; the owner decided all four questions on 2026-10-13 (below). Step A is done
+(2026-10-13): the app's maps are the TBC zones. The node research for Step B is running.** The owner asked for it on
 2026-10-12: the Professions tab's zone maps should show current TBC maps and node locations, and the route algorithm
 should be redone. [`PORT-PLAN.md`](PORT-PLAN.md) (Decision 2) asked for it before the port reaches Professions (step 3).
 
@@ -43,18 +44,27 @@ dry Thousand Needles, the old Azshara).
 
 These need confirming by the tbc-researcher before any data changes, as every data fix in this repo has been.
 
-**3. The route algorithm draws one node at a time, in straight lines, without knowing a route's purpose.**
-- It routes **one node type per map**, but a player at Herbalism 320 picks everything their skill allows. The
-  ranges in `gatheringGuides.ts` already know which nodes belong together; the routes do not use that.
+**3. The route algorithm draws straight lines and does not say how good a loop is.** (Corrected 2026-10-13: the first
+version of this plan said the maps route one node type at a time. The Professions tab's range maps already merge every
+node in a skill range into one loop per zone, through `routesForNodes`; only the older `routesForNode` is per node.)
 - **Straight lines** go over mountains and across water. In Outland at 70 with a flying mount that is how you travel,
   but in Azeroth, and in Outland before flying, it is not.
-- The **35% cut** keeps only the busiest cells of one node, so a loop can skip a stretch that is thin for that node but
-  rich for the next one in the same skill window.
+- The **35% cut** keeps only the busiest grid cells of the range's merged cloud, and the loop is nearest-neighbour from
+  the densest cell, then 2-opt. Nothing weighs a detour against what it picks up.
 - The caption says "a heuristic", which is honest, but nothing says how good a loop is (nodes per lap, lap length).
 
 ## The plan
 
-### Step A. Correct maps (small, and it fixes a visible error today)
+### Step A. Correct maps (done 2026-10-13)
+
+**As built:** `ingest-zone-maps.mjs` fetches from the TBC path, refetches whenever the recorded source differs, and
+takes area ids from the previous `zoneMaps.json` (plus Alterac Mountains, 36) when the spawn cache is not on disk. All 42
+zones have art (3.0 MB, down from 3.3 MB); `zoneMaps.json` records the source and `fetchedAt`. The test reads the map
+pixel under each spawn in the two zones Cataclysm reshaped most: on the retail art 20 of Stranglethorn's 163 Gold
+Veins and 60 of Thousand Needles' 189 Silver Veins sat on water, and on the TBC art none do (checked by swapping the old
+Stranglethorn map back in: the test fails at 20). The land-mask idea below was replaced by this colour reading.
+
+The original plan:
 - Point `ingest-zone-maps.mjs` at the TBC path, refetch all 41 maps and add Alterac Mountains (42), and record the
   source path in `zoneMaps.json`. The images are the same size, so `FarmingRouteMap.tsx` needs no change.
 - **A test** that a known spawn lands where the TBC map draws it, for a zone that changed in Cataclysm. For example:
@@ -73,8 +83,8 @@ These need confirming by the tbc-researcher before any data changes, as every da
 
 ### Step C. A new route algorithm
 Proposed design, to be prototyped on the plain grid first (the prototypes' rule) and then drawn on the TBC maps:
-1. **Route a skill window, not a node.** The input is every node a range lists, at the player's skill, so a 320 route
-   in Nagrand picks up Felweed and Dreaming Glory together.
+1. **Route a skill window, as the range maps already do.** The input stays every node a range lists, so a 320 route
+   in Nagrand picks up Felweed and Dreaming Glory together; Step B's added nodes and zones feed straight into it.
 2. **Cluster the spawns** (density-based clustering with a radius about the distance you can see a node from), weighting
    each cluster by how many spawns it holds, summed over the window's nodes.
 3. **Choose the loop for yield, not just to visit clusters.** Pick the clusters that give the most spawns per distance
@@ -88,15 +98,14 @@ Proposed design, to be prototyped on the plain grid first (the prototypes' rule)
 property test that the loop never gets longer when a cluster is removed, and the real-data numbers the prototype
 check pins (for example, the Mining 325–350 route through Nagrand and Blade's Edge).
 
-## The owner's decisions (open)
+## The owner's decisions (2026-10-13)
 
-1. **When to fix the maps (Step A):** now, as its own small commit before the port continues (recommended: today's
-   maps put nodes in the wrong place), or with Professions in step 3?
-2. **Routes by skill window or by node:** a window (recommended, matches how a player gathers) or keep one node per map?
-3. **Ground travel:** (a) straight lines with a note (recommended to start), or (b) a walkability mask per zone
-   (more accurate, much more work)?
-4. **The data fixes in Step B:** have the tbc-researcher confirm the missing nodes and zones first (recommended), as
-   the Raids and Professions steps did?
+1. **When to fix the maps:** now, as Step A, its own small commit before the port continues.
+2. **What a route covers:** a skill window, everything the player's skill can gather in that zone. The range maps
+   already work this way; the new algorithm keeps it.
+3. **Ground travel:** straight lines, with a note on the routes that are ridden on the ground (all of Azeroth, and
+   Outland before flying). No walkability masks.
+4. **The node data:** the tbc-researcher confirms the missing nodes, object ids and zones before anything is ingested.
 
 ## How it ships
 
