@@ -1,6 +1,15 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-12, end of day): the port plan is approved; start here
+## ▶ Where we left off (2026-10-12, night): the port has begun; start here
+
+**The decided designs are going into the live app** ([`docs/design/PORT-PLAN.md`](../../PORT-PLAN.md)). Done and pushed on 2026-10-12:
+- **Step 0, the look** (`fca3cfe`): glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase chip on every screen, the wordmark back to the front door, and the shared parts (`PhaseChip`, `Provenance`, `ViewSwitch`, `SpecIcon`). The tab's colour replaced the faction theme (the owner's call).
+- **Step 1, Spec Tier Lists** (`edfe2fb`): this page's design A with design B's "Against the logs", in React on the app's own data; `checks/tiers-handson.mjs` became `tests/tierlists.spec.ts`.
+- **The maps plan** (`9ee4d7f`, [`docs/design/MAPS-PLAN.md`](../../MAPS-PLAN.md)): the live app's zone maps are post-Cataclysm retail art under TBC coordinates. Four decisions wait for the owner.
+
+**Next: step 2, Raids** (`raids.html`: design A's boss journal with design C's "For my raid"), then the owner's maps decisions before step 3. Ask before each push. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-12, end of day): the port plan is approved
 
 **Next: build step 0 of [`docs/design/PORT-PLAN.md`](../../PORT-PLAN.md)**, the foundation, then Spec Tier Lists. The owner approved the plan on 2026-10-12:
 - **Look:** option C. The prototypes' look comes first (glass panels, Marcellus and Figtree, a colour per tab, game tooltips) with a still backdrop in each tab's colour. The 3D scene is the last step, as an optional lazy-loaded layer.

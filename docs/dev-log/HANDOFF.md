@@ -1,43 +1,73 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-12.** A self-contained brief for picking
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-12 (night).** A self-contained brief for picking
 this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
-**Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The exact
-next steps are also at the top of
+**Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The port's
+plan is [`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), and the next steps are also at the top of
 [`docs/design/prototypes/tabs/NEXT-SESSION-PLAN.md`](../design/prototypes/tabs/NEXT-SESSION-PLAN.md). Everything
 further down this file is the record of how earlier decisions were reached, newest first.
 
 ---
 
-## Where this is right now (2026-10-12, end of day — READ THIS FIRST)
+## Where this is right now (2026-10-12, night — READ THIS FIRST)
 
 ### For the next chat, in one paragraph
 
-**The prototype walkthrough is finished:** every tab has a decided design, and all of it is committed and pushed. The last commit on `main` is `40bc023`. **The next job is bringing those designs into the live app,** following [`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), which the owner approved on 2026-10-12:
-- **Look:** option C, the prototypes' look first with a still backdrop per tab, and the 3D scene last as an optional layer.
-- **Order:** step 0 (the foundation) first, then Spec Tier Lists.
-- **Pushing:** ask before each push.
-- **The owner's suggestion for the maps:** rework the Professions zone maps to show current TBC maps and node locations, and redo the route algorithm. Write that as its own plan (the port plan's Decision 2 lists what to research) before the port reaches Professions.
-
-**Not committed yet:** `docs/design/PORT-PLAN.md` (new), the "folded into the port plan" status line in `docs/design/UI-REFRESH-PLAN.md`, this file and `NEXT-SESSION-PLAN.md`. Ask the owner whether to commit and push them; they usually say yes.
+**The port of the decided designs into the live app is under way** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), approved 2026-10-12). **Step 0, the look, and step 1, Spec Tier Lists, are built, tested, committed and pushed** (step 0 `fca3cfe`, step 1 `edfe2fb`; the live site has both). **Next: step 2, Raids** (the boss journal with "For my raid", the search across all five raids, the game-style item tooltip, and each raid's own colour). **Before step 3 (Professions), the owner has four decisions to make in [`docs/design/MAPS-PLAN.md`](../design/MAPS-PLAN.md)**, written this session: the live app's zone maps are post-Cataclysm retail art drawn under TBC coordinates, so nodes land in the wrong places, and Wowhead serves the TBC art at its own path. The recommended first move (Step A, swapping in the TBC maps) is small and could be done before Raids if the owner says so. **Ask before each push.**
 
 ### In short
 
-- **Raids is committed and pushed** (`4ced560`, then "Refresh the daily log" `d30a8b8`). **Spec Tier Lists is committed and pushed too** (`0b6e00f`, then "Refresh the daily log" `e509e9e`). **Professions is committed and pushed too** (`206c0a7`, then "Refresh the daily log" `9b0e0e9`). With it, every tab of the walkthrough is decided. `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
-- **The live app** (`src/`) deploys to GitHub Pages on every push to `main`: https://josephevenson08.github.io/project-defeat/. It changed four times from 2026-10-10 to 12, all from the prototype work: the data and rule fixes (`9be91c1`), the upgrade finder's two-hander bug (`260b92d`), a new front door (`a8fb27b`), and with the Raids step two loot role tags and the attunement text (below).
-- **The rest of the work is a UI redesign,** as static HTML prototypes in [`docs/design/prototypes/`](../design/prototypes/), published at https://josephevenson08.github.io/project-defeat/prototypes/. It is walked through tab by tab: three designs per step, and the owner picks one, often with a feature borrowed from another.
+- **The live app looks new since 2026-10-12** (step 0): dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the "TBC Classic · Phase 2" chip on every screen, and a wordmark that goes back to the front door. The owner chose: the tab's colour replaces the faction theme, every tab takes the new look at once (the old token names point at the new values until each tab is ported), and the fonts are vendored with their licences. Details: the port plan's "Step 0, as built".
+- **Spec Tier Lists is the decided design** (step 1): the tier board with a card for any spec, and "Against the logs" behind a switch. Details: the port plan's "Step 1, as built".
+- **The maps finding** (see the maps plan): the 41 maps come from Wowhead's retail map path; the TBC art is at `wow.zamimg.com/images/wow/tbc/maps/enus/zoom/<areaId>.jpg`. The node list also misses Gromsblood, Ghost Mushroom and Plaguebloom, and has no spawns for Ragveil.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
+- `DarkSoulsFightAI/` and `adaptive_boss_demo.py` are unrelated untracked files: leave them alone.
 
-### Next: the port to the live app (approved 2026-10-12)
+### Next, in order
 
-**The plan is [`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), approved by the owner on 2026-10-12.** Option C for the look (the prototypes' look first with a still backdrop, the 3D scene last as an optional lazy-loaded layer), then the tabs in order: step 0 the foundation, then Spec Tier Lists, Raids, Professions, Simulation, Raid Composition and the Character Planner (one sub-tab per commit), and last the scene. Ask before each push. **Start with step 0.** Before step 3, write a separate plan for the owner's maps rework: current TBC zone maps and nodes, and a redone route algorithm (see the plan's Decision 2). The old `UI-REFRESH-PLAN.md` is folded into the port plan.
+1. **Step 2, Raids** (port plan): rewrite `src/features/raids/` around the boss journal (prototype `docs/design/prototypes/tabs/raids.html`, its scripts `raids-a.js` and `raids-c.js`, its check `checks/raids-handson.mjs`). New domain helpers: each drop's rank on every spec's list (from `bisRankings.json`) and who in the saved roster (`loadRoster()`, key `project-defeat:roster:v1`) wants it. Build the shared game-style item tooltip here (moved from step 0). Raids "follows the raid": give each raid its own colour, as the prototype does (`tbc-kit.js` themes `ssc`, `tk`, `hellfire`, `bladesedge`, `karazhan`). About 57 lines of the suite touch Raids.
+2. **The owner's decisions in the maps plan,** before step 3.
+3. Then steps 3 to 7 as the port plan lists them.
 
-**The owner was close to their usage limit when this was written (2026-10-12),** so nothing was built from the plan.
+### How each port step is done (what steps 0 and 1 did)
 
-**Two data cleanups are done, committed and pushed (2026-10-12, `b806f06`, then "Refresh the daily log" `40bc023`, the last commit on `main`):** Gloves of the Searing Grip's stale note, flag and made-up stats are gone from `sampleItems.ts` (the counted comments now read 119 and 141), and the crafting paths now know which recipes a trainer teaches (`compute-leveling-paths.mjs`: Wowhead's code 2 is a drop, not a trainer; a training cost, code 6 or a skill-1 starter counts), which changed a few recipes in five paths. Tests added (the full suite passed 302 of 302); details in `tabs/README.md` under "Data corrections".
+- Read the prototype page and its scripts, and its hands-on check; reuse the shared parts in `src/components/ui/` (`PhaseChip`, `Provenance`, `ViewSwitch`, `SpecIcon`).
+- Pure logic in `src/domain/` (step 1: `tierlists/specStanding.ts`), components in `src/features/<tab>/`, styles as one block in `src/styles/global.css` using the new token names, a tab's sources passed to `AppShell` as `provenance` from `App.tsx`.
+- Turn the prototype's check into `tests/<tab>.spec.ts` with its real numbers; update the older tests whose markup changed.
+- Screenshots at 1280px and 400px (the in-app browser's screenshots were unreliable this session; a small Playwright script on Edge worked), then the full suite, `tsc -b`, lint and build.
+- Update the port plan ("Step N, as built"), `docs/features.md`, the README's redesign table, the brain's "Port to the Live App" note in `tools/brain/generate-brain.mjs`, then `npm run brain`; commit, `npm run changelog`, a "Refresh the daily log" commit, and push when the owner says so.
+- After a change to how the app looks, `node tools/publish/readme-screenshots.mjs` (with the dev server up) retakes the README's screenshots and the link preview.
 
-**Every tab of the walkthrough is decided** (Professions was the last, 2026-10-12). What comes next is the owner's call. Open items they could pick from are listed under "Open items, not started" below.
+### Done on 2026-10-12, newest first
+
+| What | Commit | Notes |
+| --- | --- | --- |
+| **Port step 1: Spec Tier Lists** | `edfe2fb` | The tier board, the spec card, the tooltip and "Against the logs", on the app's own data. Also: the phone wordmark's missing space (from step 0), and the tier lists' fetch date. 318 of 318 tests. |
+| **Port step 0: the look** | `fca3cfe` | Tokens, a colour and backdrop per tab, glass, the three faces, the top bar, the shared parts, the page's title and preview, creation on a phone. 308 of 308 tests. |
+| **The maps plan** | `9ee4d7f` | `docs/design/MAPS-PLAN.md`: the retail-art finding, the node gaps, and a new route algorithm, with four decisions for the owner. |
+| **The port plan** | `0a9f90f` | `docs/design/PORT-PLAN.md`, approved by the owner. |
+| **Two data cleanups** | `b806f06` | The gloves' stale note and the crafting paths' trainer recipes. |
+| **Professions** | `206c0a7` | The last step of the design walkthrough. |
+
+Each work commit is followed by a "Refresh the daily log" commit.
+
+### Open items, not started
+
+- **The maps plan's four decisions** (above).
+- **The app's buff data** leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier cards show only what it counts. Fixing it needs the tbc-researcher.
+- **A timing-sensitive test:** "no image in the app is painted larger than the file it comes from" failed once while other browser tests ran at the same time, and passed on its own.
+
+### How to check things
+
+- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 7–8 minutes, 318 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
+- **Prototype checks** (`docs/design/prototypes/tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs`; `published.mjs` against a local build or the live site (`BASE=`).
+- **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`, `gen-prof-data.mjs`; and `npm run brain` for the vault.
+- **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.
+
+---
+
+## Before the port (2026-10-12): the walkthrough finished
 
 ### Professions (decided, built and committed 2026-10-12 as `206c0a7`)
 
@@ -81,18 +111,6 @@ further down this file is the record of how earlier decisions were reached, newe
 | **Live-app fixes from the prototype work** | `9be91c1` | See "Earlier: the live-app fixes" below. |
 
 Each work commit is followed by a "Refresh the daily log" commit.
-
-### Open items, not started
-
-- **A timing-sensitive test:** "no image in the app is painted larger than the file it comes from" failed once while other browser tests ran at the same time, and passed on its own. The full suite passed 300 of 300 after.
-- **The app's buff data** leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier cards show only what it counts. Fixing it needs the tbc-researcher.
-
-### How to check things
-
-- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 7–10 minutes, 300 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
-- **Prototype checks** (`tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs` for every tab's background; `published.mjs` against a local build (`npm run build && node tools/publish/copy-prototypes.mjs`, then the `project-defeat-preview` server) or the live site (`BASE=`). The Build and Simulation checks also compare against the real app when its dev server is up (`APP=http://localhost:5173/`, or `APP=off`).
-- **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`, `gen-prof-data.mjs`; and `npm run brain` for the vault.
-- **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.
 
 ### Earlier: the live-app fixes from the prototype work (committed 2026-10-10, `9be91c1`)
 
