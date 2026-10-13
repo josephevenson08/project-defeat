@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**467 commits across 74 days**, from 2026-06-25 to 2026-10-12.
+**469 commits across 74 days**, from 2026-06-25 to 2026-10-12.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,9 +13,9 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_40 commits_
+_42 commits_
 
-### Monday 12 October — 7 commits
+### Monday 12 October — 9 commits
 
 - Make the Raids tab a boss journal, with who in your raid wants each drop — [`4ced560`](https://github.com/josephevenson08/project-defeat/commit/4ced560086d100e5c86a131ef6a5080323320b20)
 - Make the Spec Tier Lists tab a tier board, with the logs beside it — [`0b6e00f`](https://github.com/josephevenson08/project-defeat/commit/0b6e00f68b3bb42256ed724b09cfaf96a4b985f1)
@@ -24,6 +24,8 @@ _40 commits_
 - Plan the port of the decided designs into the live app — [`0a9f90f`](https://github.com/josephevenson08/project-defeat/commit/0a9f90f21c2f7ac909840863ed0e4fe3d322db50)
 - Plan the rework of the gathering maps and routes — [`9ee4d7f`](https://github.com/josephevenson08/project-defeat/commit/9ee4d7ffa9da1ed24e6e522e54bd15bb0b1ef167)
 - Give the app the decided look: glass, new type and a colour per tab — [`fca3cfe`](https://github.com/josephevenson08/project-defeat/commit/fca3cfeeb385b9774915e08b3358f7c3091df75b)
+- Make Spec Tier Lists the tier board, with the logs beside it — [`edfe2fb`](https://github.com/josephevenson08/project-defeat/commit/edfe2fb0120bffe87c02cbb8965115ece5073a9d)
+- Bring the handoff up to the port: steps 0 and 1 done, Raids next — [`31834bc`](https://github.com/josephevenson08/project-defeat/commit/31834bc8e41896b8c34e0ee4748e7a9494aba2d5)
 
 ### Sunday 11 October — 4 commits
 
