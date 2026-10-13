@@ -45,7 +45,7 @@ const miningGuide: GatheringGuide = {
       zoneNotes: [
         {
           zone: 'Dun Morogh',
-          note: 'The densest starting zone in our data, and the mine at Gol\'Bolar Quarry east of Kharanos is worth walking into rather than past.',
+          note: 'Level with Elwynn Forest as the densest starting zone in our data, and the mine at Gol\'Bolar Quarry east of Kharanos is worth walking into rather than past.',
         },
         {
           zone: 'The Barrens',
@@ -91,7 +91,7 @@ const miningGuide: GatheringGuide = {
       zones: ['The Hinterlands', 'Tanaris', 'Azshara', 'Un\'Goro Crater', 'Feralas'],
       recommendedCharacterLevel: '43-52',
       guidance:
-        'Mithril at 175 is the long one — seventy points on essentially a single ore. Truesilver joins at 230 near the end and is rare enough to be a bonus rather than a plan. This is the range where a mount stops being optional.',
+        'Mithril at 175 is the long one — seventy points on essentially a single ore. Truesilver joins at 230 near the end and is rare enough to be a bonus rather than a plan. This is the range where a mount stops being optional. Dark Iron Deposits also open at 230, in Burning Steppes and Searing Gorge; the levelling guides ride past them, so treat them as an optional detour. They are not in our node data, so the maps do not show them.',
       zoneNotes: [
         {
           zone: 'The Hinterlands',
@@ -172,18 +172,18 @@ const herbalismGuide: GatheringGuide = {
       zones: ['Tirisfal Glades', 'Teldrassil', 'Elwynn Forest', 'Durotar', 'Azuremyst Isle', 'Dun Morogh', 'Mulgore'],
       recommendedCharacterLevel: '1-12',
       guidance:
-        'Peacebloom and Silverleaf are gatherable from skill 1, Earthroot joins at 15 and Mageroyal at 50. Every starting zone carries the first three, so this range is done wherever you happen to be — unlike Mining, Teldrassil is fine here. Tirisfal Glades is the densest zone in our data and the only starting zone carrying all three of the first herbs.',
+        'Peacebloom and Silverleaf are gatherable from skill 1, Earthroot joins at 15 and Mageroyal at 50. Every starting zone carries the first three, so this range is done wherever you happen to be — unlike Mining, Teldrassil is fine here. The maps below draw each herb in its three busiest zones only, so most starting zones show one or two of the three; the others are still there. Blood Elves also have Bloodthistle in Eversong Woods from skill 1 — any race can pick it, only Blood Elves can use it — and it is not in our node data.',
       zoneNotes: [
         {
           zone: 'Tirisfal Glades',
-          note: 'The one starting zone with Peacebloom, Silverleaf and Earthroot together, and the densest of any of them.',
+          note: 'The one starting zone in all three herbs\' busiest three, so its map shows the whole lap, and the densest of them.',
         },
         {
           zone: 'Durotar',
-          note: 'Peacebloom only in our data — plenty of it, but you will want a second zone for Silverleaf and Earthroot.',
+          note: 'The map shows Peacebloom only, because Durotar is among the busiest Peacebloom zones and not among the busiest for the other two. Silverleaf and Earthroot grow here too — Wowhead records 98 and 60 — so there is no need to move.',
         },
       ],
-      sources: [...TABLES],
+      sources: [...TABLES, 'warcraft.wiki.gg'],
     },
     {
       skillRange: [70, 115],
@@ -244,7 +244,7 @@ const herbalismGuide: GatheringGuide = {
       zones: ['Swamp of Sorrows', 'Azshara', 'Feralas', 'Un\'Goro Crater', 'The Hinterlands'],
       recommendedCharacterLevel: '50-58',
       guidance:
-        'Sungrass at 230, Blindweed at 235 and Golden Sansam at 260. Blindweed is a water plant and Swamp of Sorrows holds far more of it than anywhere else. Sungrass is the workhorse of the range and is spread widely, so the zone choice here is mostly about which of the two you would rather ride for.',
+        'Sungrass at 230, Blindweed at 235 and Golden Sansam at 260. Blindweed is a water plant and Swamp of Sorrows holds far more of it than anywhere else. Sungrass is the workhorse of the range and is spread widely, so the zone choice here is mostly about which of the two you would rather ride for. Ghost Mushroom (245) and Gromsblood (250) open in this window too; neither is in our node data, so the maps leave them out.',
       sources: [...TABLES],
     },
     {
@@ -252,11 +252,11 @@ const herbalismGuide: GatheringGuide = {
       zones: ['Winterspring', 'Eastern Plaguelands', 'Azshara', 'Silithus', 'Felwood'],
       recommendedCharacterLevel: '55-60',
       guidance:
-        'Dreamfoil at 270, Mountain Silversage at 280 and Icecap at 290 close out Azeroth. Winterspring carries all three and is the standard answer. Black Lotus also becomes gatherable at 300, but it is a rare spawn with a handful of fixed points per zone and is not something to level on — it is worth knowing where it grows, not worth planning a lap around.',
+        'Dreamfoil at 270, Mountain Silversage at 280 and Icecap at 290 close out Azeroth. Eastern Plaguelands carries the range from its first point, with Dreamfoil and Silversage both, and Plaguebloom opens there at 285 (it is not in our node data, so the maps leave it out). Winterspring is where to finish: it is the only zone with Icecap, and it has Silversage too, but Wowhead\'s TBC data records no Dreamfoil there, so arrive at 280 rather than 270. Black Lotus also becomes gatherable at 300, but it is a rare spawn with a handful of fixed points per zone and is not something to level on — it is worth knowing where it grows, not worth planning a lap around.',
       zoneNotes: [
         {
           zone: 'Winterspring',
-          note: 'The densest zone of the range and the only one carrying Dreamfoil, Mountain Silversage and Icecap together.',
+          note: 'The densest map of the range, and the only Icecap zone there is. No Dreamfoil grows here in Wowhead\'s TBC data, so this is a lap for 280 onwards.',
         },
       ],
       sources: [...TABLES],
@@ -274,21 +274,21 @@ const herbalismGuide: GatheringGuide = {
       zones: ['Terokkar Forest', 'Zangarmarsh', 'Shadowmoon Valley'],
       recommendedCharacterLevel: '62-67',
       guidance:
-        'Terocone at 325 and Flame Cap at 335. Terokkar Forest is thick with Terocone and Zangarmarsh is thick with Flame Cap, so this range is genuinely a choice between two zones rather than a ranking. Ragveil also opens at 325 in Zangarmarsh — Wowhead publishes no spawn coordinates for it, so it has no map here, but it is on the ground alongside the Flame Caps.',
+        'Terocone at 325 and Flame Cap at 335. Terokkar Forest is thick with Terocone and Zangarmarsh is thick with Flame Cap, so this range is genuinely a choice between two zones rather than a ranking. Ragveil also opens at 325 and has no map here, on purpose: Wowhead\'s TBC data places it only inside the Coilfang Reservoir dungeons (the Slave Pens, the Underbog and the Steamvault), with no coordinates, while some guides describe open-world nodes in Zangarmarsh. The only Zangarmarsh coordinates published come from today\'s game, and this page does not draw today\'s data on a TBC map.',
       zoneNotes: [
         {
           zone: 'Zangarmarsh',
           note: 'Flame Cap grows on and around the giant mushrooms rather than on open ground, which is why the cloud looks clustered rather than scattered.',
         },
       ],
-      sources: [...TABLES],
+      sources: [...TABLES, 'warcraft.wiki.gg', 'noobtoboss.com'],
     },
     {
       skillRange: [350, 375],
       zones: ['Netherstorm', 'Shadowmoon Valley', 'Terokkar Forest', 'Nagrand'],
       recommendedCharacterLevel: '67-70',
       guidance:
-        'Netherbloom at 350 finishes the climb, with Nightmare Vine at 365 in Shadowmoon Valley if you would rather be there. Mana Thistle needs 375 and cannot be picked while levelling at all — like Khorium for miners, it is what the route is worth riding for once you have capped. It is also the thinnest node in Outland: three zones and well under a hundred recorded spawns between them.',
+        'Netherbloom at 350 finishes the climb, with Nightmare Vine at 365 in Shadowmoon Valley if you would rather be there. Mana Thistle needs 375 and cannot be picked while levelling at all — like Khorium for miners, it is what the route is worth riding for once you have capped. It is also the thinnest node in Outland: Wowhead records fewer than a hundred spawns in all, spread over five Outland zones and the Isle of Quel\'Danas once that opens, and the maps show the three that hold the most.',
       sources: [...TABLES],
     },
   ],

@@ -9533,9 +9533,10 @@ test('a range draws its whole skill window, including the ores that have no sect
 
   /*
    * **A range merges its materials into one loop**, because that is how it is farmed: at 1-70 you
-   * pick all four on the same lap. Not every zone carries every herb, and the merge is right to be
-   * selective — only Tirisfal Glades has all three of the first herbs, and Durotar says one rather
-   * than implying the other two are there.
+   * pick all four on the same lap. The merge is right to be selective about what it draws: the data
+   * keeps each herb's three busiest zones, so only Tirisfal Glades has all three of the first herbs
+   * on its map, and Durotar draws one. Silverleaf and Earthroot do grow in Durotar; the range's note
+   * says so (Wowhead's 98 and 60, checked 2026-10-13), and the map does not pretend to know more.
    */
   const starter = routesForRange('Herbalism', guideFor('Herbalism')!.ranges[0])
   const tirisfal = starter.find((route) => route.zone === 'Tirisfal Glades')!

@@ -73,6 +73,61 @@ The original plan:
 - The credit line stays as it is.
 
 ### Step B. Complete and verify the nodes
+
+**Where it stands (2026-10-13): researched, the ingest is ready, the data refresh is blocked.**
+
+- **The research is done** (tbc-researcher, every id, name, skill and zone count read off Wowhead's TBC pages):
+  - Wowhead gives Felwood and Blasted Lands their own object ids for ordinary herbs and ores (Felwood's Dreamfoil is
+    176639, everyone else's 176584). Read as one id per node, those two zones were simply missing.
+  - Missing herbs: Bloodthistle 181166 (Eversong Woods only; any race picks it, only Blood Elves use it), Ghost
+    Mushroom 142144 (245; its zones are disputed between sources), Gromsblood 142145 and 176637 (250), Plaguebloom
+    176587 and 176641 (285).
+  - Mining variants worth having: Ooze Covered Truesilver 123309 (Silithus 99) and Ooze Covered Rich Thorium 177388,
+    plus Dark Iron 165658 (230, Burning Steppes and Searing Gorge). warcraft.wiki.gg has 123309 and 123310 swapped;
+    Wowhead's assignment is the one used.
+  - Ragveil 181275: Wowhead's TBC page lists only the three Coilfang dungeons, with no coordinates. Only the retail page
+    has Zangarmarsh points.
+  - Zones the three-zone cap drops: about 33 (zone, node) pairs reach 10% of a node's spawns, and no Blood Elf or Draenei
+    starting zone does (4–8% each), so those need the "a range names it" rule.
+  - **Second-source check:** pfQuest-tbc's CMaNGOS data agrees with Wowhead to rounding for Felweed in Hellfire (all 152
+    of its points have a Wowhead point within 0.3) and to about 3 points for Stranglethorn's Gold Veins. Wowhead's counts
+    include near-duplicate points (Felweed's 245 in Hellfire are about 155 sites), which Step C has to merge before it
+    counts spawns per lap.
+- **The owner's three calls:** Ragveil gets no map and the page says why; Dark Iron is included, marked optional;
+  Nethercite (Netherwing reputation, quest-gated) is left out.
+- **The ingest is rewritten and tested offline** (`tools/ingest/ingest-node-spawns.mjs`): a node can carry extra ids
+  (`also`), merged zone by zone after checking each returns the same name and skill; the seven new nodes are declared;
+  a zone stays when it is in the node's busiest three, holds 10% of its spawns, or is named by a range whose window
+  takes the node; the skill falls back to Wowhead's tooltip endpoint; `fetchedAt` is written. It refuses to write
+  unless every declared node resolves, and it no longer caches an empty reply. A run against stand-in pages built from
+  the committed data wrote 52 nodes with the expected merges (Dreamfoil gains Felwood 43, Mithril Felwood 51), refused
+  when one node failed, and dropped an extra id whose skill disagreed.
+- **Blocked:** since this month Wowhead answers scripted requests for object pages with a 202 and an empty body (or a
+  403); only a request pretending to be a desktop browser gets through. That is a bot check, and the ingest does not
+  get around it. `nodeSpawns.json` is unchanged and still matches the live pages as of the research above.
+- **Shipped without new data:** the guide text that was wrong whatever the data says. Winterspring has no Dreamfoil
+  in Wowhead's TBC data (the guide said it carried all three herbs); every starting zone grows all three first herbs
+  (the guide said only Tirisfal did, which was true of our map only); Mana Thistle is under a hundred spawns over five
+  Outland zones and Quel'Danas (it said three); Ragveil's reason is spelled out; Dark Iron, Ghost Mushroom, Gromsblood,
+  Plaguebloom and Bloodthistle are named in their ranges, marked as not in our node data.
+
+**Ways to get the data, for the owner to choose:**
+1. **Wait and retry** the ingest now and then; nothing else changes until it works.
+2. **Use pfQuest-tbc's CMaNGOS data** (`shagu/pfQuest`, `db/objects-tbc.lua`, on raw.githubusercontent.com). The
+   addon is MIT, but its TBC data comes from CMaNGOS's `tbc-db`, which is GPL-3.0, and this repo is MIT, so the licence
+   question has to be settled first. It has fewer points (no near-duplicates) and no Ragveil, Flame Cap or Ancient Lichen
+   coordinates.
+3. **The owner saves the pages** from their own browser into `tools/ingest/.cache/node-spawns/object-<id>.html` (about 70
+   pages: the 52 nodes and their extra ids); the ingest reads the cache first.
+
+**When the data arrives, in this order:** add the zones the ranges should name (Mining 1–65: Eversong Woods and Azuremyst
+Isle; Herbalism 1–70: Eversong Woods; 70–115: Ghostlands and Bloodmyst Isle; 230–270: Felwood; Mining 275–300:
+Silithus), because the ingest reads them to decide what to keep; run the ingest; run `ingest-zone-maps.mjs` for the new
+zones (Felwood, Blasted Lands, Eversong Woods, Ghostlands, Bloodmyst Isle and others; area ids come from the spawn cache);
+let a range show every zone it recommends even past the eight-tab cap, and decide what the tab test allows; rewrite the
+"not in our node data" sentences; update the node-count test (45) and the docs that quote counts.
+
+The original plan:
 - Add the missing node types (Gromsblood, Ghost Mushroom, Plaguebloom, Bloodthistle, and the mining variants the
   researcher confirms), and find Ragveil's real object ids.
 - Replace "three busiest zones" with "every zone that matters to a range": keep a zone when it holds a meaningful share

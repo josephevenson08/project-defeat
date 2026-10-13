@@ -8,7 +8,7 @@ a test in `tests/planner.spec.ts`, so if one drifts the suite fails.
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5, with all of P1 raids/gear available) and only Phase 2. The gear
-catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. The profession maps show the zones as they were in TBC (since 2026-10-13); the gathering nodes and the route algorithm are being reworked next ([`MAPS-PLAN.md`](design/MAPS-PLAN.md)).
+catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. The profession maps show the zones as they were in TBC (since 2026-10-13); the gathering nodes and the route algorithm are being reworked next ([`MAPS-PLAN.md`](design/MAPS-PLAN.md)). The node refresh is researched and its ingest ready, but waits on a data source since Wowhead began refusing scripted requests; the guides' text was corrected meanwhile (Winterspring has no Dreamfoil, every starting zone grows the first three herbs, why Ragveil has no map).
 
 **This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
 neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab

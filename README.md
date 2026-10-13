@@ -96,7 +96,7 @@ the [port plan](docs/design/PORT-PLAN.md):
 | 0 | **The look:** dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase on every screen | Done, 2026-10-12 |
 | 1 | **Spec Tier Lists:** a board of spec icons from Wowhead's three lists, a card for any spec, and a switch to Wowhead's tiers against what players actually parse (archon.gg) | Done, 2026-10-12 |
 | 2 | **Raids:** a boss journal with your spec's picks, who in your raid wants each drop, and a search across all five raids | Done, 2026-10-13 |
-| 3 | **Professions:** the game's profession window, and which two to take | Next. The [maps rework](docs/design/MAPS-PLAN.md) is decided and under way: the TBC-era zone maps are in (2026-10-13); the nodes and routes follow |
+| 3 | **Professions:** the game's profession window, and which two to take | Next. The [maps rework](docs/design/MAPS-PLAN.md) is decided and under way: the TBC-era zone maps are in (2026-10-13). The node refresh is researched and its ingest is ready, but Wowhead now refuses scripted requests, so it waits on a data source; the routes follow |
 | 4–6 | Simulation, Raid Composition, then the Character Planner one sub-tab at a time | Planned |
 | 7 | The 3D crystal-and-water scene, as an optional layer | Last |
 
