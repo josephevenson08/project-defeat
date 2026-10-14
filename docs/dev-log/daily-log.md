@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**475 commits across 75 days**, from 2026-06-25 to 2026-10-13.
+**477 commits across 76 days**, from 2026-06-25 to 2026-10-14.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,12 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_48 commits_
+_50 commits_
+
+### Wednesday 14 October — 2 commits
+
+- Route the gathering maps through spawn points, not grid cells — [`a1ffce6`](https://github.com/josephevenson08/project-defeat/commit/a1ffce6085faec846198e819b7609230d645ff06)
+- Bring the handoff up to the new routes: Step C done, step 3 can start — [`4245c02`](https://github.com/josephevenson08/project-defeat/commit/4245c02e70b2935e59efa31f9546aa0417a6cf19)
 
 ### Tuesday 13 October — 6 commits
 
