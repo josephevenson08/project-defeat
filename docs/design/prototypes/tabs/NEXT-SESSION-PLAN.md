@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-13, later): the maps rework is half done; start here
+## ▶ Where we left off (2026-10-14): the new routes are in; start here
+
+**Step C of the maps plan, the route algorithm** (`a1ffce6`), is built on today's nodes: spawn points instead of Wowhead's duplicate records, clusters, a loop through the clusters worth their detour with no crossings, and every map saying how many spawn points its loop passes and how long a lap is. This folder's `prof-data.js` was regenerated, so the Professions prototype's plain-grid routes are the new loops. **Next:** step 3 (Professions) or step 4 (Simulation); Step B's node data whenever the ingest works again. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-13, later): the maps rework is half done
 
 **The maps plan's decisions are made** ([`docs/design/MAPS-PLAN.md`](../../MAPS-PLAN.md)). Step A, the TBC-era zone maps (`4d83fd3`), is live. Step B, the gathering nodes (`151f12a`), is researched and its ingest is ready, but Wowhead now refuses scripted requests and we do not get around its bot check, so the node data stays as it is and the owner chose to wait and retry the ingest now and then. **Next:** Step C (the route algorithm) on today's nodes, or step 4 (Simulation), which does not wait on the maps; then step 3 (Professions). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
