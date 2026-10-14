@@ -4,7 +4,7 @@
  * **This is deliberately our own work rather than someone else's route.** `professionTypes.ts`
  * records that wow-professions.com's routes are linked and never copied, because they are that
  * site's craft. So nothing here reproduces a published circuit: the input is Wowhead's raw spawn
- * coordinates, and the output is a loop this file derives from them. Two people looking at the same
+ * coordinates, and the output is a loop derived from them (`routeLoop.ts`). Two people looking at the same
  * node cloud will draw similar lines, which is the point — the shape is a property of the zone, not
  * of anyone's guide.
  *
@@ -20,7 +20,16 @@
  */
 
 import nodeSpawns from './nodeSpawns.json' with { type: 'json' }
+import zoneMaps from './zoneMaps.json' with { type: 'json' }
 import type { Profession } from './professionTypes'
+import {
+  ZONE_MAP_ASPECT,
+  farmingLoop,
+  loopLength,
+  pointsWithinReach,
+  spawnClusters,
+  spawnPoints,
+} from './routeLoop'
 
 export type SpawnPoint = readonly [number, number]
 
@@ -59,7 +68,8 @@ export const gatheringNodes = nodeSpawns.nodes as unknown as readonly GatheringN
 /** Nodes Wowhead publishes no zone spawns for, so their absence reads as known rather than missed. */
 export const nodesWithoutSpawnData = nodeSpawns.noSpawnData as readonly { id: number; name: string }[]
 
-/** A cell of the density grid the map is drawn from. */
+
+/** A cell of the density grid drawn where a zone has no map art. */
 export type DensityCell = {
   /** Grid column and row, 0-indexed. */
   x: number
@@ -70,26 +80,12 @@ export type DensityCell = {
   intensity: number
 }
 
-export type FarmingRoute = {
-  node: GatheringNode
-  zone: string
-  spawnCount: number
-  sampled: boolean
-  grid: number
-  cells: DensityCell[]
-  /** The suggested circuit, in visiting order, as zone percentages. Closed: the last point returns. */
-  stops: SpawnPoint[]
-  /** Rough path length as a percentage of the zone's diagonal, for "is this a big loop or a tight one". */
-  routeLength: number
-}
-
 /**
- * Buckets spawns into a coarse grid.
+ * The density grid's size.
  *
- * A grid rather than a scatter of every point, because 300 overlapping dots say much less than 100
- * cells with an opacity each — and because the route wants *clusters* to visit, which a grid gives
- * for free. 16 is fine enough to show a zone's real shape and coarse enough that a cell is a place
- * you would actually ride to rather than a single bush.
+ * **It no longer picks the route, only draws the fallback.** Until Step C of the maps plan
+ * (2026-10-14) the busiest cells of this grid were the route's stops; now the loop comes from
+ * `routeLoop.ts`, and the grid is the picture a zone gets if it ever loses its map art.
  */
 export const DENSITY_GRID = 16
 
@@ -110,130 +106,37 @@ export function densityCells(coords: readonly SpawnPoint[], grid = DENSITY_GRID)
   })
 }
 
-/**
- * Picks the cells worth riding to, then orders them into a loop.
- *
- * **Nearest-neighbour from the densest cell, which is a heuristic and is named as one.** The optimal
- * circuit is a travelling-salesman problem and nobody needs the optimum here — a route that visits
- * the busy places without doubling back is what a player wants, and nearest-neighbour produces that
- * from a node cloud reliably. It is not the shortest possible loop and this file does not claim it is.
- *
- * Cells below `minIntensity` of the busiest are left out: a route that detours for one lonely herb
- * is worse than one that skips it, and including every cell would draw a scribble over the whole
- * zone rather than a route.
- */
-export function computeRoute(cells: readonly DensityCell[], minIntensity = 0.35, grid = DENSITY_GRID): SpawnPoint[] {
-  const worth = cells.filter((cell) => cell.intensity >= minIntensity)
-  if (worth.length === 0) return []
-
-  // Cell centres, back in the 0-100 space the coordinates came from.
-  const toPoint = (cell: DensityCell): SpawnPoint => [
-    ((cell.x + 0.5) / grid) * 100,
-    ((cell.y + 0.5) / grid) * 100,
-  ]
-
-  const remaining = [...worth].sort((a, b) => b.count - a.count)
-  const start = remaining.shift()!
-  const stops: SpawnPoint[] = [toPoint(start)]
-
-  while (remaining.length > 0) {
-    const [lastX, lastY] = stops[stops.length - 1]
-    let bestIndex = 0
-    let bestDistance = Number.POSITIVE_INFINITY
-    remaining.forEach((cell, index) => {
-      const [x, y] = toPoint(cell)
-      const distance = (x - lastX) ** 2 + (y - lastY) ** 2
-      if (distance < bestDistance) {
-        bestDistance = distance
-        bestIndex = index
-      }
-    })
-    stops.push(toPoint(remaining.splice(bestIndex, 1)[0]))
-  }
-
-  return stops
-}
-
-/** Total length of a closed loop through the stops, as a percentage of the zone's own extent. */
-export function routeLength(stops: readonly SpawnPoint[]): number {
-  if (stops.length < 2) return 0
-  let total = 0
-  for (let i = 0; i < stops.length; i += 1) {
-    const [x1, y1] = stops[i]
-    const [x2, y2] = stops[(i + 1) % stops.length]
-    total += Math.hypot(x2 - x1, y2 - y1)
-  }
-  return Math.round(total)
-}
-
-/** Every route for one node, busiest zone first. */
-export function routesForNode(node: GatheringNode): FarmingRoute[] {
-  return node.zones.map((zone) => {
-    const cells = densityCells(zone.coords)
-    const stops = computeRoute(cells)
-    return {
-      node,
-      zone: zone.zone,
-      spawnCount: zone.count,
-      sampled: zone.sampled === true,
-      grid: DENSITY_GRID,
-      cells,
-      stops,
-      routeLength: routeLength(stops),
-    }
-  })
-}
-
 /** Every node a profession gathers, in the order its materials are farmed. */
 export function nodesForProfession(profession: Profession): GatheringNode[] {
   return gatheringNodes.filter((node) => node.profession === profession)
 }
 
-/**
- * Improves a tour by uncrossing it.
- *
- * **Nearest-neighbour alone leaves crossings, and a crossing is the one route error a player sees
- * immediately** — it reads as "why am I riding back past where I just was". 2-opt repeatedly reverses
- * the segment between two edges whenever doing so shortens the loop, which removes exactly that class
- * of mistake for a few milliseconds of work.
- *
- * This is still a heuristic and the caption still says so. 2-opt converges to a local optimum, not
- * the shortest possible circuit; the difference from optimal on a 25-stop cloud is small and the
- * difference from *crossed* is the one a player would have complained about.
- */
-export function twoOptimize(stops: readonly SpawnPoint[]): SpawnPoint[] {
-  const tour = stops.map((point) => [...point] as unknown as SpawnPoint)
-  if (tour.length < 4) return tour
+const ZONE_ART = zoneMaps.zones as Record<string, { width: number; height: number }>
 
-  const gap = (a: SpawnPoint, b: SpawnPoint) => Math.hypot(a[0] - b[0], a[1] - b[1])
-  const n = tour.length
-
-  // Bounded rather than "until no improvement": a pathological cloud should cost a frame, not a tab.
-  for (let pass = 0, improved = true; improved && pass < 40; pass += 1) {
-    improved = false
-    for (let i = 0; i < n - 1; i += 1) {
-      for (let k = i + 2; k < n; k += 1) {
-        // The edge after k wraps, so skip the pair that would "reverse" the whole closed tour.
-        if (i === 0 && k === n - 1) continue
-        const delta =
-          gap(tour[i], tour[k]) + gap(tour[i + 1], tour[(k + 1) % n]) -
-          gap(tour[i], tour[i + 1]) - gap(tour[k], tour[(k + 1) % n])
-        if (delta < -1e-9) {
-          for (let lo = i + 1, hi = k; lo < hi; lo += 1, hi -= 1) {
-            const swap = tour[lo]
-            tour[lo] = tour[hi]
-            tour[hi] = swap
-          }
-          improved = true
-        }
-      }
-    }
-  }
-
-  return tour
+/** A zone's shape, width over height, read off its map art; 3:2 where there is none. */
+export function zoneAspect(zone: string): number {
+  const art = ZONE_ART[zone]
+  return art ? art.width / art.height : ZONE_MAP_ASPECT
 }
 
-/** One zone's circuit for a whole skill range, over every material that range gathers. */
+/**
+ * Outland's zones, where a level 70 character with a flying mount rides the straight line.
+ *
+ * **Everywhere else the line is drawn straight and ridden on the ground** (the owner's decision 3 in
+ * the maps plan: straight lines with a note, no walkability masks). Azeroth has no flying in TBC, and
+ * Outland has none before 70, so a route at Herbalism 300-325 is a ground route even in Hellfire.
+ */
+const OUTLAND = new Set([
+  'Hellfire Peninsula',
+  'Zangarmarsh',
+  'Terokkar Forest',
+  'Nagrand',
+  "Blade's Edge Mountains",
+  'Netherstorm',
+  'Shadowmoon Valley',
+])
+
+/** One zone's loop for a whole skill range, over every material that range gathers. */
 export type RangeRoute = {
   zone: string
   /** The range's materials that actually spawn here, busiest first. Drives the map's caption. */
@@ -241,50 +144,25 @@ export type RangeRoute = {
   /**
    * Every recorded spawn, grouped by material, for plotting over the zone art.
    *
-   * **Separate from `cells` because they answer different questions.** The density grid decides where
-   * a route should stop; these are the nodes themselves, and with Blizzard's zone art behind them
-   * they are what makes the map read like the in-game one rather than like a heat square.
+   * These are Wowhead's records as published, duplicates and all: they draw the shape of the cloud,
+   * and the counting below works on the merged spawn points instead.
    */
   spawns: { material: string; coords: SpawnPoint[] }[]
+  /** Wowhead's record count, summed over the range's materials. Decides which zones get a tab. */
   spawnCount: number
+  /** The places a node can appear, after records of the same spawn are merged (`routeLoop.ts`). */
+  spawnPoints: number
+  /** How many of those the loop passes within reach of. */
+  onLap: number
   sampled: boolean
   grid: number
   cells: DensityCell[]
+  /** The loop, in visiting order, as zone percentages; closed, and every stop a recorded spawn. */
   stops: SpawnPoint[]
+  /** The lap's length in percent of the zone's width, measured with the zone's real 3:2 shape. */
   routeLength: number
-}
-
-/**
- * Moves each stop onto the nearest real spawn.
- *
- * **A grid cell's centre is a coordinate, not a place.** It is the average of a cluster, which on a
- * zone map can land in a lake, off a cliff, or inside a wall — nowhere a player can stand and
- * nothing they can mine. That was invisible while the map was a bare square and is obvious the
- * moment the art is behind it.
- *
- * Snapping costs nothing in route quality — the nearest spawn to a dense cell's centre is by
- * construction inside that cluster — and it buys a route whose every stop is a node that exists.
- */
-export function snapToSpawns(stops: readonly SpawnPoint[], coords: readonly SpawnPoint[]): SpawnPoint[] {
-  if (coords.length === 0) return [...stops]
-
-  const used = new Set<number>()
-  return stops.map((stop) => {
-    let bestIndex = -1
-    let bestDistance = Number.POSITIVE_INFINITY
-    coords.forEach((coord, index) => {
-      // Two stops on one node would draw a doubled-back leg to nowhere.
-      if (used.has(index)) return
-      const distance = (coord[0] - stop[0]) ** 2 + (coord[1] - stop[1]) ** 2
-      if (distance < bestDistance) {
-        bestDistance = distance
-        bestIndex = index
-      }
-    })
-    if (bestIndex < 0) return stop
-    used.add(bestIndex)
-    return coords[bestIndex]
-  })
+  /** `flying-at-70` in Outland; `ground` everywhere else, where the straight line is not the ride. */
+  travel: 'ground' | 'flying-at-70'
 }
 
 /**
@@ -305,14 +183,24 @@ export function snapToSpawns(stops: readonly SpawnPoint[], coords: readonly Spaw
  * returns the first match, so the rich variants' coordinates were unreachable from any surface in
  * the app. Four of the nine mining ranges draw from those two nodes. Same lesson as
  * `GatheringNodeRef`: a display label is not a join key.
+ *
+ * **Remembered per set of nodes,** because the data never changes while the page is open and a
+ * Professions page asks for the same ranges on every render.
  */
 export function routesForNodes(refs: readonly { material: string; atSkill: number }[]): RangeRoute[] {
-  return routesFromNodes(
+  const key = refs.map((ref) => `${ref.material}@${ref.atSkill}`).join('|')
+  const remembered = routeCache.get(key)
+  if (remembered) return remembered
+  const routes = routesFromNodes(
     refs.flatMap((ref) =>
       gatheringNodes.filter((node) => node.material === ref.material && node.requiredSkill === ref.atSkill),
     ),
   )
+  routeCache.set(key, routes)
+  return routes
 }
+
+const routeCache = new Map<string, RangeRoute[]>()
 
 function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
   type ZoneBucket = {
@@ -341,13 +229,27 @@ function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
   }
 
   return [...byZone.entries()]
-    .map(([zone, bucket]) => {
-      const cells = densityCells(bucket.coords)
+    .map(([zone, bucket]): RangeRoute => {
+      const aspect = zoneAspect(zone)
+      const points = spawnPoints(bucket.coords)
       /*
-       * Density picks the clusters, snapping puts each stop on a node that exists, and 2-opt runs
-       * again afterwards because moving the stops changes which order is shortest.
+       * **The loop is worked out the first time something reads it, not here.** A range offers up to
+       * eight zones and the page draws one at a time; computing all eight up front made opening
+       * Herbalism cost a third of a second for maps nobody had clicked. Everything that decides the
+       * tabs (the counts) is plain data and is ready at once.
        */
-      const stops = twoOptimize(snapToSpawns(computeRoute(cells), bucket.coords))
+      let loop: { stops: SpawnPoint[]; onLap: number; routeLength: number } | undefined
+      const solve = () => {
+        if (!loop) {
+          const stops = farmingLoop(spawnClusters(points, aspect), aspect, points).map((stop) => stop.at)
+          loop = {
+            stops,
+            onLap: pointsWithinReach(points, stops, aspect),
+            routeLength: Math.round(loopLength(stops, aspect)),
+          }
+        }
+        return loop
+      }
       return {
         zone,
         materials: [...bucket.parts.entries()]
@@ -355,14 +257,22 @@ function routesFromNodes(nodes: readonly GatheringNode[]): RangeRoute[] {
           .sort((a, b) => b.count - a.count),
         spawns: [...bucket.byMaterial.entries()].map(([material, coords]) => ({ material, coords })),
         spawnCount: [...bucket.parts.values()].reduce((sum, count) => sum + count, 0),
+        spawnPoints: points.length,
+        get onLap() {
+          return solve().onLap
+        },
         sampled: bucket.sampled,
         grid: DENSITY_GRID,
-        cells,
-        stops,
-        routeLength: routeLength(stops),
+        cells: densityCells(bucket.coords),
+        get stops() {
+          return solve().stops
+        },
+        get routeLength() {
+          return solve().routeLength
+        },
+        travel: OUTLAND.has(zone) ? 'flying-at-70' : 'ground',
       }
     })
-    .filter((route) => route.stops.length > 0)
+    .filter((route) => route.spawnPoints > 0)
     .sort((a, b) => b.spawnCount - a.spawnCount)
 }
-

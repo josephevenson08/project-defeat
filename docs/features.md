@@ -8,7 +8,7 @@ a test in `tests/planner.spec.ts`, so if one drifts the suite fails.
 ## Current Status
 
 Working planner, targeting **TBC Phase 2** (SSC/Tempest Keep, Tier 5, with all of P1 raids/gear available) and only Phase 2. The gear
-catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. The profession maps show the zones as they were in TBC (since 2026-10-13); the gathering nodes and the route algorithm are being reworked next ([`MAPS-PLAN.md`](design/MAPS-PLAN.md)). The node refresh is researched and its ingest ready, but waits on a data source since Wowhead began refusing scripted requests; the guides' text was corrected meanwhile (Winterspring has no Dreamfoil, every starting zone grows the first three herbs, why Ragveil has no map).
+catalogue, BiS rankings, talents, enchants, gems, buffs, raids and professions are all real and sourced. The profession maps show the zones as they were in TBC (since 2026-10-13); the route algorithm is new since 2026-10-14 and the gathering nodes are being reworked ([`MAPS-PLAN.md`](design/MAPS-PLAN.md)). The node refresh is researched and its ingest ready, but waits on a data source since Wowhead began refusing scripted requests; the guides' text was corrected meanwhile (Winterspring has no Dreamfoil, every starting zone grows the first three herbs, why Ragveil has no map).
 
 **This project is for DPS.** Healer and tank maths still exist, still run and are still tested, but
 neither is somewhere effort is spent and neither is put on screen as a headline. The Simulation tab
@@ -145,9 +145,14 @@ behind every claim of its that quotes a number.
   zone's own map art, which registers with no transform because coordinates are percentages of the
   zone's extent and that is exactly the space the art covers. The art is Wowhead's TBC-era maps (since
   2026-10-13): the retail maps it replaced were the post-Cataclysm zones, on which TBC spawns landed in
-  the sea or on a flooded Thousand Needles, and a test now checks the spawns land on land. The circuit is computed here rather than
-  copied from anyone's guide — density, snapped onto nodes that actually exist, then 2-opt to uncross
-  it — and the caption says it is a strong starting line rather than a proven optimum. Zone maps are
+  the sea or on a flooded Thousand Needles, and a test now checks the spawns land on land. The loop is computed here rather than
+  copied from anyone's guide (since 2026-10-14, Step C of the maps plan): Wowhead's records merged into
+  spawn points where the same spawn was recorded twice (Felweed's 245 Hellfire records are 154 points,
+  against 152 in CMaNGOS's spawn table), grouped into clusters, and a loop through the clusters worth
+  their detour, shortened with 2-opt and Or-opt and with no crossings, measured in the zone's real 3:2
+  shape. The caption says how good it is (how many spawn points the loop passes and how long a lap is
+  against the zone's width), that it is a strong line rather than a proven optimum, and, in Azeroth,
+  that the straight line is ridden on the ground and longer than drawn; in Outland it is flown at 70. Zone maps are
   Blizzard artwork used in a free, non-commercial fan project, credited on every map; all 42 zones have
   art (Alterac Mountains too, which the retail maps lacked), and a zone without would fall back to a bare
   density grid. Recommended zones the ingest has no coordinates

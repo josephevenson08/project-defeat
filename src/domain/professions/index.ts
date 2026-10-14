@@ -19,20 +19,29 @@ export {
 } from './craftingPaths'
 export type { CraftingStep, CraftingPlanRow } from './craftingPaths'
 export { allProfessions, sampleProfessions, getProfessionProfile, professionIconNames } from './sampleProfessions'
-export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, FarmingRoute, RangeRoute } from './farmingRoutes'
+export type { SpawnPoint, NodeZoneSpawns, GatheringNode, DensityCell, RangeRoute } from './farmingRoutes'
 export {
   DENSITY_GRID,
-  computeRoute,
   densityCells,
   gatheringNodes,
   nodesForProfession,
   nodesWithoutSpawnData,
-  routeLength,
-  routesForNode,
   routesForNodes,
-  twoOptimize,
-  snapToSpawns,
+  zoneAspect,
 } from './farmingRoutes'
+export type { SpawnCluster } from './routeLoop'
+export {
+  REACH,
+  SAME_SPAWN,
+  ZONE_MAP_ASPECT,
+  farmingLoop,
+  loopLength,
+  pointsWithinReach,
+  shortenLoop,
+  spawnClusters,
+  spawnPoints,
+  zoneDistance,
+} from './routeLoop'
 export type { GatheringNodeRef, ZoneNote, GatheringRange, GatheringGuide } from './gatheringRangeTypes'
 export { gatheringGuides } from './gatheringGuides'
 export {

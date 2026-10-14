@@ -19,8 +19,11 @@ const ATTRIBUTION: string = zoneMapData.attribution
  *
  * **The route is computed here and copied from nobody.** `professionTypes.ts` records that
  * wow-professions.com's routes are linked and never copied because they are that site's craft. The
- * line below comes out of `computeRoute` — density, then snapped onto real spawns, then 2-opt to
- * uncross it — over Wowhead's published coordinates. It is a heuristic and the caption says so.
+ * line below comes out of `routeLoop.ts` over Wowhead's published coordinates: the records merged
+ * into spawn points, the points grouped into clusters, and a loop through the clusters worth their
+ * detour, shortened with 2-opt and Or-opt (Step C of the maps plan, 2026-10-14). It is a heuristic
+ * and the caption says so, along with how good the loop is: how many spawn points it passes and how
+ * long a lap is.
  *
  * **One map covers a whole skill range rather than one material**, because that is how a range is
  * farmed: at 1-100 you are picking Peacebloom, Silverleaf and Earthroot on the same lap of Durotar.
@@ -30,6 +33,7 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
   const cell = 100 / route.grid
   const path = route.stops.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
   const materials = route.materials.map((entry) => entry.material).join(', ')
+  const lap = (route.routeLength / 100).toFixed(1)
 
   return (
     <figure className={`farming-route ${art ? 'farming-route-mapped' : ''}`.trim()}>
@@ -57,7 +61,7 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`Spawn locations and suggested circuit for ${materials} in ${route.zone}: ${route.spawnCount} recorded spawns, ${route.stops.length} stops.`}
+          aria-label={`Spawn locations and suggested loop for ${materials} in ${route.zone}: ${route.spawnPoints} spawn points, ${route.onLap} of them within reach of a loop of ${route.stops.length} stops.`}
         >
           {/*
             The density grid only draws where there is no art to draw on. It was the whole picture
@@ -104,8 +108,13 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
       </div>
 
       <figcaption>
+        {/*
+          How good the loop is, which the old caption could not say: the places a node can appear,
+          how many of them the loop passes, and how long a lap is against the zone it is in.
+        */}
         <span className="farming-route-stats">
-          {route.spawnCount} recorded spawns · {route.stops.length} stops
+          {route.spawnCount} recorded spawns at {route.spawnPoints} spawn points · the loop passes{' '}
+          {route.onLap} of them · a lap is {lap}× the zone&rsquo;s width · {route.stops.length} stops
           {route.sampled ? ' · thinned for size, shape kept' : ''}
         </span>
         {/*
@@ -116,13 +125,20 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
           {route.materials.map((entry) => `${entry.material} (${entry.count})`).join(' · ')}
         </span>
         {/*
-          Said plainly on the surface a player reads, not only in the source: the circuit is a
-          heuristic over real coordinates, not an optimal path and not somebody's published route.
+          Said plainly on the surface a player reads, not only in the source: the loop is a heuristic
+          over real coordinates, not an optimal path and not somebody's published route, and the
+          straight line is only the ride where you can fly it (the owner's call in the maps plan:
+          straight lines with a note, no terrain masks).
         */}
+        <small className="farming-route-travel">
+          {route.travel === 'flying-at-70'
+            ? 'Straight lines are how this is flown at level 70 with a flying mount. Before that it is ridden on the ground, round the terrain, and longer than drawn.'
+            : 'Drawn as straight lines. This is ridden on the ground, along roads and through passes, so the ride is longer than the line.'}
+        </small>
         <small>
-          Spawn density from Wowhead. The circuit visits the busiest clusters nearest-first, snaps each
-          stop onto a node that actually exists, then uncrosses itself — a strong starting line rather
-          than a proven optimum.
+          Spawn points from Wowhead&rsquo;s records, with the same spawn recorded twice counted once. The
+          loop takes in the clusters worth their detour, leaves out the ones that are not, and shortens
+          itself with 2-opt and Or-opt — a strong line, not a proven optimum.
         </small>
         {art && <small className="farming-route-credit">{ATTRIBUTION}</small>}
       </figcaption>

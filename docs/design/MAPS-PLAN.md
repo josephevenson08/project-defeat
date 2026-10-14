@@ -138,8 +138,48 @@ The original plan:
 - Spot-check the coordinates against a second source for a handful of nodes (the tbc-researcher picks one, such as
   the in-game map or a gathering addon's published data), and write down how close they agree.
 
-### Step C. A new route algorithm
-Proposed design, to be prototyped on the plain grid first (the prototypes' rule) and then drawn on the TBC maps:
+### Step C. A new route algorithm (done 2026-10-14, on today's nodes)
+
+**As built** (`src/domain/professions/routeLoop.ts`, used by `farmingRoutes.ts`):
+1. **Distances in the zone's real shape.** Every zone map is 3:2, and a coordinate is a percentage of each axis on
+   its own, so a step down a zone is two thirds the ground of the same step across it. Distances and lap lengths
+   are in percent of the zone's width, with the aspect read off each zone's map (`zoneAspect`). The old route measured
+   both axes alike.
+2. **Spawn points, not records.** Records within 0.3 of each other are one spawn (`spawnPoints`), across materials
+   too, since herbs and ores share spawn points. Felweed's 245 Hellfire records become 154 points; CMaNGOS's spawn
+   table has 152.
+3. **Clusters** (`spawnClusters`): greedily, the point with the most others within `REACH` (3.5% of the zone's width)
+   becomes a cluster's centre with everything unclaimed around it. A centre is always a recorded spawn, so every stop
+   is a node that exists.
+4. **The loop** (`farmingLoop`): nearest-first through every cluster, shortened with 2-opt and Or-opt on neighbour
+   lists; then runs of one to three stops whose detour costs more than twice the loop's average distance per spawn
+   point are dropped, and clusters whose detour costs less than the average are put back (a prize-collecting loop,
+   by local search); waypoints the line passes anyway are taken out; a last exhaustive 2-opt guarantees no crossings.
+5. **How good it is**, on every map: the spawn points in the zone, how many the loop passes within `REACH`, and the
+   lap in zone widths. Across all 92 range maps the loops pass 86% of their zones' spawn points on average and never
+   fewer than 61%, with at most 41 stops. Mining 325–350: Nagrand passes 111 of 135 points on a lap of 2.4 zone
+   widths with 21 stops; Blade's Edge 114 of 131.
+6. **Travel** (decision 3): straight lines with a note. In Outland the note says the line is how it is flown at 70
+   and is longer on the ground before that; in Azeroth that it is ridden on the ground, along roads and passes.
+
+**What changed on the way, and why.** A first version built the loop from the busier clusters only and added cheap
+ones; on a sparse ore it closed round three pockets (Un'Goro's Small Thorium: 13 of 40 points), which is not a lap
+anyone farms, since nodes take minutes to come back. Starting from every cluster and dropping only the outliers fixed
+that. Dropping one stop at a time missed far pockets of two or three clusters side by side, so runs are weighed
+together. `REACH` was chosen by running every range at 2.5, 3.5 and 4.5 (at 2.5 the busiest zones needed up to 66
+waypoints and zig-zagged). Speed: a zone's loop is computed the first time its tab is drawn (10–60 ms), not for every
+zone when the page opens; all 92 maps together take about 0.4 s.
+
+**Not done, on purpose:** yards. The repo has no sourced table of zone sizes, so the lap is in zone widths and
+`REACH` is a share of the zone; a sourced table (the game's own map extents) would let both become distances.
+wago.tools has the data but its robots.txt forbids scripted access.
+
+**Tests:** spawn points against the second source; the 3:2 measure; a ring of clusters fed in scrambled order comes
+out as the ring, with no crossings; a far pocket of three clusters is left out; no map's loop crosses itself; taking a
+stop out never makes a loop longer (a property, over every stop of two real loops); bands for Mining 325–350 and for
+every map; the travel note per zone; and the caption on the live page.
+
+The proposed design, as written before it was built:
 1. **Route a skill window, as the range maps already do.** The input stays every node a range lists, so a 320 route
    in Nagrand picks up Felweed and Dreaming Glory together; Step B's added nodes and zones feed straight into it.
 2. **Cluster the spawns** (density-based clustering with a radius about the distance you can see a node from), weighting

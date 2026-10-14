@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/farmingRoutes.ts
-lines: 369
+lines: 279
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.farmingRoutes
 
-`src/domain/professions/farmingRoutes.ts` · **domain** layer · 369 lines
+`src/domain/professions/farmingRoutes.ts` · **domain** layer · 279 lines
 
 From the top of the file:
 
@@ -18,7 +18,7 @@ From the top of the file:
 > **This is deliberately our own work rather than someone else's route.** `professionTypes.ts`
 > records that wow-professions.com's routes are linked and never copied, because they are that
 > site's craft. So nothing here reproduces a published circuit: the input is Wowhead's raw spawn
-> coordinates, and the output is a loop this file derives from them. Two people looking at the same
+> coordinates, and the output is a loop derived from them (`routeLoop.ts`). Two people looking at the same
 > node cloud will draw similar lines, which is the point — the shape is a property of the zone, not
 > of anyone's guide.
 > 
@@ -34,20 +34,22 @@ From the top of the file:
 
 ## Exports
 
-**function** — `computeRoute`, `densityCells`, `nodesForProfession`, `routeLength`, `routesForNode`, `routesForNodes`, `snapToSpawns`, `twoOptimize`
+**function** — `densityCells`, `nodesForProfession`, `routesForNodes`, `zoneAspect`
 
 **const** — `DENSITY_GRID`, `gatheringNodes`, `nodesWithoutSpawnData`
 
-**type** — `DensityCell`, `FarmingRoute`, `GatheringNode`, `NodeZoneSpawns`, `RangeRoute`, `SpawnPoint`
+**type** — `DensityCell`, `GatheringNode`, `NodeZoneSpawns`, `RangeRoute`, `SpawnPoint`
 
 ## Imports
 
 - [[domain.professions.professionTypes]] — `src/domain/professions/professionTypes.ts`
+- [[domain.professions.routeLoop]] — `src/domain/professions/routeLoop.ts`
 
 ## Imported by
 
 - [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[domain.professions.routeLoop]] — `src/domain/professions/routeLoop.ts`
 
 ## Concepts & phases
 

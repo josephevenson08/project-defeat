@@ -149,17 +149,22 @@ import { sampleItemSets } from '../src/domain/gear/itemSets'
 import { getPairedGearSlots, isItemCompatibleWithGearSlot } from '../src/domain/gear/slotCompatibility'
 import { normalizeGearForCharacter } from '../src/domain/gear/characterItemRules'
 import { defaultGear } from '../src/domain/gear/defaultGear'
+import type { SpawnPoint } from '../src/domain/professions'
 import {
   DENSITY_GRID,
-  computeRoute,
+  REACH,
   densityCells,
+  farmingLoop,
   gatheringNodes,
+  loopLength,
   nodesWithoutSpawnData,
-  routeLength,
-  routesForNode,
+  pointsWithinReach,
   routesForNodes,
-  twoOptimize,
-  snapToSpawns,
+  shortenLoop,
+  spawnClusters,
+  spawnPoints,
+  zoneAspect,
+  zoneDistance,
   gatheringGuides,
   guideFor,
   nodesForRange,
@@ -1511,6 +1516,17 @@ test('Professions is a grid you pick from, and each profession opens its own pag
    */
   await expect(page.getByTestId('gathering-range').first()).toBeVisible()
   await expect(page.locator('svg.farming-route-map').first()).toBeVisible()
+
+  /*
+   * **The map says how good its loop is and how it is ridden** (Step C of the maps plan): spawn
+   * points, how many the loop passes, the lap against the zone's width, and, for Azeroth, that the
+   * straight line is ridden on the ground.
+   */
+  const caption = page.locator('.farming-route figcaption').first()
+  await expect(caption).toContainText('spawn points')
+  await expect(caption).toContainText('the loop passes')
+  await expect(caption).toContainText('a lap is')
+  await expect(caption.locator('.farming-route-travel')).toContainText('ridden on the ground')
 
   /*
    * **The tier table is gone and its content is not.** Training requirements are markers inside the
@@ -7339,16 +7355,7 @@ test('a farming route is computed from real spawns, and the sampling keeps the z
   expect(cells.every((cell) => cell.x < DENSITY_GRID && cell.y < DENSITY_GRID)).toBe(true)
   expect(Math.max(...cells.map((cell) => cell.intensity)), 'the busiest cell is 1').toBe(1)
 
-  /*
-   * **The route skips the lonely cells on purpose.** A circuit that detours for one herb is worse
-   * than one that skips it, and keeping every cell would draw a scribble across the whole zone
-   * rather than a route.
-   */
-  const sparse = densityCells([...Array(40).fill([50, 50]), [5, 95]] as [number, number][])
-  expect(computeRoute(sparse).length, 'one lonely spawn does not earn a stop').toBe(1)
-
-  const felweed = gatheringNodes.find((node) => node.name === 'Felweed')!
-  const route = routesForNode(felweed)[0]
+  const route = routesForNodes([{ material: 'Felweed', atSkill: 300 }])[0]
   expect(route.zone, 'busiest zone first').toBe('Hellfire Peninsula')
   expect(route.stops.length).toBeGreaterThan(5)
   expect(route.routeLength).toBeGreaterThan(0)
@@ -7360,19 +7367,8 @@ test('a farming route is computed from real spawns, and the sampling keeps the z
     expect(y).toBeGreaterThanOrEqual(0)
     expect(y).toBeLessThanOrEqual(100)
   }
-  // And visited once each, which is what makes it a circuit rather than a wander.
+  // And visited once each, which is what makes it a loop rather than a wander.
   expect(new Set(route.stops.map(([x, y]) => `${x},${y}`)).size).toBe(route.stops.length)
-
-  /*
-   * **Nearest-neighbour has to beat the order the cells arrived in**, or the ordering step is doing
-   * nothing and the line on screen would be decoration. Asserted against the same stops in
-   * density order, which is what `computeRoute` starts from.
-   */
-  const byDensity = route.cells
-    .filter((cell) => cell.intensity >= 0.35)
-    .sort((a, b) => b.count - a.count)
-    .map(({ x, y }) => [((x + 0.5) / DENSITY_GRID) * 100, ((y + 0.5) / DENSITY_GRID) * 100] as [number, number])
-  expect(routeLength(route.stops), 'ordering the stops shortens the loop').toBeLessThan(routeLength(byDensity))
 })
 
 test('the upgrade finder no longer claims most of the catalogue is estimated', () => {
@@ -9957,72 +9953,196 @@ test('spawns land on land: the maps are the zones as they were in TBC', async ({
   }
 })
 
-test('a route stop is a node that exists, not the average of a cluster', () => {
-  /*
-   * **A grid cell's centre is a coordinate, not a place.** It is the mean of a cluster, which on real
-   * terrain can land in a lake, off a cliff or inside a wall — nowhere a player can stand and nothing
-   * they can gather. That was invisible while the map was a bare square and is obvious with the zone
-   * art behind it, so every stop is snapped onto the nearest actual spawn.
-   */
-  const felweed = gatheringNodes.find((node) => node.name === 'Felweed')!
-  const zone = felweed.zones[0]
-  const raw = computeRoute(densityCells(zone.coords))
-  const snapped = snapToSpawns(raw, zone.coords)
+/** True when two legs of a loop cross properly (sharing an end does not count). */
+function legsCross(p1: SpawnPoint, p2: SpawnPoint, p3: SpawnPoint, p4: SpawnPoint): boolean {
+  const turn = (a: SpawnPoint, b: SpawnPoint, c: SpawnPoint) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+  const d1 = turn(p3, p4, p1)
+  const d2 = turn(p3, p4, p2)
+  const d3 = turn(p1, p2, p3)
+  const d4 = turn(p1, p2, p4)
+  return d1 * d2 < 0 && d3 * d4 < 0
+}
 
-  expect(snapped.length, 'snapping moves stops, it does not add or drop them').toBe(raw.length)
-
-  const spawnKeys = new Set(zone.coords.map(([x, y]) => `${x},${y}`))
-  for (const [x, y] of snapped) {
-    expect(spawnKeys.has(`${x},${y}`), `stop ${x},${y} is a recorded spawn`).toBe(true)
-  }
-
-  // Two stops on one node would draw a doubled-back leg to nowhere.
-  expect(new Set(snapped.map(([x, y]) => `${x},${y}`)).size).toBe(snapped.length)
-
-  /*
-   * **Snapping must not wreck the route.** The nearest spawn to a dense cell's centre is inside that
-   * cluster by construction, so the loop should stay close to its pre-snap length rather than
-   * wandering. Asserted as a band because the exact figure is data, not a target.
-   */
-  const before = routeLength(raw)
-  const after = routeLength(snapped)
-  expect(after).toBeLessThan(before * 1.35)
-
-  // And the rendered route carries the spawns it was derived from, so the map can plot them.
-  const route = routesForNodes([{ material: 'Felweed', atSkill: 300 }])[0]
-  expect(route.spawns.length).toBeGreaterThan(0)
-  expect(route.spawns.reduce((sum, group) => sum + group.coords.length, 0)).toBeGreaterThan(50)
-})
-
-test('2-opt shortens the circuit and leaves it a circuit', () => {
-  /*
-   * **Nearest-neighbour leaves crossings, and a crossing is the one route error a player sees.** It
-   * reads as "why am I riding back past where I just was". 2-opt reverses segments while doing so
-   * shortens the loop, which removes exactly that.
-   *
-   * Asserted as an aggregate over every real node cloud rather than one hand-made case: a single
-   * zone could improve by luck, and the claim being made on screen is about the whole feature.
-   */
-  let before = 0
-  let after = 0
-  for (const node of gatheringNodes) {
-    for (const zone of node.zones) {
-      const nearest = computeRoute(densityCells(zone.coords))
-      if (nearest.length < 4) continue
-      before += routeLength(nearest)
-      after += routeLength(twoOptimize(nearest))
+function crossings(stops: readonly SpawnPoint[]): number {
+  const n = stops.length
+  let count = 0
+  for (let i = 0; i < n; i += 1) {
+    for (let k = i + 2; k < n; k += 1) {
+      if (i === 0 && k === n - 1) continue
+      if (legsCross(stops[i], stops[i + 1], stops[k], stops[(k + 1) % n])) count += 1
     }
   }
-  expect(after, 'uncrossing never makes the total longer').toBeLessThan(before)
-  expect(after / before, 'and it is worth doing — at least 5% off').toBeLessThan(0.95)
+  return count
+}
 
-  // It reorders the same stops rather than inventing or dropping any.
-  const stops = computeRoute(densityCells(gatheringNodes[0].zones[0].coords))
-  const optimised = twoOptimize(stops)
-  expect(optimised.length).toBe(stops.length)
-  expect(new Set(optimised.map(([x, y]) => `${x},${y}`))).toEqual(
-    new Set(stops.map(([x, y]) => `${x},${y}`)),
+/** Every zone map of every gathering range, Mining and Herbalism. */
+function everyRangeRoute() {
+  return (['Mining', 'Herbalism'] as const).flatMap((profession) =>
+    guideFor(profession)!.ranges.flatMap((range) =>
+      routesForRange(profession, range).map((route) => ({ where: `${profession} ${range.skillRange.join('-')} ${route.zone}`, route })),
+    ),
   )
+}
+
+test('a spawn recorded twice is one spawn point, and every stop is one', () => {
+  /*
+   * **Wowhead lists the same spawn more than once,** in pairs and quads 0.1-0.2 apart: Felweed's 245
+   * Hellfire records are about 155 places. CMaNGOS's spawn table, read for the maps plan's
+   * second-source check (2026-10-13), has 152 Felweed spawns in Hellfire, and every one of them has a
+   * Wowhead record within 0.3. Counting records as spawns overstated every zone by about half.
+   */
+  const felweed = gatheringNodes.find((node) => node.name === 'Felweed')!
+  const hellfire = felweed.zones.find((zone) => zone.zone === 'Hellfire Peninsula')!
+  expect(hellfire.coords.length, "Wowhead's records").toBe(245)
+  const points = spawnPoints(hellfire.coords)
+  expect(points.length, 'close to the 152 in the spawn table').toBeGreaterThanOrEqual(145)
+  expect(points.length).toBeLessThanOrEqual(160)
+
+  // Every record is accounted for by a point, and no two points are the same spawn.
+  for (const record of hellfire.coords) {
+    expect(points.some((point) => Math.hypot(point[0] - record[0], point[1] - record[1]) <= 0.3 + 1e-9)).toBe(true)
+  }
+  for (let i = 0; i < points.length; i += 1) {
+    for (let k = i + 1; k < points.length; k += 1) {
+      expect(Math.hypot(points[i][0] - points[k][0], points[i][1] - points[k][1])).toBeGreaterThan(0.3)
+    }
+  }
+
+  // The order the records arrive in does not change the answer, and merging twice changes nothing.
+  expect(spawnPoints([...hellfire.coords].reverse()).length).toBe(points.length)
+  expect(spawnPoints(points)).toEqual(points)
+
+  /*
+   * **A stop is a node that exists, not the average of a cluster.** A cluster's mean can land in a
+   * lake or inside a wall on the zone art; every stop on every map is a recorded spawn, and no map
+   * visits one twice.
+   */
+  for (const { where, route } of everyRangeRoute()) {
+    const recorded = new Set(route.spawns.flatMap((group) => group.coords.map(([x, y]) => `${x},${y}`)))
+    for (const [x, y] of route.stops) expect(recorded.has(`${x},${y}`), `${where}: stop ${x},${y}`).toBe(true)
+    expect(new Set(route.stops.map(([x, y]) => `${x},${y}`)).size, `${where}: each stop once`).toBe(route.stops.length)
+  }
+})
+
+test('a zone is measured in its own 3:2 shape, not as a square', () => {
+  /*
+   * **Coordinates are percentages of each axis on its own,** and every zone map is 3:2 (772 × 515),
+   * so 15 points down a zone is the same ground as 10 points across it. The old route measured both
+   * axes alike, which made vertical legs look half as long again as they ride.
+   */
+  expect(zoneAspect('Nagrand')).toBeCloseTo(1.5, 2)
+  expect(zoneAspect('A zone with no art')).toBe(1.5)
+  expect(zoneDistance([0, 0], [15, 0])).toBeCloseTo(15, 9)
+  expect(zoneDistance([0, 0], [0, 15]), '15% of the height is 10% of the width').toBeCloseTo(10, 9)
+  expect(loopLength([[0, 0], [30, 0], [30, 45], [0, 45]]), 'a lap measured in zone widths').toBeCloseTo(120, 9)
+})
+
+test('a ring of clusters comes out as a ring, a far pocket is left out, and nothing crosses', () => {
+  /*
+   * **The known answer first.** Sixteen spawns evenly round an ellipse, fed in a scrambled order: the
+   * best loop is the ring itself, in order, and anything else crosses or doubles back.
+   */
+  const ring: SpawnPoint[] = Array.from({ length: 16 }, (_, i) => {
+    const angle = (2 * Math.PI * i) / 16
+    return [40 + 20 * Math.cos(angle), 50 + 20 * Math.sin(angle)]
+  })
+  const scrambled = ring.map((_, i) => ring[(i * 7) % 16])
+  const loop = farmingLoop(spawnClusters(scrambled), undefined, scrambled).map((stop) => stop.at)
+  const angles = loop.map(([x, y]) => Math.atan2(y - 50, x - 40))
+  const steps = angles.map((angle, i) => {
+    const next = angles[(i + 1) % angles.length]
+    return (next - angle + 2 * Math.PI) % (2 * Math.PI)
+  })
+  const turnsOnce = steps.every((step) => step < Math.PI) || steps.every((step) => step > Math.PI)
+  expect(turnsOnce, 'round the ring one way, in order').toBe(true)
+  expect(crossings(loop)).toBe(0)
+
+  // Stops the line passes anyway are not drawn as stops, and every spawn on the ring is still passed.
+  expect(loop.length).toBeLessThan(16)
+  expect(pointsWithinReach(ring, loop)).toBe(16)
+
+  /*
+   * **A far pocket is not worth its ride,** even when it is three clusters side by side — which is the
+   * case a one-stop-at-a-time rule misses, because leaving out any one of the three still means
+   * riding to the other two.
+   */
+  const pocket: SpawnPoint[] = [[95, 5], [95, 11], [99, 8]]
+  const withPocket = [...ring, ...pocket]
+  const farmed = farmingLoop(spawnClusters(withPocket), undefined, withPocket).map((stop) => stop.at)
+  expect(spawnClusters(pocket).length, 'three clusters, not one').toBe(3)
+  expect(pointsWithinReach(pocket, farmed), 'the pocket is left out').toBe(0)
+  expect(pointsWithinReach(ring, farmed), 'and the ring is kept').toBe(16)
+
+  /*
+   * **And on the real data, no map's loop crosses itself.** Asserted over every range's every zone,
+   * because the claim on screen is about the whole feature, not one lucky zone.
+   */
+  for (const { where, route } of everyRangeRoute()) expect(crossings(route.stops), where).toBe(0)
+})
+
+test('taking a stop out of a loop never makes it longer', () => {
+  /*
+   * **A property rather than a figure.** Skipping a stop is never longer than visiting it (the
+   * triangle inequality), and shortening only ever makes a change that shortens; so a loop with one
+   * stop fewer, shortened again, must be no longer than the loop it came from. A shortening step that
+   * broke this would be making loops worse while claiming to improve them.
+   */
+  const mining = guideFor('Mining')!
+  for (const zone of ['Nagrand', "Blade's Edge Mountains"]) {
+    const range = mining.ranges.find((candidate) => candidate.skillRange[0] === 325)!
+    const route = routesForRange('Mining', range).find((candidate) => candidate.zone === zone)!
+    const aspect = zoneAspect(zone)
+    const points = spawnPoints(route.spawns.flatMap((group) => group.coords))
+    const loop = farmingLoop(spawnClusters(points, aspect), aspect, points)
+    const full = loopLength(loop.map((stop) => stop.at), aspect)
+    for (let i = 0; i < loop.length; i += 1) {
+      const shorter = shortenLoop(loop.filter((_, other) => other !== i), aspect)
+      expect(loopLength(shorter.map((stop) => stop.at), aspect), `${zone} without stop ${i}`).toBeLessThanOrEqual(full + 1e-9)
+    }
+  }
+})
+
+test('every map says how good its loop is, and whether it is flown or ridden', () => {
+  /*
+   * **The old route could not say how good it was.** Each map now carries the spawn points in the
+   * zone, how many of them the loop passes within `REACH`, and the lap's length in zone widths.
+   * Pinned on the maps plan's own example, Mining 325-350 through Nagrand and Blade's Edge, as bands:
+   * the exact figures are the algorithm's, and the claim is that they are good.
+   */
+  const range = guideFor('Mining')!.ranges.find((candidate) => candidate.skillRange[0] === 325)!
+  for (const zone of ['Nagrand', "Blade's Edge Mountains"]) {
+    const route = routesForRange('Mining', range).find((candidate) => candidate.zone === zone)!
+    expect(route.onLap / route.spawnPoints, `${zone}: most of the zone's spawns on one lap`).toBeGreaterThan(0.75)
+    expect(route.routeLength, `${zone}: a lap of two to four zone widths`).toBeGreaterThan(150)
+    expect(route.routeLength).toBeLessThan(400)
+    expect(route.stops.length, `${zone}: few enough stops to follow`).toBeLessThanOrEqual(45)
+    expect(route.travel).toBe('flying-at-70')
+  }
+
+  /*
+   * Across every map: the loops take in most of their zones, none is a token ring round one pocket,
+   * and none needs more waypoints than a player can follow. The floor is the sparsest case (Dun
+   * Morogh's herbs at 1-70 and the Plaguelands at 185-230, about 65%).
+   */
+  const routes = everyRangeRoute()
+  const coverage = routes.map(({ route }) => route.onLap / route.spawnPoints)
+  expect(coverage.reduce((sum, share) => sum + share, 0) / coverage.length, 'on average').toBeGreaterThan(0.8)
+  for (const { where, route } of routes) {
+    expect(route.onLap / route.spawnPoints, where).toBeGreaterThan(0.6)
+    expect(route.stops.length, where).toBeLessThanOrEqual(45)
+    expect(route.onLap, where).toBeLessThanOrEqual(route.spawnPoints)
+    expect(route.spawnPoints, `${where}: points, not records`).toBeLessThanOrEqual(route.spawnCount)
+  }
+
+  /*
+   * **Straight lines are only the ride where you can fly** (the owner's call in the maps plan: straight
+   * lines with a note, no terrain masks). Outland at 70 is flown; everything in Azeroth is ridden.
+   */
+  const outland = new Set(['Hellfire Peninsula', 'Zangarmarsh', 'Terokkar Forest', 'Nagrand', "Blade's Edge Mountains", 'Netherstorm', 'Shadowmoon Valley'])
+  for (const { where, route } of routes) {
+    expect(route.travel, where).toBe(outland.has(route.zone) ? 'flying-at-70' : 'ground')
+  }
+  expect(REACH, 'the one tuning number, recorded in routeLoop.ts with how it was chosen').toBe(3.5)
 })
 
 test('every crafting path runs unbroken from 1 to 375 and says how its counts were made', () => {

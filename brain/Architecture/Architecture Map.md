@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-217 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+218 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -128,7 +128,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.tierlists.tierFormat]] · 6 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (133)
+### domain (134)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -204,13 +204,14 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.phase]] · 2 importers
 - [[domain.professions.characterProfessions]] · 2 importers
 - [[domain.professions.craftingPaths]] · 1 importers
-- [[domain.professions.farmingRoutes]] · 2 importers
+- [[domain.professions.farmingRoutes]] · 3 importers
 - [[domain.professions.gatheringGuides]] · 2 importers
 - [[domain.professions.gatheringPlan]] · 1 importers
 - [[domain.professions.gatheringRangeTypes]] · 3 importers
 - [[domain.professions.index]] · 10 importers
 - [[domain.professions.professionPayoffs]] · 1 importers
 - [[domain.professions.professionTypes]] · 15 importers
+- [[domain.professions.routeLoop]] · 2 importers
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 3 importers
 - [[domain.professions.sampleProfessionTiers]] · 4 importers
