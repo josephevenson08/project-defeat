@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**479 commits across 77 days**, from 2026-06-25 to 2026-10-15.
+**480 commits across 77 days**, from 2026-06-25 to 2026-10-15.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_52 commits_
+_53 commits_
 
-### Thursday 15 October — 2 commits
+### Thursday 15 October — 3 commits
 
 - Port Professions: the profession window, with Which two behind a switch — [`e319d2c`](https://github.com/josephevenson08/project-defeat/commit/e319d2cc054ff3c4b10b44c0464d6673a229b3d5)
 - Ask the next chat to answer in caveman mode, and say what really saves tokens — [`23d45d8`](https://github.com/josephevenson08/project-defeat/commit/23d45d84061352558c3a1b09e8d913f648e9979b)
+- Bring the handoff up to date: step 3 is pushed and the suite passes 340 of 340 — [`0b8bc0c`](https://github.com/josephevenson08/project-defeat/commit/0b8bc0c016f5315a44003517ee6797ee640152c2)
 
 ### Wednesday 14 October — 2 commits
 
