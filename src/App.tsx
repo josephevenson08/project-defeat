@@ -42,6 +42,8 @@ import { Provenance } from './components/ui/Provenance'
 import { RaidsPanel } from './features/raids/RaidsPanel'
 import { initialRaidsSession, raidLook, type RaidsSession } from './features/raids/raidsSession'
 import { raidSources } from './features/raids/raidSources'
+import { initialProfessionsSession, type ProfessionsSession } from './features/professions/professionsSession'
+import { professionSources } from './features/professions/professionSources'
 import { getRaidById } from './domain/raids'
 import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
@@ -194,6 +196,7 @@ function App() {
    * journal and the spec its loot is ranked for. Session state, so a visit to another tab keeps it.
    */
   const [raidsSession, setRaidsSession] = useState<RaidsSession>(initialRaidsSession)
+  const [professionsSession, setProfessionsSession] = useState<ProfessionsSession>(initialProfessionsSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -315,15 +318,14 @@ function App() {
    *
    * **Choosing the section you are already in takes you to its start.** A participant deep in the
    * Herbalism guide tapped Professions expecting the profession list, stayed exactly where she was,
-   * and thought she had broken something. Professions keeps its choice inside the panel, so bumping
-   * `sectionVisit` remounts it on the grid. Raids keeps its place here, and goes back to its first
-   * raid's first boss.
+   * and thought she had broken something. Since port step 3 the profession icons are always at the
+   * top of the window, so Professions goes back to the step your skill is on in each profession.
+   * Raids keeps its place here, and goes back to its first raid's first boss.
    */
-  const [sectionVisit, setSectionVisit] = useState(0)
   function changeSection(tab: AppTab) {
     if (tab === currentTab) {
-      setSectionVisit((visit) => visit + 1)
       if (tab === 'raids') setRaidsSession((current) => ({ ...current, raidId: initialRaidsSession.raidId, pages: {} }))
+      if (tab === 'professions') setProfessionsSession((current) => ({ ...current, picks: {} }))
     } else {
       setActiveTab(tab)
     }
@@ -509,6 +511,8 @@ function App() {
           <Provenance sources={tierListSources} />
         ) : currentTab === 'raids' ? (
           <Provenance sources={raidSources} />
+        ) : currentTab === 'professions' ? (
+          <Provenance sources={professionSources} />
         ) : undefined
       }
       onHome={() => {
@@ -592,7 +596,8 @@ function App() {
       )}
       {currentTab === 'professions' && (
         <ProfessionsPanel
-          key={sectionVisit}
+          session={professionsSession}
+          onSession={setProfessionsSession}
           character={characterChosen ? character : undefined}
           onChangeCharacter={updateCharacter}
         />

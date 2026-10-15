@@ -1477,7 +1477,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Destruction Holo-gogs' })).toBeVisible()
 })
 
-test('Professions is a grid you pick from, and each profession opens its own page', async ({ page }) => {
+test('Professions opens on the profession window, and every profession is one press away', async ({ page }) => {
   await openApp(page)
 
   await expect(page.getByTestId('character-name')).toBeVisible()
@@ -1487,34 +1487,32 @@ test('Professions is a grid you pick from, and each profession opens its own pag
   await expect(page.getByRole('heading', { name: 'Character', exact: true })).toHaveCount(0)
 
   /*
-   * **The entry grid shows no profession's contents.** It used to render the whole selected
-   * profession underneath the picker, so the page opened on thirteen cards plus a tier table plus
-   * nineteen farm rows plus thirty maps. Nothing below the grid until something is picked.
+   * **The window is the page** (port step 3, 2026-10-15). The grid of thirteen cards that each opened
+   * a page of its own is gone: the icons sit above the window and a press swaps what it shows. With
+   * no profession held it opens on Blacksmithing, as the decided design does.
    */
-  await expect(page.getByTestId('profession-pick-mining')).toBeVisible()
-  await expect(page.getByTestId('gathering-range')).toHaveCount(0)
-  await expect(page.getByTestId('crafting-step')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Blacksmithing', exact: true })).toBeVisible()
+  await expect(page.getByTestId('profession-pick-blacksmithing')).toHaveAttribute('aria-pressed', 'true')
 
   await page.getByTestId('profession-pick-mining').click()
   await expect(page.getByRole('heading', { name: 'Mining', exact: true })).toBeVisible()
   await expect(page.getByText('Copper Ore').first()).toBeVisible()
 
   /*
-   * **The landing page has promised this since the tab was built and nothing delivered it.** Its
-   * blurb reads "how to take a profession to 375 without wasting materials, and what each one is
-   * actually worth at 70" — the first half is the levelling guide, and the second half had no code
-   * path at all until 2026-09-11. A claim in your own copy that nothing satisfies is the same class
-   * of defect as a wrong number, and this is what stops it going quiet again.
+   * **The landing page has promised this since the tab was built.** Its blurb reads "how to take a
+   * profession to 375 without wasting materials, and what each one is actually worth at 70": the
+   * verdict sits under the window's title, and the perks behind "What you get, in full".
    */
-  await expect(page.getByTestId('profession-payoff')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'What it is worth at 70' })).toBeVisible()
+  await expect(page.getByTestId('profession-verdict')).toContainText('Worth at 70')
+  await page.getByTestId('profession-payoff').locator('summary').click()
+  await expect(page.getByTestId('profession-payoff').locator('li').first()).toBeVisible()
 
   /*
    * **A range draws a map, and the map covers the whole range rather than one ore.** The join used to
    * be `node.material === spot.material` against a display label, so "Thorium Ore (incl. Rich Thorium
    * Vein at 275+)" matched nothing and drew nothing — see `GatheringNodeRef`.
    */
-  await expect(page.getByTestId('gathering-range').first()).toBeVisible()
+  await expect(page.getByTestId('gathering-range')).toBeVisible()
   await expect(page.locator('svg.farming-route-map').first()).toBeVisible()
 
   /*
@@ -1529,19 +1527,16 @@ test('Professions is a grid you pick from, and each profession opens its own pag
   await expect(caption.locator('.farming-route-travel')).toContainText('ridden on the ground')
 
   /*
-   * **The tier table is gone and its content is not.** Training requirements are markers inside the
-   * progression now, at the skill where you actually have to stop.
+   * **The tier table is gone and its content is not.** Training requirements are rows in the list,
+   * at the skill where the bar stops moving, and ticks on the bar itself.
    */
   await expect(page.getByTestId('training-marker').first()).toBeVisible()
-  await expect(page.getByText('Train Journeyman at skill 50')).toBeVisible()
-
-  await page.getByTestId('profession-back').click()
-  await expect(page.getByTestId('profession-pick-alchemy')).toBeVisible()
-  await expect(page.getByTestId('gathering-range')).toHaveCount(0)
+  await expect(page.getByText('Train Journeyman at 50 · level 10')).toBeVisible()
 
   await page.getByTestId('profession-pick-alchemy').click()
   await expect(page.getByRole('heading', { name: 'Alchemy', exact: true })).toBeVisible()
-  await expect(page.getByTestId('crafting-step').first()).toBeVisible()
+  await expect(page.getByTestId('profession-row').first()).toBeVisible()
+  await expect(page.getByTestId('gathering-range')).toHaveCount(0)
   await expect(page.getByText('Copper Ore')).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Character Planner', exact: true }).click()
@@ -11207,7 +11202,8 @@ test('no image in the app is painted larger than the file it comes from', async 
     },
     {
       name: 'gathering route',
-      needs: { maps: 3 },
+      // One map: since port step 3 the profession window shows one range's zone at a time.
+      needs: { maps: 1 },
       open: async () => {
         await openApp(page, 'professions')
         // Mining rather than the first card, which is Alchemy and has no maps to draw.
@@ -11863,6 +11859,8 @@ function sectionTab(page: Page, label: string) {
  */
 async function toggleProfessionOnItsTab(page: Page, profession: string) {
   await sectionTab(page, 'Professions').click()
+  // Your two are picked in "Which two" since port step 3; the tab remembers the view between visits.
+  await page.getByTestId('view-which').click()
   await professionChip(page, profession).click()
   await sectionTab(page, 'Character Planner').click()
 }
@@ -11940,13 +11938,15 @@ test('the professions tab holds two professions, and a third replaces the oldest
   // The picker left the planner's rail in the 2026-09-26 redesign: ten toggles and a three-line note
   // about what professions do not do, on a screen about gear. It lives with the guides now.
   await sectionTab(page, 'Professions').click()
+  // Since port step 3 they are picked in "Which two", on each primary profession's card.
+  await page.getByTestId('view-which').click()
 
   const picker = page.getByTestId('profession-picker')
   await expect(picker).toBeVisible()
 
   // Primary professions only. Cooking, First Aid and Fishing are not a choice — everyone can take all
-  // three — and none of them touches a stat, so they would lengthen the list for nothing.
-  await expect(page.locator('.profession-toggle'), 'ten primaries, no secondaries').toHaveCount(10)
+  // three — and none of them touches a stat, so their cards carry no Pick.
+  await expect(page.locator('.wt-pick'), 'ten primaries, no secondaries').toHaveCount(10)
   await expect(professionChip(page, 'Cooking')).toHaveCount(0)
 
   await professionChip(page, 'Enchanting').click()
@@ -12141,7 +12141,7 @@ test('on a phone the planner carries no profession controls, only what you hold'
    * What a phone still needs is the *fact*: Enchanting moves your stats, so the screen showing the
    * stats has to say you took it.
    */
-  await expect(page.locator('.profession-toggle'), 'no picker on the planner at all').toHaveCount(0)
+  await expect(page.locator('.wt-pick'), 'no picker on the planner at all').toHaveCount(0)
 
   await toggleProfessionOnItsTab(page, 'Enchanting')
   await toggleProfessionOnItsTab(page, 'Mining')
@@ -12547,13 +12547,19 @@ test('a section opens at its top, and choosing the section you are in returns to
   await main.getByRole('button', { name: 'Raids', exact: true }).click()
   await expect(page.locator('#journal-title')).toHaveText('Hydross the Unstable')
 
-  // Professions keeps its chosen guide inside the panel; the same tap returns to the grid.
+  /*
+   * Professions keeps its profession in the app (port step 3): the icons are always at the top of
+   * the window, so the same tap returns to the top with the list back on the step your skill is on.
+   */
   await main.getByRole('button', { name: 'Professions', exact: true }).click()
   await page.getByTestId('profession-pick-herbalism').click()
   await expect(page.getByRole('heading', { name: 'Herbalism', exact: true })).toBeVisible()
+  await page.locator('.pw-row').last().click()
+  await expect(page.locator('.pw-row').last()).toHaveAttribute('aria-current', 'true')
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
   await main.getByRole('button', { name: 'Professions', exact: true }).click()
-  await expect(page.getByTestId('profession-pick-herbalism'), 'back on the profession list').toBeVisible()
+  await expect(page.getByTestId('profession-pick-herbalism'), 'the profession icons, at the top').toBeVisible()
+  await expect(page.locator('.pw-row').first(), 'back on the step your skill is on').toHaveAttribute('aria-current', 'true')
   expect(await page.evaluate(() => window.scrollY)).toBe(0)
 })
 

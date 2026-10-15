@@ -57,3 +57,18 @@ export {
 export type { PlanRow } from './gatheringPlan'
 export { professionPayoffs, payoffFor, professionsWithStatPayoff } from './professionPayoffs'
 export type { PayoffKind, ProfessionPerk, ProfessionPayoff } from './professionPayoffs'
+export type { RecipeColor, WindowRow, SpecList, ListPlace } from './professionWindow'
+export {
+  RECIPE_COLOR_WORD,
+  recipeColorAt,
+  stepIndexAt,
+  withTrainerStops,
+  gathererOf,
+  feedShares,
+  fedBy,
+  suppliesOf,
+  specLists,
+  specListKey,
+  placesOnLists,
+  placesFor,
+} from './professionWindow'

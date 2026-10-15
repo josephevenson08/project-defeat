@@ -33,7 +33,14 @@
         "vendorCopper": 1220,
         "creates": "Elixir of Lion's Strength",
         "createsIcon": "inv_potion_56",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          55,
+          75,
+          95
+        ]
       },
       {
         "spellId": 2337,
@@ -75,7 +82,14 @@
         "vendorCopper": 0,
         "creates": "Lesser Healing Potion",
         "createsIcon": "inv_potion_50",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 55,
+        "colors": [
+          55,
+          85,
+          105,
+          125
+        ]
       },
       {
         "spellId": 8240,
@@ -107,7 +121,14 @@
         "vendorCopper": 720,
         "creates": "Elixir of Giant Growth",
         "createsIcon": "inv_potion_10",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 90,
+        "colors": [
+          90,
+          120,
+          140,
+          160
+        ]
       },
       {
         "spellId": 3173,
@@ -139,7 +160,14 @@
         "vendorCopper": 520,
         "creates": "Lesser Mana Potion",
         "createsIcon": "inv_potion_71",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 120,
+        "colors": [
+          120,
+          145,
+          165,
+          185
+        ]
       },
       {
         "spellId": 3177,
@@ -171,7 +199,14 @@
         "vendorCopper": 2200,
         "creates": "Elixir of Defense",
         "createsIcon": "inv_potion_64",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 130,
+        "colors": [
+          130,
+          155,
+          175,
+          195
+        ]
       },
       {
         "spellId": 3452,
@@ -203,7 +238,14 @@
         "vendorCopper": 5200,
         "creates": "Mana Potion",
         "createsIcon": "inv_potion_72",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 160,
+        "colors": [
+          160,
+          180,
+          200,
+          220
+        ]
       },
       {
         "spellId": 11449,
@@ -235,7 +277,14 @@
         "vendorCopper": 5200,
         "creates": "Elixir of Agility",
         "createsIcon": "inv_potion_93",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 185,
+        "colors": [
+          185,
+          205,
+          225,
+          245
+        ]
       },
       {
         "spellId": 12609,
@@ -267,7 +316,14 @@
         "vendorCopper": 3000,
         "creates": "Catseye Elixir",
         "createsIcon": "inv_potion_36",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          220,
+          240,
+          260
+        ]
       },
       {
         "spellId": 11480,
@@ -287,7 +343,14 @@
         "vendorCopper": 0,
         "creates": "Truesilver Bar",
         "createsIcon": "inv_ingot_08",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 225,
+        "colors": [
+          225,
+          240,
+          260,
+          280
+        ]
       },
       {
         "spellId": 11460,
@@ -314,7 +377,14 @@
         "vendorCopper": 92500,
         "creates": "Elixir of Detect Undead",
         "createsIcon": "inv_potion_53",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 230,
+        "colors": [
+          230,
+          245,
+          265,
+          285
+        ]
       },
       {
         "spellId": 11478,
@@ -341,7 +411,14 @@
         "vendorCopper": 17500,
         "creates": "Elixir of Detect Demon",
         "createsIcon": "inv_potion_53",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          265,
+          285,
+          305
+        ]
       },
       {
         "spellId": 17559,
@@ -361,7 +438,14 @@
         "vendorCopper": 0,
         "creates": "Essence of Fire",
         "createsIcon": "spell_fire_volcano",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          275,
+          282,
+          290
+        ]
       },
       {
         "spellId": 17556,
@@ -393,7 +477,14 @@
         "vendorCopper": 10000,
         "creates": "Major Healing Potion",
         "createsIcon": "inv_potion_54",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          290,
+          310,
+          330
+        ]
       },
       {
         "spellId": 17577,
@@ -425,7 +516,14 @@
         "vendorCopper": 25000,
         "creates": "Greater Arcane Protection Potion",
         "createsIcon": "inv_potion_83",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 290,
+        "colors": [
+          290,
+          305,
+          325,
+          345
+        ]
       },
       {
         "spellId": 25146,
@@ -445,7 +543,14 @@
         "vendorCopper": 0,
         "creates": "Elemental Fire",
         "createsIcon": "spell_fire_fire",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          301,
+          305,
+          310
+        ]
       },
       {
         "spellId": 28544,
@@ -477,7 +582,14 @@
         "vendorCopper": 320000,
         "creates": "Elixir of Major Strength",
         "createsIcon": "inv_potion_147",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 305,
+        "colors": [
+          305,
+          320,
+          327,
+          335
+        ]
       },
       {
         "spellId": 39638,
@@ -509,7 +621,14 @@
         "vendorCopper": 320000,
         "creates": "Elixir of Draenic Wisdom",
         "createsIcon": "inv_potion_155",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 320,
+        "colors": [
+          320,
+          335,
+          342,
+          350
+        ]
       },
       {
         "spellId": 39639,
@@ -541,7 +660,14 @@
         "vendorCopper": 280000,
         "creates": "Elixir of Ironskin",
         "createsIcon": "inv_potion_159",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 330,
+        "colors": [
+          330,
+          345,
+          352,
+          360
+        ]
       },
       {
         "spellId": 28566,
@@ -561,7 +687,14 @@
         "vendorCopper": 0,
         "creates": "Primal Fire",
         "createsIcon": "inv_elemental_primal_fire",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          365,
+          372,
+          380
+        ]
       },
       {
         "spellId": 28578,
@@ -593,7 +726,14 @@
         "vendorCopper": 20000,
         "creates": "Elixir of Empowerment",
         "createsIcon": "inv_potion_136",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 365,
+        "colors": [
+          365,
+          380,
+          387,
+          395
+        ]
       }
     ],
     "Blacksmithing": [
@@ -615,7 +755,14 @@
         "vendorCopper": 0,
         "creates": "Rough Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          15,
+          35,
+          55
+        ]
       },
       {
         "spellId": 3320,
@@ -635,7 +782,14 @@
         "vendorCopper": 0,
         "creates": "Rough Grinding Stone",
         "createsIcon": "inv_stone_grindingstone_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 25,
+        "colors": [
+          25,
+          45,
+          65,
+          85
+        ]
       },
       {
         "spellId": 2665,
@@ -655,7 +809,14 @@
         "vendorCopper": 0,
         "creates": "Coarse Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 65,
+        "colors": [
+          65,
+          65,
+          72,
+          80
+        ]
       },
       {
         "spellId": 3326,
@@ -675,7 +836,14 @@
         "vendorCopper": 0,
         "creates": "Coarse Grinding Stone",
         "createsIcon": "inv_stone_grindingstone_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 75,
+        "colors": [
+          75,
+          75,
+          87,
+          100
+        ]
       },
       {
         "spellId": 2666,
@@ -695,7 +863,14 @@
         "vendorCopper": 0,
         "creates": "Runed Copper Belt",
         "createsIcon": "inv_belt_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 70,
+        "colors": [
+          70,
+          110,
+          130,
+          150
+        ]
       },
       {
         "spellId": 19666,
@@ -727,7 +902,14 @@
         "vendorCopper": 0,
         "creates": "Silver Skeleton Key",
         "createsIcon": "inv_misc_key_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 100,
+        "colors": [
+          100,
+          100,
+          110,
+          120
+        ]
       },
       {
         "spellId": 2668,
@@ -747,7 +929,14 @@
         "vendorCopper": 0,
         "creates": "Rough Bronze Leggings",
         "createsIcon": "inv_pants_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 105,
+        "colors": [
+          105,
+          145,
+          160,
+          175
+        ]
       },
       {
         "spellId": 2674,
@@ -767,7 +956,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 125,
+        "colors": [
+          125,
+          125,
+          132,
+          140
+        ]
       },
       {
         "spellId": 2668,
@@ -787,7 +983,14 @@
         "vendorCopper": 0,
         "creates": "Rough Bronze Leggings",
         "createsIcon": "inv_pants_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 105,
+        "colors": [
+          105,
+          145,
+          160,
+          175
+        ]
       },
       {
         "spellId": 8768,
@@ -807,7 +1010,14 @@
         "vendorCopper": 0,
         "creates": "Iron Buckle",
         "createsIcon": "inv_misc_armorkit_12",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          150,
+          152,
+          155
+        ]
       },
       {
         "spellId": 19667,
@@ -839,7 +1049,14 @@
         "vendorCopper": 0,
         "creates": "Golden Skeleton Key",
         "createsIcon": "inv_misc_key_13",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          150,
+          160,
+          170
+        ]
       },
       {
         "spellId": 3501,
@@ -866,7 +1083,14 @@
         "vendorCopper": 3400,
         "creates": "Green Iron Bracers",
         "createsIcon": "inv_bracer_06",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 165,
+        "colors": [
+          165,
+          190,
+          202,
+          215
+        ]
       },
       {
         "spellId": 7223,
@@ -898,7 +1122,14 @@
         "vendorCopper": 0,
         "creates": "Golden Scale Bracers",
         "createsIcon": "inv_bracer_10",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 185,
+        "colors": [
+          185,
+          210,
+          222,
+          235
+        ]
       },
       {
         "spellId": 9918,
@@ -918,7 +1149,14 @@
         "vendorCopper": 0,
         "creates": "Solid Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_04",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          200,
+          205,
+          210
+        ]
       },
       {
         "spellId": 19668,
@@ -950,7 +1188,14 @@
         "vendorCopper": 0,
         "creates": "Truesilver Skeleton Key",
         "createsIcon": "inv_misc_key_11",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          200,
+          210,
+          220
+        ]
       },
       {
         "spellId": 11454,
@@ -980,7 +1225,14 @@
         "vendorCopper": 0,
         "creates": "Inlaid Mithril Cylinder",
         "createsIcon": "inv_musket_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          225,
+          237,
+          250
+        ]
       },
       {
         "spellId": 9937,
@@ -1000,7 +1252,14 @@
         "vendorCopper": 0,
         "creates": "Mithril Scale Bracers",
         "createsIcon": "inv_bracer_07",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 215,
+        "colors": [
+          215,
+          235,
+          245,
+          255
+        ]
       },
       {
         "spellId": 9964,
@@ -1032,7 +1291,14 @@
         "vendorCopper": 0,
         "creates": "Mithril Spurs",
         "createsIcon": "ability_rogue_sprint",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 235,
+        "colors": [
+          235,
+          255,
+          265,
+          275
+        ]
       },
       {
         "spellId": 16641,
@@ -1052,7 +1318,14 @@
         "vendorCopper": 0,
         "creates": "Dense Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          255,
+          257,
+          260
+        ]
       },
       {
         "spellId": 9964,
@@ -1084,7 +1357,14 @@
         "vendorCopper": 0,
         "creates": "Mithril Spurs",
         "createsIcon": "ability_rogue_sprint",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 235,
+        "colors": [
+          235,
+          255,
+          265,
+          275
+        ]
       },
       {
         "spellId": 16645,
@@ -1109,7 +1389,14 @@
         "vendorCopper": 0,
         "creates": "Radiant Belt",
         "createsIcon": "inv_belt_11",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 260,
+        "colors": [
+          260,
+          280,
+          290,
+          300
+        ]
       },
       {
         "spellId": 19669,
@@ -1141,7 +1428,14 @@
         "vendorCopper": 0,
         "creates": "Arcanite Skeleton Key",
         "createsIcon": "inv_misc_key_08",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          275,
+          280,
+          285
+        ]
       },
       {
         "spellId": 15295,
@@ -1166,7 +1460,14 @@
         "vendorCopper": 0,
         "creates": "Dark Iron Shoulders",
         "createsIcon": "inv_shoulder_09",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 280,
+        "colors": [
+          280,
+          300,
+          310,
+          320
+        ]
       },
       {
         "spellId": 29654,
@@ -1191,7 +1492,14 @@
         "vendorCopper": 0,
         "creates": "Fel Sharpening Stone",
         "createsIcon": "inv_stone_sharpeningstone_06",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          300,
+          305,
+          310
+        ]
       },
       {
         "spellId": 29547,
@@ -1211,7 +1519,14 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Plate Belt",
         "createsIcon": "inv_belt_21",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 305,
+        "colors": [
+          305,
+          315,
+          325,
+          335
+        ]
       },
       {
         "spellId": 29553,
@@ -1231,7 +1546,14 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Chain Bracers",
         "createsIcon": "inv_bracer_13",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 315,
+        "colors": [
+          315,
+          325,
+          335,
+          345
+        ]
       },
       {
         "spellId": 32284,
@@ -1251,7 +1573,14 @@
         "vendorCopper": 0,
         "creates": "Lesser Rune of Warding",
         "createsIcon": "inv_misc_rune_11",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          325,
+          330,
+          335
+        ]
       },
       {
         "spellId": 29568,
@@ -1271,7 +1600,14 @@
         "vendorCopper": 0,
         "creates": "Adamantite Cleaver",
         "createsIcon": "inv_axe_09",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 330,
+        "colors": [
+          330,
+          340,
+          350,
+          360
+        ]
       },
       {
         "spellId": 42688,
@@ -1296,7 +1632,14 @@
         "vendorCopper": 0,
         "creates": "Adamantite Weapon Chain",
         "createsIcon": "spell_frost_chainsofice",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          345,
+          350,
+          355
+        ]
       },
       {
         "spellId": 29728,
@@ -1316,7 +1659,14 @@
         "vendorCopper": 0,
         "creates": "Lesser Ward of Shielding",
         "createsIcon": "inv_misc_rune_12",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 340,
+        "colors": [
+          340,
+          340,
+          345,
+          350
+        ]
       },
       {
         "spellId": 42688,
@@ -1341,7 +1691,14 @@
         "vendorCopper": 0,
         "creates": "Adamantite Weapon Chain",
         "createsIcon": "spell_frost_chainsofice",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          345,
+          350,
+          355
+        ]
       },
       {
         "spellId": 32285,
@@ -1361,7 +1718,14 @@
         "vendorCopper": 0,
         "creates": "Greater Rune of Warding",
         "createsIcon": "inv_misc_rune_10",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          350,
+          355,
+          360
+        ]
       },
       {
         "spellId": 29619,
@@ -1381,7 +1745,14 @@
         "vendorCopper": 0,
         "creates": "Felsteel Gloves",
         "createsIcon": "inv_gauntlets_29",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 360,
+        "colors": [
+          360,
+          370,
+          380,
+          390
+        ]
       }
     ],
     "Enchanting": [
@@ -1415,7 +1786,14 @@
         "vendorCopper": 1984,
         "creates": "Runed Copper Rod",
         "createsIcon": "inv_staff_goldfeathered_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          5,
+          7,
+          10
+        ]
       },
       {
         "spellId": 14293,
@@ -1442,7 +1820,14 @@
         "vendorCopper": 2736,
         "creates": "Lesser Magic Wand",
         "createsIcon": "inv_staff_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 10,
+        "colors": [
+          10,
+          75,
+          95,
+          115
+        ]
       },
       {
         "spellId": 14807,
@@ -1469,7 +1854,14 @@
         "vendorCopper": 1368,
         "creates": "Greater Magic Wand",
         "createsIcon": "inv_staff_07",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 70,
+        "colors": [
+          70,
+          110,
+          130,
+          150
+        ]
       },
       {
         "spellId": 13419,
@@ -1487,7 +1879,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 110,
+        "colors": [
+          110,
+          135,
+          155,
+          175
+        ]
       },
       {
         "spellId": 13622,
@@ -1505,7 +1904,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          175,
+          195,
+          215
+        ]
       },
       {
         "spellId": 13642,
@@ -1523,7 +1929,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 165,
+        "colors": [
+          165,
+          185,
+          205,
+          225
+        ]
       },
       {
         "spellId": 13663,
@@ -1541,7 +1954,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 185,
+        "colors": [
+          185,
+          205,
+          225,
+          245
+        ]
       },
       {
         "spellId": 13794,
@@ -1559,7 +1979,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 205,
+        "colors": [
+          205,
+          225,
+          245,
+          265
+        ]
       },
       {
         "spellId": 13935,
@@ -1577,7 +2004,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 235,
+        "colors": [
+          235,
+          255,
+          275,
+          295
+        ]
       },
       {
         "spellId": 20008,
@@ -1595,7 +2029,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 255,
+        "colors": [
+          255,
+          275,
+          295,
+          315
+        ]
       },
       {
         "spellId": 20024,
@@ -1618,7 +2059,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          295,
+          315,
+          335
+        ]
       },
       {
         "spellId": 42613,
@@ -1638,7 +2086,14 @@
         "vendorCopper": 0,
         "creates": "Small Prismatic Shard",
         "createsIcon": "inv_enchant_shardprismaticsmall",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 300,
+        "colors": [
+          0,
+          300,
+          300,
+          305
+        ]
       },
       {
         "spellId": 20024,
@@ -1661,7 +2116,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          295,
+          315,
+          335
+        ]
       },
       {
         "spellId": 34001,
@@ -1679,7 +2141,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 305,
+        "colors": [
+          305,
+          315,
+          330,
+          345
+        ]
       },
       {
         "spellId": 33990,
@@ -1697,7 +2166,14 @@
           }
         ],
         "vendorCopper": 0,
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 320,
+        "colors": [
+          320,
+          330,
+          345,
+          360
+        ]
       },
       {
         "spellId": 28028,
@@ -1717,7 +2193,14 @@
         "vendorCopper": 0,
         "creates": "Void Sphere",
         "createsIcon": "inv_enchant_voidsphere",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          360,
+          375,
+          390
+        ]
       }
     ],
     "Engineering": [
@@ -1739,7 +2222,14 @@
         "vendorCopper": 0,
         "creates": "Rough Blasting Powder",
         "createsIcon": "inv_misc_dust_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          20,
+          30,
+          40
+        ]
       },
       {
         "spellId": 3922,
@@ -1759,7 +2249,14 @@
         "vendorCopper": 0,
         "creates": "Handful of Copper Bolts",
         "createsIcon": "inv_misc_gear_06",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 30,
+        "colors": [
+          30,
+          45,
+          52,
+          60
+        ]
       },
       {
         "spellId": 3924,
@@ -1786,7 +2283,14 @@
         "vendorCopper": 2100,
         "creates": "Copper Tube",
         "createsIcon": "inv_gizmo_pipe_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 50,
+        "colors": [
+          50,
+          80,
+          95,
+          110
+        ]
       },
       {
         "spellId": 3929,
@@ -1806,7 +2310,14 @@
         "vendorCopper": 0,
         "creates": "Coarse Blasting Powder",
         "createsIcon": "inv_misc_dust_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 75,
+        "colors": [
+          75,
+          85,
+          90,
+          95
+        ]
       },
       {
         "spellId": 3973,
@@ -1826,7 +2337,14 @@
         "vendorCopper": 0,
         "creates": "Silver Contact",
         "createsIcon": "inv_ingot_04",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 90,
+        "colors": [
+          90,
+          110,
+          125,
+          140
+        ]
       },
       {
         "spellId": 3945,
@@ -1846,7 +2364,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Blasting Powder",
         "createsIcon": "classic_inv_misc_dust_06",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 125,
+        "colors": [
+          125,
+          125,
+          135,
+          145
+        ]
       },
       {
         "spellId": 3978,
@@ -1883,7 +2408,14 @@
         "vendorCopper": 0,
         "creates": "Standard Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 110,
+        "colors": [
+          110,
+          135,
+          147,
+          160
+        ]
       },
       {
         "spellId": 3944,
@@ -1920,7 +2452,14 @@
         "vendorCopper": 0,
         "creates": "Flame Deflector",
         "createsIcon": "inv_gizmo_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 125,
+        "colors": [
+          125,
+          125,
+          150,
+          175
+        ]
       },
       {
         "spellId": 12584,
@@ -1940,7 +2479,14 @@
         "vendorCopper": 0,
         "creates": "Gold Power Core",
         "createsIcon": "inv_battery_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          150,
+          170,
+          190
+        ]
       },
       {
         "spellId": 3957,
@@ -1977,7 +2523,14 @@
         "vendorCopper": 0,
         "creates": "Ice Deflector",
         "createsIcon": "inv_gizmo_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 155,
+        "colors": [
+          155,
+          175,
+          185,
+          195
+        ]
       },
       {
         "spellId": 3979,
@@ -2019,7 +2572,14 @@
         "vendorCopper": 0,
         "creates": "Accurate Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 180,
+        "colors": [
+          180,
+          200,
+          210,
+          220
+        ]
       },
       {
         "spellId": 15255,
@@ -2056,7 +2616,14 @@
         "vendorCopper": 0,
         "creates": "Mechanical Repair Kit",
         "createsIcon": "inv_gizmo_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          200,
+          220,
+          240
+        ]
       },
       {
         "spellId": 12596,
@@ -2088,7 +2655,14 @@
         "vendorCopper": 0,
         "creates": "Hi-Impact Mithril Slugs",
         "createsIcon": "inv_ammo_bullet_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 210,
+        "colors": [
+          210,
+          210,
+          230,
+          250
+        ]
       },
       {
         "spellId": 26423,
@@ -2120,7 +2694,14 @@
         "vendorCopper": 0,
         "creates": "Blue Rocket Cluster",
         "createsIcon": "inv_misc_missilesmallcluster_blue",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 225,
+        "colors": [
+          225,
+          225,
+          237,
+          250
+        ]
       },
       {
         "spellId": 12620,
@@ -2157,7 +2738,14 @@
         "vendorCopper": 0,
         "creates": "Sniper Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 240,
+        "colors": [
+          240,
+          260,
+          270,
+          280
+        ]
       },
       {
         "spellId": 19788,
@@ -2177,7 +2765,14 @@
         "vendorCopper": 0,
         "creates": "Dense Blasting Powder",
         "createsIcon": "inv_misc_ammo_gunpowder_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          250,
+          255,
+          260
+        ]
       },
       {
         "spellId": 12620,
@@ -2214,7 +2809,14 @@
         "vendorCopper": 0,
         "creates": "Sniper Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 240,
+        "colors": [
+          240,
+          260,
+          270,
+          280
+        ]
       },
       {
         "spellId": 19791,
@@ -2239,7 +2841,14 @@
         "vendorCopper": 0,
         "creates": "Thorium Widget",
         "createsIcon": "inv_gizmo_04",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 260,
+        "colors": [
+          260,
+          280,
+          290,
+          300
+        ]
       },
       {
         "spellId": 26426,
@@ -2271,7 +2880,14 @@
         "vendorCopper": 0,
         "creates": "Large Blue Rocket Cluster",
         "createsIcon": "inv_misc_missilelargecluster_blue",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          275,
+          280,
+          285
+        ]
       },
       {
         "spellId": 19791,
@@ -2296,7 +2912,14 @@
         "vendorCopper": 0,
         "creates": "Thorium Widget",
         "createsIcon": "inv_gizmo_04",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 260,
+        "colors": [
+          260,
+          280,
+          290,
+          300
+        ]
       },
       {
         "spellId": 19815,
@@ -2321,7 +2944,14 @@
         "vendorCopper": 0,
         "creates": "Delicate Arcanite Converter",
         "createsIcon": "inv_gizmo_07",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 285,
+        "colors": [
+          285,
+          305,
+          315,
+          325
+        ]
       },
       {
         "spellId": 30305,
@@ -2341,7 +2971,14 @@
         "vendorCopper": 0,
         "creates": "Handful of Fel Iron Bolts",
         "createsIcon": "inv_gizmo_felironbolts",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          300,
+          305,
+          310
+        ]
       },
       {
         "spellId": 19815,
@@ -2366,7 +3003,14 @@
         "vendorCopper": 0,
         "creates": "Delicate Arcanite Converter",
         "createsIcon": "inv_gizmo_07",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 285,
+        "colors": [
+          285,
+          305,
+          315,
+          325
+        ]
       },
       {
         "spellId": 30310,
@@ -2422,7 +3066,14 @@
         "vendorCopper": 0,
         "creates": "Fel Iron Bomb",
         "createsIcon": "inv_gizmo_felironbomb",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          320,
+          330,
+          340
+        ]
       },
       {
         "spellId": 30337,
@@ -2490,7 +3141,14 @@
         "vendorCopper": 0,
         "creates": "Crashin' Thrashin' Robot",
         "createsIcon": "inv_misc_idol_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          335,
+          345,
+          355
+        ]
       },
       {
         "spellId": 30341,
@@ -2527,7 +3185,14 @@
         "vendorCopper": 0,
         "creates": "White Smoke Flare",
         "createsIcon": "inv_misc_missilesmall_white",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          335,
+          345,
+          355
+        ]
       },
       {
         "spellId": 30309,
@@ -2547,7 +3212,14 @@
         "vendorCopper": 0,
         "creates": "Felsteel Stabilizer",
         "createsIcon": "inv_gizmo_felstabilizer",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 340,
+        "colors": [
+          340,
+          350,
+          360,
+          370
+        ]
       },
       {
         "spellId": 30332,
@@ -2584,7 +3256,14 @@
         "vendorCopper": 0,
         "creates": "Khorium Scope",
         "createsIcon": "inv_misc_spyglass_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 360,
+        "colors": [
+          360,
+          370,
+          380,
+          390
+        ]
       }
     ],
     "Jewelcrafting": [
@@ -2618,7 +3297,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Copper Ring",
         "createsIcon": "inv_jewelry_ring_12",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 5,
+        "colors": [
+          5,
+          35,
+          50,
+          65
+        ]
       },
       {
         "spellId": 32178,
@@ -2650,7 +3336,14 @@
         "vendorCopper": 0,
         "creates": "Malachite Pendant",
         "createsIcon": "inv_jewelry_necklace_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 20,
+        "colors": [
+          20,
+          50,
+          65,
+          80
+        ]
       },
       {
         "spellId": 25280,
@@ -2670,7 +3363,14 @@
         "vendorCopper": 0,
         "creates": "Elegant Silver Ring",
         "createsIcon": "inv_jewelry_ring_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 50,
+        "colors": [
+          50,
+          80,
+          95,
+          110
+        ]
       },
       {
         "spellId": 25317,
@@ -2690,7 +3390,14 @@
         "vendorCopper": 0,
         "creates": "Ring of Silver Might",
         "createsIcon": "inv_jewelry_ring_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 80,
+        "colors": [
+          80,
+          110,
+          125,
+          140
+        ]
       },
       {
         "spellId": 25610,
@@ -2722,7 +3429,14 @@
         "vendorCopper": 0,
         "creates": "Pendant of the Agate Shield",
         "createsIcon": "inv_shield_21",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 120,
+        "colors": [
+          120,
+          150,
+          165,
+          180
+        ]
       },
       {
         "spellId": 25615,
@@ -2742,7 +3456,14 @@
         "vendorCopper": 0,
         "creates": "Mithril Filigree",
         "createsIcon": "inv_jewelcrafting_mithrilfiligree",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          170,
+          180,
+          190
+        ]
       },
       {
         "spellId": 25617,
@@ -2774,7 +3495,14 @@
         "vendorCopper": 0,
         "creates": "Blazing Citrine Ring",
         "createsIcon": "inv_jewelry_ring_20",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          180,
+          195,
+          210
+        ]
       },
       {
         "spellId": 25620,
@@ -2806,7 +3534,14 @@
         "vendorCopper": 0,
         "creates": "Engraved Truesilver Ring",
         "createsIcon": "inv_jewelry_ring_35",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 170,
+        "colors": [
+          170,
+          200,
+          215,
+          230
+        ]
       },
       {
         "spellId": 25622,
@@ -2848,7 +3583,14 @@
         "vendorCopper": 0,
         "creates": "Citrine Pendant of Golden Healing",
         "createsIcon": "inv_jewelry_necklace_06",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 190,
+        "colors": [
+          190,
+          220,
+          235,
+          250
+        ]
       },
       {
         "spellId": 26876,
@@ -2880,7 +3622,14 @@
         "vendorCopper": 0,
         "creates": "Aquamarine Pendant of the Warrior",
         "createsIcon": "inv_jewelry_necklace_16",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 220,
+        "colors": [
+          220,
+          245,
+          260,
+          275
+        ]
       },
       {
         "spellId": 26880,
@@ -2900,7 +3649,14 @@
         "vendorCopper": 0,
         "creates": "Thorium Setting",
         "createsIcon": "inv_jewelcrafting_thoriumsetting",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 225,
+        "colors": [
+          225,
+          235,
+          245,
+          255
+        ]
       },
       {
         "spellId": 26883,
@@ -2932,7 +3688,14 @@
         "vendorCopper": 0,
         "creates": "Ruby Pendant of Fire",
         "createsIcon": "inv_jewelry_necklace_15",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 235,
+        "colors": [
+          235,
+          260,
+          275,
+          290
+        ]
       },
       {
         "spellId": 26902,
@@ -2964,7 +3727,14 @@
         "vendorCopper": 0,
         "creates": "Simple Opal Ring",
         "createsIcon": "inv_jewelry_ring_17",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 260,
+        "colors": [
+          260,
+          280,
+          290,
+          300
+        ]
       },
       {
         "spellId": 36526,
@@ -2996,7 +3766,14 @@
         "vendorCopper": 0,
         "creates": "Diamond Focus Ring",
         "createsIcon": "inv_jewelry_ring_42",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 265,
+        "colors": [
+          265,
+          285,
+          295,
+          305
+        ]
       },
       {
         "spellId": 34961,
@@ -3028,7 +3805,14 @@
         "vendorCopper": 0,
         "creates": "Emerald Lion Ring",
         "createsIcon": "inv_jewelry_ring_18",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 290,
+        "colors": [
+          290,
+          300,
+          310,
+          320
+        ]
       },
       {
         "spellId": 28938,
@@ -3048,7 +3832,14 @@
         "vendorCopper": 0,
         "creates": "Brilliant Golden Draenite",
         "createsIcon": "inv_misc_gem_goldendraenite_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          300,
+          320,
+          340
+        ]
       },
       {
         "spellId": 28905,
@@ -3068,7 +3859,14 @@
         "vendorCopper": 0,
         "creates": "Bold Blood Garnet",
         "createsIcon": "inv_misc_gem_bloodgem_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 305,
+        "colors": [
+          305,
+          305,
+          325,
+          345
+        ]
       },
       {
         "spellId": 28918,
@@ -3088,7 +3886,14 @@
         "vendorCopper": 0,
         "creates": "Enduring Deep Peridot",
         "createsIcon": "inv_misc_gem_deepperidot_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 315,
+        "colors": [
+          315,
+          315,
+          335,
+          355
+        ]
       },
       {
         "spellId": 39455,
@@ -3108,7 +3913,14 @@
         "vendorCopper": 0,
         "creates": "Balanced Shadow Draenite",
         "createsIcon": "inv_misc_gem_ebondraenite_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          325,
+          340,
+          355
+        ]
       },
       {
         "spellId": 31052,
@@ -3145,7 +3957,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Adamantite Ring",
         "createsIcon": "inv_jewelry_ring_59",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          345,
+          355,
+          365
+        ]
       },
       {
         "spellId": 39463,
@@ -3165,7 +3984,14 @@
         "vendorCopper": 0,
         "creates": "Balanced Nightseye",
         "createsIcon": "inv_jewelcrafting_nightseye_03",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          350,
+          365,
+          380
+        ]
       },
       {
         "spellId": 42592,
@@ -3185,7 +4011,14 @@
         "vendorCopper": 0,
         "creates": "Blood of Amber",
         "createsIcon": "inv_jewelcrafting_lionseye_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 360,
+        "colors": [
+          360,
+          365,
+          370,
+          375
+        ]
       },
       {
         "spellId": 32867,
@@ -3205,7 +4038,14 @@
         "vendorCopper": 0,
         "creates": "Bracing Earthstorm Diamond",
         "createsIcon": "inv_misc_gem_diamond_06",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 365,
+        "colors": [
+          365,
+          375,
+          385,
+          395
+        ]
       }
     ],
     "Leatherworking": [
@@ -3234,7 +4074,14 @@
         "vendorCopper": 0,
         "creates": "Light Armor Kit",
         "createsIcon": "inv_misc_armorkit_17",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          30,
+          45,
+          60
+        ]
       },
       {
         "spellId": 3816,
@@ -3261,7 +4108,14 @@
         "vendorCopper": 2350,
         "creates": "Cured Light Hide",
         "createsIcon": "inv_misc_pelt_wolf_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 35,
+        "colors": [
+          35,
+          55,
+          65,
+          75
+        ]
       },
       {
         "spellId": 3756,
@@ -3295,7 +4149,14 @@
         "vendorCopper": 720,
         "creates": "Embossed Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 55,
+        "colors": [
+          55,
+          85,
+          100,
+          115
+        ]
       },
       {
         "spellId": 3817,
@@ -3322,7 +4183,14 @@
         "vendorCopper": 1450,
         "creates": "Cured Medium Hide",
         "createsIcon": "inv_misc_pelt_bear_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 100,
+        "colors": [
+          100,
+          115,
+          122,
+          130
+        ]
       },
       {
         "spellId": 3765,
@@ -3395,7 +4263,14 @@
         "vendorCopper": 11700,
         "creates": "Dark Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 120,
+        "colors": [
+          120,
+          155,
+          167,
+          180
+        ]
       },
       {
         "spellId": 3818,
@@ -3422,7 +4297,14 @@
         "vendorCopper": 3750,
         "creates": "Cured Heavy Hide",
         "createsIcon": "inv_misc_pelt_wolf_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          160,
+          165,
+          170
+        ]
       },
       {
         "spellId": 3765,
@@ -3495,7 +4377,14 @@
         "vendorCopper": 5850,
         "creates": "Dark Leather Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 120,
+        "colors": [
+          120,
+          155,
+          167,
+          180
+        ]
       },
       {
         "spellId": 3780,
@@ -3529,7 +4418,14 @@
         "vendorCopper": 700,
         "creates": "Heavy Armor Kit",
         "createsIcon": "inv_misc_armorkit_16",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          170,
+          180,
+          190
+        ]
       },
       {
         "spellId": 3775,
@@ -3585,7 +4481,14 @@
         "vendorCopper": 1200,
         "creates": "Guardian Belt",
         "createsIcon": "inv_belt_03",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 170,
+        "colors": [
+          170,
+          190,
+          200,
+          210
+        ]
       },
       {
         "spellId": 7156,
@@ -3636,7 +4539,14 @@
         "vendorCopper": 12000,
         "creates": "Guardian Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 190,
+        "colors": [
+          190,
+          210,
+          220,
+          230
+        ]
       },
       {
         "spellId": 10487,
@@ -3670,7 +4580,14 @@
         "vendorCopper": 5500,
         "creates": "Thick Armor Kit",
         "createsIcon": "inv_misc_armorkit_07",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 200,
+        "colors": [
+          200,
+          220,
+          230,
+          240
+        ]
       },
       {
         "spellId": 10507,
@@ -3704,7 +4621,14 @@
         "vendorCopper": 23000,
         "creates": "Nightscape Headband",
         "createsIcon": "inv_belt_24",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 205,
+        "colors": [
+          205,
+          225,
+          235,
+          245
+        ]
       },
       {
         "spellId": 10529,
@@ -3753,7 +4677,14 @@
         "vendorCopper": 0,
         "creates": "Wild Leather Shoulders",
         "createsIcon": "inv_shoulder_18",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 220,
+        "colors": [
+          220,
+          240,
+          250,
+          260
+        ]
       },
       {
         "spellId": 14932,
@@ -3809,7 +4740,14 @@
         "vendorCopper": 24000,
         "creates": "Thick Leather Ammo Pouch",
         "createsIcon": "inv_misc_bag_09_black",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 225,
+        "colors": [
+          225,
+          245,
+          255,
+          265
+        ]
       },
       {
         "spellId": 19047,
@@ -3834,7 +4772,14 @@
         "vendorCopper": 0,
         "creates": "Cured Rugged Hide",
         "createsIcon": "inv_misc_pelt_bear_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          250,
+          255,
+          260
+        ]
       },
       {
         "spellId": 19048,
@@ -3873,7 +4818,14 @@
         "vendorCopper": 105000,
         "creates": "Heavy Scorpid Bracers",
         "createsIcon": "inv_bracer_09",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 255,
+        "colors": [
+          255,
+          275,
+          285,
+          295
+        ]
       },
       {
         "spellId": 19059,
@@ -3917,7 +4869,14 @@
         "vendorCopper": 105000,
         "creates": "Volcanic Leggings",
         "createsIcon": "inv_pants_06",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 270,
+        "colors": [
+          270,
+          290,
+          300,
+          310
+        ]
       },
       {
         "spellId": 19076,
@@ -3961,7 +4920,14 @@
         "vendorCopper": 15000,
         "creates": "Volcanic Breastplate",
         "createsIcon": "inv_chest_leather_07",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 285,
+        "colors": [
+          285,
+          305,
+          315,
+          325
+        ]
       },
       {
         "spellId": 32482,
@@ -3988,7 +4954,14 @@
         "vendorCopper": 0,
         "creates": "Comfortable Insoles",
         "createsIcon": "inv_misc_armorkit_17",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          300,
+          305,
+          310
+        ]
       },
       {
         "spellId": 19093,
@@ -4020,7 +4993,14 @@
         "vendorCopper": 180000,
         "creates": "Onyxia Scale Cloak",
         "createsIcon": "inv_misc_cape_05",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          320,
+          330,
+          340
+        ]
       },
       {
         "spellId": 32458,
@@ -4052,7 +5032,14 @@
         "vendorCopper": 0,
         "creates": "Magister's Armor Kit",
         "createsIcon": "inv_misc_armorkit_22",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          335,
+          340,
+          345
+        ]
       },
       {
         "spellId": 35540,
@@ -4084,7 +5071,14 @@
         "vendorCopper": 0,
         "creates": "Drums of War",
         "createsIcon": "inv_misc_drum_03",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 340,
+        "colors": [
+          340,
+          340,
+          347,
+          355
+        ]
       },
       {
         "spellId": 35524,
@@ -4116,7 +5110,14 @@
         "vendorCopper": 0,
         "creates": "Arcane Armor Kit",
         "createsIcon": "spell_shadow_sealofkings",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 340,
+        "colors": [
+          340,
+          350,
+          355,
+          360
+        ]
       },
       {
         "spellId": 44970,
@@ -4143,7 +5144,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Knothide Armor Kit",
         "createsIcon": "inv_misc_armorkit_25",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          355,
+          360,
+          365
+        ]
       },
       {
         "spellId": 32461,
@@ -4185,7 +5193,14 @@
         "vendorCopper": 0,
         "creates": "Riding Crop",
         "createsIcon": "inv_misc_crop_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          360,
+          370,
+          380
+        ]
       },
       {
         "spellId": 35543,
@@ -4217,7 +5232,14 @@
         "vendorCopper": 0,
         "creates": "Drums of Battle",
         "createsIcon": "inv_misc_drum_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 365,
+        "colors": [
+          365,
+          365,
+          372,
+          380
+        ]
       },
       {
         "spellId": 35538,
@@ -4249,7 +5271,14 @@
         "vendorCopper": 0,
         "creates": "Drums of Panic",
         "createsIcon": "inv_misc_drum_06",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 370,
+        "colors": [
+          370,
+          370,
+          377,
+          385
+        ]
       }
     ],
     "Tailoring": [
@@ -4285,7 +5314,14 @@
         "vendorCopper": 390,
         "creates": "Brown Linen Shirt",
         "createsIcon": "inv_shirt_02",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          35,
+          47,
+          60
+        ]
       },
       {
         "spellId": 8776,
@@ -4319,7 +5355,14 @@
         "vendorCopper": 400,
         "creates": "Linen Belt",
         "createsIcon": "inv_belt_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 15,
+        "colors": [
+          15,
+          50,
+          67,
+          85
+        ]
       },
       {
         "spellId": 2397,
@@ -4353,7 +5396,14 @@
         "vendorCopper": 150,
         "creates": "Reinforced Linen Cape",
         "createsIcon": "inv_misc_cape_07",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 60,
+        "colors": [
+          60,
+          85,
+          102,
+          120
+        ]
       },
       {
         "spellId": 2402,
@@ -4387,7 +5437,14 @@
         "vendorCopper": 6800,
         "creates": "Woolen Cape",
         "createsIcon": "inv_misc_cape_10",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 75,
+        "colors": [
+          75,
+          100,
+          117,
+          135
+        ]
       },
       {
         "spellId": 3848,
@@ -4421,7 +5478,14 @@
         "vendorCopper": 2000,
         "creates": "Double-stitched Woolen Shoulders",
         "createsIcon": "inv_shoulder_06",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 110,
+        "colors": [
+          110,
+          135,
+          152,
+          170
+        ]
       },
       {
         "spellId": 3869,
@@ -4462,7 +5526,14 @@
         "vendorCopper": 11400,
         "creates": "Bright Yellow Shirt",
         "createsIcon": "inv_shirt_yellow_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 135,
+        "colors": [
+          135,
+          145,
+          150,
+          155
+        ]
       },
       {
         "spellId": 8760,
@@ -4503,7 +5574,14 @@
         "vendorCopper": 1400,
         "creates": "Azure Silk Hood",
         "createsIcon": "inv_helmet_29",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 145,
+        "colors": [
+          145,
+          155,
+          160,
+          165
+        ]
       },
       {
         "spellId": 3870,
@@ -4544,7 +5622,14 @@
         "vendorCopper": 12000,
         "creates": "Dark Silk Shirt",
         "createsIcon": "inv_shirt_black_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 155,
+        "colors": [
+          155,
+          165,
+          170,
+          175
+        ]
       },
       {
         "spellId": 3871,
@@ -4585,7 +5670,14 @@
         "vendorCopper": 1950,
         "creates": "Formal White Shirt",
         "createsIcon": "inv_shirt_08",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 170,
+        "colors": [
+          170,
+          180,
+          185,
+          190
+        ]
       },
       {
         "spellId": 8786,
@@ -4626,7 +5718,14 @@
         "vendorCopper": 7500,
         "creates": "Azure Silk Cloak",
         "createsIcon": "inv_chest_cloth_14",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 175,
+        "colors": [
+          175,
+          195,
+          210,
+          225
+        ]
       },
       {
         "spellId": 12049,
@@ -4660,7 +5759,14 @@
         "vendorCopper": 15000,
         "creates": "Black Mageweave Leggings",
         "createsIcon": "inv_pants_09",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 205,
+        "colors": [
+          205,
+          220,
+          235,
+          250
+        ]
       },
       {
         "spellId": 12059,
@@ -4701,7 +5807,14 @@
         "vendorCopper": 28350,
         "creates": "White Bandit Mask",
         "createsIcon": "inv_misc_cape_11",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 215,
+        "colors": [
+          215,
+          220,
+          225,
+          230
+        ]
       },
       {
         "spellId": 12053,
@@ -4735,7 +5848,14 @@
         "vendorCopper": 36000,
         "creates": "Black Mageweave Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 215,
+        "colors": [
+          215,
+          230,
+          245,
+          260
+        ]
       },
       {
         "spellId": 12075,
@@ -4776,7 +5896,14 @@
         "vendorCopper": 54000,
         "creates": "Lavender Mageweave Shirt",
         "createsIcon": "inv_shirt_purple_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 230,
+        "colors": [
+          230,
+          235,
+          240,
+          245
+        ]
       },
       {
         "spellId": 12053,
@@ -4810,7 +5937,14 @@
         "vendorCopper": 28000,
         "creates": "Black Mageweave Gloves",
         "createsIcon": "inv_gauntlets_05",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 215,
+        "colors": [
+          215,
+          230,
+          245,
+          260
+        ]
       },
       {
         "spellId": 12072,
@@ -4844,7 +5978,14 @@
         "vendorCopper": 32000,
         "creates": "Black Mageweave Headband",
         "createsIcon": "inv_misc_bandana_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 230,
+        "colors": [
+          230,
+          245,
+          260,
+          275
+        ]
       },
       {
         "spellId": 18560,
@@ -4864,7 +6005,14 @@
         "vendorCopper": 0,
         "creates": "Mooncloth",
         "createsIcon": "inv_fabric_moonrag_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          290,
+          305,
+          320
+        ]
       },
       {
         "spellId": 26765,
@@ -4898,7 +6046,14 @@
         "vendorCopper": 85000,
         "creates": "Netherweave Belt",
         "createsIcon": "inv_belt_04",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 310,
+        "colors": [
+          310,
+          320,
+          325,
+          330
+        ]
       },
       {
         "spellId": 26747,
@@ -4930,7 +6085,14 @@
         "vendorCopper": 0,
         "creates": "Bolt of Imbued Netherweave",
         "createsIcon": "inv_fabric_netherweave_bolt_imbued",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          330,
+          335,
+          340
+        ]
       },
       {
         "spellId": 26771,
@@ -4964,7 +6126,14 @@
         "vendorCopper": 10000,
         "creates": "Netherweave Pants",
         "createsIcon": "inv_pants_09",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 325,
+        "colors": [
+          325,
+          335,
+          340,
+          345
+        ]
       },
       {
         "spellId": 31430,
@@ -4991,7 +6160,14 @@
         "vendorCopper": 75000,
         "creates": "Mystic Spellthread",
         "createsIcon": "spell_nature_astralrecal",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          345,
+          350,
+          355
+        ]
       },
       {
         "spellId": 26775,
@@ -5035,7 +6211,14 @@
         "vendorCopper": 5000,
         "creates": "Imbued Netherweave Pants",
         "createsIcon": "inv_pants_leather_09",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 340,
+        "colors": [
+          340,
+          350,
+          355,
+          360
+        ]
       },
       {
         "spellId": 26751,
@@ -5077,7 +6260,14 @@
         "vendorCopper": 0,
         "creates": "Primal Mooncloth",
         "createsIcon": "inv_fabric_moonrag_primal",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          350,
+          355,
+          360
+        ]
       },
       {
         "spellId": 37882,
@@ -5116,7 +6306,14 @@
         "vendorCopper": 20000,
         "creates": "Flameheart Bracers",
         "createsIcon": "inv_bracer_11",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          360,
+          365,
+          370
+        ]
       },
       {
         "spellId": 26777,
@@ -5160,7 +6357,14 @@
         "vendorCopper": 25000,
         "creates": "Imbued Netherweave Robe",
         "createsIcon": "inv_chest_cloth_12",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 360,
+        "colors": [
+          360,
+          370,
+          375,
+          380
+        ]
       },
       {
         "spellId": 26780,
@@ -5199,7 +6403,14 @@
         "vendorCopper": 200000,
         "creates": "Soulcloth Shoulders",
         "createsIcon": "inv_shoulder_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 365,
+        "colors": [
+          365,
+          375,
+          380,
+          385
+        ]
       }
     ],
     "Cooking": [
@@ -5230,7 +6441,14 @@
         "vendorCopper": 2065,
         "creates": "Spice Bread",
         "createsIcon": "inv_misc_food_95_grainbread",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          30,
+          35,
+          40
+        ]
       },
       {
         "spellId": 2538,
@@ -5250,7 +6468,14 @@
         "vendorCopper": 0,
         "creates": "Charred Wolf Meat",
         "createsIcon": "inv_misc_food_18",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 0,
+        "colors": [
+          0,
+          45,
+          65,
+          85
+        ]
       },
       {
         "spellId": 2541,
@@ -5270,7 +6495,14 @@
         "vendorCopper": 0,
         "creates": "Coyote Steak",
         "createsIcon": "inv_misc_food_65",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 50,
+        "colors": [
+          50,
+          90,
+          110,
+          130
+        ]
       },
       {
         "spellId": 6417,
@@ -5290,7 +6522,14 @@
         "vendorCopper": 0,
         "creates": "Dig Rat Stew",
         "createsIcon": "inv_misc_bowl_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 90,
+        "colors": [
+          90,
+          130,
+          150,
+          170
+        ]
       },
       {
         "spellId": 7755,
@@ -5310,7 +6549,14 @@
         "vendorCopper": 0,
         "creates": "Bristle Whisker Catfish",
         "createsIcon": "inv_misc_fish_30",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 100,
+        "colors": [
+          100,
+          140,
+          160,
+          180
+        ]
       },
       {
         "spellId": 15853,
@@ -5337,7 +6583,14 @@
         "vendorCopper": 260,
         "creates": "Lean Wolf Steak",
         "createsIcon": "inv_misc_food_47",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 125,
+        "colors": [
+          125,
+          165,
+          185,
+          205
+        ]
       },
       {
         "spellId": 3398,
@@ -5364,7 +6617,14 @@
         "vendorCopper": 440,
         "creates": "Hot Lion Chops",
         "createsIcon": "inv_misc_food_18",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 125,
+        "colors": [
+          125,
+          175,
+          195,
+          215
+        ]
       },
       {
         "spellId": 20916,
@@ -5384,7 +6644,14 @@
         "vendorCopper": 0,
         "creates": "Mithril Head Trout",
         "createsIcon": "inv_misc_fish_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 175,
+        "colors": [
+          175,
+          215,
+          235,
+          255
+        ]
       },
       {
         "spellId": 18241,
@@ -5404,7 +6671,14 @@
         "vendorCopper": 0,
         "creates": "Filet of Redgill",
         "createsIcon": "inv_misc_fish_06",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 225,
+        "colors": [
+          225,
+          250,
+          262,
+          275
+        ]
       },
       {
         "spellId": 46684,
@@ -5424,7 +6698,14 @@
         "vendorCopper": 0,
         "creates": "Charred Bear Kabobs",
         "createsIcon": "inv_misc_food_68",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 250,
+        "colors": [
+          250,
+          275,
+          285,
+          295
+        ]
       },
       {
         "spellId": 18247,
@@ -5451,7 +6732,14 @@
         "vendorCopper": 4320,
         "creates": "Baked Salmon",
         "createsIcon": "inv_misc_fish_20",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 275,
+        "colors": [
+          275,
+          300,
+          312,
+          325
+        ]
       },
       {
         "spellId": 43772,
@@ -5471,7 +6759,14 @@
         "vendorCopper": 0,
         "creates": "Kibler's Bits",
         "createsIcon": "inv_misc_food_49",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          345,
+          355,
+          365
+        ]
       },
       {
         "spellId": 38868,
@@ -5491,7 +6786,14 @@
         "vendorCopper": 0,
         "creates": "Crunchy Serpent",
         "createsIcon": "inv_misc_food_88_ravagernuggets",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 335,
+        "colors": [
+          335,
+          355,
+          365,
+          375
+        ]
       },
       {
         "spellId": 33296,
@@ -5511,7 +6813,14 @@
         "vendorCopper": 0,
         "creates": "Spicy Crawdad",
         "createsIcon": "inv_misc_fish_16",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 350,
+        "colors": [
+          350,
+          370,
+          380,
+          390
+        ]
       }
     ],
     "First Aid": [
@@ -5533,7 +6842,14 @@
         "vendorCopper": 0,
         "creates": "Linen Bandage",
         "createsIcon": "inv_misc_bandage_15",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 1,
+        "colors": [
+          1,
+          30,
+          45,
+          60
+        ]
       },
       {
         "spellId": 3276,
@@ -5553,7 +6869,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Linen Bandage",
         "createsIcon": "inv_misc_bandage_18",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 40,
+        "colors": [
+          40,
+          50,
+          75,
+          100
+        ]
       },
       {
         "spellId": 7934,
@@ -5573,7 +6896,14 @@
         "vendorCopper": 0,
         "creates": "Anti-Venom",
         "createsIcon": "inv_misc_slime_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 80,
+        "colors": [
+          80,
+          80,
+          115,
+          150
+        ]
       },
       {
         "spellId": 3278,
@@ -5593,7 +6923,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Wool Bandage",
         "createsIcon": "inv_misc_bandage_17",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 115,
+        "colors": [
+          115,
+          115,
+          150,
+          185
+        ]
       },
       {
         "spellId": 7935,
@@ -5613,7 +6950,14 @@
         "vendorCopper": 0,
         "creates": "Strong Anti-Venom",
         "createsIcon": "inv_misc_slime_01",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 130,
+        "colors": [
+          130,
+          130,
+          165,
+          200
+        ]
       },
       {
         "spellId": 7928,
@@ -5633,7 +6977,14 @@
         "vendorCopper": 0,
         "creates": "Silk Bandage",
         "createsIcon": "inv_misc_bandage_01",
-        "trainerTaught": true
+        "trainerTaught": true,
+        "learnedAt": 150,
+        "colors": [
+          150,
+          150,
+          180,
+          210
+        ]
       },
       {
         "spellId": 7929,
@@ -5653,7 +7004,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Silk Bandage",
         "createsIcon": "inv_misc_bandage_02",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 180,
+        "colors": [
+          180,
+          180,
+          210,
+          240
+        ]
       },
       {
         "spellId": 10840,
@@ -5673,7 +7031,14 @@
         "vendorCopper": 0,
         "creates": "Mageweave Bandage",
         "createsIcon": "inv_misc_bandage_19",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 210,
+        "colors": [
+          210,
+          210,
+          240,
+          270
+        ]
       },
       {
         "spellId": 10841,
@@ -5693,7 +7058,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Mageweave Bandage",
         "createsIcon": "inv_misc_bandage_20",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 240,
+        "colors": [
+          240,
+          240,
+          270,
+          300
+        ]
       },
       {
         "spellId": 18629,
@@ -5713,7 +7085,14 @@
         "vendorCopper": 0,
         "creates": "Runecloth Bandage",
         "createsIcon": "inv_misc_bandage_11",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 260,
+        "colors": [
+          260,
+          260,
+          290,
+          320
+        ]
       },
       {
         "spellId": 18630,
@@ -5733,7 +7112,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Runecloth Bandage",
         "createsIcon": "inv_misc_bandage_12",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 290,
+        "colors": [
+          290,
+          290,
+          320,
+          350
+        ]
       },
       {
         "spellId": 23787,
@@ -5753,7 +7139,14 @@
         "vendorCopper": 0,
         "creates": "Powerful Anti-Venom",
         "createsIcon": "inv_drink_14",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 300,
+        "colors": [
+          300,
+          300,
+          330,
+          360
+        ]
       },
       {
         "spellId": 27032,
@@ -5773,7 +7166,14 @@
         "vendorCopper": 0,
         "creates": "Netherweave Bandage",
         "createsIcon": "inv_misc_bandage_netherweave",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 330,
+        "colors": [
+          330,
+          330,
+          360,
+          390
+        ]
       },
       {
         "spellId": 27033,
@@ -5793,7 +7193,14 @@
         "vendorCopper": 0,
         "creates": "Heavy Netherweave Bandage",
         "createsIcon": "inv_misc_bandage_netherweave_heavy",
-        "trainerTaught": false
+        "trainerTaught": false,
+        "learnedAt": 360,
+        "colors": [
+          360,
+          360,
+          385,
+          410
+        ]
       }
     ]
   }

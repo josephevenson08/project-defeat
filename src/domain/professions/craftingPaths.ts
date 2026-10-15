@@ -51,6 +51,13 @@ export type CraftingStep = {
   creates?: string
   createsIcon?: string
   trainerTaught: boolean
+  /** The skill the recipe is learned at, from Wowhead's recipe data. */
+  learnedAt: number
+  /**
+   * The recipe's colour thresholds as Wowhead publishes them: orange from the first, yellow from
+   * the second, green from the third, grey from the fourth. `recipeColorAt` reads them.
+   */
+  colors: [number, number, number, number]
 }
 
 const PATHS = craftingPathData.paths as unknown as Record<string, CraftingStep[]>

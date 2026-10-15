@@ -300,6 +300,7 @@ function computePath(recipes, profession) {
         source: recipe.source,
         trainingCost: recipe.trainingCost,
         learnedAt: recipe.learnedAt,
+        colors: recipe.colors,
       }
     }
 
@@ -342,6 +343,14 @@ function computePath(recipes, profession) {
       ),
       ...(step.creates ? { creates: step.creates.name, createsIcon: step.creates.icon } : {}),
       trainerTaught: isTrainerTaught(step),
+      /*
+       * The recipe's own colour thresholds — orange from the first, yellow from the second, green from
+       * the third, grey from the fourth — and the skill it is learned at, as Wowhead publishes them.
+       * Carried so the page can colour every recipe at the player's skill the way the game's
+       * profession window does, without shipping the 2 MB recipe file (port step 3, 2026-10-15).
+       */
+      learnedAt: step.learnedAt,
+      colors: step.colors,
     }
   })
 }

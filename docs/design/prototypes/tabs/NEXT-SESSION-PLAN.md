@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-14): the new routes are in; start here
+## ▶ Where we left off (2026-10-15): port step 3, Professions, built and committed as work in progress; start here
+
+**This folder's `professions.html` (design A's window with design B's "Which two") is now the live app's Professions tab, committed as work in progress and not pushed.** `checks/profs-handson.mjs` became `tests/professions.spec.ts` (6 of 6 pass). Still to do: run the updated Professions tests in `tests/planner.spec.ts`, remove the old Professions CSS, the full suite, the docs and brain, then commit and ask before pushing. The full list of changed files and the steps in order are at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-14): the new routes are in
 
 **Step C of the maps plan, the route algorithm** (`a1ffce6`), is built on today's nodes: spawn points instead of Wowhead's duplicate records, clusters, a loop through the clusters worth their detour with no crossings, and every map saying how many spawn points its loop passes and how long a lap is. This folder's `prof-data.js` was regenerated, so the Professions prototype's plain-grid routes are the new loops. **Next:** step 3 (Professions) or step 4 (Simulation); Step B's node data whenever the ingest works again. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
