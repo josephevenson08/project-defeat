@@ -1,6 +1,6 @@
 # Project Defeat :D
 
-A gear, talent and raid planner for **World of Warcraft: The Burning Crusade Classic (Anniversary), Phase 2**.
+A gear, talent and raid comp planner for **World of Warcraft: The Burning Crusade Classic (Anniversary), Phase 2**.
 
 **[Open the live app →](https://josephevenson08.github.io/project-defeat/)**
 
