@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**480 commits across 77 days**, from 2026-06-25 to 2026-10-15.
+**484 commits across 79 days**, from 2026-06-25 to 2026-10-17.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,23 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_53 commits_
+_57 commits_
 
-### Thursday 15 October — 3 commits
+### Saturday 17 October — 1 commit
+
+- Finish the Professions port: old styles out, docs and brain in — [`f2e48cb`](https://github.com/josephevenson08/project-defeat/commit/f2e48cb5637e0d4d0f48fece7fdb458a801f84db)
+
+### Friday 16 October — 2 commits
+
+- Update README.md — [`8a81b39`](https://github.com/josephevenson08/project-defeat/commit/8a81b3988634b8af8167748a3188b0ee95c88396)
+- Update project description in README.md — [`9154be2`](https://github.com/josephevenson08/project-defeat/commit/9154be2061e58fd69c007a0972d9443461c9f5f5)
+
+### Thursday 15 October — 4 commits
 
 - Port Professions: the profession window, with Which two behind a switch — [`e319d2c`](https://github.com/josephevenson08/project-defeat/commit/e319d2cc054ff3c4b10b44c0464d6673a229b3d5)
 - Ask the next chat to answer in caveman mode, and say what really saves tokens — [`23d45d8`](https://github.com/josephevenson08/project-defeat/commit/23d45d84061352558c3a1b09e8d913f648e9979b)
 - Bring the handoff up to date: step 3 is pushed and the suite passes 340 of 340 — [`0b8bc0c`](https://github.com/josephevenson08/project-defeat/commit/0b8bc0c016f5315a44003517ee6797ee640152c2)
+- Correct the suite size in the handoff: 340 tests — [`1de0593`](https://github.com/josephevenson08/project-defeat/commit/1de0593554c98750681fc41fe085020abea142e5)
 
 ### Wednesday 14 October — 2 commits
 
