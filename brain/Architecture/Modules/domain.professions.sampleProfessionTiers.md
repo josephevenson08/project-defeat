@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 - [[domain.professions.craftingPaths]] — `src/domain/professions/craftingPaths.ts`
 - [[domain.professions.gatheringPlan]] — `src/domain/professions/gatheringPlan.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 
 ## Concepts & phases

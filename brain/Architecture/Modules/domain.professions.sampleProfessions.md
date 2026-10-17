@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[domain.professions.characterProfessions]] — `src/domain/professions/characterProfessions.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 
 ## Concepts & phases
 

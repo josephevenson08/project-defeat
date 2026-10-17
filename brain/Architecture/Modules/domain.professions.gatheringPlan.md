@@ -39,6 +39,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 
 ## Concepts & phases
 

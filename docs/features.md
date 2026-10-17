@@ -193,7 +193,7 @@ behind every claim of its that quotes a number.
   phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the
   part of the URL browsers never send to a server. Opening one lands straight in the planner wearing
   the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean
-- **Professions on the character** — a two-slot picker on the Professions tab, gating the one always-on stat
+- **Professions on the character** — your two, picked in the Professions tab's "Which two" (since 2026-10-17), gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**
   rings, for +8 to every attribute. The app previously had this wrong in both directions at once —

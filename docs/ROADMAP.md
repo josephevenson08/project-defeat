@@ -245,7 +245,11 @@ each pinned by an assertion these days.
   would fall back to a bare density grid.
   Skinning and Fishing have no nodes to draw — Skinning comes off mobs and Fishing off pools — so
   they carry the same page structure with an explicit material list in place of a map.
-- **The Professions tab is an entry grid plus one page per profession** (2026-09-02). The skill-tier
+- **The Professions tab is the game's profession window, with "Which two" behind a switch** (port step 3,
+  2026-10-17): recipes coloured at your skill from their own thresholds, trainer stops in the list, a
+  recipe's reagents and vendor prices, each range's loop on its TBC map; every profession ranked by what
+  it makes for your spec, and your character's two. It replaced the entry grid below.
+- **The Professions tab was an entry grid plus one page per profession** (2026-09-02). The skill-tier
   table is gone and its content is not — training requirements are markers placed at the skill where
   the bar actually stops. **Rebuilding the join recovered 28 of 43 ingested nodes that had never
   reached a screen**: the panel matched a node against a *display label* ("Liferoot / Fadeleaf /

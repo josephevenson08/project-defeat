@@ -33,7 +33,6 @@ _No doc comment at the top of this file._
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
-- [[features.professions.ProfessionPicker]] — `src/features/professions/ProfessionPicker.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/professions/craftingPaths.ts
-lines: 129
+lines: 136
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.professions.craftingPaths
 
-`src/domain/professions/craftingPaths.ts` · **domain** layer · 129 lines
+`src/domain/professions/craftingPaths.ts` · **domain** layer · 136 lines
 
 From the top of the file:
 
@@ -38,6 +38,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 
 ## Concepts & phases
 

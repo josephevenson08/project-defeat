@@ -35,6 +35,7 @@ _None._
 - [[domain.professions.gatheringRangeTypes]] — `src/domain/professions/gatheringRangeTypes.ts`
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
 - [[domain.professions.professionPayoffs]] — `src/domain/professions/professionPayoffs.ts`
+- [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 - [[domain.professions.sampleCraftingGuides]] — `src/domain/professions/sampleCraftingGuides.ts`
 - [[domain.professions.sampleProfessions]] — `src/domain/professions/sampleProfessions.ts`
 - [[domain.professions.sampleProfessionTiers]] — `src/domain/professions/sampleProfessionTiers.ts`

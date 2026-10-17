@@ -43,6 +43,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 
 ## Concepts & phases
 

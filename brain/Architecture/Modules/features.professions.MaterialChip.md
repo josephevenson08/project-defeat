@@ -23,8 +23,7 @@ _None._
 
 ## Imported by
 
-- [[features.professions.CraftingProgression]] — `src/features/professions/CraftingProgression.tsx`
-- [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
+_None._
 
 ## Concepts & phases
 

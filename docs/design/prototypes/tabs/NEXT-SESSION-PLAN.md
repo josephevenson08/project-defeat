@@ -1,8 +1,8 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-15): port step 3, Professions, built, live as work in progress; start here
+## ▶ Where we left off (2026-10-17): Professions is in the app too; start here
 
-**This folder's `professions.html` (design A's window with design B's "Which two") is now the live app's Professions tab, committed as work in progress (`e319d2c`), pushed and live.** `checks/profs-handson.mjs` became `tests/professions.spec.ts` (6 of 6 pass). The full suite passes 340 of 340. Still to do: remove the old Professions CSS, the full suite, the docs and brain, then commit and ask before pushing. The full list of changed files and the steps in order are at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+**Step 3, Professions** (`e319d2c` and the 2026-10-17 finish): this folder's `professions.html` (design A's profession window with design B's "Which two") is now the live app's Professions tab, and `checks/profs-handson.mjs` became `tests/professions.spec.ts`. **Next:** step 4, Simulation (`simulation.html`, `sim-*.js`, `checks/sim-handson.mjs`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-14): the new routes are in
 

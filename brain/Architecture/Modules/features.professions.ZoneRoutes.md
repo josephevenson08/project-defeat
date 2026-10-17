@@ -36,7 +36,7 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.professions.GatheringProgression]] — `src/features/professions/GatheringProgression.tsx`
+- [[features.professions.ProfessionWindow]] — `src/features/professions/ProfessionWindow.tsx`
 
 ## Concepts & phases
 

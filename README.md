@@ -17,7 +17,7 @@ A gear, talent and raid comp planner for **World of Warcraft: The Burning Crusad
 - **DPS simulation.** An estimated DPS for the 20 damage specs against a fixed raid boss. Rotations are still being worked on (see [known limitations](docs/known-limitations.md)).
 - **Raid composition.** Seat a 10 or 25-player raid and see which buffs each group actually gets. You can export the seating chart as an image for Discord.
 - **Raids.** Loot tables for every Phase 1 and 2 raid, plus the steps to get attuned.
-- **Professions.** Levelling guides from 1 to 375, crafting shopping lists, and farming route maps for Herbalism and Mining.
+- **Professions.** The game's profession window: set your skill and every recipe on the path to 375 takes its colour, with trainer stops, reagents and each gathering range's loop on its TBC zone map; "Which two" ranks every profession by what it makes for your spec.
 - **Import from the game.** A small addon exports your character, so you can open the planner already wearing your gear.
 - **Share a build as a link.** Nothing is uploaded; the whole build rides in the URL.
 
@@ -96,7 +96,7 @@ the [port plan](docs/design/PORT-PLAN.md):
 | 0 | **The look:** dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase on every screen | Done, 2026-10-12 |
 | 1 | **Spec Tier Lists:** a board of spec icons from Wowhead's three lists, a card for any spec, and a switch to Wowhead's tiers against what players actually parse (archon.gg) | Done, 2026-10-12 |
 | 2 | **Raids:** a boss journal with your spec's picks, who in your raid wants each drop, and a search across all five raids | Done, 2026-10-13 |
-| 3 | **Professions:** the game's profession window, and which two to take | Next. The [maps rework](docs/design/MAPS-PLAN.md) is decided and under way: the TBC-era zone maps are in (2026-10-13), and so is the new route algorithm (2026-10-14: loops through the clusters worth their detour, with how many spawn points they pass and how long a lap is). The node refresh is researched and its ingest is ready, but waits for Wowhead to answer scripted requests again |
+| 3 | **Professions:** the game's profession window, and which two to take | Done (2026-10-17): recipes coloured at your skill, trainer stops, reagents, each range's loop on its TBC map; "Which two" with your character's two professions. The node refresh of the [maps rework](docs/design/MAPS-PLAN.md) waits for Wowhead to answer scripted requests again |
 | 4–6 | Simulation, Raid Composition, then the Character Planner one sub-tab at a time | Planned |
 | 7 | The 3D crystal-and-water scene, as an optional layer | Last |
 
