@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-17, later): Simulation is in the app too; start here
+## ▶ Where we left off (2026-10-17, evening): Raid Composition is in the app too; start here
+
+**Step 5, Raid Composition:** this folder's `raid-composition.html` (design A's planning table, dark) is now the live app's Raid Composition tab, built around the live panel's own mechanics, and `checks/rc-handson.mjs` became `tests/raidcomp.spec.ts`. **Next:** step 6, the Character Planner, one sub-tab per commit, starting with Build (`planner.html`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-17, later): Simulation is in the app too
 
 **Step 4, Simulation:** this folder's `simulation.html` (design C's "What to do next" with design A's damage sources and breakdown) is now the live app's Simulation tab, and `checks/sim-handson.mjs` became `tests/simulation.spec.ts` (its live-app step no longer presses Run: the app has no Run button now). **Next:** step 5, Raid Composition (`raid-composition.html`, `checks/rc-handson.mjs`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

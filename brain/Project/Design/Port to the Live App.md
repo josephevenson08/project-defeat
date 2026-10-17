@@ -25,6 +25,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **Step 4, Simulation (2026-10-17):** "What to do next": your stat priority from the real weights ("Gem and enchant for Strength, then…"), your best upgrades with Equip, then the estimate against what players of your spec average on archon.gg, with what it misses for you, the damage sources (which sum to it), how it was computed, and every DPS spec's best case against the logs. No Run button: the three are worked out while the tab is on screen and are always current. The best-case harness moved from the tests into `features/simulator/bestCase.ts`, so the trust panel and the calibration test read one function; the range (1.05× to 2.13× low) and the lowest spec are computed, which showed the prototype's hand-written "Demonology" was stale (it is Destruction).
 
+**Step 5, Raid Composition (2026-10-17):** the planning table as decided. The live panel already had the palette, aiming, Move and drag, names and the PNG export, so they stayed and the page was rebuilt around the decided layout: a hero whose counts are the data's, the raid table with a roster tag, the folded raid details, the palette's next seat and "Fill in order", groups with a coverage ring, seats with a pencil and Move and Remove, Undo after anything that removes people, and the example roster labelled as the example (and as edited). Under it: role balance, what one more seat would add with a one-press seat, what is missing and who fixes it, and the coverage lists with each buff's reach tagged, from `domain/raidcomp/raidAdvice.ts`.
+
 ## Documents
 
 - [[docs/design/PORT-PLAN|The port plan, with each step as built]] — `docs/design/PORT-PLAN.md`
@@ -58,6 +60,9 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.TrustPanel]] — `src/features/simulator/TrustPanel.tsx`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 
 ## Related
 

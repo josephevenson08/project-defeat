@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
-import type { CharacterRole } from '../../domain/character/characterTypes'
+import type { Buff } from '../../domain/buffs/buffTypes'
 import { getClassColor } from '../../domain/character/classColors'
 import {
   PARTY_SIZE,
@@ -9,9 +8,12 @@ import {
   clearSeat,
   computeCoverage,
   emptyRoster,
+  filledSlots,
   getBuffIcon,
   getRaidBuild,
+  lackingPartyBuffs,
   moveSeat,
+  partyBuffCount,
   raidBuildsByClass,
   renameSeat,
   seatAt,
@@ -19,16 +21,23 @@ import {
   setRosterMeta,
   resizeRoster,
 } from '../../domain/raidcomp'
-import type { CoverageSection, RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
+import type { RaidBuild, Roster, RosterSlot, SeatRef } from '../../domain/raidcomp'
+import type { RaidPlayerSize } from '../../domain/raids/raidTypes'
+import { exampleRaid } from '../../domain/raids/exampleRaids'
 import { describeProvider } from '../../domain/buffs/buffTypes'
-import { isPartyScoped } from '../../domain/buffs/buffScope'
+import { anniversaryRaidWide, castOnAnyGroup, isPartyScoped } from '../../domain/buffs/buffScope'
 import { sampleBuffs } from '../../domain/buffs/sampleBuffs'
 import { describeStats } from '../../domain/stats/describeStats'
 import { downloadRosterImage } from './exportRosterImage'
-import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
+import { MissingList, OneMoreSeat, RaidCoverage, ReachTag, RoleBalance } from './RaidAdvice'
+import { article, buildName, iconUrl, inWords } from './raidcompFormat'
+import { loadRoster, saveRoster } from './rosterStorage'
 
 /**
- * The raid-composition planner: a seating chart in, buff coverage out.
+ * Raid Composition, as decided on 2026-10-07/08 and ported in step 5 of docs/design/PORT-PLAN.md: the
+ * planning table (`docs/design/prototypes/tabs/raid-composition.html`), dark, with a click-to-fill
+ * palette, aiming at a group, a pencil for names, Undo after anything that removes people, and the
+ * example roster; then what it adds up to (`RaidAdvice.tsx`).
  *
  * **Built around groups because in TBC composition *is* group assignment.** Most raid buffs reach only
  * the caster's group — every totem, every aura, both Warrior shouts — so which group the Shaman sits in
@@ -36,10 +45,10 @@ import { clearStoredRoster, loadRoster, saveRoster } from './rosterStorage'
  * and told a raid leader Battle Shout was covered when five of twenty-five players had it.
  */
 
-const ROLE_ORDER: readonly CharacterRole[] = ['Tank', 'Healer', 'Physical DPS', 'Caster DPS']
-
-/** For the intro, and computed so it cannot go stale the way the hard-coded "24 of the 33" did. */
+/** For the hero, and computed so it cannot go stale the way the hard-coded "24 of the 33" did. */
 const PARTY_ONLY_COUNT = sampleBuffs.filter((buff) => isPartyScoped(buff.id)).length
+const ANY_GROUP_NAMES = sampleBuffs.filter((buff) => castOnAnyGroup(buff.id)).map((buff) => buff.name)
+const RAID_WIDE_HERE = sampleBuffs.filter((buff) => buff.id in anniversaryRaidWide).map((buff) => buff.name)
 
 /*
  * There used to be a "usually 2-3 tanks, 5-7 healers" band here, in amber when a roster fell outside
@@ -48,55 +57,48 @@ const PARTY_ONLY_COUNT = sampleBuffs.filter((buff) => isPartyScoped(buff.id)).le
  * roster better than it does. The counts stay; the opinion goes.
  */
 
-const iconUrl = (name: string | undefined) => (name ? `${import.meta.env.BASE_URL}icons/${name}.jpg` : undefined)
-
 /**
- * How a seat is named in the move controls' labels.
- *
- * The player's own name when the seat has one, because that is what a raid leader is thinking about,
- * and the spec and class when it does not — which is what the rename and remove buttons already say.
+ * How a seat is named in labels and messages: the player's own name when the seat has one, because that
+ * is what a raid leader is thinking about, and the spec and class when it does not.
  */
 function describeSeat(slot: RosterSlot): string {
   return slot.playerName ?? `${slot.spec} ${slot.className}`
 }
 
 /**
- * The build a seat represents.
- *
- * Falls back to the first build of that spec when a seat carries no `buildId` — which is every seat
- * saved before builds existed, and every spec that only has one build anyway.
+ * The build a seat represents. Falls back to the first build of that spec when a seat carries no
+ * `buildId` — every seat saved before builds existed, and every spec that only has one build anyway.
  */
 function buildForSlot(slot: RosterSlot): RaidBuild | undefined {
   if (slot.buildId) return getRaidBuild(slot.buildId)
-  return raidBuildsByClass
-    .find((entry) => entry.className === slot.className)
-    ?.builds.find((build) => build.spec === slot.spec)
+  return raidBuildsByClass.find((entry) => entry.className === slot.className)?.builds.find((build) => build.spec === slot.spec)
 }
 
+const where = (ref: SeatRef) => `group ${ref.groupIndex + 1}, seat ${ref.seatIndex + 1}`
+
 /**
- * A seat's two lines of text — the player's name over their build, or just the build.
- *
- * Shared by the seat's own rename button and by the move destination button, which has to show the
- * same thing: a raid leader choosing where to put someone is reading the chart while they choose, so
- * the seats cannot go blank the moment a move is armed.
+ * A seat's two lines: the player's name over their build, or the build over its role. Shared by the
+ * seat and by the move destination button, which has to show the same thing: a raid leader choosing
+ * where to put someone is reading the chart while they choose.
  */
 function SeatIdentity({ slot }: { slot: RosterSlot }) {
-  const build = `${buildForSlot(slot)?.label ?? slot.spec} ${slot.className}`
+  const build = buildForSlot(slot)
+  const name = `${build?.label ?? slot.spec} ${slot.className}`
 
-  if (!slot.playerName) {
-    return (
-      <span className="raidcomp-seat-name" style={{ color: getClassColor(slot.className) }}>
-        {build}
-      </span>
-    )
-  }
-
-  return (
+  return slot.playerName ? (
     <>
       <span className="raidcomp-seat-player">{slot.playerName}</span>
       <span className="raidcomp-seat-spec" style={{ color: getClassColor(slot.className) }}>
-        {build}
+        {name}
+        {build && <span className="raidcomp-seat-role"> · {build.role}</span>}
       </span>
+    </>
+  ) : (
+    <>
+      <span className="raidcomp-seat-name" style={{ color: getClassColor(slot.className) }}>
+        {name}
+      </span>
+      {build && <span className="raidcomp-seat-role">{build.role}</span>}
     </>
   )
 }
@@ -105,33 +107,21 @@ function SeatIdentity({ slot }: { slot: RosterSlot }) {
 const LOCAL_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
 /**
- * Every IANA zone the browser knows, with the local one guaranteed present.
- *
- * `supportedValuesOf` is not universal, so the fallback is the local zone plus UTC rather than a
- * hand-written list of "common" zones — a short list is wrong for exactly the people it excludes,
- * and a raid roster crosses time zones by nature.
+ * Every IANA zone the browser knows, with the local one guaranteed present. `supportedValuesOf` is not
+ * universal, so the fallback is the local zone plus UTC rather than a hand-written list of "common"
+ * zones — a short list is wrong for exactly the people it excludes.
  */
 const TIMEZONES: readonly string[] = (() => {
   const supported = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : []
   return [...new Set([LOCAL_TIMEZONE, 'UTC', ...supported])].sort()
 })()
 
-/*
- * `assignableGroupsFor` lived here and drove a picker per seat — which Blessing this Paladin holds,
- * which totem this Shaman drops. It went on 2026-09-12 with the exclusivity capping that made the
- * choice necessary; there is nothing to assign when nothing is capped. See `buffCoverage.sectionFor`.
- */
-
 /**
  * What one seated player brings, revealed on hover or keyboard focus.
  *
- * The group row underneath each party shows **party-scoped buffs only**, which is correct and is the
- * whole point of the layout — but it means a Druid's Faerie Fire is invisible there, because a debuff
- * on the boss is not something group 1 "receives". That reads as a missing buff exactly when you are
- * checking whether your Druid brought it.
- *
- * So the per-seat answer lives on the seat. Split by reach rather than merged, so the distinction the
- * planner is built on survives being answered.
+ * The group row under each party shows **party-scoped buffs only**, which is the point of the layout —
+ * but it means a Druid's Faerie Fire is invisible there, because a debuff on the boss is not something
+ * group 1 "receives". So the per-seat answer lives on the seat, split by reach rather than merged.
  */
 function SeatContributionCard({ slot }: { slot: RosterSlot }) {
   const contributions = seatContributions(slot)
@@ -166,28 +156,15 @@ function SeatContributionCard({ slot }: { slot: RosterSlot }) {
 }
 
 /**
- * What one buff actually is, on hover or keyboard focus.
- *
- * The row under each group was a wall of unlabelled icons with the name in a `title` — which is the
- * browser's tooltip, appears after a delay, cannot be reached by keyboard, and says the name and
- * nothing else. "Which of these is the one I care about" was unanswerable without knowing the
- * artwork already.
- *
- * The effect is **derived from the same fields the stat totals read**, not written again here, so the
- * card cannot describe something the planner is not applying. A buff whose value this app cannot
- * express as a stat change says so in its own words instead — `unmodelledBuffs` counts them, and
- * Bloodlust reading "not modelled" is more use than Bloodlust reading nothing.
+ * What one buff actually is, on hover or keyboard focus. The effect is **derived from the same fields
+ * the stat totals read**, not written again here, so the card cannot describe something the planner is
+ * not applying; a buff whose value this app cannot express says so in its own words instead.
  */
 function BuffCard({ buff }: { buff: Buff }) {
   /*
-   * Flat stats only, and that is not an omission. The one buff in TBC whose whole value is a
-   * *multiplier* — Greater Blessing of Kings, +10% to every attribute — is raid-scoped, so it never
-   * appears in this row: the row shows what a **party** receives. A percentage describer was written
-   * here first and could not fire, which is the "module nothing renders" this repo has shipped three
-   * times before.
-   *
-   * A test asserts no party-scoped buff carries `statMultipliers`, so if that ever changes the gap
-   * fails rather than quietly showing a buff with no effect line.
+   * Flat stats only, and that is not an omission: the one buff whose whole value is a multiplier,
+   * Greater Blessing of Kings, is raid-scoped, so it never appears in this row. A test asserts no
+   * party-scoped buff carries `statMultipliers`, so if that changes the gap fails rather than hiding.
    */
   const effect = describeStats(buff.stats)
 
@@ -201,17 +178,14 @@ function BuffCard({ buff }: { buff: Buff }) {
   )
 }
 
-/** Wowhead shows granted buffs as a row of icons; hovering one says what it is. */
+/** Wowhead shows granted buffs as a row of icons; hovering or focusing one says what it is. */
 function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: string }) {
   if (buffs.length === 0) return <span className="raidcomp-group-buffs-none">{emptyLabel}</span>
 
   return (
     <ul className="raidcomp-buff-icons">
       {buffs.map((buff) => (
-        /*
-         * `tabIndex` so the card is reachable without a mouse: the CSS reveals it on `:focus-within`
-         * exactly as the seat card does, and an icon row nobody can tab through is a row of secrets.
-         */
+        // `tabIndex` so the card is reachable without a mouse: the CSS reveals it on `:focus-within`.
         <li key={buff.id} tabIndex={0} data-testid={`raidcomp-buff-${buff.id}`}>
           <img src={iconUrl(getBuffIcon(buff.id))} alt={buff.name} loading="lazy" decoding="async" />
           <BuffCard buff={buff} />
@@ -221,86 +195,63 @@ function BuffIcons({ buffs, emptyLabel }: { buffs: readonly Buff[]; emptyLabel: 
   )
 }
 
-/**
- * The checklist: every buff and debuff in the game, with how many seats bring it.
- *
- * Modelled on Wowhead's own layout — a dense multi-column list where the *count* leads, because the
- * question a raid leader is scanning for is "have I got one, and how many". Covered entries carry
- * their provider count in class colour; missing ones are dimmed with a zero, so absence reads as a
- * gap in a list rather than as a separate section you have to cross-reference.
- *
- * The earlier version split covered and missing into two stacks per category, which meant checking
- * one buff involved finding which of six lists it was in.
- */
-function BuffChecklist<T extends Buff | TargetDebuff>({
-  section,
-  label,
-}: {
-  section: CoverageSection<T>
-  label: string
-}) {
-  const total = section.covered.length + section.missing.length
-  const testLabel = label.toLowerCase().replace(/[^a-z]+/g, '-')
-
-  /* One list, sorted so what you have comes first and what you are missing is not buried. */
-  const rows = [
-    ...section.covered.map(({ entry, providedBy }) => ({ entry, count: providedBy, needs: undefined as string | undefined })),
-    ...section.missing.map(({ entry, needs }) => ({ entry, count: 0, needs })),
-  ]
-
+/** How many of the party buffs a group receives, as the ring the decided design draws round its number. */
+function CoverageRing({ seated, received }: { seated: number; received: number }) {
+  const circumference = 2 * Math.PI * 14
   return (
-    <section className="raidcomp-checklist" aria-label={label}>
-      <header className="raidcomp-coverage-head">
-        <h3>{label}</h3>
-        <span className="raidcomp-coverage-count" data-testid={`raidcomp-${testLabel}-count`}>
-          {section.covered.length} / {total}
-        </span>
-      </header>
-
-      <ul className="raidcomp-checklist-rows">
-        {rows.map(({ entry, count, needs }) => (
-          <li key={entry.id} className={count > 0 ? 'is-covered' : 'is-missing'} title={needs ? `Needs ${needs}` : undefined}>
-            <span className="raidcomp-check-count">{count}</span>
-            <img className="raidcomp-row-icon" src={iconUrl(getBuffIcon(entry.id))} alt="" loading="lazy" />
-            <span className="raidcomp-check-name" style={{ color: count > 0 ? getClassColor(entry.providedByClass) : undefined }}>
-              {entry.name}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <svg className="raidcomp-ring" viewBox="0 0 34 34" aria-hidden="true">
+      <circle className="raidcomp-ring-bg" cx="17" cy="17" r="14" />
+      <circle
+        className="raidcomp-ring-fg"
+        cx="17"
+        cy="17"
+        r="14"
+        strokeDasharray={circumference.toFixed(2)}
+        strokeDashoffset={(circumference * (1 - received / partyBuffCount)).toFixed(2)}
+      />
+      <text x="17" y="17">
+        {seated}
+      </text>
+    </svg>
   )
 }
 
+/** Our own pencil, drawn here rather than taken from an icon font. */
+const PENCIL = (
+  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <path
+      d="M11.2 2.3l2.5 2.5-7.9 7.9-3.2.7.7-3.2z M9.8 3.7l2.5 2.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+type Status = { text: string; undo?: Roster }
+
 export function RaidCompositionPanel() {
   const [roster, setRoster] = useState<Roster>(() => loadRoster() ?? emptyRoster(25))
-  const [selectedGroup, setSelectedGroup] = useState(0)
+  /** The group the palette fills next, when the reader pressed one; otherwise it fills in order. */
+  const [aim, setAim] = useState<number | undefined>()
   /** The seat currently being dragged. Held in state so the drop target can style itself. */
   const [dragging, setDragging] = useState<SeatRef | undefined>()
   /**
    * The seat picked up by the **Move** button, waiting for somewhere to go.
    *
-   * **Drag is not enough, and on a phone it is nothing at all.** HTML5 drag-and-drop is driven by
-   * mouse events; touch browsers do not synthesise them, so `dragstart` never fires from a finger and
-   * a seated player could not be moved on a phone. The keyboard had the same problem for the same
-   * reason — nothing here was reachable without a pointer, which is WCAG 2.1.1 outright.
-   *
-   * So moving is a two-step *pick up, then place* instead: one press arms this, the next press on any
-   * seat lands the player there. A tap, a click and Enter all do it, and the existing drag is left in
-   * place for the mouse users who already reach for it.
+   * **Drag is not enough, and on a phone it is nothing at all.** HTML5 drag-and-drop is driven by mouse
+   * events, which touch browsers do not synthesise, and the keyboard had the same problem. So moving is
+   * a two-step *pick up, then place*: one press arms this, the next press on any seat lands the player
+   * there. The drag stays for the mouse users who already reach for it.
    */
   const [moving, setMoving] = useState<SeatRef | undefined>()
   /** Which seat has its name field open. One at a time keeps the chart readable. */
   const [naming, setNaming] = useState<SeatRef | undefined>()
-  /**
-   * The in-progress name, held here rather than left to an uncontrolled input.
-   *
-   * An uncontrolled `defaultValue` field looked simpler and was subtly wrong: React re-renders this
-   * list on every roster change, and a re-render while the field is open discards whatever was typed
-   * because the DOM value is not the source of truth. Controlled state survives that, and it is also
-   * the only version a test can drive.
-   */
+  /** The in-progress name, controlled so a re-render while the field is open cannot discard it. */
   const [draftName, setDraftName] = useState('')
+  /** The last change, said in a line, with the roster to go back to when it removed people. */
+  const [status, setStatus] = useState<Status | undefined>()
 
   const report = useMemo(() => computeCoverage(roster), [roster])
 
@@ -310,8 +261,8 @@ export function RaidCompositionPanel() {
 
   /*
    * Escape puts the player back down. Bound to the window rather than to the seats, because arming a
-   * move moves focus onto the destination buttons and there is no one element that is reliably
-   * focused when a raid leader changes their mind.
+   * move moves focus onto the destination buttons and there is no one element reliably focused when a
+   * raid leader changes their mind.
    */
   useEffect(() => {
     if (!moving) return
@@ -323,361 +274,449 @@ export function RaidCompositionPanel() {
   }, [moving])
 
   const firstGroupWithRoom = roster.groups.findIndex((group) => group.includes(undefined))
-  const targetGroup = roster.groups[selectedGroup]?.includes(undefined) ? selectedGroup : firstGroupWithRoom
-
+  const targetGroup = aim !== undefined && roster.groups[aim]?.includes(undefined) ? aim : firstGroupWithRoom
+  const targetSeat = targetGroup === -1 ? -1 : roster.groups[targetGroup].indexOf(undefined)
   const title = `${roster.size}-player raid`
 
-  const place = (build: RaidBuild) => {
-    if (targetGroup === -1) return
-    setRoster((current) =>
-      addToGroup(current, targetGroup, { className: build.className, spec: build.spec, buildId: build.id }),
+  /**
+   * Every change to the seating goes through here: the example becomes "edited" unless the change
+   * keeps it as it is (a name, the example itself), anything held is put down, and the line under the
+   * table says what happened, with Undo when people were removed.
+   */
+  function commit(next: Roster, text: string, { undoable = false, keepExample = false } = {}) {
+    setRoster(next.example === 'loaded' && !keepExample ? { ...next, example: 'edited' } : next)
+    setMoving(undefined)
+    setStatus({ text, undo: undoable ? roster : undefined })
+  }
+
+  /** "Group 2 now receives 7 of 18 party buffs." */
+  const receivesLine = (next: Roster, groupIndex: number) =>
+    `Group ${groupIndex + 1} now receives ${partyBuffCount - lackingPartyBuffs(next.groups[groupIndex]).length} of ${partyBuffCount} party buffs.`
+
+  function seatBuild(groupIndex: number, build: RaidBuild) {
+    const seatIndex = roster.groups[groupIndex]?.indexOf(undefined) ?? -1
+    if (seatIndex === -1) return
+    const next = addToGroup(roster, groupIndex, { className: build.className, spec: build.spec, buildId: build.id })
+    const full = !next.groups.some((group) => group.includes(undefined))
+    commit(
+      next,
+      `Seated ${article(buildName(build)).toLowerCase()} ${buildName(build)} in ${where({ groupIndex, seatIndex })}. ${receivesLine(next, groupIndex)}${full ? ' The raid is full.' : ''}`,
     )
   }
 
-  const sameSeat = (a: SeatRef | undefined, b: SeatRef) =>
-    a !== undefined && a.groupIndex === b.groupIndex && a.seatIndex === b.seatIndex
+  function moveTo(from: SeatRef, to: SeatRef) {
+    const held = seatAt(roster, from)
+    const there = seatAt(roster, to)
+    if (!held || (from.groupIndex === to.groupIndex && from.seatIndex === to.seatIndex)) {
+      setMoving(undefined)
+      return
+    }
+    const next = moveSeat(roster, from, to)
+    const counts =
+      from.groupIndex === to.groupIndex
+        ? ` Group ${to.groupIndex + 1} still receives the same party buffs.`
+        : ` ${receivesLine(next, to.groupIndex)} ${receivesLine(next, from.groupIndex)}`
+    commit(
+      next,
+      (there
+        ? `${describeSeat(held)} (now group ${to.groupIndex + 1}) and ${describeSeat(there)} (now group ${from.groupIndex + 1}) swapped.`
+        : `${describeSeat(held)} moved to ${where(to)}.`) + counts,
+    )
+  }
+
+  function resize(size: RaidPlayerSize) {
+    if (size === roster.size) return
+    const dropped = roster.groups.slice(size / PARTY_SIZE).flat().filter(Boolean).length
+    if (aim !== undefined && aim >= size / PARTY_SIZE) setAim(undefined)
+    commit(
+      resizeRoster(roster, size),
+      `${size}-player raid: ${size / PARTY_SIZE} groups of five.${
+        dropped ? ` ${dropped} ${dropped === 1 ? 'player' : 'players'} in groups 3 to 5 ${dropped === 1 ? 'was' : 'were'} removed.` : ''
+      }`,
+      { undoable: dropped > 0 },
+    )
+  }
+
+  function loadExample() {
+    const had = report.filled
+    commit(
+      { ...exampleRaid(roster.size), ...(roster.meta ? { meta: roster.meta } : {}), example: 'loaded' },
+      `Loaded the example ${roster.size}-player roster: real specs, invented seating.`,
+      { undoable: had > 0, keepExample: true },
+    )
+  }
+
+  function clearRaid() {
+    const had = report.filled
+    commit(
+      { ...emptyRoster(roster.size), ...(roster.meta ? { meta: roster.meta } : {}) },
+      `Cleared ${had} ${had === 1 ? 'player' : 'players'}. Every seat is empty.`,
+      { undoable: true, keepExample: true },
+    )
+  }
+
+  function undo() {
+    if (!status?.undo) return
+    setRoster(status.undo)
+    setMoving(undefined)
+    setStatus({ text: 'Undone. The raid is back as it was.' })
+  }
+
+  function saveName(ref: SeatRef, slot: RosterSlot) {
+    const name = draftName.trim()
+    setNaming(undefined)
+    if (name === (slot.playerName ?? '')) return
+    commit(
+      renameSeat(roster, ref, draftName),
+      name ? `Named the ${buildName(buildForSlot(slot)!)} in ${where(ref)} ${name}.` : `Cleared the name in ${where(ref)}.`,
+      { keepExample: true },
+    )
+  }
+
+  const sameSeat = (a: SeatRef | undefined, b: SeatRef) => a !== undefined && a.groupIndex === b.groupIndex && a.seatIndex === b.seatIndex
 
   /*
-   * The player in the air, read back out of the roster rather than copied into state — so that
-   * renaming or resizing under an armed move cannot leave the labels describing an older version of
-   * the seat. It also reads `undefined` if the held seat stopped existing, which is what the resize
-   * button relies on.
+   * The player in the air, read back out of the roster rather than copied into state, so renaming or
+   * resizing under an armed move cannot leave the labels describing an older version of the seat.
    */
   const movingSlot = moving ? seatAt(roster, moving) : undefined
 
-  const placeInto = (destination: SeatRef) => {
-    if (moving) setRoster((current) => moveSeat(current, moving, destination))
-    setMoving(undefined)
-  }
+  const rosterTag =
+    report.filled === 0 ? (
+      'Empty raid · click a spec below, or load the example'
+    ) : roster.example ? (
+      <>
+        <span className="raidcomp-example-tag">Example</span>{' '}
+        {roster.example === 'edited' ? 'roster, edited' : 'roster: invented seating of real specs'} · {report.filled} of {report.size}{' '}
+        seated
+      </>
+    ) : (
+      `Your raid · ${report.filled} of ${report.size} seated`
+    )
 
   return (
-    <div className="panel raidcomp" data-testid="raidcomp-panel">
-      <header className="panel-head">
-        <h2>Raid Composition</h2>
-        <p className="panel-copy">
-          Seat a raid and see what each group receives.{' '}
-          <strong>
-            {PARTY_ONLY_COUNT} of the {sampleBuffs.length} raid buffs reach only the caster's group
-          </strong>{' '}
-          — totems, auras and shouts — so where someone sits matters as much as whether they are in the
-          raid.{' '}
-          <strong>To move a player, press Move on their seat and then the seat you want them in</strong>
-          {' '}— or drag them there. Click a name to label the seat.
+    <>
+      <section className="raidcomp-hero" aria-labelledby="raidcomp-hero-title">
+        <p className="eyebrow">Raid Composition · Groups of five</p>
+        <h1 id="raidcomp-hero-title">
+          Seat your raid so <em>every group gets its buffs</em>.
+        </h1>
+        <p>
+          In TBC, {PARTY_ONLY_COUNT} of the {sampleBuffs.length} raid buffs reach only the caster&apos;s own party: every totem, every aura,
+          both shouts. {inWords(ANY_GROUP_NAMES)} can be cast on any group, and {inWords(RAID_WIDE_HERE)} reaches the whole raid on
+          Anniversary realms. Click specs to fill the seats, move people between groups, and watch what each group receives.
         </p>
+      </section>
+
+      <section className="panel raidcomp" aria-labelledby="raidcomp-table-title" data-testid="raidcomp-panel">
+        <header className="raidcomp-head">
+          <h2 id="raidcomp-table-title">Raid table</h2>
+          <span className="raidcomp-roster-tag" data-testid="raidcomp-roster-tag">
+            {rosterTag}
+          </span>
+        </header>
         {/*
           **The counts say who can cast a buff, not what will be up, and that has to be on the screen.**
-
-          This screen follows Wowhead's raid-composition model by request, and Wowhead counts a lone
-          Holy Paladin as providing all six Greater Blessings. In the game they hold one. Saying so
-          costs a sentence and stops the tool quietly telling a thin roster it is covered — which is
-          this project's whole standard for anything it cannot model exactly.
+          This follows Wowhead's raid-composition model by request, and Wowhead counts a lone Holy
+          Paladin as providing all six Greater Blessings. In the game they hold one.
         */}
-        <p className="panel-copy raidcomp-caveat" data-testid="raidcomp-counting-note">
-          Counts are <strong>who could cast it</strong>, not what will be up at once. One Paladin lights
-          up every Greater Blessing here and holds one in the game; the same goes for a Shaman's totems
-          and a Warrior's shouts.
-        </p>
-      </header>
-
-      <div className="raidcomp-controls">
-        <div className="raidcomp-size" role="group" aria-label="Raid size">
-          {RAID_SIZES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={option === roster.size ? 'is-active' : ''}
-              aria-pressed={option === roster.size}
-              onClick={() => {
-                // A 25 → 10 resize can delete the seat a move is holding, so put the player down first.
-                setMoving(undefined)
-                setRoster((current) => resizeRoster(current, option))
-              }}
-              data-testid={`raidcomp-size-${option}`}
-            >
-              {option}-player
-            </button>
-          ))}
-        </div>
-
-        <p className="raidcomp-filled" data-testid="raidcomp-filled">
-          <strong>{report.filled}</strong> of {report.size} seats
-          {report.remaining > 0 ? ` · ${report.remaining} open` : ''}
+        <p className="raidcomp-caveat" data-testid="raidcomp-counting-note">
+          <strong>Counts are who could cast it, not what will be up at once.</strong> One Paladin lights up every Greater Blessing here and
+          holds one in the game; the same goes for a Shaman&apos;s totems and a Warrior&apos;s shouts.
         </p>
 
-        <div className="raidcomp-actions">
-          <button
-            type="button"
-            className="raidcomp-export"
-            // Async now: the seat icons are loaded before anything is drawn, because drawImage
-            // silently draws nothing for an image that has not finished loading.
-            onClick={() => void downloadRosterImage(roster, title)}
-            data-testid="raidcomp-export"
-          >
-            Export image
-          </button>
-          {report.filled > 0 && (
-            <button
-              type="button"
-              className="raidcomp-clear"
-              onClick={() => {
-                setMoving(undefined)
-                setRoster(emptyRoster(roster.size))
-                clearStoredRoster()
-              }}
-            >
-              Clear
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/*
-        Everything here is optional and free text. A raid leader wants "SSC — Tuesday" and an invite
-        time on the chart they paste into Discord; nobody wants a required form between them and a
-        PNG. The field sizes mirror the exported image's type scale — title largest, when it is next,
-        description smallest — so what you type looks like what you get.
-      */}
-      <section className="raidcomp-meta" aria-label="Raid details">
-        <input
-          className="raidcomp-meta-title"
-          value={roster.meta?.title ?? ''}
-          placeholder={`${roster.size}-player raid`}
-          aria-label="Raid title"
-          data-testid="raidcomp-meta-title"
-          onChange={(event) => setRoster((current) => setRosterMeta(current, 'title', event.target.value))}
-        />
-        {/*
-          Real pickers rather than free text. Every browser draws its own calendar and clock for these,
-          which is both more familiar than anything built here and correct on a phone without any
-          extra work.
-        */}
-        <div className="raidcomp-meta-when">
-          <input
-            type="date"
-            className="raidcomp-meta-date"
-            value={roster.meta?.date ?? ''}
-            aria-label="Raid date"
-            data-testid="raidcomp-meta-date"
-            onChange={(event) => setRoster((current) => setRosterMeta(current, 'date', event.target.value))}
-          />
-          <input
-            type="time"
-            className="raidcomp-meta-time"
-            value={roster.meta?.startTime ?? ''}
-            aria-label="Raid start time"
-            data-testid="raidcomp-meta-time"
-            onChange={(event) => setRoster((current) => setRosterMeta(current, 'startTime', event.target.value))}
-          />
-          {/*
-            A start time is ambiguous the moment the chart leaves the room, which is what exporting a
-            PNG is for. Defaulted to the reader's own zone rather than asked for — right nearly always,
-            and visibly wrong when it is not.
-          */}
-          <select
-            className="raidcomp-meta-timezone"
-            value={roster.meta?.timezone ?? LOCAL_TIMEZONE}
-            aria-label="Raid time zone"
-            data-testid="raidcomp-meta-timezone"
-            onChange={(event) => setRoster((current) => setRosterMeta(current, 'timezone', event.target.value))}
-          >
-            {TIMEZONES.map((zone) => (
-              <option key={zone} value={zone}>
-                {zone.replaceAll('_', ' ')}
-              </option>
-            ))}
-          </select>
-        </div>
-        <input
-          className="raidcomp-meta-description"
-          value={roster.meta?.description ?? ''}
-          placeholder="Description — loot rules, invites, anything the raid should read"
-          aria-label="Raid description"
-          data-testid="raidcomp-meta-description"
-          onChange={(event) => setRoster((current) => setRosterMeta(current, 'description', event.target.value))}
-        />
-      </section>
-
-      <section className="raidcomp-roles" aria-label="Role balance">
-        {ROLE_ORDER.map((role) => (
-          <div key={role} className="raidcomp-role" data-testid={`raidcomp-role-${role.replace(/\s+/g, '-').toLowerCase()}`}>
-            <span className="raidcomp-role-count">{report.roleCounts[role]}</span>
-            <span className="raidcomp-role-label">{role}</span>
-          </div>
-        ))}
-      </section>
-
-      <section className="raidcomp-picker" aria-label="Add a spec">
-        <h3>
-          Add to <span className="raidcomp-target">Group {targetGroup === -1 ? '—' : targetGroup + 1}</span>
-        </h3>
-        {/*
-          Grouped by class rather than one flat grid of 27. Scanning "which Druid do I want" is the
-          actual question, and a single alphabetical wall made you read every entry to answer it. The
-          class name carries Blizzard's own colour for the same reason — it is what a raid leader
-          already recognises.
-        */}
-        <div className="raidcomp-classes">
-          {raidBuildsByClass.map(({ className, builds }) => (
-            <div key={className} className="raidcomp-class">
-              <h4 className="raidcomp-class-name" style={{ color: getClassColor(className) }}>
-                {className}
-              </h4>
-              <div className="raidcomp-class-builds">
-                {builds.map((build) => (
-                  <button
-                    key={build.id}
-                    type="button"
-                    className="raidcomp-spec-add"
-                    disabled={targetGroup === -1}
-                    onClick={() => place(build)}
-                    title={build.note}
-                    data-testid={`raidcomp-add-${build.id}`}
-                    aria-label={`Add ${build.label} ${className}`}
-                  >
-                    <img src={iconUrl(build.icon)} alt="" loading="lazy" decoding="async" />
-                    <span>{build.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/*
-        Says what is in the air and how to put it down, for everyone at once: a phone user who cannot
-        see a drag cursor, and a screen reader, which hears it because the region is live. Rendered
-        only while a move is armed, so it is never a standing instruction nobody needs.
-      */}
-      {movingSlot && (
-        <p className="raidcomp-moving" role="status" data-testid="raidcomp-moving">
-          Moving <strong>{describeSeat(movingSlot)}</strong> — choose their seat, or press Escape to
-          leave them where they are.
-        </p>
-      )}
-
-      <section className="raidcomp-groups" aria-label="Groups">
-        {report.groups.map((groupCoverage) => {
-          const group = roster.groups[groupCoverage.groupIndex]
-          const isTarget = groupCoverage.groupIndex === targetGroup
-
-          return (
-            <div
-              key={groupCoverage.groupIndex}
-              className={isTarget ? 'raidcomp-group is-target' : 'raidcomp-group'}
-              data-testid={`raidcomp-group-${groupCoverage.groupIndex + 1}`}
-            >
+        <div className="raidcomp-controls">
+          <div className="raidcomp-size" role="group" aria-label="Raid size">
+            {RAID_SIZES.map((option) => (
               <button
+                key={option}
                 type="button"
-                className="raidcomp-group-head"
-                onClick={() => setSelectedGroup(groupCoverage.groupIndex)}
-                aria-pressed={isTarget}
+                className={option === roster.size ? 'is-active' : ''}
+                aria-pressed={option === roster.size}
+                onClick={() => resize(option)}
+                data-testid={`raidcomp-size-${option}`}
               >
-                <span>Group {groupCoverage.groupIndex + 1}</span>
-                <span className="raidcomp-group-count">
-                  {groupCoverage.filled}/{PARTY_SIZE}
-                </span>
+                {option}-player
               </button>
+            ))}
+          </div>
 
-              <ol className="raidcomp-seats">
-                {group.map((slot, seatIndex) => {
-                  const ref: SeatRef = { groupIndex: groupCoverage.groupIndex, seatIndex }
-                  const isNaming = sameSeat(naming, ref)
+          <p className="raidcomp-filled" data-testid="raidcomp-filled">
+            <strong>{report.filled}</strong> of {report.size} seats
+            {report.remaining > 0 ? ` · ${report.remaining} open` : ''}
+          </p>
 
-                  return (
-                    <li
-                      key={seatIndex}
-                      className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}${sameSeat(moving, ref) ? ' is-moving' : ''}`}
-                      /*
-                       * Every seat is a drop target, empty ones included — dragging into a gap is the
-                       * obvious way to move someone, and `moveSeat` swaps when the destination is
-                       * occupied so a drop never silently deletes anybody.
-                       */
-                      onDragOver={(event) => {
-                        if (dragging) event.preventDefault()
-                      }}
-                      onDrop={(event) => {
-                        event.preventDefault()
-                        if (dragging) setRoster((current) => moveSeat(current, dragging, ref))
-                        setDragging(undefined)
-                      }}
+          <div className="raidcomp-actions">
+            <button type="button" className="raidcomp-example" onClick={loadExample} data-testid="raidcomp-example">
+              {report.filled > 0 ? 'Reset to example' : 'Load example roster'}
+            </button>
+            <button type="button" className="raidcomp-clear" onClick={clearRaid} disabled={report.filled === 0} data-testid="raidcomp-clear">
+              Clear raid
+            </button>
+            <button
+              type="button"
+              className="raidcomp-export"
+              // Async: the seat icons are loaded before anything is drawn, because drawImage silently
+              // draws nothing for an image that has not finished loading.
+              onClick={() => void downloadRosterImage(roster, title)}
+              data-testid="raidcomp-export"
+            >
+              Export image
+            </button>
+          </div>
+        </div>
+
+        {/*
+          Everything here is optional and free text. A raid leader wants "SSC — Tuesday" and an invite
+          time on the chart they paste into Discord; nobody wants a required form between them and a
+          PNG. Folded away, as the decided design has it, since it is for the export alone.
+        */}
+        <details className="raidcomp-meta-fold">
+          <summary>Raid details for the exported chart (optional)</summary>
+          <section className="raidcomp-meta" aria-label="Raid details">
+            <input
+              className="raidcomp-meta-title"
+              value={roster.meta?.title ?? ''}
+              placeholder={`${roster.size}-player raid`}
+              aria-label="Raid title"
+              data-testid="raidcomp-meta-title"
+              onChange={(event) => setRoster((current) => setRosterMeta(current, 'title', event.target.value))}
+            />
+            {/* Real pickers: every browser draws its own calendar and clock, correct on a phone for free. */}
+            <div className="raidcomp-meta-when">
+              <input
+                type="date"
+                className="raidcomp-meta-date"
+                value={roster.meta?.date ?? ''}
+                aria-label="Raid date"
+                data-testid="raidcomp-meta-date"
+                onChange={(event) => setRoster((current) => setRosterMeta(current, 'date', event.target.value))}
+              />
+              <input
+                type="time"
+                className="raidcomp-meta-time"
+                value={roster.meta?.startTime ?? ''}
+                aria-label="Raid start time"
+                data-testid="raidcomp-meta-time"
+                onChange={(event) => setRoster((current) => setRosterMeta(current, 'startTime', event.target.value))}
+              />
+              {/* A start time is ambiguous the moment the chart leaves the room; defaulted to the reader's zone. */}
+              <select
+                className="raidcomp-meta-timezone"
+                value={roster.meta?.timezone ?? LOCAL_TIMEZONE}
+                aria-label="Raid time zone"
+                data-testid="raidcomp-meta-timezone"
+                onChange={(event) => setRoster((current) => setRosterMeta(current, 'timezone', event.target.value))}
+              >
+                {TIMEZONES.map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zone.replaceAll('_', ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <input
+              className="raidcomp-meta-description"
+              value={roster.meta?.description ?? ''}
+              placeholder="Description — loot rules, invites, anything the raid should read"
+              aria-label="Raid description"
+              data-testid="raidcomp-meta-description"
+              onChange={(event) => setRoster((current) => setRosterMeta(current, 'description', event.target.value))}
+            />
+          </section>
+        </details>
+
+        <section className="raidcomp-picker" aria-label="Add a spec">
+          <header className="raidcomp-picker-head">
+            <h3>
+              Add a player · next seat:{' '}
+              <span className="raidcomp-target" data-testid="raidcomp-next-seat">
+                {targetGroup === -1 ? 'none, the raid is full' : where({ groupIndex: targetGroup, seatIndex: targetSeat })}
+              </span>
+            </h3>
+            <span className="raidcomp-aim">
+              {aim !== undefined && targetGroup === aim ? (
+                <>
+                  Filling group {aim + 1}.{' '}
+                  <button type="button" className="raidcomp-unaim" onClick={() => setAim(undefined)}>
+                    Fill in order
+                  </button>
+                </>
+              ) : targetGroup === -1 ? (
+                'Remove someone, or switch to 25-player, to seat more.'
+              ) : (
+                `Fills group 1 first, on through group ${roster.groups.length}.`
+              )}
+            </span>
+          </header>
+          {/*
+            Grouped by class rather than one flat grid of 27: scanning "which Druid do I want" is the actual
+            question. The class name carries Blizzard's own colour, which a raid leader already recognises.
+          */}
+          <div className="raidcomp-classes">
+            {raidBuildsByClass.map(({ className, builds }) => (
+              <div key={className} className="raidcomp-class">
+                <h4 className="raidcomp-class-name" style={{ color: getClassColor(className) }}>
+                  {className}
+                </h4>
+                <div className="raidcomp-class-builds">
+                  {builds.map((build) => (
+                    <button
+                      key={build.id}
+                      type="button"
+                      className="raidcomp-spec-add"
+                      disabled={targetGroup === -1}
+                      onClick={() => seatBuild(targetGroup, build)}
+                      title={build.note ? `${build.role} · ${build.note}` : build.role}
+                      data-testid={`raidcomp-add-${build.id}`}
+                      aria-label={`Add ${build.label} ${className}`}
                     >
-                      {/*
-                        While a move is armed every other seat becomes one button covering the whole
-                        row, rather than an overlay on top of the controls that are already there.
-                        The seat's own name and remove buttons sit 8px apart — the reason the phone
-                        pass grew them in place instead of extending them — and a target laid over
-                        that pair would take taps meant for either of them. One button per seat also
-                        means one 44px target per seat for free, and no nested interactive elements.
-                      */}
-                      {movingSlot && !sameSeat(moving, ref) ? (
-                        <button
-                          type="button"
-                          className="raidcomp-seat-place"
-                          onClick={() => placeInto(ref)}
-                          aria-label={
-                            slot
-                              ? `Swap ${describeSeat(movingSlot)} with ${describeSeat(slot)} in group ${groupCoverage.groupIndex + 1}, seat ${seatIndex + 1}`
-                              : `Move ${describeSeat(movingSlot)} to group ${groupCoverage.groupIndex + 1}, seat ${seatIndex + 1}`
-                          }
-                          data-testid={`raidcomp-place-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
-                          data-role={slot ? buildForSlot(slot)?.role : undefined}
-                        >
-                          {slot ? (
-                            <>
-                              <img
-                                className="raidcomp-seat-icon"
-                                src={iconUrl(buildForSlot(slot)?.icon)}
-                                alt=""
-                                loading="lazy"
-                              />
-                              <span className="raidcomp-seat-text raidcomp-seat-ident">
-                                <SeatIdentity slot={slot} />
-                              </span>
-                            </>
-                          ) : (
-                            <span className="raidcomp-seat-empty">—</span>
-                          )}
-                        </button>
-                      ) : slot ? (
-                        <div
-                          className="raidcomp-seat-body"
-                          draggable
-                          onDragStart={() => setDragging(ref)}
-                          onDragEnd={() => setDragging(undefined)}
-                          data-role={buildForSlot(slot)?.role}
-                        >
-                          <img
-                            className="raidcomp-seat-icon"
-                            src={iconUrl(buildForSlot(slot)?.icon)}
-                            alt=""
-                            loading="lazy"
-                          />
+                      <img src={iconUrl(build.icon)} alt="" loading="lazy" decoding="async" />
+                      <span>{build.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-                          <span className="raidcomp-seat-text">
-                            {isNaming ? (
-                              <input
-                                className="raidcomp-seat-input"
-                                autoFocus
-                                value={draftName}
-                                placeholder="Player name"
-                                aria-label={`Name for ${slot.spec} ${slot.className}`}
-                                data-testid={`raidcomp-name-input-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
-                                onChange={(event) => setDraftName(event.target.value)}
-                                onBlur={() => {
-                                  setRoster((current) => renameSeat(current, ref, draftName))
-                                  setNaming(undefined)
-                                }}
-                                onKeyDown={(event) => {
-                                  if (event.key === 'Enter') {
-                                    setRoster((current) => renameSeat(current, ref, draftName))
-                                    setNaming(undefined)
-                                  }
-                                  // Escape abandons the edit, leaving whatever name was already there.
-                                  if (event.key === 'Escape') setNaming(undefined)
-                                }}
-                              />
+        <p className="raidcomp-howto">
+          Click a spec to seat it in the next open seat, filling group 1 first. Press a group&apos;s name to fill that group instead.{' '}
+          <strong>To move a player, press Move on their seat and then the seat you want them in</strong> (a taken seat swaps), or drag them
+          there. The pencil names a player. Esc cancels.
+        </p>
+
+        {/*
+          Says what is in the air and how to put it down, for a phone user who cannot see a drag cursor
+          and for a screen reader, which hears it because the region is live. Only while a move is armed.
+        */}
+        {movingSlot && (
+          <p className="raidcomp-moving" role="status" data-testid="raidcomp-moving">
+            Moving <strong>{describeSeat(movingSlot)}</strong> — choose their seat, or press Escape to leave them where they are.
+          </p>
+        )}
+
+        <section className={`raidcomp-groups raidcomp-groups-${roster.groups.length}`} aria-label="Groups">
+          {report.groups.map((groupCoverage) => {
+            const groupIndex = groupCoverage.groupIndex
+            const group = roster.groups[groupIndex]
+            const isTarget = groupIndex === targetGroup
+
+            return (
+              <div
+                key={groupIndex}
+                className={`raidcomp-group${isTarget ? ' is-target' : ''}${aim === groupIndex ? ' is-aimed' : ''}`}
+                data-testid={`raidcomp-group-${groupIndex + 1}`}
+              >
+                <header className="raidcomp-group-top">
+                  <CoverageRing seated={groupCoverage.filled} received={groupCoverage.partyBuffs.length} />
+                  <div>
+                    <h3>
+                      <button
+                        type="button"
+                        className="raidcomp-group-head"
+                        onClick={() => setAim(aim === groupIndex ? undefined : groupIndex)}
+                        aria-pressed={aim === groupIndex}
+                        aria-label={`Group ${groupIndex + 1}: fill this group next`}
+                      >
+                        Group {groupIndex + 1}
+                      </button>
+                    </h3>
+                    <small className="raidcomp-group-count">
+                      {groupCoverage.filled} of {PARTY_SIZE} seated · {groupCoverage.partyBuffs.length} of {partyBuffCount} party buffs
+                    </small>
+                  </div>
+                </header>
+
+                <ol className="raidcomp-seats">
+                  {group.map((slot, seatIndex) => {
+                    const ref: SeatRef = { groupIndex, seatIndex }
+                    const isNaming = sameSeat(naming, ref)
+                    const build = slot ? buildForSlot(slot) : undefined
+
+                    return (
+                      <li
+                        key={seatIndex}
+                        className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}${sameSeat(moving, ref) ? ' is-moving' : ''}${
+                          isTarget && seatIndex === targetSeat ? ' is-next' : ''
+                        }`}
+                        /*
+                         * Every seat is a drop target, empty ones included, and `moveSeat` swaps when the
+                         * destination is taken, so a drop never silently deletes anybody.
+                         */
+                        onDragOver={(event) => {
+                          if (dragging) event.preventDefault()
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault()
+                          if (dragging) moveTo(dragging, ref)
+                          setDragging(undefined)
+                        }}
+                      >
+                        {/*
+                          While a move is armed every other seat becomes one button covering the whole
+                          seat, rather than an overlay on the controls already there: one 44px target per
+                          seat, and no nested interactive elements.
+                        */}
+                        {movingSlot && moving && !sameSeat(moving, ref) ? (
+                          <button
+                            type="button"
+                            className="raidcomp-seat-place"
+                            onClick={() => moveTo(moving, ref)}
+                            aria-label={
+                              slot
+                                ? `Swap ${describeSeat(movingSlot)} with ${describeSeat(slot)} in group ${groupIndex + 1}, seat ${seatIndex + 1}`
+                                : `Move ${describeSeat(movingSlot)} to group ${groupIndex + 1}, seat ${seatIndex + 1}`
+                            }
+                            data-testid={`raidcomp-place-${groupIndex + 1}-${seatIndex + 1}`}
+                            data-role={build?.role}
+                          >
+                            {slot ? (
+                              <>
+                                <img className="raidcomp-seat-icon" src={iconUrl(build?.icon)} alt="" loading="lazy" />
+                                <span className="raidcomp-seat-text raidcomp-seat-ident">
+                                  <SeatIdentity slot={slot} />
+                                </span>
+                              </>
                             ) : (
+                              <span className="raidcomp-seat-empty">Open seat</span>
+                            )}
+                            <span className="raidcomp-seat-here">{slot ? 'Swap here' : 'Move here'}</span>
+                          </button>
+                        ) : slot ? (
+                          <div
+                            className="raidcomp-seat-body"
+                            draggable={!isNaming}
+                            onDragStart={() => setDragging(ref)}
+                            onDragEnd={() => setDragging(undefined)}
+                            data-role={build?.role}
+                          >
+                            <img className="raidcomp-seat-icon" src={iconUrl(build?.icon)} alt="" loading="lazy" />
+
+                            <span className="raidcomp-seat-text">
+                              {isNaming ? (
+                                <input
+                                  className="raidcomp-seat-input"
+                                  autoFocus
+                                  value={draftName}
+                                  placeholder="Player name"
+                                  aria-label={`Name for ${slot.spec} ${slot.className}`}
+                                  data-testid={`raidcomp-name-input-${groupIndex + 1}-${seatIndex + 1}`}
+                                  onChange={(event) => setDraftName(event.target.value)}
+                                  onBlur={() => saveName(ref, slot)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === 'Enter') saveName(ref, slot)
+                                    // Escape abandons the edit, leaving whatever name was already there.
+                                    if (event.key === 'Escape') setNaming(undefined)
+                                  }}
+                                />
+                              ) : (
+                                <SeatIdentity slot={slot} />
+                              )}
+                            </span>
+
+                            {!isNaming && (
                               <button
                                 type="button"
                                 className="raidcomp-seat-label"
@@ -685,88 +724,100 @@ export function RaidCompositionPanel() {
                                   setDraftName(slot.playerName ?? '')
                                   setNaming(ref)
                                 }}
-                                aria-label={`Name the ${slot.spec} ${slot.className} in group ${groupCoverage.groupIndex + 1}`}
+                                aria-label={`Name the ${slot.spec} ${slot.className} in group ${groupIndex + 1}`}
+                                title={slot.playerName ? 'Rename this player' : 'Name this player'}
                               >
-                                <SeatIdentity slot={slot} />
+                                {PENCIL}
                               </button>
                             )}
 
+                            <span className="raidcomp-seat-acts">
+                              {/*
+                                The word rather than an arrow glyph, and it changes to "Cancel" when armed
+                                rather than keeping its text under a different `aria-label`: the page tells
+                                a raid leader to press "Move", and voice control needs the words to match.
+                              */}
+                              <button
+                                type="button"
+                                className="raidcomp-seat-move"
+                                aria-pressed={sameSeat(moving, ref)}
+                                onClick={() => setMoving(sameSeat(moving, ref) ? undefined : ref)}
+                                aria-label={
+                                  sameSeat(moving, ref)
+                                    ? `Cancel moving ${describeSeat(slot)}`
+                                    : `Move ${describeSeat(slot)} out of group ${groupIndex + 1}`
+                                }
+                                data-testid={`raidcomp-move-${groupIndex + 1}-${seatIndex + 1}`}
+                              >
+                                {sameSeat(moving, ref) ? 'Cancel' : 'Move'}
+                              </button>
+                              <button
+                                type="button"
+                                className="raidcomp-seat-remove"
+                                onClick={() =>
+                                  // Removing the held player puts the move down with them (commit does).
+                                  commit(clearSeat(roster, groupIndex, seatIndex), `Removed ${describeSeat(slot)} from ${where(ref)}.`, {
+                                    undoable: true,
+                                  })
+                                }
+                                aria-label={`Remove ${slot.spec} ${slot.className}`}
+                              >
+                                Remove
+                              </button>
+                            </span>
+
+                            {/* Revealed by CSS on hover and on keyboard focus within the seat. */}
+                            <SeatContributionCard slot={slot} />
+                          </div>
+                        ) : (
+                          <span className="raidcomp-seat-empty">
+                            Open seat{isTarget && seatIndex === targetSeat ? <small> · next to fill</small> : null}
                           </span>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ol>
 
-                          {/*
-                            The word rather than an arrow glyph, and it changes to "Cancel" when armed
-                            rather than staying put with a different `aria-label`. The panel copy tells
-                            a raid leader to press "Move", so that word has to be on the screen — and
-                            a button whose accessible name says Cancel while it reads Move breaks
-                            WCAG 2.5.3 for anyone driving it by voice.
-                          */}
-                          <button
-                            type="button"
-                            className="raidcomp-seat-move"
-                            aria-pressed={sameSeat(moving, ref)}
-                            onClick={() => setMoving(sameSeat(moving, ref) ? undefined : ref)}
-                            aria-label={
-                              sameSeat(moving, ref)
-                                ? `Cancel moving ${describeSeat(slot)}`
-                                : `Move ${describeSeat(slot)} out of group ${groupCoverage.groupIndex + 1}`
-                            }
-                            data-testid={`raidcomp-move-${groupCoverage.groupIndex + 1}-${seatIndex + 1}`}
-                          >
-                            {sameSeat(moving, ref) ? 'Cancel' : 'Move'}
-                          </button>
-
-                          <button
-                            type="button"
-                            className="raidcomp-seat-remove"
-                            onClick={() => {
-                              /*
-                               * `moving` is a seat address, not a copy of the player, and the held
-                               * seat keeps its × — so removing that player has to put the move down
-                               * with them. Otherwise the address outlives them and the next person
-                               * to land in that seat is picked up silently, filling the chart with
-                               * destinations for somebody nobody chose.
-                               */
-                              setMoving(undefined)
-                              setRoster((current) => clearSeat(current, ref.groupIndex, ref.seatIndex))
-                            }}
-                            aria-label={`Remove ${slot.spec} ${slot.className}`}
-                          >
-                            ×
-                          </button>
-
-                          {/* Revealed by CSS on hover and on keyboard focus within the seat. */}
-                          <SeatContributionCard slot={slot} />
-                        </div>
-                      ) : (
-                        <span className="raidcomp-seat-empty">—</span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ol>
-
-              {/*
-                What this seating buys, as icons — the same shape Wowhead uses, and deliberately kept
-                out of the exported image: this is the decision surface, the PNG is the result.
-              */}
-              <div className="raidcomp-group-buffs">
-                <span className="raidcomp-group-buffs-label">Party buffs · {groupCoverage.partyBuffs.length}</span>
-                <BuffIcons
-                  buffs={groupCoverage.partyBuffs}
-                  emptyLabel={groupCoverage.filled === 0 ? 'Empty group' : 'None from this group'}
-                />
+                {/*
+                  What this seating buys, as icons, the way Wowhead shows them, with the reach tag the
+                  decided design puts on it. Kept out of the exported image: this is the decision surface,
+                  the PNG is the result.
+                */}
+                <div className="raidcomp-group-buffs">
+                  <span className="raidcomp-group-buffs-label">
+                    Receives {groupCoverage.partyBuffs.length} of {partyBuffCount} <ReachTag reach="Party" />
+                  </span>
+                  <BuffIcons buffs={groupCoverage.partyBuffs} emptyLabel={groupCoverage.filled === 0 ? 'Empty group' : 'None from this group'} />
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </section>
+        <p className="raidcomp-plus">
+          Every group also gets the {report.raidWide.covered.length} <ReachTag reach="Raid" />, <ReachTag reach="Any group" /> and{' '}
+          <ReachTag reach="Single" /> buffs the raid can cast, which do not depend on seating.
+        </p>
+
+        <p className="raidcomp-status" role="status" data-testid="raidcomp-status">
+          {status?.text}
+          {status?.undo && (
+            <>
+              {' '}
+              <button type="button" className="raidcomp-undo" onClick={undo} data-testid="raidcomp-undo">
+                Undo
+              </button>
+            </>
+          )}
+        </p>
       </section>
 
-      <div className="raidcomp-columns">
-        <BuffChecklist section={report.raidWide} label="Raid-wide" />
-        <BuffChecklist section={report.partyScoped} label="Party buffs" />
-        <BuffChecklist section={report.debuffs} label="Debuffs" />
+      <div className="raidcomp-results">
+        <RoleBalance report={report} />
+        <OneMoreSeat roster={roster} onSeat={seatBuild} />
+        <MissingList roster={roster} filled={filledSlots(roster).length} />
+        <RaidCoverage report={report} />
       </div>
-
-    </div>
+    </>
   )
 }

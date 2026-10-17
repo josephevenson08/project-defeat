@@ -43,7 +43,9 @@ From the top of the file:
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
 - [[domain.buffs.sampleTargetDebuffs]] — `src/domain/buffs/sampleTargetDebuffs.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 
 ## Concepts & phases

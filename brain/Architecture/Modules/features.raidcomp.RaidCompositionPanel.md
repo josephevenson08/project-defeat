@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/RaidCompositionPanel.tsx
-lines: 773
+lines: 824
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.RaidCompositionPanel
 
-`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 773 lines
+`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 824 lines
 
 _No doc comment at the top of this file._
 
@@ -22,11 +22,14 @@ _No doc comment at the top of this file._
 - [[domain.buffs.buffScope]] — `src/domain/buffs/buffScope.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
+- [[domain.raids.exampleRaids]] — `src/domain/raids/exampleRaids.ts`
+- [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
+- [[features.raidcomp.raidcompFormat]] — `src/features/raidcomp/raidcompFormat.ts`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 
 ## Imported by
@@ -35,6 +38,7 @@ _No doc comment at the top of this file._
 
 ## Concepts & phases
 
+- [[Port to the Live App]]
 - [[Step 2 Walkthrough]]
 
 Up: [[Architecture Map]]

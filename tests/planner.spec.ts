@@ -8105,7 +8105,7 @@ test('a player can be moved by tapping, which is the only way a phone can move o
   const group2 = page.getByTestId('raidcomp-group-2')
   const group2Buffs = group2.locator('.raidcomp-group-buffs-label')
   await expect(group1).toContainText('Enhancement Shaman')
-  await expect(group2Buffs).toHaveText('Party buffs · 0')
+  await expect(group2Buffs).toHaveText(/^Receives 0 of \d+/)
 
   // The panel says how to do this. If the control is ever renamed, this is what notices.
   await expect(page.getByTestId('raidcomp-panel')).toContainText(
@@ -8267,7 +8267,9 @@ test('a seat can be named through the UI, and the name survives a reload', async
   await input.fill('Dave')
   await input.press('Enter')
 
-  await expect(page.getByText('Dave')).toBeVisible()
+  // On the seat. The line under the table says it too ("Named the Restoration Shaman … Dave").
+  const group1 = page.getByTestId('raidcomp-group-1')
+  await expect(group1.getByText('Dave')).toBeVisible()
 
   /*
    * Persisted, not merely rendered — asserted on the stored payload first so a failure says which
@@ -8279,7 +8281,7 @@ test('a seat can be named through the UI, and the name survives a reload', async
 
   await page.reload()
   await page.getByTestId('section-raidcomp').click()
-  await expect(page.getByText('Dave')).toBeVisible()
+  await expect(group1.getByText('Dave')).toBeVisible()
 })
 
 test('a roster saved with the old per-seat buff assignments still loads', async ({ page }) => {
@@ -10832,6 +10834,8 @@ test('the raid date and time are pickers, and the time carries a zone', async ({
   expect(chosen, 'defaults to the reader\'s own zone rather than asking').toBe(local)
 
   // And it survives a round trip through storage, which is where this app has lost fields before.
+  // The fields are folded away under the export's details since port step 5.
+  await page.getByText('Raid details for the exported chart').click()
   await page.getByTestId('raidcomp-meta-date').fill('2026-08-25')
   await timezone.selectOption('UTC')
   await page.reload()

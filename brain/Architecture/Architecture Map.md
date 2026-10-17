@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-220 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+224 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -23,11 +23,11 @@ The modules everything else leans on — change these carefully.
 - [[domain.stats.statTypes]] — 17 importers
 - [[domain.professions.professionTypes]] — 16 importers
 - [[features.gear.gearTypes]] — 15 importers
+- [[domain.raids.raidTypes]] — 14 importers
 - [[domain.abilities.abilityTypes]] — 13 importers
-- [[domain.raids.raidTypes]] — 13 importers
 - [[domain.character.tbcClasses]] — 12 importers
 - [[domain.gear.slotCompatibility]] — 12 importers
-- [[components.layout.Panel]] — 11 importers
+- [[domain.raidcomp.index]] — 12 importers
 
 ## By layer
 
@@ -56,13 +56,13 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.itemTipModel]] · 2 importers
 - [[components.ui.ItemTooltip]] · 1 importers
 - [[components.ui.PhaseChip]] · 1 importers
-- [[components.ui.Provenance]] · 5 importers
+- [[components.ui.Provenance]] · 6 importers
 - [[components.ui.SelectField]] · 1 importers
 - [[components.ui.SpecIcon]] · 5 importers
 - [[components.ui.useHoverTip]] · 5 importers
 - [[components.ui.ViewSwitch]] · 4 importers
 
-### features (62)
+### features (65)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -94,7 +94,10 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.professions.WhichTwo]] · 1 importers
 - [[features.professions.ZoneRoutes]] · 1 importers
 - [[features.raidcomp.exportRosterImage]] · 1 importers
+- [[features.raidcomp.RaidAdvice]] · 1 importers
+- [[features.raidcomp.raidcompFormat]] · 2 importers
 - [[features.raidcomp.RaidCompositionPanel]] · 1 importers
+- [[features.raidcomp.raidcompSources]] · 1 importers
 - [[features.raidcomp.rosterStorage]] · 3 importers
 - [[features.raids.BossJournal]] · 1 importers
 - [[features.raids.ForMyRaid]] · 1 importers
@@ -129,7 +132,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.tierlists.tierFormat]] · 6 importers
 - [[features.tierlists.TierListsPanel]] · 1 importers
 
-### domain (135)
+### domain (136)
 
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
@@ -153,11 +156,11 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.index]] · 5 importers
 - [[domain.bis.rankedSource]] · 2 importers
 - [[domain.buffs.buffExclusivity]] · 1 importers
-- [[domain.buffs.buffScope]] · 2 importers
+- [[domain.buffs.buffScope]] · 3 importers
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
-- [[domain.buffs.buffTypes]] · 5 importers
-- [[domain.buffs.sampleBuffs]] · 7 importers
-- [[domain.buffs.sampleTargetDebuffs]] · 4 importers
+- [[domain.buffs.buffTypes]] · 7 importers
+- [[domain.buffs.sampleBuffs]] · 9 importers
+- [[domain.buffs.sampleTargetDebuffs]] · 6 importers
 - [[domain.builds.addonImport]] · 2 importers
 - [[domain.builds.buildSerialization]] · 4 importers
 - [[domain.builds.buildTypes]] · 7 importers
@@ -166,7 +169,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.attributeConversions]] · 1 importers
 - [[domain.character.baseStats]] · 1 importers
 - [[domain.character.characterTypes]] · 50 importers
-- [[domain.character.classColors]] · 8 importers
+- [[domain.character.classColors]] · 9 importers
 - [[domain.character.factionColors]] · 1 importers
 - [[domain.character.races]] · 5 importers
 - [[domain.character.racialTypes]] · 2 importers
@@ -217,22 +220,23 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.professions.sampleCraftingGuides]] · 2 importers
 - [[domain.professions.sampleProfessions]] · 4 importers
 - [[domain.professions.sampleProfessionTiers]] · 5 importers
-- [[domain.raidcomp.buffCoverage]] · 1 importers
-- [[domain.raidcomp.index]] · 10 importers
-- [[domain.raidcomp.raidBuilds]] · 2 importers
+- [[domain.raidcomp.buffCoverage]] · 2 importers
+- [[domain.raidcomp.index]] · 12 importers
+- [[domain.raidcomp.raidAdvice]] · 1 importers
+- [[domain.raidcomp.raidBuilds]] · 3 importers
 - [[domain.raidcomp.raidcompIcons]] · 2 importers
 - [[domain.raidcomp.raidcompIconsJson.d]] · 0 importers
-- [[domain.raidcomp.rosterTypes]] · 2 importers
+- [[domain.raidcomp.rosterTypes]] · 3 importers
 - [[domain.raids.bossArt]] · 2 importers
 - [[domain.raids.bossArtJson.d]] · 0 importers
-- [[domain.raids.exampleRaids]] · 1 importers
+- [[domain.raids.exampleRaids]] · 2 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
 - [[domain.raids.index]] · 11 importers
 - [[domain.raids.karazhanBosses]] · 1 importers
 - [[domain.raids.magtheridonsLairBosses]] · 1 importers
 - [[domain.raids.raidLoot]] · 1 importers
 - [[domain.raids.raidSources]] · 1 importers
-- [[domain.raids.raidTypes]] · 13 importers
+- [[domain.raids.raidTypes]] · 14 importers
 - [[domain.raids.sampleAttunements]] · 1 importers
 - [[domain.raids.sampleRaidBosses]] · 3 importers
 - [[domain.raids.sampleRaids]] · 3 importers

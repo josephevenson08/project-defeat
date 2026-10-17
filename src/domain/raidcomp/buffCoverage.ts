@@ -98,7 +98,7 @@ export type CoverageReport = {
  * A class-wide buff says "any" because that is the useful distinction — any Shaman brings Heroism, but
  * only an Enhancement one brings Strength of Earth.
  */
-function describeNeed(provider: BuffProvider): string {
+export function describeNeed(provider: BuffProvider): string {
   const who = describeProvider(provider)
   return provider.providedBySpec ? `an ${who}`.replace(/^an (?![AEIOU])/, 'a ') : `any ${who}`
 }

@@ -119,7 +119,10 @@ export function loadRoster(): Roster | undefined {
           ) as Roster['meta'])
         : undefined
 
-    return { size, groups, ...(meta && Object.keys(meta).length > 0 ? { meta } : {}) }
+    const storedExample = (candidate as { example?: unknown }).example
+    const example = storedExample === 'loaded' || storedExample === 'edited' ? storedExample : undefined
+
+    return { size, groups, ...(meta && Object.keys(meta).length > 0 ? { meta } : {}), ...(example ? { example } : {}) }
   } catch {
     // A corrupt or unreadable payload is not worth surfacing — the planner opens empty, which is a
     // recoverable state, where a thrown error mid-render is not.
@@ -132,14 +135,6 @@ export function saveRoster(roster: Roster): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(roster))
   } catch {
     // Private-browsing quota failures must not take the planner down with them.
-  }
-}
-
-export function clearStoredRoster(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // Same reasoning as above.
   }
 }
 

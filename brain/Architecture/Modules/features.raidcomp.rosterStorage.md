@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/rosterStorage.ts
-lines: 149
+lines: 144
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.rosterStorage
 
-`src/features/raidcomp/rosterStorage.ts` · **features** layer · 149 lines
+`src/features/raidcomp/rosterStorage.ts` · **features** layer · 144 lines
 
 From the top of the file:
 
@@ -21,7 +21,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `clearStoredRoster`, `loadRoster`, `saveRoster`
+**function** — `loadRoster`, `saveRoster`
 
 **const** — `rosterShape`, `rosterStorageKey`
 

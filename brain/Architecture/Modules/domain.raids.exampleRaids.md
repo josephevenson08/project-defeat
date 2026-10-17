@@ -29,6 +29,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
+- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 
 ## Concepts & phases
 

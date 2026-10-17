@@ -39,6 +39,7 @@ From the top of the file:
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`

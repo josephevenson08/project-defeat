@@ -64,7 +64,9 @@ From the top of the file:
 ## Imported by
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 

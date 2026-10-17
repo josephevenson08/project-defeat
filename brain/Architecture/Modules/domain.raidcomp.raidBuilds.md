@@ -43,6 +43,7 @@ From the top of the file:
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 
 ## Concepts & phases
 

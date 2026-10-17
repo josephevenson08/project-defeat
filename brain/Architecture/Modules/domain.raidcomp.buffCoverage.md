@@ -21,7 +21,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `computeCoverage`, `seatContributions`, `slotProvides`
+**function** — `computeCoverage`, `describeNeed`, `seatContributions`, `slotProvides`
 
 **type** — `CoverageReport`, `CoverageSection`, `CoveredEntry`, `GroupCoverage`, `MissingEntry`, `SeatContributions`
 
@@ -39,6 +39,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 
 ## Concepts & phases
 

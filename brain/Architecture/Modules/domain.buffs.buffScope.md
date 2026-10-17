@@ -49,6 +49,7 @@ _None._
 ## Imported by
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
+- [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 
 ## Concepts & phases

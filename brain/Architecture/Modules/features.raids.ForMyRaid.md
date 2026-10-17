@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/ForMyRaid.tsx
-lines: 328
+lines: 333
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.ForMyRaid
 
-`src/features/raids/ForMyRaid.tsx` · **features** layer · 328 lines
+`src/features/raids/ForMyRaid.tsx` · **features** layer · 333 lines
 
 _No doc comment at the top of this file._
 

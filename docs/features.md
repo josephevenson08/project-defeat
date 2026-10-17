@@ -89,25 +89,27 @@ behind every claim of its that quotes a number.
   against the logs for the 20 damage specs (they agree on 9), sortable either way. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.
   These rank *specs*, not items, so they deliberately do not feed the per-slot BiS rankings
-- **Raid Composition section**: a seating chart for a 10 or 25-player raid — five groups of five,
-  with the buffs each group actually receives listed underneath it. **Most raid buffs reach only the
-  caster's group in TBC** (totems, auras and shouts); every scope is read from the spell's own Wowhead
-  tooltip. Gift of the Wild, Fortitude, Arcane Brilliance and Prayer of Spirit reach any group, one
-  cast each, and Heroism is raid-wide on Anniversary realms. Shaman totems come from the spec that runs
-  them (Enhancement: Strength of Earth, Grace of Air, Windfury). Role balance, a ranked list of what one more seat would
-  buy you, missing entries naming who fixes them ("any Shaman", "an Elemental Shaman"), roster
-  persistence, and a **PNG export** of the seating chart for pasting into Discord. Real icons for every
-  spec and buff, **two ways to move a player between groups** — press Move on their seat and then the
-  seat you want them in, or drag them there — with occupied seats swapping rather than being
-  overwritten, an optional player name per seat, and a hover card on each seat listing everything that
-  player brings — party buffs, raid-wide buffs and debuffs — since the per-group row shows only what
-  that group actually receives. **Counts follow Wowhead's raid-composition tool**: they say who
-  *could* cast a buff rather than what will be up at once, so one Paladin lights up every Greater
-  Blessing where in the game they hold one. That is stated on the screen rather than left to be
-  discovered — the app should never tell a thin roster it is covered. The exclusivity rule itself
-  (one Blessing and one aura per Paladin, one totem per element, one shout per Warrior) is still
-  sourced and still tested in `buffExclusivity.ts`; this screen just does not apply it. A fillable
-  header (title, date, start time, description) is drawn onto the exported chart
+- **Raid Composition section** (the decided design, ported 2026-10-17): a planning table for a 10 or
+  25-player raid, five groups of five. **Most raid buffs reach only the caster's group in TBC**
+  (totems, auras and shouts); every scope is read from the spell's own Wowhead tooltip. Gift of the
+  Wild, Fortitude, Arcane Brilliance and Prayer of Spirit reach any group, one cast each, and Heroism
+  is raid-wide on Anniversary realms; the page's opening counts and names these from the data. Shaman
+  totems come from the spec that runs them (Enhancement: Strength of Earth, Grace of Air, Windfury).
+  **A click-to-fill palette** of all 29 builds with their spec icons seats each in the next open seat,
+  group 1 first, or in a group you aim at by pressing its name. Each group shows a ring of how many of
+  the 18 party buffs it receives and the buffs themselves as icons with hover cards. **Two ways to move
+  a player** (press Move and then the seat you want, or drag), with taken seats swapping; a pencil for
+  each player's name; Remove, 10-player and Clear each offer **Undo**; and **the example roster**
+  (real builds, invented seating), labelled as the example and as edited once a seat moves. Under the
+  table: role balance, **what one more seat would add** to each group with a one-press seat, **what is
+  missing and who fixes it** ("any Shaman", "an Elemental Shaman"), and the raid-wide, single-target
+  and boss coverage with each buff's reach tagged. The roster is kept in the browser, a hover card on
+  each seat lists everything that player brings, and a **PNG export** of the seating chart, with an
+  optional title, date, start time, zone and description, is for pasting into Discord. **Counts follow
+  Wowhead's raid-composition tool**: they say who *could* cast a buff rather than what will be up at
+  once, so one Paladin lights up every Greater Blessing where in the game they hold one. That is stated
+  on the screen; the exclusivity rule itself (one Blessing and one aura per Paladin, one totem per
+  element, one shout per Warrior) is still sourced and tested in `buffExclusivity.ts`
 - Planner split into six sub-tabs (Gear / Compare / Talents / Buffs & Consumables / Ranked Gear /
   Build) rather than one ~15-screen scroll column, under a character line and a sticky stat bar that
   stay put across all six

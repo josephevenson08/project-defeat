@@ -66,7 +66,7 @@ _No doc comment at the top of this file._
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`

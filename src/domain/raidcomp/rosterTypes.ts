@@ -104,6 +104,12 @@ export type Roster = {
   size: RaidPlayerSize
   groups: readonly RaidGroup[]
   meta?: RosterMeta
+  /**
+   * Set while the roster is the example raid loaded on Raid Composition: `loaded` as it came, `edited`
+   * once a seat changed. The page labels it as the example either way (real builds, invented
+   * seating), so nobody mistakes it for a raid they planned.
+   */
+  example?: 'loaded' | 'edited'
 }
 
 export const groupCountFor = (size: RaidPlayerSize) => size / PARTY_SIZE

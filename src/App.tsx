@@ -28,6 +28,7 @@ import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { findUpgrades } from './features/simulator/findUpgrades'
 import { SimulationPanel } from './features/simulator/SimulationPanel'
 import { simulationSources } from './features/simulator/simFormat'
+import { raidcompSources } from './features/raidcomp/raidcompSources'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatBar } from './features/stats/StatBar'
@@ -524,6 +525,8 @@ function App() {
           <Provenance sources={professionSources} />
         ) : currentTab === 'simulation' ? (
           <Provenance sources={simulationSources} />
+        ) : currentTab === 'raidcomp' ? (
+          <Provenance sources={raidcompSources} />
         ) : undefined
       }
       onHome={() => {

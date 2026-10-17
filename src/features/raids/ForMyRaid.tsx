@@ -86,7 +86,12 @@ export function ForMyRaid({ raid, saved, onPlanRaid, onJump, bindTip }: ForMyRai
         </h2>
         <p className="raid-plan-source" data-testid="raid-plan-source">
           {useSaved ? (
-            'Your raid from Raid Composition.'
+            // The example can be loaded on Raid Composition itself (port step 5); it stays the example here.
+            saved.example ? (
+              `The example raid you loaded on Raid Composition${saved.example === 'edited' ? ', edited' : ''}.`
+            ) : (
+              'Your raid from Raid Composition.'
+            )
           ) : (
             <>
               The <strong>example {raid.playerSize}-player raid</strong>
