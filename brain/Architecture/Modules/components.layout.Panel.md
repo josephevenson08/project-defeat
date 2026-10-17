@@ -28,9 +28,8 @@ _No doc comment at the top of this file._
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
+- [[features.simulator.WhatIsModelled]] — `src/features/simulator/WhatIsModelled.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`

@@ -37,6 +37,7 @@ From the top of the file:
 ## Imported by
 
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 
 ## Concepts & phases
 

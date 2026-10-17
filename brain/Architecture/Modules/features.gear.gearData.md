@@ -35,8 +35,9 @@ _No doc comment at the top of this file._
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 
 ## Concepts & phases
 

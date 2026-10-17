@@ -40,6 +40,7 @@ From the top of the file:
 ## Imported by
 
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

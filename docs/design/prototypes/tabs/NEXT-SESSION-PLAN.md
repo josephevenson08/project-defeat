@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-17): Professions is in the app too; start here
+## ▶ Where we left off (2026-10-17, later): Simulation is in the app too; start here
+
+**Step 4, Simulation:** this folder's `simulation.html` (design C's "What to do next" with design A's damage sources and breakdown) is now the live app's Simulation tab, and `checks/sim-handson.mjs` became `tests/simulation.spec.ts` (its live-app step no longer presses Run: the app has no Run button now). **Next:** step 5, Raid Composition (`raid-composition.html`, `checks/rc-handson.mjs`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-17): Professions is in the app too
 
 **Step 3, Professions** (`e319d2c` and the 2026-10-17 finish): this folder's `professions.html` (design A's profession window with design B's "Which two") is now the live app's Professions tab, and `checks/profs-handson.mjs` became `tests/professions.spec.ts`. **Next:** step 4, Simulation (`simulation.html`, `sim-*.js`, `checks/sim-handson.mjs`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

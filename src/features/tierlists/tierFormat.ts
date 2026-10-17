@@ -1,5 +1,5 @@
 import type { ProvenanceSource } from '../../components/ui/Provenance'
-import { DPS_REFERENCE_SOURCE } from '../../domain/simulation/dpsReference'
+import { DPS_REFERENCE_READ_ON, DPS_REFERENCE_URL } from '../../domain/simulation/dpsReference'
 import { getTierList, tierListsFetchedAt } from '../../domain/tierlists'
 import type { SpecStanding } from '../../domain/tierlists/specStanding'
 
@@ -16,8 +16,8 @@ export const formatDps = (n: number) => n.toLocaleString('en-US')
 export const placesText = (standing: SpecStanding) =>
   standing.places.map((place) => `${place.label} for ${ROLE_WORD[place.role]}`).join(', ')
 
-/** When archon.gg's numbers were read, from the source line the reference data carries. */
-export const LOGS_READ_ON = DPS_REFERENCE_SOURCE.match(/read (\d{4}-\d{2}-\d{2})/)?.[1]
+/** When archon.gg's numbers were read, as the reference data records it. */
+export const LOGS_READ_ON = DPS_REFERENCE_READ_ON
 
 /** "Mage" for one, "Mages" for several. */
 export const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
@@ -32,7 +32,7 @@ export const tierListSources: readonly ProvenanceSource[] = [
   },
   {
     name: 'archon.gg logs',
-    href: 'https://www.archon.gg/classic-fresh/tier-list/dps-rankings/raid/normal/all-bosses',
+    href: DPS_REFERENCE_URL,
     readOn: LOGS_READ_ON,
     verb: 'read',
   },

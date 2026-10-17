@@ -35,8 +35,8 @@ From the top of the file:
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

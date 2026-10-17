@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
 
 ## Concepts & phases
 

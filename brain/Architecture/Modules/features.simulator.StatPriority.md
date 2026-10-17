@@ -1,32 +1,29 @@
 ---
 type: module
 layer: features
-source: src/features/simulator/StatWeightsPanel.tsx
-lines: 78
+source: src/features/simulator/StatPriority.tsx
+lines: 74
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.simulator.StatWeightsPanel
+# features.simulator.StatPriority
 
-`src/features/simulator/StatWeightsPanel.tsx` · **features** layer · 78 lines
+`src/features/simulator/StatPriority.tsx` · **features** layer · 74 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `StatWeightsPanel`
+**function** — `StatPriority`
 
 ## Imports
 
-- [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
-- [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.character.roleTheme]] — `src/domain/character/roleTheme.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 
 ## Imported by
 
-- [[App]] — `src/App.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 
 ## Concepts & phases
 

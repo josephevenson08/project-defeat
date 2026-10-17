@@ -23,6 +23,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **The maps rework** has a plan of its own (`docs/design/MAPS-PLAN.md`). The Professions maps were retail, post-Cataclysm art under TBC coordinates, so nodes landed in the sea; the owner decided on 2026-10-13 to swap in Wowhead's TBC-era maps at once (Step A, done: all 42 zones, Alterac Mountains included, and a test that the spawns land on land), to keep routes covering a whole skill window, to draw ground routes as straight lines with a note, and to have the tbc-researcher confirm the missing nodes before they are ingested (Step B). Step B's research is done and the node ingest is rewritten for it (extra object ids per node, seven new nodes, zones kept by share or by a range naming them, no write unless every node resolves), but Wowhead began refusing scripted requests in October 2026 and the ingest does not get around that, so `nodeSpawns.json` is unchanged (the owner chose to wait and retry); the guide text that was wrong regardless was corrected. Step C, the route algorithm, is done on today's nodes (2026-10-14, `routeLoop.ts`): records merged into spawn points, clusters a rider takes in from one spot, a loop through the clusters worth their detour (2-opt and Or-opt, outliers dropped, no crossings), measured in each zone's 3:2 shape, and every map says how many spawn points its loop passes and how long a lap is, and whether the straight line is flown (Outland at 70) or ridden on the ground. **Step 3, Professions, is built** (2026-10-17): the profession window (recipes coloured at your skill from their own thresholds, now on each step of `craftingPaths.json`; trainer stops in the list; a recipe's reagents; a range's loop on its TBC map) with "Which two" behind a switch, whose pair is the character's two professions; the helpers are in `professionWindow.ts`.
 
+**Step 4, Simulation (2026-10-17):** "What to do next": your stat priority from the real weights ("Gem and enchant for Strength, then…"), your best upgrades with Equip, then the estimate against what players of your spec average on archon.gg, with what it misses for you, the damage sources (which sum to it), how it was computed, and every DPS spec's best case against the logs. No Run button: the three are worked out while the tab is on screen and are always current. The best-case harness moved from the tests into `features/simulator/bestCase.ts`, so the trust panel and the calibration test read one function; the range (1.05× to 2.13× low) and the lowest spec are computed, which showed the prototype's hand-written "Demonology" was stale (it is Destruction).
+
 ## Documents
 
 - [[docs/design/PORT-PLAN|The port plan, with each step as built]] — `docs/design/PORT-PLAN.md`
@@ -53,6 +55,9 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.professions.ProfessionWindow]] — `src/features/professions/ProfessionWindow.tsx`
 - [[features.professions.WhichTwo]] — `src/features/professions/WhichTwo.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
+- [[features.simulator.TrustPanel]] — `src/features/simulator/TrustPanel.tsx`
 
 ## Related
 

@@ -71,14 +71,3 @@ export function animateStatUpdate(target: AnimationTarget) {
   })
 }
 
-export function animateResultCard(target: AnimationTarget) {
-  if (!canAnimate() || !target) return
-
-  animate(target, {
-    opacity: [0, 1],
-    translateY: [10, 0],
-    scale: [0.985, 1],
-    duration: 420,
-    easing: 'easeOutQuad',
-  })
-}

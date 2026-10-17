@@ -37,7 +37,8 @@ From the top of the file:
 ## Imported by
 
 - [[App]] — `src/App.tsx`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
+- [[features.simulator.StatPriority]] — `src/features/simulator/StatPriority.tsx`
 
 ## Concepts & phases
 

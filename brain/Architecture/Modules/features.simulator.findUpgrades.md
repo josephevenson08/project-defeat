@@ -38,7 +38,8 @@ _No doc comment at the top of this file._
 
 - [[App]] — `src/App.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 
 ## Concepts & phases
 

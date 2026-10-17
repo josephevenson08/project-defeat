@@ -65,6 +65,7 @@ From the top of the file:
 
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 
 ## Concepts & phases

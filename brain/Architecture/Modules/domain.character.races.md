@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.character.baseStats]] — `src/domain/character/baseStats.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 
 ## Concepts & phases
 

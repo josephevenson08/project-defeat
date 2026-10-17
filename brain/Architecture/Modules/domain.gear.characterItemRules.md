@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 
 ## Concepts & phases
 

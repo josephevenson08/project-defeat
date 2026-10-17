@@ -34,11 +34,14 @@ _No doc comment at the top of this file._
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.simulator.simulationTypes]] — `src/features/simulator/simulationTypes.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.TheEstimate]] — `src/features/simulator/TheEstimate.tsx`
+- [[features.simulator.TrustPanel]] — `src/features/simulator/TrustPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`

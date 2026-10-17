@@ -2,20 +2,20 @@
 type: module
 layer: lib
 source: src/lib/animations.ts
-lines: 85
+lines: 74
 generated: true
 tags: [brain/architecture, layer/lib]
 ---
 
 # lib.animations
 
-`src/lib/animations.ts` · **lib** layer · 85 lines
+`src/lib/animations.ts` · **lib** layer · 74 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `animateEquipFeedback`, `animateIntro`, `animateIntroExit`, `animatePanelEntrance`, `animateResultCard`, `animateStatUpdate`, `introDurationMs`, `prefersReducedMotion`
+**function** — `animateEquipFeedback`, `animateIntro`, `animateIntroExit`, `animatePanelEntrance`, `animateStatUpdate`, `introDurationMs`, `prefersReducedMotion`
 
 ## Imports
 
@@ -26,8 +26,7 @@ _None._
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
 - [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
 

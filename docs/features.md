@@ -37,11 +37,20 @@ behind every claim of its that quotes a number.
 - Spec-aware gear slot visibility for every class, including the Totem/Libram/Idol relic display for Shaman/Paladin/Druid and the hidden Ranged-vs-Relic slot swap
 - 212 gems and 91 enchants, ingested and validated, with per-spec gem and enchant recommendations from Wowhead
 - Calculated stat totals from base stats, gear, gems, socket bonuses, and enchants
-- Role-aware prototype simulation outputs:
-  - DPS (separation between melee, ranged and caster)
-  - Healer
-  - Tank
-- Result breakdown panel
+- **Simulation tab** (the decided design, ported 2026-10-17): **"What to do next"** for the
+  character you made, always current, with no Run button. First **your stat priority** ("Gem and
+  enchant for Strength, then Crit Rating, then Attack Power"), from re-running the model with each
+  stat nudged, with stats the engine does not read yet named as unknown rather than zero. Then **your
+  best upgrades**: every legal item in the catalogue simulated as a straight swap with the best
+  colour-matched gems, best first, two at most per slot, each with Equip, which applies exactly the
+  gems and enchant the score assumed. Then **the estimate, and how far to trust it**: the number
+  against what players of your spec average on archon.gg ("5.66× below what Fury warriors average"),
+  what it misses for your spec and your talents, where the damage comes from (a log-style table that
+  sums to the estimate), how it was computed, and every DPS spec's best case by this model against
+  the logs, yours marked (1.05× to 2.13× low, computed). A missing weapon is said first, before
+  anything else. The page names its fixed encounter and what the model does and does not cover, with
+  every figure in that list computed. DPS specs only; Healer and Tank results (estimated healing,
+  effective health) are still computed and reachable with `?simulation=1`
 - **Raids tab** (the decided design, ported 2026-10-13): all five Phase 1/2 raids, picked from the
   tab's own header, which takes each raid's colour (Serpentshrine teal, Tempest Keep gold over violet,
   the Phase 1 raids torchlight). **The boss journal** shows one boss at a time, like the game's
@@ -200,7 +209,6 @@ behind every claim of its that quotes a number.
   offering them to every character, and only ever on Finger 1. Dropping the profession removes the
   enchant rather than leaving it applied. Everything else a profession gives in TBC is access, not
   stats, and the picker says so rather than implying a bonus that is really Wrath's
-- Computed stat weights and a per-slot upgrade finder, both scored against the live simulation
 - **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
   actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip
   comparison cannot see them. Shows the stat-by-stat difference and the change in the role's headline
@@ -212,7 +220,7 @@ behind every claim of its that quotes a number.
   shown for damage specs only, the same call the Simulation tab makes and for the same reason; the
   stat comparison is shown to every spec
 - A fixed encounter — one target, level 73, 7,700 armor — with no controls, matching what the reference TBC simulators do. The panel names it, since a DPS figure means nothing without knowing what it was measured against
-- Anime.js-powered loading intro, panel entrance, equip feedback, stat update, and result reveal animations
+- Anime.js-powered loading intro, panel entrance, equip feedback and stat update animations
 - Reduced-motion aware animation helpers
 - Playwright tests for physical, caster, healer, and tank flows
 - Playwright regression coverage for expanded slot options and every class/spec's Phase 2 sample gear selection, plus a full-coverage check that every class/spec resolves to a BiS list

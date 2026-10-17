@@ -67,10 +67,9 @@ _No doc comment at the top of this file._
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`

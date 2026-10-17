@@ -35,8 +35,12 @@ export type DpsReference = {
   tier: 'S' | 'A' | 'B' | 'C'
 }
 
-export const DPS_REFERENCE_SOURCE =
-  'archon.gg Classic Fresh DPS tier list, raid / normal / all bosses, read 2026-08-23'
+/** When the table below was read off archon.gg, as an ISO date: part of the datum, since the meta moves. */
+export const DPS_REFERENCE_READ_ON = '2026-08-23'
+
+export const DPS_REFERENCE_URL = 'https://www.archon.gg/classic-fresh/tier-list/dps-rankings/raid/normal/all-bosses'
+
+export const DPS_REFERENCE_SOURCE = `archon.gg Classic Fresh DPS tier list, raid / normal / all bosses, read ${DPS_REFERENCE_READ_ON}`
 
 export const dpsReference: readonly DpsReference[] = [
   { className: 'Mage', spec: 'Arcane', dps: 2084, tier: 'S' },

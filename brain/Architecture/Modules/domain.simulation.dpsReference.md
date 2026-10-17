@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/dpsReference.ts
-lines: 67
+lines: 71
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.dpsReference
 
-`src/domain/simulation/dpsReference.ts` · **domain** layer · 67 lines
+`src/domain/simulation/dpsReference.ts` · **domain** layer · 71 lines
 
 From the top of the file:
 
@@ -42,7 +42,7 @@ From the top of the file:
 
 **function** — `getDpsReference`
 
-**const** — `DPS_REFERENCE_SOURCE`, `dpsReference`
+**const** — `DPS_REFERENCE_READ_ON`, `DPS_REFERENCE_SOURCE`, `DPS_REFERENCE_URL`, `dpsReference`
 
 **type** — `DpsReference`
 
@@ -54,6 +54,9 @@ From the top of the file:
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
+- [[features.simulator.TrustPanel]] — `src/features/simulator/TrustPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 

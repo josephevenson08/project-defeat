@@ -36,7 +36,7 @@ Upgrade planning, side-by-side gear comparison, named saves, import/export, shar
 ## Key modules
 
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`

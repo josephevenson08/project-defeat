@@ -33,7 +33,7 @@ _No doc comment at the top of this file._
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 
 ## Concepts & phases
 

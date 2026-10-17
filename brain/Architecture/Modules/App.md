@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 610
+lines: 630
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 610 lines
+`src/App.tsx` · **app** layer · 630 lines
 
 From the top of the file:
 
@@ -69,10 +69,8 @@ _Nothing exported (side-effect or style module)._
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.simulator.simulationTypes]] — `src/features/simulator/simulationTypes.ts`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`

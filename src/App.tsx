@@ -26,10 +26,8 @@ import { calculateSimulation } from './features/simulator/calculateSimulation'
 import { isSimulationEnabled } from './featureFlags'
 import { calculateStatWeights } from './features/simulator/calculateStatWeights'
 import { findUpgrades } from './features/simulator/findUpgrades'
-import { SimulatorPanel } from './features/simulator/SimulatorPanel'
-import { StatWeightsPanel } from './features/simulator/StatWeightsPanel'
-import { UpgradesPanel } from './features/simulator/UpgradesPanel'
-import type { SimulationResult } from './features/simulator/simulationTypes'
+import { SimulationPanel } from './features/simulator/SimulationPanel'
+import { simulationSources } from './features/simulator/simFormat'
 import { defaultSimulationTarget } from './domain/simulation/sampleEncounters'
 import { calculateStats } from './features/stats/calculateStats'
 import { StatBar } from './features/stats/StatBar'
@@ -210,7 +208,6 @@ function App() {
    * is simply no longer read back.
    */
   const target = defaultSimulationTarget
-  const [simulationResult, setSimulationResult] = useState<SimulationResult>()
 
   const buildState: BuildState = { character, gear, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, talentPoints, target }
 
@@ -222,7 +219,6 @@ function App() {
     setActiveConsumableIds(build.activeConsumableIds)
     setActiveTargetDebuffIds(build.activeTargetDebuffIds)
     setTalentPoints(build.talentPoints ?? {})
-    setSimulationResult(undefined)
   }, [])
 
   /*
@@ -343,18 +339,26 @@ function App() {
     () => calculateStats(character, gear, activeBuffIds, activeConsumableIds, undefined, talentModifiers),
     [character, gear, activeBuffIds, activeConsumableIds, talentModifiers],
   )
-  // Cheap enough to keep live (a handful of pure re-runs of the sim), and stat priority is reference
-  // information you want visible while gearing rather than something to press a button for.
+  /*
+   * **What the Simulation tab shows, worked out only while it is on screen.** The estimate, the stat
+   * weights (a dozen re-runs of the model) and the upgrade finder (a re-run for every legal item in
+   * every slot) are always current there, with no Run button (port step 4): the tab leads with what to
+   * act on, which needs all three. Until then the finder re-ran over the whole catalogue on every gear
+   * change in the planner too, where nothing reads it.
+   */
+  const simulating = currentTab === 'simulation' && simulationEnabled
   const statWeights = useMemo(
-    () => calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints),
-    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
+    () =>
+      simulating
+        ? calculateStatWeights(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints)
+        : undefined,
+    [simulating, character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
   )
 
   function updateGear(slot: GearSlot, equippedSlot: EquippedSlot) {
     // Equipping a two-hander has to empty the off hand, the same way switching spec into one does.
     // Without this the rule would hold only until the first manual weapon change.
     setGear((current) => applyWeaponSlotRules({ ...current, [slot]: equippedSlot }))
-    setSimulationResult(undefined)
   }
 
   /**
@@ -368,7 +372,6 @@ function App() {
     const recommended = buildRecommendedSet(character, gear)
     if (!recommended) return undefined
     setGear(dropIllegalEnchants(recommended.gear, character))
-    setSimulationResult(undefined)
     return recommended
   }
 
@@ -382,7 +385,6 @@ function App() {
       // picker stops offering something the stat rail is still counting.
       dropIllegalEnchants(normalizeGearForCharacter(current, nextCharacter.className, nextCharacter.spec), nextCharacter),
     )
-    setSimulationResult(undefined)
   }
 
   /*
@@ -405,15 +407,22 @@ function App() {
   const toggleTargetDebuff = useMemo(() => toggleId(setActiveTargetDebuffIds), [toggleId])
 
   const upgradeReport = useMemo(
-    () => findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints),
-    [character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
+    () =>
+      simulating
+        ? findUpgrades(character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints)
+        : undefined,
+    [simulating, character, gear, role, activeBuffIds, activeConsumableIds, activeTargetDebuffIds, target, talentPoints],
   )
 
-  function runSimulation() {
-    // `stats` already carries the talent build, so the estimate and the rail agree by construction
-    // rather than by coincidence. They disagreed by design until 2026-08-20.
-    setSimulationResult(calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds))
-  }
+  // `stats` already carries the talent build, so the estimate and the rail agree by construction
+  // rather than by coincidence. They disagreed by design until 2026-08-20.
+  const simulation = useMemo(
+    () =>
+      simulating
+        ? calculateSimulation(character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds)
+        : undefined,
+    [simulating, character, gear, stats, role, activeTargetDebuffIds, target, talentPoints, activeBuffIds],
+  )
 
   const completeIntro = useCallback(() => {
     setIntroComplete(true)
@@ -513,6 +522,8 @@ function App() {
           <Provenance sources={raidSources} />
         ) : currentTab === 'professions' ? (
           <Provenance sources={professionSources} />
+        ) : currentTab === 'simulation' ? (
+          <Provenance sources={simulationSources} />
         ) : undefined
       }
       onHome={() => {
@@ -566,12 +577,21 @@ function App() {
           {plannerView === 'build' && <BuildPanel state={buildState} role={role} onImport={importBuild} />}
         </>
       )}
-      {currentTab === 'simulation' && simulationEnabled && (
-        <>
-          <SimulatorPanel result={simulationResult} role={role} onRun={runSimulation} />
-          <StatWeightsPanel weights={statWeights} role={role} />
-          <UpgradesPanel character={character} report={upgradeReport} role={role} onEquip={updateGear} />
-        </>
+      {currentTab === 'simulation' && simulation && statWeights && upgradeReport && (
+        <SimulationPanel
+          character={character}
+          gear={gear}
+          talentPoints={talentPoints}
+          buffCount={activeBuffIds.length}
+          consumableCount={activeConsumableIds.length}
+          debuffCount={activeTargetDebuffIds.length}
+          target={target}
+          result={simulation}
+          weights={statWeights}
+          upgrades={upgradeReport}
+          onEquip={updateGear}
+          onOpenPlanner={() => changeSection('planner')}
+        />
       )}
       {/* The character is passed only once it has been chosen deliberately. Marking the default Fury
           Warrior on the lists for someone who never picked it would answer "where do I stand" with a

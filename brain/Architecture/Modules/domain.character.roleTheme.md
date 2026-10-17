@@ -37,9 +37,7 @@ From the top of the file:
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 

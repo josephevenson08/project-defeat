@@ -28,6 +28,7 @@ _None._
 - [[App]] — `src/App.tsx`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 - [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 
 ## Concepts & phases

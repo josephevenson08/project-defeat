@@ -61,6 +61,7 @@ import { sampleSignatureAbilities } from '../src/domain/abilities/sampleSignatur
 import iconMap from '../src/domain/icons/icons.json' with { type: 'json' }
 import { sampleItems } from '../src/domain/gear/sampleItems'
 import { calculateSimulation } from '../src/features/simulator/calculateSimulation'
+import { bestCaseSimulation } from '../src/features/simulator/bestCase'
 import { findUpgrades } from '../src/features/simulator/findUpgrades'
 import { calculateStatWeights } from '../src/features/simulator/calculateStatWeights'
 import { getEnchantById } from '../src/domain/enchants/sampleEnchants'
@@ -115,7 +116,6 @@ import {
 } from '../src/domain/bis'
 import rawRankings from '../src/domain/bis/bisRankings.json' with { type: 'json' }
 import { acquisitionCostCounts, getAcquisitionCost } from '../src/domain/gear/acquisitionCost'
-import { sampleConsumables } from '../src/domain/consumables/sampleConsumables'
 import { DPS_REFERENCE_SOURCE, dpsReference, getDpsReference } from '../src/domain/simulation/dpsReference'
 import {
   HUNTER_PET_ATTACK_POWER_INHERITANCE,
@@ -303,7 +303,7 @@ async function openSimulationTab(page: Page) {
    * set beforehand.
    */
   await page.getByRole('button', { name: 'Simulation', exact: true }).click()
-  await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What to do next' })).toBeVisible()
 }
 
 /**
@@ -375,10 +375,13 @@ async function expectNoRankingHeading(page: Page, label: string) {
  * two tab switches was always the indirect way to assert that buffs reach the stat totals.
  */
 
-/** Switches to the simulation tab and produces a fresh result there. */
+/**
+ * Switches to the simulation tab, where the result is always current. There is no Run button since
+ * port step 4 (2026-10-17): the tab leads with the stat weights and the upgrade finder, which re-ran
+ * the model on every change already, so the estimate does too.
+ */
 async function runSimulation(page: Page) {
   await openSimulationTab(page)
-  await page.getByRole('button', { name: /run simulation/i }).click()
 }
 
 /** The slot's row in the gear grid. Slot *presence* is now this button, not a select. */
@@ -592,7 +595,6 @@ test('user can run a basic local physical DPS simulation', async ({ page }) => {
 
   // And the simulation itself still runs for the default character.
   await openSimulationTab(page)
-  await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/estimated dps/i)).toBeVisible()
   await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
@@ -684,7 +686,8 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   // it. These are invariants of the mechanic, not of any particular model, so they should hold
   // through future changes too.
   const percentRow = async (label: RegExp) => {
-    const text = await tankBreakdown.locator('div', { hasText: label }).first().innerText()
+    // Values are grouped ("12,345") since port step 4, so the commas go before the number is read.
+    const text = (await tankBreakdown.locator('div', { hasText: label }).first().innerText()).replace(/,/g, '')
     return Number(text.match(/(-?[\d.]+)\s*%?\s*$/)?.[1] ?? 'NaN')
   }
 
@@ -708,7 +711,7 @@ test('healer and tank roles produce role-specific results', async ({ page }) => 
   // come out at least as large as the health itself — mitigation and avoidance can only stretch a
   // health pool, never shrink it. If this ever inverts, the multiplier has been applied upside down.
   const healthFromStamina = await percentRow(/Health from Stamina/i)
-  const effectiveHealth = Number(await page.getByTestId('simulation-score').innerText())
+  const effectiveHealth = Number((await page.getByTestId('simulation-score').innerText()).replace(/,/g, ''))
   expect(healthFromStamina).toBeGreaterThan(0)
   expect(effectiveHealth).toBeGreaterThanOrEqual(healthFromStamina)
 })
@@ -1077,7 +1080,7 @@ test('character role sets a distinct accent color across Character, Stats, and S
   expect(await nameAccent()).toBe(healer)
 
   await openSimulationTab(page)
-  await expect(page.getByRole('region', { name: 'Simulation' })).toHaveCSS('border-top-color', healer)
+  await expect(page.getByRole('region', { name: 'What to do next' })).toHaveCSS('border-top-color', healer)
 })
 
 test('Elemental and Restoration Shaman get Totem/Ranged spec-aware slot treatment and their own BiS list', async ({ page }) => {
@@ -1636,7 +1639,6 @@ test('the encounter is disclosed by the result, not by a panel of its own', asyn
   await expect(page.getByRole('region', { name: 'Encounter', exact: true }), 'the panel is gone').toHaveCount(0)
   await expect(page.getByTestId('encounter-armor-mitigation')).toHaveCount(0)
 
-  await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/vs\. a level 73 target/i), 'the estimate still says what it ran against').toBeVisible()
 })
 
@@ -1703,14 +1705,15 @@ test('upgrade finder ranks real swaps, spans slots, and equipping delivers the p
 
   // The headline claim has to hold: equipping the top pick should move the simulation by
   // approximately the advertised amount. Because equipping applies the same gems the score assumed,
-  // this also catches a candidate being scored gemmed but equipped bare.
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const before = Number(await page.getByTestId('simulation-score').innerText())
+  // this also catches a candidate being scored gemmed but equipped bare. The estimate is always
+  // current, so it is read again once it has moved.
+  const score = async () => Number((await page.getByTestId('simulation-score').innerText()).replace(/,/g, ''))
+  const before = await score()
 
   const topDelta = deltas[0]
   await rows.first().getByRole('button', { name: /equip/i }).click()
-  await page.getByRole('button', { name: /run simulation/i }).click()
-  const after = Number(await page.getByTestId('simulation-score').innerText())
+  await expect.poll(score).not.toBe(before)
+  const after = await score()
 
   expect(after - before).toBeGreaterThan(0)
   expect(Math.abs(after - before - topDelta)).toBeLessThan(0.5)
@@ -2253,8 +2256,9 @@ test('the Simulation door leads through character creation into the simulator', 
   await page.getByTestId('section-simulation').click()
   // The estimate is about a character, so, as with the planner, there is one to make first.
   await completeCharacterCreation(page)
-  await expect(page.getByRole('heading', { name: /simulation/i }).first()).toBeVisible()
-  await expect(page.getByRole('button', { name: /run simulation/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'What to do next' })).toBeVisible()
+  // No Run button since port step 4: the estimate is there on arrival.
+  await expect(page.getByTestId('simulation-score')).toContainText(/\d/)
 })
 
 test('the app opens on a section picker, and the planner names its character', async ({ page }) => {
@@ -4995,7 +4999,7 @@ test('the rotation-coverage claim on the Simulation panel matches the ability da
    * say "the panel says two specs" while the assertion below said five, which is the whole failure
    * in one place: the count was known to be wrong, written down twice, and connected to nothing.
    *
-   * `SimulatorPanel` derives both figures from `getRotationAbilities` now, so the sentence a player
+   * The Simulation tab (`WhatIsModelled` since port step 4) derives both figures from `getRotationAbilities`, so the sentence a player
    * reads cannot drift from this list. The assertion stays because it names *which* specs, which a
    * count cannot.
    */
@@ -5538,129 +5542,13 @@ test('Windfury rolls on both hands, and the proc rate is the one a real log show
   expect(fast.limitedByInternalCooldown).toBe(true)
 })
 
-/**
- * Dresses a spec in its own rank-1 BiS, buffs and consumables it fully, and fills its primary talent
- * tree to the 61-point cap — the strongest character this app can currently describe.
- *
- * Not a claim that a real raider looks like this. It is a **ceiling**, and the point of measuring the
- * ceiling is that anything below it in the comparison table is a gap in the model rather than a gap
- * in what the player brought.
+/*
+ * `bestCaseSimulation` lived here: a spec in its own rank-1 BiS with every buff, consumable and target
+ * debuff and its sourced talents, the strongest character this app can describe. It moved, unchanged,
+ * to `src/features/simulator/bestCase.ts` in port step 4 (2026-10-17), because the Simulation tab's
+ * "how far to trust it" panel draws the same table this test pins. The reasons behind each choice in
+ * it went with it.
  */
-function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: CharacterRole) {
-  const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
-
-  let gear = normalizeGearForCharacter(defaultGear, className, spec)
-  const list = getBisListForSpec(className, spec)
-  const filled = new Set<string>()
-
-  /*
-   * **Gems and enchants come with the item, and leaving them off was worth about a quarter of the
-   * gap this table exists to measure.** `defaultGear` sets `gemIds: []` and no `enchantId`, and the
-   * first version of this harness never read the entries' own `recommendedGemIds` /
-   * `recommendedEnchantId` — so it scored a "best case" character wearing raid gear with empty
-   * sockets and bare weapons, which is not a character anyone plays.
-   *
-   * Coverage is partial and that is fine: 7 of a spec's 15 rank-1 entries carry gems and 11 carry an
-   * enchant, so this raises the floor rather than reaching the true ceiling.
-   */
-  const equip = (slot: string, entry: { itemId: string; recommendedEnchantId?: string; recommendedGemIds?: string[] }) => {
-    const item = getItemById(entry.itemId)
-    if (!item) return false
-    gear = {
-      ...gear,
-      [slot]: {
-        ...(gear as Record<string, unknown>)[slot],
-        item,
-        gemIds: entry.recommendedGemIds ?? [],
-        ...(entry.recommendedEnchantId ? { enchantId: entry.recommendedEnchantId } : {}),
-      },
-    } as typeof gear
-    return true
-  }
-
-  for (const entry of list?.entries ?? []) {
-    if (entry.rank !== 1 || filled.has(entry.slot)) continue
-    if (equip(entry.slot, entry)) filled.add(entry.slot)
-  }
-
-  /*
-   * **The paired slots, which the ranked list does not name.** It ranks `Finger 1` and `Trinket 1`
-   * and stops — there is no `Finger 2` row anywhere in the data — so a best-case character was
-   * walking around with one ring and one trinket. The second-ranked pick for the same slot is what a
-   * real player puts in the other one.
-   */
-  for (const [ranked, paired] of [
-    ['Finger 1', 'Finger 2'],
-    ['Trinket 1', 'Trinket 2'],
-  ] as const) {
-    if (filled.has(paired)) continue
-    const second = list?.entries.find((entry) => entry.slot === ranked && entry.rank === 2)
-    if (second && equip(paired, second)) filled.add(paired)
-  }
-
-  /*
-   * The primary tree, filled in listed order and stopped at 61 — the real level-70 budget. Maxing a
-   * whole tree overruns it (Enhancement alone is 65 points), and a ceiling that spends points the
-   * game does not give would flatter the model in exactly the direction this table exists to check.
-   */
-  /*
-   * **A real raiding build where upstream has one, and the old rule only where it does not.**
-   *
-   * This used to fill the spec's primary tree in listed order to 61 points, which is not a build any
-   * TBC raider plays and is not a ceiling either — a real 41/20 split can be worth more than 61
-   * points down one tree. It cost a measurable number twice in one hour on 2026-08-27: it handed a
-   * Demonology warlock a talent that spec does not use, and it made Demonic Sacrifice read as exactly
-   * zero for the two specs that actually take it, because they take it out of a second tree.
-   *
-   * `talentBuilds.json` carries wowsims' own presets for **17 of the 20 DPS specs**. The other three
-   * — Hunter Marksmanship, Warlock Affliction, Warlock Demonology — have no upstream preset and keep
-   * the old rule rather than getting an invented build, which was the repo owner's call. The
-   * calibration test names which specs use which, so the table does not mix two methodologies
-   * silently.
-   */
-  const sourced = talentBuilds.builds.find((build) => build.className === className && build.spec === spec)
-  const points: Record<number, number> = sourced ? { ...sourced.points } : {}
-  if (!sourced) {
-    const tree = getTalentData(className)?.trees.find((entry) => entry.spec === spec)
-    let spent = 0
-    for (const talent of tree?.talents ?? []) {
-      if (spent >= 61) break
-      const rank = Math.min(talent.maxRank, 61 - spent)
-      points[talent.id] = rank
-      spent += rank
-    }
-  }
-
-  const buffIds = sampleBuffs.map((buff) => buff.id)
-  const stats = calculateStats(
-    character,
-    gear,
-    buffIds,
-    sampleConsumables.map((consumable) => consumable.id),
-    undefined,
-    deriveTalentModifiers(points),
-  )
-
-  /*
-   * **Every modelled target debuff, because a raid always has them.** Leaving them off was the first
-   * version of this harness and it understated every physical spec by about 28%: Sunder, Faerie Fire
-   * and Curse of Recklessness strip 4,010 armour between them, which against this app's 7,700-armour
-   * target is the difference between 42.2% mitigation and 25.9%. A "best case" that omits what every
-   * real parse has would be measuring the wrong thing.
-   */
-  const debuffs = modelledTargetDebuffs.map((debuff) => debuff.id)
-
-  /*
-   * `buffIds` goes to the simulator as well as to `calculateStats`, and forgetting the second half is
-   * silent: stat buffs arrive folded into `stats` either way, so the run still looks right while
-   * percentage haste and damage multipliers contribute nothing. Which is exactly what happened the
-   * first time Bloodlust was modelled — the table did not move by a single point.
-   */
-  return {
-    result: calculateSimulation(character, gear, stats, role, debuffs, undefined, points, buffIds),
-    slots: filled.size,
-  }
-}
 
 test('every DPS spec is measured against what players actually parse', () => {
   /*
@@ -7419,7 +7307,6 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
   // And the estimate itself must run against the fixed boss, not the planted one. This is the whole
   // assertion now that the Encounter panel is gone — it was the sharper half of it anyway, since a
   // panel could have shown the right number while the model used the planted one.
-  await page.getByRole('button', { name: /run simulation/i }).click()
   await expect(page.getByText(/vs\. a level 73 target/i)).toBeVisible()
 })
 
@@ -7473,7 +7360,6 @@ test('every spec says what its own estimate misses, and none of them say the sam
 test('the spec caveat is rendered with the result, not just computed', async ({ page }) => {
   await openApp(page)
   await openSimulationTab(page)
-  await page.getByRole('button', { name: /run simulation/i }).click()
 
   const note = page.getByTestId('simulation-spec-note')
   await expect(note).toBeVisible()
@@ -11718,7 +11604,7 @@ test('the shell collapses to one column on a phone, and nothing lands past the v
   }
 
   await page.getByRole('button', { name: 'Simulation', exact: true }).click()
-  await expect(page.getByRole('region', { name: 'Upgrade Finder' })).toBeVisible()
+  await expect(page.getByTestId('upgrade-list')).toBeVisible()
   expect(await horizontalOverflow(page), 'Simulation fits its viewport').toBe(0)
 
   await page.getByRole('button', { name: 'Professions', exact: true }).click()
@@ -13086,7 +12972,7 @@ test('the simulator says when no weapon is equipped, and says why an ability was
 
   const warning = page.getByTestId('simulation-missing-weapon')
   await expect(warning).toContainText('No main-hand weapon is equipped')
-  await expect(page.locator('.simulation-result'), 'and the dropped ability says the weapon is why').toContainText(
+  await expect(page.getByTestId('simulation-summary'), 'and the dropped ability says the weapon is why').toContainText(
     'it scales off weapon damage, and no weapon is equipped',
   )
 

@@ -17,7 +17,7 @@ The honest caveat: a stat the simulator does not model gets a weight of zero, no
 ## Where this lives in the code
 
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
-- [[features.simulator.StatWeightsPanel]] — `src/features/simulator/StatWeightsPanel.tsx`
+- [[features.simulator.StatPriority]] — `src/features/simulator/StatPriority.tsx`
 
 ## Related
 

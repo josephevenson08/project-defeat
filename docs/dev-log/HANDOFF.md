@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-17.** A self-contained brief for picking
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-17 (after port step 4).** A self-contained brief for picking
 this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The port's
@@ -14,7 +14,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### For the next chat, in one paragraph
 
-**Port steps 0 to 3 are built, tested and live** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md); step 3, Professions: the work-in-progress commit `e319d2c` and the finishing commit of 2026-10-17, which removed about 720 lines of the old Professions styles and wrote the docs). The maps rework's Steps A and C are live; Step B (the node data) waits for Wowhead to answer the ingest again (the owner chose to wait and retry). **Next: step 4, Simulation.** **Ask before each push.** **Answer in caveman mode:** the owner asked (2026-10-15) for short, direct answers, so invoke the `caveman:caveman` skill at the start of the chat and keep it on until they ask for normal answers. Measured on the 2026-10-15 chat, the replies were 0.3% of the context and tool output 93%, so caveman saves under half a percent; the real savers are a fresh chat before the context passes about 250,000–400,000 tokens, reading only the parts of files and logs that are needed, and agents for heavy reading.
+**Port steps 0 to 3 are built, tested and live, and step 4 (Simulation) is built and tested, waiting for the owner's OK to commit and push** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), "Step 4, as built"). The maps rework's Steps A and C are live; Step B (the node data) waits for Wowhead to answer the ingest again (the owner chose to wait and retry). **Next: commit and push step 4 once the owner says so, then step 5, Raid Composition.** **Ask before each push.** **Answer in caveman mode:** the owner asked (2026-10-15) for short, direct answers, so invoke the `caveman:caveman` skill at the start of the chat and keep it on until they ask for normal answers. Measured on the 2026-10-15 chat, the replies were 0.3% of the context and tool output 93%, so caveman saves under half a percent; the real savers are a fresh chat before the context passes about 250,000–400,000 tokens, reading only the parts of files and logs that are needed, and agents for heavy reading.
 
 ### In short
 
@@ -23,6 +23,7 @@ further down this file is the record of how earlier decisions were reached, newe
 - **Raids is the decided design** (step 2): the boss journal (one boss at a time, "Loot for" any spec with its ranks, the fight, the raid's attunement on its About page), "For my raid" (who in the saved raid, or a labelled example raid, wants each drop), a search across all five raids, and the game-style item tooltip the planner tabs will reuse. The "Which raid?" picker, the rail of raids and the boss cards are gone, and the shell has no rail at all now. Each raid has its own colour. Details: the port plan's "Step 2, as built".
 - **The maps** (see the maps plan): all 42 zones now use Wowhead's TBC-era art (`wow.zamimg.com/images/wow/tbc/maps/enus/zoom/<areaId>.jpg`), and a test reads the map under the spawns to prove they land on land. The owner's decisions: maps fixed first, routes cover a skill window, ground routes are straight lines with a note, the tbc-researcher confirms nodes before ingest; and for Step B, Ragveil gets no map with the reason given, Dark Iron is in and marked optional, Nethercite is out.
 - **Professions is the decided design** (step 3): the profession window (recipes coloured at your skill from their own thresholds, trainer stops in the list, a recipe's reagents and vendor prices, a range's loop on its TBC map) with "Which two" behind a switch (every profession by what it makes for your spec, who feeds whom, and your two, which are the character's professions, so the planner and this tab share one pair). Details: the port plan's "Step 3, as built".
+- **Simulation is the decided design** (step 4, 2026-10-17): "What to do next" (your stat priority, your best upgrades with Equip, then the estimate against archon.gg with what it misses, the damage sources, how it was computed and every DPS spec's best case against the logs). No Run button: the estimate, the weights and the finder are worked out while the tab is on screen and are always current. The best-case harness moved from the tests to `src/features/simulator/bestCase.ts`. Two calls made in the build, worth confirming with the owner: no Run button, and the missing-weapon note first. Details: the port plan's "Step 4, as built".
 - **The routes are new** (Step C, 2026-10-14, `src/domain/professions/routeLoop.ts`): Wowhead's records merged into spawn points (the same spawn recorded twice is one), clusters a rider takes in from one spot, a loop through the clusters worth their detour (2-opt and Or-opt, far pockets dropped, no crossings), measured in the zone's 3:2 shape. Every map says how many spawn points its loop passes, how long a lap is against the zone's width, and whether the line is flown (Outland at 70) or ridden on the ground. A zone's loop is computed when its tab is first drawn. Details: the maps plan's Step C, as built.
 - **The node data is unchanged** (45 nodes) until Step B gets a data source. The research is in the maps plan: Felwood's and Blasted Lands' own object ids, the missing herbs (Bloodthistle, Ghost Mushroom, Gromsblood, Plaguebloom), the ooze-covered veins and Dark Iron, and a second-source check that agrees with Wowhead.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
@@ -30,8 +31,8 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### Next, in order
 
-1. **Step 4, Simulation:** "What to do next" with the damage-source table (prototype `docs/design/prototypes/tabs/simulation.html`, scripts `sim-*.js`, check `checks/sim-handson.mjs`). The engine does not change.
-2. Then steps 5 to 7 as the port plan lists them.
+1. **Commit and push step 4** when the owner says so: the work commit, `npm run changelog`, a "Refresh the daily log" commit, then the push.
+2. **Step 5, Raid Composition** (prototype `raid-composition.html`, check `checks/rc-handson.mjs`): compare it with `raidcomp/RaidCompositionPanel.tsx` first; much of the decided design came from the app. Then steps 6 and 7 as the port plan lists them.
 3. **Alongside: retry the node ingest now and then** (the owner chose to wait, 2026-10-13). When it succeeds, in the order the maps plan's "When the data arrives" gives: the guides' new zones, the ingest, the new zones' maps, the tab cap, the tests and docs. The routes need nothing: they take whatever nodes the data holds.
 4. Optional: `gen-prof-data.mjs` could read each recipe's colours from `craftingPaths.json` now, instead of the 2 MB ingest file.
 
@@ -48,6 +49,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 | What | Commit | Notes |
 | --- | --- | --- |
+| **Port step 4: Simulation** | the 2026-10-17 Simulation commit | "What to do next" with the damage sources and the trust panel; no Run button; the best-case harness in `src`; the three old panels and about 390 lines of their styles removed. 348 of 348 (the full run passed 346; the two older tests that still named the old panels were fixed and pass). |
 | **Port step 3: Professions** | `e319d2c` and the 2026-10-17 finish | The profession window and "Which two"; step colours on the crafting paths; your two are the character's; the old grid, page, picker, progressions, plan tables, payoff panel and their styles removed. 340 of 340 tests. |
 | **Maps Step C: the route algorithm** | `a1ffce6` | Spawn points instead of records, clusters, a prize-collecting loop with 2-opt and Or-opt and no crossings, the 3:2 measure, how many spawn points each loop passes and how long a lap is, the flown-or-ridden note, loops computed per tab. 334 of 334 tests. |
 | **Maps Step B, part one** | `151f12a` | The node ingest rewritten for the research (extra ids, seven new nodes, zones kept by share or by a range naming them, no partial writes, no cached empty replies), tested offline; the guide text corrected. The data refresh itself is blocked: Wowhead refuses scripted requests. |
@@ -70,7 +72,7 @@ Each work commit is followed by a "Refresh the daily log" commit.
 
 ### How to check things
 
-- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 8 minutes, 340 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
+- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 8 minutes, 348 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
 - **Prototype checks** (`docs/design/prototypes/tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs`; `published.mjs` against a local build or the live site (`BASE=`).
 - **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`, `gen-prof-data.mjs`; and `npm run brain` for the vault.
 - **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.

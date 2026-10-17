@@ -32,10 +32,12 @@ _No doc comment at the top of this file._
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
+- [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.calculateStatWeights]] — `src/features/simulator/calculateStatWeights.ts`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.simulator.UpgradesPanel]] — `src/features/simulator/UpgradesPanel.tsx`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

@@ -23,9 +23,10 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
-- [[App]] — `src/App.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
+- [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
+- [[features.simulator.TheEstimate]] — `src/features/simulator/TheEstimate.tsx`
 
 ## Concepts & phases
 

@@ -33,7 +33,9 @@ _No doc comment at the top of this file._
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[features.character.characterData]] — `src/features/character/characterData.ts`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
-- [[features.simulator.SimulatorPanel]] — `src/features/simulator/SimulatorPanel.tsx`
+- [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
+- [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
+- [[features.simulator.WhatIsModelled]] — `src/features/simulator/WhatIsModelled.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases

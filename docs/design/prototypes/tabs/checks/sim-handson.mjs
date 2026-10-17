@@ -51,7 +51,7 @@ if (APP !== "off") await step("the live app gives the same estimate for the same
   try { await app.goto(APP + link.slice(link.indexOf("#")), { waitUntil: "domcontentloaded" }); } catch (e) { throw new Error(`the app isn't running at ${APP}: start it with npm run dev, or set APP=off`); }
   await app.getByTestId("share-notice").waitFor({ timeout: 15000 });
   await app.getByRole("button", { name: "Simulation", exact: true }).click();
-  await app.getByRole("button", { name: /run simulation/i }).click();
+  // the live app has no Run button since port step 4: the estimate is there on arrival
   const got = num(await app.getByTestId("simulation-score").innerText());
   await app.close();
   expect(Math.abs(got - score) < 0.05, `app ${got}, design ${score}`);
