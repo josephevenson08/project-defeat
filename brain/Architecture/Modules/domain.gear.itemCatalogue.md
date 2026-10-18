@@ -56,6 +56,7 @@ From the top of the file:
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 

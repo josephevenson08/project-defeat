@@ -203,7 +203,14 @@ behind every claim of its that quotes a number.
   talents, buffs and consumables) packed into the address, so a build made on the desktop opens on a
   phone, or goes to a raid leader in one Discord message. Nothing is uploaded: the build rides in the
   part of the URL browsers never send to a server. Opening one lands straight in the planner wearing
-  the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean
+  the build. Named saves stay in the browser, and nothing is saved automatically — a reload starts clean.
+  **The Build tab** (the decided design, ported 2026-10-18) leads with a share card for the build on
+  screen (spec icon, slots filled, item level, talents, buffs, set pieces and the gear's icons), the
+  link to it, always current, and named saves that say what each holds. One box takes a link, build
+  text or the addon's export, and **reading it changes nothing**: a report shows what came in slot by
+  slot (or why a slot is empty), asks the spec when the talents cannot say, and only "Load into the
+  planner" wears it. An addon export keeps the buffs already set, since the addon cannot read them, and
+  a labelled example export shows the format
 - **Professions on the character** — your two, picked in the Professions tab's "Which two" (since 2026-10-17), gating the one always-on stat
   bonus any profession gives a level 70 character in TBC: Enchanting's ring enchants. They are
   Enchanter-only (Wowhead's spell 27927 is flagged "target must be own item") and go on **both**

@@ -1,6 +1,6 @@
 # Project Defeat — handoff
 
-**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-17 (after port step 5).** A self-contained brief for picking
+**Started 2026-08-09, substantially rewritten 2026-08-15, current to 2026-10-18 (step 6 begun: Build).** A self-contained brief for picking
 this up in a fresh chat. If `git log` disagrees with this file, trust git.
 
 **Start here:** read "Where this is right now", directly below. It covers everything needed to continue. The port's
@@ -14,7 +14,7 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### For the next chat, in one paragraph
 
-**Port steps 0 to 4 are built, tested and live (step 4, Simulation: `62d9522`, pushed 2026-10-17), and step 5 (Raid Composition) is built and tested, waiting for the owner's OK to commit and push** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), "Step 4, as built" and "Step 5, as built"). The maps rework's Steps A and C are live; Step B (the node data) waits for Wowhead to answer the ingest again (the owner chose to wait and retry). **Next: commit and push step 5 once the owner says so, then step 6, the Character Planner (Build first).** **Ask before each push.** **Answer in caveman mode:** the owner asked (2026-10-15) for short, direct answers, so invoke the `caveman:caveman` skill at the start of the chat and keep it on until they ask for normal answers. Measured on the 2026-10-15 chat, the replies were 0.3% of the context and tool output 93%, so caveman saves under half a percent; the real savers are a fresh chat before the context passes about 250,000–400,000 tokens, reading only the parts of files and logs that are needed, and agents for heavy reading.
+**Port steps 0 to 5 are built, tested and live (step 4, Simulation: `62d9522`; step 5, Raid Composition: `c8229e7`; both pushed 2026-10-17). Step 6, the Character Planner, has begun: Build is built and tested, waiting for the owner's OK to commit and push** ([`docs/design/PORT-PLAN.md`](../design/PORT-PLAN.md), "Step 6, Character Planner · Build, as built"). The maps rework's Steps A and C are live; Step B (the node data) waits for Wowhead to answer the ingest again (the owner chose to wait and retry). **Next: commit and push Build once the owner says so, then step 6's Ranked Gear.** **Ask before each push.** **Answer in caveman mode:** the owner asked (2026-10-15) for short, direct answers, so invoke the `caveman:caveman` skill at the start of the chat and keep it on until they ask for normal answers. Measured on the 2026-10-15 chat, the replies were 0.3% of the context and tool output 93%, so caveman saves under half a percent; the real savers are a fresh chat before the context passes about 250,000–400,000 tokens, reading only the parts of files and logs that are needed, and agents for heavy reading.
 
 ### In short
 
@@ -25,6 +25,7 @@ further down this file is the record of how earlier decisions were reached, newe
 - **Professions is the decided design** (step 3): the profession window (recipes coloured at your skill from their own thresholds, trainer stops in the list, a recipe's reagents and vendor prices, a range's loop on its TBC map) with "Which two" behind a switch (every profession by what it makes for your spec, who feeds whom, and your two, which are the character's professions, so the planner and this tab share one pair). Details: the port plan's "Step 3, as built".
 - **Simulation is the decided design** (step 4, 2026-10-17): "What to do next" (your stat priority, your best upgrades with Equip, then the estimate against archon.gg with what it misses, the damage sources, how it was computed and every DPS spec's best case against the logs). No Run button: the estimate, the weights and the finder are worked out while the tab is on screen and are always current. The best-case harness moved from the tests to `src/features/simulator/bestCase.ts`. Two calls made in the build, worth confirming with the owner: no Run button, and the missing-weapon note first. Details: the port plan's "Step 4, as built".
 - **Raid Composition is the decided design** (step 5, 2026-10-17): the planning table (the palette fills group 1 first or the group you aim at, a coverage ring per group, a pencil for names, Move and drag, Undo after Remove, a resize that drops players, Clear or loading the example, and the example roster labelled as such), then role balance, what one more seat would add, what is missing and who fixes it, and the coverage lists with reach tags (`domain/raidcomp/raidAdvice.ts`). Everything the live panel had stayed, with its test ids. Details: the port plan's "Step 5, as built".
+- **The planner's Build tab is the decided design** (step 6, 2026-10-18): the share card, the link always current, named saves with their facts, and a read-first report on the paste box with the spec question and "Load into the planner". An addon load now keeps the Buffs tab's buffs (it emptied them, against what the report said). Details: the port plan's "Step 6, Character Planner · Build, as built".
 - **The routes are new** (Step C, 2026-10-14, `src/domain/professions/routeLoop.ts`): Wowhead's records merged into spawn points (the same spawn recorded twice is one), clusters a rider takes in from one spot, a loop through the clusters worth their detour (2-opt and Or-opt, far pockets dropped, no crossings), measured in the zone's 3:2 shape. Every map says how many spawn points its loop passes, how long a lap is against the zone's width, and whether the line is flown (Outland at 70) or ridden on the ground. A zone's loop is computed when its tab is first drawn. Details: the maps plan's Step C, as built.
 - **The node data is unchanged** (45 nodes) until Step B gets a data source. The research is in the maps plan: Felwood's and Blasted Lands' own object ids, the missing herbs (Bloodthistle, Ghost Mushroom, Gromsblood, Plaguebloom), the ooze-covered veins and Dark Iron, and a second-source check that agrees with Wowhead.
 - **The app targets TBC Anniversary Phase 2 on purpose,** even though Phase 3 is live.
@@ -32,8 +33,8 @@ further down this file is the record of how earlier decisions were reached, newe
 
 ### Next, in order
 
-1. **Commit and push step 5** when the owner says so: the work commit, `npm run changelog`, a "Refresh the daily log" commit, then the push.
-2. **Step 6, the Character Planner, one sub-tab per commit:** Build, Ranked Gear, Compare, Buffs, Gear, Talents (prototype `planner.html` and its scripts). Every design generalises from Fury to all 27 specs. Then step 7, the scene.
+1. **Commit and push Build** when the owner says so: the work commit, `npm run changelog`, a "Refresh the daily log" commit, then the push.
+2. **The rest of step 6, one sub-tab per commit:** Ranked Gear (Wowhead's order slot by slot as tooltips, plus "Where it drops"), then Compare, Buffs, Gear and Talents (prototype `planner.html` with `ranked-planner.js`, `gear-planner.js` and the shared Gear, Talents and Buffs scripts, and their checks in `checks/`). Every design generalises from Fury to all 27 specs. Then step 7, the scene.
 3. **Alongside: retry the node ingest now and then** (the owner chose to wait, 2026-10-13). When it succeeds, in the order the maps plan's "When the data arrives" gives: the guides' new zones, the ingest, the new zones' maps, the tab cap, the tests and docs. The routes need nothing: they take whatever nodes the data holds.
 4. Optional: `gen-prof-data.mjs` could read each recipe's colours from `craftingPaths.json` now, instead of the 2 MB ingest file.
 
@@ -50,7 +51,8 @@ further down this file is the record of how earlier decisions were reached, newe
 
 | What | Commit | Notes |
 | --- | --- | --- |
-| **Port step 5: Raid Composition** | the 2026-10-17 Raid Composition commit | The planning table as decided around the live panel's mechanics; Undo; the example roster; one more seat; missing and who fixes it; reach tags. 355 of 355: the full run passed 354; the one failure was the known timing-sensitive image test (the Raids journal's lazy icons), which passed twice on its own. |
+| **Port step 6: Build** | the 2026-10-18 Build commit | The share card, the always-current link, saves with facts, the read-first report; an addon load keeps the buffs. 362 of 362 in a full run, after the image test learned to wait for its icons. |
+| **Port step 5: Raid Composition** | `c8229e7`, pushed | The planning table as decided around the live panel's mechanics; Undo; the example roster; one more seat; missing and who fixes it; reach tags. 355 of 355: the full run passed 354; the one failure was the known timing-sensitive image test (the Raids journal's lazy icons), which passed twice on its own. |
 | **Port step 4: Simulation** | `62d9522`, pushed | "What to do next" with the damage sources and the trust panel; no Run button; the best-case harness in `src`; the three old panels and about 390 lines of their styles removed. 348 of 348 (the full run passed 346; the two older tests that still named the old panels were fixed and pass). |
 | **Port step 3: Professions** | `e319d2c` and the 2026-10-17 finish | The profession window and "Which two"; step colours on the crafting paths; your two are the character's; the old grid, page, picker, progressions, plan tables, payoff panel and their styles removed. 340 of 340 tests. |
 | **Maps Step C: the route algorithm** | `a1ffce6` | Spawn points instead of records, clusters, a prize-collecting loop with 2-opt and Or-opt and no crossings, the 3:2 measure, how many spawn points each loop passes and how long a lap is, the flown-or-ridden note, loops computed per tab. 334 of 334 tests. |
@@ -70,11 +72,11 @@ Each work commit is followed by a "Refresh the daily log" commit.
 
 - **Step B's data refresh** (above): waiting for Wowhead to answer the ingest again.
 - **The app's buff data** leaves out caster-side debuffs and mana (Shadow Priest's, for one), so Raid Composition and the tier cards show only what it counts. Fixing it needs the tbc-researcher.
-- **A timing-sensitive test:** "no image in the app is painted larger than the file it comes from" failed once while other browser tests ran at the same time, and passed on its own.
+- **A timing-sensitive test, now waiting properly:** "no image in the app is painted larger than the file it comes from" failed in full runs on 2026-10-17 and 18 (the Raids journal measured 7 or 8 of its 10 lazy icons) and passed on its own. Since the Build step it waits for each screen's floor before measuring. If it fails again in a full run, look at the count it reached.
 
 ### How to check things
 
-- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 8 minutes, 355 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
+- **The app's suite:** `npx playwright test -c playwright.edge.config.ts` (Playwright's own Chromium isn't installed, so it runs on Edge; about 8 minutes, 362 tests). Stop any dev server you started first: the suite starts its own on 127.0.0.1:5173.
 - **Prototype checks** (`docs/design/prototypes/tabs/checks/`, run from the repo root on Edge): `<step>-handson.mjs a|b|c|p` for each step, with `WIDTH=400` for a phone and `RM=1` for reduced motion; `check-bg.mjs`; `published.mjs` against a local build or the live site (`BASE=`).
 - **Generated prototype data,** to re-run when `src/` changes: `gen-gear-data.mjs`, `gen-talent-data.mjs`, `gen-buff-data.mjs`, `gen-sim-engine.mjs`, `gen-front-data.mjs`, `gen-raid-data.mjs`, `gen-tier-data.mjs`, `gen-prof-data.mjs`; and `npm run brain` for the vault.
 - **Deploy gate:** `tsc -b`, `npm run lint` and `npm run build` run in `deploy.yml` before every deploy.

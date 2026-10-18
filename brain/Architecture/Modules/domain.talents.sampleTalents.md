@@ -42,6 +42,7 @@ From the top of the file:
 
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`

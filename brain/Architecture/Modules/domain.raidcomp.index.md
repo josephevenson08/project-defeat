@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.exampleRaids]] — `src/domain/raids/exampleRaids.ts`
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.raidcomp.raidcompFormat]] — `src/features/raidcomp/raidcompFormat.ts`

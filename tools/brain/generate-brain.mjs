@@ -694,7 +694,9 @@ const DESIGN_NOTES = [
 
 **Step 4, Simulation (2026-10-17):** "What to do next": your stat priority from the real weights ("Gem and enchant for Strength, then…"), your best upgrades with Equip, then the estimate against what players of your spec average on archon.gg, with what it misses for you, the damage sources (which sum to it), how it was computed, and every DPS spec's best case against the logs. No Run button: the three are worked out while the tab is on screen and are always current. The best-case harness moved from the tests into \`features/simulator/bestCase.ts\`, so the trust panel and the calibration test read one function; the range (1.05× to 2.13× low) and the lowest spec are computed, which showed the prototype's hand-written "Demonology" was stale (it is Destruction).
 
-**Step 5, Raid Composition (2026-10-17):** the planning table as decided. The live panel already had the palette, aiming, Move and drag, names and the PNG export, so they stayed and the page was rebuilt around the decided layout: a hero whose counts are the data's, the raid table with a roster tag, the folded raid details, the palette's next seat and "Fill in order", groups with a coverage ring, seats with a pencil and Move and Remove, Undo after anything that removes people, and the example roster labelled as the example (and as edited). Under it: role balance, what one more seat would add with a one-press seat, what is missing and who fixes it, and the coverage lists with each buff's reach tagged, from \`domain/raidcomp/raidAdvice.ts\`.`,
+**Step 5, Raid Composition (2026-10-17):** the planning table as decided. The live panel already had the palette, aiming, Move and drag, names and the PNG export, so they stayed and the page was rebuilt around the decided layout: a hero whose counts are the data's, the raid table with a roster tag, the folded raid details, the palette's next seat and "Fill in order", groups with a coverage ring, seats with a pencil and Move and Remove, Undo after anything that removes people, and the example roster labelled as the example (and as edited). Under it: role balance, what one more seat would add with a one-press seat, what is missing and who fixes it, and the coverage lists with each buff's reach tagged, from \`domain/raidcomp/raidAdvice.ts\`.
+
+**Step 6, the Character Planner, began with Build (2026-10-18):** the share card for the build on screen (\`features/builds/buildSummary.ts\`), its link always current, named saves with their facts, and one box for a link, build text or the addon's export that reads first: a report of what came in, the spec question, and only then "Load into the planner". The port found that an addon load emptied the Buffs tab while the report promised it would keep its own; it keeps them now.`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
       ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],
@@ -729,6 +731,8 @@ const DESIGN_NOTES = [
       'domain/raidcomp/raidAdvice.ts',
       'features/raidcomp/RaidCompositionPanel.tsx',
       'features/raidcomp/RaidAdvice.tsx',
+      'features/builds/buildSummary.ts',
+      'features/builds/BuildPanel.tsx',
     ],
     related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },

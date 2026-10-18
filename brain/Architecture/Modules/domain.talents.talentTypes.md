@@ -30,6 +30,7 @@ _None._
 - [[App]] — `src/App.tsx`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

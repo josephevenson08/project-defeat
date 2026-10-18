@@ -40,6 +40,7 @@ _No doc comment at the top of this file._
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 
 ## Concepts & phases
 

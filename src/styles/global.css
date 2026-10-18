@@ -9859,3 +9859,216 @@ h4,
     padding: 6px 8px 6px 9px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Character Planner · Build: the share card and "What came in" (port step 6, 2026-10-18).
+ *
+ * The decided design (`docs/design/prototypes/tabs/planner.html`, Build): design A's share card with
+ * the link and named saves, and design C's read-first report on the paste box.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.build-card {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  display: grid;
+  gap: 4px 12px;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 14px 0 12px;
+  padding: 12px 14px;
+}
+
+.build-card-icon {
+  border: 1.5px solid var(--glow);
+  border-radius: 8px;
+  grid-row: span 2;
+  height: 44px;
+  width: 44px;
+}
+
+.build-card h3 {
+  color: var(--ink);
+  font: 400 var(--t-lg) / 1.2 var(--f-head);
+  margin: 0;
+}
+
+.build-card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.build-card-facts li {
+  background: var(--glow-soft);
+  border: 1px solid var(--rim-2);
+  border-radius: 999px;
+  color: var(--ink);
+  font: 500 var(--t-xs) var(--f-mono);
+  padding: 3px 9px;
+}
+
+.build-card-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.build-pill {
+  align-items: center;
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 var(--t-xs) var(--f-body);
+  min-height: 34px;
+  padding: 6px 14px;
+}
+
+.build-pill:hover,
+.build-pill:focus-visible {
+  border-color: var(--glow);
+  color: var(--glow);
+}
+
+.build-pill[aria-pressed='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.build-load {
+  margin-top: 18px;
+}
+
+.build-load h3 {
+  margin: 0 0 4px;
+}
+
+.build-small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.build-example-tag {
+  align-self: center;
+  background: var(--warn-soft);
+  border: 1px solid rgba(255, 207, 122, 0.4);
+  border-radius: 4px;
+  color: var(--warn);
+  font: 700 10px / 1.4 var(--f-body);
+  letter-spacing: 0.1em;
+  padding: 1px 6px;
+  text-transform: uppercase;
+}
+
+.build-report {
+  background: var(--scrim);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+}
+
+.build-report h4 {
+  color: var(--ink);
+  font: 400 var(--t-lg) var(--f-head);
+  margin: 0 0 6px;
+}
+
+.build-report > p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.build-report > p b {
+  color: var(--ink);
+}
+
+.build-report .build-spec-choice {
+  background: var(--warn-soft);
+  border: 1px solid rgba(255, 207, 122, 0.35);
+  border-radius: 10px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+}
+
+.build-report .build-spec-choice p {
+  margin: 0 0 6px;
+}
+
+.build-spec-choice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.build-report-slots {
+  display: grid;
+  gap: 3px 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.build-report-slots li {
+  align-items: center;
+  border-top: 1px solid var(--rim-2);
+  display: grid;
+  font-size: var(--t-sm);
+  gap: 0 8px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  min-height: 32px;
+  padding: 3px 0;
+}
+
+.build-report-slots small {
+  color: var(--ink-3);
+  font: 600 10px var(--f-mono);
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+
+.build-report-empty-icon {
+  border: 1px dashed var(--rim);
+  border-radius: 5px;
+  height: 24px;
+  width: 24px;
+}
+
+.build-report-empty {
+  color: var(--ink-3);
+}
+
+.build-report-why {
+  color: var(--warn);
+  display: block;
+  font-size: var(--t-xs);
+}
+
+@media (max-width: 699px), (pointer: coarse) {
+  .build-pill,
+  .build-panel-shell .button,
+  .build-share-link input,
+  .build-slot-save input {
+    min-height: 44px;
+  }
+
+  .build-export-details summary {
+    align-items: center;
+    display: flex;
+    min-height: 44px;
+  }
+}

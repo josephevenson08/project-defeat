@@ -27,6 +27,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **Step 5, Raid Composition (2026-10-17):** the planning table as decided. The live panel already had the palette, aiming, Move and drag, names and the PNG export, so they stayed and the page was rebuilt around the decided layout: a hero whose counts are the data's, the raid table with a roster tag, the folded raid details, the palette's next seat and "Fill in order", groups with a coverage ring, seats with a pencil and Move and Remove, Undo after anything that removes people, and the example roster labelled as the example (and as edited). Under it: role balance, what one more seat would add with a one-press seat, what is missing and who fixes it, and the coverage lists with each buff's reach tagged, from `domain/raidcomp/raidAdvice.ts`.
 
+**Step 6, the Character Planner, began with Build (2026-10-18):** the share card for the build on screen (`features/builds/buildSummary.ts`), its link always current, named saves with their facts, and one box for a link, build text or the addon's export that reads first: a report of what came in, the spec question, and only then "Load into the planner". The port found that an addon load emptied the Buffs tab while the report promised it would keep its own; it keeps them now.
+
 ## Documents
 
 - [[docs/design/PORT-PLAN|The port plan, with each step as built]] — `docs/design/PORT-PLAN.md`
@@ -63,6 +65,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
+- [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 
 ## Related
 

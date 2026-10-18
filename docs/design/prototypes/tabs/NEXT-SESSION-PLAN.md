@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-17, evening): Raid Composition is in the app too; start here
+## ▶ Where we left off (2026-10-18): the planner's Build tab is in the app; start here
+
+**Step 6 began with Build:** `planner.html`'s Build sub-tab (design A's share card with design C's "What came in" report) is now the live app's Build tab, and `checks/build-handson.mjs` became `tests/build.spec.ts`. **Next:** Ranked Gear (`ranked-planner.js`), then Compare, Buffs, Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-17, evening): Raid Composition is in the app too
 
 **Step 5, Raid Composition:** this folder's `raid-composition.html` (design A's planning table, dark) is now the live app's Raid Composition tab, built around the live panel's own mechanics, and `checks/rc-handson.mjs` became `tests/raidcomp.spec.ts`. **Next:** step 6, the Character Planner, one sub-tab per commit, starting with Build (`planner.html`). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

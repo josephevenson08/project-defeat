@@ -49,6 +49,7 @@ From the top of the file:
 
 - [[App]] — `src/App.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 
 ## Concepts & phases
 

@@ -36,6 +36,7 @@ From the top of the file:
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildStorage]] — `src/features/builds/buildStorage.ts`
+- [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`
 
 ## Concepts & phases

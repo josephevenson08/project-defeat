@@ -293,6 +293,7 @@ async function equipDefaultGear(page: Page) {
   )
   await page.getByTestId('build-import-input').fill(JSON.stringify(exported))
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
   await openPlannerView(page, 'Gear')
 }
 
@@ -1808,6 +1809,7 @@ test('a build can be exported and imported back', async ({ page }) => {
   // Pasting the captured build back must restore the original character.
   await page.getByTestId('build-import-input').fill(exported)
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
 
   await expect(await characterField(page, 'Class')).toHaveValue('Warrior')
   await expect(page.getByTestId('build-status')).toContainText(/Build loaded/i)
@@ -1843,6 +1845,7 @@ test('a build referencing a missing item still loads, reporting the dropped slot
 
   await page.getByTestId('build-import-input').fill(JSON.stringify(exported))
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
 
   const status = page.getByTestId('build-status')
   await expect(status).toContainText(/Build loaded/i)
@@ -7298,6 +7301,7 @@ test('a saved build cannot bring back a different encounter target', async ({ pa
 
   await page.getByTestId('build-import-input').fill(JSON.stringify(stale))
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
 
   await openSimulationTab(page)
 
@@ -11110,6 +11114,19 @@ test('no image in the app is painted larger than the file it comes from', async 
 
   for (const screen of screens) {
     await screen.open()
+    /*
+     * Lazy images can still be arriving after the walk when the machine is busy: in a full suite run
+     * the raid journal measured 7 and 8 of its 10 icons twice in a row (2026-10-17 and 18), and 10+ on
+     * its own each time. So wait for each family's floor before measuring, rather than measuring a page
+     * that is half loaded. A floor never reached still fails below, with the count it got to.
+     */
+    const reached = async () => {
+      const rows = await paintedImages(page)
+      return Object.entries(screen.needs).every(
+        ([family, least]) => new Set(rows.filter((row) => familyOf(row.src) === family).map((row) => row.src)).size >= least,
+      )
+    }
+    await expect.poll(reached, { timeout: 10_000 }).toBe(true).catch(() => undefined)
     const painted = await paintedImages(page)
 
     const counted = new Map<string, Set<string>>()
@@ -12288,6 +12305,7 @@ test('an untouched character saves and loads as itself, empty slots and all', as
   const exported = await page.getByTestId('build-export-output').inputValue()
   await page.getByTestId('build-import-input').fill(exported)
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
   await expect(page.getByTestId('build-status')).toContainText('Every slot resolved cleanly')
 
   await openPlannerView(page, 'Gear')
@@ -12372,13 +12390,14 @@ test('the Build panel shares only the build on screen, and no longer promises an
   await expect(copy).toContainText('Nothing is saved automatically')
   await expect(page.getByRole('region', { name: 'Build', exact: true })).not.toContainText('restored next visit')
 
-  await page.getByTestId('build-share-copy').click()
-  await expect(page.getByTestId('build-share-link')).toBeVisible()
-
-  // A link made from the build as it was is withdrawn once the build changes, rather than left on
-  // screen describing a character that no longer exists.
+  // The link is on screen from the start (port step 6, the share card) and is made again whenever the
+  // build changes, so it never describes a character that no longer exists.
+  const link = page.getByTestId('build-share-link')
+  await expect(link).toHaveValue(/#build=/)
+  const before = await link.inputValue()
   await (await characterField(page, 'Specialization')).selectOption('Arms')
-  await expect(page.getByTestId('build-share-link')).toHaveCount(0)
+  await expect(link).not.toHaveValue(before)
+  await expect(link).toHaveValue(/#build=/)
 })
 
 /*
@@ -12671,6 +12690,7 @@ test('a character pasted from the addon arrives in the planner', async ({ page }
 
   await page.getByTestId('build-import-input').fill(JSON.stringify(realExport))
   await page.getByTestId('build-import-button').click()
+  await page.getByTestId('build-import-load').click()
 
   const status = page.getByTestId('build-status')
   await expect(status).toContainText(/Build loaded/i)
@@ -12705,7 +12725,9 @@ test('an addon export with no spec to infer asks instead of guessing', async ({ 
   await expect(choice).toContainText(/spent no talent points/i)
   await expect(choice.getByRole('button')).toHaveCount(3)
 
+  // Asked in the report, before anything loads (port step 6): pick, then load.
   await page.getByTestId('build-spec-restoration').click()
+  await page.getByTestId('build-import-load').click()
   await expect(page.getByTestId('character-name')).toHaveText('Troll Restoration Shaman')
 })
 
