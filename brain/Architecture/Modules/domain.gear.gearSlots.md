@@ -27,6 +27,7 @@ _None._
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
@@ -40,7 +41,7 @@ _None._
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.gear.slotVisibility]] — `src/domain/gear/slotVisibility.ts`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 

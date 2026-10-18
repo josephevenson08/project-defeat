@@ -16,7 +16,8 @@ All 27 specs have Phase 1/2 starter rankings. They are guide-shaped rather than 
 
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
 
 ## Related
 

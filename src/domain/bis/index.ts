@@ -1,8 +1,26 @@
 export type { BisList, RankedGearEntry, RankedGearSource } from './bisTypes'
-export { bisLists, bisRankingsFetchedAt, excludedByPhase, getBisListForSpec, requireBisList } from './bisLists'
+export { bisLists, bisRankingsFetchedAt, excludedByPhase, getBisListForSpec, getGuideRecommendation, requireBisList } from './bisLists'
 export type { ItemAcquisition } from './acquisition'
 export { findRaidDrop, raidDropIndexSize, resolveAcquisition } from './acquisition'
 export { parseRankedSource, UNCLASSIFIED_INSTANCES } from './rankedSource'
+export type { EquipBlock, RankedItem, RankedList, RankedWhere, Standing } from './rankedGear'
+export {
+  bestSlotFor,
+  equipBlock,
+  guideFitting,
+  listForSlot,
+  raidShortName,
+  raidsInOrder,
+  rankedItems,
+  rankedListsFor,
+  slotsWearing,
+  standingOf,
+  upgradesLeft,
+  whereFrom,
+  whereText,
+  wornItem,
+  wornRank,
+} from './rankedGear'
 
 import { requireBisList } from './bisLists'
 

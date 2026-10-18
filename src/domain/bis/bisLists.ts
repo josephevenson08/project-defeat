@@ -97,6 +97,8 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
     sourceName: spec.sourceName,
     sourceUrl: spec.sourceUrl,
     notes,
+    ...(raw.note ? { label: raw.note } : {}),
+    ...(raw.source ? { sourceText: raw.source } : {}),
     ...(source ? { source } : {}),
     ...(enchantId ? { recommendedEnchantId: enchantId } : {}),
     ...(gemIds?.some(Boolean) ? { recommendedGemIds: gemIds } : {}),
@@ -225,6 +227,16 @@ export const bisLists: readonly BisList[] = buildLists()
 
 /** When Wowhead's 27 Phase 2 guides were fetched, as an ISO date, for the source lines under the top bar. */
 export const bisRankingsFetchedAt: string | undefined = rawRankings.fetchedAt
+
+/**
+ * The guide's gem for each socket colour and enchant for each slot, for one spec.
+ *
+ * Published for the spec as a whole rather than per item, so Ranked Gear fits every item in a slot
+ * out with them, the way a player would; the lists themselves still hang them on rank 1 only.
+ */
+export function getGuideRecommendation(className: TbcClass, spec: TbcSpec): RawRecommendation | undefined {
+  return recommendationsBySpec[`${className}|${spec}`]
+}
 
 export function getBisListForSpec(className: TbcClass, spec: TbcSpec) {
   return bisLists.find((list) => list.className === className && list.spec === spec)

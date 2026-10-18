@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-18): the planner's Build tab is in the app; start here
+## ▶ Where we left off (2026-10-18, later): Ranked Gear is in the app too; start here
+
+**Step 6 continued with Ranked Gear:** `planner.html`'s Ranked Gear sub-tab (`ranked-planner.js`: design A's guide slot by slot as tooltips, with design C's "Where it drops" behind the switch) is now the live app's Ranked Gear tab for all 27 specs, and `checks/ranked-handson.mjs` became `tests/ranked.spec.ts`. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Compare (`compare-*.js`), Buffs, Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-18): the planner's Build tab is in the app
 
 **Step 6 began with Build:** `planner.html`'s Build sub-tab (design A's share card with design C's "What came in" report) is now the live app's Build tab, and `checks/build-handson.mjs` became `tests/build.spec.ts`. **Next:** Ranked Gear (`ranked-planner.js`), then Compare, Buffs, Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

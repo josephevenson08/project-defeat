@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisLists.ts
-lines: 239
+lines: 251
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisLists
 
-`src/domain/bis/bisLists.ts` · **domain** layer · 239 lines
+`src/domain/bis/bisLists.ts` · **domain** layer · 251 lines
 
 From the top of the file:
 
@@ -26,7 +26,7 @@ From the top of the file:
 
 ## Exports
 
-**function** — `getBisListForSpec`, `requireBisList`
+**function** — `getBisListForSpec`, `getGuideRecommendation`, `requireBisList`
 
 **const** — `bisLists`, `bisRankingsFetchedAt`
 
@@ -43,6 +43,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 

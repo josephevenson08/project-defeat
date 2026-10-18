@@ -2,20 +2,22 @@
 type: module
 layer: components
 source: src/components/ui/ItemTooltip.tsx
-lines: 62
+lines: 88
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.ui.ItemTooltip
 
-`src/components/ui/ItemTooltip.tsx` · **components** layer · 62 lines
+`src/components/ui/ItemTooltip.tsx` · **components** layer · 88 lines
 
 From the top of the file:
 
 > A game-style item tooltip: our own markup and wording in the game's layout and colours (quality
-> name, yellow item level, white base stats, green bonuses, sockets, a yellow kind line). The icons
-> are the files the app already ships. Drawn inside a `FloatingTip`.
+> name, yellow item level, white base stats, the enchant in green, sockets or the gems in them, the
+> socket bonus, green bonuses, the set, a yellow kind line). The icons are the files the app already
+> ships. Drawn inside a `FloatingTip`, or straight on the page where a tab shows items as tooltips
+> (Ranked Gear).
 
 ## Exports
 
@@ -28,6 +30,8 @@ From the top of the file:
 
 ## Imported by
 
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 
 ## Concepts & phases

@@ -26,6 +26,7 @@ _None._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 - [[features.raidcomp.raidcompSources]] — `src/features/raidcomp/raidcompSources.ts`
 - [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`

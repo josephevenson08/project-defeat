@@ -2,7 +2,9 @@ import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, us
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
-import { BisPanel } from './features/bis/BisPanel'
+import { RankedGearPanel } from './features/bis/RankedGearPanel'
+import { initialRankedSession, rankedSources, type RankedSession } from './features/bis/rankedSession'
+import { getBisListForSpec } from './domain/bis'
 import { BuildPanel } from './features/builds/BuildPanel'
 import { applySavedGear, type BuildState } from './domain/builds/buildSerialization'
 import { decodeBuildFromLink, readShareValue } from './domain/builds/shareLink'
@@ -196,6 +198,8 @@ function App() {
    */
   const [raidsSession, setRaidsSession] = useState<RaidsSession>(initialRaidsSession)
   const [professionsSession, setProfessionsSession] = useState<ProfessionsSession>(initialProfessionsSession)
+  // Ranked Gear's view, slot and "Only upgrades", kept the same way.
+  const [rankedSession, setRankedSession] = useState<RankedSession>(initialRankedSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -527,6 +531,8 @@ function App() {
           <Provenance sources={simulationSources} />
         ) : currentTab === 'raidcomp' ? (
           <Provenance sources={raidcompSources} />
+        ) : currentTab === 'planner' && plannerView === 'bis' ? (
+          <Provenance sources={rankedSources(getBisListForSpec(character.className, character.spec))} />
         ) : undefined
       }
       onHome={() => {
@@ -576,7 +582,9 @@ function App() {
               onToggleTargetDebuff={toggleTargetDebuff}
             />
           )}
-          {plannerView === 'bis' && <BisPanel character={character} gear={gear} onEquip={updateGear} />}
+          {plannerView === 'bis' && (
+            <RankedGearPanel character={character} gear={gear} onEquip={updateGear} session={rankedSession} onSession={setRankedSession} />
+          )}
           {plannerView === 'build' && <BuildPanel state={buildState} role={role} onImport={importBuild} />}
         </>
       )}

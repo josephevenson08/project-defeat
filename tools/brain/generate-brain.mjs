@@ -377,7 +377,7 @@ The honest caveat: a stat the simulator does not model gets a weight of zero, no
     body: `A BiS list in this project is a ranked list per class/spec/phase/slot, not a single answer. Each entry carries its source (raid, boss, vendor, reputation, crafting) so the list doubles as an acquisition plan rather than just a target.
 
 All 27 specs have Phase 1/2 starter rankings. They are guide-shaped rather than tooltip-audited: items whose stats were approximated are flagged so the UI can say so. See [[Needs Verification]].`,
-    modules: ['domain/bis/bisTypes.ts', 'domain/bis/bisLists.ts', 'features/bis/BisPanel.tsx'],
+    modules: ['domain/bis/bisTypes.ts', 'domain/bis/bisLists.ts', 'domain/bis/rankedGear.ts', 'features/bis/RankedGearPanel.tsx'],
     related: ['Needs Verification', 'Content Phases', 'Stat Weights'],
   },
   {
@@ -696,7 +696,9 @@ const DESIGN_NOTES = [
 
 **Step 5, Raid Composition (2026-10-17):** the planning table as decided. The live panel already had the palette, aiming, Move and drag, names and the PNG export, so they stayed and the page was rebuilt around the decided layout: a hero whose counts are the data's, the raid table with a roster tag, the folded raid details, the palette's next seat and "Fill in order", groups with a coverage ring, seats with a pencil and Move and Remove, Undo after anything that removes people, and the example roster labelled as the example (and as edited). Under it: role balance, what one more seat would add with a one-press seat, what is missing and who fixes it, and the coverage lists with each buff's reach tagged, from \`domain/raidcomp/raidAdvice.ts\`.
 
-**Step 6, the Character Planner, began with Build (2026-10-18):** the share card for the build on screen (\`features/builds/buildSummary.ts\`), its link always current, named saves with their facts, and one box for a link, build text or the addon's export that reads first: a report of what came in, the spec question, and only then "Load into the planner". The port found that an addon load emptied the Buffs tab while the report promised it would keep its own; it keeps them now.`,
+**Step 6, the Character Planner, began with Build (2026-10-18):** the share card for the build on screen (\`features/builds/buildSummary.ts\`), its link always current, named saves with their facts, and one box for a link, build text or the addon's export that reads first: a report of what came in, the spec question, and only then "Load into the planner". The port found that an addon load emptied the Buffs tab while the report promised it would keep its own; it keeps them now.
+
+**Step 6 continued with Ranked Gear (2026-10-18):** Wowhead's Phase 2 order for the character's own spec, slot by slot as game tooltips (the slot picker shows what you wear; each item fitted out with the guide's enchant and gems, marked when worn, with Equip), and "Where it drops" behind a switch counting the upgrades left: every item once, grouped by raid and boss in kill order, then world bosses, crafting and the rest, with "Only upgrades". The logic is \`domain/bis/rankedGear.ts\`, for all 27 specs. The port found two things: many classes' tier pieces have no boss in the loot tables, so a piece now takes the boss whose token for that slot it is bought with; and a floating tooltip inside a glass panel was placed against the panel rather than the screen, so \`FloatingTip\` now draws into the body.`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
       ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],
@@ -733,6 +735,10 @@ const DESIGN_NOTES = [
       'features/raidcomp/RaidAdvice.tsx',
       'features/builds/buildSummary.ts',
       'features/builds/BuildPanel.tsx',
+      'domain/bis/rankedGear.ts',
+      'features/bis/RankedGearPanel.tsx',
+      'features/bis/SlotBySlot.tsx',
+      'features/bis/WhereItDrops.tsx',
     ],
     related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },

@@ -99,7 +99,7 @@ the [port plan](docs/design/PORT-PLAN.md):
 | 3 | **Professions:** the game's profession window, and which two to take | Done (2026-10-17): recipes coloured at your skill, trainer stops, reagents, each range's loop on its TBC map; "Which two" with your character's two professions. The node refresh of the [maps rework](docs/design/MAPS-PLAN.md) waits for Wowhead to answer scripted requests again |
 | 4 | **Simulation:** what to do next (your stat priority, your best upgrades with Equip, then the estimate) with the damage sources and how far to trust the number | Done, 2026-10-17 |
 | 5 | **Raid Composition:** the planning table with a click-to-fill palette, Undo and the example roster, then what one more seat would add and who fixes what is missing | Done, 2026-10-17 |
-| 6 | **The Character Planner**, one sub-tab at a time: **Build** (the share card, and a read-first report on the paste box) done 2026-10-18; Ranked Gear, Compare, Buffs, Gear and Talents to come | In progress |
+| 6 | **The Character Planner**, one sub-tab at a time: **Build** (the share card, and a read-first report on the paste box) and **Ranked Gear** (Wowhead's order slot by slot as game tooltips, and where each item drops) done 2026-10-18; Compare, Buffs, Gear and Talents to come | In progress |
 | 7 | The 3D crystal-and-water scene, as an optional layer | Last |
 
 **To pick the work back up,** read the top of [`docs/dev-log/HANDOFF.md`](docs/dev-log/HANDOFF.md).

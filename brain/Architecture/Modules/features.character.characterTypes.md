@@ -24,7 +24,9 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`

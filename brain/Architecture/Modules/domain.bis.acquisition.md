@@ -38,6 +38,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 
 ## Concepts & phases
 

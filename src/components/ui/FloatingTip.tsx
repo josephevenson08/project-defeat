@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { SHEET_BELOW } from './useHoverTip'
 
 type FloatingTipProps = {
@@ -17,6 +18,10 @@ type FloatingTipProps = {
  *
  * Decorative for assistive tech: everything a tip shows is also on the page or one press away, and
  * the anchor's own name already says what it is.
+ *
+ * Drawn into the body rather than where it is used: inside a glass panel (`backdrop-filter`) a fixed
+ * box is placed against the panel, not the screen, which put Ranked Gear's tips hundreds of pixels
+ * off the top. The tokens it uses live on the root, so nothing about its look depends on the tab.
  */
 export function FloatingTip({ anchor, placement, className, testId, children }: FloatingTipProps) {
   const tipRef = useRef<HTMLDivElement>(null)
@@ -56,7 +61,7 @@ export function FloatingTip({ anchor, placement, className, testId, children }: 
     tip.style.visibility = 'visible'
   }, [anchor, placement, sheet, children])
 
-  return (
+  return createPortal(
     <div
       className={`floating-tip ${className}${sheet ? ' floating-tip-sheet' : ''}`}
       ref={tipRef}
@@ -66,6 +71,7 @@ export function FloatingTip({ anchor, placement, className, testId, children }: 
       style={sheet ? undefined : { visibility: 'hidden' }}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   )
 }

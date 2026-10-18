@@ -24,7 +24,6 @@ _None._
 ## Imported by
 
 - [[components.layout.ErrorBoundary]] — `src/components/layout/ErrorBoundary.tsx`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 

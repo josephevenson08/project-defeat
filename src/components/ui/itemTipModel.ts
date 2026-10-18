@@ -1,4 +1,5 @@
-import type { ItemQuality, SocketColor } from '../../domain/gear/itemTypes'
+import type { GearItem, ItemQuality, SocketColor } from '../../domain/gear/itemTypes'
+import { describeStats } from '../../domain/stats/describeStats'
 
 /**
  * What an item tooltip shows, in the order the game shows it. Built by each tab from its own data
@@ -17,8 +18,16 @@ export type ItemTipModel = {
   damage?: { min: number; max: number; speed: number }
   /** Base stats are white, as in the game; everything else is green. */
   stats: readonly { text: string; base: boolean }[]
+  /** The enchant on it, green under the base stats, for a tab that fits items out (Ranked Gear). */
+  enchant?: string
   sockets?: readonly SocketColor[]
+  /** What sits in each socket, in socket order; an empty one is drawn as the bare socket. */
+  gems?: readonly ({ name: string; icon?: string } | undefined)[]
   socketBonus?: string
+  /** With gems shown: whether they match their sockets, so the bonus is on (green) rather than grey. */
+  socketBonusOn?: boolean
+  /** The tier set it belongs to, with each bonus as the game prints it ("(2) Set: …"). */
+  set?: { name: string; bonuses: readonly string[] }
   /** "Tier token", "Recipe" and the like, in the game's yellow. */
   kind?: string
   note?: string
@@ -44,4 +53,30 @@ export function statLinesFrom(described: string): ItemTipModel['stats'] {
   return parts
     .filter((part) => !(attackPower && / Ranged AP$/.test(part) && part.split(' ')[0] === attackPower.split(' ')[0]))
     .map((part) => (/ Armor$/.test(part) ? { text: part.replace(/^\+/, ''), base: true } : { text: part, base: BASE_STAT.test(part) }))
+}
+
+/** "Finger 1" reads "Finger" on an item, as in the game. */
+export const slotName = (slot: string | undefined) => slot?.replace(/ [12]$/, '')
+
+/**
+ * The part of a tooltip the catalogue item alone decides: its name, quality, item level, slot and
+ * type line, weapon damage, stats, sockets and socket bonus. Raids adds where it drops and who ranks
+ * it; Ranked Gear adds the guide's enchant and gems.
+ */
+export function catalogueTip(item: GearItem | undefined, name = item?.name ?? ''): ItemTipModel {
+  return {
+    name,
+    quality: item?.quality,
+    itemLevel: item?.itemLevel,
+    unique: item?.unique,
+    slot: slotName(item?.slot),
+    typeLine: item?.weaponType ? [item.handType, item.weaponType].filter(Boolean).join(' ') : item?.armorType,
+    damage:
+      item?.weaponDamageMin !== undefined && item.weaponDamageMax !== undefined && item.weaponSpeed !== undefined
+        ? { min: item.weaponDamageMin, max: item.weaponDamageMax, speed: item.weaponSpeed }
+        : undefined,
+    stats: statLinesFrom(describeStats(item?.stats)),
+    sockets: item?.sockets,
+    socketBonus: describeStats(item?.socketBonus) || undefined,
+  }
 }

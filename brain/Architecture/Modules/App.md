@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 633
+lines: 641
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 633 lines
+`src/App.tsx` · **app** layer · 641 lines
 
 From the top of the file:
 
@@ -35,6 +35,7 @@ _Nothing exported (side-effect or style module)._
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.layout.TabNav]] — `src/components/layout/TabNav.tsx`
 - [[components.ui.Provenance]] — `src/components/ui/Provenance.tsx`
+- [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
@@ -46,7 +47,8 @@ _Nothing exported (side-effect or style module)._
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
 - [[featureFlags]] — `src/featureFlags.ts`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`

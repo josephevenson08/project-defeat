@@ -33,6 +33,10 @@ export type RankedGearEntry = {
   recommendedEnchantId?: string
   recommendedGemIds?: string[]
   notes?: string
+  /** The guide's own label for the pick ("Best", "P1 BiS", "Great (Orc)"), the first half of `notes`. */
+  label?: string
+  /** The guide's source column as written ("Vendor: (41 Badges of Justice)"), the second half of `notes`. */
+  sourceText?: string
   sourceName: string
   sourceUrl?: string
   source?: RankedGearSource

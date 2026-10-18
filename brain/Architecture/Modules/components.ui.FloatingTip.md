@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/ui/FloatingTip.tsx
-lines: 72
+lines: 78
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.ui.FloatingTip
 
-`src/components/ui/FloatingTip.tsx` · **components** layer · 72 lines
+`src/components/ui/FloatingTip.tsx` · **components** layer · 78 lines
 
 _No doc comment at the top of this file._
 
@@ -23,6 +23,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 

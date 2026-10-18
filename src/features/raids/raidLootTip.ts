@@ -1,5 +1,5 @@
 import type { ItemTipModel } from '../../components/ui/itemTipModel'
-import { statLinesFrom } from '../../components/ui/itemTipModel'
+import { catalogueTip, slotName } from '../../components/ui/itemTipModel'
 import {
   listKey,
   lootItem,
@@ -10,10 +10,8 @@ import {
   type RaidLootEntry,
   type SpecRef,
 } from '../../domain/raids'
-import { describeStats } from '../../domain/stats/describeStats'
 
-/** "Finger 1" reads "Finger" on an item, as in the game. */
-export const slotName = (slot: string | undefined) => slot?.replace(/ [12]$/, '')
+export { slotName }
 
 export const listName = (spec: SpecRef) => `${spec.spec} ${spec.className}`
 
@@ -25,19 +23,7 @@ export function raidLootTip(entry: RaidLootEntry, lootFor: SpecRef | undefined):
   const others = ranks.filter((rank) => rank !== yours).slice(0, yours ? 3 : 4)
 
   return {
-    name: entry.name,
-    quality: item?.quality,
-    itemLevel: item?.itemLevel,
-    unique: item?.unique,
-    slot: slotName(item?.slot),
-    typeLine: item?.weaponType ? [item.handType, item.weaponType].filter(Boolean).join(' ') : item?.armorType,
-    damage:
-      item?.weaponDamageMin !== undefined && item.weaponDamageMax !== undefined && item.weaponSpeed !== undefined
-        ? { min: item.weaponDamageMin, max: item.weaponDamageMax, speed: item.weaponSpeed }
-        : undefined,
-    stats: statLinesFrom(describeStats(item?.stats)),
-    sockets: item?.sockets,
-    socketBonus: describeStats(item?.socketBonus) || undefined,
+    ...catalogueTip(item, entry.name),
     kind: lootKindLabel(entry),
     note: entry.notes,
     where: whereItDropsText(entry) || undefined,

@@ -28,6 +28,7 @@ _None._
 ## Imported by
 
 - [[components.ui.FloatingTip]] — `src/components/ui/FloatingTip.tsx`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`

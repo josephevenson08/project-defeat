@@ -353,20 +353,34 @@ async function expectRankedList(page: Page, title: string) {
 }
 
 /**
- * Asserts the ranking has a section for a slot, under the label that spec uses for it.
+ * The Ranked Gear slot picker's button for a slot, by the label that spec uses for it ("Totem").
+ * Named "Totem: Totem of the Astral Winds" when the slot holds something, "Totem, empty" when not.
+ */
+function rankingSlotButton(page: Page, label: string) {
+  return page.getByRole('group', { name: 'Slot', exact: true }).getByRole('button', { name: new RegExp(`^${label}[:,]`) })
+}
+
+/**
+ * Asserts the ranking has a list for a slot, under the label that spec uses for it.
  *
- * The slot display name is a *heading* only in the ranking — the gear grid renders it as a span — so
- * these assertions belong to that view and nowhere else.
+ * Since port step 6 the ranking shows one slot at a time ("Slot by slot"), so this picks the slot
+ * and reads its heading. The slot display name is a *heading* only in the ranking — the gear grid
+ * renders it as a span — so these assertions belong to that view and nowhere else.
  */
 async function expectRankingHeading(page: Page, label: string) {
   await openPlannerView(page, 'Ranked Gear')
-  await expect(page.getByRole('heading', { name: label, exact: true })).toBeVisible()
+  await page.getByTestId('view-slot').click()
+  await rankingSlotButton(page, label).click()
+  await expect(page.locator('.ranked-head').getByRole('heading', { name: label, exact: true })).toBeVisible()
+  await expect(page.locator('.ranked-card').first(), `${label} has ranked items`).toBeVisible()
 }
 
 /** The absence form, which needs the view switch even more: elsewhere it passes vacuously. */
 async function expectNoRankingHeading(page: Page, label: string) {
   await openPlannerView(page, 'Ranked Gear')
-  await expect(page.getByRole('heading', { name: label, exact: true })).toHaveCount(0)
+  await page.getByTestId('view-slot').click()
+  await expect(page.getByRole('group', { name: 'Slot', exact: true })).toBeVisible()
+  await expect(rankingSlotButton(page, label)).toHaveCount(0)
 }
 
 /*
@@ -833,12 +847,14 @@ test('Enhancement Shaman filters gear, relics, enchants, and source details by s
   await expectRankingHeading(page, 'Totem')
   await expectNoRankingHeading(page, 'Ranged')
 
-  // Instance and boss used to be a separate "Farm" row restating the source in more words. They now
-  // sit on the single identity line with the item id and slot, so this asserts the content rather
-  // than the old row's exact punctuation.
-  const leotherasRow = page.locator('.bis-entry', { hasText: 'Leotheras the Blind' }).first()
-  await expect(leotherasRow).toContainText('Serpentshrine Cavern')
-  await expect(leotherasRow).toContainText('Leotheras the Blind')
+  // Where an item drops is Ranked Gear's second view since port step 6: every ranked item grouped by
+  // raid and boss, so Leotheras' drops sit under him inside Serpentshrine Cavern.
+  await page.getByTestId('view-where').click()
+  const leotheras = page.getByTestId('ranked-group-serpentshrine-cavern').locator('.ranked-boss', { hasText: 'Leotheras the Blind' })
+  await expect(leotheras.locator('.ranked-row').first()).toBeVisible()
+  // A pick the data flags is still said to need checking, on its card: the top ring here.
+  await page.getByTestId('view-slot').click()
+  await rankingSlotButton(page, 'Finger 1').click()
   await expect(page.getByText(/Needs source\/rank verification/i).first()).toBeVisible()
 })
 
@@ -846,7 +862,7 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await openApp(page)
   await openPlannerView(page, 'Ranked Gear')
 
-  await expect(page.getByRole('heading', { name: /BiS \/ Ranked Gear/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ranked Gear', exact: true })).toBeVisible()
 
   await (await characterField(page, 'Faction')).selectOption('Horde')
   await (await characterField(page, 'Race')).selectOption('Troll')
@@ -856,9 +872,9 @@ test('BiS panel shows Enhancement Shaman rankings and equips a listed item', asy
   await expect(page.getByTestId('bis-panel')).toBeVisible()
   await expectRankedList(page, 'Enhancement Shaman Phase 2 Ranked List')
   await expectRankingHeading(page, 'Head')
-  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Cataclysm Helm' })).toBeVisible()
-  // The id is now prefixed with # on the compact identity line rather than spelled "Item ID".
-  await expect(page.getByTestId('bis-panel').getByText(/#30190/)).toBeVisible()
+  // Each pick is its game tooltip since port step 6, ranked on its card: Cataclysm Helm is Head's #1.
+  await expect(page.getByTestId('ranked-card-cataclysm-helm')).toContainText('#1')
+  await expect(page.getByTestId('ranked-card-cataclysm-helm').locator('.item-tip')).toContainText('Cataclysm Helm')
 
   const before = readStatValue(await (await statRow(page, 'attack-power')).innerText())
   await page.getByRole('button', { name: /Equip Cataclysm Helm/i }).click()
@@ -882,23 +898,26 @@ test('BiS panel can equip paired trinket targets without duplicating unique item
   await (await characterField(page, 'Class')).selectOption('Shaman')
   await (await characterField(page, 'Specialization')).selectOption('Enhancement')
 
-  // One row per trinket: the ranking is not duplicated across Trinket 1 and Trinket 2, because each
-  // row already carries an equip button for both sockets.
-  const dragonspineRow = page.locator('.bis-entry', { hasText: 'Dragonspine Trophy' })
-  const bloodlustRow = page.locator('.bis-entry', { hasText: 'Bloodlust Brooch' })
+  // One list for both trinkets, shown for whichever trinket slot is picked, so each card equips into
+  // that slot: the ranking is not duplicated across Trinket 1 and Trinket 2.
+  const dragonspineCard = page.getByTestId('ranked-card-dragonspine-trophy')
+  const bloodlustCard = page.getByTestId('ranked-card-bloodlust-brooch')
 
   // This test alternates between the ranking and the gear grid, which are separate sub-tabs now.
-  // `withSlotOpen` moves to Gear on its own, so each return to a row has to ask for Ranked Gear.
+  // `withSlotOpen` moves to Gear on its own, so each return to a card has to ask for Ranked Gear.
   await openPlannerView(page, 'Ranked Gear')
-  await dragonspineRow.getByRole('button', { name: 'Equip Trinket 1' }).click()
+  await rankingSlotButton(page, 'Trinket 1').click()
+  await dragonspineCard.getByRole('button', { name: 'Equip Dragonspine Trophy in Trinket 1' }).click()
   await withSlotOpen(page, 'Trinket 1', async () => {
     await expect(page.getByLabel('Trinket 1', { exact: true })).toHaveValue('dragonspine-trophy')
   })
 
+  // The second trinket cannot take a second Dragonspine.
   await openPlannerView(page, 'Ranked Gear')
-  await expect(dragonspineRow.getByRole('button', { name: 'Unique equipped' })).toBeDisabled()
+  await rankingSlotButton(page, 'Trinket 2').click()
+  await expect(dragonspineCard.getByRole('button', { name: 'Unique: already in Trinket 1' })).toBeDisabled()
 
-  await bloodlustRow.getByRole('button', { name: 'Equip Trinket 2' }).click()
+  await bloodlustCard.getByRole('button', { name: 'Equip Bloodlust Brooch in Trinket 2' }).click()
   await withSlotOpen(page, 'Trinket 2', async () => {
     await expect(page.getByLabel('Trinket 2', { exact: true })).toHaveValue('bloodlust-brooch')
   })
@@ -1478,7 +1497,7 @@ test('Warlock specs hide the Relic slot, use a real Ranged wand, and each get th
   // "Voidheart Cover", which this used to assert, does not exist — it was one of the invented names
   // in the old hand-written lists. The real set piece is Voidheart Crown, and the guide's top head
   // pick for Destruction is the engineering helm.
-  await expect(page.getByTestId('bis-panel').getByRole('heading', { name: 'Destruction Holo-gogs' })).toBeVisible()
+  await expect(page.locator('.ranked-card').first()).toContainText('Destruction Holo-gogs')
 })
 
 test('Professions opens on the profession window, and every profession is one press away', async ({ page }) => {
@@ -4267,54 +4286,33 @@ test('the two pure-proc meta gems reach the stat total, at their uptime', async 
   })
 })
 
-test('the ranked list opens collapsed per slot, and only offers the control where it earns it', async ({ page }) => {
+test('the ranked list shows one slot at a time, every rank in it, with no control to open more', async ({ page }) => {
   /*
-   * Measured before the cap was chosen, not after: the panel was 6,458px — 9.0 screens at 1280x720 —
-   * from 64 entries across 15 slot groups, with a median entry height of only 61px. The length came
-   * from how many entries there were, not from how tall they are, which is why the fix is to show
-   * fewer by default rather than to shrink them.
-   *
-   * Capping at 3, the obvious "a few", would have hidden just 22.9% of entries across all 27 specs,
-   * because 288 of the 398 slot groups hold exactly 4. Two lands at ~6.1 screens and still reads as
-   * a ranking, since a #1 and a #2 are both on screen.
+   * The list was 6,458px — 9.0 screens at 1280x720 — from 64 entries across 15 slot groups, and was
+   * cut to the top two per slot with a "Show all" per slot. Since port step 6 the decided design shows
+   * one slot at a time, picked from your own gear, with every rank of it on screen: a ranking you can
+   * read whole without the nine-screen wall, and nothing left behind a control.
    */
   await openApp(page)
   await openPlannerView(page, 'Ranked Gear')
 
   const panel = page.getByTestId('bis-panel')
+  // Fury's 17 slots in the picker, and Head's three ranks, all of them.
+  await expect(page.getByRole('group', { name: 'Slot', exact: true }).getByRole('button')).toHaveCount(17)
+  await expect(panel.locator('.ranked-card')).toHaveCount(3)
+  await expect(panel.locator('[data-testid^="bis-show-all-"]')).toHaveCount(0)
 
-  // Fury Warrior ranks 3 or 4 items in every one of its 15 slots, so nothing is fully shown and the
-  // collapsed total is exactly 15 x 2.
-  await expect(panel.locator('.bis-entry')).toHaveCount(30)
-  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(15)
+  await rankingSlotButton(page, 'Main Hand').click()
+  await expect(panel.locator('.ranked-card')).toHaveCount(4)
 
-  // Head ranks 3, so opening it reveals exactly the one it was holding back.
-  const headToggle = page.getByTestId('bis-show-all-Head')
-  await expect(headToggle).toHaveText('Show all 3')
-  await expect(headToggle).toHaveAttribute('aria-expanded', 'false')
-
-  await headToggle.click()
-  await expect(panel.locator('.bis-entry')).toHaveCount(31)
-  await expect(headToggle).toHaveText('Show top 2')
-  await expect(headToggle).toHaveAttribute('aria-expanded', 'true')
-
-  // Opening one slot must not open the rest. The point is to compare within a slot, not to restore
-  // the nine-screen wall in one click.
-  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(15)
-
-  await headToggle.click()
-  await expect(panel.locator('.bis-entry')).toHaveCount(30)
-  await expect(headToggle).toHaveText('Show all 3')
-
-  /*
-   * A Combat Rogue ranks at most 2 in every slot, so nothing is ever hidden. No slot should offer a
-   * control that would reveal nothing — a dead "Show all 2" next to two visible rows is worse than
-   * no control, because it implies there is more.
-   */
+  // A Combat Rogue's Head ranks one item, and the rings two.
   await (await characterField(page, 'Class')).selectOption('Rogue')
   await (await characterField(page, 'Specialization')).selectOption('Combat')
   await expectRankedList(page, 'Combat Rogue Phase 2 Ranked List')
-  await expect(panel.locator('.bis-slot-toggle')).toHaveCount(0)
+  await rankingSlotButton(page, 'Head').click()
+  await expect(panel.locator('.ranked-card')).toHaveCount(1)
+  await rankingSlotButton(page, 'Finger 1').click()
+  await expect(panel.locator('.ranked-card')).toHaveCount(2)
 })
 
 test('Buffs & Consumables is reachable again, and a toggle moves the totals', async ({ page }) => {
@@ -11382,6 +11380,8 @@ test('a crafted or bought BiS pick says what it costs, and the price is never in
    */
   await openApp(page)
   await openPlannerView(page, 'Ranked Gear')
+  // One slot at a time since port step 6: the trinkets carry the badge-bought Bloodlust Brooch.
+  await rankingSlotButton(page, 'Trinket 1').click()
 
   const costLines = page.locator('[data-testid^="bis-cost-"]')
   expect(await costLines.count(), 'the default spec shows at least one priced pick').toBeGreaterThan(0)
@@ -11393,8 +11393,8 @@ test('a crafted or bought BiS pick says what it costs, and the price is never in
    * rendering would print the reagent list twice on the same row.
    */
   const doubled = await page.evaluate(() =>
-    [...document.querySelectorAll('.bis-entry')].filter(
-      (row) => row.querySelector('.bis-crafting') && row.querySelector('.bis-entry-cost'),
+    [...document.querySelectorAll('.ranked-card')].filter(
+      (card) => card.querySelector('.ranked-crafting') && card.querySelector('.ranked-cost'),
     ).length,
   )
   expect(doubled, 'no row shows both the curated recipe and the ingested cost').toBe(0)

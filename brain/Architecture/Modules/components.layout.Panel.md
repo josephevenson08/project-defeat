@@ -23,7 +23,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`

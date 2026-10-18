@@ -73,6 +73,20 @@ behind every claim of its that quotes a number.
   The merge is a **union**, because a boss's drop table cannot see the tier set pieces a token is
   traded for, the quest rewards an encounter hands out, or Kael'thas's seven encounter weapons — 32
   curated Tempest Keep rows a replace would have deleted
+- **The Ranked Gear tab** (the decided design, ported 2026-10-18): Wowhead's Phase 2 order for your
+  own spec, **slot by slot**. Pick a slot from your gear (each shows what you wear) and its ranked items
+  stand in order as game-style tooltips with the guide's note ("Best", "P1 BiS"), fitted out with the
+  guide's enchant for the slot and its gem for each socket colour, with where each drops, what it costs
+  to make or buy, and Equip, which puts on exactly what the card shows. What you wear is marked, and
+  shown first when the list does not rank it. Rings and trinkets share one list, and a unique one cannot
+  go in both. **"Where it drops"**, behind a switch whose count is the upgrades left, lists every item
+  once (a one-hander ranked for both hands is one row naming both), grouped by raid with the bosses in
+  kill order and this tier's raids first, then world bosses, crafting and everything else, each said in
+  the guide's words. Tier pieces sit under the boss whose token buys them, even where the loot tables
+  list only the token. What you wear is ticked, anything ranked above it is an upgrade, "Only upgrades"
+  hides the rest, and each row's tooltip shows the item fitted out. All 27 specs; the three slots a
+  guide leaves empty (a Feral Druid's and a Retribution Paladin's off hand, a Holy Paladin's Libram)
+  say so
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
   profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
   can say, and 720 of the 1,427 rows name an encounter. This is a join across the guides' own Source

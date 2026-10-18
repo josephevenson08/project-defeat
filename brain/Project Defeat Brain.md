@@ -10,7 +10,7 @@ A local-first TBC Classic Anniversary simulator and gear planner, mapped as a gr
 
 ## The maps
 
-- [[Architecture Map]] — 225 modules with their real import edges. The dependency graph, browsable.
+- [[Architecture Map]] — 230 modules with their real import edges. The dependency graph, browsable.
 - [[TBC Knowledge Map]] — 9 classes, 27 specs, 5 raids, 24 bosses, 13 professions, and the mechanics behind them.
 - [[Roadmap Board]] — six phases, what is done, and what is honestly still missing.
 - [[UI Refresh]] — the redesign, still in prototypes: research, a plan, and every tab walked through with the owner.

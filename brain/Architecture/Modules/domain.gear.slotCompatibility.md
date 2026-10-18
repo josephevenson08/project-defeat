@@ -27,12 +27,12 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`

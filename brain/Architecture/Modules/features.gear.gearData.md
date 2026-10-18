@@ -29,7 +29,8 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`

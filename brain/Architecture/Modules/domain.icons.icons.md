@@ -37,6 +37,7 @@ _None._
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[domain.professions.professionWindow]] — `src/domain/professions/professionWindow.ts`
+- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`
 

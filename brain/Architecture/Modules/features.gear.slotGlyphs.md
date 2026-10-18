@@ -30,7 +30,8 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 

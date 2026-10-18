@@ -32,7 +32,7 @@ From the top of the file:
 ## Imported by
 
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`

@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
@@ -52,6 +53,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
+- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`

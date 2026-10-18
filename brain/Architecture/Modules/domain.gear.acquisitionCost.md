@@ -38,7 +38,7 @@ _None._
 
 ## Imported by
 
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 
 ## Concepts & phases
 

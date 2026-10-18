@@ -25,7 +25,6 @@ _None._
 
 - [[components.layout.LoadingIntro]] — `src/components/layout/LoadingIntro.tsx`
 - [[components.layout.Panel]] — `src/components/layout/Panel.tsx`
-- [[features.bis.BisPanel]] — `src/features/bis/BisPanel.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`

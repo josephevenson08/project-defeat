@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/ui/ViewSwitch.tsx
-lines: 42
+lines: 50
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.ui.ViewSwitch
 
-`src/components/ui/ViewSwitch.tsx` · **components** layer · 42 lines
+`src/components/ui/ViewSwitch.tsx` · **components** layer · 50 lines
 
 _No doc comment at the top of this file._
 
@@ -25,6 +25,7 @@ _None._
 
 ## Imported by
 
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`

@@ -2,14 +2,14 @@
 type: module
 layer: components
 source: src/components/ui/itemTipModel.ts
-lines: 48
+lines: 83
 generated: true
 tags: [brain/architecture, layer/components]
 ---
 
 # components.ui.itemTipModel
 
-`src/components/ui/itemTipModel.ts` · **components** layer · 48 lines
+`src/components/ui/itemTipModel.ts` · **components** layer · 83 lines
 
 From the top of the file:
 
@@ -19,17 +19,21 @@ From the top of the file:
 
 ## Exports
 
-**function** — `statLinesFrom`
+**function** — `catalogueTip`, `statLinesFrom`
+
+**const** — `slotName`
 
 **type** — `ItemTipModel`
 
 ## Imports
 
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
+- [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
 
 ## Imported by
 
 - [[components.ui.ItemTooltip]] — `src/components/ui/ItemTooltip.tsx`
+- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
 
 ## Concepts & phases

@@ -29,6 +29,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **Step 6, the Character Planner, began with Build (2026-10-18):** the share card for the build on screen (`features/builds/buildSummary.ts`), its link always current, named saves with their facts, and one box for a link, build text or the addon's export that reads first: a report of what came in, the spec question, and only then "Load into the planner". The port found that an addon load emptied the Buffs tab while the report promised it would keep its own; it keeps them now.
 
+**Step 6 continued with Ranked Gear (2026-10-18):** Wowhead's Phase 2 order for the character's own spec, slot by slot as game tooltips (the slot picker shows what you wear; each item fitted out with the guide's enchant and gems, marked when worn, with Equip), and "Where it drops" behind a switch counting the upgrades left: every item once, grouped by raid and boss in kill order, then world bosses, crafting and the rest, with "Only upgrades". The logic is `domain/bis/rankedGear.ts`, for all 27 specs. The port found two things: many classes' tier pieces have no boss in the loot tables, so a piece now takes the boss whose token for that slot it is bought with; and a floating tooltip inside a glass panel was placed against the panel rather than the screen, so `FloatingTip` now draws into the body.
+
 ## Documents
 
 - [[docs/design/PORT-PLAN|The port plan, with each step as built]] — `docs/design/PORT-PLAN.md`
@@ -67,6 +69,10 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
+- [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 
 ## Related
 

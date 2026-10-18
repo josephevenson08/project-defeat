@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/bis/bisTypes.ts
-lines: 52
+lines: 56
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.bis.bisTypes
 
-`src/domain/bis/bisTypes.ts` · **domain** layer · 52 lines
+`src/domain/bis/bisTypes.ts` · **domain** layer · 56 lines
 
 _No doc comment at the top of this file._
 
@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 

@@ -31,6 +31,9 @@ _No doc comment at the top of this file._
 
 - [[App]] — `src/App.tsx`
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
+- [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
+- [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
+- [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`

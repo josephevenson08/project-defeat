@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/raidLootTip.ts
-lines: 65
+lines: 51
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.raidLootTip
 
-`src/features/raids/raidLootTip.ts` · **features** layer · 65 lines
+`src/features/raids/raidLootTip.ts` · **features** layer · 51 lines
 
 _No doc comment at the top of this file._
 
@@ -17,7 +17,7 @@ _No doc comment at the top of this file._
 
 **function** — `lootKey`, `raidLootTip`
 
-**const** — `listName`, `slotName`
+**const** — `listName`
 
 **type** — `LootTipBinder`
 
@@ -25,7 +25,6 @@ _No doc comment at the top of this file._
 
 - [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
-- [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
 
 ## Imported by
 
