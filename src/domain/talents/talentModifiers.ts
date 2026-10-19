@@ -440,6 +440,17 @@ export function deriveTalentModifiers(points: TalentPoints): TalentModifiers {
 }
 
 /**
+ * The talents in a build that feed one additive field, and what each gives at its ranks: Precision
+ * 3/3 is `{ talent: 'Precision', value: 0.03 }`. Their sum is that field of `deriveTalentModifiers`;
+ * this says where it came from, for a line that names the talent (the Gear tab's hit cap).
+ */
+export function talentSourcesOf(points: TalentPoints, kind: 'meleeHitChance' | 'spellHitChance'): readonly { talent: string; value: number }[] {
+  return rawTalentEffects.effects
+    .filter((effect) => effect.kind === kind && (points[effect.talentId] ?? 0) > 0)
+    .map((effect) => ({ talent: effect.talent, value: effect.flatValue ?? (effect.perRank ?? 0) * (points[effect.talentId] ?? 0) }))
+}
+
+/**
  * Flurry's expected attack-speed multiplier, in closed form.
  *
  * **This is the one piece the ingest cannot hand over.** wowsims models Flurry as a 3-stack aura on

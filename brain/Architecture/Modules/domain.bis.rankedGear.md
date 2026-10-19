@@ -44,6 +44,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 
 ## Concepts & phases

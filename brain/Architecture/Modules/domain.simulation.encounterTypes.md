@@ -24,6 +24,7 @@ _None._
 ## Imported by
 
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`

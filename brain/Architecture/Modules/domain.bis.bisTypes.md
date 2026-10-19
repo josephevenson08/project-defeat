@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`

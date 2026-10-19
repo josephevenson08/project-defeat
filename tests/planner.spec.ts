@@ -4368,8 +4368,11 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
    * wowsims rather than hand-written. A Human Fury Warrior's base Strength was 92 against a real
    * 145, and Agility converted to crit at a rate no class uses. The old number was never a
    * measurement of TBC; this one is.
+   *
+   * **215.3 until 2026-10-19**, when the attack table's miss against a level 73 boss became TBC's 9%
+   * rather than 8% (the 1% hit suppression past a 10-point skill gap).
    */
-  expect(empty.score).toBe(215.3)
+  expect(empty.score).toBe(213.1)
 })
 
 test('main-hand and off-hand picks are separate rankings, not one collided list', () => {
@@ -4753,8 +4756,9 @@ test('talent modifiers come from the ingest, and reach the melee estimate', () =
   expect(critOf(after) - critOf(before)).toBeCloseTo(5, 6)
 
   expect(after.scoreExact, 'talents must raise melee DPS').toBeGreaterThan(before.scoreExact)
-  // 224.3 before the base stats and attribute conversions were sourced — see the untalented figure.
-  expect(after.score).toBe(254.7)
+  // 224.3 before the base stats and attribute conversions were sourced, and 254.7 before the 9% miss
+  // against a level 73 boss (2026-10-19) — see the untalented figure.
+  expect(after.score).toBe(252.4)
 })
 
 test('talents do NOT close the rage gap, which is what this pass set out to test', () => {
@@ -11647,13 +11651,21 @@ test('on a phone the first screen carries the offer, then the gear', async ({ pa
   expect(empty.scrolled, 'the planner opens at the top').toBe(0)
   expect(button, `the offer is pressable without scrolling (bottom at ${button})`).toBeLessThanOrEqual(empty.viewport)
 
-  // And once it has been taken, the list is what has to be on the first screen.
+  /*
+   * And once it has been taken, the Gear tab takes the offer's place on the first screen. **Since
+   * the port (step 6, 2026-10-19) the gear is the character sheet**, with the tab's tools and the
+   * switch to "What's left" above it as the decided design has them, so the sheet itself starts below
+   * the first screen on a phone and the floor is on the tab: its tools show at least 120px here, and
+   * the sheet follows within the next screen.
+   */
   await page.getByTestId('equip-recommended').click()
-  const list = await topOf('.gear-list')
+  const tools = await topOf('.gear-tools')
   expect(
-    list.viewport - list.y,
-    `the gear shows at least 120px on the first screen (starts at ${list.y})`,
+    tools.viewport - tools.y,
+    `the Gear tab shows at least 120px on the first screen (starts at ${tools.y})`,
   ).toBeGreaterThanOrEqual(120)
+  const sheet = await topOf('.gear-list')
+  expect(sheet.y, `the sheet starts within the second screen (at ${sheet.y})`).toBeLessThan(sheet.viewport * 2)
 })
 
 test('the stat bar reads the same at every width, and the table is one press away', async ({ page }) => {

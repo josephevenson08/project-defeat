@@ -42,6 +42,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`

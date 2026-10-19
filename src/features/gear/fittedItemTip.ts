@@ -6,7 +6,7 @@ import { getGemById, socketBonusIsActive } from '../../domain/gems/sampleGems'
 import { getIconName } from '../../domain/icons/icons'
 
 /** "Chest - Exceptional Stats" and "Enchant Boots - Cat's Swiftness" read as the game prints them on the item. */
-const enchantLine = (name: string) => name.replace(/^(Enchant \w+|Weapon|Bracer|Gloves|Chest|Ring|Cloak|Boots|Shield) - /, '')
+export const enchantLine = (name: string) => name.replace(/^(Enchant \w+|Weapon|Bracer|Gloves|Chest|Ring|Cloak|Boots|Shield) - /, '')
 
 /**
  * An item as the game's tooltip, fitted out the way it would be worn: the enchant, the gem in each

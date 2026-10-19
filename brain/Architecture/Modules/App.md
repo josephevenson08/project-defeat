@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 647
+lines: 678
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 647 lines
+`src/App.tsx` · **app** layer · 678 lines
 
 From the top of the file:
 
@@ -42,6 +42,7 @@ _Nothing exported (side-effect or style module)._
 - [[domain.builds.shareLink]] — `src/domain/builds/shareLink.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.sampleEncounters]] — `src/domain/simulation/sampleEncounters.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
@@ -63,6 +64,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.gearData]] — `src/features/gear/gearData.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.gearSession]] — `src/features/gear/gearSession.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`

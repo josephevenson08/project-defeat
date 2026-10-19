@@ -33,8 +33,9 @@ From the top of the file:
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
+- [[features.gear.WhatsLeft]] — `src/features/gear/WhatsLeft.tsx`
 
 ## Concepts & phases
 

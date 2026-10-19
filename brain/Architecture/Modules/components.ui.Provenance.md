@@ -29,6 +29,7 @@ _None._
 - [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.gear.compareSession]] — `src/features/gear/compareSession.ts`
+- [[features.gear.gearSession]] — `src/features/gear/gearSession.ts`
 - [[features.professions.professionSources]] — `src/features/professions/professionSources.ts`
 - [[features.raidcomp.raidcompSources]] — `src/features/raidcomp/raidcompSources.ts`
 - [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`

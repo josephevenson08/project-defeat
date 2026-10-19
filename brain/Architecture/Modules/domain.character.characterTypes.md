@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[domain.abilities.sampleSignatureAbilities]] — `src/domain/abilities/sampleSignatureAbilities.ts`
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.buffs.raidBuffs]] — `src/domain/buffs/raidBuffs.ts`
@@ -58,6 +59,7 @@ _No doc comment at the top of this file._
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
@@ -69,6 +71,8 @@ _No doc comment at the top of this file._
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

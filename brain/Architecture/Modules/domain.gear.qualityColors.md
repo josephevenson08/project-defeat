@@ -29,9 +29,10 @@ _No doc comment at the top of this file._
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
+- [[features.gear.WhatsLeft]] — `src/features/gear/WhatsLeft.tsx`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`

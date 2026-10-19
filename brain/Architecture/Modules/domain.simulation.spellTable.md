@@ -27,6 +27,7 @@ _None._
 
 ## Imported by
 
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 
 ## Concepts & phases

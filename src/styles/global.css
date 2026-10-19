@@ -1601,171 +1601,6 @@ select {
 }
 
 /*
- * The gear list: one line per slot, one hairline between them.
- *
- * Deliberately not cards. Seventeen bordered boxes inside a bordered panel inside the frame was three
- * levels of enclosure for a list — and the middle level was carrying no information the row itself
- * did not already state.
- */
-.gear-list {
-  border-top: 1px solid var(--line);
-}
-
-/*
- * Two columns once there is room, filled top-to-bottom rather than left-to-right.
- *
- * One column of seventeen rows is 1,174px of page where the paperdoll was 980 — a list that reads
- * better per row but needs a scroll to see the character. `grid-auto-flow: column` against a row
- * count the panel measures keeps the reading order running down the body, so the second column
- * continues the first instead of interleaving with it. DOM order is untouched either way.
- */
-@media (min-width: 1000px) {
-  .gear-list {
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: repeat(var(--gear-rows, 9), auto);
-    column-gap: 28px;
-  }
-}
-
-.gear-row {
-  align-items: center;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  color: inherit;
-  cursor: pointer;
-  display: grid;
-  font-family: var(--font-sans);
-  gap: 14px;
-  grid-template-columns: 26px 96px minmax(0, 1fr) auto;
-  min-height: 44px;
-  padding: 8px 10px;
-  text-align: left;
-  width: 100%;
-}
-
-.gear-row:hover,
-.gear-row:focus-visible {
-  background: var(--surface-2);
-}
-
-.gear-row-icon {
-  align-items: center;
-  display: flex;
-  height: 26px;
-  justify-content: center;
-  width: 26px;
-}
-
-.gear-row-icon .item-icon {
-  border: 1px solid var(--line);
-  height: 26px;
-  width: 26px;
-}
-
-.gear-row-icon .item-icon-fallback {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-.gear-row-slot {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.gear-row-item {
-  font-size: 14.5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gear-row-empty {
-  color: #5f666b;
-  font-style: italic;
-}
-
-/* The one warning a row can carry: an item the current spec cannot use. */
-.stale-slot-warning {
-  color: var(--warn);
-}
-
-.gear-row-trail {
-  align-items: center;
-  color: var(--text-faint);
-  display: flex;
-  font-size: 12px;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-/* Under 700px the slot label moves above the item name: one column cannot hold four. */
-@media (max-width: 700px) {
-  .gear-row {
-    grid-template-columns: 26px minmax(0, 1fr);
-    row-gap: 2px;
-  }
-
-  .gear-row-slot,
-  .gear-row-item,
-  .gear-row-trail {
-    grid-column: 2;
-  }
-
-  .gear-row-trail {
-    justify-content: flex-start;
-  }
-}
-
-/*
- * Under 900px the body collapses to a single column in anatomical order, because three columns of
- * slot rows on a phone are three slivers — and the figure goes with it, since a silhouette behind
- * one narrow column is just a smudge under the text.
- */
-@media (max-width: 900px) {
-  .gear-paperdoll {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'head' 'neck' 'shoulders' 'back' 'chest' 'wrists' 'hands'
-      'waist' 'legs' 'feet' 'f1' 'f2' 't1' 't2' 'relic' 'mh' 'oh' 'rg';
-  }
-
-  /*
-   * The summary stays on mobile — it is information, not decoration, and it was the silhouette that
-   * had nothing to say in one column. It moves to the top, above the head slot, where a readout
-   * belongs when there is nothing to sit between.
-   */
-  .gear-summary {
-    order: -1;
-  }
-}
-
-/* Mirroring only makes sense with two sides flanking something, and below 900px there is one column. */
-@media (max-width: 900px) {
-  .gear-cell[data-side='right'] {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .gear-cell[data-side='right'] .gear-cell-text {
-    justify-items: start;
-  }
-}
-
-.gear-glyph .item-icon-fallback {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-
-/*
  * A row under the item name, not an overlay on its icon.
  *
  * These were absolutely positioned over the 44px artwork at 7px across, which made the colour — the
@@ -1851,11 +1686,6 @@ select {
   .gear-split[data-pane] {
     align-items: start;
     grid-template-columns: minmax(0, 1fr) minmax(380px, 460px);
-  }
-
-  /* One column while the pane has the other half; two when it does not. */
-  .gear-split[data-pane] .gear-list {
-    display: block;
   }
 }
 
@@ -5030,15 +4860,6 @@ input[type='text']:focus {
   height: 100%;
   object-fit: cover;
   width: 100%;
-}
-
-/*
- * Quality already colours the hairline on each paperdoll slot, and the icon underneath it is full
- * of its own colour. A hard edge between the two read as a seam, so the icon is inset by the
- * border rather than sitting flush against it.
- */
-.gear-glyph .item-icon {
-  border-radius: 1px;
 }
 
 /*
@@ -10838,5 +10659,932 @@ h4,
 @media (max-width: 420px) {
   .buffs-roster {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Character Planner · Gear: the character sheet and "What's left" (port step 6, 2026-10-19).
+ *
+ * The decided design (`docs/design/prototypes/tabs/planner.html`, Gear): design B's character sheet,
+ * with design C's checklist behind the view switch. Slots open the app's slot pane beside them, which
+ * takes the new look here too.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.gear-tools,
+.gear-empty-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.gear-empty-actions {
+  justify-content: center;
+  margin: 0;
+}
+
+.gear-tool {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 38px;
+  padding: 7px 16px;
+}
+
+.gear-tool.is-main,
+.gear-empty-action {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.gear-tool:hover,
+.gear-tool:focus-visible {
+  border-color: var(--glow);
+}
+
+.gear-empty {
+  border-bottom: 1px solid var(--rim-2);
+  margin: 0 0 10px;
+}
+
+.gear-empty h3 {
+  color: var(--ink);
+  font: 400 var(--t-lg) var(--f-head);
+}
+
+.gear-empty p {
+  color: var(--ink-2);
+}
+
+.gear-empty-action {
+  border-radius: 999px;
+  font: 600 var(--t-sm) var(--f-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.gear-empty-action:hover {
+  border-color: #ffffff;
+}
+
+.gear-msg {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 8px;
+  min-height: 1.3em;
+}
+
+.gear-equip-note {
+  border-bottom: 0;
+  padding: 0 0 8px;
+}
+
+/* The sheet: armour left, jewellery right, the character in the middle, weapons along the bottom. */
+.gear-sheet {
+  background:
+    radial-gradient(70% 60% at 50% 40%, var(--glow-soft), transparent 70%),
+    var(--scrim);
+  border: 1px solid var(--rim);
+  border-radius: 14px;
+  display: grid;
+  gap: 14px 16px;
+  grid-template-areas:
+    'left mid right'
+    'bottom bottom bottom';
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 0.95fr) minmax(0, 1fr);
+  padding: 14px;
+}
+
+.gear-sheet-col {
+  align-content: start;
+  display: grid;
+  gap: 7px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gear-sheet-col.is-left {
+  grid-area: left;
+}
+
+.gear-sheet-col.is-right {
+  grid-area: right;
+}
+
+.gear-sheet-mid {
+  align-content: start;
+  display: grid;
+  gap: 10px;
+  grid-area: mid;
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.gear-sheet-bottom {
+  border-top: 1px solid var(--rim-2);
+  display: flex;
+  gap: 18px;
+  grid-area: bottom;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+}
+
+.gear-slot {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: 9px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.gear-slot.is-right {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.gear-slot.is-bottom {
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  width: 150px;
+}
+
+.gear-slot-icon {
+  background: linear-gradient(145deg, #132433, #081019);
+  border: 2px solid var(--q, rgba(255, 255, 255, 0.18));
+  border-radius: 7px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 12px -4px var(--q, transparent);
+  color: var(--ink-3);
+  display: grid;
+  flex: none;
+  font: 600 10px var(--f-mono);
+  height: 52px;
+  overflow: hidden;
+  place-items: center;
+  position: relative;
+  width: 52px;
+}
+
+.gear-slot-icon.is-empty {
+  border-style: dashed;
+}
+
+.gear-slot-icon .item-icon {
+  border: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.gear-slot-ilvl {
+  background: rgba(0, 0, 0, 0.8);
+  border-top-left-radius: 4px;
+  bottom: 0;
+  color: #ffffff;
+  font: 600 9.5px / 1 var(--f-mono);
+  font-style: normal;
+  padding: 2px 3px;
+  position: absolute;
+  right: 0;
+}
+
+.gear-slot:hover .gear-slot-icon,
+.gear-slot:focus-visible .gear-slot-icon,
+.gear-slot[aria-expanded='true'] .gear-slot-icon {
+  border-color: #ffffff;
+  box-shadow:
+    0 0 0 2px var(--glow),
+    0 0 18px -2px var(--glow);
+}
+
+.gear-slot:focus-visible {
+  outline: none;
+}
+
+.gear-slot.gear-row-open {
+  background: none;
+  box-shadow: none;
+}
+
+.gear-slot-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gear-slot .gear-row-slot,
+.gear-slot-cosmetic .gear-row-slot {
+  color: var(--ink-3);
+  font: 500 9.5px var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gear-slot .gear-row-item {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gear-slot .gear-row-empty,
+.gear-check .gear-row-empty {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.gear-slot-sub {
+  align-items: center;
+  color: var(--ink-3);
+  display: flex;
+  font-size: 11px;
+  gap: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gear-slot.is-right .gear-slot-sub {
+  justify-content: flex-end;
+}
+
+.gear-slot.is-bottom .gear-slot-sub {
+  justify-content: center;
+}
+
+.gear-slot-sub .gear-gems {
+  margin: 0;
+}
+
+.gear-slot-sub .socket-dot {
+  height: 10px;
+  width: 10px;
+}
+
+.gear-row-enchant {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gear-row-enchant.is-ok {
+  color: #7fdc8a;
+}
+
+.gear-row-enchant.is-miss {
+  color: var(--warn);
+}
+
+.gear-slot-cosmetic {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-height: 52px;
+  opacity: 0.45;
+}
+
+.gear-slot-cosmetic .gear-slot-icon {
+  border-color: var(--rim);
+}
+
+.gear-slot-cosmetic small {
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+/* The middle column: the character, its set, what the gear adds, and the four counts. */
+.gear-sheet-crest {
+  display: block;
+  height: 88px;
+  margin: 0 auto;
+  width: 88px;
+}
+
+.gear-sheet-mid h3 {
+  font: 400 var(--t-lg) var(--f-head);
+  margin: 0;
+}
+
+.gear-sheet-set {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--t-xs);
+  gap: 5px;
+  justify-content: center;
+  margin: 0;
+}
+
+.gear-sheet-set-name {
+  color: var(--q-epic);
+}
+
+.gear-sheet-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.gear-sheet-pips i {
+  border: 1.5px solid var(--q-epic);
+  border-radius: 2px;
+  height: 9px;
+  width: 9px;
+}
+
+.gear-sheet-pips i.is-on {
+  background: var(--q-epic);
+  box-shadow: 0 0 8px var(--q-epic);
+}
+
+.gear-sheet-set-n {
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+}
+
+.gear-sheet-sth {
+  color: var(--ink-3);
+  font: 600 10px var(--f-body);
+  letter-spacing: 0.1em;
+  margin: 2px 0 -6px;
+  text-transform: uppercase;
+}
+
+.gear-sheet-stats {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  display: grid;
+  font-size: var(--t-sm);
+  gap: 3px;
+  margin: 0;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.gear-sheet-stats div {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.gear-sheet-stats dt {
+  color: var(--ink-2);
+}
+
+.gear-sheet-stats dd {
+  font-family: var(--f-mono);
+  margin: 0;
+}
+
+.gear-sheet-stats .is-hit.is-under dd,
+.gear-sheet-hit.is-under b {
+  color: var(--warn);
+}
+
+.gear-sheet-stats .is-hit.is-over dd,
+.gear-sheet-stats .is-hit.is-at dd,
+.gear-sheet-hit.is-over b,
+.gear-sheet-hit.is-at b {
+  color: #7fdc8a;
+}
+
+.gear-sheet-hit {
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+  margin: 0;
+  text-align: left;
+}
+
+.gear-sheet-hit b {
+  font-family: var(--f-mono);
+}
+
+.gear-sheet-hit small {
+  color: var(--ink-3);
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.gear-sheet-counts {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.gear-sheet-count {
+  background: none;
+  border: 0;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--t-xs);
+  min-height: 28px;
+  padding: 2px 0;
+  text-align: left;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.gear-sheet-count.is-ok {
+  color: #7fdc8a;
+}
+
+.gear-sheet-count.is-miss {
+  color: var(--warn);
+}
+
+.gear-sheet-count:hover,
+.gear-sheet-count:focus-visible {
+  text-decoration-style: solid;
+}
+
+/* "What's left": the summary, the filters, then a row per slot with its flags and fixes. */
+.gear-left {
+  display: grid;
+  gap: 10px;
+}
+
+.gear-tiles {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.gear-tile {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  display: grid;
+  gap: 2px;
+  padding: 9px 12px;
+}
+
+.gear-tile b {
+  font: 500 var(--t-xl) / 1.05 var(--f-mono);
+}
+
+.gear-tile b small {
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+
+.gear-tile span {
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+}
+
+.gear-tile.is-ok {
+  border-color: rgba(127, 220, 138, 0.45);
+}
+
+.gear-tile.is-ok b {
+  color: #7fdc8a;
+}
+
+.gear-tile.is-todo {
+  border-color: rgba(255, 207, 122, 0.45);
+}
+
+.gear-tile.is-todo b {
+  color: var(--warn);
+}
+
+.gear-left-ctrl {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+
+.gear-seg-label {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  margin-right: 6px;
+}
+
+.gear-seg {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.gear-seg button {
+  background: none;
+  border: 0;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 36px;
+  padding: 7px 14px;
+}
+
+.gear-seg button[aria-pressed='true'] {
+  background: var(--glow);
+  color: var(--glow-ink);
+}
+
+.gear-checklist {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gear-check {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 11px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 22px 40px minmax(0, 1.1fr) minmax(0, 1.6fr) auto;
+  padding: 7px 10px;
+}
+
+.gear-check.is-todo {
+  border-left: 3px solid var(--warn);
+}
+
+.gear-check.is-done {
+  border-left: 3px solid #7fdc8a;
+}
+
+.gear-check-state {
+  font: 700 13px var(--f-mono);
+  text-align: center;
+}
+
+.gear-check.is-done .gear-check-state {
+  color: #7fdc8a;
+}
+
+.gear-check.is-todo .gear-check-state {
+  color: var(--warn);
+}
+
+.gear-check-icon,
+.gear-flag-icon {
+  background: #0a1418;
+  border: 2px solid var(--q, var(--rim));
+  border-radius: 6px;
+  color: var(--ink-3);
+  display: grid;
+  font: 600 10px var(--f-mono);
+  height: 40px;
+  overflow: hidden;
+  place-items: center;
+  width: 40px;
+}
+
+.gear-flag-icon {
+  border-radius: 3px;
+  border-width: 1px;
+  flex: none;
+  height: 18px;
+  width: 18px;
+}
+
+.gear-check-item {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gear-check-slot {
+  color: var(--ink-3);
+  font: 500 10px var(--f-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.gear-check-item b {
+  font-size: var(--t-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gear-check-item small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gear-check-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.gear-flag {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--rim-2);
+  border-radius: 999px;
+  color: var(--ink-2);
+  display: inline-flex;
+  font: 600 var(--t-xs) var(--f-body);
+  gap: 5px;
+  min-height: 30px;
+  padding: 3px 10px;
+}
+
+button.gear-flag {
+  cursor: pointer;
+  text-align: left;
+}
+
+.gear-flag.is-ok {
+  border-color: rgba(127, 220, 138, 0.35);
+  color: #7fdc8a;
+}
+
+.gear-flag.is-up {
+  border-color: var(--rim);
+  color: var(--ink);
+}
+
+.gear-flag.is-warn {
+  border-color: rgba(255, 207, 122, 0.45);
+  color: var(--warn);
+}
+
+button.gear-flag:hover,
+button.gear-flag:focus-visible {
+  background: var(--glow-soft);
+}
+
+.gear-flag-act {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gear-check-change {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: 600 var(--t-xs) var(--f-body);
+  min-height: 32px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.gear-check-change[aria-expanded='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.gear-where {
+  display: grid;
+  gap: 14px;
+}
+
+.gear-where-group h4 {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  font: 400 var(--t-lg) var(--f-head);
+  gap: 10px;
+  margin: 0 0 6px;
+}
+
+.gear-where-group h4 small {
+  color: var(--ink-3);
+  font: 500 var(--t-xs) var(--f-body);
+}
+
+.gear-where-boss h5 {
+  color: var(--ink-2);
+  font: 600 var(--t-xs) var(--f-body);
+  margin: 0 0 5px;
+}
+
+.gear-where ul {
+  display: grid;
+  gap: 5px;
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.gear-loot {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 9px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  padding: 5px 10px 5px 5px;
+}
+
+.gear-loot.is-have {
+  opacity: 0.72;
+}
+
+.gear-allgood {
+  border: 1px dashed rgba(127, 220, 138, 0.5);
+  border-radius: 12px;
+  color: #7fdc8a;
+  margin: 0;
+  padding: 14px;
+  text-align: center;
+}
+
+.gear-left-note {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* The slot pane, in the new look: solid glass, the tab's rim, the planner's type. */
+.slot-pane {
+  background: var(--glass-solid);
+  border: 1px solid var(--rim);
+  border-radius: 14px;
+}
+
+.slot-pane .pane-header {
+  border-bottom-color: var(--rim-2);
+}
+
+.slot-pane .pane-header h2 {
+  font: 400 var(--t-lg) var(--f-head);
+}
+
+.slot-pane .eyebrow {
+  color: var(--ink-3);
+}
+
+.slot-pane .pane-prompt,
+.slot-pane .pane-rank {
+  color: var(--ink-2);
+}
+
+.slot-pane .pane-prompt,
+.slot-pane .pane-pane-detail {
+  border-color: var(--rim-2);
+}
+
+.slot-pane .pane-close {
+  border-color: var(--rim);
+  border-radius: 8px;
+  color: var(--ink);
+  height: 40px;
+  width: 40px;
+}
+
+.slot-pane .pane-close:hover,
+.slot-pane .pane-close:focus-visible {
+  border-color: var(--glow);
+}
+
+.slot-pane select,
+.slot-pane .pane-filter {
+  background: var(--abyss);
+  border: 1px solid var(--rim);
+  border-radius: 8px;
+  color: var(--ink);
+}
+
+.slot-pane select:focus-visible,
+.slot-pane .pane-filter:focus-visible {
+  border-color: var(--glow);
+  outline: none;
+}
+
+/* A phone: the character first, then each column as a grid of icons, weapons last. */
+@media (max-width: 759px) {
+  .gear-sheet {
+    grid-template-areas: 'mid' 'left' 'right' 'bottom';
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 10px;
+  }
+
+  .gear-sheet-col {
+    gap: 10px 6px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .gear-slot,
+  .gear-slot.is-right {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .gear-slot .gear-row-item {
+    font-size: 10.5px;
+    line-height: 1.15;
+    max-height: 2.3em;
+    white-space: normal;
+  }
+
+  .gear-slot-sub,
+  .gear-slot.is-right .gear-slot-sub {
+    justify-content: center;
+  }
+
+  .gear-slot-sub .gear-row-enchant {
+    display: none;
+  }
+
+  .gear-slot-cosmetic {
+    display: none;
+  }
+
+  .gear-sheet-bottom {
+    gap: 6px;
+    justify-content: space-around;
+  }
+
+  .gear-slot.is-bottom {
+    width: auto;
+  }
+
+  .gear-check {
+    grid-template-areas:
+      's i t o'
+      'f f f f';
+    grid-template-columns: 18px 40px minmax(0, 1fr) auto;
+  }
+
+  .gear-check > .gear-check-state {
+    grid-area: s;
+  }
+
+  .gear-check > .gear-check-icon {
+    grid-area: i;
+  }
+
+  .gear-check > .gear-check-item {
+    grid-area: t;
+  }
+
+  .gear-check > .gear-check-flags {
+    grid-area: f;
+  }
+
+  .gear-check > .gear-check-change {
+    grid-area: o;
+  }
+}
+
+/* A phone: the offer a little tighter, so its button is on the first screen under the sources line;
+   the three tools on two rows rather than three. */
+@media (max-width: 699px) {
+  .gear-empty {
+    padding: 14px 6px 18px;
+  }
+
+  .gear-tool {
+    flex: 1 1 auto;
+    font-size: var(--t-xs);
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 699px), (pointer: coarse) {
+  .gear-tool,
+  .gear-seg button,
+  .gear-flag,
+  .gear-check-change,
+  .gear-sheet-count,
+  .slot-pane .pane-close {
+    min-height: 44px;
+  }
+
+  .slot-pane .pane-close {
+    width: 44px;
   }
 }

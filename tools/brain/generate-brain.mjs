@@ -702,7 +702,9 @@ const DESIGN_NOTES = [
 
 **Then Compare (2026-10-19):** what you wear against another item for the same slot, as side-by-side game tooltips with the trade in one sentence ("You gain +6 Crit and lose −8 Hit…") and the simulated score. The other item comes from the spec's Wowhead list for the slot or any item it takes, and it opens on the guide's best one you do not wear. The score is still \`compareItems\`, the app's simulator, not the prototype's example weights; Equip applies what it assumed. Ranked Gear's slot picker and tooltip builder became shared (\`features/gear/SlotStrip.tsx\`, \`fittedItemTip.ts\`).
 
-**Then Buffs (2026-10-19):** your buffs filled in from who is in your raid: pick the raid (the Raid Composition roster, an example 25 or 10, or just you) and your seat, and each buff sits under how far it reaches or under Missing with what it needs. The raid's Paladins each give the Blessing you assign; any buff can still be switched by hand; consumables take one slot each. The counting is \`domain/buffs/raidBuffs.ts\` (one buff of an exclusive set per provider, Blessings by role). The tab opens By hand with nothing on, since the app starts clean.`,
+**Then Buffs (2026-10-19):** your buffs filled in from who is in your raid: pick the raid (the Raid Composition roster, an example 25 or 10, or just you) and your seat, and each buff sits under how far it reaches or under Missing with what it needs. The raid's Paladins each give the Blessing you assign; any buff can still be switched by hand; consumables take one slot each. The counting is \`domain/buffs/raidBuffs.ts\` (one buff of an exclusive set per provider, Blessings by role). The tab opens By hand with nothing on, since the app starts clean.
+
+**Then Gear (2026-10-19):** the game's character sheet (armour left, jewellery right, weapons along the bottom, each slot with its item level, gem dots, enchant and a game tooltip), its middle column holding the character, set pips, what the gear alone adds (\`domain/gear/gearStats.ts\`, which \`calculateStats\` now uses too), the hit cap in plain words and four counts that open "What's left": a row per slot with what it still needs and a one-press fix, "Only what's left", and the targets by raid and boss. The hit cap is new for every spec (\`domain/simulation/hitCap.ts\`): special attacks, ranged attacks or spells by role, read from the simulator's own tables, less talents, race, buffs and Improved Faerie Fire; none for a healer. Building it showed the simulator's base miss against a level 73 boss was 8%, not TBC's 9% (the 1% hit suppression past a 10-point skill gap); the owner had it fixed in the port, so the sheet's 142 (95 with Precision 3/3) and the estimate agree, and melee and ranged best cases dropped 0.1–1.0%. The checklist is \`domain/bis/gearChecklist.ts\`. Slots open the app's own slot pane beside the sheet, restyled (the owner's call), so every legal item and the profession-gated enchants stay. The port found that a guide can gem against a socket bonus on purpose (a Protection Warrior's), which is not a to-do, and that the recommended set leaves a Hunter's off hand unenchanted (the guide's advice is attached before the ranks are made dense).`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
       ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],
@@ -747,6 +749,12 @@ const DESIGN_NOTES = [
       'features/gear/SlotStrip.tsx',
       'domain/buffs/raidBuffs.ts',
       'features/buffs/BuffsPanel.tsx',
+      'domain/simulation/hitCap.ts',
+      'domain/bis/gearChecklist.ts',
+      'domain/gear/gearStats.ts',
+      'features/gear/GearPanel.tsx',
+      'features/gear/GearSheet.tsx',
+      'features/gear/WhatsLeft.tsx',
     ],
     related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
   },

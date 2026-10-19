@@ -32,6 +32,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

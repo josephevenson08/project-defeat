@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/attackTable.ts
-lines: 304
+lines: 315
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.attackTable
 
-`src/domain/simulation/attackTable.ts` · **domain** layer · 304 lines
+`src/domain/simulation/attackTable.ts` · **domain** layer · 315 lines
 
 _No doc comment at the top of this file._
 
@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 
 ## Concepts & phases

@@ -45,14 +45,15 @@ From the top of the file:
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
-- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
-- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 

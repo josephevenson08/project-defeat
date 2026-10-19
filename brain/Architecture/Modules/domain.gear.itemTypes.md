@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
 - [[domain.bis.acquisition]] — `src/domain/bis/acquisition.ts`
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.bis.rankedSource]] — `src/domain/bis/rankedSource.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
@@ -42,6 +43,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`
 - [[domain.gear.characterItemRules]] — `src/domain/gear/characterItemRules.ts`
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.gear.itemSets]] — `src/domain/gear/itemSets.ts`
 - [[domain.gear.obtainability]] — `src/domain/gear/obtainability.ts`
@@ -52,6 +54,7 @@ _No doc comment at the top of this file._
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`

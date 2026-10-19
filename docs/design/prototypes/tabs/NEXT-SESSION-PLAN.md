@@ -1,8 +1,12 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-19, later): Buffs is in the app too; start here
+## ▶ Where we left off (2026-10-19, evening): Gear is in the app too; start here
 
-**Step 6 continued with Buffs:** `planner.html`'s Buffs sub-tab (`buffs-c.js` with `buffs-a.js`'s icon tiles) is now the live app's Buffs tab, and `checks/buffs-handson.mjs` became `tests/buffs.spec.ts`. It opens By hand with nothing on, where the prototype filled the example raid, since the app starts clean. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Gear (`gear-planner.js`, `gear-b.js` with `gear-c.js`'s checklist, and the hit line) and Talents. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+**Step 6 continued with Gear:** `planner.html`'s Gear sub-tab (`gear-planner.js`: design B's character sheet from `gear-b.js`, with `gear-c.js`'s checklist as "What's left") is now the live app's Gear tab for every spec, and `checks/gear-handson.mjs` became `tests/gear.spec.ts`. As the owner decided: the app's slot pane, restyled, opens beside the sheet instead of the flyout; the hit cap is a new helper for every spec, read from the simulator's tables, whose base miss against a level 73 boss is now TBC's 9% (it was 8%), so Fury reads 142, or 95 with Precision 3/3; the part-geared example is not ported. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Talents, the last sub-tab. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-19, later): Buffs is in the app too
+
+**Step 6 continued with Buffs:** `planner.html`'s Buffs sub-tab (`buffs-c.js` with `buffs-a.js`'s icon tiles) is now the live app's Buffs tab, and `checks/buffs-handson.mjs` became `tests/buffs.spec.ts`. It opens By hand with nothing on, where the prototype filled the example raid, since the app starts clean. Committed and pushed (`aa06c9a`). **Next:** Gear (`gear-planner.js`, `gear-b.js` with `gear-c.js`'s checklist, and the hit line) and Talents. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-19): Compare is in the app too
 

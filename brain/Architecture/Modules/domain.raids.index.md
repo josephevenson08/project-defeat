@@ -36,6 +36,7 @@ _No doc comment at the top of this file._
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.compareSession]] — `src/features/gear/compareSession.ts`
+- [[features.gear.gearSession]] — `src/features/gear/gearSession.ts`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.raids.LootIcon]] — `src/features/raids/LootIcon.tsx`

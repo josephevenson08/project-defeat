@@ -52,6 +52,7 @@ From the top of the file:
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.SetBonuses]] — `src/features/gear/SetBonuses.tsx`
 
 ## Concepts & phases

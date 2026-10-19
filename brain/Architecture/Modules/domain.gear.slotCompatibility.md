@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[domain.bis.bisLists]] — `src/domain/bis/bisLists.ts`
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`

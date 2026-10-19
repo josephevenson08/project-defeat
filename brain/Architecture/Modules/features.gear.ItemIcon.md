@@ -27,8 +27,9 @@ _No doc comment at the top of this file._
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
-- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
+- [[features.gear.WhatsLeft]] — `src/features/gear/WhatsLeft.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 
 ## Concepts & phases

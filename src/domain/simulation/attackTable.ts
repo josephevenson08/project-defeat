@@ -20,9 +20,20 @@ export function computeSkillDiff(targetLevel: number, attackerSkill: number = PL
   return targetLevel * 5 - attackerSkill
 }
 
+/**
+ * The attacker's chance to miss with no hit at all, before the dual-wield penalty: 9% against a level
+ * 73 boss.
+ *
+ * Past a 10-point skill gap TBC adds **a 1% hit penalty** on top of the 0.2%-per-point slope — the
+ * first 1% of hit does nothing — so a level 70 with 350 weapon skill misses a raid boss 9% of the time
+ * (5% + 15 × 0.2% + 1%), the "9% hit cap" every TBC guide quotes, and a dual-wielder's white swings 28%.
+ * wowsims/tbc writes the same as a base miss of 0.09 at +3 in `NewAttackTable()`. Until 2026-10-19 this
+ * returned 8%, and the Gear tab's hit cap, read from here, was the first place it showed.
+ */
 export function computeBaseMissChance(skillDiff: number) {
   const perPoint = skillDiff >= 11 ? 0.002 : 0.001
-  return Math.max(0, 0.05 + skillDiff * perPoint)
+  const hitSuppression = skillDiff > 10 ? 0.01 : 0
+  return Math.max(0, 0.05 + skillDiff * perPoint + hitSuppression)
 }
 
 /**

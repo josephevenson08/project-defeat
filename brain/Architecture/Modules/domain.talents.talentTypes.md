@@ -28,6 +28,7 @@ _None._
 ## Imported by
 
 - [[App]] — `src/App.tsx`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`

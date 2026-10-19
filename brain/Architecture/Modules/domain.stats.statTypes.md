@@ -33,6 +33,7 @@ _None._
 - [[domain.consumables.consumableTypes]] — `src/domain/consumables/consumableTypes.ts`
 - [[domain.enchants.enchantTypes]] — `src/domain/enchants/enchantTypes.ts`
 - [[domain.gear.catalogueTypes]] — `src/domain/gear/catalogueTypes.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.gems.gemTypes]] — `src/domain/gems/gemTypes.ts`
 - [[domain.stats.describeStats]] — `src/domain/stats/describeStats.ts`
@@ -41,6 +42,7 @@ _None._
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`
 
 ## Concepts & phases

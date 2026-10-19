@@ -17,6 +17,8 @@ _No doc comment at the top of this file._
 
 **function** — `fittedItemTip`
 
+**const** — `enchantLine`
+
 ## Imports
 
 - [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
@@ -31,6 +33,8 @@ _No doc comment at the top of this file._
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
+- [[features.gear.WhatsLeft]] — `src/features/gear/WhatsLeft.tsx`
 
 ## Concepts & phases
 

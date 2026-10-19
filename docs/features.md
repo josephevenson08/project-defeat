@@ -87,6 +87,22 @@ behind every claim of its that quotes a number.
   hides the rest, and each row's tooltip shows the item fitted out. All 27 specs; the three slots a
   guide leaves empty (a Feral Druid's and a Retribution Paladin's off hand, a Holy Paladin's Libram)
   say so
+- **The Gear tab** (the decided design, ported 2026-10-19): your gear as **the game's character
+  sheet**, armour down the left, jewellery down the right, weapons along the bottom, each slot the
+  game's icon frame with its item level, its gems as coloured dots and its enchant (or "no enchant"
+  where the guide puts one), and a game-style tooltip on hover or focus with its rank on your spec's
+  list and where it drops. The middle holds the character and its tier set pieces, **what the gear
+  alone adds** (the same sum the stat bar uses), **the hit cap in plain words** ("Hit 140 / 95, 45
+  over the cap" for a Fury Warrior with Precision, with what talents, race, buffs and Improved Faerie Fire on the boss already give,
+  from the simulator's own tables, for every spec: special attacks, ranged attacks or spells by role,
+  none for a healer), and four counts (slots best on Wowhead's list, enchants, sockets, socket
+  bonuses) that open **"What's left"**: a summary, then every slot marked done or with what it still
+  needs, each with a one-press fix (equip the best, add the guide's enchant, fill the gems the guide's
+  way), "Only what's left", and the same targets **grouped by raid and boss in kill order** to plan a
+  raid night. A guide that gems against a socket bonus on purpose (a Protection Warrior's) is not
+  flagged. Pressing a slot opens the slot pane beside the sheet, with every legal item, the
+  profession-gated enchants and the gem pickers. Equip the recommended set, Empty every slot, and
+  Import your character sit above it. Every spec, with its own 16 to 18 slots and its own list
 - Where every ranked pick comes from: instance, the actual boss where a loot table names one, the
   profession that crafts it, or the vendor and currency. **503 of the 557 recommended items (90.3%)**
   can say, and 720 of the 1,427 rows name an encounter. This is a join across the guides' own Source
@@ -147,7 +163,7 @@ behind every claim of its that quotes a number.
   restores every stat — attributes and armor are never hidden
 - Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
   descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
-- Real item icons on the gear list, the ranked-gear rows and the raid loot tables. Icon names are
+- Real item icons on the character sheet, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
   `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
@@ -197,11 +213,11 @@ behind every claim of its that quotes a number.
   density grid. Recommended zones the ingest has no coordinates
   for are named under the tabs rather than dropped. Skinning and Fishing get the same page without
   maps, because the game gives them no nodes — Skinning comes off mobs and Fishing off pools
-- **Laid out for a phone.** The character line, the stat bar and the gear list stack without a
+- **Laid out for a phone.** The character line, the stat bar and the character sheet stack without a
   sidebar to collapse — the rail they replaced was one full screen tall at 375px on its own. Both tab
   bars are a three-column grid, so every tab stays visible without swiping, and every control on the
   planner, folded away or not, is a 44px tap target. Measured at 375x812: an empty planner's one
-  action is pressable without scrolling, a filled gear list shows on the first screen, and no section
+  action is pressable without scrolling, a filled character sheet starts on the first screen, and no section
   scrolls sideways. Raid Composition and the
   profession guides were reviewed the same way and every control there is a 44px target too; desktop
   keeps its density, since all of it sits inside the phone breakpoint. **Moving a player between raid
@@ -217,8 +233,8 @@ behind every claim of its that quotes a number.
   than seventeen empty rows: one press fills every slot from the ranked list for the spec, with the
   enchants and gems that list recommends, and the offer disappears once taken. Rings and trinkets
   take successive entries, so both hands get filled rather than only the first
-- **Choosing gear happens beside the list, not over it.** Picking a slot opens a pane next to the
-  gear list: the row you are editing stays visible and updates as you click, so there is no
+- **Choosing gear happens beside the sheet, not over it.** Picking a slot opens a pane next to the
+  character sheet: the slot you are editing stays visible and updates as you click, so there is no
   confirmation step and nothing to close before you can see what you did. It says what to do when
   you arrive, and hands focus back to the row you came from when you leave
 - **Usable from the keyboard.** A "Skip to the main content" link opens the shell, so the section tabs

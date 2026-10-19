@@ -41,6 +41,7 @@ From the top of the file:
 ## Imported by
 
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 
 ## Concepts & phases

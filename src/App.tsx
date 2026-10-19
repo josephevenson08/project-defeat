@@ -22,6 +22,8 @@ import { applyWeaponSlotRules, emptyGear, normalizeGearForCharacter } from './fe
 import { dropIllegalEnchants } from './domain/enchants/sampleEnchants'
 import { ComparePanel } from './features/gear/ComparePanel'
 import { compareSources, initialCompareSession, type CompareSession } from './features/gear/compareSession'
+import { gearSources, initialGearSession, type GearSession } from './features/gear/gearSession'
+import { hitCapFor } from './domain/simulation/hitCap'
 import { buildRecommendedSet } from './features/gear/equipRecommendedSet'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
@@ -203,6 +205,8 @@ function App() {
   const [professionsSession, setProfessionsSession] = useState<ProfessionsSession>(initialProfessionsSession)
   // Ranked Gear's view, slot and "Only upgrades", kept the same way.
   const [rankedSession, setRankedSession] = useState<RankedSession>(initialRankedSession)
+  // The Gear tab's view, and in "What's left" its filter and grouping.
+  const [gearSession, setGearSession] = useState<GearSession>(initialGearSession)
   // And Compare's slot and the item held against yours.
   const [compareSession, setCompareSession] = useState<CompareSession>(initialCompareSession)
   // And Buffs': the raid your buffs come from, your seat in it and its Paladins' Blessings.
@@ -296,6 +300,15 @@ function App() {
   const role = getRoleForSpec(character.className, character.spec)
 
   /*
+   * The hit rating the gear has to bring, from the simulator's own tables, less what talents, race,
+   * buffs and the boss's debuffs already give (the Gear tab's "Hit 140 / 95"). Nothing for a healer.
+   */
+  const hitCap = useMemo(
+    () => hitCapFor({ character, role, gear, talentPoints, activeBuffIds, activeTargetDebuffIds, target }),
+    [character, role, gear, talentPoints, activeBuffIds, activeTargetDebuffIds, target],
+  )
+
+  /*
    * Recomputed per render rather than read once at mount, because it now depends on the character:
    * the Simulation tab is a DPS surface, so changing spec from Fury to Protection takes it away.
    *
@@ -385,6 +398,11 @@ function App() {
     if (!recommended) return undefined
     setGear(dropIllegalEnchants(recommended.gear, character))
     return recommended
+  }
+
+  /** "Empty every slot" on the Gear tab: the character's own slots, each empty, as a new character starts. */
+  function emptyAllGear() {
+    setGear(normalizeGearForCharacter(emptyGear, character.className, character.spec))
   }
 
   function updateCharacter(nextCharacter: CharacterProfile) {
@@ -529,6 +547,8 @@ function App() {
           <Provenance sources={simulationSources} />
         ) : currentTab === 'raidcomp' ? (
           <Provenance sources={raidcompSources} />
+        ) : currentTab === 'planner' && plannerView === 'gear' ? (
+          <Provenance sources={gearSources(getBisListForSpec(character.className, character.spec))} />
         ) : currentTab === 'planner' && plannerView === 'bis' ? (
           <Provenance sources={rankedSources(getBisListForSpec(character.className, character.spec))} />
         ) : currentTab === 'planner' && plannerView === 'buffs' ? (
@@ -558,7 +578,18 @@ function App() {
             className="tab-nav tab-nav-sub"
           />
           {plannerView === 'gear' && (
-            <GearPanel character={character} gear={gear} onChange={updateGear} onEquipRecommended={equipRecommendedSet} />
+            <GearPanel
+              character={character}
+              role={role}
+              gear={gear}
+              onChange={updateGear}
+              onEquipRecommended={equipRecommendedSet}
+              onEmpty={emptyAllGear}
+              onImport={() => setPlannerView('build')}
+              hitCap={hitCap}
+              session={gearSession}
+              onSession={setGearSession}
+            />
           )}
           {plannerView === 'compare' && (
             <ComparePanel

@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 
 ## Concepts & phases

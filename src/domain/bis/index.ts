@@ -21,6 +21,8 @@ export {
   wornItem,
   wornRank,
 } from './rankedGear'
+export type { ChecklistTotals, SlotCheck, SlotPick } from './gearChecklist'
+export { bestPickFor, checklistTotals, checkSlot, equipBest, gearChecklist, withGuideEnchant, withGuideGems } from './gearChecklist'
 
 import { requireBisList } from './bisLists'
 

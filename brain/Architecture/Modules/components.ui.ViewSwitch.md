@@ -26,6 +26,7 @@ _None._
 ## Imported by
 
 - [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.professions.ProfessionsPanel]] — `src/features/professions/ProfessionsPanel.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`

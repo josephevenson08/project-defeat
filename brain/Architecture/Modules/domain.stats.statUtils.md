@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 - [[domain.character.applyRacialTraits]] — `src/domain/character/applyRacialTraits.ts`
 - [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases

@@ -1,52 +1,38 @@
-import { useMemo, useRef, useState } from 'react'
-import { getEnchantById } from '../../domain/enchants/sampleEnchants'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ViewSwitch } from '../../components/ui/ViewSwitch'
+import { checklistTotals, gearChecklist, getBisListForSpec, rankedListsFor } from '../../domain/bis'
+import type { CharacterRole } from '../../domain/character/characterTypes'
+import { sumGearStats } from '../../domain/gear/gearStats'
 import { getActiveSets } from '../../domain/gear/itemSets'
-import { getQualityColor } from '../../domain/gear/qualityColors'
+import type { HitCap } from '../../domain/simulation/hitCap'
 import type { CharacterProfile } from '../character/characterTypes'
+import { GearSheet } from './GearSheet'
+import type { GearSession, GearView } from './gearSession'
 import { SetBonuses } from './SetBonuses'
-import { getGearSlotDisplayName, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isEmptySlotItem, isItemBlockedByUniqueInGear } from './gearData'
+import { getGearSlotDisplayName, getVisibleGearSlotsForSpec, isEmptySlotItem, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes'
 import type { RecommendedSet } from './equipRecommendedSet'
-import { ItemIcon } from './ItemIcon'
 import { SlotPane } from './SlotPane'
-import { slotGlyph } from './slotGlyphs'
+import { WhatsLeft } from './WhatsLeft'
 
 type GearPanelProps = {
   character: CharacterProfile
+  role: CharacterRole
   gear: EquippedGear
   onChange: (slot: GearSlot, equippedSlot: EquippedSlot) => void
   /** Fills every slot from this spec's ranked list; see `equipRecommendedSet`. */
   onEquipRecommended: () => RecommendedSet | undefined
+  /** Takes everything off. */
+  onEmpty: () => void
+  /** Opens the Build tab, where a character is imported. */
+  onImport: () => void
+  /** The hit rating the gear has to bring, from the simulator's tables; nothing for a healer. */
+  hitCap?: HitCap
+  session: GearSession
+  onSession: (session: GearSession) => void
 }
 
-/**
- * The paperdoll arrangement, following the in-game character sheet: armour down the left, the rest
- * down the right, weapons across the bottom.
- *
- * This is spatial memory doing work a list cannot. A player who has spent any time in WoW already
- * knows Head is top-left and trinkets are bottom-right, so the layout itself becomes the label — a
- * flat 4-by-5 grid made you read every slot name to find the one you wanted.
- *
- * Every slot the app knows appears here exactly once; `getVisibleGearSlotsForSpec` then filters it
- * per spec, so a Rogue's Relic and a Druid's Ranged simply do not render.
- */
-/**
- * The order the slots are listed in: down the body, then the weapons.
- *
- * **This replaced a paperdoll, and the trade is worth stating.** The slots used to be arranged on a
- * grid shaped like a body — head at the top centre, feet at the bottom centre, armour down either
- * side — so you found the boots by looking where boots go, and the arrangement did the work of a
- * label. That is genuinely better at *finding a slot*.
- *
- * It is worse at everything else this screen does. Seventeen cards three lines tall, each reading
- * "Empty / No enchant" on a character that has just been created, is what the owner's heuristic
- * evaluation rated a major density problem: fifty-one lines of nothing arranged as a person. A list
- * is one line per slot, so the same screen is readable when it is empty and scannable when it is
- * full, and the item names — which is what you actually read once there are any — line up in a
- * column instead of being scattered around a silhouette.
- *
- * The order still follows the body, so the spatial habit is not thrown away entirely.
- */
+/** The order the game's character window lists slots in, for "What's left" and the count. */
 const SLOT_ORDER: readonly GearSlot[] = [
   'Head',
   'Neck',
@@ -68,16 +54,22 @@ const SLOT_ORDER: readonly GearSlot[] = [
   'Relic',
 ]
 
+const RECOMMENDED_MESSAGE =
+  "Equipped the recommended set: Wowhead's rank 1 in every slot (the second ring and trinket take the next one down), with the guide's enchants and gems."
+
 /**
- * The equipped-gear list, laid out like the WoWSims gear panel the user pointed at: two columns of
- * slots, each a glyph carrying its item level, the item name in quality colour, and the enchant named
- * underneath in smaller text. Gems read as coloured dots on the glyph.
+ * The Character Planner's Gear tab (port step 6, 2026-10-19): design B's character sheet, with design
+ * C's checklist behind a switch as "What's left", whose count is the slots with something left to do.
+ * Both read the spec's own Wowhead list and its gem and enchant guide; pressing a slot (or Change in
+ * the checklist) opens the slot pane beside them, which keeps every legal item, the profession-gated
+ * enchants and the gem pickers.
  *
- * Nothing here edits in place. Clicking a slot opens `ItemPopup`, so the list keeps its height and
- * stays scannable no matter what is being changed.
+ * **The pane is the app's, not the prototype's flyout** (the owner's call, 2026-10-19): the flyout
+ * offered only the guide's ranked items, where the pane offers every item the slot takes.
  */
-export function GearPanel({ character, gear, onChange, onEquipRecommended }: GearPanelProps) {
+export function GearPanel({ character, role, gear, onChange, onEquipRecommended, onEmpty, onImport, hitCap, session, onSession }: GearPanelProps) {
   const [openSlot, setOpenSlot] = useState<GearSlot>()
+  const [message, setMessage] = useState('')
   /*
    * What the last press of "Equip the recommended set" managed, kept so the panel can say when the
    * list came up short. Cleared when the set is emptied again, because a report about a set that is
@@ -85,18 +77,40 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
    */
   const [lastEquip, setLastEquip] = useState<RecommendedSet>()
   /*
-   * The rows, so closing the pane can hand focus back to the one that opened it.
-   *
-   * Without this the browser drops focus to the top of the document when the pane's Close button
-   * stops existing, and a keyboard user lands back at the skip link — which the 2026-09-26 keyboard
-   * work noted as the last thing left in that group.
+   * The slot buttons and the checklist's Change buttons, so closing the pane can hand focus back to
+   * the one that opened it. Without this the browser drops focus to the top of the document when the
+   * pane's Close button stops existing.
    */
-  const rowRefs = useRef<Partial<Record<GearSlot, HTMLButtonElement | null>>>({})
+  const slotRefs = useRef<Partial<Record<GearSlot, HTMLButtonElement | null>>>({})
+  const changeRefs = useRef<Partial<Record<GearSlot, HTMLButtonElement | null>>>({})
+  const onlyRef = useRef<HTMLButtonElement | null>(null)
+  const focusOnly = useRef(false)
+
+  const shown = useMemo(() => {
+    const slots = getVisibleGearSlotsForSpec(character.className, character.spec)
+    return SLOT_ORDER.filter((slot) => slots.includes(slot))
+  }, [character.className, character.spec])
+  const bisList = getBisListForSpec(character.className, character.spec)
+  const lists = useMemo(() => (bisList ? rankedListsFor(bisList) : []), [bisList])
+  const checks = useMemo(() => gearChecklist(character, shown, gear, lists), [character, shown, gear, lists])
+  const totals = checklistTotals(checks)
+  const fromGear = useMemo(() => sumGearStats(gear), [gear])
+  const activeSets = useMemo(() => getActiveSets(Object.values(gear).map((slot) => slot.item)), [gear])
+  const nothingEquipped = shown.every((slot) => isEmptySlotItem(gear[slot].item))
+  const display = (slot: GearSlot) => getGearSlotDisplayName(slot, character.className, character.spec)
+
+  // A count on the sheet opens "What's left" and puts focus on its filter, as the prototype did.
+  useEffect(() => {
+    if (session.view === 'left' && focusOnly.current) {
+      focusOnly.current = false
+      onlyRef.current?.focus()
+    }
+  }, [session.view])
 
   function closePane() {
     const returning = openSlot
     setOpenSlot(undefined)
-    if (returning) rowRefs.current[returning]?.focus()
+    if (returning) (session.view === 'sheet' ? slotRefs : changeRefs).current[returning]?.focus()
   }
 
   function updateItem(slot: GearSlot, item: GearItem) {
@@ -104,74 +118,16 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
     onChange(slot, { item, gemIds: item.sockets?.map(() => '') ?? [] })
   }
 
-  const slots = getVisibleGearSlotsForSpec(character.className, character.spec)
-  const activeSets = useMemo(() => getActiveSets(Object.values(gear).map((slot) => slot.item)), [gear])
+  function equipRecommended() {
+    const set = onEquipRecommended()
+    setLastEquip(set)
+    setOpenSlot(undefined)
+    setMessage(set ? RECOMMENDED_MESSAGE : '')
+  }
 
-  /** Slots this spec actually wears — Rogues have no Relic, Druids no Ranged, and so on. */
-  const shown = SLOT_ORDER.filter((slot) => slots.includes(slot))
-  const nothingEquipped = shown.every((slot) => isEmptySlotItem(gear[slot].item))
-
-  function renderSlot(slot: GearSlot) {
-    const equipped = gear[slot]
-    const displayName = getGearSlotDisplayName(slot, character.className, character.spec)
-    const options = getItemsForSlotAndCharacter(slot, character.className, character.spec)
-    // An empty slot is neither valid nor invalid — it is empty, and saying "Not valid for this spec"
-    // about a slot nobody has filled reads as a fault in a character that was just created.
-    const isValid = isEmptySlotItem(equipped.item) || options.some((option) => option.id === equipped.item.id)
-    const enchant = equipped.enchantId ? getEnchantById(equipped.enchantId) : undefined
-
-    const empty = isEmptySlotItem(equipped.item)
-
-    return (
-      <button
-        type="button"
-        className={`gear-row${openSlot === slot ? ' gear-row-open' : ''}`}
-        key={slot}
-        ref={(node) => {
-          rowRefs.current[slot] = node
-        }}
-        aria-label={`${displayName} slot`}
-        // Says which row the pane belongs to, for a screen reader as much as for the marker.
-        aria-expanded={openSlot === slot}
-        onClick={() => setOpenSlot(openSlot === slot ? undefined : slot)}
-      >
-        <span className="gear-row-icon" aria-hidden="true">
-          <ItemIcon wowItemId={equipped.item.wowItemId} fallback={slotGlyph(slot)} />
-        </span>
-
-        <span className="gear-row-slot">{displayName}</span>
-
-        {/*
-          Quality is the one colour this interface lets carry meaning, so it goes on the name and
-          nowhere else. The cell used to repeat it as a hairline down the card's outer edge; a list
-          has no outer edge to spare, and one signal for one fact is the rule this layout follows.
-        */}
-        <span
-          className={`gear-row-item${empty ? ' gear-row-empty' : ''}`}
-          style={empty ? undefined : { color: getQualityColor(equipped.item.quality) }}
-        >
-          {empty ? 'empty' : equipped.item.name}
-        </span>
-
-        <span className="gear-row-trail">
-          {/* "No enchant" is not printed. An empty slot said it seventeen times over on a new
-              character, which is the noise this list was made to remove; what is *there* is worth a
-              line, what is missing is not. */}
-          {enchant ? <span className="gear-row-enchant">{enchant.name}</span> : null}
-          {equipped.item.sockets?.length ? (
-            <span className="gear-gems" aria-hidden="true">
-              {equipped.item.sockets.map((socket, index) => (
-                <i
-                  key={`${slot}-${socket}-${index}`}
-                  className={`socket-dot socket-${socket.toLowerCase()} ${equipped.gemIds[index] ? 'socket-filled' : ''}`.trim()}
-                />
-              ))}
-            </span>
-          ) : null}
-          {!isValid && <span className="stale-slot-warning">Not valid for this spec</span>}
-        </span>
-      </button>
-    )
+  function show(view: GearView) {
+    setOpenSlot(undefined)
+    onSession({ ...session, view })
   }
 
   return (
@@ -186,24 +142,50 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
 
         Five participants in the usability study ran the simulator on a character wearing nothing,
         and the owner's evaluation asked the same question at the gear popup: "how do I know what
-        item to select". Seventeen empty rows do not answer it. The ranked list for the spec does,
-        and equipping it is one press — after which this block is gone and the screen is the list.
+        item to select". Seventeen empty slots do not answer it. The ranked list for the spec does,
+        and equipping it is one press — after which this block is gone and the tools take its place.
       */}
-      {nothingEquipped && (
+      {nothingEquipped ? (
         <div className="gear-empty" data-testid="gear-empty">
           <h3>Nothing equipped yet</h3>
           <p>Start from the Phase 2 list for {character.spec} {character.className}, then change whatever you like.</p>
-          <button
-            type="button"
-            className="gear-empty-action"
-            data-testid="equip-recommended"
-            onClick={() => setLastEquip(onEquipRecommended())}
-          >
-            Equip the recommended set
-          </button>
+          <div className="gear-empty-actions">
+            <button type="button" className="gear-empty-action" data-testid="equip-recommended" onClick={equipRecommended}>
+              Equip the recommended set
+            </button>
+            <button type="button" className="gear-tool" data-testid="gear-import" onClick={onImport}>
+              Import your character
+            </button>
+          </div>
           <p className="gear-empty-alt">or pick a slot below and choose for yourself</p>
         </div>
+      ) : (
+        <div className="gear-tools">
+          <button type="button" className="gear-tool is-main" data-testid="equip-recommended" onClick={equipRecommended}>
+            Equip the recommended set
+          </button>
+          <button
+            type="button"
+            className="gear-tool"
+            data-testid="gear-empty-all"
+            onClick={() => {
+              onEmpty()
+              setLastEquip(undefined)
+              setOpenSlot(undefined)
+              setMessage('Emptied every slot.')
+            }}
+          >
+            Empty every slot
+          </button>
+          <button type="button" className="gear-tool" data-testid="gear-import" onClick={onImport}>
+            Import your character
+          </button>
+        </div>
       )}
+
+      <p className="gear-msg" role="status" data-testid="gear-message">
+        {message}
+      </p>
 
       {/*
         Said plainly when the list could not fill something, rather than leaving a gap to be noticed
@@ -216,19 +198,73 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
         </p>
       )}
 
-      {/*
-        The list and the slot you are working on, side by side.
+      <ViewSwitch
+        label="Gear view"
+        value={session.view}
+        onChange={show}
+        options={[
+          { id: 'sheet', label: 'Character sheet' },
+          {
+            id: 'left',
+            label: "What's left",
+            count: { n: totals.left, label: `${totals.left} slot${totals.left === 1 ? '' : 's'} with something left` },
+          },
+        ]}
+      />
 
-        `data-pane` drops the list to one column while the pane is open, because the pane takes the
-        other half — and the list has to stay readable *while* you choose, which is the whole reason
-        this is not an overlay any more.
+      {/*
+        The gear and the slot you are working on, side by side: the sheet (or the checklist) stays
+        readable while you choose, which is the whole reason this is not an overlay.
       */}
       <div className="gear-split" data-pane={openSlot ? '' : undefined}>
-        {/* The row count is the panel's to know: a spec wears 16, 17 or 18 slots, and the two-column
-            layout needs half of *this* character's list, not a constant that is wrong for two of them. */}
-        <div className="gear-list" style={{ '--gear-rows': Math.ceil(shown.length / 2) } as React.CSSProperties}>
-          {shown.map(renderSlot)}
-        </div>
+        {session.view === 'sheet' ? (
+          <GearSheet
+            character={character}
+            role={role}
+            gear={gear}
+            checks={checks}
+            totals={totals}
+            fromGear={fromGear}
+            hitCap={hitCap}
+            activeSets={activeSets}
+            openSlot={openSlot}
+            onOpen={(slot) => setOpenSlot(openSlot === slot ? undefined : slot)}
+            slotRef={(slot, node) => {
+              slotRefs.current[slot] = node
+            }}
+            onShowLeft={() => {
+              focusOnly.current = true
+              setOpenSlot(undefined)
+              onSession({ ...session, view: 'left', onlyLeft: true, group: 'slot' })
+            }}
+          />
+        ) : (
+          <WhatsLeft
+            character={character}
+            gear={gear}
+            checks={checks}
+            totals={totals}
+            hitCap={hitCap}
+            gearHit={hitCap ? Math.round(fromGear[hitCap.stat]) : 0}
+            session={session}
+            onSession={onSession}
+            display={display}
+            onFix={(slot, equipped, text) => {
+              onChange(slot, equipped)
+              setMessage(text)
+              // The pressed fix leaves with its flag; focus stays on the row, or on the filter if the row went too.
+              requestAnimationFrame(() => (changeRefs.current[slot] ?? onlyRef.current)?.focus())
+            }}
+            openSlot={openSlot}
+            onOpen={(slot) => setOpenSlot(openSlot === slot ? undefined : slot)}
+            changeRef={(slot, node) => {
+              changeRefs.current[slot] = node
+            }}
+            onlyRef={(node) => {
+              onlyRef.current = node
+            }}
+          />
+        )}
 
         {openSlot && (
           <SlotPane
@@ -248,7 +284,6 @@ export function GearPanel({ character, gear, onChange, onEquipRecommended }: Gea
       </div>
 
       <SetBonuses activeSets={activeSets} />
-
     </section>
   )
 }

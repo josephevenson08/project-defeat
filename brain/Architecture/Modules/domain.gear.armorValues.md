@@ -37,7 +37,7 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 
 ## Concepts & phases
 

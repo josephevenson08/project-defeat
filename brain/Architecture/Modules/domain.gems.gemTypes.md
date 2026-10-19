@@ -33,9 +33,10 @@ From the top of the file:
 
 ## Imported by
 
+- [[domain.bis.gearChecklist]] — `src/domain/bis/gearChecklist.ts`
+- [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[domain.gems.sampleGems]] — `src/domain/gems/sampleGems.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
-- [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
 
 ## Concepts & phases
 

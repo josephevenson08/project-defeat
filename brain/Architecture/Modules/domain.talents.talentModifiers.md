@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/talents/talentModifiers.ts
-lines: 530
+lines: 541
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentModifiers
 
-`src/domain/talents/talentModifiers.ts` · **domain** layer · 530 lines
+`src/domain/talents/talentModifiers.ts` · **domain** layer · 541 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `classHasTalentEffects`, `deriveTalentModifiers`, `flurrySpeedMultiplier`, `unmodelledTalentsInBuild`
+**function** — `classHasTalentEffects`, `deriveTalentModifiers`, `flurrySpeedMultiplier`, `talentSourcesOf`, `unmodelledTalentsInBuild`
 
 **const** — `classesWithTalentEffects`, `noTalentModifiers`, `unmodelledTalents`
 
@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 
 - [[App]] — `src/App.tsx`
 - [[domain.character.attributeConversions]] — `src/domain/character/attributeConversions.ts`
+- [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

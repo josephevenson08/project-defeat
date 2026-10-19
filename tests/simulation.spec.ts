@@ -65,8 +65,9 @@ test('the trust panel’s data: every DPS spec’s best case against the logs, 1
   const rows = specTrust()
   expect(rows, 'all 20 DPS specs').toHaveLength(20)
   const fury = rows.find((row) => row.className === 'Warrior' && row.spec === 'Fury')!
-  // The prototype's figure (sim-data.js, generated from the same model on 2026-10-11).
-  expect(Math.round(fury.best * 10) / 10).toBe(1348.3)
+  // The prototype's figure (sim-data.js, generated from the same model on 2026-10-11) was 1,348.3;
+  // the 9% miss against a level 73 boss (port step 6, Gear, 2026-10-19) took it to 1,343.2.
+  expect(Math.round(fury.best * 10) / 10).toBe(1343.2)
   expect(fury.dps).toBe(2053)
 
   const { low, high, worst } = trustRange(rows)
@@ -111,9 +112,11 @@ test('the estimate is the engine’s for the character on screen, against what F
   await expect(page.getByTestId('simulation-missing-weapon')).toHaveCount(0)
   await expect(page.getByTestId('simulation-who')).toContainText('17 of 17 slots')
 
-  // Against the 2,053 Fury warriors average on archon.gg.
-  const ratio = (2053 / shown).toFixed(2)
-  await expect(page.getByTestId('simulation-versus')).toHaveText(`${ratio}× below what Fury warriors average (2,053, archon.gg)`)
+  // Against the 2,053 Fury warriors average on archon.gg. The page divides by the unrounded score, so
+  // the ratio is checked to within the shown score's rounding rather than recomputed from it.
+  const versus = page.getByTestId('simulation-versus')
+  await expect(versus).toHaveText(/^\d\.\d\d× below what Fury warriors average \(2,053, archon\.gg\)$/)
+  expect(Math.abs(Number((await versus.innerText()).slice(0, 4)) - 2053 / shown)).toBeLessThan(0.006)
 
   // The damage sources add up to the estimate.
   const table = page.getByTestId('simulation-damage-sources')
