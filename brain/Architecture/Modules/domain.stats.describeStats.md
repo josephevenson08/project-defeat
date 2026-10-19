@@ -24,7 +24,7 @@ _No doc comment at the top of this file._
 ## Imported by
 
 - [[components.ui.itemTipModel]] — `src/components/ui/itemTipModel.ts`
-- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`

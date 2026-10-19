@@ -33,6 +33,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 
 **Then Compare (2026-10-19):** what you wear against another item for the same slot, as side-by-side game tooltips with the trade in one sentence ("You gain +6 Crit and lose −8 Hit…") and the simulated score. The other item comes from the spec's Wowhead list for the slot or any item it takes, and it opens on the guide's best one you do not wear. The score is still `compareItems`, the app's simulator, not the prototype's example weights; Equip applies what it assumed. Ranked Gear's slot picker and tooltip builder became shared (`features/gear/SlotStrip.tsx`, `fittedItemTip.ts`).
 
+**Then Buffs (2026-10-19):** your buffs filled in from who is in your raid: pick the raid (the Raid Composition roster, an example 25 or 10, or just you) and your seat, and each buff sits under how far it reaches or under Missing with what it needs. The raid's Paladins each give the Blessing you assign; any buff can still be switched by hand; consumables take one slot each. The counting is `domain/buffs/raidBuffs.ts` (one buff of an exclusive set per provider, Blessings by role). The tab opens By hand with nothing on, since the app starts clean.
+
 ## Documents
 
 - [[docs/design/PORT-PLAN|The port plan, with each step as built]] — `docs/design/PORT-PLAN.md`
@@ -77,6 +79,8 @@ The plan the owner approved on 2026-10-12 (`docs/design/PORT-PLAN.md`). **Option
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
+- [[domain.buffs.raidBuffs]] — `src/domain/buffs/raidBuffs.ts`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 
 ## Related
 

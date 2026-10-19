@@ -53,7 +53,6 @@ _No doc comment at the top of this file._
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
 - [[domain.simulation.specialAttacks]] — `src/domain/simulation/specialAttacks.ts`
-- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`

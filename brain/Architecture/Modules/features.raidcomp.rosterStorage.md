@@ -34,6 +34,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`

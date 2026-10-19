@@ -26,6 +26,7 @@ _No doc comment at the top of this file._
 
 - [[domain.consumables.sampleConsumables]] — `src/domain/consumables/sampleConsumables.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 
 ## Concepts & phases
 

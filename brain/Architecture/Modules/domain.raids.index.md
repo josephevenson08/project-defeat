@@ -34,6 +34,7 @@ _No doc comment at the top of this file._
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.compareSession]] — `src/features/gear/compareSession.ts`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`

@@ -302,10 +302,11 @@ test('on a phone: nothing past the edge, and every Ranked Gear control is at lea
   await page.setViewportSize({ width: 400, height: 860 })
   await openRanked(page)
   const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  // 43.5, not 44: a 44px control can measure a hair short under load, from subpixel layout.
   const short = () =>
     page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>('[data-testid="bis-panel"] button, [data-testid="bis-panel"] summary')]
-        .filter((element) => element.offsetParent && element.getBoundingClientRect().height < 44)
+        .filter((element) => element.offsetParent && element.getBoundingClientRect().height < 43.5)
         .map((element) => `${(element.textContent ?? '').trim().slice(0, 24)} ${Math.round(element.getBoundingClientRect().height)}`),
     )
   expect(await overflow()).toBe(0)

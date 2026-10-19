@@ -25,6 +25,7 @@ _No doc comment at the top of this file._
 
 ## Imported by
 
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`

@@ -124,6 +124,20 @@ behind every claim of its that quotes a number.
   once, so one Paladin lights up every Greater Blessing where in the game they hold one. That is stated
   on the screen; the exclusivity rule itself (one Blessing and one aura per Paladin, one totem per
   element, one shout per Warrior) is still sourced and tested in `buffExclusivity.ts`
+- **The Buffs tab** (the decided design, ported 2026-10-19): your buffs **filled in from who is in your
+  raid**. Pick the raid (the roster on Raid Composition, an example 25-man or 10-man, or just you) and
+  press a seat to sit there; every buff and boss debuff then sits under how far it reaches (from your
+  group, from the raid, on the boss) or under **Missing**, which says what each needs ("needs an
+  Enhancement Shaman in your group") or who is busy ("whoever could give it is already giving Windfury
+  Totem"): one aura per Paladin, one air totem per Shaman and one shout per Warrior, from
+  `buffExclusivity.ts`. **The raid's Paladins each give the Blessing you assign**, Kings first and then
+  your role's (Might for melee and tanks, Wisdom for casters and healers); a Blessing another Paladin
+  gives swaps. The buffs are design A's icon tiles with game-style tooltips, and any can still be
+  switched by hand, marked "by hand" until you choose the raid again. "By hand" drops the raid
+  altogether, and the tab opens there with nothing on, as the app starts clean. Consumables take one
+  slot each (flask, battle elixir, guardian elixir, food); a flask takes both elixir slots. Buffs the
+  simulator does not count are shown crossed out and say why. For every spec: the buffs and
+  consumables listed are your role's
 - Planner split into six sub-tabs (Gear / Compare / Talents / Buffs & Consumables / Ranked Gear /
   Build) rather than one ~15-screen scroll column, under a character line and a sticky stat bar that
   stay put across all six

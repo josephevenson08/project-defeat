@@ -39,7 +39,7 @@ _None._
 - [[domain.stats.statRelevance]] — `src/domain/stats/statRelevance.ts`
 - [[domain.stats.statUtils]] — `src/domain/stats/statUtils.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
-- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`
 

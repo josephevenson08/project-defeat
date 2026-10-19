@@ -34,6 +34,7 @@ From the top of the file:
 ## Imported by
 
 - [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`

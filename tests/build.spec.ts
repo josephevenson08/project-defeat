@@ -72,7 +72,7 @@ test('a broken paste changes nothing and says so, and so does another format’s
 test('reading the example export changes nothing; loading it wears it, and the buffs stay', async ({ page }) => {
   await openBuild(page, { dressed: false })
   await view(page, 'Buffs')
-  await page.getByTestId('buff-toggle-battle-shout').check()
+  await page.getByTestId('buff-toggle-battle-shout').click()
   await view(page, 'Build')
   const buffsBefore = await page.getByTestId('build-card').locator('li', { hasText: 'consumable' }).innerText()
   expect(buffsBefore).toBe('1 buff · 0 consumables')

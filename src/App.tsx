@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
@@ -49,6 +49,8 @@ import { professionSources } from './features/professions/professionSources'
 import { getRaidById } from './domain/raids'
 import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
+import { initialBuffsSession, type BuffsSession } from './features/buffs/buffsSession'
+import { buffsSources } from './features/buffs/buffWords'
 
 /**
  * The screen's colour is stamped on `<html>` as `data-tab`, not on a wrapper inside the app.
@@ -203,6 +205,8 @@ function App() {
   const [rankedSession, setRankedSession] = useState<RankedSession>(initialRankedSession)
   // And Compare's slot and the item held against yours.
   const [compareSession, setCompareSession] = useState<CompareSession>(initialCompareSession)
+  // And Buffs': the raid your buffs come from, your seat in it and its Paladins' Blessings.
+  const [buffsSession, setBuffsSession] = useState<BuffsSession>(initialBuffsSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -396,23 +400,14 @@ function App() {
   }
 
   /*
-   * The three id lists feed `calculateStats`, `findUpgrades` and the saved-build format, and these
-   * toggles are what let a player change them again. They were removed when the Buffs & Consumables
-   * panel was hidden, which left the lists permanently empty — the sourced buff data was still being
-   * applied, it just had nothing to apply.
-   *
-   * One shared helper rather than three near-identical ones: the operation is the same set-toggle in
-   * every case, and the only thing that differs is which piece of state it writes.
+   * The three id lists feed `calculateStats`, `findUpgrades` and the saved-build format. Since port
+   * step 6 the Buffs tab sets them whole: a raid fills the buffs and debuffs that reach your seat, and
+   * a switch by hand or a consumable slot writes the list it changes.
    */
-  const toggleId = useCallback(
-    (setIds: Dispatch<SetStateAction<readonly string[]>>) => (id: string) =>
-      setIds((current) => (current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id])),
-    [],
-  )
-
-  const toggleBuff = useMemo(() => toggleId(setActiveBuffIds), [toggleId])
-  const toggleConsumable = useMemo(() => toggleId(setActiveConsumableIds), [toggleId])
-  const toggleTargetDebuff = useMemo(() => toggleId(setActiveTargetDebuffIds), [toggleId])
+  const setRaidBuffs = useCallback((buffIds: readonly string[], debuffIds: readonly string[]) => {
+    setActiveBuffIds(buffIds)
+    setActiveTargetDebuffIds(debuffIds)
+  }, [])
 
   const upgradeReport = useMemo(
     () =>
@@ -536,6 +531,8 @@ function App() {
           <Provenance sources={raidcompSources} />
         ) : currentTab === 'planner' && plannerView === 'bis' ? (
           <Provenance sources={rankedSources(getBisListForSpec(character.className, character.spec))} />
+        ) : currentTab === 'planner' && plannerView === 'buffs' ? (
+          <Provenance sources={buffsSources} />
         ) : currentTab === 'planner' && plannerView === 'compare' ? (
           <Provenance sources={compareSources(getBisListForSpec(character.className, character.spec))} />
         ) : undefined
@@ -585,9 +582,10 @@ function App() {
               activeBuffIds={activeBuffIds}
               activeConsumableIds={activeConsumableIds}
               activeTargetDebuffIds={activeTargetDebuffIds}
-              onToggleBuff={toggleBuff}
-              onToggleConsumable={toggleConsumable}
-              onToggleTargetDebuff={toggleTargetDebuff}
+              onSetBuffs={setRaidBuffs}
+              onSetConsumables={setActiveConsumableIds}
+              session={buffsSession}
+              onSession={setBuffsSession}
             />
           )}
           {plannerView === 'bis' && (

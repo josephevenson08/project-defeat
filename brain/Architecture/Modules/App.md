@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 649
+lines: 647
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 649 lines
+`src/App.tsx` · **app** layer · 647 lines
 
 From the top of the file:
 
@@ -50,6 +50,8 @@ _Nothing exported (side-effect or style module)._
 - [[features.bis.RankedGearPanel]] — `src/features/bis/RankedGearPanel.tsx`
 - [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.buffs.buffsSession]] — `src/features/buffs/buffsSession.ts`
+- [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.builds.ShareNotice]] — `src/features/builds/ShareNotice.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`

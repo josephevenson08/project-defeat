@@ -37,6 +37,7 @@ From the top of the file:
 ## Imported by
 
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`

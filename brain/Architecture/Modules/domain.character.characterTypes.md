@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 - [[domain.bis.bisTypes]] — `src/domain/bis/bisTypes.ts`
 - [[domain.bis.rankedGear]] — `src/domain/bis/rankedGear.ts`
 - [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
+- [[domain.buffs.raidBuffs]] — `src/domain/buffs/raidBuffs.ts`
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
 - [[domain.builds.buildSerialization]] — `src/domain/builds/buildSerialization.ts`
 - [[domain.builds.buildTypes]] — `src/domain/builds/buildTypes.ts`

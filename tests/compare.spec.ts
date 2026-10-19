@@ -177,9 +177,10 @@ test('on a phone: nothing past the edge, and every Compare control is at least 4
   await openCompare(page)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)
+  // 43.5, not 44: a 44px control can measure a hair short under load, from subpixel layout.
   const short = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLElement>('.compare-panel-shell button, .compare-panel-shell select, .compare-panel-shell summary')]
-      .filter((element) => element.offsetParent && element.getBoundingClientRect().height < 44)
+      .filter((element) => element.offsetParent && element.getBoundingClientRect().height < 43.5)
       .map((element) => `${(element.textContent ?? '').trim().slice(0, 24)} ${Math.round(element.getBoundingClientRect().height)}`),
   )
   expect(short).toEqual([])

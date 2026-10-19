@@ -311,7 +311,7 @@ small {
 /*
  * The same trap as `small` above, one level up, and still latent rather than live.
  *
- * Every `h3` rule in this file is a *descendant* selector — `.talent-tree-head h3`, `.buffs-group
+ * Every `h3` rule in this file is a *descendant* selector — `.talent-tree-head h3`, `.gear-empty
  * h3`, and so on — and there was no bare `h3` rule at all. Every h3 currently on screen happens to
  * sit inside one of those containers (measured: 20 of them across every view, all landing on a
  * chosen size), so nothing is wrong today. But an h3 in a new container would inherit the browser's
@@ -2392,87 +2392,6 @@ select:focus-visible {
   color: var(--text-dim);
   margin-top: 18px;
   padding: 18px;
-}
-
-.buffs-panel {
-  display: grid;
-  gap: 20px;
-}
-
-.buffs-group h3 {
-  color: var(--text-strong);
-  font-size: var(--heading-section);
-  margin: 0 0 10px;
-}
-
-.buffs-consumable-category {
-  margin-top: 14px;
-}
-
-.buffs-consumable-category h4 {
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-  margin: 0 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.buffs-hint {
-  color: var(--text-dim);
-  margin: 0 0 4px;
-}
-
-.buffs-checkbox-list {
-  display: grid;
-  gap: 8px;
-}
-
-.buffs-checkbox-row {
-  align-items: start;
-  background: var(--surface-0);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  cursor: pointer;
-  display: flex;
-  gap: 10px;
-  padding: 8px 10px;
-}
-
-.buffs-checkbox-row input {
-  accent-color: var(--panel-accent, var(--text-dim));
-  margin-top: 3px;
-}
-
-.buffs-checkbox-row span {
-  display: grid;
-  gap: 2px;
-}
-
-.buffs-checkbox-row strong {
-  color: var(--text-strong);
-  font-size: 14px;
-}
-
-.buffs-checkbox-row small {
-  color: var(--text-dim);
-  line-height: 1.4;
-}
-
-.buffs-checkbox-row-disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-/*
- * Buffs listed for completeness with no checkbox: real raid buffs this app cannot apply. Held at
- * full opacity rather than dimmed like a disabled row — the information is accurate and worth
- * reading, it is just not actionable. The left rule is what marks it as a different kind of entry.
- */
-.buffs-checkbox-row-static {
-  border-left: 2px solid var(--line-strong);
-  cursor: default;
-  padding-left: 12px;
 }
 
 .tab-nav {
@@ -10419,5 +10338,505 @@ h4,
     box-sizing: border-box;
     min-height: 44px;
     padding: 13px 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Character Planner · Buffs: from your raid, with icons (port step 6, 2026-10-19).
+ *
+ * The decided design (`docs/design/prototypes/tabs/planner.html`, Buffs): design C, the buffs filled
+ * in from who is in your raid and your seat in it, with design A's icon tiles.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.buffs-panel-shell {
+  grid-column: 1 / -1;
+}
+
+.buffs-lead {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  margin: 0 0 12px;
+  max-width: 78ch;
+}
+
+.buffs-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+
+.buffs-sources button {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.buffs-sources button[aria-pressed='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.buffs-sources button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.buffs-msg {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 10px;
+  min-height: 1.3em;
+}
+
+.buffs-note,
+.buffs-none {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+  margin: 4px 0 10px;
+}
+
+/* The raid, a group per box, yours outlined; press a seat to sit there. */
+.buffs-roster {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  margin: 0 0 4px;
+}
+
+.buffs-group {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+.buffs-group.is-yours {
+  border-color: #f0c050;
+  box-shadow: 0 0 14px -6px rgba(240, 192, 80, 0.8);
+}
+
+.buffs-group h5 {
+  color: var(--ink-3);
+  display: flex;
+  font: 700 var(--t-xs) var(--f-body);
+  justify-content: space-between;
+  letter-spacing: 0.08em;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+
+.buffs-group.is-yours h5 {
+  color: #ffd56b;
+}
+
+.buffs-seats {
+  display: flex;
+  gap: 4px;
+}
+
+.buffs-seat {
+  background: #05080b;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  position: relative;
+  width: 40px;
+}
+
+.buffs-seat.is-empty {
+  border: 2px dashed #3a414a;
+}
+
+.buffs-seat.is-you {
+  border-color: #f0c050;
+  box-shadow: 0 0 0 2px #f0c050;
+}
+
+.buffs-seat.is-you::after {
+  background: #f0c050;
+  border-radius: 3px;
+  bottom: -9px;
+  color: #1a1204;
+  content: 'YOU';
+  font: 800 8px / 1 var(--f-body);
+  left: 50%;
+  padding: 2px 3px;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.buffs-seat:hover,
+.buffs-seat:focus-visible {
+  border-color: #ffffff;
+}
+
+.buffs-section {
+  margin: 12px 0 0;
+}
+
+.buffs-section > h4,
+.buffs-box h4 {
+  align-items: baseline;
+  color: var(--ink);
+  display: flex;
+  font: 400 var(--t-lg) var(--f-head);
+  gap: 8px;
+  margin: 0 0 6px;
+}
+
+.buffs-box h4 small {
+  color: var(--ink-3);
+  font: 600 var(--t-xs) var(--f-body);
+}
+
+/* A Paladin per row, with the five Greater Blessings to give. */
+.buffs-pals {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.buffs-pals li {
+  align-items: center;
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 6px 8px;
+}
+
+.buffs-pal-name {
+  color: var(--ink);
+  font: 600 var(--t-sm) var(--f-body);
+  min-width: 170px;
+}
+
+.buffs-pal-choices {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.buffs-pal-choice {
+  align-items: center;
+  background: var(--glass-2);
+  border: 1px solid var(--rim-2);
+  border-radius: 999px;
+  color: var(--ink-3);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 var(--t-xs) var(--f-body);
+  gap: 5px;
+  padding: 2px 9px 2px 2px;
+}
+
+.buffs-pal-choice img {
+  border-radius: 50%;
+  filter: grayscale(1) brightness(0.55);
+}
+
+.buffs-pal-choice.is-none {
+  padding: 5px 10px;
+}
+
+.buffs-pal-choice.is-out span {
+  opacity: 0.75;
+}
+
+.buffs-pal-choice[aria-pressed='true'] {
+  background: rgba(240, 192, 80, 0.12);
+  border-color: #f0c050;
+  color: var(--ink);
+}
+
+.buffs-pal-choice[aria-pressed='true'] img {
+  filter: none;
+}
+
+.buffs-pal-choice:hover,
+.buffs-pal-choice:focus-visible {
+  border-color: var(--glow);
+}
+
+/* Your group, the raid, the boss and what is missing. */
+.buffs-boxes {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 12px 0 0;
+}
+
+.buffs-box {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.buffs-box.is-missing {
+  border-color: rgba(255, 207, 122, 0.3);
+}
+
+.buffs-needs {
+  color: var(--ink-3);
+  display: grid;
+  font-size: var(--t-xs);
+  gap: 3px;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.buffs-needs b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.buffs-needs span {
+  color: var(--warn);
+}
+
+/* Design A's tiles: the icon in a frame with its class's colour along the bottom, gold when on. */
+.buff-bar {
+  background: linear-gradient(180deg, rgba(6, 10, 16, 0.92), rgba(3, 6, 10, 0.92));
+  border: 1px solid #5b4a2e;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 8px;
+  padding: 10px;
+}
+
+.buff-tile {
+  background: none;
+  border: 0;
+  color: var(--ink-3);
+  cursor: pointer;
+  display: grid;
+  font: 600 10px / 1.15 var(--f-body);
+  gap: 4px;
+  justify-items: center;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  width: 64px;
+}
+
+.buff-tile-frame {
+  background: #05080b;
+  border: 2px solid #3a414a;
+  border-radius: 7px;
+  height: 46px;
+  overflow: hidden;
+  position: relative;
+  width: 46px;
+}
+
+.buff-tile-frame img {
+  display: block;
+  filter: grayscale(1) brightness(0.45);
+  height: 100%;
+  width: 100%;
+}
+
+.buff-tile-frame i {
+  background: var(--cc);
+  bottom: 0;
+  height: 4px;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.buff-tile.is-on {
+  color: var(--ink);
+}
+
+.buff-tile.is-on .buff-tile-frame {
+  border-color: #f0c050;
+  box-shadow: 0 0 12px -2px rgba(240, 192, 80, 0.75);
+}
+
+.buff-tile.is-on .buff-tile-frame img {
+  filter: none;
+}
+
+.buff-tile.is-missing .buff-tile-frame {
+  border: 2px dashed var(--warn);
+}
+
+.buff-tile.is-out .buff-tile-frame {
+  border-color: #4a5058;
+  border-style: dashed;
+}
+
+.buff-tile.is-out .buff-tile-frame img {
+  filter: grayscale(1) brightness(0.35);
+}
+
+.buff-tile.is-out .buff-tile-frame::after {
+  background: rgba(255, 143, 134, 0.85);
+  content: '';
+  height: 2px;
+  left: -6px;
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: rotate(-45deg);
+}
+
+.buff-tile-name {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  min-height: 2.3em;
+  overflow: hidden;
+}
+
+.buff-tile-badge {
+  background: var(--glow);
+  border-radius: 3px;
+  color: var(--glow-ink);
+  font: 800 8px / 1 var(--f-body);
+  letter-spacing: 0.04em;
+  padding: 2px 3px;
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+  top: -6px;
+  white-space: nowrap;
+}
+
+.buff-tile:hover .buff-tile-frame,
+.buff-tile:focus-visible .buff-tile-frame {
+  border-color: #ffffff;
+}
+
+.buff-tip-effect {
+  color: #ffd100;
+}
+
+.buff-tip-from,
+.buff-tip-need {
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+
+.buff-tip-from {
+  color: #7fe0d4;
+}
+
+.buff-tip-need {
+  color: #ff8f86;
+}
+
+/* Consumables: a slot each, one choice in it. */
+.buffs-cons {
+  display: grid;
+  gap: 10px;
+}
+
+.buffs-cat-label {
+  color: var(--ink-3);
+  display: block;
+  font: 700 var(--t-xs) var(--f-body);
+  letter-spacing: 0.08em;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+
+.buffs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.buffs-chip {
+  background: var(--glass-2);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  color: var(--ink-2);
+  cursor: pointer;
+  display: grid;
+  font: 600 var(--t-xs) var(--f-body);
+  gap: 1px;
+  max-width: 260px;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.buffs-chip b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.buffs-chip small {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.buffs-chip[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--glow) 16%, var(--scrim));
+  border-color: var(--glow);
+  box-shadow: inset 3px 0 0 var(--glow);
+}
+
+.buffs-chip:hover,
+.buffs-chip:focus-visible {
+  border-color: var(--glow);
+}
+
+@media (min-width: 900px) {
+  .buffs-boxes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 699px), (pointer: coarse) {
+  .buffs-sources button,
+  .buffs-pal-choice,
+  .buffs-chip {
+    min-height: 44px;
+  }
+
+  .buffs-seat {
+    height: 44px;
+    width: 44px;
+  }
+
+  .buff-tile {
+    min-height: 44px;
+    width: 60px;
+  }
+
+  .buffs-pal-name {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .buffs-roster {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

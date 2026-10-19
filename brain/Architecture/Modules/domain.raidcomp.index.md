@@ -29,9 +29,13 @@ _No doc comment at the top of this file._
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
 - [[components.ui.SpecIcon]] — `src/components/ui/SpecIcon.tsx`
+- [[domain.buffs.raidBuffs]] — `src/domain/buffs/raidBuffs.ts`
 - [[domain.raids.exampleRaids]] — `src/domain/raids/exampleRaids.ts`
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.tierlists.specStanding]] — `src/domain/tierlists/specStanding.ts`
+- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
+- [[features.buffs.buffsSession]] — `src/features/buffs/buffsSession.ts`
+- [[features.buffs.buffWords]] — `src/features/buffs/buffWords.ts`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.raidcomp.exportRosterImage]] — `src/features/raidcomp/exportRosterImage.ts`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`

@@ -62,9 +62,9 @@ From the top of the file:
 ## Imported by
 
 - [[components.layout.SectionPicker]] — `src/components/layout/SectionPicker.tsx`
+- [[domain.buffs.raidBuffs]] — `src/domain/buffs/raidBuffs.ts`
 - [[domain.raidcomp.buffCoverage]] — `src/domain/raidcomp/buffCoverage.ts`
 - [[domain.raidcomp.raidAdvice]] — `src/domain/raidcomp/raidAdvice.ts`
-- [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
