@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**490 commits across 81 days**, from 2026-06-25 to 2026-10-19.
+**491 commits across 81 days**, from 2026-06-25 to 2026-10-19.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_63 commits_
+_64 commits_
 
-### Monday 19 October — 2 commits
+### Monday 19 October — 3 commits
 
 - Port step 6: the planner's Compare tab — [`ff62d37`](https://github.com/josephevenson08/project-defeat/commit/ff62d37c43d0826a184b5608e3c25cacff43c10c)
 - Port step 6: the planner's Buffs tab — [`aa06c9a`](https://github.com/josephevenson08/project-defeat/commit/aa06c9a16f5b8add1d20dd12bc3d98d46062d910)
+- Port step 6: the planner's Gear tab — [`632d73c`](https://github.com/josephevenson08/project-defeat/commit/632d73c611ce6ee8917e4c2972f6ec742a801cd1)
 
 ### Sunday 18 October — 2 commits
 
