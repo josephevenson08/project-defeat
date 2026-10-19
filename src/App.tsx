@@ -21,6 +21,7 @@ import type { CharacterProfile } from './features/character/characterTypes'
 import { applyWeaponSlotRules, emptyGear, normalizeGearForCharacter } from './features/gear/gearData'
 import { dropIllegalEnchants } from './domain/enchants/sampleEnchants'
 import { ComparePanel } from './features/gear/ComparePanel'
+import { compareSources, initialCompareSession, type CompareSession } from './features/gear/compareSession'
 import { buildRecommendedSet } from './features/gear/equipRecommendedSet'
 import { GearPanel } from './features/gear/GearPanel'
 import type { EquippedGear, EquippedSlot, GearSlot } from './features/gear/gearTypes'
@@ -200,6 +201,8 @@ function App() {
   const [professionsSession, setProfessionsSession] = useState<ProfessionsSession>(initialProfessionsSession)
   // Ranked Gear's view, slot and "Only upgrades", kept the same way.
   const [rankedSession, setRankedSession] = useState<RankedSession>(initialRankedSession)
+  // And Compare's slot and the item held against yours.
+  const [compareSession, setCompareSession] = useState<CompareSession>(initialCompareSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -533,6 +536,8 @@ function App() {
           <Provenance sources={raidcompSources} />
         ) : currentTab === 'planner' && plannerView === 'bis' ? (
           <Provenance sources={rankedSources(getBisListForSpec(character.className, character.spec))} />
+        ) : currentTab === 'planner' && plannerView === 'compare' ? (
+          <Provenance sources={compareSources(getBisListForSpec(character.className, character.spec))} />
         ) : undefined
       }
       onHome={() => {
@@ -568,6 +573,9 @@ function App() {
               activeTargetDebuffIds={activeTargetDebuffIds}
               target={target}
               talentPoints={talentPoints}
+              session={compareSession}
+              onSession={setCompareSession}
+              onEquip={updateGear}
             />
           )}
           {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}

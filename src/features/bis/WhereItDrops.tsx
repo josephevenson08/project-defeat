@@ -9,7 +9,7 @@ import type { CharacterProfile } from '../character/characterTypes'
 import type { EquippedGear, GearItem, GearSlot } from '../gear/gearTypes'
 import { ItemIcon } from '../gear/ItemIcon'
 import { slotGlyph } from '../gear/slotGlyphs'
-import { rankedTip } from './rankedTip'
+import { fittedItemTip } from '../gear/fittedItemTip'
 
 type WhereItDropsProps = {
   character: CharacterProfile
@@ -198,7 +198,7 @@ export function WhereItDrops({ character, gear, items, onlyUpgrades, onOnlyUpgra
       {tip.target && (
         <FloatingTip anchor={tip.target.anchor} placement="beside" className="item-tip-box" testId="item-tip">
           <ItemTooltip
-            tip={rankedTip(
+            tip={fittedItemTip(
               tip.target.data.item,
               guideFitting(character, tipSlot(tip.target.data, gear), tip.target.data.item, gear),
               whereText(tip.target.data.where),

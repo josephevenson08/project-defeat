@@ -186,18 +186,18 @@ function cleanSourceText(text: string | undefined): string | undefined {
  * `resolveAcquisition`), a world boss, a profession, or anything else (badges, PvP, quests,
  * dungeons, older raids), said in the guide's own words when nothing more exact is known.
  */
-export function whereFrom(entry: RankedGearEntry, item: GearItem | undefined): RankedWhere {
+export function whereFrom(entry: RankedGearEntry | undefined, item: GearItem | undefined): RankedWhere {
   const acquired = resolveAcquisition(entry, item)
   const raid = raidNamed(acquired.instance)
   if (raid) {
-    const id = entry.wowItemId ?? item?.wowItemId
+    const id = entry?.wowItemId ?? item?.wowItemId
     const listed = acquired.boss ? lootSources(raid).find((source) => source.boss?.name === acquired.boss)?.boss : undefined
     const byToken = item ? tokenBoss(raid, item) : undefined
     const token = (id !== undefined && tokenPieces.has(id)) || byToken !== undefined
     const boss = listed ?? byToken
     return { kind: 'raid', raid, ...(boss ? { boss } : {}), ...(token ? { token: `${raid.tier} token` } : {}) }
   }
-  if (acquired.instance === 'World Boss' || /world boss/i.test(entry.label ?? '')) {
+  if (acquired.instance === 'World Boss' || /world boss/i.test(entry?.label ?? '')) {
     return { kind: 'world', text: acquired.boss ? `World boss: ${acquired.boss}` : 'World boss' }
   }
   if (acquired.type === 'Crafted' || acquired.craftedBy) {
@@ -206,7 +206,7 @@ export function whereFrom(entry: RankedGearEntry, item: GearItem | undefined): R
   const place = [acquired.type, acquired.instance ?? acquired.vendor ?? acquired.reputation]
     .filter((part) => part && /[a-z]{3}/i.test(part))
     .join(': ')
-  return { kind: 'other', text: cleanSourceText(entry.sourceText) ?? (place || 'Source not recorded') }
+  return { kind: 'other', text: cleanSourceText(entry?.sourceText) ?? (place || 'Source not recorded') }
 }
 
 /** One line for a tooltip: "Lady Vashj, Serpentshrine Cavern", "T5 token · Lady Vashj, …", "Crafted: Engineering". */

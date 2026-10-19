@@ -32,6 +32,7 @@ From the top of the file:
 
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
 
 ## Concepts & phases

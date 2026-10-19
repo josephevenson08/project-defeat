@@ -16,9 +16,10 @@ import { getQualityColor } from '../../domain/gear/qualityColors'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, getItemById, getVisibleGearSlotsForSpec } from '../gear/gearData'
 import type { EquippedGear, GearItem, GearSlot } from '../gear/gearTypes'
+import { fittedItemTip } from '../gear/fittedItemTip'
 import { ItemIcon } from '../gear/ItemIcon'
+import { SlotStrip } from '../gear/SlotStrip'
 import { slotGlyph } from '../gear/slotGlyphs'
-import { rankedTip } from './rankedTip'
 
 type SlotBySlotProps = {
   character: CharacterProfile
@@ -65,30 +66,16 @@ export function SlotBySlot({ character, gear, lists, slot, onSlot, onEquip }: Sl
         Wowhead's {character.spec} {character.className} Phase 2 order for each slot, best first. Pick a slot from your gear. Each item is
         shown with the guide's enchant for the slot and its gem for each socket colour; Equip puts it on, and the Gear tab shows it too.
       </p>
-      <div className="ranked-slots" role="group" aria-label="Slot" ref={stripRef}>
-        {visible.map((key) => {
-          const item = wornItem(gear, key)
-          const name = display(key)
-          return (
-            <button
-              key={key}
-              type="button"
-              className="ranked-slot"
-              aria-pressed={key === current}
-              aria-label={item ? `${name}: ${item.name}` : `${name}, empty`}
-              title={item ? `${name}: ${item.name}` : name}
-              data-slot={key}
-              data-testid={`ranked-slot-${key}`}
-              onClick={() => onSlot(key)}
-            >
-              <span className={`ranked-slot-icon${item ? '' : ' is-empty'}`} style={qualityFrame(item)} aria-hidden="true">
-                <ItemIcon wowItemId={item?.wowItemId} fallback={slotGlyph(key)} />
-              </span>
-              <small aria-hidden="true">{slotGlyph(key)}</small>
-            </button>
-          )
-        })}
-      </div>
+      <SlotStrip
+        character={character}
+        gear={gear}
+        slots={visible}
+        selected={current}
+        onSelect={onSlot}
+        label="Slot"
+        testIdPrefix="ranked-slot"
+        ref={stripRef}
+      />
 
       <div className="ranked-head">
         <h4>{display(current)}</h4>
@@ -170,7 +157,7 @@ function RankedCard({ character, gear, slot, list, item, entry, display, onEquip
         <span className="ranked-card-icon" style={qualityFrame(item)} aria-hidden="true">
           <ItemIcon wowItemId={item.wowItemId} fallback={slotGlyph(slot)} />
         </span>
-        <ItemTooltip tip={rankedTip(item, guideFitting(character, slot, item, gear), where ? whereText(where) : '')} />
+        <ItemTooltip tip={fittedItemTip(item, guideFitting(character, slot, item, gear), where ? whereText(where) : '')} />
       </div>
 
       {entry && <CostLine entry={entry} item={item} />}

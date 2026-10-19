@@ -1,3 +1,4 @@
+import { getBisListForSpec, listForSlot, rankedListsFor, wornItem, type RankedGearEntry } from '../../domain/bis'
 import { getEnchantsForSlot } from '../../domain/enchants/sampleEnchants'
 import { getDefaultItemForSlot, isEmptySlotItem, twoHanderOccupiesOffHand } from '../../domain/gear/slotCompatibility'
 import { statLabels, type StatBlock } from '../../domain/stats/statTypes'
@@ -8,7 +9,7 @@ import type { CharacterProfile, CharacterRole } from '../character/characterType
 import { calculateSimulation } from '../simulator/calculateSimulation'
 import { pickBestGemPerColor } from '../simulator/findUpgrades'
 import { calculateStats } from '../stats/calculateStats'
-import { getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
+import { getItemById, getItemsForSlotAndCharacter, getVisibleGearSlotsForSpec, isItemBlockedByUniqueInGear } from './gearData'
 import type { EquippedGear, GearItem, GearSlot } from './gearTypes'
 
 /** Everything the comparison needs about the character it is comparing for. */
@@ -159,6 +160,44 @@ export function defaultComparisonPair(
   )
 
   return { left, right }
+}
+
+/** An item Compare offers against what you wear: from Wowhead's list for the slot with its entry, or what you wear when the list does not rank it. */
+export type CompareCandidate = { item: GearItem; entry?: RankedGearEntry }
+
+/**
+ * What Compare offers as icons for a slot (port step 6): Wowhead's Phase 2 list for the spec, best
+ * first, then what you wear if the list does not rank it, so the ranking always reads against your
+ * own item. Items the character cannot put in the slot right now (a unique ring already in the other
+ * hand) are left out, as `comparableItemsFor` leaves them out.
+ */
+export function compareCandidates(context: ComparisonContext, slot: GearSlot): CompareCandidate[] {
+  const { character, gear } = context
+  const list = getBisListForSpec(character.className, character.spec)
+  const entries = (list && listForSlot(rankedListsFor(list), slot)?.entries) || []
+  const legal = new Set(comparableItemsFor(context, slot).map((item) => item.id))
+  const worn = wornItem(gear, slot)
+  const candidates: CompareCandidate[] = entries.flatMap((entry) => {
+    const item = getItemById(entry.itemId)
+    return item && (legal.has(item.id) || item.id === worn?.id) ? [{ item, entry }] : []
+  })
+  if (worn && !candidates.some((candidate) => candidate.item.id === worn.id)) candidates.push({ item: worn })
+  return candidates
+}
+
+/**
+ * The item Compare opens on against what you wear: the guide's best one you do not wear, or, where
+ * the guide ranks nothing for the slot, the highest item level you could put there.
+ */
+export function defaultCompareItem(context: ComparisonContext, slot: GearSlot, candidates: readonly CompareCandidate[]) {
+  const worn = wornItem(context.gear, slot)
+  return (
+    candidates.find((candidate) => candidate.item.id !== worn?.id)?.item ??
+    getDefaultItemForSlot(
+      slot,
+      comparableItemsFor(context, slot).filter((item) => item.id !== worn?.id),
+    )
+  )
 }
 
 /**

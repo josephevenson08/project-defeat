@@ -9,11 +9,12 @@ import { getIconName } from '../../domain/icons/icons'
 const enchantLine = (name: string) => name.replace(/^(Enchant \w+|Weapon|Bracer|Gloves|Chest|Ring|Cloak|Boots|Shield) - /, '')
 
 /**
- * A ranked item as the game's tooltip, fitted out the way it would be worn: the enchant, the gem in
- * each socket (with the socket bonus green when they match), and its tier set. `where` is where it
- * comes from, and `note` its place on the list when the tooltip floats over a row.
+ * An item as the game's tooltip, fitted out the way it would be worn: the enchant, the gem in each
+ * socket (with the socket bonus green when they match), and its tier set. `where` is where it comes
+ * from, and `note` its place on a list. Ranked Gear fits items the guide's way; Compare fits them the
+ * way its score assumes.
  */
-export function rankedTip(item: GearItem, fitted: EquippedSlot, where: string, note?: string): ItemTipModel {
+export function fittedItemTip(item: GearItem, fitted: EquippedSlot, where: string, note?: string): ItemTipModel {
   const enchant = getEnchantById(fitted.enchantId)
   const gems = item.sockets?.map((_, index) => {
     const gem = getGemById(fitted.gemIds[index])

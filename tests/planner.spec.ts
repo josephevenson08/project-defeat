@@ -3704,8 +3704,8 @@ test('the planner shows one panel at a time instead of a single long column', as
   // Each view renders its own panel and *only* its own — the point is the other three are not in the
   // document, not merely scrolled past.
   const views = [
-    { view: 'Compare' as const, present: page.getByRole('region', { name: 'Gear Comparison' }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
-    { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Gear Comparison' }) },
+    { view: 'Compare' as const, present: page.getByRole('region', { name: 'Compare with what you wear' }), absent: page.getByRole('region', { name: 'Gear', exact: true }) },
+    { view: 'Talents' as const, present: page.getByRole('region', { name: 'Talents', exact: true }), absent: page.getByRole('region', { name: 'Compare with what you wear' }) },
     { view: 'Buffs' as const, present: page.getByTestId('buffs-panel'), absent: page.getByRole('region', { name: 'Talents', exact: true }) },
     { view: 'Ranked Gear' as const, present: page.getByTestId('bis-panel'), absent: page.getByTestId('buffs-panel') },
     // The Build panel's region, not its export textarea — that lives inside a collapsed <details>,
@@ -11401,13 +11401,11 @@ test('a crafted or bought BiS pick says what it costs, and the price is never in
 })
 
 /*
- * Gear comparison — two items for one slot, with the stat difference and the change in the role's
- * headline number. The question the upgrade finder cannot answer: that list ranks what beats your
- * current kit, so it cannot show a pair where one side is a downgrade, cannot compare two items you
- * do not own, and gives a score where what you want is the stat line behind it.
+ * Gear comparison — what you wear against another item for the same slot, with the stat difference
+ * and the change in the role's headline number (since port step 6, design A's side-by-side tooltips
+ * with design B's sentence; `tests/compare.spec.ts` has the decided design's own check).
  */
 
-/** The label showing in a picker, read off the select rather than guessed from option order. */
 /**
  * A character select, which now folds behind "Change character" on the planner's strip rather than
  * sitting open on a rail.
@@ -11422,19 +11420,16 @@ async function characterField(page: Page, label: 'Faction' | 'Race' | 'Class' | 
   return page.getByLabel(label)
 }
 
-async function selectedLabel(page: Page, name: string) {
-  const field = await characterField(page, name as 'Faction' | 'Race' | 'Class' | 'Specialization')
-  return field.evaluate((element) => (element as HTMLSelectElement).selectedOptions[0]?.text.trim() ?? '')
-}
-
 test('the gear comparison puts two items side by side and its numbers add up on screen', async ({ page }) => {
   await openApp(page)
+  await page.getByTestId('equip-recommended').click()
   await openPlannerView(page, 'Compare')
 
-  await expect(page.getByRole('region', { name: 'Gear Comparison' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Compare with what you wear' })).toBeVisible()
 
-  // Two named items rather than an empty frame waiting on pickers nobody has touched.
-  const names = page.locator('.compare-side-header h4')
+  // Two named items rather than an empty frame waiting on pickers nobody has touched: what you wear,
+  // and the guide's best one you do not.
+  const names = page.locator('.compare-tip .item-tip-name')
   await expect(names).toHaveCount(2)
   const [leftName, rightName] = await names.allInnerTexts()
   expect(leftName.trim(), 'the two sides open on different items').not.toBe(rightName.trim())
@@ -11445,15 +11440,18 @@ test('the gear comparison puts two items side by side and its numbers add up on 
    * 56 and 66 beside a difference of +9.9, and the score row printed 35.0 -> 42.0 beside +7.1. Every
    * figure was individually true and not one of them added up, because each side was rounded on its
    * own and then differenced against the exact values. Both deltas are derived from the rounded pair
-   * now, and this assertion fails if either reverts.
+   * now, and this assertion fails if either reverts. The page writes a real minus sign.
    */
+  const asNumber = (text: string) => Number(text.replace('−', '-'))
   const values = page.locator('.compare-score-values strong')
-  const left = Number(await values.nth(0).innerText())
-  const right = Number(await values.nth(1).innerText())
-  const delta = Number((await page.getByTestId('compare-score-delta').innerText()).split(' ')[0])
+  const left = asNumber(await values.nth(0).innerText())
+  const right = asNumber(await values.nth(1).innerText())
+  const delta = asNumber((await page.getByTestId('compare-score-delta').innerText()).split(' ')[0])
   expect(Number.isFinite(left) && Number.isFinite(right) && Number.isFinite(delta), 'all three are numbers').toBe(true)
   expect(Math.abs(left + delta - right), `the score row: ${left} + ${delta} should reach ${right}`).toBeLessThan(0.051)
 
+  // The totals behind the sentence are folded since port step 6; open them.
+  await page.getByTestId('compare-totals').locator('summary').click()
   const rows = await page
     .locator('.compare-table tbody tr')
     .evaluateAll((trs) => trs.map((tr) => [...tr.children].map((cell) => (cell as HTMLElement).innerText.trim())))
@@ -11465,53 +11463,32 @@ test('the gear comparison puts two items side by side and its numbers add up on 
   }
 })
 
-test('the comparison opens on an era-appropriate pair rather than catalogue order', async ({ page }) => {
+test('the comparison opens on the guide\'s pick rather than catalogue order', async ({ page }) => {
   await openApp(page)
   await openPlannerView(page, 'Compare')
 
-  const leftPicker = page.getByRole('combobox', { name: 'Left item' })
-
   /*
-   * **Catalogue order is not usable as a default here, and that is why `defaultComparisonPair`
-   * exists.** `getItemsForSlotAndCharacter` spans all of Classic as well as TBC, so the first two
-   * Head entries are a pair of vanilla tier-2 helms — the same trap `getDefaultItemForSlot` was
-   * written for, arriving at a Phase 2 planner by a different route. Landing on the first two options
-   * again is the regression this catches.
-   */
-  const options = await leftPicker.locator('option').allInnerTexts()
-  expect(options.length, 'the Head slot offers plenty to choose between').toBeGreaterThan(2)
-  expect(await selectedLabel(page, 'Left item'), 'the left default is not the first catalogue entry').not.toBe(
-    options[0].trim(),
-  )
-  expect(await selectedLabel(page, 'Right item'), 'the right default is not the second catalogue entry').not.toBe(
-    options[1].trim(),
-  )
-
-  /*
-   * **A new character wears nothing, and the panel still has to open on two real items.**
+   * **Catalogue order is not usable as a default here.** `getItemsForSlotAndCharacter` spans all of
+   * Classic as well as TBC, so the first two Head entries are a pair of vanilla tier-2 helms. Since
+   * port step 6 the other side opens on the spec's Wowhead list instead — its best item you do not
+   * wear — and the picker for any other item is sorted by item level, so neither lands in Classic.
    *
-   * This asserted "no empty-slot placeholder is offered" first, which was vacuous: the catalogue does
-   * not contain the placeholders at all — `emptyItemForSlot` builds them on demand for `emptyGear` —
-   * so that assertion would have held however broken the filtering became, which is this repo's
-   * documented worst kind of passing test. The live risk is the opposite end: the left side defaults
-   * to what you are wearing, and on a fresh character that is nothing. Both sides resolving to a real
-   * catalogue item is the thing that would actually break.
+   * **A new character wears nothing**, and the panel still opens on a real item against that nothing
+   * rather than falling back to the empty placeholder.
    */
-  const shownNames = await page.locator('.compare-side-header h4').allInnerTexts()
-  expect(shownNames, 'both sides name an item').toHaveLength(2)
-  for (const name of shownNames) {
-    expect(name.trim(), 'a side never falls back to the empty placeholder').not.toBe('Empty')
-    expect(options.map((option) => option.trim()), `${name.trim()} is a real option for this slot`).toContain(name.trim())
-  }
+  await expect(page.getByTestId('compare-yours')).toContainText('Nothing in this slot')
+  await expect(page.getByTestId('compare-other')).toContainText('Rank 1')
+  await expect(page.getByTestId('compare-other')).toContainText('Destroyer Battle-Helm')
+  await expect(page.locator('.compare-tip .item-tip-name').filter({ hasText: /^Empty$/ })).toHaveCount(0)
 
-  // Changing slot has to re-default both sides. Carrying either id across would fall through to a
-  // default anyway and look like the picker ignored the change.
-  await page.getByRole('combobox', { name: 'Comparison slot' }).selectOption('Main Hand')
-  await expect(page.getByTestId('compare-table')).toBeVisible()
-  const mainHandLeft = await selectedLabel(page, 'Left item')
-  const mainHandRight = await selectedLabel(page, 'Right item')
-  expect(mainHandLeft, 'the new slot picks its own left item').not.toBe('')
-  expect(mainHandLeft, 'the new slot still opens on two different items').not.toBe(mainHandRight)
+  const options = await page.getByRole('combobox', { name: 'Any item for this slot' }).locator('option').allInnerTexts()
+  expect(options.length, 'the Head slot offers plenty to choose between').toBeGreaterThan(2)
+  const firstLevel = Number(options[1].match(/\((\d+)\)$/)?.[1])
+  expect(firstLevel, 'the first item offered is a TBC one, not a vanilla helm').toBeGreaterThan(100)
+
+  // Changing slot re-defaults the other side to that slot's own list.
+  await page.getByTestId('compare-slot-Main Hand').click()
+  await expect(page.getByTestId('compare-other')).toContainText('Dragonstrike')
 })
 
 test('both sides of a comparison are gemmed the same way, unlike the upgrade finder', async ({ page }) => {
@@ -11526,15 +11503,15 @@ test('both sides of a comparison are gemmed the same way, unlike the upgrade fin
    * "you have not gemmed yet" into an answer about the items. Both get the best colour-matched gems,
    * and the panel says so rather than leaving the reader to assume either convention.
    */
-  const copy = page.getByRole('region', { name: 'Gear Comparison' }).locator('.panel-copy')
+  const copy = page.getByRole('region', { name: 'Compare with what you wear' }).locator('.compare-lead')
   await expect(copy).toContainText(/both sides are scored the same way/i)
   await expect(copy, 'the panel names the surface it can disagree with').toContainText(/upgrade finder/i)
 
   // Whenever the note appears at all it has to speak for both sides, since that is the claim.
   const note = page.getByTestId('compare-gem-note')
   if (await note.count()) {
-    await expect(note).toContainText(/on the left/i)
-    await expect(note).toContainText(/on the right/i)
+    await expect(note).toContainText(/in yours/i)
+    await expect(note).toContainText(/in the other/i)
     await expect(note).toContainText(/once gemmed/i)
   }
 })
@@ -11559,7 +11536,7 @@ test('the comparison score is a DPS surface, but the stat table is for every spe
 
   await expect(page.getByTestId('compare-score')).toHaveCount(0)
   await expect(page.getByTestId('compare-score-hidden')).toContainText(/damage specs only/i)
-  await expect(page.getByTestId('compare-table'), 'a healer still gets the stat comparison').toBeVisible()
+  await expect(page.getByTestId('compare-changes'), 'a healer still gets the stat comparison').toBeVisible()
 
   /*
    * And a damage spec does get the number, from the same page load, so this pins the gate rather than

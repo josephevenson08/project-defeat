@@ -49,8 +49,8 @@ From the top of the file:
 
 ## Imported by
 
-- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
+- [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SetBonuses]] — `src/features/gear/SetBonuses.tsx`
 

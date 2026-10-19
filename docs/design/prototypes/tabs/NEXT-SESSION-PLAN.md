@@ -1,8 +1,12 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-18, later): Ranked Gear is in the app too; start here
+## ▶ Where we left off (2026-10-19): Compare is in the app too; start here
 
-**Step 6 continued with Ranked Gear:** `planner.html`'s Ranked Gear sub-tab (`ranked-planner.js`: design A's guide slot by slot as tooltips, with design C's "Where it drops" behind the switch) is now the live app's Ranked Gear tab for all 27 specs, and `checks/ranked-handson.mjs` became `tests/ranked.spec.ts`. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Compare (`compare-*.js`), Buffs, Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+**Step 6 continued with Compare:** `planner.html`'s Compare sub-tab (`compare-a.js` with design B's one-sentence summary) is now the live app's Compare tab, scored by the app's simulator rather than the prototype's example weights, and `checks/compare-handson.mjs` became `tests/compare.spec.ts`. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Buffs (`buffs-c.js` with `buffs-a.js`'s icons), Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-18, later): Ranked Gear is in the app too
+
+**Step 6 continued with Ranked Gear:** `planner.html`'s Ranked Gear sub-tab (`ranked-planner.js`: design A's guide slot by slot as tooltips, with design C's "Where it drops" behind the switch) is now the live app's Ranked Gear tab for all 27 specs, and `checks/ranked-handson.mjs` became `tests/ranked.spec.ts`. Committed and pushed (`efc6cac`). **Next:** Compare (`compare-*.js`), Buffs, Gear and Talents, one commit each. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-18): the planner's Build tab is in the app
 

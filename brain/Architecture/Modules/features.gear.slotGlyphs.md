@@ -34,6 +34,7 @@ From the top of the file:
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 
 ## Concepts & phases
 

@@ -1,21 +1,21 @@
 ---
 type: module
 layer: features
-source: src/features/bis/rankedTip.ts
-lines: 33
+source: src/features/gear/fittedItemTip.ts
+lines: 34
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
-# features.bis.rankedTip
+# features.gear.fittedItemTip
 
-`src/features/bis/rankedTip.ts` · **features** layer · 33 lines
+`src/features/gear/fittedItemTip.ts` · **features** layer · 34 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `rankedTip`
+**function** — `fittedItemTip`
 
 ## Imports
 
@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 
 ## Concepts & phases
 

@@ -232,12 +232,17 @@ behind every claim of its that quotes a number.
   offering them to every character, and only ever on Finger 1. Dropping the profession removes the
   enchant rather than leaving it applied. Everything else a profession gives in TBC is access, not
   stats, and the picker says so rather than implying a bonus that is really Wrath's
-- **Side-by-side gear comparison** — two items for one slot, each swapped into the set you are
-  actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip
-  comparison cannot see them. Shows the stat-by-stat difference and the change in the role's headline
-  number. It answers what the upgrade finder cannot: that list ranks what beats your current kit, so
-  it cannot show a pair where one side is a downgrade, or compare two items you do not own yet.
-  **Both sides are scored with the best colour-matched gems**, deliberately unlike the upgrade
+- **The Compare tab** (the decided design, ported 2026-10-19): what you wear against another item for
+  the same slot, as **side-by-side game tooltips** the way the game draws a Shift-compare, with **the
+  trade in one sentence** above them ("You gain +6 Crit and lose −8 Hit… Estimated DPS 363.7 → 362.8").
+  Pick the slot from your gear (the same slot picker as Ranked Gear) and the other item from your
+  spec's Wowhead list for it, rank in the corner and yours marked, or any item the slot takes, best
+  item level first; it opens on the guide's best item you do not wear. Under the other tooltip, the
+  stats that change; Equip puts it on with the gems its score assumed. Each side is swapped into the
+  set you are actually wearing, so set bonuses and socket bonuses count where a tooltip-against-tooltip
+  comparison cannot see them, and your totals with each are one press away. It answers what the
+  upgrade finder cannot: that list ranks what beats your current kit, so it cannot show a pair where
+  one side is a downgrade. **Both sides are scored with the best colour-matched gems**, deliberately unlike the upgrade
   finder, which scores your baseline as-is — the question here is which *item* is better, not whether
   you have gemmed yet, and the panel states which question it is answering. The simulated score is
   shown for damage specs only, the same call the Simulation tab makes and for the same reason; the

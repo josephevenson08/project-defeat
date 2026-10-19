@@ -38,6 +38,7 @@ _No doc comment at the top of this file._
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`

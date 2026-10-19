@@ -40,6 +40,7 @@ From the top of the file:
 
 ## Imported by
 
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 
 ## Concepts & phases

@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[features.builds.BuildPanel]] — `src/features/builds/BuildPanel.tsx`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 
 ## Concepts & phases

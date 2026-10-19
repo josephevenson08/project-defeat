@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 - [[features.raids.BossJournal]] — `src/features/raids/BossJournal.tsx`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
 - [[features.raids.LootSearchResults]] — `src/features/raids/LootSearchResults.tsx`

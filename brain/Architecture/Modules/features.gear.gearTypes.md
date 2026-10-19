@@ -31,10 +31,12 @@ _No doc comment at the top of this file._
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.compareSession]] — `src/features/gear/compareSession.ts`
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`

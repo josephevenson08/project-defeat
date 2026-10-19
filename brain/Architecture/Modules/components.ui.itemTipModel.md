@@ -33,7 +33,7 @@ From the top of the file:
 ## Imported by
 
 - [[components.ui.ItemTooltip]] — `src/components/ui/ItemTooltip.tsx`
-- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
+- [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
 
 ## Concepts & phases

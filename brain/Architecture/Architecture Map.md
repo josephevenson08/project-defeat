@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-230 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+232 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -18,16 +18,16 @@ The modules everything else leans on — change these carefully.
 
 - [[domain.character.characterTypes]] — 52 importers
 - [[domain.gear.itemTypes]] — 33 importers
-- [[features.character.characterTypes]] — 24 importers
+- [[features.character.characterTypes]] — 25 importers
+- [[features.gear.gearTypes]] — 20 importers
 - [[domain.gear.gearSlots]] — 19 importers
-- [[features.gear.gearTypes]] — 18 importers
 - [[domain.stats.statTypes]] — 17 importers
 - [[domain.professions.professionTypes]] — 16 importers
-- [[domain.raids.index]] — 14 importers
+- [[domain.raids.index]] — 15 importers
 - [[domain.raids.raidTypes]] — 14 importers
+- [[features.gear.gearData]] — 14 importers
 - [[domain.abilities.abilityTypes]] — 13 importers
-- [[domain.raidcomp.index]] — 13 importers
-- [[features.gear.gearData]] — 13 importers
+- [[domain.bis.index]] — 13 importers
 
 ## By layer
 
@@ -54,21 +54,20 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.Button]] · 3 importers
 - [[components.ui.FloatingTip]] · 3 importers
 - [[components.ui.itemTipModel]] · 3 importers
-- [[components.ui.ItemTooltip]] · 3 importers
+- [[components.ui.ItemTooltip]] · 4 importers
 - [[components.ui.PhaseChip]] · 1 importers
-- [[components.ui.Provenance]] · 7 importers
+- [[components.ui.Provenance]] · 8 importers
 - [[components.ui.SelectField]] · 1 importers
 - [[components.ui.SpecIcon]] · 5 importers
 - [[components.ui.useHoverTip]] · 6 importers
 - [[components.ui.ViewSwitch]] · 5 importers
 
-### features (70)
+### features (72)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
 - [[features.bis.RankedGearPanel]] · 1 importers
 - [[features.bis.rankedSession]] · 2 importers
-- [[features.bis.rankedTip]] · 2 importers
 - [[features.bis.SlotBySlot]] · 1 importers
 - [[features.bis.WhereItDrops]] · 1 importers
 - [[features.buffs.BuffsPanel]] · 1 importers
@@ -79,17 +78,20 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.character.CharacterCreator]] · 1 importers
 - [[features.character.characterData]] · 6 importers
 - [[features.character.CharacterStrip]] · 1 importers
-- [[features.character.characterTypes]] · 24 importers
+- [[features.character.characterTypes]] · 25 importers
 - [[features.gear.compareItems]] · 1 importers
 - [[features.gear.ComparePanel]] · 1 importers
+- [[features.gear.compareSession]] · 2 importers
 - [[features.gear.equipRecommendedSet]] · 2 importers
-- [[features.gear.gearData]] · 13 importers
+- [[features.gear.fittedItemTip]] · 3 importers
+- [[features.gear.gearData]] · 14 importers
 - [[features.gear.GearPanel]] · 1 importers
-- [[features.gear.gearTypes]] · 18 importers
-- [[features.gear.ItemIcon]] · 6 importers
+- [[features.gear.gearTypes]] · 20 importers
+- [[features.gear.ItemIcon]] · 7 importers
 - [[features.gear.SetBonuses]] · 1 importers
-- [[features.gear.slotGlyphs]] · 4 importers
+- [[features.gear.slotGlyphs]] · 5 importers
 - [[features.gear.SlotPane]] · 1 importers
+- [[features.gear.SlotStrip]] · 2 importers
 - [[features.professions.FarmingRouteMap]] · 1 importers
 - [[features.professions.MaterialChip]] · 0 importers
 - [[features.professions.professionSources]] · 1 importers
@@ -158,7 +160,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.bis.bisRankingsJson.d]] · 0 importers
 - [[domain.bis.bisRecommendationsJson.d]] · 0 importers
 - [[domain.bis.bisTypes]] · 6 importers
-- [[domain.bis.index]] · 9 importers
+- [[domain.bis.index]] · 13 importers
 - [[domain.bis.rankedGear]] · 1 importers
 - [[domain.bis.rankedSource]] · 2 importers
 - [[domain.buffs.buffExclusivity]] · 1 importers
@@ -202,7 +204,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.gear.itemSets]] · 4 importers
 - [[domain.gear.itemTypes]] · 33 importers
 - [[domain.gear.obtainability]] · 2 importers
-- [[domain.gear.qualityColors]] · 10 importers
+- [[domain.gear.qualityColors]] · 11 importers
 - [[domain.gear.sampleItems]] · 1 importers
 - [[domain.gear.slotCompatibility]] · 12 importers
 - [[domain.gear.slotVisibility]] · 3 importers
@@ -237,7 +239,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.raids.bossArtJson.d]] · 0 importers
 - [[domain.raids.exampleRaids]] · 2 importers
 - [[domain.raids.gruulsLairBosses]] · 1 importers
-- [[domain.raids.index]] · 14 importers
+- [[domain.raids.index]] · 15 importers
 - [[domain.raids.karazhanBosses]] · 1 importers
 - [[domain.raids.magtheridonsLairBosses]] · 1 importers
 - [[domain.raids.raidLoot]] · 1 importers
@@ -266,7 +268,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.simulation.warlockPet]] · 1 importers
 - [[domain.simulation.weaponImbues]] · 1 importers
 - [[domain.stats.describeStats]] · 5 importers
-- [[domain.stats.statRelevance]] · 1 importers
+- [[domain.stats.statRelevance]] · 2 importers
 - [[domain.stats.statTypes]] · 17 importers
 - [[domain.stats.statUtils]] · 3 importers
 - [[domain.talents.sampleTalents]] · 6 importers

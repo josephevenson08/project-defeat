@@ -32,8 +32,8 @@ From the top of the file:
 ## Imported by
 
 - [[domain.builds.addonImport]] — `src/domain/builds/addonImport.ts`
-- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
 - [[features.simulator.BestUpgrades]] — `src/features/simulator/BestUpgrades.tsx`
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`

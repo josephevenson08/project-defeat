@@ -35,8 +35,12 @@ _No doc comment at the top of this file._
 - [[features.bis.rankedSession]] — `src/features/bis/rankedSession.ts`
 - [[features.bis.SlotBySlot]] — `src/features/bis/SlotBySlot.tsx`
 - [[features.bis.WhereItDrops]] — `src/features/bis/WhereItDrops.tsx`
+- [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
+- [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
+- [[features.gear.compareSession]] — `src/features/gear/compareSession.ts`
 - [[features.gear.equipRecommendedSet]] — `src/features/gear/equipRecommendedSet.ts`
 - [[features.gear.SlotPane]] — `src/features/gear/SlotPane.tsx`
+- [[features.gear.SlotStrip]] — `src/features/gear/SlotStrip.tsx`
 - [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
 
 ## Concepts & phases

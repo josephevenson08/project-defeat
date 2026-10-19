@@ -2,25 +2,26 @@
 type: module
 layer: features
 source: src/features/gear/compareItems.ts
-lines: 292
+lines: 331
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.compareItems
 
-`src/features/gear/compareItems.ts` · **features** layer · 292 lines
+`src/features/gear/compareItems.ts` · **features** layer · 331 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `comparableItemsFor`, `comparableSlotsFor`, `compareItems`, `defaultComparisonPair`
+**function** — `comparableItemsFor`, `comparableSlotsFor`, `compareCandidates`, `compareItems`, `defaultCompareItem`, `defaultComparisonPair`
 
-**type** — `ComparisonContext`, `ComparisonSide`, `ComparisonStatRow`, `ItemComparison`
+**type** — `CompareCandidate`, `ComparisonContext`, `ComparisonSide`, `ComparisonStatRow`, `ItemComparison`
 
 ## Imports
 
+- [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.enchants.sampleEnchants]] — `src/domain/enchants/sampleEnchants.ts`
 - [[domain.gear.slotCompatibility]] — `src/domain/gear/slotCompatibility.ts`
 - [[domain.simulation.encounterTypes]] — `src/domain/simulation/encounterTypes.ts`

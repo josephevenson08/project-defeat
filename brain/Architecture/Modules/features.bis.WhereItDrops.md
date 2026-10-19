@@ -25,8 +25,8 @@ _No doc comment at the top of this file._
 - [[domain.bis.index]] — `src/domain/bis/index.ts`
 - [[domain.gear.qualityColors]] — `src/domain/gear/qualityColors.ts`
 - [[domain.raids.index]] — `src/domain/raids/index.ts`
-- [[features.bis.rankedTip]] — `src/features/bis/rankedTip.ts`
 - [[features.character.characterTypes]] — `src/features/character/characterTypes.ts`
+- [[features.gear.fittedItemTip]] — `src/features/gear/fittedItemTip.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
