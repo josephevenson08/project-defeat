@@ -75,7 +75,7 @@ brain/        generated Obsidian notes that map the codebase
 
 ## Coming next: a Discord bot
 
-A bot that answers questions in Discord from the same data as the app: `/bis fury warrior` for a
+A bot that answers questions/requests in Discord from the same data as the app: `/bis fury warrior` for a
 spec's BiS list, `/whodrops`, `/loot karazhan`, `/attune`, `/farm fel iron`, and `/import` to list
 upgrades from your in-game export. It will run on a Raspberry Pi. See the
 [plan](discord-bot/PLAN.md).
