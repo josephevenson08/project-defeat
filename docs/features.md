@@ -47,7 +47,7 @@ behind every claim of its that quotes a number.
   against what players of your spec average on archon.gg ("5.66× below what Fury warriors average"),
   what it misses for your spec and your talents, where the damage comes from (a log-style table that
   sums to the estimate), how it was computed, and every DPS spec's best case by this model against
-  the logs, yours marked (1.05× to 2.13× low, computed). A missing weapon is said first, before
+  the logs, yours marked (1.04× to 2.13× low, computed). A missing weapon is said first, before
   anything else. The page names its fixed encounter and what the model does and does not cover, with
   every figure in that list computed. DPS specs only; Healer and Tank results (estimated healing,
   effective health) are still computed and reachable with `?simulation=1`

@@ -100,13 +100,12 @@ test("every spec: the recommended set's checklist, and the hit cap its role uses
     expect(totals.best, name).toBe(totals.ranked)
     expect(totals.filled, name).toBe(totals.sockets)
     /*
-     * And nothing is left, but for one gap in the recommended set rather than in this tab: it applies
-     * the guide's advice only where an entry was rank 1 before the ranks were made dense, and a
-     * Hunter's off hand (Claw of the Phoenix, #2 in the guide's weapons table) never was, so it comes
-     * unenchanted. The checklist says so and offers the guide's Agility.
+     * And nothing is left. Hunters had one to-do here until the lists hung the guide's advice on each
+     * slot's rank 1 after the ranks were made dense rather than before: their off hand (Claw of the
+     * Phoenix, #2 in the guide's weapons table) came unenchanted and this offered the guide's Agility.
      */
     const left = checks.filter((check) => check.todo).map((check) => `${check.slot}${check.missingEnchant ? ' enchant' : ''}`)
-    expect(left, name).toEqual(list.className === 'Hunter' ? ['Off Hand enchant'] : [])
+    expect(left, name).toEqual([])
 
     const role = getRoleForSpec(list.className, list.spec)
     const cap = hitCapFor({ character, role, gear, talentPoints: {}, activeBuffIds: [], activeTargetDebuffIds: [], target: defaultSimulationTarget })
