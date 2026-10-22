@@ -17,7 +17,7 @@ A gear / talent / raid comp planner for **World of Warcraft: The Burning Crusade
 - **DPS simulation.** An estimated DPS for the 20 damage specs against a fixed raid boss. Rotations are still being worked on (see [known limitations](docs/known-limitations.md)).
 - **Raid composition.** Seat a 10 or 25-player raid and see which buffs each group actually gets. You can export the seating chart as an image for Discord.
 - **Raids.** Loot tables for every Phase 1 and 2 raid, plus the steps to get attuned.
-- **Professions.** The game's profession window: set your skill and every recipe on the path to 375 takes its colour, with trainer stops, reagents and each gathering range's loop on its TBC zone map; "Which two" ranks every profession by what it makes for your spec.
+- **Professions.** The game's profession tab: set your skill and every recipe on the path to 375 takes its colour, with trainer stops, reagents and each gathering range's loop on its TBC zone map; "Which two" ranks every profession by what it makes for your spec.
 - **Import from the game.** A small addon exports your character, so you can open the planner already wearing your gear.
 - **Share a build as a link.** Nothing is uploaded; the whole build rides in the URL.
 
