@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**496 commits across 83 days**, from 2026-06-25 to 2026-10-22.
+**497 commits across 83 days**, from 2026-06-25 to 2026-10-22.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,13 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_69 commits_
+_70 commits_
 
-### Thursday 22 October — 3 commits
+### Thursday 22 October — 4 commits
 
 - Update README.md — [`7ab895d`](https://github.com/josephevenson08/project-defeat/commit/7ab895dd41f2468d5f62dafa4fee7d30182615e4)
 - Update README.md — [`66ec55e`](https://github.com/josephevenson08/project-defeat/commit/66ec55eda26a93c7ba454e142b2e15bfc20653bf)
+- Give the guide's gem and enchant advice to each slot's final rank 1 — [`0500559`](https://github.com/josephevenson08/project-defeat/commit/0500559954986c311b37f1aeeeef67507287552f)
 - Port step 6: the planner's Talents tab — [`4da2509`](https://github.com/josephevenson08/project-defeat/commit/4da25099503f4cbae934ee33a4aa1360fbd69044)
 
 ### Tuesday 20 October — 2 commits
