@@ -294,8 +294,8 @@ test('the line under the top bar names the spec\'s own Wowhead list', async ({ p
   const sources = page.getByTestId('provenance')
   await expect(sources).toContainText("Wowhead's Fury Warrior Phase 2 list")
   await expect(sources.getByRole('link', { name: "Wowhead's Fury Warrior Phase 2 list" })).toHaveAttribute('href', /wowhead\.com/)
-  // A tab not yet ported has no sources line (Gear has its own since it was ported).
-  await view(page, 'Talents')
+  // A tab with no sources of its own has no line (Gear and Talents have theirs since they were ported).
+  await view(page, 'Build')
   await expect(page.getByTestId('provenance')).toHaveCount(0)
 })
 

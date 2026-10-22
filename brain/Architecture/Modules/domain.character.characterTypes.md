@@ -79,6 +79,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
 - [[features.stats.StatBar]] — `src/features/stats/StatBar.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases

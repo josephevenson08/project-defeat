@@ -2,20 +2,20 @@
 type: module
 layer: domain
 source: src/domain/talents/talentTypes.ts
-lines: 184
+lines: 208
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentTypes
 
-`src/domain/talents/talentTypes.ts` · **domain** layer · 184 lines
+`src/domain/talents/talentTypes.ts` · **domain** layer · 208 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `canRemovePoint`, `pointsAboveRow`, `pointsInTree`, `pointsSpent`, `ruleBreaks`, `whyBlocked`
+**function** — `canRemovePoint`, `pointsAboveRow`, `pointsInTree`, `pointsSpent`, `ruleBreaks`, `whyBlocked`, `whyCannotRemove`
 
 **const** — `POINTS_PER_ROW`, `TALENT_POINTS_AT_70`
 
@@ -31,6 +31,7 @@ _None._
 - [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
+- [[domain.talents.talentWindow]] — `src/domain/talents/talentWindow.ts`
 - [[features.builds.buildSummary]] — `src/features/builds/buildSummary.ts`
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
@@ -39,6 +40,7 @@ _None._
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 
 ## Concepts & phases
 

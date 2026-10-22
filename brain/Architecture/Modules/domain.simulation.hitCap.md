@@ -52,6 +52,7 @@ From the top of the file:
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.gear.WhatsLeft]] — `src/features/gear/WhatsLeft.tsx`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases
 

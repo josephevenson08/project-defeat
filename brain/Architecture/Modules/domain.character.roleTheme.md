@@ -41,7 +41,6 @@ From the top of the file:
 - [[features.gear.ComparePanel]] — `src/features/gear/ComparePanel.tsx`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
-- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases
 

@@ -43,6 +43,7 @@ _No doc comment at the top of this file._
 - [[features.raidcomp.RaidCompositionPanel]] — `src/features/raidcomp/RaidCompositionPanel.tsx`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
 - [[features.raids.ForMyRaid]] — `src/features/raids/ForMyRaid.tsx`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
 
 ## Concepts & phases

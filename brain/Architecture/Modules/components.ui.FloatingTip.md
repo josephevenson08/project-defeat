@@ -27,6 +27,7 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.raids.RaidsPanel]] — `src/features/raids/RaidsPanel.tsx`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 
 ## Concepts & phases

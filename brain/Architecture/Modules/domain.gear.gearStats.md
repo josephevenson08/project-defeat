@@ -39,6 +39,7 @@ From the top of the file:
 
 - [[features.gear.GearPanel]] — `src/features/gear/GearPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases
 

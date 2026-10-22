@@ -29,7 +29,6 @@ _No doc comment at the top of this file._
 - [[features.buffs.BuffsPanel]] — `src/features/buffs/BuffsPanel.tsx`
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.character.CharacterStrip]] — `src/features/character/CharacterStrip.tsx`
-- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases
 

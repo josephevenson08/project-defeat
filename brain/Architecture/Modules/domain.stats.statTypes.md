@@ -44,6 +44,7 @@ _None._
 - [[features.gear.compareItems]] — `src/features/gear/compareItems.ts`
 - [[features.gear.GearSheet]] — `src/features/gear/GearSheet.tsx`
 - [[features.stats.statsTypes]] — `src/features/stats/statsTypes.ts`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 
 ## Concepts & phases
 

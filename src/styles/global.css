@@ -681,146 +681,6 @@ select {
 }
 
 /*
- * Talents: three 4-wide grids side by side, as the game lays them out.
- *
- * The geometry is the information here — how deep a build goes is a vertical distance, and comparing
- * two builds means comparing two shapes. A list of talent names would lose that entirely.
- */
-.talents-summary {
-  align-items: baseline;
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-}
-
-.talents-reset {
-  background: transparent;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  padding: 6px 12px;
-}
-
-.talents-reset:disabled {
-  color: var(--text-faint);
-  cursor: default;
-}
-
-.talent-trees {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.talent-tree {
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  border-top: 2px solid var(--tree-accent);
-  padding: 14px;
-}
-
-.talent-tree-head {
-  align-items: baseline;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.talent-tree-head h3 {
-  font-size: var(--heading-section);
-  margin: 0;
-}
-
-.talent-tree-count {
-  color: var(--text-strong);
-  font-family: var(--font-mono);
-  font-size: 15px;
-}
-
-.talent-grid {
-  display: grid;
-  gap: 6px;
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* Holds the column open where a tree has no talent, so rows stay aligned across all three trees. */
-.talent-empty {
-  aspect-ratio: 1;
-}
-
-.talent {
-  align-items: center;
-  aspect-ratio: 1;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  font: inherit;
-  gap: 2px;
-  justify-content: center;
-  overflow: hidden;
-  padding: 4px;
-  text-align: center;
-  transition: border-color 120ms ease, background 120ms ease;
-}
-
-.talent:hover {
-  border-color: var(--line-strong);
-}
-
-/*
- * Two lines at most. Figtree is wider than the condensed face this was sized for, and the longest
- * names ("Improved Demoralizing Shout") ran to a third line over the rank. The full name is in the
- * tooltip and the aria-label, as it is when the name is hidden on a narrow screen.
- */
-.talent-name {
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-  font-size: 9px;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  line-height: 1.15;
-  overflow: hidden;
-}
-
-.talent-rank {
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-/* Spent, and spent out — the two states worth seeing at a glance from across the grid. */
-.talent-filled {
-  border-color: var(--tree-accent);
-  color: var(--text);
-}
-
-.talent-filled .talent-rank {
-  color: var(--tree-accent);
-}
-
-.talent-maxed {
-  background: var(--surface-3);
-}
-
-.talent-maxed .talent-rank {
-  color: #6f8f6a;
-}
-
-/* A row you have not reached yet. Dimmed rather than hidden: seeing what is further down the tree is
-   most of the reason to look at a tree at all. */
-.talent-locked {
-  opacity: 0.45;
-}
-
-/*
  * A socketed gem: a colour-matched frame standing in for the gem icon, its name in quality colour,
  * and what it actually gives you. The dropdown above names the gem; this says why you picked it.
  *
@@ -4860,50 +4720,6 @@ input[type='text']:focus {
   height: 100%;
   object-fit: cover;
   width: 100%;
-}
-
-/*
- * Talent icons.
- *
- * A talent cell is square and already carries a name and a rank, so the icon takes the space it can
- * and the text sits under it. Sizing is relative rather than fixed: the grid is four columns of
- * whatever the panel is wide, so a hardcoded pixel size would either overflow on a narrow viewport
- * or float in the middle on a wide one.
- *
- * A locked talent dims through .talent-locked's opacity, which covers the icon too — deliberately,
- * because a bright icon in a dimmed cell would undo the one signal that row is not reachable yet.
- */
-.talent-icon {
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  display: block;
-  flex: 0 1 auto;
-  min-height: 0;
-  object-fit: cover;
-  width: 60%;
-  max-width: 32px;
-  aspect-ratio: 1;
-}
-
-/* Spent talents get the tree's accent on the icon frame as well as the cell, so a filled column
-   reads as one run rather than as cells that happen to be adjacent. */
-.talent-filled .talent-icon {
-  border-color: var(--tree-accent);
-}
-
-/*
- * Below roughly 900px the grid columns get narrow enough that the icon, the name and the rank stop
- * fitting together. The name is the one that can go: the icon identifies the talent, and the full
- * name is still in the tooltip and the aria-label.
- */
-@media (max-width: 900px) {
-  .talent-name {
-    display: none;
-  }
-
-  .talent-icon {
-    width: 72%;
-  }
 }
 
 /*
@@ -11586,5 +11402,641 @@ button.gear-flag:focus-visible {
 
   .slot-pane .pane-close {
     width: 44px;
+  }
+}
+
+/*
+ * The Character Planner's Talents tab (port step 6, 2026-10-22): design A, the game's talent window,
+ * with design C's "What's off". Three trees side by side on their own dark grounds with the spec's
+ * icon behind each (one at a time below 900px, with tree tabs); the talents as icon frames with their
+ * rank, gold when full, green when they hold or can take a point, grey when locked, red or amber when
+ * they hold points against a rule; an arrow from each prerequisite, gold once it is met.
+ *
+ * The geometry is the information here, as it was before the port: how deep a build goes is a
+ * vertical distance, and comparing two builds means comparing two shapes.
+ */
+.talents-lead {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  margin: 0 0 12px;
+  max-width: 78ch;
+}
+
+.talents-tools {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0 0 8px;
+}
+
+.talents-left {
+  color: var(--ink-2);
+  font: 600 var(--t-sm) var(--f-body);
+  margin: 0 6px 0 0;
+}
+
+.talents-left b,
+.talents-left span {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.talents-left b {
+  font-size: var(--t-md);
+}
+
+.talents-tool {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: 600 var(--t-sm) var(--f-body);
+  min-height: 36px;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+
+.talents-tool:hover:not(:disabled),
+.talents-tool:focus-visible {
+  border-color: var(--glow);
+}
+
+.talents-tool:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+
+.talents-tool[aria-pressed='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.talents-note {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+  margin: 4px 0 8px;
+}
+
+.talents-hit {
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
+
+.talents-hit b {
+  font-family: var(--f-mono);
+}
+
+.talents-hit.is-under b {
+  color: var(--warn);
+}
+
+.talents-hit.is-over b,
+.talents-hit.is-at b {
+  color: #7fdc8a;
+}
+
+.talents-hit small {
+  color: var(--ink-3);
+  display: block;
+}
+
+.talents-msg {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 10px;
+  min-height: 1.3em;
+}
+
+/* The phone's way between trees; on a wide screen all three are on show and these are not needed. */
+.talent-tree-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.talent-tree-tabs button {
+  align-items: center;
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 var(--t-sm) var(--f-body);
+  gap: 7px;
+  padding: 5px 12px 5px 5px;
+}
+
+.talent-tree-tabs img {
+  border-radius: 50%;
+  height: 26px;
+  width: 26px;
+}
+
+.talent-tree-tabs b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.talent-tree-tabs button[aria-pressed='true'] {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--glow-ink);
+}
+
+.talent-tree-tabs button[aria-pressed='true'] b {
+  color: var(--glow-ink);
+}
+
+.talents-frame {
+  background: linear-gradient(180deg, #0b0f14, #05070a);
+  border: 1px solid #6b5a36;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 14px 34px -14px rgba(0, 0, 0, 0.85);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 10px;
+}
+
+@media (min-width: 900px) {
+  .talents-frame {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .talent-tree-tabs {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .talent-tree:not(.is-on) {
+    display: none;
+  }
+}
+
+.talent-tree {
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(var(--tree-rgb), 0.3), transparent 62%),
+    linear-gradient(180deg, color-mix(in srgb, rgb(var(--tree-rgb)) 12%, #07090c), #050607);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 10px 8px 18px;
+  position: relative;
+}
+
+/* The spec's icon, faint, behind the tree, as the game's tree art sits behind its talents. */
+.talent-tree::before {
+  aspect-ratio: 1;
+  background: var(--tree-icon) center / cover no-repeat;
+  border-radius: 50%;
+  content: '';
+  filter: blur(1.5px);
+  left: 50%;
+  opacity: 0.08;
+  pointer-events: none;
+  position: absolute;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  width: 78%;
+}
+
+.talent-tree-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0 4px;
+  position: relative;
+}
+
+.talent-tree-icon {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.talent-tree-head h3 {
+  flex: 1;
+  font: 400 var(--t-md) var(--f-head);
+  margin: 0;
+}
+
+.talent-tree-count {
+  color: #ffd56b;
+  font: 700 var(--t-md) var(--f-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.talent-grid {
+  --cell: 46px;
+  --gap: 8px;
+  display: grid;
+  gap: var(--gap);
+  grid-auto-rows: var(--cell);
+  grid-template-columns: repeat(4, var(--cell));
+  justify-content: center;
+  position: relative;
+}
+
+.talent {
+  background: #060b10;
+  border: 2px solid #4a5568;
+  border-radius: 7px;
+  cursor: pointer;
+  height: var(--cell);
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  width: var(--cell);
+  z-index: 1;
+}
+
+.talent-icon {
+  border-radius: 5px;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.talent-rank {
+  background: #05080b;
+  border: 1px solid #4a5568;
+  border-radius: 5px;
+  bottom: -7px;
+  color: #cfd8dc;
+  font: 700 10.5px / 1 var(--f-body);
+  font-variant-numeric: tabular-nums;
+  padding: 2px 3px;
+  pointer-events: none;
+  position: absolute;
+  right: -6px;
+}
+
+.talent.is-locked {
+  border-color: #2c333b;
+  cursor: not-allowed;
+}
+
+.talent.is-locked .talent-icon {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.talent.is-open,
+.talent.is-part {
+  border-color: #3fbf4a;
+}
+
+.talent.is-part {
+  box-shadow: 0 0 10px -2px rgba(63, 191, 74, 0.7);
+}
+
+.talent.is-open .talent-rank,
+.talent.is-part .talent-rank {
+  border-color: #3fbf4a;
+  color: #7fe08a;
+}
+
+.talent.is-max {
+  border-color: #f0c050;
+  box-shadow: 0 0 12px -2px rgba(240, 192, 80, 0.75);
+}
+
+.talent.is-max .talent-rank {
+  border-color: #f0c050;
+  color: #ffd56b;
+}
+
+/* Points held against a rule: red for a missing prerequisite, amber for a row short of points. */
+.talent.is-broken {
+  border-color: #ff6b5e;
+  box-shadow: 0 0 12px -2px rgba(255, 107, 94, 0.8);
+}
+
+.talent.is-broken .talent-rank {
+  border-color: #ff6b5e;
+  color: #ffb0a8;
+}
+
+.talent.is-broken::before {
+  background: #ff6b5e;
+  border-radius: 50%;
+  color: #1a0503;
+  content: '!';
+  font: 800 10px / 15px var(--f-body);
+  height: 15px;
+  left: -6px;
+  position: absolute;
+  text-align: center;
+  top: -7px;
+  width: 15px;
+  z-index: 2;
+}
+
+.talent.is-broken-row {
+  border-color: var(--warn);
+  box-shadow: 0 0 10px -3px rgba(255, 207, 122, 0.7);
+}
+
+.talent.is-broken-row .talent-rank {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.talent.is-broken-row::before {
+  background: var(--warn);
+}
+
+.talent:hover:not(.is-locked),
+.talent:focus-visible {
+  border-color: #ffffff;
+}
+
+.talent[aria-current='true'] {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* "Show where": the talents above a short row that can take a point. */
+.talent.is-hint {
+  box-shadow: 0 0 0 3px var(--glow), 0 0 18px var(--glow);
+}
+
+/* Prerequisite arrows, drawn on the tree's grid under the talents: grey, gold once met, red when the
+   talent below holds points without it. */
+.talent-arrow {
+  background: currentColor;
+  border-radius: 2px;
+  color: #39414b;
+  pointer-events: none;
+  position: relative;
+  z-index: 0;
+}
+
+.talent-arrow.is-met {
+  color: #f0c050;
+}
+
+.talent-arrow.is-bad {
+  color: #ff6b5e;
+}
+
+.talent-arrow::after {
+  border: 6px solid transparent;
+  content: '';
+  position: absolute;
+}
+
+.talent-arrow.is-down {
+  justify-self: center;
+  margin: calc(var(--cell) / 2) 0 calc(var(--cell) + 2px);
+  width: 4px;
+}
+
+.talent-arrow.is-down::after {
+  border-bottom: 0;
+  border-top: 7px solid currentColor;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.talent-arrow.is-right,
+.talent-arrow.is-left {
+  align-self: center;
+  height: 4px;
+}
+
+.talent-arrow.is-right {
+  margin: 0 calc(var(--cell) + 2px) 0 calc(var(--cell) / 2);
+}
+
+.talent-arrow.is-left {
+  margin: 0 calc(var(--cell) / 2) 0 calc(var(--cell) + 2px);
+}
+
+.talent-arrow.is-right::after,
+.talent-arrow.is-left::after {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.talent-arrow.is-right::after {
+  border-left: 7px solid currentColor;
+  border-right: 0;
+  right: -7px;
+}
+
+.talent-arrow.is-left::after {
+  border-left: 0;
+  border-right: 7px solid currentColor;
+  left: -7px;
+}
+
+/* The first leg of an elbow stops at the centre of the column it turns down. */
+.talent-arrow.is-right.is-elbow {
+  margin-right: calc(var(--cell) / 2 - 2px);
+}
+
+.talent-arrow.is-left.is-elbow {
+  margin-left: calc(var(--cell) / 2 - 2px);
+}
+
+.talent-arrow.is-elbow::after {
+  display: none;
+}
+
+/* A talent's tooltip: the item tooltip's box and type, in the game's talent colours. */
+.talent-tip {
+  max-width: 300px;
+}
+
+.talents-tipbox .talent-tip,
+.floating-tip-sheet .talent-tip {
+  max-width: none;
+}
+
+.talent-tip-rank {
+  color: #9d9d9d;
+}
+
+.talent-tip-red {
+  color: #ff5c50;
+}
+
+.talent-tip-desc {
+  color: #ffd100;
+}
+
+.talent-tip-next {
+  color: #ffffff;
+  margin-top: 5px;
+}
+
+.talent-tip-sim {
+  color: #9d9d9d;
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+
+.talent-tip-sim.is-sim,
+.talent-tip-sim.is-ability {
+  color: #7fe0d4;
+}
+
+.talent-tip-hint {
+  color: #9d9d9d;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.talents-selected {
+  align-items: start;
+  display: grid;
+  gap: 10px 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 12px 0 0;
+}
+
+@media (min-width: 700px) {
+  .talents-selected {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+.talents-step {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.talents-step small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  max-width: 28ch;
+}
+
+.talents-stepper {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.talents-stepper .talents-tool {
+  font-size: var(--t-md);
+  min-width: 40px;
+  padding: 4px 10px;
+}
+
+.talents-step-rank {
+  font: 700 var(--t-md) var(--f-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.talents-off {
+  background: var(--scrim);
+  border: 1px solid var(--rim-2);
+  border-radius: 10px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+}
+
+.talents-off h3 {
+  font: 400 var(--t-lg) var(--f-head);
+  margin: 0 0 2px;
+}
+
+.talents-off-sum {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  margin: 0 0 8px;
+}
+
+.talents-off-list {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.talents-off-list li {
+  align-items: center;
+  border-top: 1px solid var(--rim-2);
+  display: grid;
+  font-size: var(--t-sm);
+  gap: 4px 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: 6px 0;
+}
+
+.talents-off-list li:first-child {
+  border-top: 0;
+}
+
+.talents-off-list small {
+  color: var(--ink-3);
+  display: block;
+  font-size: var(--t-xs);
+}
+
+.talents-off-k {
+  border-radius: 50%;
+  display: grid;
+  font: 800 14px var(--f-body);
+  height: 30px;
+  place-items: center;
+  width: 30px;
+}
+
+.talents-off-k.is-prerequisite {
+  background: #ff6b5e;
+  color: #1a0503;
+}
+
+.talents-off-k.is-rows {
+  background: var(--warn);
+  color: #1a1204;
+}
+
+.talents-off-k.is-left {
+  background: var(--glow-soft);
+  border: 1px solid var(--rim);
+  color: var(--glow);
+}
+
+.talents-off-ok {
+  color: #7fdc8a;
+  font-size: var(--t-sm);
+  margin: 0;
+}
+
+@media (max-width: 699px), (pointer: coarse) {
+  .talents-tool,
+  .talent-tree-tabs button {
+    min-height: 44px;
+  }
+
+  .talent-grid {
+    --cell: 48px;
+    --gap: 12px;
+  }
+
+  .talents-off-list li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .talents-off-list li .talents-tool {
+    grid-column: 2;
+    justify-self: start;
   }
 }

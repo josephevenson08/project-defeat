@@ -1,8 +1,12 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-19, evening): Gear is in the app too; start here
+## ▶ Where we left off (2026-10-22): Talents is in the app, and step 6 is done; start here
 
-**Step 6 continued with Gear:** `planner.html`'s Gear sub-tab (`gear-planner.js`: design B's character sheet from `gear-b.js`, with `gear-c.js`'s checklist as "What's left") is now the live app's Gear tab for every spec, and `checks/gear-handson.mjs` became `tests/gear.spec.ts`. As the owner decided: the app's slot pane, restyled, opens beside the sheet instead of the flyout; the hit cap is a new helper for every spec, read from the simulator's tables, whose base miss against a level 73 boss is now TBC's 9% (it was 8%), so Fury reads 142, or 95 with Precision 3/3; the part-geared example is not ported. Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. **Next:** push it when the owner says so, then Talents, the last sub-tab. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+**Step 6 finished with Talents:** `planner.html`'s Talents sub-tab (`talents-a.js`, the game's talent window, with `talent-common.js`'s "What's off" from design C) is now the live app's Talents tab for every class and spec, and `checks/talents-handson.mjs` became `tests/talents.spec.ts`. As the owner decided, it opens untalented, since the app starts clean; "Load the <spec> preset" puts in wowsims' preset as stored for the 17 specs that have one, and the rest say there is none. The hit cap line reuses Gear's helper (95 at Precision 3/3, 111 at 2/3). Built, tested and committed, **not yet pushed**: the push waits for the owner's OK. Gear is pushed (`632d73c`, `ddaf09f`). **Next:** step 7, the optional 3D scene. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-19, evening): Gear is in the app too
+
+**Step 6 continued with Gear:** `planner.html`'s Gear sub-tab (`gear-planner.js`: design B's character sheet from `gear-b.js`, with `gear-c.js`'s checklist as "What's left") is now the live app's Gear tab for every spec, and `checks/gear-handson.mjs` became `tests/gear.spec.ts`. As the owner decided: the app's slot pane, restyled, opens beside the sheet instead of the flyout; the hit cap is a new helper for every spec, read from the simulator's tables, whose base miss against a level 73 boss is now TBC's 9% (it was 8%), so Fury reads 142, or 95 with Precision 3/3; the part-geared example is not ported. Committed and pushed (`632d73c`). **Next:** Talents, the last sub-tab. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-19, later): Buffs is in the app too
 

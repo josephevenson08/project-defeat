@@ -53,6 +53,8 @@ import { TabNav, type TabDefinition } from './components/layout/TabNav'
 import { BuffsPanel } from './features/buffs/BuffsPanel'
 import { initialBuffsSession, type BuffsSession } from './features/buffs/buffsSession'
 import { buffsSources } from './features/buffs/buffWords'
+import { initialTalentsSession, type TalentsSession } from './features/talents/talentsSession'
+import { talentsSources } from './features/talents/talentWords'
 
 /**
  * The screen's colour is stamped on `<html>` as `data-tab`, not on a wrapper inside the app.
@@ -211,6 +213,8 @@ function App() {
   const [compareSession, setCompareSession] = useState<CompareSession>(initialCompareSession)
   // And Buffs': the raid your buffs come from, your seat in it and its Paladins' Blessings.
   const [buffsSession, setBuffsSession] = useState<BuffsSession>(initialBuffsSession)
+  // And Talents': the tree shown on a phone and the talent whose tooltip sits under the frame.
+  const [talentsSession, setTalentsSession] = useState<TalentsSession>(initialTalentsSession)
   /*
    * The encounter is fixed, so this is a constant rather than state.
    *
@@ -553,6 +557,8 @@ function App() {
           <Provenance sources={rankedSources(getBisListForSpec(character.className, character.spec))} />
         ) : currentTab === 'planner' && plannerView === 'buffs' ? (
           <Provenance sources={buffsSources} />
+        ) : currentTab === 'planner' && plannerView === 'talents' ? (
+          <Provenance sources={talentsSources} />
         ) : currentTab === 'planner' && plannerView === 'compare' ? (
           <Provenance sources={compareSources(getBisListForSpec(character.className, character.spec))} />
         ) : undefined
@@ -606,7 +612,17 @@ function App() {
               onEquip={updateGear}
             />
           )}
-          {plannerView === 'talents' && <TalentsPanel character={character} points={talentPoints} onChange={setTalentPoints} />}
+          {plannerView === 'talents' && (
+            <TalentsPanel
+              character={character}
+              points={talentPoints}
+              onChange={setTalentPoints}
+              hitCap={hitCap}
+              gear={gear}
+              session={talentsSession}
+              onSession={setTalentsSession}
+            />
+          )}
           {plannerView === 'buffs' && (
             <BuffsPanel
               character={character}

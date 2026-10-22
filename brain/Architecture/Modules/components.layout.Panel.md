@@ -31,7 +31,6 @@ _No doc comment at the top of this file._
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.simulator.WhatIsModelled]] — `src/features/simulator/WhatIsModelled.tsx`
 - [[features.stats.StatsPanel]] — `src/features/stats/StatsPanel.tsx`
-- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 - [[features.tierlists.AgainstTheLogs]] — `src/features/tierlists/AgainstTheLogs.tsx`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 

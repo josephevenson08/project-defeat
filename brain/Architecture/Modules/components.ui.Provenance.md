@@ -34,6 +34,7 @@ _None._
 - [[features.raidcomp.raidcompSources]] — `src/features/raidcomp/raidcompSources.ts`
 - [[features.raids.raidSources]] — `src/features/raids/raidSources.ts`
 - [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 
 ## Concepts & phases

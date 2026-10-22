@@ -161,8 +161,21 @@ behind every claim of its that quotes a number.
   for the role sit on one line; the full table opens under it and the six are not repeated above it.
   Scoped to the spec, so a Fury Warrior sees 12 rows rather than 26, with a "show all" toggle that
   restores every stat — attributes and armor are never hidden
-- Talent trees for all nine classes — 579 talents across 27 trees, with real icons, per-rank
-  descriptions and prerequisite gating, ingested from Wowhead's TBC talent calculator
+- **The Talents tab** (the decided design, ported 2026-10-22): **the game's talent window** for all
+  nine classes (579 talents across 27 trees, ingested from Wowhead's TBC talent calculator). Three
+  trees side by side, each on a dark ground with its spec's icon behind it (one at a time on a phone,
+  with tree tabs); each talent its real icon with its rank, gold when full, green when it holds or can
+  take a point, grey when locked, with an arrow from each prerequisite. Click learns a point and
+  right-click unlearns one; where the game would refuse, the tab says why ("Needs 10 points in
+  Protection", "Bloodthirst needs Sweeping Strikes at 1/1"). A game-style tooltip on hover or focus,
+  and the chosen talent's tooltip under the frame with − and +, each saying what the simulator reads
+  from it ("In the simulation: +20% attack speed for 3 swings after a crit") or why it does not. Each
+  tree is one tab stop, moved around with the arrow keys, Home and End; Enter or + learns, − or Delete
+  unlearns. Points left and the split ("9 / 39 / 0") at the top, with **the hit cap as Precision and
+  its kin move it** ("Hit 140 / 95, 45 over the cap"). It opens untalented; **"Load the <spec>
+  preset"** puts in wowsims' preset where it has one (17 builds), as stored, and **"What's off"** lists
+  every rule a build breaks with a one-press fix ("Add Enrage to 5/5") or "Show where", which lights
+  the talents that can take a point toward a short row, then the points left unspent
 - Real item icons on the character sheet, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
   `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network

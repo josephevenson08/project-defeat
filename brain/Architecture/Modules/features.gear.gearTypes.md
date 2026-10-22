@@ -46,6 +46,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
+- [[features.talents.TalentsPanel]] — `src/features/talents/TalentsPanel.tsx`
 
 ## Concepts & phases
 

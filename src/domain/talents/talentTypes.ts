@@ -120,8 +120,16 @@ export function pointsAboveRow(tree: TalentTree, row: number, points: TalentPoin
  * the broken talent, and the only way out would be Reset.
  */
 export function canRemovePoint(tree: TalentTree, talent: Talent, points: TalentPoints): boolean {
+  return whyCannotRemove(tree, talent, points) === undefined
+}
+
+/**
+ * Why a point cannot come out, or `undefined` when it can: `canRemovePoint` with its reason, for the
+ * talent window's "Can't unlearn Sweeping Strikes: Bloodthirst needs Sweeping Strikes at 1/1."
+ */
+export function whyCannotRemove(tree: TalentTree, talent: Talent, points: TalentPoints): string | undefined {
   const current = points[talent.id] ?? 0
-  if (current <= 0) return false
+  if (current <= 0) return 'No points to remove.'
 
   const next: Record<number, number> = { ...points, [talent.id]: current - 1 }
 
@@ -129,7 +137,9 @@ export function canRemovePoint(tree: TalentTree, talent: Talent, points: TalentP
   for (const other of tree.talents) {
     if ((next[other.id] ?? 0) === 0) continue
     const requirement = other.requires.find((entry) => entry.id === talent.id)
-    if (requirement && current >= requirement.rank && next[talent.id] < requirement.rank) return false
+    if (requirement && current >= requirement.rank && next[talent.id] < requirement.rank) {
+      return `${other.name} needs ${talent.name} at ${requirement.rank}/${talent.maxRank}.`
+    }
   }
 
   /*
@@ -140,17 +150,21 @@ export function canRemovePoint(tree: TalentTree, talent: Talent, points: TalentP
    * ninth, it let a Cruelty point out — 39 above Rampage, one short — where the game's calculators
    * refuse. The old comment here noted the guard "cannot currently fire" for exactly that reason.
    */
-  return !tree.talents.some((other) => {
+  const stranded = tree.talents.find((other) => {
     if (other.row <= talent.row || (next[other.id] ?? 0) === 0) return false
     const gate = other.row * POINTS_PER_ROW
     return pointsAboveRow(tree, other.row, points) >= gate && pointsAboveRow(tree, other.row, next) < gate
   })
+  return stranded ? `${stranded.name} needs ${stranded.row * POINTS_PER_ROW} points in ${tree.spec} above its row.` : undefined
 }
 
-/** One rule a build breaks: a prerequisite below its rank, or a talent short of the points above its row. */
+/**
+ * One rule a build breaks: a prerequisite below its rank, or a talent short of the points above its
+ * row. `talentId` is the talent breaking it, and `needsId` the prerequisite it is missing.
+ */
 export type TalentRuleBreak =
-  | { kind: 'prerequisite'; tree: string; talent: string; needs: string; rank: number; max: number; has: number }
-  | { kind: 'row'; tree: string; talent: string; row: number; needs: number; has: number }
+  | { kind: 'prerequisite'; tree: string; talent: string; talentId: number; needs: string; needsId: number; rank: number; max: number; has: number }
+  | { kind: 'row'; tree: string; talent: string; talentId: number; row: number; needs: number; has: number }
 
 /**
  * Every rule a set of points breaks, in tree and row order. Empty for any build put together a point
@@ -170,12 +184,22 @@ export function ruleBreaks(trees: readonly TalentTree[], points: TalentPoints): 
         const prerequisite = tree.talents.find((entry) => entry.id === requirement.id)
         const has = points[requirement.id] ?? 0
         if (prerequisite && has < requirement.rank) {
-          breaks.push({ kind: 'prerequisite', tree: tree.spec, talent: talent.name, needs: prerequisite.name, rank: requirement.rank, max: prerequisite.maxRank, has })
+          breaks.push({
+            kind: 'prerequisite',
+            tree: tree.spec,
+            talent: talent.name,
+            talentId: talent.id,
+            needs: prerequisite.name,
+            needsId: prerequisite.id,
+            rank: requirement.rank,
+            max: prerequisite.maxRank,
+            has,
+          })
         }
       }
       const above = pointsAboveRow(tree, talent.row, points)
       if (above < talent.row * POINTS_PER_ROW) {
-        breaks.push({ kind: 'row', tree: tree.spec, talent: talent.name, row: talent.row + 1, needs: talent.row * POINTS_PER_ROW, has: above })
+        breaks.push({ kind: 'row', tree: tree.spec, talent: talent.name, talentId: talent.id, row: talent.row + 1, needs: talent.row * POINTS_PER_ROW, has: above })
       }
     }
   }

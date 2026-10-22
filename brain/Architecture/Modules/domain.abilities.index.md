@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[features.character.CharacterCreator]] — `src/features/character/CharacterCreator.tsx`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.simulator.WhatIsModelled]] — `src/features/simulator/WhatIsModelled.tsx`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 
 ## Concepts & phases
 
