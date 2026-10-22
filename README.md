@@ -1,4 +1,4 @@
-# Project Defeat :D
+# Project Defeat
 
 A gear / talent / raid comp planner for **World of Warcraft: The Burning Crusade Classic (Anniversary), Phase 2**.
 
