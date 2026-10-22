@@ -18,7 +18,7 @@ import { calculateStats } from '../src/features/stats/calculateStats'
  * hands-on check (`checks/sim-handson.mjs`) with its real numbers: the estimate is the engine's for
  * the character on screen; it is read against the 2,053 Fury warriors average on archon.gg; the damage
  * sources add up to it; it leads with Strength and the best upgrade; the trust panel lists all 20 DPS
- * specs with Fury marked and reads 1.05× to 2.13× low.
+ * specs with Fury marked and reads 1.04× to 2.13× low.
  */
 
 const num = (text: string) => Number(text.replace(/[^\d.\-−]/g, '').replace('−', '-'))
@@ -61,7 +61,7 @@ async function engineScore(page: Page) {
   return result.score
 }
 
-test('the trust panel’s data: every DPS spec’s best case against the logs, 1.05× to 2.13× low', () => {
+test('the trust panel’s data: every DPS spec’s best case against the logs, 1.04× to 2.13× low', () => {
   const rows = specTrust()
   expect(rows, 'all 20 DPS specs').toHaveLength(20)
   const fury = rows.find((row) => row.className === 'Warrior' && row.spec === 'Fury')!
@@ -71,7 +71,9 @@ test('the trust panel’s data: every DPS spec’s best case against the logs, 1
   expect(fury.dps).toBe(2053)
 
   const { low, high, worst } = trustRange(rows)
-  expect(low.toFixed(2)).toBe('1.05')
+  // 1.05 until the Hunters' off hand took the guide's enchant (2026-10-20): Marksmanship, the
+  // lowest, went from 1,275.7 to 1,284.1 against its 1,341.
+  expect(low.toFixed(2)).toBe('1.04')
   expect(high.toFixed(2)).toBe('2.13')
   // Computed, so it follows the model. The prototype's hand-written panel still named Demonology.
   expect(`${worst.spec} ${worst.className}`).toBe('Destruction Warlock')
@@ -137,8 +139,8 @@ test('the trust panel lists all 20 DPS specs with yours marked, and the range is
   await expect(trust.locator('li')).toHaveCount(20)
   await expect(trust.locator('li[aria-current="true"]')).toHaveCount(1)
   await expect(trust.locator('li[aria-current="true"]')).toContainText('Fury Warrior')
-  await expect(trust).toContainText('it reads 1.05× to 2.13× low')
-  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.05× to 2.13× low')
+  await expect(trust).toContainText('it reads 1.04× to 2.13× low')
+  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.04× to 2.13× low')
   await expect(page.getByTestId('simulation-range')).toContainText('Lowest today: Destruction Warlock')
 
   // The rotation count is the ability catalogue's, not a sentence written by hand.

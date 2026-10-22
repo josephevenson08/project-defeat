@@ -109,6 +109,7 @@ import {
 } from '../src/domain/gear/itemCatalogue'
 import {
   excludedByPhase,
+  getGuideRecommendation,
   parseRankedSource,
   raidDropIndexSize,
   resolveAcquisition,
@@ -1371,6 +1372,29 @@ test('every recommended gem and enchant across all BiS lists resolves to a real 
       }
     }
   }
+})
+
+test("the guide's gem and enchant advice sits on each slot's final rank 1, and nowhere else", async () => {
+  /*
+   * It used to follow the guide's own #1, read before the ranks were made dense per slot, so an entry
+   * promoted to rank 1 came without it: every Hunter's off hand (Claw of the Phoenix, #2 in the
+   * guide's weapons table) went unenchanted in the recommended set and in the best case.
+   */
+  for (const bisList of bisLists) {
+    const guide = getGuideRecommendation(bisList.className, bisList.spec)
+    for (const entry of bisList.entries) {
+      const where = `${bisList.id}/${entry.slot} #${entry.rank}`
+      if (entry.rank !== 1) {
+        expect(entry.recommendedEnchantId, where).toBeUndefined()
+        expect(entry.recommendedGemIds, where).toBeUndefined()
+        continue
+      }
+      expect(entry.recommendedEnchantId, where).toBe(guide?.enchants[entry.slot])
+    }
+  }
+  const claw = beastMasteryHunterPhase2Bis.entries.find((entry) => entry.slot === 'Off Hand' && entry.rank === 1)
+  expect(claw?.itemId).toBe('claw-of-the-phoenix')
+  expect(claw?.recommendedEnchantId).toBe('weapon-agility')
 })
 
 // The recommendations now come from the separate enchants-and-gems guides, so this runs again.
@@ -5681,7 +5705,7 @@ ${talentBuilds.buildCount} of 20 specs use a wowsims raiding build; ${talentBuil
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.05x').toBeGreaterThan(1.02)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.04x').toBeGreaterThan(1.02)
   expect(best).toBeLessThan(1.1)
   expect(worst, 'featureFlags.ts claims the worst spec is around 2.15x').toBeGreaterThan(2.05)
   expect(worst).toBeLessThan(2.25)
@@ -7120,12 +7144,14 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
 
   const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
 
-  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.2%').toBeGreaterThan(0.018)
+  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.1%').toBeGreaterThan(0.018)
   expect(share(focusRows)).toBeLessThan(0.027)
-  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.5%').toBeGreaterThan(0.030)
+  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.4%').toBeGreaterThan(0.030)
   expect(share([killCommandRow!])).toBeLessThan(0.040)
-  expect(share(petRows), 'featureFlags says the pet as a whole is about 18.4%').toBeGreaterThan(0.175)
-  expect(share(petRows)).toBeLessThan(0.195)
+  // Recentred on 2026-10-20 (it was 0.175 to 0.195, around 18.4%): the off hand's enchant took the
+  // owner up and the pet's share from 17.55% to 17.49%, under a floor the prose had already left.
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 17.5%').toBeGreaterThan(0.165)
+  expect(share(petRows)).toBeLessThan(0.185)
 
   /*
    * **The comparison featureFlags leans on: Kill Command beats Bite and Claw together.** It lands

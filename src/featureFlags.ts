@@ -51,7 +51,7 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.05x to 2.15x low** — a range this file has now got
+ *   best case against them. The model reads **1.04x to 2.15x low** — a range this file has now got
  *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
@@ -80,13 +80,13 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **A hunter's pet is a second attacker, and it presses three buttons.** Its auto attack is modelled
  *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
  *   crit — along with every Beast Mastery talent this model can express, a focus bar spent on Bite
- *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **18.4% of a
+ *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **17.5% of a
  *   best-case Beast Mastery hunter**, against an attributed share nearer a third.
  *
  *   **Whether a pet ability scales is what decides its worth, and the two kinds behave oppositely.**
  *   Bite and Claw are `BaseDamageConfigRoll` — flat, with **no attack power scaling at all** — so
- *   they add about 2.2% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
- *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.5%**:
+ *   they add about 2.1% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
+ *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.4%**:
  *   more than Bite and Claw together despite landing only 7.7 times a minute.
  *
  *   **Three gates, pointing at three different things**, which is the part worth holding on to. Bite

@@ -52,20 +52,36 @@ function recommendationFor(spec: RawSpec): RawRecommendation | undefined {
   return recommendationsBySpec[`${spec.className}|${spec.spec}`]
 }
 
+/**
+ * The entry with the guide's gem and enchant advice when it is the top pick, and without it otherwise.
+ *
+ * Only the top pick carries it. The guides recommend one enchant per slot and one gem per socket
+ * colour for the spec as a whole, not per ranked alternative, so hanging them off every row would
+ * imply a precision the source does not have.
+ *
+ * **Applied after the ranks are made dense, not while the rows are read.** Reading `raw.rank` here
+ * gave the advice to the guide's #1, which is not always the slot's #1 once phase drops and slot
+ * moves are settled: Claw of the Phoenix is #2 in Hunter's weapons table and the only off hand, so
+ * every Hunter's off hand came out unenchanted and "Equip the recommended set" left it that way.
+ */
+function withAdvice(entry: RankedGearEntry, spec: RawSpec): RankedGearEntry {
+  if (entry.rank !== 1) return entry
+
+  const recommended = recommendationFor(spec)
+  const sockets = getItemByWowItemId(entry.wowItemId ?? 0)?.sockets
+  const enchantId = recommended?.enchants[entry.slot]
+  const gemIds = sockets?.length ? sockets.map((socket) => recommended?.gems[socket] ?? '') : undefined
+
+  return {
+    ...entry,
+    ...(enchantId ? { recommendedEnchantId: enchantId } : {}),
+    ...(gemIds?.some(Boolean) ? { recommendedGemIds: gemIds } : {}),
+  }
+}
+
 function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry | undefined {
   const item = getItemByWowItemId(raw.wowItemId)
   if (!item) return undefined
-
-  const recommended = recommendationFor(spec)
-
-  // Only the top pick carries the gem and enchant advice. The guides recommend one enchant per slot
-  // and one gem per socket colour for the spec as a whole, not per ranked alternative, so hanging
-  // them off every row would imply a precision the source does not have.
-  const enchantId = raw.rank === 1 ? recommended?.enchants[slot] : undefined
-  const gemIds =
-    raw.rank === 1 && item.sockets?.length
-      ? item.sockets.map((socket) => recommended?.gems[socket] ?? '')
-      : undefined
 
   // The guide's own label ("Best Overall", "Threat Alternative") is kept verbatim: it carries the
   // reason a pick sits where it does, which a bare rank number throws away.
@@ -100,8 +116,6 @@ function toEntry(raw: RawEntry, slot: GearSlot, spec: RawSpec): RankedGearEntry 
     ...(raw.note ? { label: raw.note } : {}),
     ...(raw.source ? { sourceText: raw.source } : {}),
     ...(source ? { source } : {}),
-    ...(enchantId ? { recommendedEnchantId: enchantId } : {}),
-    ...(gemIds?.some(Boolean) ? { recommendedGemIds: gemIds } : {}),
   }
 }
 
@@ -196,10 +210,9 @@ function buildLists(): BisList[] {
      * slots — "Claw of the Phoenix" is ranked #2 in Hunter's Main Hand section and is off-hand only,
      * so Main Hand was left reading `#1 #3 #4` with nothing to explain the missing #2.
      *
-     * Relative order is untouched; this only closes holes. It can move an entry to rank 1 and with it
-     * the gem and enchant advice `toEntry` hangs there — which is correct, because that advice is
-     * published per spec rather than per item, so it belongs on whatever is genuinely best in the
-     * slot rather than on a row that is no longer in it.
+     * Relative order is untouched; this only closes holes. It can move an entry to rank 1, which is
+     * why `withAdvice` runs after it: the advice is published per spec rather than per item, so it
+     * belongs on whatever is genuinely best in the slot rather than on a row that is no longer in it.
      */
     const nextRankBySlot = new Map<GearSlot, number>()
     for (const entry of [...entries].sort((a, b) => a.rank - b.rank)) {
@@ -216,7 +229,7 @@ function buildLists(): BisList[] {
       title: `${spec.spec} ${spec.className} Phase ${spec.phase} Ranked List`,
       sourceName: spec.sourceName,
       sourceUrl: spec.sourceUrl,
-      entries,
+      entries: entries.map((entry) => withAdvice(entry, spec)),
     })
   }
 
