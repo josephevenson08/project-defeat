@@ -25,7 +25,7 @@ A gear / talent / raid comp planner for **World of Warcraft: The Burning Crusade
 
 ## Using it
 
-Everything runs in your browser. There are no accounts and no server.
+Everything runs in your browser. There are no accounts and no server. Theres no need to make one.
 
 1. Open the [live app](https://josephevenson08.github.io/project-defeat/) and choose **Character Planner**.
 2. Create your character, or press **Import your character from the game** if you use the addon.
