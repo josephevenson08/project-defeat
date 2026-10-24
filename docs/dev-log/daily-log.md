@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**497 commits across 83 days**, from 2026-06-25 to 2026-10-22.
+**500 commits across 85 days**, from 2026-06-25 to 2026-10-24.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,7 +13,16 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_70 commits_
+_73 commits_
+
+### Saturday 24 October — 1 commit
+
+- Name every refused talent in the Simulation tab's talent caveat — [`c2f7ace`](https://github.com/josephevenson08/project-defeat/commit/c2f7ace92d1a75c14b8e1ae8a5b23d1c4383c35e)
+
+### Friday 23 October — 2 commits
+
+- Update README.md — [`13a0280`](https://github.com/josephevenson08/project-defeat/commit/13a0280deb4ab0391e0701a83bd2fb5dbdb8a928)
+- Enhance Raid Composition with export functionality — [`51553b9`](https://github.com/josephevenson08/project-defeat/commit/51553b9775ea026af8e1ee9037c42cb24b50339a)
 
 ### Thursday 22 October — 4 commits
 
