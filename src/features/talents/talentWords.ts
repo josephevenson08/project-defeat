@@ -112,7 +112,7 @@ export function talentEffectLines(talentId: number, rank: number): string[] {
 /*
  * Why a talent is not simulated, in plain words. The ingest records its reasons for developers
  * (`talentEffects.json` `skipped`); these say the same for a player, keyed by the ingest's own label,
- * which can name several talents ("Mace/Sword/Poleaxe Specialization").
+ * which can name several talents ("Seal Fate / Ruthlessness"). A test holds every key to a label.
  */
 const PLAIN_SKIP: Record<string, string> = {
   'Warrior|Deep Wounds': "It is a bleed, and the simulator doesn't model bleeds from special attacks.",
@@ -121,7 +121,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Warrior|Enrage': "It triggers when you take a crit, and the simulator doesn't model damage taken by a damage dealer.",
   'Warrior|Sweeping Strikes': 'It hits extra targets, and the simulator models one target.',
   'Warrior|Blood Frenzy': 'It is a debuff on the boss rather than a change to you.',
-  'Warrior|Mace/Sword/Poleaxe Specialization': "It depends on the weapon type, which the simulator doesn't check yet.",
+  'Warrior|Mace Specialization / Sword Specialization / Poleaxe Specialization': "It depends on the weapon type, which the simulator doesn't check yet.",
   'Warrior|Impale': "It raises the crit damage of abilities, which the simulator doesn't take from talents yet.",
   'Warrior|Defiance': "Its expertise only matters to the tank model, which scores survival and doesn't roll your own attacks.",
   'Warrior|Shield Mastery': 'It raises how much a block absorbs, and the simulator only counts whether you block.',
@@ -138,7 +138,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Hunter|Master Tactician / Thrill of the Hunt / Readiness': "It procs or is a cooldown, and the simulator doesn't play the fight out moment by moment.",
   'Shaman|Toughness / Anticipation / Shield Specialization': "It helps you take hits, and the simulator scores a Shaman's damage only.",
   'Shaman|Elemental Fury / Concussion / Call of Thunder': "It changes particular spells, and the simulator casts one generic spell for the spec.",
-  'Shaman|Shamanistic Rage / Stormstrike cooldowns': "It is an ability you press, and the simulator doesn't plan when you'd press it.",
+  'Shaman|Shamanistic Rage / Stormstrike (Nature debuff)': "It is an ability you press, and the simulator doesn't plan when you'd press it.",
   'Druid|Subtlety': "It lowers threat, which the simulator doesn't score.",
   'Druid|Survival of the Fittest': "It lowers the chance you're crit, which the simulator doesn't model for damage.",
   'Druid|Heart of the Wild / Furor': "It depends on your form, and the simulator doesn't model forms yet.",
@@ -148,9 +148,9 @@ const PLAIN_SKIP: Record<string, string> = {
   'Paladin|Vengeance / Sanctity Aura': "It procs or needs your party, and the simulator models neither.",
   'Paladin|Crusade': "It only works on some kinds of creature, and the simulator doesn't know what the boss is.",
   'Paladin|Shield Specialization': 'It raises how much a block absorbs, and the simulator only counts whether you block.',
-  'Mage|Ignite / Combustion / Winters Chill': "It changes particular spells or schools, and the simulator casts one generic spell for the spec.",
+  "Mage|Ignite / Combustion / Winter's Chill": "It changes particular spells or schools, and the simulator casts one generic spell for the spec.",
   'Mage|Arcane Power / Presence of Mind / Icy Veins': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
-  'Mage|Empowered Fireball / Frostbolt': "It strengthens one spell, and the simulator casts one generic spell for the spec.",
+  'Mage|Empowered Fireball / Empowered Frostbolt': "It strengthens one spell, and the simulator casts one generic spell for the spec.",
   'Priest|Shadow Weaving / Misery': "It stacks on the boss as you cast, and the simulator doesn't play the fight out moment by moment.",
   'Priest|Inner Focus / Power Infusion': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Priest|Improved Renew / Empowered Healing': 'It strengthens particular heals, and the simulator casts one generic heal.',
@@ -160,28 +160,11 @@ const PLAIN_SKIP: Record<string, string> = {
   'Warlock|Soul Leech / Nightfall': "It procs, and the simulator doesn't play the fight out moment by moment.",
 }
 
-/** Names compared without case or apostrophes: the ingest writes "Winters Chill" for Winter's Chill. */
-const nameKey = (name: string) => name.toLowerCase().replace(/['’]/g, '').trim()
-
-/*
- * Each class's skipped talents by name, with the plain reason. A label naming several shares its
- * words the way the ingest wrote them: "Mace/Sword/Poleaxe Specialization" is three Specializations,
- * "Empowered Fireball / Frostbolt" two Empowered ones, so each part is also tried with the last
- * part's trailing words and the first part's leading ones. A name no talent has is never looked up.
- */
-const skippedByClass = new Map<string, Map<string, string>>()
+/** Each skipped talent's plain reason, by the talent ids the ingest resolved each refusal to. */
+const skippedById = new Map<number, string>()
 for (const entry of rawTalentEffects.skipped) {
-  const names = skippedByClass.get(entry.className) ?? new Map<string, string>()
   const reason = PLAIN_SKIP[`${entry.className}|${entry.talent}`] ?? entry.reason
-  const parts = entry.talent
-    .replace(/ \(.*\)$/, '')
-    .replace(/ cooldowns$/, '')
-    .split(/\s*\/\s*/)
-  const last = parts[parts.length - 1]
-  const suffix = last.includes(' ') ? last.slice(last.indexOf(' ')) : ''
-  const prefix = parts[0].includes(' ') ? parts[0].slice(0, parts[0].lastIndexOf(' ') + 1) : ''
-  for (const part of parts) for (const name of [part, part + suffix, prefix + part]) names.set(nameKey(name), reason)
-  skippedByClass.set(entry.className, names)
+  for (const { talentId } of entry.talents) skippedById.set(talentId, reason)
 }
 
 export type TalentSimStatus = { kind: 'sim' | 'skip' | 'ability' | 'none'; text: string }
@@ -200,7 +183,7 @@ export function talentSimStatus(className: TbcClass, talent: Talent, rank: numbe
     return entry.name === talent.name && role !== 'Healer' && role !== 'Tank'
   })
   if (ability) return { kind: 'ability', text: `Its ability is in the simulated ${ability.spec} rotation; the talent point itself isn't read.` }
-  const skipped = skippedByClass.get(className)?.get(nameKey(talent.name))
+  const skipped = skippedById.get(talent.id)
   if (skipped) return { kind: 'skip', text: `Not simulated: ${skipped}` }
   return { kind: 'none', text: "Not read by the simulator: it changes something the estimate doesn't track, such as a cost, a cooldown or utility." }
 }

@@ -971,216 +971,596 @@
     {
       "className": "Warrior",
       "talent": "Deep Wounds",
+      "talents": [
+        {
+          "talentId": 121,
+          "talent": "Deep Wounds"
+        }
+      ],
       "reason": "A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials."
     },
     {
       "className": "Warrior",
       "talent": "Death Wish",
+      "talents": [
+        {
+          "talentId": 133,
+          "talent": "Death Wish"
+        }
+      ],
       "reason": "An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has."
     },
     {
       "className": "Warrior",
       "talent": "Rampage",
+      "talents": [
+        {
+          "talentId": 1659,
+          "talent": "Rampage"
+        }
+      ],
       "reason": "Stacking on-hit attack power. Needs a timeline to build stacks."
     },
     {
       "className": "Warrior",
       "talent": "Enrage",
+      "talents": [
+        {
+          "talentId": 155,
+          "talent": "Enrage"
+        }
+      ],
       "reason": "Triggers on being crit by the target — the model has no incoming-damage stream for a DPS."
     },
     {
       "className": "Warrior",
       "talent": "Sweeping Strikes",
+      "talents": [
+        {
+          "talentId": 165,
+          "talent": "Sweeping Strikes"
+        }
+      ],
       "reason": "Extra targets. Single-target model."
     },
     {
       "className": "Warrior",
       "talent": "Blood Frenzy",
+      "talents": [
+        {
+          "talentId": 1664,
+          "talent": "Blood Frenzy"
+        }
+      ],
       "reason": "A debuff on the target rather than a change to the player."
     },
     {
       "className": "Warrior",
-      "talent": "Mace/Sword/Poleaxe Specialization",
+      "talent": "Mace Specialization / Sword Specialization / Poleaxe Specialization",
+      "talents": [
+        {
+          "talentId": 125,
+          "talent": "Mace Specialization"
+        },
+        {
+          "talentId": 123,
+          "talent": "Sword Specialization"
+        },
+        {
+          "talentId": 132,
+          "talent": "Poleaxe Specialization"
+        }
+      ],
       "reason": "Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet."
     },
     {
       "className": "Warrior",
       "talent": "Impale",
+      "talents": [
+        {
+          "talentId": 662,
+          "talent": "Impale"
+        }
+      ],
       "reason": "Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers."
     },
     {
       "className": "Warrior",
       "talent": "Defiance",
+      "talents": [
+        {
+          "talentId": 144,
+          "talent": "Defiance"
+        }
+      ],
       "reason": "Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player's own attack table."
     },
     {
       "className": "Warrior",
       "talent": "Shield Mastery",
+      "talents": [
+        {
+          "talentId": 1654,
+          "talent": "Shield Mastery"
+        }
+      ],
       "reason": "Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change."
     },
     {
       "className": "Rogue",
       "talent": "Murder",
+      "talents": [
+        {
+          "talentId": 274,
+          "talent": "Murder"
+        }
+      ],
       "reason": "Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type."
     },
     {
       "className": "Rogue",
       "talent": "Serrated Blades",
+      "talents": [
+        {
+          "talentId": 1123,
+          "talent": "Serrated Blades"
+        }
+      ],
       "reason": "Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the \"not modelled\" list."
     },
     {
       "className": "Rogue",
       "talent": "Seal Fate / Ruthlessness",
+      "talents": [
+        {
+          "talentId": 283,
+          "talent": "Seal Fate"
+        },
+        {
+          "talentId": 273,
+          "talent": "Ruthlessness"
+        }
+      ],
       "reason": "Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do."
     },
     {
       "className": "Rogue",
       "talent": "Adrenaline Rush / Blade Flurry / Cold Blood",
+      "talents": [
+        {
+          "talentId": 205,
+          "talent": "Adrenaline Rush"
+        },
+        {
+          "talentId": 223,
+          "talent": "Blade Flurry"
+        },
+        {
+          "talentId": 280,
+          "talent": "Cold Blood"
+        }
+      ],
       "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
     },
     {
       "className": "Hunter",
       "talent": "Focused Fire (Kill Command half)",
+      "talents": [
+        {
+          "talentId": 1624,
+          "talent": "Focused Fire",
+          "part": "Kill Command half"
+        }
+      ],
       "reason": "The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor."
     },
     {
       "className": "Hunter",
       "talent": "The Beast Within / Bestial Wrath",
+      "talents": [
+        {
+          "talentId": 1803,
+          "talent": "The Beast Within"
+        },
+        {
+          "talentId": 1386,
+          "talent": "Bestial Wrath"
+        }
+      ],
       "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
     },
     {
       "className": "Hunter",
       "talent": "Survivalist",
+      "talents": [
+        {
+          "talentId": 1622,
+          "talent": "Survivalist"
+        }
+      ],
       "reason": "Multiplies Health, which StatBlock has no field for — health is derived from Stamina here."
     },
     {
       "className": "Hunter",
       "talent": "Combat Experience",
+      "talents": [
+        {
+          "talentId": 1804,
+          "talent": "Combat Experience"
+        }
+      ],
       "reason": "Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested."
     },
     {
       "className": "Hunter",
       "talent": "Mortal Shots",
+      "talents": [
+        {
+          "talentId": 1349,
+          "talent": "Mortal Shots"
+        }
+      ],
       "reason": "Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers."
     },
     {
       "className": "Hunter",
       "talent": "Expose Weakness",
+      "talents": [
+        {
+          "talentId": 1812,
+          "talent": "Expose Weakness"
+        }
+      ],
       "reason": "Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume."
     },
     {
       "className": "Hunter",
       "talent": "Master Tactician / Thrill of the Hunt / Readiness",
+      "talents": [
+        {
+          "talentId": 1813,
+          "talent": "Master Tactician"
+        },
+        {
+          "talentId": 1811,
+          "talent": "Thrill of the Hunt"
+        },
+        {
+          "talentId": 1814,
+          "talent": "Readiness"
+        }
+      ],
       "reason": "Procs and cooldowns needing a timeline."
     },
     {
       "className": "Shaman",
       "talent": "Toughness / Anticipation / Shield Specialization",
+      "talents": [
+        {
+          "talentId": 615,
+          "talent": "Toughness"
+        },
+        {
+          "talentId": 601,
+          "talent": "Anticipation"
+        },
+        {
+          "talentId": 612,
+          "talent": "Shield Specialization"
+        }
+      ],
       "reason": "Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only."
     },
     {
       "className": "Shaman",
       "talent": "Elemental Fury / Concussion / Call of Thunder",
+      "talents": [
+        {
+          "talentId": 565,
+          "talent": "Elemental Fury"
+        },
+        {
+          "talentId": 563,
+          "talent": "Concussion"
+        },
+        {
+          "talentId": 562,
+          "talent": "Call of Thunder"
+        }
+      ],
       "reason": "Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19."
     },
     {
       "className": "Shaman",
-      "talent": "Shamanistic Rage / Stormstrike cooldowns",
-      "reason": "Activated abilities needing a usage policy."
+      "talent": "Shamanistic Rage / Stormstrike (Nature debuff)",
+      "talents": [
+        {
+          "talentId": 1693,
+          "talent": "Shamanistic Rage"
+        },
+        {
+          "talentId": 901,
+          "talent": "Stormstrike",
+          "part": "Nature debuff"
+        }
+      ],
+      "reason": "Shamanistic Rage is an activated cooldown needing a usage policy. Stormstrike's strike is in Enhancement's rotation as a special attack; what is not modelled is the debuff it leaves, the next two Nature hits on the target taking 20% more."
     },
     {
       "className": "Druid",
       "talent": "Subtlety",
+      "talents": [
+        {
+          "talentId": 841,
+          "talent": "Subtlety"
+        }
+      ],
       "reason": "Reduces threat, which nothing here scores."
     },
     {
       "className": "Druid",
       "talent": "Survival of the Fittest",
+      "talents": [
+        {
+          "talentId": 1794,
+          "talent": "Survival of the Fittest"
+        }
+      ],
       "reason": "Reduces the chance to be crit, which the damage path does not model."
     },
     {
       "className": "Druid",
       "talent": "Heart of the Wild / Furor",
+      "talents": [
+        {
+          "talentId": 808,
+          "talent": "Heart of the Wild"
+        },
+        {
+          "talentId": 822,
+          "talent": "Furor"
+        }
+      ],
       "reason": "Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model."
     },
     {
       "className": "Druid",
       "talent": "Moonkin Form / Tree of Life",
+      "talents": [
+        {
+          "talentId": 793,
+          "talent": "Moonkin Form"
+        },
+        {
+          "talentId": 1791,
+          "talent": "Tree of Life"
+        }
+      ],
       "reason": "Shapeshifts with party-wide effects; neither the form nor the party is modelled."
     },
     {
       "className": "Druid",
       "talent": "Omen of Clarity / Primal Fury",
+      "talents": [
+        {
+          "talentId": 827,
+          "talent": "Omen of Clarity"
+        },
+        {
+          "talentId": 801,
+          "talent": "Primal Fury"
+        }
+      ],
       "reason": "Proc-driven energy and combo points, needing a timeline."
     },
     {
       "className": "Paladin",
       "talent": "Spell Warding / Improved Righteous Fury",
+      "talents": [
+        {
+          "talentId": 1749,
+          "talent": "Spell Warding"
+        },
+        {
+          "talentId": 1501,
+          "talent": "Improved Righteous Fury"
+        }
+      ],
       "reason": "Damage-taken reduction; no incoming-damage stream on the damage path."
     },
     {
       "className": "Paladin",
       "talent": "Vengeance / Sanctity Aura",
+      "talents": [
+        {
+          "talentId": 1402,
+          "talent": "Vengeance"
+        },
+        {
+          "talentId": 1409,
+          "talent": "Sanctity Aura"
+        }
+      ],
       "reason": "Proc-driven and aura damage multipliers that need a timeline or a party."
     },
     {
       "className": "Paladin",
       "talent": "Crusade",
+      "talents": [
+        {
+          "talentId": 1755,
+          "talent": "Crusade"
+        }
+      ],
       "reason": "Gated on the target being a humanoid, demon, undead or elemental. No mob type here."
     },
     {
       "className": "Paladin",
       "talent": "Shield Specialization",
+      "talents": [
+        {
+          "talentId": 1424,
+          "talent": "Shield Specialization"
+        }
+      ],
       "reason": "Paladin's raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change."
     },
     {
       "className": "Mage",
-      "talent": "Ignite / Combustion / Winters Chill",
+      "talent": "Ignite / Combustion / Winter's Chill",
+      "talents": [
+        {
+          "talentId": 34,
+          "talent": "Ignite"
+        },
+        {
+          "talentId": 36,
+          "talent": "Combustion"
+        },
+        {
+          "talentId": 68,
+          "talent": "Winter's Chill"
+        }
+      ],
       "reason": "Per-spell and school-scoped; the simulator models one generic cast and records no spell school."
     },
     {
       "className": "Mage",
       "talent": "Arcane Power / Presence of Mind / Icy Veins",
+      "talents": [
+        {
+          "talentId": 87,
+          "talent": "Arcane Power"
+        },
+        {
+          "talentId": 86,
+          "talent": "Presence of Mind"
+        },
+        {
+          "talentId": 69,
+          "talent": "Icy Veins"
+        }
+      ],
       "reason": "Timed cooldowns. A closed-form model has no timeline to place them on."
     },
     {
       "className": "Mage",
-      "talent": "Empowered Fireball / Frostbolt",
+      "talent": "Empowered Fireball / Empowered Frostbolt",
+      "talents": [
+        {
+          "talentId": 1734,
+          "talent": "Empowered Fireball"
+        },
+        {
+          "talentId": 1740,
+          "talent": "Empowered Frostbolt"
+        }
+      ],
       "reason": "Raise one spell's coefficient; the generic cast profile has no per-spell coefficient to raise."
     },
     {
       "className": "Priest",
       "talent": "Shadow Weaving / Misery",
+      "talents": [
+        {
+          "talentId": 461,
+          "talent": "Shadow Weaving"
+        },
+        {
+          "talentId": 1816,
+          "talent": "Misery"
+        }
+      ],
       "reason": "Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target."
     },
     {
       "className": "Priest",
       "talent": "Inner Focus / Power Infusion",
+      "talents": [
+        {
+          "talentId": 348,
+          "talent": "Inner Focus"
+        },
+        {
+          "talentId": 322,
+          "talent": "Power Infusion"
+        }
+      ],
       "reason": "Timed cooldowns, which a closed-form model has no timeline to place."
     },
     {
       "className": "Priest",
       "talent": "Improved Renew / Empowered Healing",
+      "talents": [
+        {
+          "talentId": 406,
+          "talent": "Improved Renew"
+        },
+        {
+          "talentId": 1767,
+          "talent": "Empowered Healing"
+        }
+      ],
       "reason": "Per-spell coefficients; the healer path models one generic cast."
     },
     {
       "className": "Warlock",
       "talent": "Master Demonologist",
+      "talents": [
+        {
+          "talentId": 1244,
+          "talent": "Master Demonologist"
+        }
+      ],
       "reason": "Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet."
     },
     {
       "className": "Warlock",
       "talent": "Fel Intellect / Fel Stamina",
+      "talents": [
+        {
+          "talentId": 1242,
+          "talent": "Fel Intellect"
+        },
+        {
+          "talentId": 1241,
+          "talent": "Fel Stamina"
+        }
+      ],
       "reason": "Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested."
     },
     {
       "className": "Warlock",
       "talent": "Improved Shadow Bolt / Ruin / Emberstorm",
+      "talents": [
+        {
+          "talentId": 944,
+          "talent": "Improved Shadow Bolt"
+        },
+        {
+          "talentId": 967,
+          "talent": "Ruin"
+        },
+        {
+          "talentId": 966,
+          "talent": "Emberstorm"
+        }
+      ],
       "reason": "Per-spell and school-scoped; no spell school is recorded anywhere in this simulator."
     },
     {
       "className": "Warlock",
       "talent": "Soul Leech / Nightfall",
+      "talents": [
+        {
+          "talentId": 1678,
+          "talent": "Soul Leech"
+        },
+        {
+          "talentId": 1002,
+          "talent": "Nightfall"
+        }
+      ],
       "reason": "Proc-driven, needing a timeline."
     }
   ]

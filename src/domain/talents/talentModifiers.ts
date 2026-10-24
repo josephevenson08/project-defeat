@@ -1,5 +1,4 @@
 import rawTalentEffects from './talentEffects.json' with { type: 'json' }
-import { getTalentData } from './sampleTalents'
 import type { TalentPoints } from './talentTypes'
 import type { StatBlock } from '../stats/statTypes'
 import type { SpellSchool } from '../abilities/abilityTypes'
@@ -503,37 +502,29 @@ export function classHasTalentEffects(className: string): boolean {
 }
 
 /** The talents this pass deliberately does not model, and why. Surfaced so the gap stays visible. */
-export const unmodelledTalents: readonly { talent: string; reason: string }[] = rawTalentEffects.skipped
+export const unmodelledTalents: readonly (typeof rawTalentEffects.skipped)[number][] = rawTalentEffects.skipped
 
 /**
  * The unmodelled talents this particular build has actually spent points in.
  *
- * Returns the **specific talent names**, not the grouped labels the ingest files them under: a player
- * who took Impale wants to read "Impale", not "Mace/Sword/Poleaxe Specialization". Several skipped
- * entries cover more than one talent, which is why the labels are split before matching.
+ * Returns the **specific talent names**, not the group labels: a player who took Sword
+ * Specialization wants to read that, not "Mace Specialization / Sword Specialization / Poleaxe
+ * Specialization". A talent refused only in part is named with its part, "Focused Fire (Kill
+ * Command half)", because the rest of it is in the estimate.
+ *
+ * Matched by talent id, which the ingest resolves against each class's tree. It used to split the
+ * labels back into names, and labels that were not names ("Winters Chill", "Mace/Sword/Poleaxe
+ * Specialization") meant Sword Specialization, Winter's Chill and Empowered Frostbolt were never named.
  *
  * Empty when nothing applies, and that emptiness is the point — warning someone about talents they do
  * not have is noise, and noise is how a caveat stops being read.
  */
 export function unmodelledTalentsInBuild(className: string, points: TalentPoints): readonly string[] {
-  const data = getTalentData(className)
-  if (!data) return []
-
-  const spent = new Set<string>()
-  for (const tree of data.trees) {
-    for (const talent of tree.talents) {
-      if ((points[talent.id] ?? 0) > 0) spent.add(talent.name)
-    }
-  }
-  if (spent.size === 0) return []
-
   const taken: string[] = []
   for (const entry of rawTalentEffects.skipped) {
-    // Only this class's skips. Warrior and Rogue share talent names, so an unfiltered match would
-    // warn a Warrior about a Rogue talent they cannot have taken.
     if (entry.className !== className) continue
-    for (const name of entry.talent.split('/').map((part) => part.trim())) {
-      if (spent.has(name)) taken.push(name)
+    for (const { talentId, talent, part } of entry.talents) {
+      if ((points[talentId] ?? 0) > 0) taken.push(part ? `${talent} (${part})` : talent)
     }
   }
   return taken

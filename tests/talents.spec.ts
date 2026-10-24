@@ -1,10 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
+import type { TbcClass } from '../src/domain/character/characterTypes'
 import { racesByClass } from '../src/domain/character/races'
 import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
 import { defaultGear } from '../src/domain/gear/defaultGear'
 import { hitCapFor } from '../src/domain/simulation/hitCap'
 import { defaultSimulationTarget } from '../src/domain/simulation/sampleEncounters'
 import { getTalentData } from '../src/domain/talents/sampleTalents'
+import { unmodelledTalents } from '../src/domain/talents/talentModifiers'
 import { pointsSpent } from '../src/domain/talents/talentTypes'
 import {
   hintedTalents,
@@ -130,11 +132,21 @@ test('the tooltip says what the simulator reads, in plain words, for every class
 
   const find = (className: 'Mage' | 'Shaman', name: string) =>
     getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((entry) => entry.name === name)!
-  // Labels that share words: "Empowered Fireball / Frostbolt", "Winters Chill".
+  // Once filed under labels no talent has ("Empowered Fireball / Frostbolt", "Winters Chill").
   expect(talentSimStatus('Mage', find('Mage', 'Empowered Frostbolt'), 0).kind).toBe('skip')
   expect(talentSimStatus('Mage', find('Mage', "Winter's Chill"), 0).kind).toBe('skip')
-  // Stormstrike's cooldown is skipped, but its strike is in Enhancement's rotation.
+  // Stormstrike's Nature debuff is skipped, but its strike is in Enhancement's rotation.
   expect(talentSimStatus('Shaman', find('Shaman', 'Stormstrike'), 1).kind).toBe('ability')
+
+  // Every skipped talent says why in plain words, not the ingest's note for developers: a label the
+  // plain words' keys no longer match would fall back to that note.
+  for (const entry of unmodelledTalents) {
+    for (const { talentId } of entry.talents) {
+      const talent = getTalentData(entry.className)!.trees.flatMap((tree) => tree.talents).find((each) => each.id === talentId)!
+      const status = talentSimStatus(entry.className as TbcClass, talent, 0)
+      if (status.kind === 'skip') expect(status.text, `${entry.className} ${talent.name}`).not.toContain(entry.reason)
+    }
+  }
 
   for (const { className } of tbcClasses) {
     for (const tree of getTalentData(className)!.trees) {

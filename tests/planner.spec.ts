@@ -7422,17 +7422,64 @@ test('the estimate names unmodelled talents you actually took, and stays quiet o
   // Talents the model DOES express must not produce a warning either.
   expect(noteFor(furyTalentPoints([['Cruelty', 5], ['Flurry', 5]])), 'modelled talents are not a gap').toBeUndefined()
 
-  /*
-   * And when an unmodelled one is taken it is named specifically. "Impale" rather than the grouped
-   * label the ingest files it under ("Mace/Sword/Poleaxe Specialization"), because the player picked
-   * a talent, not a category.
-   */
+  // And when an unmodelled one is taken it is named specifically.
   const note = noteFor(furyTalentPoints([['Cruelty', 5], ['Deep Wounds', 3], ['Impale', 2]]))
   expect(note).toBeTruthy()
   expect(note).toContain('Deep Wounds')
   expect(note).toContain('Impale')
   expect(note, 'talents that ARE modelled must not be listed as gaps').not.toContain('Cruelty')
   expect(note, 'and it should say which way the estimate is wrong').toMatch(/low by/i)
+})
+
+test('the caveat names refused talents that share a group, by id rather than by the group label', () => {
+  /*
+   * Found in the Talents port: the ingest filed refusals under labels ("Mace/Sword/Poleaxe
+   * Specialization", "Ignite / Combustion / Winters Chill", "Empowered Fireball / Frostbolt"), the
+   * caveat split those back into names, and Sword Specialization, Winter's Chill and Empowered
+   * Frostbolt came out as names no talent has. So a player who took them was never told. The ingest
+   * now resolves each refusal to talent ids against the class's tree and fails on a name it can't find.
+   */
+  const pointsFor = (className: TbcClass, entries: readonly (readonly [string, number])[]) => {
+    const byName = new Map(getTalentData(className)!.trees.flatMap((tree) => tree.talents).map((talent) => [talent.name, talent.id]))
+    const points: Record<number, number> = {}
+    for (const [name, rank] of entries) {
+      expect(byName.get(name), `${name} must exist in the ingested ${className} tree`).toBeDefined()
+      points[byName.get(name)!] = rank
+    }
+    return points
+  }
+  const noteFor = (className: TbcClass, spec: TbcSpec, points: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor(className), className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    return calculateSimulation(character, gear, stats, getRoleForSpec(className, spec), [], undefined, points).unmodelledTalentNote
+  }
+
+  const arms = noteFor('Warrior', 'Arms', pointsFor('Warrior', [['Two-Handed Weapon Specialization', 5], ['Sword Specialization', 5]]))
+  expect(arms).toContain('Sword Specialization')
+  expect(arms, 'the talent taken, not the group it is filed under').not.toMatch(/Mace|Poleaxe/)
+  expect(arms, 'a modelled talent is not a gap').not.toContain('Two-Handed')
+
+  const frost = noteFor('Mage', 'Frost', pointsFor('Mage', [['Arcane Instability', 3], ["Winter's Chill", 5], ['Empowered Frostbolt', 5]]))
+  expect(frost).toContain("Winter's Chill")
+  expect(frost).toContain('Empowered Frostbolt')
+  expect(frost, 'nor its group mates').not.toMatch(/Ignite|Combustion|Empowered Fireball/)
+  expect(frost, 'a modelled talent is not a gap').not.toContain('Arcane Instability')
+
+  // Without them the same specs stay quiet: their modelled talents alone are no gap.
+  expect(noteFor('Warrior', 'Arms', pointsFor('Warrior', [['Two-Handed Weapon Specialization', 5]]))).toBeUndefined()
+  expect(noteFor('Mage', 'Frost', pointsFor('Mage', [['Arcane Instability', 3]]))).toBeUndefined()
+
+  // A talent refused only in part is named with its part, since the rest is in the estimate.
+  expect(noteFor('Hunter', 'Beast Mastery', pointsFor('Hunter', [['Focused Fire', 2]]))).toContain('Focused Fire (Kill Command half)')
+  expect(noteFor('Shaman', 'Enhancement', pointsFor('Shaman', [['Stormstrike', 1]]))).toContain('Stormstrike (Nature debuff)')
+
+  // Every refusal covers at least one real talent of its class, so none can go unnamed again.
+  for (const entry of unmodelledTalents) {
+    const ids = new Set(getTalentData(entry.className)!.trees.flatMap((tree) => tree.talents).map((talent) => talent.id))
+    expect(entry.talents.length, `${entry.talent} covers a talent`).toBeGreaterThan(0)
+    for (const { talentId } of entry.talents) expect(ids.has(talentId), `${entry.talent}: ${talentId} is a ${entry.className} talent`).toBe(true)
+  }
 })
 
 test('talent scaling covers both Warrior DPS specs, and the tank reads its own', () => {

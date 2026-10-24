@@ -225,17 +225,27 @@ const WARRIOR_STAT_EXTRACTORS = [
   },
 ]
 
+/*
+ * Each class's refusals: the talents an entry covers, by their real names, and why.
+ *
+ * Real names because they are resolved to talent ids against the class's own tree below, and an
+ * entry that names no talent fails the run like an extractor that matches nothing. They used to be
+ * labels ("Mace/Sword/Poleaxe Specialization", "Winters Chill") that the app split back into names,
+ * and the split missed Sword Specialization, Winter's Chill and Empowered Frostbolt, so the estimate's
+ * caveat never named them. `part` marks a talent whose effect is only partly refused, so the caveat
+ * names the part rather than calling the whole talent unmodelled.
+ */
 const WARRIOR_SKIPPED = [
-  ['Deep Wounds', 'A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials.'],
-  ['Death Wish', 'An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has.'],
-  ['Rampage', 'Stacking on-hit attack power. Needs a timeline to build stacks.'],
-  ['Enrage', 'Triggers on being crit by the target — the model has no incoming-damage stream for a DPS.'],
-  ['Sweeping Strikes', 'Extra targets. Single-target model.'],
-  ['Blood Frenzy', 'A debuff on the target rather than a change to the player.'],
-  ['Mace/Sword/Poleaxe Specialization', 'Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet.'],
-  ['Impale', 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
-  ['Defiance', 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
-  ['Shield Mastery', 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
+  [['Deep Wounds'], 'A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials.'],
+  [['Death Wish'], 'An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has.'],
+  [['Rampage'], 'Stacking on-hit attack power. Needs a timeline to build stacks.'],
+  [['Enrage'], 'Triggers on being crit by the target — the model has no incoming-damage stream for a DPS.'],
+  [['Sweeping Strikes'], 'Extra targets. Single-target model.'],
+  [['Blood Frenzy'], 'A debuff on the target rather than a change to the player.'],
+  [['Mace Specialization', 'Sword Specialization', 'Poleaxe Specialization'], 'Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet.'],
+  [['Impale'], 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
+  [['Defiance'], 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
+  [['Shield Mastery'], 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
 ]
 
 const ROGUE_SOURCES = [
@@ -380,10 +390,10 @@ const ROGUE_POISON_EXTRACTORS = [
 ]
 
 const ROGUE_SKIPPED = [
-  ['Murder', 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
-  ['Serrated Blades', 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
-  ['Seal Fate / Ruthlessness', 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
-  ['Adrenaline Rush / Blade Flurry / Cold Blood', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+  [['Murder'], 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
+  [['Serrated Blades'], 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
+  [['Seal Fate', 'Ruthlessness'], 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
+  [['Adrenaline Rush', 'Blade Flurry', 'Cold Blood'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
 ]
 
 const HUNTER_SOURCES = [
@@ -522,13 +532,13 @@ const HUNTER_EXTRACTORS = [
 ]
 
 const HUNTER_SKIPPED = [
-  ['Focused Fire (Kill Command half)', 'The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor.'],
-  ['The Beast Within / Bestial Wrath', 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
-  ['Survivalist', 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
-  ['Combat Experience', 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
-  ['Mortal Shots', 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
-  ['Expose Weakness', 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
-  ['Master Tactician / Thrill of the Hunt / Readiness', 'Procs and cooldowns needing a timeline.'],
+  [[{ talent: 'Focused Fire', part: 'Kill Command half' }], 'The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor.'],
+  [['The Beast Within', 'Bestial Wrath'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+  [['Survivalist'], 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
+  [['Combat Experience'], 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
+  [['Mortal Shots'], 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
+  [['Expose Weakness'], 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
+  [['Master Tactician', 'Thrill of the Hunt', 'Readiness'], 'Procs and cooldowns needing a timeline.'],
 ]
 
 const SHAMAN_SOURCES = [{ path: 'sim/shaman/talents.go', cache: 'sim_shaman_talents.go' }]
@@ -597,9 +607,9 @@ const SHAMAN_EXTRACTORS = [
 ]
 
 const SHAMAN_SKIPPED = [
-  ['Toughness / Anticipation / Shield Specialization', 'Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only.'],
-  ['Elemental Fury / Concussion / Call of Thunder', 'Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19.'],
-  ['Shamanistic Rage / Stormstrike cooldowns', 'Activated abilities needing a usage policy.'],
+  [['Toughness', 'Anticipation', 'Shield Specialization'], 'Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only.'],
+  [['Elemental Fury', 'Concussion', 'Call of Thunder'], 'Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19.'],
+  [['Shamanistic Rage', { talent: 'Stormstrike', part: 'Nature debuff' }], 'Shamanistic Rage is an activated cooldown needing a usage policy. Stormstrike\'s strike is in Enhancement\'s rotation as a special attack; what is not modelled is the debuff it leaves, the next two Nature hits on the target taking 20% more.'],
 ]
 
 const DRUID_SOURCES = [{ path: 'sim/druid/talents.go', cache: 'sim_druid_talents.go' },
@@ -700,11 +710,11 @@ const DRUID_BLEED_EXTRACTORS = [
 ]
 
 const DRUID_SKIPPED = [
-  ['Subtlety', 'Reduces threat, which nothing here scores.'],
-  ['Survival of the Fittest', 'Reduces the chance to be crit, which the damage path does not model.'],
-  ['Heart of the Wild / Furor', 'Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model.'],
-  ['Moonkin Form / Tree of Life', 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
-  ['Omen of Clarity / Primal Fury', 'Proc-driven energy and combo points, needing a timeline.'],
+  [['Subtlety'], 'Reduces threat, which nothing here scores.'],
+  [['Survival of the Fittest'], 'Reduces the chance to be crit, which the damage path does not model.'],
+  [['Heart of the Wild', 'Furor'], 'Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model.'],
+  [['Moonkin Form', 'Tree of Life'], 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
+  [['Omen of Clarity', 'Primal Fury'], 'Proc-driven energy and combo points, needing a timeline.'],
 ]
 
 const PALADIN_SOURCES = [{ path: 'sim/paladin/talents.go', cache: 'sim_paladin_talents.go' }]
@@ -797,10 +807,10 @@ const PALADIN_STAT_EXTRACTORS = [
 ]
 
 const PALADIN_SKIPPED = [
-  ['Spell Warding / Improved Righteous Fury', 'Damage-taken reduction; no incoming-damage stream on the damage path.'],
-  ['Vengeance / Sanctity Aura', 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
-  ['Crusade', 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
-  ['Shield Specialization', 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
+  [['Spell Warding', 'Improved Righteous Fury'], 'Damage-taken reduction; no incoming-damage stream on the damage path.'],
+  [['Vengeance', 'Sanctity Aura'], 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
+  [['Crusade'], 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
+  [['Shield Specialization'], 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
 ]
 
 /*
@@ -870,9 +880,9 @@ const MAGE_STAT_EXTRACTORS = [
 ]
 
 const MAGE_SKIPPED = [
-  ['Ignite / Combustion / Winters Chill', 'Per-spell and school-scoped; the simulator models one generic cast and records no spell school.'],
-  ['Arcane Power / Presence of Mind / Icy Veins', 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
-  ['Empowered Fireball / Frostbolt', 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
+  [['Ignite', 'Combustion', "Winter's Chill"], 'Per-spell and school-scoped; the simulator models one generic cast and records no spell school.'],
+  [['Arcane Power', 'Presence of Mind', 'Icy Veins'], 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
+  [['Empowered Fireball', 'Empowered Frostbolt'], 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
 ]
 
 const PRIEST_SOURCES = [{ path: 'sim/priest/talents.go', cache: 'sim_priest_talents.go' }]
@@ -911,9 +921,9 @@ const PRIEST_STAT_EXTRACTORS = [
 ]
 
 const PRIEST_SKIPPED = [
-  ['Shadow Weaving / Misery', 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
-  ['Inner Focus / Power Infusion', 'Timed cooldowns, which a closed-form model has no timeline to place.'],
-  ['Improved Renew / Empowered Healing', 'Per-spell coefficients; the healer path models one generic cast.'],
+  [['Shadow Weaving', 'Misery'], 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
+  [['Inner Focus', 'Power Infusion'], 'Timed cooldowns, which a closed-form model has no timeline to place.'],
+  [['Improved Renew', 'Empowered Healing'], 'Per-spell coefficients; the healer path models one generic cast.'],
 ]
 
 const WARLOCK_SOURCES = [
@@ -991,10 +1001,10 @@ const WARLOCK_DEMON_EXTRACTORS = [
 ]
 
 const WARLOCK_SKIPPED = [
-  ['Master Demonologist', 'Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet.'],
-  ['Fel Intellect / Fel Stamina', 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
-  ['Improved Shadow Bolt / Ruin / Emberstorm', 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
-  ['Soul Leech / Nightfall', 'Proc-driven, needing a timeline.'],
+  [['Master Demonologist'], 'Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet.'],
+  [['Fel Intellect', 'Fel Stamina'], 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
+  [['Improved Shadow Bolt', 'Ruin', 'Emberstorm'], 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
+  [['Soul Leech', 'Nightfall'], 'Proc-driven, needing a timeline.'],
 ]
 
 const CLASSES = [
@@ -1070,7 +1080,29 @@ for (const entry of CLASSES) {
     })
   }
 
-  for (const [talent, reason] of entry.skipped) skippedAll.push({ className: entry.className, talent, reason })
+  for (const [covers, reason] of entry.skipped) {
+    const named = covers.map((cover) => (typeof cover === 'string' ? { talent: cover } : cover))
+    const talents = []
+    for (const { talent: name, part } of named) {
+      const talent = talentsByName.get(name)
+      if (!talent) {
+        failures.push(`${entry.className} skipped ${name}: no talent by that name in ${entry.talentJson}`)
+        continue
+      }
+      // Refused whole and extracted at once would make the caveat contradict the estimate.
+      if (!part && effects.some((effect) => effect.talentId === talent.id)) {
+        failures.push(`${entry.className} skipped ${name}: it has an extracted effect, so name the part that is refused`)
+        continue
+      }
+      if (skippedAll.some((skip) => skip.talents.some((t) => t.talentId === talent.id))) {
+        failures.push(`${entry.className} skipped ${name}: refused twice`)
+        continue
+      }
+      talents.push({ talentId: talent.id, talent: name, part })
+    }
+    const label = named.map(({ talent, part }) => (part ? `${talent} (${part})` : talent)).join(' / ')
+    skippedAll.push({ className: entry.className, talent: label, talents, reason })
+  }
 }
 
 if (failures.length > 0) {

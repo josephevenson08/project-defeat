@@ -34,7 +34,19 @@ declare module "*/talentEffects.json" {
       caveat?: string
       source: string
     }[]
-    skipped: { className: string; talent: string; reason: string }[]
+    skipped: {
+      className: string
+      /** A label for the group, made from the talents below; never matched against. */
+      talent: string
+      /** The talents this refusal covers, resolved to ids against the class's tree at ingest. */
+      talents: {
+        talentId: number
+        talent: string
+        /** Set when only part of the talent is refused: Focused Fire's Kill Command half. */
+        part?: string
+      }[]
+      reason: string
+    }[]
   }
   export default talentEffects
 }
