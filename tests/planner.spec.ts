@@ -7482,6 +7482,33 @@ test('the caveat names refused talents that share a group, by id rather than by 
   }
 })
 
+test('a Frost Mage is told about the damage talents the estimate never mentioned', () => {
+  /*
+   * The last silent gap: talents the ingest neither extracted nor refused reached no caveat at all.
+   * No Frost Mage talent is modelled, and Elemental Precision (Fire and Frost hit), Ice Shards (Frost
+   * crit damage) and Piercing Ice (Frost damage) are core to the spec, so the estimate was low by
+   * all three and said nothing. They are refused by name now, like every talent that changes output.
+   */
+  const byName = new Map(getTalentData('Mage')!.trees.flatMap((tree) => tree.talents).map((talent) => [talent.name, talent.id]))
+  const pointsFor = (entries: readonly (readonly [string, number])[]) =>
+    Object.fromEntries(entries.map(([name, rank]) => [byName.get(name)!, rank])) as Record<number, number>
+  const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor('Mage'), className: 'Mage', spec: 'Frost' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Mage', 'Frost')
+  const stats = calculateStats(character, gear)
+  const noteFor = (points: Record<number, number>) => calculateSimulation(character, gear, stats, 'Caster DPS', [], undefined, points).unmodelledTalentNote
+
+  const note = noteFor(pointsFor([['Elemental Precision', 3], ['Ice Shards', 5], ['Piercing Ice', 3], ['Arcane Instability', 3]]))
+  expect(note).toContain('Elemental Precision')
+  expect(note).toContain('Ice Shards')
+  expect(note).toContain('Piercing Ice')
+  expect(note, 'a modelled talent is not a gap').not.toContain('Arcane Instability')
+  expect(note, 'and it points to where each reason is').toMatch(/tooltip on the Talents tab says why/)
+
+  // Elemental Precision alone is enough to be named, and utility alone stays quiet.
+  expect(noteFor(pointsFor([['Elemental Precision', 3]]))).toContain('Elemental Precision')
+  expect(noteFor(pointsFor([['Frostbite', 3], ['Improved Frost Nova', 2], ['Permafrost', 3]])), 'crowd control is not a gap').toBeUndefined()
+})
+
 test('talent scaling covers both Warrior DPS specs, and the tank reads its own', () => {
   /*
    * The scope described stage 1 as "Fury Warrior". Arms gets it free, and that is worth pinning

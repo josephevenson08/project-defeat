@@ -260,8 +260,7 @@ function unmodelledTalentNoteFor(
 
   return (
     `${taken.join(', ')} ${taken.length === 1 ? 'is' : 'are'} spent but not modelled here, so this estimate is ` +
-    'low by whatever they are worth. They need a damage-over-time layer, a cooldown usage policy or an ' +
-    'incoming-damage stream, none of which a closed-form model has.'
+    "low by whatever they are worth. Each one's tooltip on the Talents tab says why."
   )
 }
 

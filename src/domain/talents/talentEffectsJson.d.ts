@@ -47,6 +47,22 @@ declare module "*/talentEffects.json" {
       }[]
       reason: string
     }[]
+    /** Every talent neither extracted nor refused, and why nothing needs to read it. */
+    notRead: {
+      className: string
+      /**
+       * `ability`: it teaches an ability `spec`'s estimate already includes. `buff`: its effect is the
+       * Buffs-tab entry `buff`, or the target debuff `debuff`. `utility`: nothing an estimate computes.
+       */
+      kind: 'ability' | 'buff' | 'utility'
+      talentId: number
+      talent: string
+      spec?: string
+      /** Said after the ability line, where it holds only sometimes: Seal of Command is Alliance's. */
+      note?: string
+      buff?: string
+      debuff?: string
+    }[]
   }
   export default talentEffects
 }

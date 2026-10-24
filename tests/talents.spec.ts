@@ -1,4 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
+import { getSignatureAbilitiesForClass } from '../src/domain/abilities'
+import { getBuffById } from '../src/domain/buffs/sampleBuffs'
+import { getTargetDebuffById } from '../src/domain/buffs/sampleTargetDebuffs'
 import type { TbcClass } from '../src/domain/character/characterTypes'
 import { racesByClass } from '../src/domain/character/races'
 import { getRoleForSpec, tbcClasses } from '../src/domain/character/tbcClasses'
@@ -6,6 +9,7 @@ import { defaultGear } from '../src/domain/gear/defaultGear'
 import { hitCapFor } from '../src/domain/simulation/hitCap'
 import { defaultSimulationTarget } from '../src/domain/simulation/sampleEncounters'
 import { getTalentData } from '../src/domain/talents/sampleTalents'
+import rawTalentEffects from '../src/domain/talents/talentEffects.json' with { type: 'json' }
 import { unmodelledTalents } from '../src/domain/talents/talentModifiers'
 import { pointsSpent } from '../src/domain/talents/talentTypes'
 import {
@@ -137,6 +141,12 @@ test('the tooltip says what the simulator reads, in plain words, for every class
   expect(talentSimStatus('Mage', find('Mage', "Winter's Chill"), 0).kind).toBe('skip')
   // Stormstrike's Nature debuff is skipped, but its strike is in Enhancement's rotation.
   expect(talentSimStatus('Shaman', find('Shaman', 'Stormstrike'), 1).kind).toBe('ability')
+  // Once called "a cost, a cooldown or utility", which spell hit is not.
+  expect(talentSimStatus('Mage', find('Mage', 'Elemental Precision'), 3).text).toMatch(/^Not simulated: It changes hit or resistances for some schools/)
+  // A talent whose effect is a Buffs-tab entry points there.
+  expect(talentSimStatus('Druid', getTalentData('Druid')!.trees.flatMap((tree) => tree.talents).find((entry) => entry.name === 'Leader of the Pack')!, 1).text).toBe(
+    "It is on the Buffs tab as Leader of the Pack: tick it there. The talent point itself isn't read.",
+  )
 
   // Every skipped talent says why in plain words, not the ingest's note for developers: a label the
   // plain words' keys no longer match would fall back to that note.
@@ -151,6 +161,52 @@ test('the tooltip says what the simulator reads, in plain words, for every class
   for (const { className } of tbcClasses) {
     for (const tree of getTalentData(className)!.trees) {
       for (const entry of tree.talents) expect(talentSimStatus(className, entry, 1).text, `${className} ${entry.name}`).not.toBe('')
+    }
+  }
+})
+
+test('every talent is modelled, refused or says why nothing reads it, and only utility says nothing', () => {
+  /*
+   * Until 2026-10-24 the ingest named only the talents it extracted or refused, and the tooltip called
+   * every other one "a cost, a cooldown or utility". A Frost Mage's Elemental Precision (spell hit),
+   * Ice Shards and Piercing Ice were among 435 such talents, and the estimate's caveat never named
+   * them. The ingest now accounts for every talent and refuses to write when one is unmentioned.
+   */
+  const notRead = new Map(rawTalentEffects.notRead.map((entry) => [entry.talentId, entry]))
+  const modelled = new Set(rawTalentEffects.effects.map((effect) => effect.talentId))
+  const refused = new Set(rawTalentEffects.skipped.flatMap((entry) => entry.talents.map((talent) => talent.talentId)))
+  // Abilities an estimate includes that are not a rotation's signature ability.
+  const notSignature: Record<string, string> = {
+    'Paladin|Seal of Command': 'paladinSeals.ts procs it on Alliance swings',
+    'Warlock|Summon Felguard': 'warlockPet.ts gives Demonology the Felguard',
+    'Shaman|Dual Wield': 'weaponImbues.ts puts Windfury on both hands',
+  }
+
+  for (const { className } of tbcClasses) {
+    const signatures = getSignatureAbilitiesForClass(className).filter((ability) => getRoleForSpec(className, ability.spec) !== 'Tank')
+    for (const tree of getTalentData(className)!.trees) {
+      for (const talent of tree.talents) {
+        const label = `${className} ${talent.name}`
+        const listed = notRead.get(talent.id)
+        expect(modelled.has(talent.id) || refused.has(talent.id) || !!listed, `${label} is accounted for`).toBe(true)
+
+        // Only a utility talent says the simulator doesn't read it; anything that changes damage,
+        // healing, hit, crit, haste or survival is modelled or refused, and the tooltip says which.
+        const status = talentSimStatus(className, talent, 1)
+        expect(status.kind === 'none', `${label}: "${status.text}"`).toBe(listed?.kind === 'utility')
+        if (listed?.kind === 'utility') expect(modelled.has(talent.id) || refused.has(talent.id), `${label} is utility only`).toBe(false)
+
+        // A rotation's ability is listed as one for its spec, and nothing else is without a reason.
+        const signature = signatures.find((ability) => ability.name === talent.name)
+        if (signature) expect(listed, `${label} is ${signature.spec}'s rotation ability`).toMatchObject({ kind: 'ability', spec: signature.spec })
+        if (listed?.kind === 'ability' && !signature) expect(notSignature[`${className}|${talent.name}`], `${label} is in an estimate`).toBeDefined()
+
+        if (listed?.kind === 'buff') {
+          const entry = listed.buff ? getBuffById(listed.buff) : getTargetDebuffById(listed.debuff ?? '')
+          expect(entry, `${label} names a Buffs-tab entry`).toBeDefined()
+          expect(status.text).toContain(entry!.name)
+        }
+      }
     }
   }
 })
