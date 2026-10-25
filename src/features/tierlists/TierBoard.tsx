@@ -1,8 +1,9 @@
-import { useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { Panel } from '../../components/layout/Panel'
 import { SpecIcon } from '../../components/ui/SpecIcon'
 import { useHoverTip } from '../../components/ui/useHoverTip'
 import { getClassColor } from '../../domain/character/classColors'
+import { cue } from '../../lib/motion'
 import type { TbcClass } from '../../domain/character/characterTypes'
 import { tbcClasses } from '../../domain/character/tbcClasses'
 import { getTierList, type SpecTierList } from '../../domain/tierlists'
@@ -34,6 +35,9 @@ export function TierBoard({ yours, selected, onSelect, raidCount }: TierBoardPro
   const tip = useHoverTip<SpecRef>()
   const [dps, healer, tank] = (['DPS', 'Healer', 'Tank'] as const).map(getTierList)
   const standing = selected ? getSpecStanding(selected) : undefined
+
+  // The prototype's tiles land row by row when the board opens (port step 7's motion layer).
+  useEffect(() => cue({ kind: 'land', target: '.tier-board .tier-tile' }), [])
 
   const board = (list: SpecTierList | undefined) =>
     list && (

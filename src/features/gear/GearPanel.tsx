@@ -14,6 +14,7 @@ import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from './gearTypes
 import type { RecommendedSet } from './equipRecommendedSet'
 import { SlotPane } from './SlotPane'
 import { WhatsLeft } from './WhatsLeft'
+import { cue } from '../../lib/motion'
 
 type GearPanelProps = {
   character: CharacterProfile
@@ -107,6 +108,11 @@ export function GearPanel({ character, role, gear, onChange, onEquipRecommended,
     }
   }, [session.view])
 
+  // A slot's pane opens through a small ring of light (port step 7's motion layer).
+  useEffect(() => {
+    if (openSlot) cue({ kind: 'enter', target: '.slot-pane' })
+  }, [openSlot])
+
   function closePane() {
     const returning = openSlot
     setOpenSlot(undefined)
@@ -120,6 +126,7 @@ export function GearPanel({ character, role, gear, onChange, onEquipRecommended,
 
   function equipRecommended() {
     const set = onEquipRecommended()
+    if (set) cue({ kind: 'swell' })
     setLastEquip(set)
     setOpenSlot(undefined)
     setMessage(set ? RECOMMENDED_MESSAGE : '')

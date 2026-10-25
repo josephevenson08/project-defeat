@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/talents/talentEffectsJson.d.ts
-lines: 41
+lines: 53
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentEffectsJson.d
 
-`src/domain/talents/talentEffectsJson.d.ts` · **domain** layer · 41 lines
+`src/domain/talents/talentEffectsJson.d.ts` · **domain** layer · 53 lines
 
 _No doc comment at the top of this file._
 

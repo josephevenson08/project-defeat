@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/RaidCompositionPanel.tsx
-lines: 824
+lines: 841
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.RaidCompositionPanel
 
-`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 824 lines
+`src/features/raidcomp/RaidCompositionPanel.tsx` · **features** layer · 841 lines
 
 _No doc comment at the top of this file._
 
@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.raidcomp.raidcompFormat]] — `src/features/raidcomp/raidcompFormat.ts`
 - [[features.raidcomp.rosterStorage]] — `src/features/raidcomp/rosterStorage.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

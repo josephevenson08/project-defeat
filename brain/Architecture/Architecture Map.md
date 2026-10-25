@@ -6,7 +6,7 @@ tags: [brain/architecture, moc]
 
 # Architecture Map
 
-244 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
+249 modules across 5 layers. Every module note lists its real imports and importers, so Obsidian's graph view of this folder *is* the dependency graph.
 
 ## Dependency rule
 
@@ -62,7 +62,7 @@ Presentational shell and primitives. No domain knowledge — these would work un
 - [[components.ui.useHoverTip]] · 9 importers
 - [[components.ui.ViewSwitch]] · 6 importers
 
-### features (79)
+### features (83)
 
 Per-feature panels plus the calculation functions that drive them. This is where domain data becomes a number on screen.
 
@@ -120,6 +120,10 @@ Per-feature panels plus the calculation functions that drive them. This is where
 - [[features.raids.raidSources]] · 1 importers
 - [[features.raids.RaidsPanel]] · 1 importers
 - [[features.raids.raidsSession]] · 3 importers
+- [[features.scene.motionLayer]] · 0 importers
+- [[features.scene.sceneControl]] · 4 importers
+- [[features.scene.SceneSwitch]] · 1 importers
+- [[features.scene.waterScene]] · 0 importers
 - [[features.simulator.bestCase]] · 2 importers
 - [[features.simulator.BestUpgrades]] · 1 importers
 - [[features.simulator.calculateSimulation]] · 5 importers
@@ -282,7 +286,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.stats.statRelevance]] · 3 importers
 - [[domain.stats.statTypes]] · 20 importers
 - [[domain.stats.statUtils]] · 4 importers
-- [[domain.talents.sampleTalents]] · 6 importers
+- [[domain.talents.sampleTalents]] · 5 importers
 - [[domain.talents.talentEffectsJson.d]] · 0 importers
 - [[domain.talents.talentModifiers]] · 9 importers
 - [[domain.talents.talentTypes]] · 14 importers
@@ -293,11 +297,12 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.tierlists.tierListsJson.d]] · 0 importers
 - [[domain.tierlists.tierListTypes]] · 3 importers
 
-### lib (2)
+### lib (3)
 
 Cross-cutting helpers with no domain meaning.
 
 - [[lib.animations]] · 5 importers
+- [[lib.motion]] · 12 importers
 - [[lib.useScreenFocus]] · 2 importers
 
 Up: [[Project Defeat Brain]]

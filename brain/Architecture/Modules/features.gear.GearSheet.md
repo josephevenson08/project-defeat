@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/gear/GearSheet.tsx
-lines: 260
+lines: 264
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.gear.GearSheet
 
-`src/features/gear/GearSheet.tsx` · **features** layer · 260 lines
+`src/features/gear/GearSheet.tsx` · **features** layer · 264 lines
 
 _No doc comment at the top of this file._
 
@@ -36,6 +36,7 @@ _No doc comment at the top of this file._
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.gear.ItemIcon]] — `src/features/gear/ItemIcon.tsx`
 - [[features.gear.slotGlyphs]] — `src/features/gear/slotGlyphs.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

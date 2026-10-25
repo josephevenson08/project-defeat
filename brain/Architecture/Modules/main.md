@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/main.tsx
-lines: 14
+lines: 18
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # main
 
-`src/main.tsx` · **app** layer · 14 lines
+`src/main.tsx` · **app** layer · 18 lines
 
 _No doc comment at the top of this file._
 
@@ -21,6 +21,7 @@ _Nothing exported (side-effect or style module)._
 
 - [[App]] — `src/App.tsx`
 - [[components.layout.ErrorBoundary]] — `src/components/layout/ErrorBoundary.tsx`
+- [[features.scene.sceneControl]] — `src/features/scene/sceneControl.ts`
 - [[styles.global]] — `src/styles/global.css`
 
 ## Imported by

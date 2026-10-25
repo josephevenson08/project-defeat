@@ -22,6 +22,7 @@ import { LootIcon } from './LootIcon'
 import { RaidAbout } from './RaidAbout'
 import { listName, lootKey, slotName, type LootTipBinder } from './raidLootTip'
 import { defaultJournalPage, journalPages, type JournalPage } from './raidsSession'
+import { cue } from '../../lib/motion'
 
 type BossJournalProps = {
   raid: Raid
@@ -66,6 +67,18 @@ export function BossJournal({ raid, page, onPage, lootFor, onLootFor, bindTip }:
     const box = open.getBoundingClientRect()
     if (box.left < row.left || box.right > row.right) list.scrollLeft += box.left - row.left - 12
   }, [current])
+
+  /*
+   * Another boss's or raid's page rises into place (port step 7's motion layer). Not the first one: the
+   * tab's own entrance covers that, and the rise's long, slow tail would still be moving it when a
+   * reader, or a test measuring a control, gets there.
+   */
+  const shownPage = useRef(`${raid.id}/${current}`)
+  useEffect(() => {
+    const key = `${raid.id}/${current}`
+    if (shownPage.current !== key) cue({ kind: 'rise', target: '.journal-page' })
+    shownPage.current = key
+  }, [raid.id, current])
 
   function go(next: JournalPage) {
     onPage(next)

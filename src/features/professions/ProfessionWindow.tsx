@@ -25,6 +25,7 @@ import type {
 } from '../../domain/professions'
 import { professionSlug } from './professionsSession'
 import { ZoneRoutes } from './ZoneRoutes'
+import { cue } from '../../lib/motion'
 
 const CATEGORIES: readonly ProfessionCategory[] = ['Gathering', 'Crafting', 'Secondary']
 const MAX_SKILL = 375
@@ -102,6 +103,13 @@ export function ProfessionWindow({ profession, skill, pick, onProfession, onSkil
       list.scrollTop += rowBox.top - listBox.top - listBox.height / 3
     }
   }, [profession, selected])
+
+  // Another profession's window rises into place (port step 7's motion layer); the first opens with the tab.
+  const shownProfession = useRef(profession)
+  useEffect(() => {
+    if (shownProfession.current !== profession) cue({ kind: 'rise', target: '.pw-window' })
+    shownProfession.current = profession
+  }, [profession])
 
   if (!profile) return null
   const kinds = payoff ? [...new Set(payoff.perks.map((perk) => perk.kind))] : []

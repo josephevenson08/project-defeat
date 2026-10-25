@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/talents/TalentsPanel.tsx
-lines: 565
+lines: 573
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.talents.TalentsPanel
 
-`src/features/talents/TalentsPanel.tsx` · **features** layer · 565 lines
+`src/features/talents/TalentsPanel.tsx` · **features** layer · 573 lines
 
 _No doc comment at the top of this file._
 
@@ -31,6 +31,7 @@ _No doc comment at the top of this file._
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`
 - [[features.talents.talentsSession]] — `src/features/talents/talentsSession.ts`
 - [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

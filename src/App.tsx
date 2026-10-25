@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingIntro } from './components/layout/LoadingIntro'
 import { SectionPicker } from './components/layout/SectionPicker'
@@ -55,6 +55,7 @@ import { initialBuffsSession, type BuffsSession } from './features/buffs/buffsSe
 import { buffsSources } from './features/buffs/buffWords'
 import { initialTalentsSession, type TalentsSession } from './features/talents/talentsSession'
 import { talentsSources } from './features/talents/talentWords'
+import { cue } from './lib/motion'
 
 /**
  * The screen's colour is stamped on `<html>` as `data-tab`, not on a wrapper inside the app.
@@ -68,14 +69,17 @@ import { talentsSources } from './features/talents/talentWords'
  * then the whole app was themed by the character's faction, which made a Horde player's tier list
  * look different from an Alliance player's for no reason that had to do with tier lists.
  */
-function useScreenTheme(screen: 'home' | AppTab, raid?: 'ssc' | 'tk' | 'p1') {
+function useScreenTheme(screen: 'home' | AppTab, raid?: 'ssc' | 'tk' | 'p1', raidId?: string) {
   useEffect(() => {
     const root = document.documentElement
     root.dataset.tab = screen
     // Raids follows the raid it shows: Serpentshrine teal, Tempest Keep gold over violet, Phase 1 torchlight.
     if (raid) root.dataset.raid = raid
     else delete root.dataset.raid
-  }, [screen, raid])
+    // The 3D scene (port step 7) goes further and lights each Phase 1 raid its own way.
+    if (raidId) root.dataset.raidId = raidId
+    else delete root.dataset.raidId
+  }, [screen, raid, raidId])
 }
 
 const initialCharacter: CharacterProfile = {
@@ -312,6 +316,13 @@ function App() {
     [character, role, gear, talentPoints, activeBuffIds, activeTargetDebuffIds, target],
   )
 
+  // A buff that moves the hit cap (Improved Faerie Fire, Totem of Wrath) swells the scene, as on the prototype's Buffs tab.
+  const capBefore = useRef<number>(undefined)
+  useEffect(() => {
+    if (plannerView === 'buffs' && capBefore.current !== undefined && hitCap && hitCap.cap !== capBefore.current) cue({ kind: 'swell' })
+    capBefore.current = hitCap?.cap
+  }, [hitCap, plannerView])
+
   /*
    * Recomputed per render rather than read once at mount, because it now depends on the character:
    * the Simulation tab is a DPS surface, so changing spec from Fury to Protection takes it away.
@@ -332,6 +343,7 @@ function App() {
   useScreenTheme(
     introComplete && !sharePending && sectionChosen ? currentTab : 'home',
     sectionChosen && currentTab === 'raids' && shownRaid ? raidLook(shownRaid.id, shownRaid.phase) : undefined,
+    sectionChosen && currentTab === 'raids' ? shownRaid?.id : undefined,
   )
 
   /**

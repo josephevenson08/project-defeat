@@ -3,6 +3,7 @@ import { Button } from '../../components/ui/Button'
 import { getQualityColor } from '../../domain/gear/qualityColors'
 import { getGemById } from '../../domain/gems/sampleGems'
 import { animateEquipFeedback } from '../../lib/animations'
+import { cue } from '../../lib/motion'
 import type { CharacterProfile } from '../character/characterTypes'
 import { getGearSlotDisplayName, isEmptySlotItem } from '../gear/gearData'
 import type { EquippedGear, EquippedSlot, GearItem, GearSlot } from '../gear/gearTypes'
@@ -42,6 +43,9 @@ export function BestUpgrades({ character, gear, report, onEquip }: BestUpgradesP
 
   function equip(event: MouseEvent<HTMLButtonElement>, candidate: UpgradeCandidate) {
     animateEquipFeedback(event.currentTarget)
+    // The prototype's run: embers rise while the estimate moves, then the crystal swells (port step 7).
+    cue({ kind: 'embers' })
+    cue({ kind: 'swell' })
     onEquip(candidate.slot, {
       item: candidate.item,
       // Gems and enchant must both match what findUpgrades scored, or the realised gain won't equal

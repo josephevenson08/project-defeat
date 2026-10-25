@@ -14,6 +14,7 @@ Built once and exposed as `window.TBCKit`; each page hands it its Three.js scene
 - **Effects:** a crystal swell, embers, a rune ring, entry rings, a rebirth burst, a taint tint and a lift, each tied to a real action (equip, import, simulate).
 - **Fallbacks:** a Motion switch and a 3D switch, a still frame for reduced motion, a CSS gradient in each tab's colour when WebGL is off, and performance tiers that settle after about two seconds of real frames.
 - **No Blizzard art and no sound.** Everything is drawn in code.
+- **In the live app since 2026-10-24** (port step 7, [[Port to the Live App]]): the scene and the themes ported to three 0.186 as `features/scene/waterScene.ts`, the DOM effects as Web Animations in `motionLayer.ts`, both loaded on demand. Left in the prototypes: the portal ignition, the rune ring, the rebirth burst and the lift, and the separate Motion switch (the app's motion follows reduced motion).
 
 ## Documents
 

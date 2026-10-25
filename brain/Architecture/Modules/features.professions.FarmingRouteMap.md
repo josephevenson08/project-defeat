@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/professions/FarmingRouteMap.tsx
-lines: 148
+lines: 154
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.professions.FarmingRouteMap
 
-`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 148 lines
+`src/features/professions/FarmingRouteMap.tsx` · **features** layer · 154 lines
 
 _No doc comment at the top of this file._
 
@@ -20,6 +20,7 @@ _No doc comment at the top of this file._
 ## Imports
 
 - [[domain.professions.index]] — `src/domain/professions/index.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

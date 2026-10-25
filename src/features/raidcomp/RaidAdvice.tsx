@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { Buff, TargetDebuff } from '../../domain/buffs/buffTypes'
 import type { CharacterRole } from '../../domain/character/characterTypes'
 import { getClassColor } from '../../domain/character/classColors'
@@ -6,6 +7,7 @@ import { sampleTargetDebuffs } from '../../domain/buffs/sampleTargetDebuffs'
 import { bestAddition, buffReach, getBuffIcon, partyBuffCount, raidGaps } from '../../domain/raidcomp'
 import type { BuffReach, CoverageReport, CoverageSection, RaidBuild, Roster } from '../../domain/raidcomp'
 import { article, buildName, iconUrl, inWords } from './raidcompFormat'
+import { cue } from '../../lib/motion'
 
 /**
  * What the raid table adds up to (port step 5, the decided Raid Composition design): role balance,
@@ -30,6 +32,8 @@ export function ReachTag({ reach }: { reach: BuffReach }) {
 }
 
 export function RoleBalance({ report }: { report: CoverageReport }) {
+  // The bars fill the first time they come into view (port step 7's motion layer).
+  useEffect(() => cue({ kind: 'fill', target: '.raidcomp-rolebar-track i' }), [])
   const rows: [string, number, string][] = [
     ...ROLE_ORDER.map((role): [string, number, string] => [role, report.roleCounts[role], `raidcomp-role-${role.replace(/\s+/g, '-').toLowerCase()}`]),
     ['Open seats', report.remaining, 'raidcomp-role-open'],

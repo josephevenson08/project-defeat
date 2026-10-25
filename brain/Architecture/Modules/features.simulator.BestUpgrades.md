@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/BestUpgrades.tsx
-lines: 128
+lines: 132
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.BestUpgrades
 
-`src/features/simulator/BestUpgrades.tsx` · **features** layer · 128 lines
+`src/features/simulator/BestUpgrades.tsx` · **features** layer · 132 lines
 
 _No doc comment at the top of this file._
 
@@ -29,6 +29,7 @@ _No doc comment at the top of this file._
 - [[features.simulator.findUpgrades]] — `src/features/simulator/findUpgrades.ts`
 - [[features.simulator.simFormat]] — `src/features/simulator/simFormat.ts`
 - [[lib.animations]] — `src/lib/animations.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raidcomp/RaidAdvice.tsx
-lines: 214
+lines: 218
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raidcomp.RaidAdvice
 
-`src/features/raidcomp/RaidAdvice.tsx` · **features** layer · 214 lines
+`src/features/raidcomp/RaidAdvice.tsx` · **features** layer · 218 lines
 
 From the top of the file:
 
@@ -30,6 +30,7 @@ From the top of the file:
 - [[domain.character.classColors]] — `src/domain/character/classColors.ts`
 - [[domain.raidcomp.index]] — `src/domain/raidcomp/index.ts`
 - [[features.raidcomp.raidcompFormat]] — `src/features/raidcomp/raidcompFormat.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react'
 import type { RangeRoute } from '../../domain/professions'
+import { cue } from '../../lib/motion'
 import zoneMapData from '../../domain/professions/zoneMaps.json'
 
 const ZONE_MAPS: Record<string, { areaId: number; file: string; width: number; height: number }> =
@@ -34,6 +36,10 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
   const path = route.stops.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
   const materials = route.materials.map((entry) => entry.material).join(', ')
   const lap = (route.routeLength / 100).toFixed(1)
+  const line = useRef<SVGPolygonElement>(null)
+
+  // The loop draws itself in as its map opens (port step 7's motion layer).
+  useEffect(() => cue({ kind: 'draw', target: line.current }), [path])
 
   return (
     <figure className={`farming-route ${art ? 'farming-route-mapped' : ''}`.trim()}>
@@ -94,7 +100,7 @@ export function FarmingRouteMap({ route }: { route: RangeRoute }) {
             </g>
           ))}
 
-          {route.stops.length > 1 && <polygon className="farming-route-path" points={path} />}
+          {route.stops.length > 1 && <polygon className="farming-route-path" points={path} ref={line} />}
           {route.stops.map(([x, y], index) => (
             <circle
               key={`${x}-${y}`}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Buff } from '../../domain/buffs/buffTypes'
 import { getClassColor } from '../../domain/character/classColors'
 import {
@@ -32,6 +32,7 @@ import { downloadRosterImage } from './exportRosterImage'
 import { MissingList, OneMoreSeat, RaidCoverage, ReachTag, RoleBalance } from './RaidAdvice'
 import { article, buildName, iconUrl, inWords } from './raidcompFormat'
 import { loadRoster, saveRoster } from './rosterStorage'
+import { cue } from '../../lib/motion'
 
 /**
  * Raid Composition, as decided on 2026-10-07/08 and ported in step 5 of docs/design/PORT-PLAN.md: the
@@ -260,6 +261,19 @@ export function RaidCompositionPanel() {
   }, [roster])
 
   /*
+   * The scene's light per group (port step 7): one light circles the crystal for each group, as bright
+   * as the group is covered, and the crystal swells when a change covers something new.
+   */
+  const coveredBefore = useRef<number>(undefined)
+  useEffect(() => {
+    const covered =
+      report.raidWide.covered.length + report.debuffs.covered.length + report.groups.reduce((sum, group) => sum + group.partyBuffs.length, 0)
+    cue({ kind: 'groups', f: report.groups.map((group) => group.partyBuffs.length / partyBuffCount), n: report.groups.length })
+    if (coveredBefore.current !== undefined && covered > coveredBefore.current) cue({ kind: 'swell' })
+    coveredBefore.current = covered
+  }, [report])
+
+  /*
    * Escape puts the player back down. Bound to the window rather than to the seats, because arming a
    * move moves focus onto the destination buttons and there is no one element reliably focused when a
    * raid leader changes their mind.
@@ -298,6 +312,7 @@ export function RaidCompositionPanel() {
     if (seatIndex === -1) return
     const next = addToGroup(roster, groupIndex, { className: build.className, spec: build.spec, buildId: build.id })
     const full = !next.groups.some((group) => group.includes(undefined))
+    cue({ kind: 'enter', target: `[data-seat="${groupIndex + 1}-${seatIndex + 1}"]` })
     commit(
       next,
       `Seated ${article(buildName(build)).toLowerCase()} ${buildName(build)} in ${where({ groupIndex, seatIndex })}. ${receivesLine(next, groupIndex)}${full ? ' The raid is full.' : ''}`,
@@ -312,6 +327,7 @@ export function RaidCompositionPanel() {
       return
     }
     const next = moveSeat(roster, from, to)
+    cue({ kind: 'enter', target: `[data-seat="${to.groupIndex + 1}-${to.seatIndex + 1}"]` })
     const counts =
       from.groupIndex === to.groupIndex
         ? ` Group ${to.groupIndex + 1} still receives the same party buffs.`
@@ -641,6 +657,7 @@ export function RaidCompositionPanel() {
                         className={`raidcomp-seat${slot ? ' is-filled' : ''}${sameSeat(dragging, ref) ? ' is-dragging' : ''}${sameSeat(moving, ref) ? ' is-moving' : ''}${
                           isTarget && seatIndex === targetSeat ? ' is-next' : ''
                         }`}
+                        data-seat={`${groupIndex + 1}-${seatIndex + 1}`}
                         /*
                          * Every seat is a drop target, empty ones included, and `moveSeat` swaps when the
                          * destination is taken, so a drop never silently deletes anybody.

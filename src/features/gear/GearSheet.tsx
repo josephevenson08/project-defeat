@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import { FloatingTip } from '../../components/ui/FloatingTip'
 import { ItemTooltip } from '../../components/ui/ItemTooltip'
 import { useHoverTip } from '../../components/ui/useHoverTip'
@@ -16,6 +16,7 @@ import { getGearSlotDisplayName, getItemsForSlotAndCharacter } from './gearData'
 import type { EquippedGear, GearSlot } from './gearTypes'
 import { ItemIcon } from './ItemIcon'
 import { slotGlyph } from './slotGlyphs'
+import { cue } from '../../lib/motion'
 
 type GearSheetProps = {
   character: CharacterProfile
@@ -171,6 +172,9 @@ export function GearSheet({
   const shownStats = relevantStats(SHEET_STATS[role], role, character.className, character.spec)
   const hit = hitCap ? Math.round(fromGear[hitCap.stat]) : 0
   const standing = hitCap ? hitStanding(hit, hitCap) : undefined
+  // Short of the cap, the hit number takes the prototypes' slow tint (port step 7); the words say so too.
+  const under = standing?.state === 'under'
+  useEffect(() => cue({ kind: 'taint', target: '[data-testid="gear-hit"]', on: under }), [under])
 
   const count = (testId: string, ok: boolean, text: string) => (
     <button type="button" className={`gear-sheet-count ${ok ? 'is-ok' : 'is-miss'}`} data-testid={testId} onClick={onShowLeft}>

@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/tierlists/TierBoard.tsx
-lines: 180
+lines: 184
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.tierlists.TierBoard
 
-`src/features/tierlists/TierBoard.tsx` · **features** layer · 180 lines
+`src/features/tierlists/TierBoard.tsx` · **features** layer · 184 lines
 
 _No doc comment at the top of this file._
 
@@ -30,6 +30,7 @@ _No doc comment at the top of this file._
 - [[features.tierlists.SpecCard]] — `src/features/tierlists/SpecCard.tsx`
 - [[features.tierlists.SpecTip]] — `src/features/tierlists/SpecTip.tsx`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

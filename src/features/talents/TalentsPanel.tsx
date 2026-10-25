@@ -33,6 +33,7 @@ import type { CharacterProfile } from '../character/characterTypes'
 import type { EquippedGear } from '../gear/gearTypes'
 import { talentSimStatus } from './talentWords'
 import type { TalentsSession } from './talentsSession'
+import { cue } from '../../lib/motion'
 
 type TalentsPanelProps = {
   character: CharacterProfile
@@ -230,6 +231,13 @@ export function TalentsPanel({ character, points, onChange, hitCap, gear, sessio
     setMessage(
       `${found.talent.name} ${change.points[id] ?? 0}/${found.talent.maxRank}. ${TALENT_POINTS_AT_70 - pointsSpent(trees, change.points)} of ${TALENT_POINTS_AT_70} points left.`,
     )
+    // The prototype's motion (port step 7): a learned point pulses, and a tree's 41-point talent swells the scene.
+    if (direction > 0) {
+      // The icon, not the button: the button's box stays put, so a quick second click lands at once.
+      cue({ kind: 'pulse', target: buttons.current.get(id)?.querySelector('.talent-icon') })
+      const deepest = Math.max(...found.tree.talents.map((talent) => talent.row))
+      if (found.talent.row === deepest && change.points[id] === 1) cue({ kind: 'swell' })
+    }
   }
 
   /* Arrow keys move between a tree's talents by row and column, nearest first; Home and End go to its ends. */

@@ -2,14 +2,14 @@
 type: module
 layer: app
 source: src/App.tsx
-lines: 694
+lines: 706
 generated: true
 tags: [brain/architecture, layer/app]
 ---
 
 # App
 
-`src/App.tsx` · **app** layer · 694 lines
+`src/App.tsx` · **app** layer · 706 lines
 
 From the top of the file:
 
@@ -86,6 +86,7 @@ _Nothing exported (side-effect or style module)._
 - [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 - [[features.tierlists.tierFormat]] — `src/features/tierlists/tierFormat.ts`
 - [[features.tierlists.TierListsPanel]] — `src/features/tierlists/TierListsPanel.tsx`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

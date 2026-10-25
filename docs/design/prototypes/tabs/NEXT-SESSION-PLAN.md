@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-22): Talents is in the app, and step 6 is done; start here
+## ▶ Where we left off (2026-10-24): the scene is in the app, and the port is done; start here
+
+**Step 7, the last, brought this folder's scene and motion into the app:** the crystal-and-water host every tab page carries (`window.SCENE`) and `tbc-kit.js`'s themes, ported to three 0.186 as `src/features/scene/waterScene.ts`, and the kit's DOM effects as Web Animations in `motionLayer.ts`, both loaded on demand. As the owner decided (2026-10-23): `three` plus the app's own anime.js, not GSAP; on by default with a "3D scene" switch; and the main bundle up at most 1.5 KB gzipped (it is 1,241 bytes). Each tab has its page's colour, numbers and detail, and each raid its own light; reduced motion, no WebGL or a weak device keep the still backdrop; the front door keeps its art and has no 3D. Left here: the portal ignition, the rune ring, the rebirth burst, the lift, the separate Motion switch and the scroll-driven text. Built and tested (`tests/scene.spec.ts`), waiting for the owner's OK to commit. **Next:** commit and push it; then Step B of the maps rework when Wowhead answers. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-22): Talents is in the app, and step 6 is done
 
 **Step 6 finished with Talents:** `planner.html`'s Talents sub-tab (`talents-a.js`, the game's talent window, with `talent-common.js`'s "What's off" from design C) is now the live app's Talents tab for every class and spec, and `checks/talents-handson.mjs` became `tests/talents.spec.ts`. As the owner decided, it opens untalented, since the app starts clean; "Load the <spec> preset" puts in wowsims' preset as stored for the 17 specs that have one, and the rest say there is none. The hit cap line reuses Gear's helper (95 at Precision 3/3, 111 at 2/3). Built, tested and pushed (`4da2509`, 2026-10-22), as is Gear (`632d73c`). The guide's gem and enchant fix (a Hunter's off hand) is merged on top, waiting for the owner's OK to push. **Next:** step 7, the optional 3D scene. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

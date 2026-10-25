@@ -278,8 +278,8 @@
  * The still backdrop, behind every screen.
  *
  * A fixed layer under the page rather than a `background-attachment: fixed` on `body`, which phones
- * ignore. It is the prototypes' WebGL-off fallback for the tab, and it is what the optional 3D scene
- * (the port plan's last step) will paint over.
+ * ignore. It is the prototypes' WebGL-off fallback for the tab, and what reduced motion, a weak device
+ * or a browser without WebGL keep when the optional 3D scene (port step 7, below) does not run.
  */
 body::before {
   content: '';
@@ -288,6 +288,85 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background: var(--veil), var(--backdrop);
+}
+
+/*
+ * The optional 3D scene (port step 7, `features/scene/`), between the backdrop and the veil.
+ *
+ * With the scene on, `body::before` keeps only the backdrop, which shows while the canvas fades in and
+ * again if it stops, and `body::after` lays the veil over the canvas, so text reads as it does over the
+ * still backdrop. The canvas is added after the app, so the three paint in that order.
+ */
+.scene-canvas {
+  display: block;
+  height: 100%;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 0.8s ease-out;
+  width: 100%;
+  z-index: -1;
+}
+
+.scene-canvas.is-shown {
+  opacity: 1;
+}
+
+:root.scene-on body::before {
+  background: var(--backdrop);
+}
+
+:root.scene-on body::after {
+  background: var(--veil);
+  content: '';
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: -1;
+}
+
+/* Without the scene, its swell brightens the backdrop once instead. */
+:root.backdrop-swell body::before {
+  animation: backdrop-swell 1.2s ease-in-out;
+}
+
+@keyframes backdrop-swell {
+  40% {
+    filter: brightness(1.3);
+  }
+}
+
+/* The ring of light that opens a pane (the prototypes' K8). */
+.scene-ring {
+  border: 1.5px solid var(--glow);
+  border-radius: 50%;
+  box-shadow: 0 0 18px var(--glow), inset 0 0 12px var(--glow);
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 40;
+}
+
+/* A slow teal-to-sickly-green tint on a row short of the hit cap (the prototypes' K10); its words say so too. */
+.scene-taint {
+  position: relative;
+}
+
+.scene-taint::after {
+  background: linear-gradient(135deg, rgba(150, 205, 50, 0.18), rgba(110, 150, 30, 0.07));
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(170, 215, 70, 0.55), 0 0 18px -6px rgba(150, 205, 50, 0.6);
+  content: '';
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 1.6s ease-in-out;
+}
+
+.scene-taint.is-tainted::after {
+  opacity: 1;
 }
 
 :focus-visible {
@@ -6287,6 +6366,7 @@ h4,
   flex-wrap: wrap;
   gap: 0 22px;
   min-height: 54px;
+  position: relative;
 }
 
 .brand {
@@ -6371,6 +6451,34 @@ h4,
   background: var(--glow);
   border-color: var(--glow);
   color: var(--glow-ink);
+}
+
+/* "3D scene: on", the prototypes' switch, at the end of the top bar; on a narrow screen, at the end of the wordmark's row. */
+.scene-switch {
+  background: var(--glass-2);
+  border: 1px solid var(--rim);
+  border-radius: 999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: 600 var(--t-xs) var(--f-body);
+  margin-left: auto;
+  padding: 5px 10px;
+}
+
+.scene-switch[aria-pressed='true'] {
+  background: var(--glow-soft);
+  border-color: var(--glow);
+  color: var(--glow);
+}
+
+.scene-switch[aria-disabled='true'] {
+  cursor: default;
+}
+
+@media (max-width: 699px), (pointer: coarse) {
+  .scene-switch {
+    min-height: 44px;
+  }
 }
 
 /* `PhaseChip`: which game and phase every number on the screen is for. */
@@ -6983,6 +7091,14 @@ h4,
 
   .topbar .tab-nav {
     gap: 2px 6px;
+  }
+
+  /* The scene's switch shares the wordmark's row, so it costs the first screen nothing. */
+  .topbar-bar .scene-switch {
+    min-height: 44px;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 }
 

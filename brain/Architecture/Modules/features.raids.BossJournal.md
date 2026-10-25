@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/raids/BossJournal.tsx
-lines: 421
+lines: 434
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.raids.BossJournal
 
-`src/features/raids/BossJournal.tsx` · **features** layer · 421 lines
+`src/features/raids/BossJournal.tsx` · **features** layer · 434 lines
 
 _No doc comment at the top of this file._
 
@@ -28,6 +28,7 @@ _No doc comment at the top of this file._
 - [[features.raids.RaidAbout]] — `src/features/raids/RaidAbout.tsx`
 - [[features.raids.raidLootTip]] — `src/features/raids/raidLootTip.ts`
 - [[features.raids.raidsSession]] — `src/features/raids/raidsSession.ts`
+- [[lib.motion]] — `src/lib/motion.ts`
 
 ## Imported by
 

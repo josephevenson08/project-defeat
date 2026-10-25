@@ -30,6 +30,20 @@ behind every claim of its that quotes a number.
   quality is still the only colour the app assigns to data it did not choose, and every ink clears
   WCAG AA on the glass it lands on. The three typefaces are vendored latin-subset in `public/fonts`
   with their licences (64 KB, no third-party request). Faction no longer recolours the page
+- **The crystal-and-water scene and its motion** (port step 7, 2026-10-24, `docs/design/PORT-PLAN.md`):
+  behind every section, the prototypes' 3D scene (water with caustics, a floating crystal, pillars and a
+  shattered sky) in the tab's colour with the tab's own detail: bubbles on the Character Planner, crystal
+  pillars on Simulation, one light per raid group on Raid Composition (as bright as the group is
+  covered), rank rings on the tier lists, ore glints on Professions, and each raid lit its own way. It is
+  optional and on by default, with a "3D scene" switch in the top bar that is remembered. `three` is
+  downloaded only where the scene runs, once the first screen is up (143 KB gzipped); the main bundle
+  grew by about 1.2 KB. With reduced motion nothing loads and nothing moves; without WebGL, with WebGL
+  only in software, on a device with under 4 GB of memory or two cores, with Data Saver, or if the scene
+  runs under 25 frames a second, the tab keeps its still backdrop and the switch says why. The front door
+  keeps its painted art and has no 3D. The motion: the tier tiles land row by row, raid and profession
+  pages rise into place, a farming loop draws itself, a ring of light opens a seat or a slot's pane, a
+  learned talent pulses, and the crystal swells on a 41-point talent, a buff that moves the hit cap, new
+  raid coverage, Equip and the recommended set; the hit number takes a slow tint while it is short
 - **Phase 2 and only Phase 2.** 
 - Source/farming metadata fields for gear, including instance, boss, vendor, reputation, crafting profession, and notes
 - Crafted items can show full recipe detail: required profession skill level, specialization, where the recipe/pattern is obtained, and each material's own farm/source location

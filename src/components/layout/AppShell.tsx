@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from 'react'
 import { useScreenFocus } from '../../lib/useScreenFocus'
 import { PhaseChip } from '../ui/PhaseChip'
+import { SceneSwitch } from '../../features/scene/SceneSwitch'
 import { TabNav, type TabDefinition } from './TabNav'
 
 type AppShellProps<T extends string> = {
@@ -56,6 +57,10 @@ export function AppShell<T extends string>({ children, tabs, activeTab, onTabCha
               Project <span>Defeat</span>
             </button>
             <TabNav tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
+            {/* The optional 3D scene (port step 7). In the bar rather than on the line under it, where on a
+                phone it took a row of its own and pushed the first screen down: here it shares the
+                wordmark's row. */}
+            <SceneSwitch />
           </div>
         </header>
         {/* Under the bar rather than in it, as in the prototypes: the bar stays on screen as you

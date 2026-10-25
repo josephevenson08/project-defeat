@@ -676,7 +676,7 @@ const DESIGN_NOTES = [
   },
   {
     title: 'Port to the Live App',
-    summary: 'Bringing the decided designs into src/: the look first, then one tab per commit, and the 3D scene last as an optional layer.',
+    summary: 'Bringing the decided designs into src/: the look first, then one tab per commit, and the 3D scene last as an optional layer. All eight steps are in (2026-10-24).',
     body: `The plan the owner approved on 2026-10-12 (\`docs/design/PORT-PLAN.md\`). **Option C:** the prototypes' look first, with a still backdrop per tab; the 3D scene comes last, lazy-loaded and optional. Then the tabs in order: the foundation, Spec Tier Lists, Raids, Professions, Simulation, Raid Composition, and the Character Planner one sub-tab per commit. Each step is a rewrite into React against the app's own state and domain functions, works for all 27 specs, turns the prototype's hands-on check into Playwright tests, and is pushed only after the owner says so.
 
 **Step 0, the foundation (2026-10-12):**
@@ -706,7 +706,9 @@ const DESIGN_NOTES = [
 
 **Then Gear (2026-10-19):** the game's character sheet (armour left, jewellery right, weapons along the bottom, each slot with its item level, gem dots, enchant and a game tooltip), its middle column holding the character, set pips, what the gear alone adds (\`domain/gear/gearStats.ts\`, which \`calculateStats\` now uses too), the hit cap in plain words and four counts that open "What's left": a row per slot with what it still needs and a one-press fix, "Only what's left", and the targets by raid and boss. The hit cap is new for every spec (\`domain/simulation/hitCap.ts\`): special attacks, ranged attacks or spells by role, read from the simulator's own tables, less talents, race, buffs and Improved Faerie Fire; none for a healer. Building it showed the simulator's base miss against a level 73 boss was 8%, not TBC's 9% (the 1% hit suppression past a 10-point skill gap); the owner had it fixed in the port, so the sheet's 142 (95 with Precision 3/3) and the estimate agree, and melee and ranged best cases dropped 0.1–1.0%. The checklist is \`domain/bis/gearChecklist.ts\`. Slots open the app's own slot pane beside the sheet, restyled (the owner's call), so every legal item and the profession-gated enchants stay. The port found that a guide can gem against a socket bonus on purpose (a Protection Warrior's), which is not a to-do, and that the recommended set leaves a Hunter's off hand unenchanted (the guide's advice is attached before the ranks are made dense).
 
-**Then Talents, which finished step 6 (2026-10-22):** the game's talent window for every class: three trees side by side on dark grounds with the spec's icon behind each (one at a time on a phone, with tree tabs), real icons with their rank (gold full, green open, grey locked), arrows from each prerequisite, click to learn and right-click to unlearn with the game's reason when it refuses, a tooltip on hover or focus and the chosen talent's under the frame with − and +, each tree one tab stop moved with the arrow keys. Every tooltip says what the simulator reads from the talent, in plain words (\`features/talents/talentWords.ts\`). The hit cap line follows Precision (95 at 3/3, 111 at 2/3). It opens untalented, as the app starts clean (the owner's call); "Load the <spec> preset" puts in wowsims' preset as stored for the 17 specs that have one, and "What's off" lists each rule a build breaks with a one-press fix ("Add Enrage to 5/5" fixes two of the Fury preset's three) or "Show where", then the unspent points. The rules are \`domain/talents/talentWindow.ts\`; \`whyCannotRemove\` now gives the reason a point cannot come out. Next is step 7, the scene.`,
+**Then Talents, which finished step 6 (2026-10-22):** the game's talent window for every class: three trees side by side on dark grounds with the spec's icon behind each (one at a time on a phone, with tree tabs), real icons with their rank (gold full, green open, grey locked), arrows from each prerequisite, click to learn and right-click to unlearn with the game's reason when it refuses, a tooltip on hover or focus and the chosen talent's under the frame with − and +, each tree one tab stop moved with the arrow keys. Every tooltip says what the simulator reads from the talent, in plain words (\`features/talents/talentWords.ts\`). The hit cap line follows Precision (95 at 3/3, 111 at 2/3). It opens untalented, as the app starts clean (the owner's call); "Load the <spec> preset" puts in wowsims' preset as stored for the 17 specs that have one, and "What's off" lists each rule a build breaks with a one-press fix ("Add Enrage to 5/5" fixes two of the Fury preset's three) or "Show where", then the unspent points. The rules are \`domain/talents/talentWindow.ts\`; \`whyCannotRemove\` now gives the reason a point cannot come out.
+
+**Step 7, the scene, finished the port (2026-10-24):** the prototypes' crystal-and-water scene and their motion (${link('TBC Motion Kit')}) as one optional layer, on by default with a "3D scene" switch in the top bar that is remembered. It costs the main bundle about 1.2 KB gzipped (the switch, the rules and a loader, held under the owner's 1.5 KB by a test); \`three\` (0.186) and the scene are their own 143 KB chunk, fetched when the browser is idle and only where the scene will run, and the DOM motion is a 1.5 KB chunk of Web Animations. Reduced motion loads neither and keeps the still backdrop; so do WebGL off or in software, under 4 GB of memory, two cores or fewer and Data Saver, and the scene gives itself up if even its lowest quality runs under 25 frames a second; the switch says why. Every tab has the prototype's colour and detail: Planner bubbles, Simulation's crystal pillars, one light per raid group, rank rings, ore glints, and each raid lit its own way. It is drawn to look as it did on three r128 (colour management off, lights scaled by π, r128's light falloff put back into the shader). The front door has its own art and no 3D, so the scene rests there. The motion each step had left out is in: tiles landing, panels rising, routes drawing, a ring of light on a seat or a slot's pane, a learned talent's pulse, the swell on a 41-point talent, a hit-cap buff, new raid coverage and Equip, and a slow tint on the hit number while it is short. The control is \`features/scene/sceneControl.ts\`; tabs call \`cue()\` from \`lib/motion.ts\`.`,
     docs: [
       ['docs/design/PORT-PLAN', 'The port plan, with each step as built'],
       ['docs/design/MAPS-PLAN', 'The maps and routes rework plan'],
@@ -760,8 +762,13 @@ const DESIGN_NOTES = [
       'domain/talents/talentWindow.ts',
       'features/talents/TalentsPanel.tsx',
       'features/talents/talentWords.ts',
+      'lib/motion.ts',
+      'features/scene/sceneControl.ts',
+      'features/scene/SceneSwitch.tsx',
+      'features/scene/waterScene.ts',
+      'features/scene/motionLayer.ts',
     ],
-    related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes'],
+    related: ['UI Refresh', 'Step 2 Walkthrough', 'Tab Prototypes', 'TBC Motion Kit'],
   },
   {
     title: 'Tab Prototypes',
@@ -837,7 +844,8 @@ Moving between tabs is a plain link. A full-screen curtain was tried and removed
 - **Themes:** the five raid scenes (Serpentshrine, Tempest Keep, Hellfire, Blade's Edge, Karazhan) and the four tab themes, each with its detail: bubbles, one light per raid group, rank rings and ore glints. Themes crossfade over 1.2s.
 - **Effects:** a crystal swell, embers, a rune ring, entry rings, a rebirth burst, a taint tint and a lift, each tied to a real action (equip, import, simulate).
 - **Fallbacks:** a Motion switch and a 3D switch, a still frame for reduced motion, a CSS gradient in each tab's colour when WebGL is off, and performance tiers that settle after about two seconds of real frames.
-- **No Blizzard art and no sound.** Everything is drawn in code.`,
+- **No Blizzard art and no sound.** Everything is drawn in code.
+- **In the live app since 2026-10-24** (port step 7, ${link('Port to the Live App')}): the scene and the themes ported to three 0.186 as \`features/scene/waterScene.ts\`, the DOM effects as Web Animations in \`motionLayer.ts\`, both loaded on demand. Left in the prototypes: the portal ignition, the rune ring, the rebirth burst and the lift, and the separate Motion switch (the app's motion follows reduced motion).`,
     docs: [
       ['docs/research/wow-tbc-motion/README', 'TBC motion research'],
       ['docs/research/wow-tbc-motion/recommendations', 'What the kit was built from'],

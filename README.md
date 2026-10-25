@@ -88,7 +88,7 @@ of every tab, walked through with the owner one tab at a time, three designs per
 TBC by [this research](docs/research/wow-tbc-motion/README.md). **Try them:** the
 [prototype gallery](https://josephevenson08.github.io/project-defeat/prototypes/) is published beside the app.
 
-**Every tab's design is decided** (2026-10-12), and the decided designs are now going into the live app, following
+**Every tab's design is decided** (2026-10-12), and since 2026-10-24 every decided design is in the live app, following
 the [port plan](docs/design/PORT-PLAN.md):
 
 | Step | What | State |
@@ -100,7 +100,7 @@ the [port plan](docs/design/PORT-PLAN.md):
 | 4 | **Simulation:** what to do next (your stat priority, your best upgrades with Equip, then the estimate) with the damage sources and how far to trust the number | Done, 2026-10-17 |
 | 5 | **Raid Composition:** the planning table with a click-to-fill palette, Undo and the example roster, then what one more seat would add and who fixes what is missing, you can also export this do bring it to your discord server to show others what the raid night will look like. | Done, 2026-10-17 |
 | 6 | **The Character Planner**, one sub-tab at a time: **Build** (the share card, and a read-first report on the paste box) and **Ranked Gear** (Wowhead's order slot by slot as game tooltips, and where each item drops) done 2026-10-18; **Compare** (your item's tooltip beside another's, with the trade in one sentence), **Buffs** (filled in from your raid and your seat in it, with icons) and **Gear** (the game's character sheet with the hit cap in plain words for every spec, and "What's left" with one-press fixes) done 2026-10-19; **Talents** (the game's talent window for every class, wowsims' preset where it has one, and "What's off" with one-press fixes) done 2026-10-22 | Done, 2026-10-22 |
-| 7 | The 3D crystal-and-water scene, as an optional layer | Last |
+| 7 | **The scene:** the prototypes' 3D crystal-and-water scene behind every section in its tab's colour and detail, with the motion each tab was waiting for (tiles landing, a learned talent's pulse, a light per raid group), as an optional layer: on by default with a switch, downloaded only where it runs, and the still backdrop with reduced motion, without WebGL or on a weak device | Done, 2026-10-24 |
 
 **To pick the work back up,** read the top of [`docs/dev-log/HANDOFF.md`](docs/dev-log/HANDOFF.md).
 
