@@ -71,7 +71,9 @@ import {
   deriveTalentModifiers,
   flurrySpeedMultiplier,
   noTalentModifiers,
+  talentsWithEffect,
   unmodelledTalentsInBuild,
+  type TalentEffect,
   type TalentModifiers,
 } from '../../domain/talents/talentModifiers'
 import type { TalentPoints } from '../../domain/talents/talentTypes'
@@ -224,44 +226,71 @@ function unmodelledTalentNoteFor(
     )
   }
 
+  const taken = unmodelledTalentsInBuild(character.className, talentPoints)
+
   /*
-   * The tank message used to say Effective Health read no talents at all. As of 2026-08-19 it reads
-   * three — Anticipation, Deflection and Shield Specialization — and the remaining gap is a *specific*
-   * one worth naming rather than a blanket absence, because the reason is a product decision rather
-   * than missing work: Toughness and Vitality multiply armour and stamina, which `calculateStats`
-   * owns, and routing talents there would move the always-visible stat rail, the gear rankings and
-   * the upgrade finder.
+   * The tank note says what Effective Health reads before it names what this build took and is
+   * refused. Naming only the refusals, as the DPS note does, would imply every unlisted talent is
+   * counted, and a tank's unlisted set is mostly talents Effective Health has no use for: Cruelty,
+   * Precision, the utility. "And no other talent" is what stops that reading.
    *
-   * Falling through to the generic per-build note would be wrong here — that one says the listed
-   * talents are "spent but not modelled", implying everything unlisted is counted, and for a tank the
-   * unlisted set includes the two biggest survivability talents in the tree.
+   * The read list comes from the effects (`readByEffectiveHealth`), not a hand-written sentence.
+   * The sentence it replaced said Toughness and Vitality were not counted because talents did not
+   * reach the stat pipeline, which stopped being true when `calculateStats` began taking them. It
+   * also returned before the refusals, so a Protection Warrior was never told about Last Stand or
+   * Improved Shield Block. Derived per class, it also keeps the two Shield Specializations apart:
+   * Warrior's raises block chance, which the table rolls, and Paladin's raises block value, which is
+   * refused and so named among the refusals instead.
    */
   if (role === 'Tank') {
-    /*
-     * Named per class rather than as a fixed list, because the two tanks genuinely differ: Warrior's
-     * Shield Specialization raises block **chance**, which the incoming-attack table rolls, while
-     * Paladin's talent of the same name raises block **value**, which the table does not model at
-     * all. Listing it for a Paladin would be a wrong caveat of exactly the kind this file keeps
-     * having to correct — and it would be wrong in the confident direction.
-     */
-    const read =
-      character.className === 'Warrior'
-        ? 'Anticipation, Deflection and Shield Specialization'
-        : 'Anticipation and Deflection'
+    const read = talentsWithEffect(character.className, readByEffectiveHealth)
+    const reads =
+      read.length > 0 ? `Effective Health reads ${inWords(read)}, and no other talent.` : 'Effective Health reads no talent.'
+    if (taken.length === 0) return reads
     return (
-      `Effective Health reads ${read}, which is where most of a tank tree's avoidance lives. Toughness ` +
-      'and Vitality are not counted: they multiply armour and stamina, and talents do not reach the stat ' +
-      'pipeline those come from — so this figure is low by whatever those two are worth to you.'
+      `${reads} ${inWords(taken)} ${taken.length === 1 ? 'is' : 'are'} spent here but not modelled, so where ` +
+      "one adds survival this figure is low by that much. Each one's tooltip on the Talents tab says why."
     )
   }
 
-  const taken = unmodelledTalentsInBuild(character.className, talentPoints)
   if (taken.length === 0) return undefined
 
   return (
     `${taken.join(', ')} ${taken.length === 1 ? 'is' : 'are'} spent but not modelled here, so this estimate is ` +
     "low by whatever they are worth. Each one's tooltip on the Talents tab says why."
   )
+}
+
+/**
+ * The effect kinds Effective Health reads, and the stats it reads that a talent can multiply.
+ *
+ * Defense skill, parry and block chance land on the incoming-attack table (`calculateTankSurvivability`
+ * takes them as `talents`). The rest act on stats, which reach it already folded in, because `App`
+ * gives `calculateStats` the same talents: Toughness through item armour, Vitality through Stamina.
+ * Strength is not here: Vitality's Strength half reaches attack power, which Effective Health does not use.
+ */
+const TANK_READ_KINDS = new Set(['defenseSkill', 'parryChance', 'blockChance', 'itemArmorMultiplier'])
+const TANK_READ_STATS = new Set([
+  'stamina',
+  'agility',
+  'armor',
+  'defenseRating',
+  'dodgeRating',
+  'parryRating',
+  'blockRating',
+  'resilienceRating',
+])
+
+function readByEffectiveHealth(effect: TalentEffect): boolean {
+  if (TANK_READ_KINDS.has(effect.kind)) return true
+  if (effect.kind === 'statFactor') return TANK_READ_STATS.has(effect.stat ?? '')
+  if (effect.kind === 'statConversion') return TANK_READ_STATS.has(effect.to ?? '')
+  return false
+}
+
+/** "A", "A and B", "A, B and C": how the notes on screen list names. */
+function inWords(names: readonly string[]) {
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names.join('')
 }
 
 function round(value: number) {
@@ -2146,10 +2175,8 @@ export function calculateSimulation(
   // identity modifiers, so an unmodelled one contributes nothing rather than a wrong answer, and the
   // ingest reports every talent group it refused and why.
   //
-  // Three of the four paths below now receive this. **The tank path still does not** — a Protection
-  // Warrior is scored by `calculateTankSurvivability`, which never takes it, so Toughness, Vitality,
-  // Anticipation and the shield talents reach nothing. That is the remaining honest gap, and a test
-  // pins it so it reads as a decision rather than an oversight.
+  // All four paths below receive this. The tank path reads Defense skill, parry and block chance from
+  // it; Toughness and Vitality reach it through `stats` instead, and its note names both.
   const talents = deriveTalentModifiers(talentPoints)
 
   const talentNote = unmodelledTalentNoteFor(character, talentPoints, role)

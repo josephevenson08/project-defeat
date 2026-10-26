@@ -156,10 +156,9 @@ const WARRIOR_EXTRACTORS = [
    * Defense skill figure the table already derives from rating, and the other two move a single
    * avoidance term each.
    *
-   * Toughness and Vitality are deliberately NOT here. They multiply armour, stamina and strength,
-   * which `calculateStats` owns — reaching them means talents reaching the always-visible stat rail,
-   * gear rankings and the upgrade finder, which is a product decision this repo has explicitly
-   * reserved for its owner. They are refused by name below with that reason.
+   * Toughness and Vitality are not here because they multiply armour, stamina and strength, which
+   * `calculateStats` owns. They were refused for that until talents reached the stat pipeline, and
+   * are now extracted as stat-pipeline effects further down.
    */
   {
     talent: 'Deflection',
