@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/talents/talentWords.ts
-lines: 199
+lines: 296
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.talents.talentWords
 
-`src/features/talents/talentWords.ts` · **features** layer · 199 lines
+`src/features/talents/talentWords.ts` · **features** layer · 296 lines
 
 From the top of the file:
 
@@ -28,9 +28,9 @@ From the top of the file:
 ## Imports
 
 - [[components.ui.Provenance]] — `src/components/ui/Provenance.tsx`
-- [[domain.abilities.index]] — `src/domain/abilities/index.ts`
+- [[domain.buffs.sampleBuffs]] — `src/domain/buffs/sampleBuffs.ts`
+- [[domain.buffs.sampleTargetDebuffs]] — `src/domain/buffs/sampleTargetDebuffs.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
-- [[domain.character.tbcClasses]] — `src/domain/character/tbcClasses.ts`
 - [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`
 - [[domain.talents.talentTypes]] — `src/domain/talents/talentTypes.ts`
 - [[domain.talents.talentWindow]] — `src/domain/talents/talentWindow.ts`

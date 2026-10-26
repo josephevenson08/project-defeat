@@ -2,24 +2,24 @@
 type: module
 layer: domain
 source: src/domain/talents/talentModifiers.ts
-lines: 532
+lines: 549
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.talentModifiers
 
-`src/domain/talents/talentModifiers.ts` · **domain** layer · 532 lines
+`src/domain/talents/talentModifiers.ts` · **domain** layer · 549 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**function** — `classHasTalentEffects`, `deriveTalentModifiers`, `flurrySpeedMultiplier`, `talentSourcesOf`, `unmodelledTalentsInBuild`
+**function** — `classHasTalentEffects`, `deriveTalentModifiers`, `flurrySpeedMultiplier`, `talentSourcesOf`, `talentsWithEffect`, `unmodelledTalentsInBuild`
 
 **const** — `classesWithTalentEffects`, `noTalentModifiers`, `unmodelledTalents`
 
-**type** — `TalentModifiers`, `TalentStatConversion`
+**type** — `TalentEffect`, `TalentModifiers`, `TalentStatConversion`
 
 ## Imports
 

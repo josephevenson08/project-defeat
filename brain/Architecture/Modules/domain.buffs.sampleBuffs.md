@@ -71,6 +71,7 @@ From the top of the file:
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 - [[features.stats.calculateStats]] — `src/features/stats/calculateStats.ts`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 
 ## Concepts & phases
 

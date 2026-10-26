@@ -1087,6 +1087,132 @@
       "reason": "Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change."
     },
     {
+      "className": "Warrior",
+      "talent": "Improved Heroic Strike / Improved Mortal Strike / Improved Whirlwind / Focused Rage / Improved Bloodrage",
+      "talents": [
+        {
+          "talentId": 124,
+          "talent": "Improved Heroic Strike"
+        },
+        {
+          "talentId": 1824,
+          "talent": "Improved Mortal Strike"
+        },
+        {
+          "talentId": 1655,
+          "talent": "Improved Whirlwind"
+        },
+        {
+          "talentId": 1660,
+          "talent": "Focused Rage"
+        },
+        {
+          "talentId": 142,
+          "talent": "Improved Bloodrage"
+        }
+      ],
+      "reason": "Change abilities the Arms and Fury estimates use: Heroic Strike's rage cost (and every offensive ability's, for Focused Rage), Mortal Strike's and Whirlwind's cooldowns, Mortal Strike's damage and Bloodrage's rage. The estimate prices each at its base cost, cooldown, damage and rage; TalentModifiers has no per-ability field for them."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Improved Rend / Improved Thunder Clap / Improved Overpower / Improved Cleave / Improved Slam",
+      "talents": [
+        {
+          "talentId": 127,
+          "talent": "Improved Rend"
+        },
+        {
+          "talentId": 128,
+          "talent": "Improved Thunder Clap"
+        },
+        {
+          "talentId": 131,
+          "talent": "Improved Overpower"
+        },
+        {
+          "talentId": 166,
+          "talent": "Improved Cleave"
+        },
+        {
+          "talentId": 168,
+          "talent": "Improved Slam"
+        }
+      ],
+      "reason": "Strengthen abilities neither Warrior DPS estimate casts: Rend, Thunder Clap, Overpower, Cleave and Slam."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Commanding Presence / Improved Demoralizing Shout",
+      "talents": [
+        {
+          "talentId": 154,
+          "talent": "Commanding Presence"
+        },
+        {
+          "talentId": 161,
+          "talent": "Improved Demoralizing Shout"
+        }
+      ],
+      "reason": "Strengthen shouts. The Buffs tab carries Battle Shout at its untalented value and has no Demoralizing Shout on the boss."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Second Wind / Blood Craze",
+      "talents": [
+        {
+          "talentId": 1663,
+          "talent": "Second Wind"
+        },
+        {
+          "talentId": 661,
+          "talent": "Blood Craze"
+        }
+      ],
+      "reason": "Heal or grant rage when you are stunned or crit. A damage dealer has no incoming-damage stream here for either to trigger on."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Last Stand / Improved Shield Block / Improved Shield Wall / Improved Defensive Stance",
+      "talents": [
+        {
+          "talentId": 153,
+          "talent": "Last Stand"
+        },
+        {
+          "talentId": 145,
+          "talent": "Improved Shield Block"
+        },
+        {
+          "talentId": 150,
+          "talent": "Improved Shield Wall"
+        },
+        {
+          "talentId": 1652,
+          "talent": "Improved Defensive Stance"
+        }
+      ],
+      "reason": "Tank survival the tank estimate does not read: Last Stand and Shield Wall are cooldowns needing a usage policy, Shield Block's extra block needs a timeline, and the incoming-attack table has no spell damage for Improved Defensive Stance to reduce."
+    },
+    {
+      "className": "Warrior",
+      "talent": "Shield Slam / Devastate / One-Handed Weapon Specialization",
+      "talents": [
+        {
+          "talentId": 148,
+          "talent": "Shield Slam"
+        },
+        {
+          "talentId": 1666,
+          "talent": "Devastate"
+        },
+        {
+          "talentId": 702,
+          "talent": "One-Handed Weapon Specialization"
+        }
+      ],
+      "reason": "A tank's damage and threat. The tank estimate scores survival, and neither DPS estimate casts Shield Slam or Devastate or checks for a one-handed weapon."
+    },
+    {
       "className": "Rogue",
       "talent": "Murder",
       "talents": [
@@ -1141,6 +1267,182 @@
         }
       ],
       "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Improved Eviscerate / Puncturing Wounds / Lethality / Aggression / Surprise Attacks / Opportunity",
+      "talents": [
+        {
+          "talentId": 276,
+          "talent": "Improved Eviscerate"
+        },
+        {
+          "talentId": 277,
+          "talent": "Puncturing Wounds"
+        },
+        {
+          "talentId": 269,
+          "talent": "Lethality"
+        },
+        {
+          "talentId": 1122,
+          "talent": "Aggression"
+        },
+        {
+          "talentId": 1709,
+          "talent": "Surprise Attacks"
+        },
+        {
+          "talentId": 261,
+          "talent": "Opportunity"
+        }
+      ],
+      "reason": "Raise named abilities' damage, crit or crit damage. TalentModifiers has no per-ability field for them, so none applies, even where an estimate casts the ability: Combat's Sinister Strike, Assassination's Mutilate, Subtlety's Hemorrhage."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Riposte / Ghostly Strike / Improved Ambush",
+      "talents": [
+        {
+          "talentId": 301,
+          "talent": "Riposte"
+        },
+        {
+          "talentId": 303,
+          "talent": "Ghostly Strike"
+        },
+        {
+          "talentId": 263,
+          "talent": "Improved Ambush"
+        }
+      ],
+      "reason": "Teach or strengthen attacks no Rogue estimate makes: Riposte, Ghostly Strike and Ambush."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Dagger Specialization / Mace Specialization / Sword Specialization / Fist Weapon Specialization",
+      "talents": [
+        {
+          "talentId": 182,
+          "talent": "Dagger Specialization"
+        },
+        {
+          "talentId": 184,
+          "talent": "Mace Specialization"
+        },
+        {
+          "talentId": 242,
+          "talent": "Sword Specialization"
+        },
+        {
+          "talentId": 183,
+          "talent": "Fist Weapon Specialization"
+        }
+      ],
+      "reason": "Weapon-type gated, and the mace one adds a stun. Would need per-weapon-type dispatch, the same reason the Warrior specializations are refused."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Improved Kidney Shot / Find Weakness / Dirty Deeds / Master of Subtlety / Shadowstep",
+      "talents": [
+        {
+          "talentId": 279,
+          "talent": "Improved Kidney Shot"
+        },
+        {
+          "talentId": 1718,
+          "talent": "Find Weakness"
+        },
+        {
+          "talentId": 265,
+          "talent": "Dirty Deeds"
+        },
+        {
+          "talentId": 1713,
+          "talent": "Master of Subtlety"
+        },
+        {
+          "talentId": 1714,
+          "talent": "Shadowstep"
+        }
+      ],
+      "reason": "Windowed bonuses: while Kidney Shot holds, for 10 seconds after a finisher, below 35% health, from stealth, or after Shadowstep. Each needs a fight timeline."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Improved Sinister Strike / Vigor",
+      "talents": [
+        {
+          "talentId": 201,
+          "talent": "Improved Sinister Strike"
+        },
+        {
+          "talentId": 382,
+          "talent": "Vigor"
+        }
+      ],
+      "reason": "Energy. Improved Sinister Strike lowers the cost of the Combat estimate's builder, which it prices at base cost; Vigor raises the energy cap, which a sustained energy rate never meets, so energy lost to capping is not modelled either."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Dual Wield Specialization",
+      "talents": [
+        {
+          "talentId": 221,
+          "talent": "Dual Wield Specialization"
+        }
+      ],
+      "reason": "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible; not yet ingested, because it moves every dual-wielding Rogue's estimate and wants its own check."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Quick Recovery / Deadened Nerves / Lightning Reflexes / Deflection / Sleight of Hand / Heightened Senses / Enveloping Shadows / Cheat Death",
+      "talents": [
+        {
+          "talentId": 1762,
+          "talent": "Quick Recovery"
+        },
+        {
+          "talentId": 1723,
+          "talent": "Deadened Nerves"
+        },
+        {
+          "talentId": 186,
+          "talent": "Lightning Reflexes"
+        },
+        {
+          "talentId": 187,
+          "talent": "Deflection"
+        },
+        {
+          "talentId": 1700,
+          "talent": "Sleight of Hand"
+        },
+        {
+          "talentId": 1701,
+          "talent": "Heightened Senses"
+        },
+        {
+          "talentId": 1711,
+          "talent": "Enveloping Shadows"
+        },
+        {
+          "talentId": 1722,
+          "talent": "Cheat Death"
+        }
+      ],
+      "reason": "Survival: healing taken, damage taken, dodge, parry, and the chance to be hit or crit. A damage dealer has no incoming-damage stream here. Quick Recovery's other half refunds energy on a missed finisher, which the sustained rate does not price."
+    },
+    {
+      "className": "Rogue",
+      "talent": "Improved Expose Armor",
+      "talents": [
+        {
+          "talentId": 278,
+          "talent": "Improved Expose Armor"
+        }
+      ],
+      "reason": "Strengthens Expose Armor, which the Buffs tab's target debuffs do not carry."
     },
     {
       "className": "Hunter",
@@ -1233,6 +1535,155 @@
       "reason": "Procs and cooldowns needing a timeline."
     },
     {
+      "className": "Hunter",
+      "talent": "Improved Stings / Barrage / Improved Barrage / Savage Strikes / Clever Traps / Aimed Shot / Silencing Shot / Counterattack",
+      "talents": [
+        {
+          "talentId": 1348,
+          "talent": "Improved Stings"
+        },
+        {
+          "talentId": 1347,
+          "talent": "Barrage"
+        },
+        {
+          "talentId": 1821,
+          "talent": "Improved Barrage"
+        },
+        {
+          "talentId": 1621,
+          "talent": "Savage Strikes"
+        },
+        {
+          "talentId": 1306,
+          "talent": "Clever Traps"
+        },
+        {
+          "talentId": 1345,
+          "talent": "Aimed Shot"
+        },
+        {
+          "talentId": 1808,
+          "talent": "Silencing Shot"
+        },
+        {
+          "talentId": 1312,
+          "talent": "Counterattack"
+        }
+      ],
+      "reason": "Teach or strengthen shots, strikes and traps no Hunter estimate makes. Every Hunter spec is modelled as Auto Shot and Steady Shot."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Monster Slaying / Humanoid Slaying",
+      "talents": [
+        {
+          "talentId": 1623,
+          "talent": "Monster Slaying"
+        },
+        {
+          "talentId": 1301,
+          "talent": "Humanoid Slaying"
+        }
+      ],
+      "reason": "Gated on the target being a beast, giant, dragonkin or humanoid. Nothing here models a mob type."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Careful Aim / Master Marksman / Survival Instincts / Lightning Reflexes",
+      "talents": [
+        {
+          "talentId": 1806,
+          "talent": "Careful Aim"
+        },
+        {
+          "talentId": 1807,
+          "talent": "Master Marksman"
+        },
+        {
+          "talentId": 1810,
+          "talent": "Survival Instincts"
+        },
+        {
+          "talentId": 1303,
+          "talent": "Lightning Reflexes"
+        }
+      ],
+      "reason": "Ranged attack power from Intellect, a ranged attack power multiplier, +4% attack power, and +15% Agility. Upstream writes Careful Aim and Master Marksman in talents.go; Lightning Reflexes would be a stat factor, which that file does not write. None is ingested yet. Survival Instincts also cuts damage taken, which has no stream here."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Endurance Training / Improved Aspect of the Monkey / Thick Hide / Spirit Bond / Catlike Reflexes / Deflection / Deterrence",
+      "talents": [
+        {
+          "talentId": 1389,
+          "talent": "Endurance Training"
+        },
+        {
+          "talentId": 1381,
+          "talent": "Improved Aspect of the Monkey"
+        },
+        {
+          "talentId": 1395,
+          "talent": "Thick Hide"
+        },
+        {
+          "talentId": 1388,
+          "talent": "Spirit Bond"
+        },
+        {
+          "talentId": 1801,
+          "talent": "Catlike Reflexes"
+        },
+        {
+          "talentId": 1311,
+          "talent": "Deflection"
+        },
+        {
+          "talentId": 1308,
+          "talent": "Deterrence"
+        }
+      ],
+      "reason": "Survival for you and your pet: health, dodge, parry, armour and regeneration, and Deterrence is a cooldown. A damage dealer has no incoming-damage stream here."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Improved Aspect of the Hawk / Go for the Throat",
+      "talents": [
+        {
+          "talentId": 1382,
+          "talent": "Improved Aspect of the Hawk"
+        },
+        {
+          "talentId": 1818,
+          "talent": "Go for the Throat"
+        }
+      ],
+      "reason": "Procs on ranged attacks: a haste aura, and Focus for the pet on a crit. The pet's Focus income is modelled from its regeneration alone."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Improved Hunter's Mark",
+      "talents": [
+        {
+          "talentId": 1343,
+          "talent": "Improved Hunter's Mark"
+        }
+      ],
+      "reason": "Makes Hunter's Mark raise melee attack power too, and the Buffs tab's target debuffs do not carry Hunter's Mark."
+    },
+    {
+      "className": "Hunter",
+      "talent": "Efficiency",
+      "talents": [
+        {
+          "talentId": 1342,
+          "talent": "Efficiency"
+        }
+      ],
+      "reason": "Lowers the mana cost of shots. The Hunter estimate's mana figures price Steady Shot at its base cost."
+    },
+    {
       "className": "Shaman",
       "talent": "Toughness / Anticipation / Shield Specialization",
       "talents": [
@@ -1268,7 +1719,7 @@
           "talent": "Call of Thunder"
         }
       ],
-      "reason": "Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19."
+      "reason": "Spell-side talents with nowhere to attach: Elemental Fury raises spell *crit damage*, which has no field, and Concussion and Call of Thunder are scoped to named Nature spells, which TalentModifiers has no per-spell field for. (This used to say no spell school was recorded; abilities record one now, and Demonic Sacrifice, the one school-scoped talent ingested, reads it. The reason before that, that calculateCasterDps took no talents, stopped being true on 2026-08-19.)"
     },
     {
       "className": "Shaman",
@@ -1285,6 +1736,174 @@
         }
       ],
       "reason": "Shamanistic Rage is an activated cooldown needing a usage policy. Stormstrike's strike is in Enhancement's rotation as a special attack; what is not modelled is the debuff it leaves, the next two Nature hits on the target taking 20% more."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Call of Flame / Improved Lightning Shield / Lightning Mastery / Lightning Overload / Improved Healing Wave / Healing Way / Improved Chain Heal / Earth Shield",
+      "talents": [
+        {
+          "talentId": 561,
+          "talent": "Call of Flame"
+        },
+        {
+          "talentId": 607,
+          "talent": "Improved Lightning Shield"
+        },
+        {
+          "talentId": 721,
+          "talent": "Lightning Mastery"
+        },
+        {
+          "talentId": 1686,
+          "talent": "Lightning Overload"
+        },
+        {
+          "talentId": 586,
+          "talent": "Improved Healing Wave"
+        },
+        {
+          "talentId": 1648,
+          "talent": "Healing Way"
+        },
+        {
+          "talentId": 1697,
+          "talent": "Improved Chain Heal"
+        },
+        {
+          "talentId": 1698,
+          "talent": "Earth Shield"
+        }
+      ],
+      "reason": "Change particular spells (Fire totems, Lightning Shield, Lightning Bolt's cast time and its second bolt, Healing Wave, Chain Heal) or teach Earth Shield. TalentModifiers has no per-spell field for them, so none applies, even to Lightning Bolt and Chain Heal, which the Elemental and Restoration estimates cast."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Unrelenting Storm / Ancestral Knowledge / Tidal Focus",
+      "talents": [
+        {
+          "talentId": 1682,
+          "talent": "Unrelenting Storm"
+        },
+        {
+          "talentId": 614,
+          "talent": "Ancestral Knowledge"
+        },
+        {
+          "talentId": 593,
+          "talent": "Tidal Focus"
+        }
+      ],
+      "reason": "Mana the healer estimate tracks: regeneration from Intellect, maximum mana, and cheaper heals. Its mana figures price Chain Heal at base cost and read regeneration from MP5 and Spirit alone, and StatBlock has no Mana field. Upstream writes Unrelenting Storm and Ancestral Knowledge in talents.go."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Elemental Devastation / Elemental Mastery / Nature's Swiftness",
+      "talents": [
+        {
+          "talentId": 1645,
+          "talent": "Elemental Devastation"
+        },
+        {
+          "talentId": 573,
+          "talent": "Elemental Mastery"
+        },
+        {
+          "talentId": 591,
+          "talent": "Nature's Swiftness"
+        }
+      ],
+      "reason": "Procs and cooldowns: melee crit after a spell crit, a guaranteed crit, an instant cast. Each needs a timeline."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Elemental Warding / Elemental Shields / Spirit Weapons / Nature's Guardian",
+      "talents": [
+        {
+          "talentId": 1640,
+          "talent": "Elemental Warding"
+        },
+        {
+          "talentId": 1683,
+          "talent": "Elemental Shields"
+        },
+        {
+          "talentId": 616,
+          "talent": "Spirit Weapons"
+        },
+        {
+          "talentId": 1699,
+          "talent": "Nature's Guardian"
+        }
+      ],
+      "reason": "Survival: damage taken, the chance to be crit, parry, and a heal at low health. A damage dealer or healer has no incoming-damage stream here."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Guardian Totems / Enhancing Totems / Improved Weapon Totems / Restorative Totems",
+      "talents": [
+        {
+          "talentId": 609,
+          "talent": "Guardian Totems"
+        },
+        {
+          "talentId": 610,
+          "talent": "Enhancing Totems"
+        },
+        {
+          "talentId": 1647,
+          "talent": "Improved Weapon Totems"
+        },
+        {
+          "talentId": 588,
+          "talent": "Restorative Totems"
+        }
+      ],
+      "reason": "Strengthen totems. The Buffs tab carries Strength of Earth, Grace of Air, Windfury and Mana Spring Totem at their untalented values, and has no Stoneskin or Windwall Totem."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Elemental Weapons",
+      "talents": [
+        {
+          "talentId": 611,
+          "talent": "Elemental Weapons"
+        }
+      ],
+      "reason": "Strengthens weapon imbues. Windfury Weapon is in the Enhancement estimate at its untalented value."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Mental Quickness / Nature's Blessing",
+      "talents": [
+        {
+          "talentId": 1691,
+          "talent": "Mental Quickness"
+        },
+        {
+          "talentId": 1696,
+          "talent": "Nature's Blessing"
+        }
+      ],
+      "reason": "Spell power from attack power and from Intellect. Upstream writes both in talents.go, so they are expressible as stat conversions; not yet ingested."
+    },
+    {
+      "className": "Shaman",
+      "talent": "Purification / Tidal Mastery / Elemental Precision",
+      "talents": [
+        {
+          "talentId": 592,
+          "talent": "Purification"
+        },
+        {
+          "talentId": 594,
+          "talent": "Tidal Mastery"
+        },
+        {
+          "talentId": 1685,
+          "talent": "Elemental Precision"
+        }
+      ],
+      "reason": "Scoped to kinds of spell rather than to the character: +10% healing (there is no healing multiplier field), crit for healing and Lightning spells, and hit for Fire, Frost and Nature spells. Upstream does not write them in talents.go."
     },
     {
       "className": "Druid",
@@ -1354,6 +1973,174 @@
       "reason": "Proc-driven energy and combo points, needing a timeline."
     },
     {
+      "className": "Druid",
+      "talent": "Starlight Wrath / Focused Starlight / Improved Moonfire / Vengeance / Moonfury / Wrath of Cenarius / Insect Swarm / Brambles",
+      "talents": [
+        {
+          "talentId": 762,
+          "talent": "Starlight Wrath"
+        },
+        {
+          "talentId": 1822,
+          "talent": "Focused Starlight"
+        },
+        {
+          "talentId": 763,
+          "talent": "Improved Moonfire"
+        },
+        {
+          "talentId": 792,
+          "talent": "Vengeance"
+        },
+        {
+          "talentId": 790,
+          "talent": "Moonfury"
+        },
+        {
+          "talentId": 1786,
+          "talent": "Wrath of Cenarius"
+        },
+        {
+          "talentId": 788,
+          "talent": "Insect Swarm"
+        },
+        {
+          "talentId": 782,
+          "talent": "Brambles"
+        }
+      ],
+      "reason": "Change particular Balance spells (Starfire's and Wrath's cast time, crit, crit damage, damage and coefficient, Moonfire, Thorns, Entangling Roots) or teach Insect Swarm. TalentModifiers has no per-spell field for them, so none applies, even to Starfire, which the Balance estimate casts."
+    },
+    {
+      "className": "Druid",
+      "talent": "Feral Aggression / Shredding Attacks / Savage Fury / Predatory Instincts / Mangle",
+      "talents": [
+        {
+          "talentId": 795,
+          "talent": "Feral Aggression"
+        },
+        {
+          "talentId": 802,
+          "talent": "Shredding Attacks"
+        },
+        {
+          "talentId": 805,
+          "talent": "Savage Fury"
+        },
+        {
+          "talentId": 1795,
+          "talent": "Predatory Instincts"
+        },
+        {
+          "talentId": 1796,
+          "talent": "Mangle"
+        }
+      ],
+      "reason": "Change particular cat abilities (Ferocious Bite's damage, Shred's energy cost, Claw, Rake and Mangle's damage, crit damage in forms) or teach Mangle. The Feral estimate prices Shred and Rake at their base figures, takes no crit damage from talents, and casts neither Mangle nor Ferocious Bite."
+    },
+    {
+      "className": "Druid",
+      "talent": "Improved Rejuvenation / Empowered Touch / Improved Regrowth / Swiftmend / Empowered Rejuvenation / Gift of Nature",
+      "talents": [
+        {
+          "talentId": 830,
+          "talent": "Improved Rejuvenation"
+        },
+        {
+          "talentId": 1788,
+          "talent": "Empowered Touch"
+        },
+        {
+          "talentId": 825,
+          "talent": "Improved Regrowth"
+        },
+        {
+          "talentId": 844,
+          "talent": "Swiftmend"
+        },
+        {
+          "talentId": 1789,
+          "talent": "Empowered Rejuvenation"
+        },
+        {
+          "talentId": 828,
+          "talent": "Gift of Nature"
+        }
+      ],
+      "reason": "Strengthen particular heals (Rejuvenation, Healing Touch, Regrowth, heals over time) or teach Swiftmend; Gift of Nature raises all healing. None has a field: Empowered Rejuvenation reaches Lifebloom, which the Restoration estimate casts, and is still not applied, and there is no healing multiplier."
+    },
+    {
+      "className": "Druid",
+      "talent": "Dreamstate",
+      "talents": [
+        {
+          "talentId": 1784,
+          "talent": "Dreamstate"
+        }
+      ],
+      "reason": "Mana regeneration from Intellect, which the healer estimate's mana figures do not read: they read MP5 and Spirit. Upstream writes it in talents.go; not yet ingested."
+    },
+    {
+      "className": "Druid",
+      "talent": "Nature's Grace / Nature's Swiftness / Force of Nature",
+      "talents": [
+        {
+          "talentId": 789,
+          "talent": "Nature's Grace"
+        },
+        {
+          "talentId": 831,
+          "talent": "Nature's Swiftness"
+        },
+        {
+          "talentId": 1787,
+          "talent": "Force of Nature"
+        }
+      ],
+      "reason": "A faster cast after a spell crit, an instant cast, and treants on a cooldown. Each needs a timeline, and nothing here models the treants."
+    },
+    {
+      "className": "Druid",
+      "talent": "Feral Swiftness / Nurturing Instinct / Improved Leader of the Pack",
+      "talents": [
+        {
+          "talentId": 807,
+          "talent": "Feral Swiftness"
+        },
+        {
+          "talentId": 1792,
+          "talent": "Nurturing Instinct"
+        },
+        {
+          "talentId": 1798,
+          "talent": "Improved Leader of the Pack"
+        }
+      ],
+      "reason": "Survival: dodge in forms, healing taken, and a heal on crit. A damage dealer has no incoming-damage stream here, and Nurturing Instinct's healing from Agility is for heals no Feral estimate casts."
+    },
+    {
+      "className": "Druid",
+      "talent": "Improved Mark of the Wild",
+      "talents": [
+        {
+          "talentId": 821,
+          "talent": "Improved Mark of the Wild"
+        }
+      ],
+      "reason": "Strengthens Gift of the Wild, which the Buffs tab carries at its untalented value."
+    },
+    {
+      "className": "Druid",
+      "talent": "Living Spirit",
+      "talents": [
+        {
+          "talentId": 1797,
+          "talent": "Living Spirit"
+        }
+      ],
+      "reason": "Multiplies Spirit. Upstream writes it in talents.go, so it is expressible as a stat factor; not yet ingested."
+    },
+    {
       "className": "Paladin",
       "talent": "Spell Warding / Improved Righteous Fury",
       "talents": [
@@ -1406,6 +2193,187 @@
       "reason": "Paladin's raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change."
     },
     {
+      "className": "Paladin",
+      "talent": "Improved Seal of Righteousness / Healing Light / Sanctified Light / Purifying Power / Holy Power / Holy Shock",
+      "talents": [
+        {
+          "talentId": 1463,
+          "talent": "Improved Seal of Righteousness"
+        },
+        {
+          "talentId": 1444,
+          "talent": "Healing Light"
+        },
+        {
+          "talentId": 1465,
+          "talent": "Sanctified Light"
+        },
+        {
+          "talentId": 1743,
+          "talent": "Purifying Power"
+        },
+        {
+          "talentId": 1627,
+          "talent": "Holy Power"
+        },
+        {
+          "talentId": 1502,
+          "talent": "Holy Shock"
+        }
+      ],
+      "reason": "Strengthen particular spells (Seal of Righteousness, Holy Light and Flash of Light, Exorcism and Holy Wrath, Holy spells' crit) or teach Holy Shock. TalentModifiers has no per-spell field for them, so none applies, even to Holy Light, which the Holy estimate casts."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Illumination / Divine Favor / Light's Grace / Divine Illumination",
+      "talents": [
+        {
+          "talentId": 1461,
+          "talent": "Illumination"
+        },
+        {
+          "talentId": 1433,
+          "talent": "Divine Favor"
+        },
+        {
+          "talentId": 1745,
+          "talent": "Light's Grace"
+        },
+        {
+          "talentId": 1747,
+          "talent": "Divine Illumination"
+        }
+      ],
+      "reason": "Procs and cooldowns: mana back on a heal crit, a guaranteed crit, a faster Holy Light, half-price spells. Each needs a timeline."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Divine Intellect / Holy Guidance / Sacred Duty / Combat Expertise",
+      "talents": [
+        {
+          "talentId": 1449,
+          "talent": "Divine Intellect"
+        },
+        {
+          "talentId": 1746,
+          "talent": "Holy Guidance"
+        },
+        {
+          "talentId": 1750,
+          "talent": "Sacred Duty"
+        },
+        {
+          "talentId": 1753,
+          "talent": "Combat Expertise"
+        }
+      ],
+      "reason": "Intellect, spell power from Intellect, Stamina, and expertise with Stamina. Upstream writes Divine Intellect, Sacred Duty and Combat Expertise in talents.go, so their stat factors are expressible; not yet ingested. Holy Guidance is not in that file. Combat Expertise's expertise is a tank's, which the tank estimate does not roll, as with Defiance."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Improved Blessing of Wisdom / Improved Devotion Aura / Improved Blessing of Might / Improved Retribution Aura / Improved Sanctity Aura",
+      "talents": [
+        {
+          "talentId": 1446,
+          "talent": "Improved Blessing of Wisdom"
+        },
+        {
+          "talentId": 1422,
+          "talent": "Improved Devotion Aura"
+        },
+        {
+          "talentId": 1401,
+          "talent": "Improved Blessing of Might"
+        },
+        {
+          "talentId": 1405,
+          "talent": "Improved Retribution Aura"
+        },
+        {
+          "talentId": 1756,
+          "talent": "Improved Sanctity Aura"
+        }
+      ],
+      "reason": "Strengthen blessings and auras. The Buffs tab carries them at their untalented values."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Redoubt / Reckoning / One-Handed Weapon Specialization / Improved Holy Shield / Holy Shield / Ardent Defender / Avenger's Shield",
+      "talents": [
+        {
+          "talentId": 1421,
+          "talent": "Redoubt"
+        },
+        {
+          "talentId": 1426,
+          "talent": "Reckoning"
+        },
+        {
+          "talentId": 1429,
+          "talent": "One-Handed Weapon Specialization"
+        },
+        {
+          "talentId": 1829,
+          "talent": "Improved Holy Shield"
+        },
+        {
+          "talentId": 1430,
+          "talent": "Holy Shield"
+        },
+        {
+          "talentId": 1751,
+          "talent": "Ardent Defender"
+        },
+        {
+          "talentId": 1754,
+          "talent": "Avenger's Shield"
+        }
+      ],
+      "reason": "Tank procs, damage and threat. The tank estimate rolls a steady incoming-attack table with no timeline, so Redoubt's and Reckoning's procs, Holy Shield's charges and Ardent Defender's low-health window have nothing to run on, and it does not score a tank's damage."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Improved Judgement / Fanaticism / Two-Handed Weapon Specialization",
+      "talents": [
+        {
+          "talentId": 1631,
+          "talent": "Improved Judgement"
+        },
+        {
+          "talentId": 1759,
+          "talent": "Fanaticism"
+        },
+        {
+          "talentId": 1410,
+          "talent": "Two-Handed Weapon Specialization"
+        }
+      ],
+      "reason": "Change Retribution's damage: Judgement's cooldown and crit, and +6% physical damage with a two-handed weapon. The estimate judges on the base 10-second cooldown. Upstream writes Two-Handed Weapon Specialization in talents.go as the same two-handed physical multiplier the Warrior talent of that name reaches, so it is expressible; not yet ingested, because it moves every Retribution estimate and wants its own check."
+    },
+    {
+      "className": "Paladin",
+      "talent": "Blessed Life / Pursuit of Justice / Eye for an Eye / Divine Purpose",
+      "talents": [
+        {
+          "talentId": 1744,
+          "talent": "Blessed Life"
+        },
+        {
+          "talentId": 1634,
+          "talent": "Pursuit of Justice"
+        },
+        {
+          "talentId": 1632,
+          "talent": "Eye for an Eye"
+        },
+        {
+          "talentId": 1757,
+          "talent": "Divine Purpose"
+        }
+      ],
+      "reason": "Survival, or damage returned when you are hit: half damage, spell hit taken, crits taken. A damage dealer or healer has no incoming-damage stream here."
+    },
+    {
       "className": "Mage",
       "talent": "Ignite / Combustion / Winter's Chill",
       "talents": [
@@ -1422,7 +2390,7 @@
           "talent": "Winter's Chill"
         }
       ],
-      "reason": "Per-spell and school-scoped; the simulator models one generic cast and records no spell school."
+      "reason": "Per-spell and school-scoped: Ignite is a burn left by Fire crits, Combustion a cooldown, and Winter's Chill a stacking debuff Frost spells keep up (the Buffs tab carries the debuff itself). Each needs a timeline or a per-spell field TalentModifiers does not have."
     },
     {
       "className": "Mage",
@@ -1457,6 +2425,180 @@
         }
       ],
       "reason": "Raise one spell's coefficient; the generic cast profile has no per-spell coefficient to raise."
+    },
+    {
+      "className": "Mage",
+      "talent": "Arcane Subtlety / Arcane Focus / Elemental Precision",
+      "talents": [
+        {
+          "talentId": 74,
+          "talent": "Arcane Subtlety"
+        },
+        {
+          "talentId": 76,
+          "talent": "Arcane Focus"
+        },
+        {
+          "talentId": 1649,
+          "talent": "Elemental Precision"
+        }
+      ],
+      "reason": "Hit and resistance scoped to schools: Arcane Focus is Arcane hit, Elemental Precision Fire and Frost hit (and cheaper Fire and Frost spells), Arcane Subtlety lowers the target's resistances. The spell hit field is character-wide, so an Arcane Mage would collect Elemental Precision's hit, and target resistances are not modelled. Upstream does not write them in talents.go."
+    },
+    {
+      "className": "Mage",
+      "talent": "Critical Mass / Pyromaniac / Fire Power / Piercing Ice / Arctic Winds",
+      "talents": [
+        {
+          "talentId": 33,
+          "talent": "Critical Mass"
+        },
+        {
+          "talentId": 1733,
+          "talent": "Pyromaniac"
+        },
+        {
+          "talentId": 35,
+          "talent": "Fire Power"
+        },
+        {
+          "talentId": 61,
+          "talent": "Piercing Ice"
+        },
+        {
+          "talentId": 1738,
+          "talent": "Arctic Winds"
+        }
+      ],
+      "reason": "Fire and Frost crit and damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped crit has no field. Arctic Winds also lowers the chance to be hit."
+    },
+    {
+      "className": "Mage",
+      "talent": "Spell Power / Ice Shards",
+      "talents": [
+        {
+          "talentId": 1826,
+          "talent": "Spell Power"
+        },
+        {
+          "talentId": 73,
+          "talent": "Ice Shards"
+        }
+      ],
+      "reason": "Raise spell crit damage, for all spells and for Frost spells. There is no crit-damage field for talents, the same gap as Elemental Fury."
+    },
+    {
+      "className": "Mage",
+      "talent": "Arcane Impact / Empowered Arcane Missiles / Improved Fireball / Incineration / Improved Flamestrike / Improved Frostbolt / Improved Cone of Cold / Wand Specialization / Pyroblast / Blast Wave / Dragon's Breath / Summon Water Elemental",
+      "talents": [
+        {
+          "talentId": 81,
+          "talent": "Arcane Impact"
+        },
+        {
+          "talentId": 1727,
+          "talent": "Empowered Arcane Missiles"
+        },
+        {
+          "talentId": 26,
+          "talent": "Improved Fireball"
+        },
+        {
+          "talentId": 1141,
+          "talent": "Incineration"
+        },
+        {
+          "talentId": 31,
+          "talent": "Improved Flamestrike"
+        },
+        {
+          "talentId": 37,
+          "talent": "Improved Frostbolt"
+        },
+        {
+          "talentId": 64,
+          "talent": "Improved Cone of Cold"
+        },
+        {
+          "talentId": 78,
+          "talent": "Wand Specialization"
+        },
+        {
+          "talentId": 29,
+          "talent": "Pyroblast"
+        },
+        {
+          "talentId": 32,
+          "talent": "Blast Wave"
+        },
+        {
+          "talentId": 1735,
+          "talent": "Dragon's Breath"
+        },
+        {
+          "talentId": 1741,
+          "talent": "Summon Water Elemental"
+        }
+      ],
+      "reason": "Change particular spells (Arcane Blast's crit, Arcane Missiles, Fireball's and Frostbolt's cast time, Fire Blast, Scorch, Flamestrike, Cone of Cold, wands) or teach a spell or the Water Elemental. TalentModifiers has no per-spell field for them, so none applies, even to Arcane Blast, Fireball and Frostbolt, which the estimates cast; nothing here models the Water Elemental."
+    },
+    {
+      "className": "Mage",
+      "talent": "Arcane Potency / Improved Scorch / Molten Fury",
+      "talents": [
+        {
+          "talentId": 1725,
+          "talent": "Arcane Potency"
+        },
+        {
+          "talentId": 25,
+          "talent": "Improved Scorch"
+        },
+        {
+          "talentId": 1732,
+          "talent": "Molten Fury"
+        }
+      ],
+      "reason": "Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch, and the Buffs tab does not carry it), and damage below 20% health. Each needs a fight timeline."
+    },
+    {
+      "className": "Mage",
+      "talent": "Magic Absorption / Arcane Fortitude / Improved Mana Shield / Improved Blink / Prismatic Cloak / Frost Warding / Frozen Core / Ice Barrier",
+      "talents": [
+        {
+          "talentId": 1650,
+          "talent": "Magic Absorption"
+        },
+        {
+          "talentId": 85,
+          "talent": "Arcane Fortitude"
+        },
+        {
+          "talentId": 83,
+          "talent": "Improved Mana Shield"
+        },
+        {
+          "talentId": 1724,
+          "talent": "Improved Blink"
+        },
+        {
+          "talentId": 1726,
+          "talent": "Prismatic Cloak"
+        },
+        {
+          "talentId": 70,
+          "talent": "Frost Warding"
+        },
+        {
+          "talentId": 1736,
+          "talent": "Frozen Core"
+        },
+        {
+          "talentId": 71,
+          "talent": "Ice Barrier"
+        }
+      ],
+      "reason": "Survival: resistances, armour, damage taken, absorbs and the chance to be hit. A damage dealer has no incoming-damage stream here."
     },
     {
       "className": "Priest",
@@ -1504,6 +2646,172 @@
       "reason": "Per-spell coefficients; the healer path models one generic cast."
     },
     {
+      "className": "Priest",
+      "talent": "Improved Power Word: Shield / Focused Power / Divine Fury / Searing Light / Surge of Light / Improved Shadow Word: Pain / Improved Mind Blast / Shadow Power / Reflective Shield / Wand Specialization / Holy Nova / Lightwell",
+      "talents": [
+        {
+          "talentId": 343,
+          "talent": "Improved Power Word: Shield"
+        },
+        {
+          "talentId": 1771,
+          "talent": "Focused Power"
+        },
+        {
+          "talentId": 1181,
+          "talent": "Divine Fury"
+        },
+        {
+          "talentId": 403,
+          "talent": "Searing Light"
+        },
+        {
+          "talentId": 1766,
+          "talent": "Surge of Light"
+        },
+        {
+          "talentId": 482,
+          "talent": "Improved Shadow Word: Pain"
+        },
+        {
+          "talentId": 481,
+          "talent": "Improved Mind Blast"
+        },
+        {
+          "talentId": 1778,
+          "talent": "Shadow Power"
+        },
+        {
+          "talentId": 1773,
+          "talent": "Reflective Shield"
+        },
+        {
+          "talentId": 345,
+          "talent": "Wand Specialization"
+        },
+        {
+          "talentId": 442,
+          "talent": "Holy Nova"
+        },
+        {
+          "talentId": 1637,
+          "talent": "Lightwell"
+        }
+      ],
+      "reason": "Change particular spells (Power Word: Shield, Smite and Mind Blast's hit, Smite, Holy Fire and the big heals' cast time, a free instant Smite after a crit, Shadow Word: Pain's duration, Mind Blast's cooldown and crit, wands) or teach Holy Nova or Lightwell. TalentModifiers has no per-spell field for them, so none applies, even to Shadow Word: Pain and Mind Blast, which the Shadow estimate casts."
+    },
+    {
+      "className": "Priest",
+      "talent": "Holy Specialization / Shadow Focus / Darkness / Shadowform",
+      "talents": [
+        {
+          "talentId": 401,
+          "talent": "Holy Specialization"
+        },
+        {
+          "talentId": 463,
+          "talent": "Shadow Focus"
+        },
+        {
+          "talentId": 462,
+          "talent": "Darkness"
+        },
+        {
+          "talentId": 521,
+          "talent": "Shadowform"
+        }
+      ],
+      "reason": "Scoped to a school: Holy crit, Shadow hit, Shadow damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped hit and crit have no field. Shadowform also cuts physical damage taken."
+    },
+    {
+      "className": "Priest",
+      "talent": "Mental Agility / Mental Strength / Holy Concentration",
+      "talents": [
+        {
+          "talentId": 341,
+          "talent": "Mental Agility"
+        },
+        {
+          "talentId": 1201,
+          "talent": "Mental Strength"
+        },
+        {
+          "talentId": 1768,
+          "talent": "Holy Concentration"
+        }
+      ],
+      "reason": "Mana the healer estimates track: cheaper instant spells (Holy's Circle of Healing), maximum mana, and free heals after a proc (Discipline's Flash Heal). Their mana figures price each heal at base cost, StatBlock has no Mana field, and the proc needs a timeline. Upstream writes Mental Strength in talents.go."
+    },
+    {
+      "className": "Priest",
+      "talent": "Enlightenment / Spirit of Redemption / Spiritual Healing",
+      "talents": [
+        {
+          "talentId": 1772,
+          "talent": "Enlightenment"
+        },
+        {
+          "talentId": 1561,
+          "talent": "Spirit of Redemption"
+        },
+        {
+          "talentId": 404,
+          "talent": "Spiritual Healing"
+        }
+      ],
+      "reason": "Multiply Stamina, Intellect and Spirit, or Spirit alone, or raise all healing. Upstream writes Enlightenment and Spirit of Redemption in talents.go, so their stat factors are expressible; not yet ingested. There is no healing multiplier field."
+    },
+    {
+      "className": "Priest",
+      "talent": "Improved Inner Fire / Focused Will / Spell Warding / Blessed Recovery / Blessed Resilience / Shadow Resilience / Pain Suppression",
+      "talents": [
+        {
+          "talentId": 346,
+          "talent": "Improved Inner Fire"
+        },
+        {
+          "talentId": 1858,
+          "talent": "Focused Will"
+        },
+        {
+          "talentId": 411,
+          "talent": "Spell Warding"
+        },
+        {
+          "talentId": 1636,
+          "talent": "Blessed Recovery"
+        },
+        {
+          "talentId": 1765,
+          "talent": "Blessed Resilience"
+        },
+        {
+          "talentId": 1781,
+          "talent": "Shadow Resilience"
+        },
+        {
+          "talentId": 1774,
+          "talent": "Pain Suppression"
+        }
+      ],
+      "reason": "Survival: armour, damage taken, heals after a crit, the chance to be crit, and Pain Suppression's cooldown. A damage dealer or healer has no incoming-damage stream here."
+    },
+    {
+      "className": "Priest",
+      "talent": "Improved Power Word: Fortitude / Improved Divine Spirit",
+      "talents": [
+        {
+          "talentId": 344,
+          "talent": "Improved Power Word: Fortitude"
+        },
+        {
+          "talentId": 1770,
+          "talent": "Improved Divine Spirit"
+        }
+      ],
+      "reason": "Strengthen Prayer of Fortitude and Prayer of Spirit, which the Buffs tab carries at their untalented values."
+    },
+    {
       "className": "Warlock",
       "talent": "Master Demonologist",
       "talents": [
@@ -1546,7 +2854,7 @@
           "talent": "Emberstorm"
         }
       ],
-      "reason": "Per-spell and school-scoped; no spell school is recorded anywhere in this simulator."
+      "reason": "Per-spell and school-scoped: Improved Shadow Bolt is a Shadow vulnerability its crits leave, Ruin raises Destruction crit damage, Emberstorm Fire damage. None is in upstream talents.go, which is all this ingest reads. (This used to say no spell school was recorded anywhere; abilities record one now, and Demonic Sacrifice reads it.)"
     },
     {
       "className": "Warlock",
@@ -1562,6 +2870,1271 @@
         }
       ],
       "reason": "Proc-driven, needing a timeline."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Improved Corruption / Empowered Corruption / Improved Curse of Agony / Contagion / Soul Siphon / Bane / Improved Immolate / Shadow and Flame / Improved Searing Pain / Shadowburn / Conflagrate / Shadowfury",
+      "talents": [
+        {
+          "talentId": 1003,
+          "talent": "Improved Corruption"
+        },
+        {
+          "talentId": 1764,
+          "talent": "Empowered Corruption"
+        },
+        {
+          "talentId": 1284,
+          "talent": "Improved Curse of Agony"
+        },
+        {
+          "talentId": 1669,
+          "talent": "Contagion"
+        },
+        {
+          "talentId": 1004,
+          "talent": "Soul Siphon"
+        },
+        {
+          "talentId": 943,
+          "talent": "Bane"
+        },
+        {
+          "talentId": 961,
+          "talent": "Improved Immolate"
+        },
+        {
+          "talentId": 1677,
+          "talent": "Shadow and Flame"
+        },
+        {
+          "talentId": 965,
+          "talent": "Improved Searing Pain"
+        },
+        {
+          "talentId": 963,
+          "talent": "Shadowburn"
+        },
+        {
+          "talentId": 968,
+          "talent": "Conflagrate"
+        },
+        {
+          "talentId": 1676,
+          "talent": "Shadowfury"
+        }
+      ],
+      "reason": "Change particular spells (Corruption's cast time and coefficient, Curse of Agony and Corruption damage, Drain Life, Shadow Bolt's and Immolate's cast time, Immolate's opening hit, Shadow Bolt's and Incinerate's coefficient, Searing Pain) or teach Shadowburn, Conflagrate or Shadowfury. TalentModifiers has no per-spell field for them, so none applies, even to the Corruption, Curse of Agony, Shadow Bolt, Incinerate and Immolate the estimates cast."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Suppression / Shadow Mastery / Devastation",
+      "talents": [
+        {
+          "talentId": 1005,
+          "talent": "Suppression"
+        },
+        {
+          "talentId": 1042,
+          "talent": "Shadow Mastery"
+        },
+        {
+          "talentId": 981,
+          "talent": "Devastation"
+        }
+      ],
+      "reason": "Affliction hit, Shadow damage and Destruction crit. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write Shadow Mastery in talents.go, which is all this ingest reads, and hit and crit scoped to a tree have no field."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Amplify Curse",
+      "talents": [
+        {
+          "talentId": 1061,
+          "talent": "Amplify Curse"
+        }
+      ],
+      "reason": "An activated cooldown for the next curse. Uptime needs a usage policy this model has none of."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Improved Imp / Improved Sayaad / Improved Firebolt / Improved Lash of Pain / Demonic Knowledge",
+      "talents": [
+        {
+          "talentId": 1222,
+          "talent": "Improved Imp"
+        },
+        {
+          "talentId": 1243,
+          "talent": "Improved Sayaad"
+        },
+        {
+          "talentId": 983,
+          "talent": "Improved Firebolt"
+        },
+        {
+          "talentId": 984,
+          "talent": "Improved Lash of Pain"
+        },
+        {
+          "talentId": 1263,
+          "talent": "Demonic Knowledge"
+        }
+      ],
+      "reason": "Strengthen demons other than the Felguard, the only demon modelled, or grant spell power from the active demon's Stamina and Intellect, which nothing here tracks. Improved Imp also raises Blood Pact, which the Buffs tab carries at its untalented value."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Demonic Embrace / Demonic Aegis / Master Conjuror",
+      "talents": [
+        {
+          "talentId": 1223,
+          "talent": "Demonic Embrace"
+        },
+        {
+          "talentId": 1671,
+          "talent": "Demonic Aegis"
+        },
+        {
+          "talentId": 1261,
+          "talent": "Master Conjuror"
+        }
+      ],
+      "reason": "Stamina and Spirit factors, a stronger Fel Armor, and stronger Firestone and Spellstone. Upstream writes Demonic Embrace in talents.go, so it is expressible as a stat factor; not yet ingested. Fel Armor and the stones are not modelled."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Malediction",
+      "talents": [
+        {
+          "talentId": 1667,
+          "talent": "Malediction"
+        }
+      ],
+      "reason": "Raises Curse of the Elements to 13%, and the Buffs tab carries the untalented 10%."
+    },
+    {
+      "className": "Warlock",
+      "talent": "Demonic Resilience / Soul Link / Nether Protection",
+      "talents": [
+        {
+          "talentId": 1680,
+          "talent": "Demonic Resilience"
+        },
+        {
+          "talentId": 1282,
+          "talent": "Soul Link"
+        },
+        {
+          "talentId": 1679,
+          "talent": "Nether Protection"
+        }
+      ],
+      "reason": "Survival: the chance to be crit, damage shared with the demon, immunity after a spell hit. A damage dealer has no incoming-damage stream here."
+    }
+  ],
+  "notRead": [
+    {
+      "className": "Warrior",
+      "kind": "ability",
+      "talentId": 135,
+      "talent": "Mortal Strike",
+      "spec": "Arms"
+    },
+    {
+      "className": "Warrior",
+      "kind": "ability",
+      "talentId": 167,
+      "talent": "Bloodthirst",
+      "spec": "Fury"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 126,
+      "talent": "Improved Charge"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 641,
+      "talent": "Iron Will"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 134,
+      "talent": "Improved Intercept"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 129,
+      "talent": "Improved Hamstring"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 1662,
+      "talent": "Improved Disciplines"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 158,
+      "talent": "Booming Voice"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 160,
+      "talent": "Piercing Howl"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 1542,
+      "talent": "Improved Execute"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 141,
+      "talent": "Tactical Mastery"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 147,
+      "talent": "Improved Revenge"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 146,
+      "talent": "Improved Sunder Armor"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 151,
+      "talent": "Improved Disarm"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 143,
+      "talent": "Improved Taunt"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 152,
+      "talent": "Concussion Blow"
+    },
+    {
+      "className": "Warrior",
+      "kind": "utility",
+      "talentId": 149,
+      "talent": "Improved Shield Bash"
+    },
+    {
+      "className": "Rogue",
+      "kind": "ability",
+      "talentId": 1719,
+      "talent": "Mutilate",
+      "spec": "Assassination"
+    },
+    {
+      "className": "Rogue",
+      "kind": "ability",
+      "talentId": 681,
+      "talent": "Hemorrhage",
+      "spec": "Subtlety"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 272,
+      "talent": "Remorseless Attacks"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 1721,
+      "talent": "Fleet Footed"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 203,
+      "talent": "Improved Gouge"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 204,
+      "talent": "Endurance"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 222,
+      "talent": "Improved Sprint"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 206,
+      "talent": "Improved Kick"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 1706,
+      "talent": "Blade Twisting"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 1707,
+      "talent": "Nerves of Steel"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 241,
+      "talent": "Master of Deception"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 262,
+      "talent": "Dirty Tricks"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 244,
+      "talent": "Camouflage"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 245,
+      "talent": "Initiative"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 246,
+      "talent": "Setup"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 247,
+      "talent": "Elusiveness"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 284,
+      "talent": "Preparation"
+    },
+    {
+      "className": "Rogue",
+      "kind": "utility",
+      "talentId": 381,
+      "talent": "Premeditation"
+    },
+    {
+      "className": "Hunter",
+      "kind": "buff",
+      "talentId": 1361,
+      "talent": "Trueshot Aura",
+      "buff": "trueshot-aura"
+    },
+    {
+      "className": "Hunter",
+      "kind": "buff",
+      "talentId": 1800,
+      "talent": "Ferocious Inspiration",
+      "buff": "ferocious-inspiration"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1625,
+      "talent": "Improved Revive Pet"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1384,
+      "talent": "Pathfinding"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1391,
+      "talent": "Bestial Swiftness"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1385,
+      "talent": "Improved Mend Pet"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1387,
+      "talent": "Intimidation"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1341,
+      "talent": "Improved Concussive Shot"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1346,
+      "talent": "Improved Arcane Shot"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1819,
+      "talent": "Rapid Killing"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1351,
+      "talent": "Concussive Barrage"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1353,
+      "talent": "Scatter Shot"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1820,
+      "talent": "Hawk Eye"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1304,
+      "talent": "Entrapment"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1305,
+      "talent": "Improved Wing Clip"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1322,
+      "talent": "Trap Mastery"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1309,
+      "talent": "Improved Feign Death"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1809,
+      "talent": "Resourcefulness"
+    },
+    {
+      "className": "Hunter",
+      "kind": "utility",
+      "talentId": 1325,
+      "talent": "Wyvern Sting"
+    },
+    {
+      "className": "Shaman",
+      "kind": "ability",
+      "talentId": 901,
+      "talent": "Stormstrike",
+      "spec": "Enhancement"
+    },
+    {
+      "className": "Shaman",
+      "kind": "ability",
+      "talentId": 1690,
+      "talent": "Dual Wield",
+      "spec": "Enhancement",
+      "note": "The Enhancement estimate swings both hands."
+    },
+    {
+      "className": "Shaman",
+      "kind": "buff",
+      "talentId": 1687,
+      "talent": "Totem of Wrath",
+      "buff": "totem-of-wrath"
+    },
+    {
+      "className": "Shaman",
+      "kind": "buff",
+      "talentId": 590,
+      "talent": "Mana Tide Totem",
+      "buff": "mana-tide-totem"
+    },
+    {
+      "className": "Shaman",
+      "kind": "buff",
+      "talentId": 1689,
+      "talent": "Unleashed Rage",
+      "buff": "unleashed-rage"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 564,
+      "talent": "Convection"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 574,
+      "talent": "Elemental Focus"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 572,
+      "talent": "Earth's Grasp"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 575,
+      "talent": "Reverberation"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 567,
+      "talent": "Improved Fire Totems"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 1642,
+      "talent": "Eye of the Storm"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 1641,
+      "talent": "Storm Reach"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 605,
+      "talent": "Improved Ghost Wolf"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 617,
+      "talent": "Shamanistic Focus"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 589,
+      "talent": "Improved Reincarnation"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 581,
+      "talent": "Ancestral Healing"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 595,
+      "talent": "Totemic Focus"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 587,
+      "talent": "Healing Focus"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 582,
+      "talent": "Totemic Mastery"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 1646,
+      "talent": "Healing Grace"
+    },
+    {
+      "className": "Shaman",
+      "kind": "utility",
+      "talentId": 1695,
+      "talent": "Focused Mind"
+    },
+    {
+      "className": "Druid",
+      "kind": "buff",
+      "talentId": 809,
+      "talent": "Leader of the Pack",
+      "buff": "leader-of-the-pack"
+    },
+    {
+      "className": "Druid",
+      "kind": "buff",
+      "talentId": 1162,
+      "talent": "Faerie Fire (Feral)",
+      "debuff": "faerie-fire"
+    },
+    {
+      "className": "Druid",
+      "kind": "buff",
+      "talentId": 1785,
+      "talent": "Improved Faerie Fire",
+      "debuff": "improved-faerie-fire"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 783,
+      "talent": "Moonglow"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 761,
+      "talent": "Nature's Grasp"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 921,
+      "talent": "Improved Nature's Grasp"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 787,
+      "talent": "Control of Nature"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 764,
+      "talent": "Nature's Reach"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 784,
+      "talent": "Celestial Focus"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 799,
+      "talent": "Feral Instinct"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 797,
+      "talent": "Brutal Impact"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 804,
+      "talent": "Feral Charge"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 1793,
+      "talent": "Primal Tenacity"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 823,
+      "talent": "Nature's Focus"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 826,
+      "talent": "Natural Shapeshifter"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 843,
+      "talent": "Tranquil Spirit"
+    },
+    {
+      "className": "Druid",
+      "kind": "utility",
+      "talentId": 842,
+      "talent": "Improved Tranquility"
+    },
+    {
+      "className": "Paladin",
+      "kind": "ability",
+      "talentId": 1823,
+      "talent": "Crusader Strike",
+      "spec": "Retribution"
+    },
+    {
+      "className": "Paladin",
+      "kind": "ability",
+      "talentId": 1481,
+      "talent": "Seal of Command",
+      "spec": "Retribution",
+      "note": "Alliance only: a Horde estimate uses Seal of Blood."
+    },
+    {
+      "className": "Paladin",
+      "kind": "buff",
+      "talentId": 1442,
+      "talent": "Blessing of Kings",
+      "buff": "blessing-of-kings"
+    },
+    {
+      "className": "Paladin",
+      "kind": "buff",
+      "talentId": 1431,
+      "talent": "Blessing of Sanctuary",
+      "buff": "blessing-of-sanctuary"
+    },
+    {
+      "className": "Paladin",
+      "kind": "buff",
+      "talentId": 1464,
+      "talent": "Improved Seal of the Crusader",
+      "debuff": "improved-seal-of-the-crusader"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1432,
+      "talent": "Spiritual Focus"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1435,
+      "talent": "Aura Mastery"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1443,
+      "talent": "Improved Lay on Hands"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1628,
+      "talent": "Unyielding Faith"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1742,
+      "talent": "Pure of Heart"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1425,
+      "talent": "Guardian's Favor"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1748,
+      "talent": "Stoicism"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1521,
+      "talent": "Improved Hammer of Justice"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1626,
+      "talent": "Improved Concentration Aura"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1407,
+      "talent": "Benediction"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1633,
+      "talent": "Vindication"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1758,
+      "talent": "Sanctified Judgement"
+    },
+    {
+      "className": "Paladin",
+      "kind": "utility",
+      "talentId": 1441,
+      "talent": "Repentance"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 75,
+      "talent": "Arcane Concentration"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 1639,
+      "talent": "Master of Elements"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 66,
+      "talent": "Frost Channeling"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 80,
+      "talent": "Improved Arcane Missiles"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 82,
+      "talent": "Magic Attunement"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 88,
+      "talent": "Improved Counterspell"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 1729,
+      "talent": "Slow"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 30,
+      "talent": "Impact"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 28,
+      "talent": "Flame Throwing"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 27,
+      "talent": "Improved Fire Blast"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 23,
+      "talent": "Burning Soul"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 24,
+      "talent": "Molten Shields"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 1731,
+      "talent": "Blazing Speed"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 38,
+      "talent": "Frostbite"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 62,
+      "talent": "Improved Frost Nova"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 65,
+      "talent": "Permafrost"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 63,
+      "talent": "Improved Blizzard"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 741,
+      "talent": "Arctic Reach"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 67,
+      "talent": "Shatter"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 72,
+      "talent": "Cold Snap"
+    },
+    {
+      "className": "Mage",
+      "kind": "utility",
+      "talentId": 1737,
+      "talent": "Ice Floes"
+    },
+    {
+      "className": "Priest",
+      "kind": "ability",
+      "talentId": 501,
+      "talent": "Mind Flay",
+      "spec": "Shadow"
+    },
+    {
+      "className": "Priest",
+      "kind": "ability",
+      "talentId": 1779,
+      "talent": "Vampiric Touch",
+      "spec": "Shadow"
+    },
+    {
+      "className": "Priest",
+      "kind": "ability",
+      "talentId": 1815,
+      "talent": "Circle of Healing",
+      "spec": "Holy"
+    },
+    {
+      "className": "Priest",
+      "kind": "buff",
+      "talentId": 351,
+      "talent": "Divine Spirit",
+      "buff": "prayer-of-spirit"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 1777,
+      "talent": "Focused Mind"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 342,
+      "talent": "Unbreakable Will"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 352,
+      "talent": "Silent Resolve"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 321,
+      "talent": "Martyrdom"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 1769,
+      "talent": "Absolution"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 350,
+      "talent": "Improved Mana Burn"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 410,
+      "talent": "Healing Focus"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 361,
+      "talent": "Inspiration"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 1635,
+      "talent": "Holy Reach"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 408,
+      "talent": "Improved Healing"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 413,
+      "talent": "Healing Prayers"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 465,
+      "talent": "Spirit Tap"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 464,
+      "talent": "Blackout"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 466,
+      "talent": "Shadow Affinity"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 542,
+      "talent": "Improved Psychic Scream"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 483,
+      "talent": "Improved Fade"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 881,
+      "talent": "Shadow Reach"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 541,
+      "talent": "Silence"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 484,
+      "talent": "Vampiric Embrace"
+    },
+    {
+      "className": "Priest",
+      "kind": "utility",
+      "talentId": 1638,
+      "talent": "Improved Vampiric Embrace"
+    },
+    {
+      "className": "Warlock",
+      "kind": "ability",
+      "talentId": 1041,
+      "talent": "Siphon Life",
+      "spec": "Affliction"
+    },
+    {
+      "className": "Warlock",
+      "kind": "ability",
+      "talentId": 1670,
+      "talent": "Unstable Affliction",
+      "spec": "Affliction"
+    },
+    {
+      "className": "Warlock",
+      "kind": "ability",
+      "talentId": 1672,
+      "talent": "Summon Felguard",
+      "spec": "Demonology"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1007,
+      "talent": "Improved Life Tap"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1022,
+      "talent": "Dark Pact"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 941,
+      "talent": "Cataclysm"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1006,
+      "talent": "Improved Curse of Weakness"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1101,
+      "talent": "Improved Drain Soul"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1001,
+      "talent": "Fel Concentration"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1021,
+      "talent": "Grim Reach"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1763,
+      "talent": "Shadow Embrace"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1081,
+      "talent": "Curse of Exhaustion"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1668,
+      "talent": "Improved Howl of Terror"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1221,
+      "talent": "Improved Healthstone"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1224,
+      "talent": "Improved Health Funnel"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1225,
+      "talent": "Improved Voidwalker"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1226,
+      "talent": "Fel Domination"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1227,
+      "talent": "Master Summoner"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1283,
+      "talent": "Improved Subjugate Demon"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 1681,
+      "talent": "Mana Feed"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 982,
+      "talent": "Aftermath"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 985,
+      "talent": "Intensity"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 964,
+      "talent": "Destructive Reach"
+    },
+    {
+      "className": "Warlock",
+      "kind": "utility",
+      "talentId": 986,
+      "talent": "Pyroclasm"
     }
   ]
 }

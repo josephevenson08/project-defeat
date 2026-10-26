@@ -529,3 +529,20 @@ export function unmodelledTalentsInBuild(className: string, points: TalentPoints
   }
   return taken
 }
+
+/** One ingested talent effect, as `talentEffects.json` records it. */
+export type TalentEffect = (typeof rawTalentEffects.effects)[number]
+
+/**
+ * One class's talents with an ingested effect that `reads` accepts, each named once, in ingest order.
+ *
+ * For a caveat that names what a path reads and means "and no other": the list comes from the
+ * effects, so a talent the ingest starts extracting is named the day it lands. The tank note's
+ * hand-written list went on saying Toughness and Vitality were not counted long after they were.
+ */
+export function talentsWithEffect(className: string, reads: (effect: TalentEffect) => boolean): readonly string[] {
+  const names = rawTalentEffects.effects
+    .filter((effect) => effect.className === className && reads(effect))
+    .map((effect) => effect.talent)
+  return [...new Set(names)]
+}

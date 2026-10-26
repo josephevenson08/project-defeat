@@ -7482,6 +7482,33 @@ test('the caveat names refused talents that share a group, by id rather than by 
   }
 })
 
+test('a Frost Mage is told about the damage talents the estimate never mentioned', () => {
+  /*
+   * The last silent gap: talents the ingest neither extracted nor refused reached no caveat at all.
+   * No Frost Mage talent is modelled, and Elemental Precision (Fire and Frost hit), Ice Shards (Frost
+   * crit damage) and Piercing Ice (Frost damage) are core to the spec, so the estimate was low by
+   * all three and said nothing. They are refused by name now, like every talent that changes output.
+   */
+  const byName = new Map(getTalentData('Mage')!.trees.flatMap((tree) => tree.talents).map((talent) => [talent.name, talent.id]))
+  const pointsFor = (entries: readonly (readonly [string, number])[]) =>
+    Object.fromEntries(entries.map(([name, rank]) => [byName.get(name)!, rank])) as Record<number, number>
+  const character: CharacterProfile = { faction: 'Alliance', race: legalRaceFor('Mage'), className: 'Mage', spec: 'Frost' }
+  const gear = normalizeGearForCharacter(defaultGear, 'Mage', 'Frost')
+  const stats = calculateStats(character, gear)
+  const noteFor = (points: Record<number, number>) => calculateSimulation(character, gear, stats, 'Caster DPS', [], undefined, points).unmodelledTalentNote
+
+  const note = noteFor(pointsFor([['Elemental Precision', 3], ['Ice Shards', 5], ['Piercing Ice', 3], ['Arcane Instability', 3]]))
+  expect(note).toContain('Elemental Precision')
+  expect(note).toContain('Ice Shards')
+  expect(note).toContain('Piercing Ice')
+  expect(note, 'a modelled talent is not a gap').not.toContain('Arcane Instability')
+  expect(note, 'and it points to where each reason is').toMatch(/tooltip on the Talents tab says why/)
+
+  // Elemental Precision alone is enough to be named, and utility alone stays quiet.
+  expect(noteFor(pointsFor([['Elemental Precision', 3]]))).toContain('Elemental Precision')
+  expect(noteFor(pointsFor([['Frostbite', 3], ['Improved Frost Nova', 2], ['Permafrost', 3]])), 'crowd control is not a gap').toBeUndefined()
+})
+
 test('talent scaling covers both Warrior DPS specs, and the tank reads its own', () => {
   /*
    * The scope described stage 1 as "Fury Warrior". Arms gets it free, and that is worth pinning
@@ -7492,8 +7519,8 @@ test('talent scaling covers both Warrior DPS specs, and the tank reads its own',
    * Protection used to be the honest gap, and this test asserted it received nothing at all. Since
    * 2026-08-19 `calculateTankSurvivability` takes talents too, so the assertion below flipped: a
    * *DPS* talent must still not move a tank score, which is the sharper claim. Toughness and Vitality
-   * remain uncounted, but for a stated reason — they multiply armour and stamina, which
-   * `calculateStats` owns — rather than because the path is blind.
+   * reach it too, through the armour and Stamina `calculateStats` hands it; the caveat test below
+   * pins that.
    */
   const talents = getTalentData('Warrior')!
   const byName = new Map<string, number>()
@@ -7607,9 +7634,10 @@ test('every role says what talents do for it, and the tank message is not the DP
    *
    * The tank case is the one worth pinning hardest, because the first version of this got it wrong in
    * the confident direction: it gave Protection the DPS message, which names only the *skipped*
-   * talents and so implies Toughness, Vitality and the rest are counted. They are not — the tank path
-   * receives none. A caveat that is wrong is worse than no caveat, which is the lesson this file has
-   * now recorded six times.
+   * talents and so implies the rest are counted. The tank path receives none of the DPS ones. A
+   * caveat that is wrong is worse than no caveat, which is the lesson this file has now recorded
+   * seven times: the seventh was the tank note itself, which said Toughness and Vitality were not
+   * counted long after they were.
    */
   const spendFirstTree = (className: string) => {
     const data = getTalentData(className)!
@@ -7641,23 +7669,76 @@ test('every role says what talents do for it, and the tank message is not the DP
   expect(mage, 'the dead "no effects for this class" branch must not fire').not.toMatch(/only ingested for/i)
   expect(mage).toMatch(/spent but not modelled/i)
 
-  // The tank gets its own message, naming the real reason.
+  // The tank gets its own message: what Effective Health reads, then the refusals this build took.
   /*
-   * The tank message now names what it *does* read and what it does not, rather than claiming it
-   * reads nothing. The "must not be the DPS message" half is unchanged and is the point of the test:
-   * the generic note says the listed talents are "spent but not modelled", which implies everything
-   * unlisted is counted — and for a tank the unlisted set includes Toughness and Vitality, the two
-   * biggest survivability talents in the tree.
+   * The "must not be the DPS message" half is the point of the test: the generic note names only the
+   * refusals, which implies everything unlisted is counted, and most of a tank's unlisted talents are
+   * ones Effective Health has no use for. So the tank note says what it reads and "no other talent".
+   *
+   * It used to say Toughness and Vitality were not counted, and stop there. Both were false by then:
+   * they reach Effective Health through `calculateStats`, and returning early hid Last Stand and
+   * Improved Shield Block, which the ingest refuses. The build below takes all four plus Cruelty, which
+   * is modelled for DPS and read by nothing here, so it is the talent "no other" has to cover.
    */
-  const tank = noteFor('Warrior', 'Protection', 'Tank', spendFirstTree('Warrior'))
-  expect(tank).toBeTruthy()
-  expect(tank, 'the tank message must name the avoidance talents it reads').toMatch(/Anticipation/i)
-  expect(tank, 'and name the two it does not, with the reason').toMatch(/Toughness and Vitality are not counted/i)
-  expect(tank, 'and must NOT imply the unlisted ones are counted').not.toMatch(/spent but not modelled/i)
+  const protWarrior = Object.fromEntries(
+    (
+      [
+        ['Anticipation', 5],
+        ['Shield Specialization', 5],
+        ['Toughness', 5],
+        ['Vitality', 5],
+        ['Last Stand', 1],
+        ['Improved Shield Block', 1],
+        ['Cruelty', 5],
+      ] as const
+    ).map(([name, rank]) => [talentId('Warrior', name), rank]),
+  )
+  const tank = noteFor('Warrior', 'Protection', 'Tank', protWarrior)
+  const [tankReads] = tank!.split('. ')
+  for (const read of ['Anticipation', 'Deflection', 'Shield Specialization', 'Toughness', 'Vitality']) {
+    expect(tankReads, `the tank message must say Effective Health reads ${read}`).toContain(read)
+  }
+  expect(tankReads, 'and that it reads no other talent').toMatch(/and no other talent$/)
+  expect(tank, 'and name the refused talents this build took').toContain('Last Stand and Improved Shield Block are spent here but not modelled')
+  expect(tank, 'a talent neither read nor refused is covered by "no other", not named').not.toContain('Cruelty')
+  expect(tank, 'and it must NOT be the DPS message').not.toMatch(/spent but not modelled/i)
+  expect(tank, 'and must not repeat the old false claim').not.toMatch(/not counted/i)
 
-  // Paladin's Shield Specialization raises block value, which is unmodelled — so it must not be named.
-  const paladinTank = noteFor('Paladin', 'Protection', 'Tank', spendFirstTree('Paladin'))
-  expect(paladinTank, "a Paladin must not be told Shield Specialization is read").not.toMatch(/Shield Specialization/i)
+  // The claim behind the note: Toughness and Vitality move Effective Health once the stats carry them.
+  const effectiveHealth = (points: Record<number, number>) => {
+    const character: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Protection' }
+    const gear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Protection')
+    return calculateSimulation(character, gear, statsFor('Warrior', 'Protection', points), 'Tank', [], undefined, points).scoreExact
+  }
+  for (const name of ['Toughness', 'Vitality']) {
+    expect(effectiveHealth({ [talentId('Warrior', name)]: 5 }), `${name} must raise Effective Health`).toBeGreaterThan(effectiveHealth({}))
+  }
+
+  /*
+   * Paladin's Shield Specialization raises block value, which the table does not model, so it must
+   * not be in what Effective Health reads. It is refused, so a Paladin who takes it is told among the
+   * refusals, with Holy Shield and Ardent Defender.
+   */
+  const protPaladin = Object.fromEntries(
+    (
+      [
+        ['Anticipation', 5],
+        ['Toughness', 5],
+        ['Shield Specialization', 3],
+        ['Holy Shield', 1],
+        ['Ardent Defender', 5],
+      ] as const
+    ).map(([name, rank]) => [talentId('Paladin', name), rank]),
+  )
+  const paladinTank = noteFor('Paladin', 'Protection', 'Tank', protPaladin)
+  const [paladinReads, paladinRefused] = paladinTank!.split(', and no other talent. ')
+  expect(paladinReads).toBe('Effective Health reads Deflection, Anticipation and Toughness')
+  expect(paladinRefused, 'Shield Specialization is named as refused instead').toMatch(/^Shield Specialization, Holy Shield and Ardent Defender are spent here but not modelled/)
+
+  // Points spent on nothing refused still get the read list, because "no other talent" is the news.
+  expect(noteFor('Warrior', 'Protection', 'Tank', { [talentId('Warrior', 'Cruelty')]: 5 })).toBe(
+    'Effective Health reads Deflection, Anticipation, Shield Specialization, Vitality and Toughness, and no other talent.',
+  )
 
   // Silence when there is nothing to say, which is what keeps the others readable.
   expect(noteFor('Mage', 'Fire', 'Caster DPS', {}), 'no points, no note').toBeUndefined()

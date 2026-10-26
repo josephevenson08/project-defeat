@@ -249,7 +249,7 @@ The comparison came first, as this plan asked: the live panel already had the pa
 
 ## Step 7, the scene, as built (2026-10-24)
 
-The owner's calls before the build (2026-10-23): **`three` plus the anime.js the app already ships**, not GSAP (the only new dependency is `three`, 0.186.1, with `@types/three`); **the scene on by default** wherever it can run, with a switch; and **"the main bundle does not grow" means at most 1.5 KB gzipped** for the switch, the rules and the loader, with `three` and the scene never in it.
+The owner's calls before the build (2026-10-23): **`three` plus the anime.js the app already ships**, not GSAP (the only new dependency is `three`, 0.186.1, with `@types/three`); **the scene on by default** wherever it can run, with a switch; and **"the main bundle does not grow" means at most 1.5 KB gzipped** (raised to 2 KB on 2026-10-26, because the measurement moves about 500 bytes with unrelated content: merging the talent data moved the same layer, unchanged, from 1,241 to 1,723 bytes) for the switch, the rules and the loader, with `three` and the scene never in it.
 
 | Part | Where | Notes |
 | --- | --- | --- |

@@ -36,7 +36,6 @@ _No doc comment at the top of this file._
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.SimulationPanel]] — `src/features/simulator/SimulationPanel.tsx`
 - [[features.simulator.WhatIsModelled]] — `src/features/simulator/WhatIsModelled.tsx`
-- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 - [[features.tierlists.TierBoard]] — `src/features/tierlists/TierBoard.tsx`
 
 ## Concepts & phases

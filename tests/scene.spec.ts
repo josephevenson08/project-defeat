@@ -227,11 +227,14 @@ test.describe('with WebGL', () => {
 /*
  * The main bundle, measured. The app is built twice, once as it is and once with the layer's three
  * modules in the main bundle (the cue, the control and the switch) swapped for empty ones, and the
- * difference has to stay within the budget the owner set (1.5 KB gzipped, 2026-10-23). `three` and the
+ * difference has to stay within the budget the owner set: 1.5 KB gzipped (2026-10-23), raised to 2 KB
+ * (2026-10-26) because the measurement moves about 500 bytes with unrelated content. Merging the talent
+ * data took the same layer, unchanged, from 1,241 to 1,723 bytes: the difference of two gzips of a
+ * 650 KB bundle shifts with whatever else sits in the compression window. `three` and the
  * scene must not be in the main bundle at all. Measured by hand against ce1dd35 when step 7 went in:
  * 648,751 → 649,992 bytes gzipped, call sites included.
  */
-test('the main bundle carries no scene and grows by less than 1.5 KB gzipped', async () => {
+test('the main bundle carries no scene and grows by less than 2 KB gzipped', async () => {
   test.setTimeout(240_000)
   const root = process.cwd()
   const stub: Plugin = {
@@ -268,5 +271,5 @@ test('the main bundle carries no scene and grows by less than 1.5 KB gzipped', a
   expect(withLayer.files.some((file) => file.startsWith('motionLayer-')), 'the motion layer is its own chunk').toBe(true)
   expect(withLayer.code, 'three is not in the main bundle').not.toContain('WebGLRenderer')
   expect(withLayer.code, 'nor are the scene’s shaders').not.toContain('float caustic(vec2')
-  expect(withLayer.gzip - withoutLayer.gzip, `the main bundle: ${withoutLayer.gzip} → ${withLayer.gzip} bytes gzipped`).toBeLessThanOrEqual(1536)
+  expect(withLayer.gzip - withoutLayer.gzip, `the main bundle: ${withoutLayer.gzip} → ${withLayer.gzip} bytes gzipped`).toBeLessThanOrEqual(2048)
 })

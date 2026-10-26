@@ -156,10 +156,9 @@ const WARRIOR_EXTRACTORS = [
    * Defense skill figure the table already derives from rating, and the other two move a single
    * avoidance term each.
    *
-   * Toughness and Vitality are deliberately NOT here. They multiply armour, stamina and strength,
-   * which `calculateStats` owns — reaching them means talents reaching the always-visible stat rail,
-   * gear rankings and the upgrade finder, which is a product decision this repo has explicitly
-   * reserved for its owner. They are refused by name below with that reason.
+   * Toughness and Vitality are not here because they multiply armour, stamina and strength, which
+   * `calculateStats` owns. They were refused for that until talents reached the stat pipeline, and
+   * are now extracted as stat-pipeline effects further down.
    */
   {
     talent: 'Deflection',
@@ -246,7 +245,36 @@ const WARRIOR_SKIPPED = [
   [['Impale'], 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
   [['Defiance'], 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
   [['Shield Mastery'], 'Raises block VALUE. The incoming-attack table models block as a chance and does not track how much a block absorbs, so there is nothing for this to change.'],
+  [['Improved Heroic Strike', 'Improved Mortal Strike', 'Improved Whirlwind', 'Focused Rage', 'Improved Bloodrage'], "Change abilities the Arms and Fury estimates use: Heroic Strike's rage cost (and every offensive ability's, for Focused Rage), Mortal Strike's and Whirlwind's cooldowns, Mortal Strike's damage and Bloodrage's rage. The estimate prices each at its base cost, cooldown, damage and rage; TalentModifiers has no per-ability field for them."],
+  [['Improved Rend', 'Improved Thunder Clap', 'Improved Overpower', 'Improved Cleave', 'Improved Slam'], 'Strengthen abilities neither Warrior DPS estimate casts: Rend, Thunder Clap, Overpower, Cleave and Slam.'],
+  [['Commanding Presence', 'Improved Demoralizing Shout'], 'Strengthen shouts. The Buffs tab carries Battle Shout at its untalented value and has no Demoralizing Shout on the boss.'],
+  [['Second Wind', 'Blood Craze'], 'Heal or grant rage when you are stunned or crit. A damage dealer has no incoming-damage stream here for either to trigger on.'],
+  [['Last Stand', 'Improved Shield Block', 'Improved Shield Wall', 'Improved Defensive Stance'], "Tank survival the tank estimate does not read: Last Stand and Shield Wall are cooldowns needing a usage policy, Shield Block's extra block needs a timeline, and the incoming-attack table has no spell damage for Improved Defensive Stance to reduce."],
+  [['Shield Slam', 'Devastate', 'One-Handed Weapon Specialization'], "A tank's damage and threat. The tank estimate scores survival, and neither DPS estimate casts Shield Slam or Devastate or checks for a one-handed weapon."],
 ]
+
+/*
+ * Each class's talents that the estimate has no reason to read, so that every talent in a tree is
+ * accounted for: extracted above, refused in the skip list, or here. The run refuses to write when a
+ * talent is in none of them, which is what keeps a talent from going silent — before 2026-10-24 a
+ * Frost Mage's Elemental Precision, Ice Shards and Piercing Ice reached no caveat, because nothing
+ * here mentioned them and the tooltip assumed anything unmentioned was utility.
+ *
+ * - `ability`: it teaches an ability a spec's estimate already includes (the rotation's Bloodthirst,
+ *   Retribution's Seal of Command, Demonology's Felguard), so the point itself is not read.
+ * - `buff`: its effect is an entry on the Buffs tab, by that entry's id (`buff`, or `debuff` for one
+ *   on the target), so the player ticks it there.
+ * - `utility`: it changes nothing an estimate computes — crowd control, movement, range, threat,
+ *   resisting crowd control, the cost or cooldown of an ability no estimate casts, or mana for a
+ *   caster's damage estimate, which tracks no mana (only the healer and Hunter estimates do).
+ *
+ * Anything that changes damage, healing, hit, crit, haste or survival belongs in the skip list instead.
+ */
+const WARRIOR_NOT_READ = {
+  ability: [{ talent: 'Mortal Strike', spec: 'Arms' }, { talent: 'Bloodthirst', spec: 'Fury' }],
+  buff: [],
+  utility: ['Improved Charge', 'Iron Will', 'Improved Intercept', 'Improved Hamstring', 'Improved Disciplines', 'Booming Voice', 'Piercing Howl', 'Improved Execute', 'Tactical Mastery', 'Improved Revenge', 'Improved Sunder Armor', 'Improved Disarm', 'Improved Taunt', 'Concussion Blow', 'Improved Shield Bash'],
+}
 
 const ROGUE_SOURCES = [
   { path: 'sim/rogue/talents.go', cache: 'sim_rogue_talents.go' },
@@ -394,7 +422,21 @@ const ROGUE_SKIPPED = [
   [['Serrated Blades'], 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
   [['Seal Fate', 'Ruthlessness'], 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
   [['Adrenaline Rush', 'Blade Flurry', 'Cold Blood'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+  [['Improved Eviscerate', 'Puncturing Wounds', 'Lethality', 'Aggression', 'Surprise Attacks', 'Opportunity'], "Raise named abilities' damage, crit or crit damage. TalentModifiers has no per-ability field for them, so none applies, even where an estimate casts the ability: Combat's Sinister Strike, Assassination's Mutilate, Subtlety's Hemorrhage."],
+  [['Riposte', 'Ghostly Strike', 'Improved Ambush'], 'Teach or strengthen attacks no Rogue estimate makes: Riposte, Ghostly Strike and Ambush.'],
+  [['Dagger Specialization', 'Mace Specialization', 'Sword Specialization', 'Fist Weapon Specialization'], 'Weapon-type gated, and the mace one adds a stun. Would need per-weapon-type dispatch, the same reason the Warrior specializations are refused.'],
+  [['Improved Kidney Shot', 'Find Weakness', 'Dirty Deeds', 'Master of Subtlety', 'Shadowstep'], 'Windowed bonuses: while Kidney Shot holds, for 10 seconds after a finisher, below 35% health, from stealth, or after Shadowstep. Each needs a fight timeline.'],
+  [['Improved Sinister Strike', 'Vigor'], "Energy. Improved Sinister Strike lowers the cost of the Combat estimate's builder, which it prices at base cost; Vigor raises the energy cap, which a sustained energy rate never meets, so energy lost to capping is not modelled either."],
+  [['Dual Wield Specialization'], "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible; not yet ingested, because it moves every dual-wielding Rogue's estimate and wants its own check."],
+  [['Quick Recovery', 'Deadened Nerves', 'Lightning Reflexes', 'Deflection', 'Sleight of Hand', 'Heightened Senses', 'Enveloping Shadows', 'Cheat Death'], "Survival: healing taken, damage taken, dodge, parry, and the chance to be hit or crit. A damage dealer has no incoming-damage stream here. Quick Recovery's other half refunds energy on a missed finisher, which the sustained rate does not price."],
+  [['Improved Expose Armor'], "Strengthens Expose Armor, which the Buffs tab's target debuffs do not carry."],
 ]
+
+const ROGUE_NOT_READ = {
+  ability: [{ talent: 'Mutilate', spec: 'Assassination' }, { talent: 'Hemorrhage', spec: 'Subtlety' }],
+  buff: [],
+  utility: ['Remorseless Attacks', 'Fleet Footed', 'Improved Gouge', 'Endurance', 'Improved Sprint', 'Improved Kick', 'Blade Twisting', 'Nerves of Steel', 'Master of Deception', 'Dirty Tricks', 'Camouflage', 'Initiative', 'Setup', 'Elusiveness', 'Preparation', 'Premeditation'],
+}
 
 const HUNTER_SOURCES = [
   { path: 'sim/hunter/talents.go', cache: 'sim_hunter_talents.go' },
@@ -539,7 +581,20 @@ const HUNTER_SKIPPED = [
   [['Mortal Shots'], 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
   [['Expose Weakness'], 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
   [['Master Tactician', 'Thrill of the Hunt', 'Readiness'], 'Procs and cooldowns needing a timeline.'],
+  [['Improved Stings', 'Barrage', 'Improved Barrage', 'Savage Strikes', 'Clever Traps', 'Aimed Shot', 'Silencing Shot', 'Counterattack'], 'Teach or strengthen shots, strikes and traps no Hunter estimate makes. Every Hunter spec is modelled as Auto Shot and Steady Shot.'],
+  [['Monster Slaying', 'Humanoid Slaying'], 'Gated on the target being a beast, giant, dragonkin or humanoid. Nothing here models a mob type.'],
+  [['Careful Aim', 'Master Marksman', 'Survival Instincts', 'Lightning Reflexes'], 'Ranged attack power from Intellect, a ranged attack power multiplier, +4% attack power, and +15% Agility. Upstream writes Careful Aim and Master Marksman in talents.go; Lightning Reflexes would be a stat factor, which that file does not write. None is ingested yet. Survival Instincts also cuts damage taken, which has no stream here.'],
+  [['Endurance Training', 'Improved Aspect of the Monkey', 'Thick Hide', 'Spirit Bond', 'Catlike Reflexes', 'Deflection', 'Deterrence'], 'Survival for you and your pet: health, dodge, parry, armour and regeneration, and Deterrence is a cooldown. A damage dealer has no incoming-damage stream here.'],
+  [['Improved Aspect of the Hawk', 'Go for the Throat'], 'Procs on ranged attacks: a haste aura, and Focus for the pet on a crit. The pet\'s Focus income is modelled from its regeneration alone.'],
+  [["Improved Hunter's Mark"], "Makes Hunter's Mark raise melee attack power too, and the Buffs tab's target debuffs do not carry Hunter's Mark."],
+  [['Efficiency'], "Lowers the mana cost of shots. The Hunter estimate's mana figures price Steady Shot at its base cost."],
 ]
+
+const HUNTER_NOT_READ = {
+  ability: [],
+  buff: [{ talent: 'Trueshot Aura', buff: 'trueshot-aura' }, { talent: 'Ferocious Inspiration', buff: 'ferocious-inspiration' }],
+  utility: ['Improved Revive Pet', 'Pathfinding', 'Bestial Swiftness', 'Improved Mend Pet', 'Intimidation', 'Improved Concussive Shot', 'Improved Arcane Shot', 'Rapid Killing', 'Concussive Barrage', 'Scatter Shot', 'Hawk Eye', 'Entrapment', 'Improved Wing Clip', 'Trap Mastery', 'Improved Feign Death', 'Resourcefulness', 'Wyvern Sting'],
+}
 
 const SHAMAN_SOURCES = [{ path: 'sim/shaman/talents.go', cache: 'sim_shaman_talents.go' }]
 
@@ -608,9 +663,23 @@ const SHAMAN_EXTRACTORS = [
 
 const SHAMAN_SKIPPED = [
   [['Toughness', 'Anticipation', 'Shield Specialization'], 'Tank-facing armour, dodge and block. Expressible, but talents reach the damage path only.'],
-  [['Elemental Fury', 'Concussion', 'Call of Thunder'], 'Spell-side talents that are per-spell rather than per-character: Elemental Fury raises spell *crit damage*, and Concussion and Call of Thunder are scoped to named Nature spells. This simulator models one generic cast per spec and records no spell school, so none of the three has anything to attach to. The earlier reason given here — that calculateCasterDps took no talents — stopped being true on 2026-08-19.'],
+  [['Elemental Fury', 'Concussion', 'Call of Thunder'], 'Spell-side talents with nowhere to attach: Elemental Fury raises spell *crit damage*, which has no field, and Concussion and Call of Thunder are scoped to named Nature spells, which TalentModifiers has no per-spell field for. (This used to say no spell school was recorded; abilities record one now, and Demonic Sacrifice, the one school-scoped talent ingested, reads it. The reason before that, that calculateCasterDps took no talents, stopped being true on 2026-08-19.)'],
   [['Shamanistic Rage', { talent: 'Stormstrike', part: 'Nature debuff' }], 'Shamanistic Rage is an activated cooldown needing a usage policy. Stormstrike\'s strike is in Enhancement\'s rotation as a special attack; what is not modelled is the debuff it leaves, the next two Nature hits on the target taking 20% more.'],
+  [['Call of Flame', 'Improved Lightning Shield', 'Lightning Mastery', 'Lightning Overload', 'Improved Healing Wave', 'Healing Way', 'Improved Chain Heal', 'Earth Shield'], "Change particular spells (Fire totems, Lightning Shield, Lightning Bolt's cast time and its second bolt, Healing Wave, Chain Heal) or teach Earth Shield. TalentModifiers has no per-spell field for them, so none applies, even to Lightning Bolt and Chain Heal, which the Elemental and Restoration estimates cast."],
+  [['Unrelenting Storm', 'Ancestral Knowledge', 'Tidal Focus'], "Mana the healer estimate tracks: regeneration from Intellect, maximum mana, and cheaper heals. Its mana figures price Chain Heal at base cost and read regeneration from MP5 and Spirit alone, and StatBlock has no Mana field. Upstream writes Unrelenting Storm and Ancestral Knowledge in talents.go."],
+  [['Elemental Devastation', 'Elemental Mastery', "Nature's Swiftness"], 'Procs and cooldowns: melee crit after a spell crit, a guaranteed crit, an instant cast. Each needs a timeline.'],
+  [['Elemental Warding', 'Elemental Shields', 'Spirit Weapons', "Nature's Guardian"], 'Survival: damage taken, the chance to be crit, parry, and a heal at low health. A damage dealer or healer has no incoming-damage stream here.'],
+  [['Guardian Totems', 'Enhancing Totems', 'Improved Weapon Totems', 'Restorative Totems'], 'Strengthen totems. The Buffs tab carries Strength of Earth, Grace of Air, Windfury and Mana Spring Totem at their untalented values, and has no Stoneskin or Windwall Totem.'],
+  [['Elemental Weapons'], 'Strengthens weapon imbues. Windfury Weapon is in the Enhancement estimate at its untalented value.'],
+  [['Mental Quickness', "Nature's Blessing"], 'Spell power from attack power and from Intellect. Upstream writes both in talents.go, so they are expressible as stat conversions; not yet ingested.'],
+  [['Purification', 'Tidal Mastery', 'Elemental Precision'], 'Scoped to kinds of spell rather than to the character: +10% healing (there is no healing multiplier field), crit for healing and Lightning spells, and hit for Fire, Frost and Nature spells. Upstream does not write them in talents.go.'],
 ]
+
+const SHAMAN_NOT_READ = {
+  ability: [{ talent: 'Stormstrike', spec: 'Enhancement' }, { talent: 'Dual Wield', spec: 'Enhancement', note: 'The Enhancement estimate swings both hands.' }],
+  buff: [{ talent: 'Totem of Wrath', buff: 'totem-of-wrath' }, { talent: 'Mana Tide Totem', buff: 'mana-tide-totem' }, { talent: 'Unleashed Rage', buff: 'unleashed-rage' }],
+  utility: ['Convection', 'Elemental Focus', "Earth's Grasp", 'Reverberation', 'Improved Fire Totems', 'Eye of the Storm', 'Storm Reach', 'Improved Ghost Wolf', 'Shamanistic Focus', 'Improved Reincarnation', 'Ancestral Healing', 'Totemic Focus', 'Healing Focus', 'Totemic Mastery', 'Healing Grace', 'Focused Mind'],
+}
 
 const DRUID_SOURCES = [{ path: 'sim/druid/talents.go', cache: 'sim_druid_talents.go' },
   // Ferocity is applied where Rake's cost is computed, not in talents.go.
@@ -715,7 +784,21 @@ const DRUID_SKIPPED = [
   [['Heart of the Wild', 'Furor'], 'Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model.'],
   [['Moonkin Form', 'Tree of Life'], 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
   [['Omen of Clarity', 'Primal Fury'], 'Proc-driven energy and combo points, needing a timeline.'],
+  [['Starlight Wrath', 'Focused Starlight', 'Improved Moonfire', 'Vengeance', 'Moonfury', 'Wrath of Cenarius', 'Insect Swarm', 'Brambles'], "Change particular Balance spells (Starfire's and Wrath's cast time, crit, crit damage, damage and coefficient, Moonfire, Thorns, Entangling Roots) or teach Insect Swarm. TalentModifiers has no per-spell field for them, so none applies, even to Starfire, which the Balance estimate casts."],
+  [['Feral Aggression', 'Shredding Attacks', 'Savage Fury', 'Predatory Instincts', 'Mangle'], "Change particular cat abilities (Ferocious Bite's damage, Shred's energy cost, Claw, Rake and Mangle's damage, crit damage in forms) or teach Mangle. The Feral estimate prices Shred and Rake at their base figures, takes no crit damage from talents, and casts neither Mangle nor Ferocious Bite."],
+  [['Improved Rejuvenation', 'Empowered Touch', 'Improved Regrowth', 'Swiftmend', 'Empowered Rejuvenation', 'Gift of Nature'], 'Strengthen particular heals (Rejuvenation, Healing Touch, Regrowth, heals over time) or teach Swiftmend; Gift of Nature raises all healing. None has a field: Empowered Rejuvenation reaches Lifebloom, which the Restoration estimate casts, and is still not applied, and there is no healing multiplier.'],
+  [['Dreamstate'], "Mana regeneration from Intellect, which the healer estimate's mana figures do not read: they read MP5 and Spirit. Upstream writes it in talents.go; not yet ingested."],
+  [["Nature's Grace", "Nature's Swiftness", 'Force of Nature'], 'A faster cast after a spell crit, an instant cast, and treants on a cooldown. Each needs a timeline, and nothing here models the treants.'],
+  [['Feral Swiftness', 'Nurturing Instinct', 'Improved Leader of the Pack'], "Survival: dodge in forms, healing taken, and a heal on crit. A damage dealer has no incoming-damage stream here, and Nurturing Instinct's healing from Agility is for heals no Feral estimate casts."],
+  [['Improved Mark of the Wild'], 'Strengthens Gift of the Wild, which the Buffs tab carries at its untalented value.'],
+  [['Living Spirit'], 'Multiplies Spirit. Upstream writes it in talents.go, so it is expressible as a stat factor; not yet ingested.'],
 ]
+
+const DRUID_NOT_READ = {
+  ability: [],
+  buff: [{ talent: 'Leader of the Pack', buff: 'leader-of-the-pack' }, { talent: 'Faerie Fire (Feral)', debuff: 'faerie-fire' }, { talent: 'Improved Faerie Fire', debuff: 'improved-faerie-fire' }],
+  utility: ['Moonglow', "Nature's Grasp", "Improved Nature's Grasp", 'Control of Nature', "Nature's Reach", 'Celestial Focus', 'Feral Instinct', 'Brutal Impact', 'Feral Charge', 'Primal Tenacity', "Nature's Focus", 'Natural Shapeshifter', 'Tranquil Spirit', 'Improved Tranquility'],
+}
 
 const PALADIN_SOURCES = [{ path: 'sim/paladin/talents.go', cache: 'sim_paladin_talents.go' }]
 
@@ -811,7 +894,20 @@ const PALADIN_SKIPPED = [
   [['Vengeance', 'Sanctity Aura'], 'Proc-driven and aura damage multipliers that need a timeline or a party.'],
   [['Crusade'], 'Gated on the target being a humanoid, demon, undead or elemental. No mob type here.'],
   [['Shield Specialization'], 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
+  [['Improved Seal of Righteousness', 'Healing Light', 'Sanctified Light', 'Purifying Power', 'Holy Power', 'Holy Shock'], "Strengthen particular spells (Seal of Righteousness, Holy Light and Flash of Light, Exorcism and Holy Wrath, Holy spells' crit) or teach Holy Shock. TalentModifiers has no per-spell field for them, so none applies, even to Holy Light, which the Holy estimate casts."],
+  [['Illumination', 'Divine Favor', "Light's Grace", 'Divine Illumination'], 'Procs and cooldowns: mana back on a heal crit, a guaranteed crit, a faster Holy Light, half-price spells. Each needs a timeline.'],
+  [['Divine Intellect', 'Holy Guidance', 'Sacred Duty', 'Combat Expertise'], "Intellect, spell power from Intellect, Stamina, and expertise with Stamina. Upstream writes Divine Intellect, Sacred Duty and Combat Expertise in talents.go, so their stat factors are expressible; not yet ingested. Holy Guidance is not in that file. Combat Expertise's expertise is a tank's, which the tank estimate does not roll, as with Defiance."],
+  [['Improved Blessing of Wisdom', 'Improved Devotion Aura', 'Improved Blessing of Might', 'Improved Retribution Aura', 'Improved Sanctity Aura'], 'Strengthen blessings and auras. The Buffs tab carries them at their untalented values.'],
+  [['Redoubt', 'Reckoning', 'One-Handed Weapon Specialization', 'Improved Holy Shield', 'Holy Shield', 'Ardent Defender', "Avenger's Shield"], "Tank procs, damage and threat. The tank estimate rolls a steady incoming-attack table with no timeline, so Redoubt's and Reckoning's procs, Holy Shield's charges and Ardent Defender's low-health window have nothing to run on, and it does not score a tank's damage."],
+  [['Improved Judgement', 'Fanaticism', 'Two-Handed Weapon Specialization'], "Change Retribution's damage: Judgement's cooldown and crit, and +6% physical damage with a two-handed weapon. The estimate judges on the base 10-second cooldown. Upstream writes Two-Handed Weapon Specialization in talents.go as the same two-handed physical multiplier the Warrior talent of that name reaches, so it is expressible; not yet ingested, because it moves every Retribution estimate and wants its own check."],
+  [['Blessed Life', 'Pursuit of Justice', 'Eye for an Eye', 'Divine Purpose'], 'Survival, or damage returned when you are hit: half damage, spell hit taken, crits taken. A damage dealer or healer has no incoming-damage stream here.'],
 ]
+
+const PALADIN_NOT_READ = {
+  ability: [{ talent: 'Crusader Strike', spec: 'Retribution' }, { talent: 'Seal of Command', spec: 'Retribution', note: 'Alliance only: a Horde estimate uses Seal of Blood.' }],
+  buff: [{ talent: 'Blessing of Kings', buff: 'blessing-of-kings' }, { talent: 'Blessing of Sanctuary', buff: 'blessing-of-sanctuary' }, { talent: 'Improved Seal of the Crusader', debuff: 'improved-seal-of-the-crusader' }],
+  utility: ['Spiritual Focus', 'Aura Mastery', 'Improved Lay on Hands', 'Unyielding Faith', 'Pure of Heart', "Guardian's Favor", 'Stoicism', 'Improved Hammer of Justice', 'Improved Concentration Aura', 'Benediction', 'Vindication', 'Sanctified Judgement', 'Repentance'],
+}
 
 /*
  * The three pure caster classes, added once `calculateCasterDps` and `calculateHealing` could
@@ -880,10 +976,22 @@ const MAGE_STAT_EXTRACTORS = [
 ]
 
 const MAGE_SKIPPED = [
-  [['Ignite', 'Combustion', "Winter's Chill"], 'Per-spell and school-scoped; the simulator models one generic cast and records no spell school.'],
+  [['Ignite', 'Combustion', "Winter's Chill"], 'Per-spell and school-scoped: Ignite is a burn left by Fire crits, Combustion a cooldown, and Winter\'s Chill a stacking debuff Frost spells keep up (the Buffs tab carries the debuff itself). Each needs a timeline or a per-spell field TalentModifiers does not have.'],
   [['Arcane Power', 'Presence of Mind', 'Icy Veins'], 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
   [['Empowered Fireball', 'Empowered Frostbolt'], 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
+  [['Arcane Subtlety', 'Arcane Focus', 'Elemental Precision'], "Hit and resistance scoped to schools: Arcane Focus is Arcane hit, Elemental Precision Fire and Frost hit (and cheaper Fire and Frost spells), Arcane Subtlety lowers the target's resistances. The spell hit field is character-wide, so an Arcane Mage would collect Elemental Precision's hit, and target resistances are not modelled. Upstream does not write them in talents.go."],
+  [['Critical Mass', 'Pyromaniac', 'Fire Power', 'Piercing Ice', 'Arctic Winds'], "Fire and Frost crit and damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped crit has no field. Arctic Winds also lowers the chance to be hit."],
+  [['Spell Power', 'Ice Shards'], 'Raise spell crit damage, for all spells and for Frost spells. There is no crit-damage field for talents, the same gap as Elemental Fury.'],
+  [['Arcane Impact', 'Empowered Arcane Missiles', 'Improved Fireball', 'Incineration', 'Improved Flamestrike', 'Improved Frostbolt', 'Improved Cone of Cold', 'Wand Specialization', 'Pyroblast', 'Blast Wave', "Dragon's Breath", 'Summon Water Elemental'], "Change particular spells (Arcane Blast's crit, Arcane Missiles, Fireball's and Frostbolt's cast time, Fire Blast, Scorch, Flamestrike, Cone of Cold, wands) or teach a spell or the Water Elemental. TalentModifiers has no per-spell field for them, so none applies, even to Arcane Blast, Fireball and Frostbolt, which the estimates cast; nothing here models the Water Elemental."],
+  [['Arcane Potency', 'Improved Scorch', 'Molten Fury'], 'Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch, and the Buffs tab does not carry it), and damage below 20% health. Each needs a fight timeline.'],
+  [['Magic Absorption', 'Arcane Fortitude', 'Improved Mana Shield', 'Improved Blink', 'Prismatic Cloak', 'Frost Warding', 'Frozen Core', 'Ice Barrier'], 'Survival: resistances, armour, damage taken, absorbs and the chance to be hit. A damage dealer has no incoming-damage stream here.'],
 ]
+
+const MAGE_NOT_READ = {
+  ability: [],
+  buff: [],
+  utility: ['Arcane Concentration', 'Master of Elements', 'Frost Channeling', 'Improved Arcane Missiles', 'Magic Attunement', 'Improved Counterspell', 'Slow', 'Impact', 'Flame Throwing', 'Improved Fire Blast', 'Burning Soul', 'Molten Shields', 'Blazing Speed', 'Frostbite', 'Improved Frost Nova', 'Permafrost', 'Improved Blizzard', 'Arctic Reach', 'Shatter', 'Cold Snap', 'Ice Floes'],
+}
 
 const PRIEST_SOURCES = [{ path: 'sim/priest/talents.go', cache: 'sim_priest_talents.go' }]
 
@@ -924,7 +1032,19 @@ const PRIEST_SKIPPED = [
   [['Shadow Weaving', 'Misery'], 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
   [['Inner Focus', 'Power Infusion'], 'Timed cooldowns, which a closed-form model has no timeline to place.'],
   [['Improved Renew', 'Empowered Healing'], 'Per-spell coefficients; the healer path models one generic cast.'],
+  [['Improved Power Word: Shield', 'Focused Power', 'Divine Fury', 'Searing Light', 'Surge of Light', 'Improved Shadow Word: Pain', 'Improved Mind Blast', 'Shadow Power', 'Reflective Shield', 'Wand Specialization', 'Holy Nova', 'Lightwell'], "Change particular spells (Power Word: Shield, Smite and Mind Blast's hit, Smite, Holy Fire and the big heals' cast time, a free instant Smite after a crit, Shadow Word: Pain's duration, Mind Blast's cooldown and crit, wands) or teach Holy Nova or Lightwell. TalentModifiers has no per-spell field for them, so none applies, even to Shadow Word: Pain and Mind Blast, which the Shadow estimate casts."],
+  [['Holy Specialization', 'Shadow Focus', 'Darkness', 'Shadowform'], "Scoped to a school: Holy crit, Shadow hit, Shadow damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped hit and crit have no field. Shadowform also cuts physical damage taken."],
+  [['Mental Agility', 'Mental Strength', 'Holy Concentration'], "Mana the healer estimates track: cheaper instant spells (Holy's Circle of Healing), maximum mana, and free heals after a proc (Discipline's Flash Heal). Their mana figures price each heal at base cost, StatBlock has no Mana field, and the proc needs a timeline. Upstream writes Mental Strength in talents.go."],
+  [['Enlightenment', 'Spirit of Redemption', 'Spiritual Healing'], 'Multiply Stamina, Intellect and Spirit, or Spirit alone, or raise all healing. Upstream writes Enlightenment and Spirit of Redemption in talents.go, so their stat factors are expressible; not yet ingested. There is no healing multiplier field.'],
+  [['Improved Inner Fire', 'Focused Will', 'Spell Warding', 'Blessed Recovery', 'Blessed Resilience', 'Shadow Resilience', 'Pain Suppression'], "Survival: armour, damage taken, heals after a crit, the chance to be crit, and Pain Suppression's cooldown. A damage dealer or healer has no incoming-damage stream here."],
+  [['Improved Power Word: Fortitude', 'Improved Divine Spirit'], 'Strengthen Prayer of Fortitude and Prayer of Spirit, which the Buffs tab carries at their untalented values.'],
 ]
+
+const PRIEST_NOT_READ = {
+  ability: [{ talent: 'Mind Flay', spec: 'Shadow' }, { talent: 'Vampiric Touch', spec: 'Shadow' }, { talent: 'Circle of Healing', spec: 'Holy' }],
+  buff: [{ talent: 'Divine Spirit', buff: 'prayer-of-spirit' }],
+  utility: ['Focused Mind', 'Unbreakable Will', 'Silent Resolve', 'Martyrdom', 'Absolution', 'Improved Mana Burn', 'Healing Focus', 'Inspiration', 'Holy Reach', 'Improved Healing', 'Healing Prayers', 'Spirit Tap', 'Blackout', 'Shadow Affinity', 'Improved Psychic Scream', 'Improved Fade', 'Shadow Reach', 'Silence', 'Vampiric Embrace', 'Improved Vampiric Embrace'],
+}
 
 const WARLOCK_SOURCES = [
   { path: 'sim/warlock/talents.go', cache: 'sim_warlock_talents.go' },
@@ -1003,24 +1123,38 @@ const WARLOCK_DEMON_EXTRACTORS = [
 const WARLOCK_SKIPPED = [
   [['Master Demonologist'], 'Gated on which demon is summoned. Only the Felguard is modelled, and it does not read this bonus yet.'],
   [['Fel Intellect', 'Fel Stamina'], 'Both land on Mana and Health, which StatBlock has no field for. Fel Stamina also multiplies Stamina, which is expressible now that talents reach the stat pipeline; not yet ingested.'],
-  [['Improved Shadow Bolt', 'Ruin', 'Emberstorm'], 'Per-spell and school-scoped; no spell school is recorded anywhere in this simulator.'],
+  [['Improved Shadow Bolt', 'Ruin', 'Emberstorm'], 'Per-spell and school-scoped: Improved Shadow Bolt is a Shadow vulnerability its crits leave, Ruin raises Destruction crit damage, Emberstorm Fire damage. None is in upstream talents.go, which is all this ingest reads. (This used to say no spell school was recorded anywhere; abilities record one now, and Demonic Sacrifice reads it.)'],
   [['Soul Leech', 'Nightfall'], 'Proc-driven, needing a timeline.'],
+  [['Improved Corruption', 'Empowered Corruption', 'Improved Curse of Agony', 'Contagion', 'Soul Siphon', 'Bane', 'Improved Immolate', 'Shadow and Flame', 'Improved Searing Pain', 'Shadowburn', 'Conflagrate', 'Shadowfury'], "Change particular spells (Corruption's cast time and coefficient, Curse of Agony and Corruption damage, Drain Life, Shadow Bolt's and Immolate's cast time, Immolate's opening hit, Shadow Bolt's and Incinerate's coefficient, Searing Pain) or teach Shadowburn, Conflagrate or Shadowfury. TalentModifiers has no per-spell field for them, so none applies, even to the Corruption, Curse of Agony, Shadow Bolt, Incinerate and Immolate the estimates cast."],
+  [['Suppression', 'Shadow Mastery', 'Devastation'], "Affliction hit, Shadow damage and Destruction crit. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write Shadow Mastery in talents.go, which is all this ingest reads, and hit and crit scoped to a tree have no field."],
+  [['Amplify Curse'], 'An activated cooldown for the next curse. Uptime needs a usage policy this model has none of.'],
+  [['Improved Imp', 'Improved Sayaad', 'Improved Firebolt', 'Improved Lash of Pain', 'Demonic Knowledge'], "Strengthen demons other than the Felguard, the only demon modelled, or grant spell power from the active demon's Stamina and Intellect, which nothing here tracks. Improved Imp also raises Blood Pact, which the Buffs tab carries at its untalented value."],
+  [['Demonic Embrace', 'Demonic Aegis', 'Master Conjuror'], 'Stamina and Spirit factors, a stronger Fel Armor, and stronger Firestone and Spellstone. Upstream writes Demonic Embrace in talents.go, so it is expressible as a stat factor; not yet ingested. Fel Armor and the stones are not modelled.'],
+  [['Malediction'], 'Raises Curse of the Elements to 13%, and the Buffs tab carries the untalented 10%.'],
+  [['Demonic Resilience', 'Soul Link', 'Nether Protection'], 'Survival: the chance to be crit, damage shared with the demon, immunity after a spell hit. A damage dealer has no incoming-damage stream here.'],
 ]
 
+const WARLOCK_NOT_READ = {
+  ability: [{ talent: 'Siphon Life', spec: 'Affliction' }, { talent: 'Unstable Affliction', spec: 'Affliction' }, { talent: 'Summon Felguard', spec: 'Demonology' }],
+  buff: [],
+  utility: ['Improved Life Tap', 'Dark Pact', 'Cataclysm', 'Improved Curse of Weakness', 'Improved Drain Soul', 'Fel Concentration', 'Grim Reach', 'Shadow Embrace', 'Curse of Exhaustion', 'Improved Howl of Terror', 'Improved Healthstone', 'Improved Health Funnel', 'Improved Voidwalker', 'Fel Domination', 'Master Summoner', 'Improved Subjugate Demon', 'Mana Feed', 'Aftermath', 'Intensity', 'Destructive Reach', 'Pyroclasm'],
+}
+
 const CLASSES = [
-  { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: [...WARRIOR_EXTRACTORS, ...WARRIOR_STAT_EXTRACTORS], skipped: WARRIOR_SKIPPED },
-  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS, ...ROGUE_POISON_EXTRACTORS], skipped: ROGUE_SKIPPED },
-  { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED },
-  { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED },
-  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS, ...DRUID_BLEED_EXTRACTORS], skipped: DRUID_SKIPPED },
-  { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: [...PALADIN_EXTRACTORS, ...PALADIN_STAT_EXTRACTORS], skipped: PALADIN_SKIPPED },
-  { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: [...MAGE_EXTRACTORS, ...MAGE_STAT_EXTRACTORS], skipped: MAGE_SKIPPED },
-  { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: [...PRIEST_EXTRACTORS, ...PRIEST_STAT_EXTRACTORS], skipped: PRIEST_SKIPPED },
-  { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: [...WARLOCK_EXTRACTORS, ...WARLOCK_DEMON_EXTRACTORS], skipped: WARLOCK_SKIPPED },
+  { className: 'Warrior', talentJson: 'warriorTalents.json', sources: WARRIOR_SOURCES, extractors: [...WARRIOR_EXTRACTORS, ...WARRIOR_STAT_EXTRACTORS], skipped: WARRIOR_SKIPPED, notRead: WARRIOR_NOT_READ },
+  { className: 'Rogue', talentJson: 'rogueTalents.json', sources: ROGUE_SOURCES, extractors: [...ROGUE_EXTRACTORS, ...ROGUE_STAT_EXTRACTORS, ...ROGUE_ENERGY_EXTRACTORS, ...ROGUE_POISON_EXTRACTORS], skipped: ROGUE_SKIPPED, notRead: ROGUE_NOT_READ },
+  { className: 'Hunter', talentJson: 'hunterTalents.json', sources: HUNTER_SOURCES, extractors: HUNTER_EXTRACTORS, skipped: HUNTER_SKIPPED, notRead: HUNTER_NOT_READ },
+  { className: 'Shaman', talentJson: 'shamanTalents.json', sources: SHAMAN_SOURCES, extractors: SHAMAN_EXTRACTORS, skipped: SHAMAN_SKIPPED, notRead: SHAMAN_NOT_READ },
+  { className: 'Druid', talentJson: 'druidTalents.json', sources: DRUID_SOURCES, extractors: [...DRUID_EXTRACTORS, ...DRUID_STAT_EXTRACTORS, ...DRUID_BLEED_EXTRACTORS], skipped: DRUID_SKIPPED, notRead: DRUID_NOT_READ },
+  { className: 'Paladin', talentJson: 'paladinTalents.json', sources: PALADIN_SOURCES, extractors: [...PALADIN_EXTRACTORS, ...PALADIN_STAT_EXTRACTORS], skipped: PALADIN_SKIPPED, notRead: PALADIN_NOT_READ },
+  { className: 'Mage', talentJson: 'mageTalents.json', sources: MAGE_SOURCES, extractors: [...MAGE_EXTRACTORS, ...MAGE_STAT_EXTRACTORS], skipped: MAGE_SKIPPED, notRead: MAGE_NOT_READ },
+  { className: 'Priest', talentJson: 'priestTalents.json', sources: PRIEST_SOURCES, extractors: [...PRIEST_EXTRACTORS, ...PRIEST_STAT_EXTRACTORS], skipped: PRIEST_SKIPPED, notRead: PRIEST_NOT_READ },
+  { className: 'Warlock', talentJson: 'warlockTalents.json', sources: WARLOCK_SOURCES, extractors: [...WARLOCK_EXTRACTORS, ...WARLOCK_DEMON_EXTRACTORS], skipped: WARLOCK_SKIPPED, notRead: WARLOCK_NOT_READ },
 ]
 
 const effects = []
 const skippedAll = []
+const notReadAll = []
 const failures = []
 
 for (const entry of CLASSES) {
@@ -1103,6 +1237,40 @@ for (const entry of CLASSES) {
     const label = named.map(({ talent, part }) => (part ? `${talent} (${part})` : talent)).join(' / ')
     skippedAll.push({ className: entry.className, talent: label, talents, reason })
   }
+
+  for (const kind of ['ability', 'buff', 'utility']) {
+    for (const listed of entry.notRead[kind]) {
+      const { talent: name, ...rest } = typeof listed === 'string' ? { talent: listed } : listed
+      const talent = talentsByName.get(name)
+      if (!talent) {
+        failures.push(`${entry.className} not read ${name}: no talent by that name in ${entry.talentJson}`)
+        continue
+      }
+      const extracted = effects.some((effect) => effect.talentId === talent.id)
+      const refusal = skippedAll.flatMap((skip) => skip.talents).find((t) => t.talentId === talent.id)
+      // Only an ability can share a talent with a refusal, and only a partial one: Stormstrike's strike
+      // is in Enhancement's rotation while its Nature debuff is refused.
+      if (extracted || (refusal && (kind !== 'ability' || !refusal.part))) {
+        failures.push(`${entry.className} not read ${name}: it is ${extracted ? 'extracted' : 'refused'}, so it is read or refused, not "${kind}"`)
+        continue
+      }
+      if (notReadAll.some((each) => each.talentId === talent.id)) {
+        failures.push(`${entry.className} not read ${name}: listed twice`)
+        continue
+      }
+      notReadAll.push({ className: entry.className, kind, talentId: talent.id, talent: name, ...rest })
+    }
+  }
+
+  // Every talent is accounted for, or the run stops: an unmentioned talent is how a damage talent
+  // used to reach no caveat while the tooltip called it utility.
+  for (const talent of tree.trees.flatMap((t) => t.talents)) {
+    const accounted =
+      effects.some((effect) => effect.talentId === talent.id) ||
+      skippedAll.some((skip) => skip.talents.some((t) => t.talentId === talent.id)) ||
+      notReadAll.some((each) => each.talentId === talent.id)
+    if (!accounted) failures.push(`${entry.className} ${talent.name}: neither extracted, refused nor listed as not read`)
+  }
 }
 
 if (failures.length > 0) {
@@ -1120,6 +1288,7 @@ const out = {
   effectCount: effects.length,
   effects,
   skipped: skippedAll,
+  notRead: notReadAll,
 }
 
 const target = resolve(REPO, 'src/domain/talents/talentEffects.json')
@@ -1137,3 +1306,4 @@ for (const e of effects) {
   console.log(`  ${e.className.padEnd(8)} ${e.talent.padEnd(34)} ${e.kind.padEnd(26)} ${value}`)
 }
 console.log(`\nskipped ${skippedAll.length} talent groups across ${CLASSES.length} classes; see "skipped" in the JSON for why each one.`)
+console.log(`not read: ${notReadAll.length} talents (${['ability', 'buff', 'utility'].map((kind) => `${notReadAll.filter((each) => each.kind === kind).length} ${kind}`).join(', ')}).`)

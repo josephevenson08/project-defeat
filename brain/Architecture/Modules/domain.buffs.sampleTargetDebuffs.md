@@ -70,6 +70,7 @@ From the top of the file:
 - [[features.raidcomp.RaidAdvice]] — `src/features/raidcomp/RaidAdvice.tsx`
 - [[features.simulator.bestCase]] — `src/features/simulator/bestCase.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
+- [[features.talents.talentWords]] — `src/features/talents/talentWords.ts`
 
 ## Concepts & phases
 

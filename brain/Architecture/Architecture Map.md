@@ -155,7 +155,7 @@ Per-feature panels plus the calculation functions that drive them. This is where
 Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `features` or `components`, which is what keeps the domain reusable.
 
 - [[domain.abilities.abilityTypes]] · 13 importers
-- [[domain.abilities.index]] · 5 importers
+- [[domain.abilities.index]] · 4 importers
 - [[domain.abilities.sampleSignatureAbilities]] · 2 importers
 - [[domain.abilities.signatureAbilitiesDruid]] · 1 importers
 - [[domain.abilities.signatureAbilitiesHunter]] · 1 importers
@@ -180,8 +180,8 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.buffs.buffScopeJson.d]] · 0 importers
 - [[domain.buffs.buffTypes]] · 9 importers
 - [[domain.buffs.raidBuffs]] · 2 importers
-- [[domain.buffs.sampleBuffs]] · 10 importers
-- [[domain.buffs.sampleTargetDebuffs]] · 7 importers
+- [[domain.buffs.sampleBuffs]] · 11 importers
+- [[domain.buffs.sampleTargetDebuffs]] · 8 importers
 - [[domain.builds.addonImport]] · 2 importers
 - [[domain.builds.buildSerialization]] · 5 importers
 - [[domain.builds.buildTypes]] · 8 importers
@@ -196,7 +196,7 @@ Typed TBC knowledge: rules, formulas, and data. Nothing here imports from `featu
 - [[domain.character.racialTypes]] · 2 importers
 - [[domain.character.roleTheme]] · 8 importers
 - [[domain.character.sampleRacialTraits]] · 1 importers
-- [[domain.character.tbcClasses]] · 13 importers
+- [[domain.character.tbcClasses]] · 12 importers
 - [[domain.consumables.consumableCatalogueJson.d]] · 0 importers
 - [[domain.consumables.consumableTypes]] · 3 importers
 - [[domain.consumables.sampleConsumables]] · 3 importers
