@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**502 commits across 86 days**, from 2026-06-25 to 2026-10-25.
+**505 commits across 87 days**, from 2026-06-25 to 2026-10-26.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,16 +13,22 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_75 commits_
+_78 commits_
 
-### Sunday 25 October — 1 commit
+### Monday 26 October — 1 commit
+
+- Make the tank talent note true: what Effective Health reads, then the refusals — [`dc62b27`](https://github.com/josephevenson08/project-defeat/commit/dc62b27ff31508db15f50704b5fc593dc21ae4d0)
+
+### Sunday 25 October — 2 commits
 
 - Port step 7: the crystal-and-water scene and its motion — [`c3e2a7b`](https://github.com/josephevenson08/project-defeat/commit/c3e2a7bb29ea0be25f3375f67ef7a6e5be5c44fc)
+- Refresh the daily log — [`71a2e21`](https://github.com/josephevenson08/project-defeat/commit/71a2e218d25904c32515f03a23808a570f56ff7b)
 
-### Saturday 24 October — 2 commits
+### Saturday 24 October — 3 commits
 
 - Name every refused talent in the Simulation tab's talent caveat — [`c2f7ace`](https://github.com/josephevenson08/project-defeat/commit/c2f7ace92d1a75c14b8e1ae8a5b23d1c4383c35e)
 - Refresh the daily log — [`ce1dd35`](https://github.com/josephevenson08/project-defeat/commit/ce1dd356de1a9c528e38ace74767a0e3aa1f80f2)
+- Account for every talent: modelled, refused, or said why nothing reads it — [`17f2c57`](https://github.com/josephevenson08/project-defeat/commit/17f2c572f679555dd9e5860742a04e5773b42c0e)
 
 ### Friday 23 October — 2 commits
 
