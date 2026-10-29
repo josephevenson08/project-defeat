@@ -548,8 +548,14 @@ independently. The plan has five stages:
 3. One in-game check session.
 4. Distribution through GitHub Releases first.
 
-Twelve decisions are the owner's, and nothing has been built yet. Share links, the other half of the
-original "backend" question, landed 2026-09-20 without one.
+**Status (2026-10-29): built, except stages 1 and 4.** Share links, the other half of the original
+"backend" question, landed 2026-09-20 without one. The one-file addon (`addon/ProjectDefeatExport`,
+stage 2) was written on 2026-09-28 and checked without the game by `addon/verify`, and a real in-game
+export is in `addon/verify/real-export.json` (stage 3). Pasting `/pdexport`'s string works on the front
+door (straight into the planner as that character) and in the planner's Build tab, which reads it first
+and asks the spec when the talents cannot say (`src/domain/builds/addonImport.ts`). Not done: reading
+WoWSims exporter JSON (stage 1), and publishing the addon (stage 4: no release is tagged yet; the steps
+are in `addon/README.md`).
 
 ## Phase 7: Discord Bot
 
@@ -562,7 +568,11 @@ Re-checking the three attunement chains for Anniversary realms still comes first
 
 ## Phase 8: UI Refresh
 
-**Planned 2026-10-02, not started: see [`UI-REFRESH-PLAN.md`](design/UI-REFRESH-PLAN.md).** Drawn from
+**Folded into the port and shipped with it (2026-10-12 to 2026-10-25), except the global search.** The
+port plan's "What carries over from the 2 October plan" says where each item went: the tab title and
+link previews, the font preload, the colour tokens, the provenance line with dates and the phase on
+every screen came with step 0; the plain-language hit line with the Gear tab; counts in tab labels were
+dropped; global search with Ctrl K is still to do. The original plan: [`UI-REFRESH-PLAN.md`](design/UI-REFRESH-PLAN.md). Drawn from
 the [gaming UI research](research/gaming-ui/README.md), which covers 25 platforms with a cited source
 for every claim. Three phases:
 
