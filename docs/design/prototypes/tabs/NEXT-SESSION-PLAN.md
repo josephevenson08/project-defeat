@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-24): the scene is in the app, and the port is done; start here
+## ▶ Where we left off (2026-10-29): the owner's quick wins, committed; start here
+
+The port is complete and live (origin/main at `8bccd3c`). The owner's quick wins are committed on main, not pushed: the roadmap's stale statuses (`c297464`), a dev-server warm-up before the test suite (`56411a3`), and the expressible talents (`f919045`: 80 effects to 94; Rogue Dual Wield Specialization tried and put back because Subtlety then read above its reference). A full run from a cold server passed 431 of 431. **Next:** push when the owner says so; then why Subtlety reads high with Dual Wield Specialization. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-24): the scene is in the app, and the port is done
 
 **Step 7, the last, brought this folder's scene and motion into the app:** the crystal-and-water host every tab page carries (`window.SCENE`) and `tbc-kit.js`'s themes, ported to three 0.186 as `src/features/scene/waterScene.ts`, and the kit's DOM effects as Web Animations in `motionLayer.ts`, both loaded on demand. As the owner decided (2026-10-23): `three` plus the app's own anime.js, not GSAP; on by default with a "3D scene" switch; and the main bundle up at most 1.5 KB gzipped (it is 1,241 bytes). Each tab has its page's colour, numbers and detail, and each raid its own light; reduced motion, no WebGL or a weak device keep the still backdrop; the front door keeps its art and has no 3D. Left here: the portal ignition, the rune ring, the rebirth burst, the lift, the separate Motion switch and the scroll-driven text. Built, tested (`tests/scene.spec.ts`) and committed (`c3e2a7b`), waiting for the owner's OK to push. **Next:** push it; then Step B of the maps rework when Wowhead answers. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
