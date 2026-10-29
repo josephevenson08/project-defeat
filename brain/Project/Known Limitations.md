@@ -21,7 +21,7 @@ Kept deliberately blunt. A planner that overstates its accuracy is worse than on
 
 ## Talents
 
-- Talents reach all 27 specs, but **coverage is not completeness**: 106 talent groups are refused by name, each with a reason. A talented estimate reads low, especially for casters.
+- Talents reach all 27 specs, but **coverage is not completeness**: 104 talent groups are refused by name, each with a reason. A talented estimate reads low, especially for casters.
 - Every refusal carries its own reason (per-spell effects, procs, cooldowns, utility). Stat-pipeline talents such as Toughness and Vitality are modelled: talents reach `calculateStats`, and the tank note names what Effective Health reads.
 - **Two talents that raise healing are modelled for their damage half only.** Spiritual Guidance and Lunar Guidance raise spell damage *and* healing in game, but wowsims implements no healer for either class at the pinned commit, so only the sourced half is ingested. A healer estimate reads low by it.
 

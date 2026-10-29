@@ -35,7 +35,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 80,
+  "effectCount": 94,
   "effects": [
     {
       "className": "Warrior",
@@ -384,6 +384,30 @@
     },
     {
       "className": "Hunter",
+      "talentId": 1804,
+      "talent": "Combat Experience",
+      "tree": "Marksmanship",
+      "maxRank": 2,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "agility",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
+      "talentId": 1804,
+      "talent": "Combat Experience",
+      "tree": "Marksmanship",
+      "maxRank": 2,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.03,
+      "stat": "intellect",
+      "source": "sim/hunter/talents.go"
+    },
+    {
+      "className": "Hunter",
       "talentId": 1321,
       "talent": "Killer Instinct",
       "tree": "Survival",
@@ -660,6 +684,31 @@
     },
     {
       "className": "Druid",
+      "talentId": 1797,
+      "talent": "Living Spirit",
+      "tree": "Restoration",
+      "maxRank": 3,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "stat": "spirit",
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
+      "talentId": 808,
+      "talent": "Heart of the Wild",
+      "tree": "Feral",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.04,
+      "stat": "intellect",
+      "caveat": "The Intellect half only: upstream gates the Stamina and attack power halves on the bear and cat forms.",
+      "source": "sim/druid/talents.go"
+    },
+    {
+      "className": "Druid",
       "talentId": 1782,
       "talent": "Lunar Guidance",
       "tree": "Balance",
@@ -695,6 +744,18 @@
       "perRank": 1,
       "caveat": "Upstream writes a bare subtraction with no coefficient, which means one energy a rank. Also discounts Claw, which this model does not have.",
       "source": "sim/druid/rake.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1410,
+      "talent": "Two-Handed Weapon Specialization",
+      "tree": "Retribution",
+      "maxRank": 3,
+      "kind": "twoHandedDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "caveat": "Applies only while a two-handed weapon is in the main hand, and to physical damage: upstream leaves Seals and Judgements to be done separately.",
+      "source": "sim/paladin/talents.go"
     },
     {
       "className": "Paladin",
@@ -776,6 +837,42 @@
       "unit": "fraction per rank (implied coefficient of 1 upstream)",
       "perRank": 0.01,
       "caveat": "Upstream omits the coefficient, which means 1.",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1449,
+      "talent": "Divine Intellect",
+      "tree": "Holy",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "stat": "intellect",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1750,
+      "talent": "Sacred Duty",
+      "tree": "Protection",
+      "maxRank": 2,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.03,
+      "stat": "stamina",
+      "source": "sim/paladin/talents.go"
+    },
+    {
+      "className": "Paladin",
+      "talentId": 1753,
+      "talent": "Combat Expertise",
+      "tree": "Protection",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.02,
+      "stat": "stamina",
       "source": "sim/paladin/talents.go"
     },
     {
@@ -895,6 +992,54 @@
     },
     {
       "className": "Priest",
+      "talentId": 1772,
+      "talent": "Enlightenment",
+      "tree": "Discipline",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "intellect",
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 1772,
+      "talent": "Enlightenment",
+      "tree": "Discipline",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "stamina",
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 1772,
+      "talent": "Enlightenment",
+      "tree": "Discipline",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.01,
+      "stat": "spirit",
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
+      "talentId": 1561,
+      "talent": "Spirit of Redemption",
+      "tree": "Holy",
+      "maxRank": 1,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.05,
+      "stat": "spirit",
+      "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Priest",
       "talentId": 402,
       "talent": "Spiritual Guidance",
       "tree": "Holy",
@@ -906,6 +1051,30 @@
       "to": "spellPower",
       "caveat": "Upstream models the spell-damage half only, because wowsims has no healer implemented for this class at the pinned commit. The talent raises healing by the same amount in game, so a healer estimate here reads low by it; sourcing that half needs the tooltip itself, which is not this file.",
       "source": "sim/priest/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1223,
+      "talent": "Demonic Embrace",
+      "tree": "Demonology",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": 0.03,
+      "stat": "stamina",
+      "source": "sim/warlock/talents.go"
+    },
+    {
+      "className": "Warlock",
+      "talentId": 1223,
+      "talent": "Demonic Embrace",
+      "tree": "Demonology",
+      "maxRank": 5,
+      "kind": "statFactor",
+      "unit": "fraction per rank",
+      "perRank": -0.01,
+      "stat": "spirit",
+      "source": "sim/warlock/talents.go"
     },
     {
       "className": "Warlock",
@@ -1214,6 +1383,17 @@
     },
     {
       "className": "Rogue",
+      "talent": "Dual Wield Specialization",
+      "talents": [
+        {
+          "talentId": 221,
+          "talent": "Dual Wield Specialization"
+        }
+      ],
+      "reason": "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible. Ingesting it (tried 2026-10-29) took Subtlety's best case to 1,295 against its 1,292 reference, and a spec reading above what players parse is treated here as something counted twice: find that before this goes in."
+    },
+    {
+      "className": "Rogue",
       "talent": "Murder",
       "talents": [
         {
@@ -1385,17 +1565,6 @@
     },
     {
       "className": "Rogue",
-      "talent": "Dual Wield Specialization",
-      "talents": [
-        {
-          "talentId": 221,
-          "talent": "Dual Wield Specialization"
-        }
-      ],
-      "reason": "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible; not yet ingested, because it moves every dual-wielding Rogue's estimate and wants its own check."
-    },
-    {
-      "className": "Rogue",
       "talent": "Quick Recovery / Deadened Nerves / Lightning Reflexes / Deflection / Sleight of Hand / Heightened Senses / Enveloping Shadows / Cheat Death",
       "talents": [
         {
@@ -1481,17 +1650,6 @@
         }
       ],
       "reason": "Multiplies Health, which StatBlock has no field for — health is derived from Stamina here."
-    },
-    {
-      "className": "Hunter",
-      "talent": "Combat Experience",
-      "talents": [
-        {
-          "talentId": 1804,
-          "talent": "Combat Experience"
-        }
-      ],
-      "reason": "Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested."
     },
     {
       "className": "Hunter",
@@ -1929,18 +2087,19 @@
     },
     {
       "className": "Druid",
-      "talent": "Heart of the Wild / Furor",
+      "talent": "Heart of the Wild (Stamina and attack power halves) / Furor",
       "talents": [
         {
           "talentId": 808,
-          "talent": "Heart of the Wild"
+          "talent": "Heart of the Wild",
+          "part": "Stamina and attack power halves"
         },
         {
           "talentId": 822,
           "talent": "Furor"
         }
       ],
-      "reason": "Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model."
+      "reason": "Heart of the Wild's Intellect half is ingested; its Stamina and attack power halves are gated on the shapeshift form, and this app has no form model (Feral is modelled as a cat throughout, without the form's own terms). Furor is a form-entry resource effect."
     },
     {
       "className": "Druid",
@@ -2130,17 +2289,6 @@
       "reason": "Strengthens Gift of the Wild, which the Buffs tab carries at its untalented value."
     },
     {
-      "className": "Druid",
-      "talent": "Living Spirit",
-      "talents": [
-        {
-          "talentId": 1797,
-          "talent": "Living Spirit"
-        }
-      ],
-      "reason": "Multiplies Spirit. Upstream writes it in talents.go, so it is expressible as a stat factor; not yet ingested."
-    },
-    {
       "className": "Paladin",
       "talent": "Spell Warding / Improved Righteous Fury",
       "talents": [
@@ -2248,26 +2396,19 @@
     },
     {
       "className": "Paladin",
-      "talent": "Divine Intellect / Holy Guidance / Sacred Duty / Combat Expertise",
+      "talent": "Holy Guidance / Combat Expertise (expertise)",
       "talents": [
-        {
-          "talentId": 1449,
-          "talent": "Divine Intellect"
-        },
         {
           "talentId": 1746,
           "talent": "Holy Guidance"
         },
         {
-          "talentId": 1750,
-          "talent": "Sacred Duty"
-        },
-        {
           "talentId": 1753,
-          "talent": "Combat Expertise"
+          "talent": "Combat Expertise",
+          "part": "expertise"
         }
       ],
-      "reason": "Intellect, spell power from Intellect, Stamina, and expertise with Stamina. Upstream writes Divine Intellect, Sacred Duty and Combat Expertise in talents.go, so their stat factors are expressible; not yet ingested. Holy Guidance is not in that file. Combat Expertise's expertise is a tank's, which the tank estimate does not roll, as with Defiance."
+      "reason": "Holy Guidance is spell power from Intellect, which upstream's talents.go does not carry. Combat Expertise's Stamina half is ingested; its expertise is a tank's, which the tank estimate does not roll, as with Defiance."
     },
     {
       "className": "Paladin",
@@ -2333,7 +2474,7 @@
     },
     {
       "className": "Paladin",
-      "talent": "Improved Judgement / Fanaticism / Two-Handed Weapon Specialization",
+      "talent": "Improved Judgement / Fanaticism",
       "talents": [
         {
           "talentId": 1631,
@@ -2342,13 +2483,9 @@
         {
           "talentId": 1759,
           "talent": "Fanaticism"
-        },
-        {
-          "talentId": 1410,
-          "talent": "Two-Handed Weapon Specialization"
         }
       ],
-      "reason": "Change Retribution's damage: Judgement's cooldown and crit, and +6% physical damage with a two-handed weapon. The estimate judges on the base 10-second cooldown. Upstream writes Two-Handed Weapon Specialization in talents.go as the same two-handed physical multiplier the Warrior talent of that name reaches, so it is expressible; not yet ingested, because it moves every Retribution estimate and wants its own check."
+      "reason": "Change Retribution's Judgement: its cooldown and its crit. The estimate judges on the base 10-second cooldown."
     },
     {
       "className": "Paladin",
@@ -2744,22 +2881,14 @@
     },
     {
       "className": "Priest",
-      "talent": "Enlightenment / Spirit of Redemption / Spiritual Healing",
+      "talent": "Spiritual Healing",
       "talents": [
-        {
-          "talentId": 1772,
-          "talent": "Enlightenment"
-        },
-        {
-          "talentId": 1561,
-          "talent": "Spirit of Redemption"
-        },
         {
           "talentId": 404,
           "talent": "Spiritual Healing"
         }
       ],
-      "reason": "Multiply Stamina, Intellect and Spirit, or Spirit alone, or raise all healing. Upstream writes Enlightenment and Spirit of Redemption in talents.go, so their stat factors are expressible; not yet ingested. There is no healing multiplier field."
+      "reason": "Raises all healing, and there is no healing multiplier field."
     },
     {
       "className": "Priest",
@@ -2985,12 +3114,8 @@
     },
     {
       "className": "Warlock",
-      "talent": "Demonic Embrace / Demonic Aegis / Master Conjuror",
+      "talent": "Demonic Aegis / Master Conjuror",
       "talents": [
-        {
-          "talentId": 1223,
-          "talent": "Demonic Embrace"
-        },
         {
           "talentId": 1671,
           "talent": "Demonic Aegis"
@@ -3000,7 +3125,7 @@
           "talent": "Master Conjuror"
         }
       ],
-      "reason": "Stamina and Spirit factors, a stronger Fel Armor, and stronger Firestone and Spellstone. Upstream writes Demonic Embrace in talents.go, so it is expressible as a stat factor; not yet ingested. Fel Armor and the stones are not modelled."
+      "reason": "A stronger Fel Armor, and stronger Firestone and Spellstone, none of which is modelled."
     },
     {
       "className": "Warlock",

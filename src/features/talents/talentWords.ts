@@ -38,7 +38,8 @@ const PHRASES: Record<string, (value: number, effect: Effect) => string> = {
   parryChance: (v) => `+${pct(v)} parry chance`,
   defenseSkill: (v) => `+${count(v)} defense skill`,
   blockChance: (v) => `+${pct(v)} block chance`,
-  statFactor: (v, e) => `+${pct(v)} ${statLabelsByKey.get(e.stat ?? '') ?? e.stat ?? 'stats'}`,
+  // Signed: Demonic Embrace's Spirit half goes down a percent a rank.
+  statFactor: (v, e) => `${v < 0 ? '−' : '+'}${pct(Math.abs(v))} ${statLabelsByKey.get(e.stat ?? '') ?? e.stat ?? 'stats'}`,
   itemArmorMultiplier: (v) => `+${pct(v)} armor from items`,
   expertiseSkill: (v) => `+${count(v)} expertise`,
   offHandEnergyPerProc: (v) => `${count(v)} energy from 20% of off-hand hits`,
@@ -123,7 +124,6 @@ const SURVIVAL = "It helps you survive, and the simulator doesn't model damage t
 const TANK_NOT_READ = "It helps a tank in a way the tank estimate doesn't read: a cooldown, a proc, an extra block or spell damage taken."
 const UNTALENTED_BUFF = 'It strengthens a buff, and the Buffs tab uses the untalented one.'
 const HEALER_MANA = "It changes mana a healer spends or regains, and the simulator's mana figures use base costs and read only MP5 and Spirit."
-const STAT_NOT_YET = "Its stat bonus isn't read from talents yet."
 
 const PLAIN_SKIP: Record<string, string> = {
   'Warrior|Deep Wounds': "It is a bleed, and the simulator doesn't model bleeds from special attacks.",
@@ -159,7 +159,6 @@ const PLAIN_SKIP: Record<string, string> = {
   'Hunter|Focused Fire (Kill Command half)': "Its pet's Kill Command crit isn't simulated; its damage bonus is.",
   'Hunter|The Beast Within / Bestial Wrath': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Hunter|Survivalist': "It raises health, which the simulator doesn't use for a damage dealer.",
-  'Hunter|Combat Experience': "Its Agility and Intellect aren't read from talents yet.",
   'Hunter|Mortal Shots': "It raises the crit damage of shots, which the simulator doesn't take from talents yet.",
   'Hunter|Expose Weakness': 'It gives attack power to the raid, not to you.',
   'Hunter|Master Tactician / Thrill of the Hunt / Readiness': "It procs or is a cooldown, and the simulator doesn't play the fight out moment by moment.",
@@ -187,7 +186,7 @@ const PLAIN_SKIP: Record<string, string> = {
     'It changes only some kinds of spell (heals, Lightning, or Fire, Frost and Nature), and the simulator only reads talents that change all your spells.',
   'Druid|Subtlety': "It lowers threat, which the simulator doesn't score.",
   'Druid|Survival of the Fittest': "It lowers the chance you're crit, which the simulator doesn't model for damage.",
-  'Druid|Heart of the Wild / Furor': "It depends on your form, and the simulator doesn't model forms yet.",
+  'Druid|Heart of the Wild (Stamina and attack power halves) / Furor': "It depends on your form, and the simulator doesn't model forms yet.",
   'Druid|Moonkin Form / Tree of Life': "It is a form with a party-wide effect, and the simulator models neither forms nor your party.",
   'Druid|Omen of Clarity / Primal Fury': "It procs, and the simulator doesn't play the fight out moment by moment.",
   'Druid|Starlight Wrath / Focused Starlight / Improved Moonfire / Vengeance / Moonfury / Wrath of Cenarius / Insect Swarm / Brambles': PARTICULAR_SPELLS,
@@ -198,18 +197,17 @@ const PLAIN_SKIP: Record<string, string> = {
   "Druid|Nature's Grace / Nature's Swiftness / Force of Nature": MOMENT_BY_MOMENT,
   'Druid|Feral Swiftness / Nurturing Instinct / Improved Leader of the Pack': SURVIVAL,
   'Druid|Improved Mark of the Wild': UNTALENTED_BUFF,
-  'Druid|Living Spirit': STAT_NOT_YET,
   'Paladin|Spell Warding / Improved Righteous Fury': "It lowers damage you take, which the simulator doesn't model for damage.",
   'Paladin|Vengeance / Sanctity Aura': "It procs or needs your party, and the simulator models neither.",
   'Paladin|Crusade': "It only works on some kinds of creature, and the simulator doesn't know what the boss is.",
   'Paladin|Shield Specialization': 'It raises how much a block absorbs, and the simulator only counts whether you block.',
   'Paladin|Improved Seal of Righteousness / Healing Light / Sanctified Light / Purifying Power / Holy Power / Holy Shock': PARTICULAR_SPELLS,
   "Paladin|Illumination / Divine Favor / Light's Grace / Divine Illumination": MOMENT_BY_MOMENT,
-  'Paladin|Divine Intellect / Holy Guidance / Sacred Duty / Combat Expertise': STAT_NOT_YET,
+  'Paladin|Holy Guidance / Combat Expertise (expertise)':
+    "Holy Guidance's spell power from Intellect isn't read, and Combat Expertise's expertise is a tank's, which nothing here rolls.",
   'Paladin|Improved Blessing of Wisdom / Improved Devotion Aura / Improved Blessing of Might / Improved Retribution Aura / Improved Sanctity Aura': UNTALENTED_BUFF,
   "Paladin|Redoubt / Reckoning / One-Handed Weapon Specialization / Improved Holy Shield / Holy Shield / Ardent Defender / Avenger's Shield": TANK_NOT_READ,
-  'Paladin|Improved Judgement / Fanaticism / Two-Handed Weapon Specialization':
-    "It changes Judgement or two-handed damage, and the simulator uses the base Judgement and doesn't read a Paladin's two-handed bonus yet.",
+  'Paladin|Improved Judgement / Fanaticism': "It changes Judgement, and the simulator uses the base Judgement.",
   'Paladin|Blessed Life / Pursuit of Justice / Eye for an Eye / Divine Purpose': SURVIVAL,
   "Mage|Ignite / Combustion / Winter's Chill": "It changes particular spells or schools, and the simulator casts one generic spell for the spec.",
   'Mage|Arcane Power / Presence of Mind / Icy Veins': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
@@ -230,7 +228,7 @@ const PLAIN_SKIP: Record<string, string> = {
     PARTICULAR_SPELLS,
   'Priest|Holy Specialization / Shadow Focus / Darkness / Shadowform': "It changes one school of magic, and the simulator doesn't read school bonuses from Priest talents yet.",
   'Priest|Mental Agility / Mental Strength / Holy Concentration': HEALER_MANA,
-  'Priest|Enlightenment / Spirit of Redemption / Spiritual Healing': "Its stat or healing bonus isn't read from talents yet.",
+  'Priest|Spiritual Healing': "Its healing bonus isn't read from talents yet.",
   'Priest|Improved Inner Fire / Focused Will / Spell Warding / Blessed Recovery / Blessed Resilience / Shadow Resilience / Pain Suppression': SURVIVAL,
   'Priest|Improved Power Word: Fortitude / Improved Divine Spirit': UNTALENTED_BUFF,
   'Warlock|Master Demonologist': "It depends on which demon you have out, and the simulator doesn't read it yet.",
@@ -243,7 +241,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Warlock|Amplify Curse': COOLDOWN,
   'Warlock|Improved Imp / Improved Sayaad / Improved Firebolt / Improved Lash of Pain / Demonic Knowledge':
     "It strengthens a demon other than the Felguard, or reads your demon's stats, and the simulator models only the Felguard's damage.",
-  'Warlock|Demonic Embrace / Demonic Aegis / Master Conjuror': "Its stat, armor or stone bonus isn't read from talents yet.",
+  'Warlock|Demonic Aegis / Master Conjuror': "Its armor or stone bonus isn't read from talents yet.",
   'Warlock|Malediction': 'It strengthens Curse of the Elements, and the Buffs tab uses the untalented curse.',
   'Warlock|Demonic Resilience / Soul Link / Nether Protection': SURVIVAL,
 }

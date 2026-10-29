@@ -7732,7 +7732,8 @@ test('every role says what talents do for it, and the tank message is not the DP
   )
   const paladinTank = noteFor('Paladin', 'Protection', 'Tank', protPaladin)
   const [paladinReads, paladinRefused] = paladinTank!.split(', and no other talent. ')
-  expect(paladinReads).toBe('Effective Health reads Deflection, Anticipation and Toughness')
+  // Sacred Duty and Combat Expertise multiply Stamina since 2026-10-29, so the derived list names them.
+  expect(paladinReads).toBe('Effective Health reads Deflection, Anticipation, Sacred Duty, Combat Expertise and Toughness')
   expect(paladinRefused, 'Shield Specialization is named as refused instead').toMatch(/^Shield Specialization, Holy Shield and Ardent Defender are spent here but not modelled/)
 
   // Points spent on nothing refused still get the read list, because "no other talent" is the news.

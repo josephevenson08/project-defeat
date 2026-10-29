@@ -418,6 +418,7 @@ const ROGUE_POISON_EXTRACTORS = [
 ]
 
 const ROGUE_SKIPPED = [
+  [['Dual Wield Specialization'], "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible. Ingesting it (tried 2026-10-29) took Subtlety's best case to 1,295 against its 1,292 reference, and a spec reading above what players parse is treated here as something counted twice: find that before this goes in."],
   [['Murder'], 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
   [['Serrated Blades'], 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
   [['Seal Fate', 'Ruthlessness'], 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
@@ -427,7 +428,6 @@ const ROGUE_SKIPPED = [
   [['Dagger Specialization', 'Mace Specialization', 'Sword Specialization', 'Fist Weapon Specialization'], 'Weapon-type gated, and the mace one adds a stun. Would need per-weapon-type dispatch, the same reason the Warrior specializations are refused.'],
   [['Improved Kidney Shot', 'Find Weakness', 'Dirty Deeds', 'Master of Subtlety', 'Shadowstep'], 'Windowed bonuses: while Kidney Shot holds, for 10 seconds after a finisher, below 35% health, from stealth, or after Shadowstep. Each needs a fight timeline.'],
   [['Improved Sinister Strike', 'Vigor'], "Energy. Improved Sinister Strike lowers the cost of the Combat estimate's builder, which it prices at base cost; Vigor raises the energy cap, which a sustained energy rate never meets, so energy lost to capping is not modelled either."],
-  [['Dual Wield Specialization'], "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible; not yet ingested, because it moves every dual-wielding Rogue's estimate and wants its own check."],
   [['Quick Recovery', 'Deadened Nerves', 'Lightning Reflexes', 'Deflection', 'Sleight of Hand', 'Heightened Senses', 'Enveloping Shadows', 'Cheat Death'], "Survival: healing taken, damage taken, dodge, parry, and the chance to be hit or crit. A damage dealer has no incoming-damage stream here. Quick Recovery's other half refunds energy on a missed finisher, which the sustained rate does not price."],
   [['Improved Expose Armor'], "Strengthens Expose Armor, which the Buffs tab's target debuffs do not carry."],
 ]
@@ -462,6 +462,22 @@ const HUNTER_SOURCES = [
  * than talents.
  */
 const HUNTER_EXTRACTORS = [
+  {
+    talent: 'Combat Experience',
+    kind: 'statFactor',
+    stat: 'agility',
+    unit: 'fraction per rank',
+    re: /agiBonus := 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.CombatExperience\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Combat Experience',
+    kind: 'statFactor',
+    stat: 'intellect',
+    unit: 'fraction per rank',
+    re: /intBonus := 1 \+ ([\d.]+)\*float64\(hunter\.Talents\.CombatExperience\)/,
+    value: (m) => Number(m[1]),
+  },
   {
     talent: 'Killer Instinct',
     kind: 'meleeCritChance',
@@ -577,7 +593,6 @@ const HUNTER_SKIPPED = [
   [[{ talent: 'Focused Fire', part: 'Kill Command half' }], 'The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor.'],
   [['The Beast Within', 'Bestial Wrath'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
   [['Survivalist'], 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
-  [['Combat Experience'], 'Multiplies Agility and Intellect. Expressible now that talents reach the stat pipeline; not yet ingested.'],
   [['Mortal Shots'], 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
   [['Expose Weakness'], 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
   [['Master Tactician', 'Thrill of the Hunt', 'Readiness'], 'Procs and cooldowns needing a timeline.'],
@@ -737,6 +752,23 @@ const DRUID_EXTRACTORS = [
 
 const DRUID_STAT_EXTRACTORS = [
   {
+    talent: 'Living Spirit',
+    kind: 'statFactor',
+    stat: 'spirit',
+    unit: 'fraction per rank',
+    re: /bonus := ([\d.]+) \* float64\(druid\.Talents\.LivingSpirit\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Heart of the Wild',
+    kind: 'statFactor',
+    stat: 'intellect',
+    unit: 'fraction per rank',
+    re: /bonus := ([\d.]+) \* float64\(druid\.Talents\.HeartOfTheWild\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'The Intellect half only: upstream gates the Stamina and attack power halves on the bear and cat forms.',
+  },
+  {
     talent: 'Lunar Guidance',
     kind: 'statConversion',
     from: 'intellect',
@@ -781,7 +813,7 @@ const DRUID_BLEED_EXTRACTORS = [
 const DRUID_SKIPPED = [
   [['Subtlety'], 'Reduces threat, which nothing here scores.'],
   [['Survival of the Fittest'], 'Reduces the chance to be crit, which the damage path does not model.'],
-  [['Heart of the Wild', 'Furor'], 'Heart of the Wild multiplies Intellect outright but its Stamina and attack power halves are gated on the shapeshift form, and this app models Feral as cat only. Furor is a form-entry resource effect. The Intellect half is expressible now; the rest needs a form model.'],
+  [[{ talent: 'Heart of the Wild', part: 'Stamina and attack power halves' }, 'Furor'], 'Heart of the Wild\'s Intellect half is ingested; its Stamina and attack power halves are gated on the shapeshift form, and this app has no form model (Feral is modelled as a cat throughout, without the form\'s own terms). Furor is a form-entry resource effect.'],
   [['Moonkin Form', 'Tree of Life'], 'Shapeshifts with party-wide effects; neither the form nor the party is modelled.'],
   [['Omen of Clarity', 'Primal Fury'], 'Proc-driven energy and combo points, needing a timeline.'],
   [['Starlight Wrath', 'Focused Starlight', 'Improved Moonfire', 'Vengeance', 'Moonfury', 'Wrath of Cenarius', 'Insect Swarm', 'Brambles'], "Change particular Balance spells (Starfire's and Wrath's cast time, crit, crit damage, damage and coefficient, Moonfire, Thorns, Entangling Roots) or teach Insect Swarm. TalentModifiers has no per-spell field for them, so none applies, even to Starfire, which the Balance estimate casts."],
@@ -791,7 +823,6 @@ const DRUID_SKIPPED = [
   [["Nature's Grace", "Nature's Swiftness", 'Force of Nature'], 'A faster cast after a spell crit, an instant cast, and treants on a cooldown. Each needs a timeline, and nothing here models the treants.'],
   [['Feral Swiftness', 'Nurturing Instinct', 'Improved Leader of the Pack'], "Survival: dodge in forms, healing taken, and a heal on crit. A damage dealer has no incoming-damage stream here, and Nurturing Instinct's healing from Agility is for heals no Feral estimate casts."],
   [['Improved Mark of the Wild'], 'Strengthens Gift of the Wild, which the Buffs tab carries at its untalented value.'],
-  [['Living Spirit'], 'Multiplies Spirit. Upstream writes it in talents.go, so it is expressible as a stat factor; not yet ingested.'],
 ]
 
 const DRUID_NOT_READ = {
@@ -809,6 +840,14 @@ const PALADIN_SOURCES = [{ path: 'sim/paladin/talents.go', cache: 'sim_paladin_t
  * nothing between them, so a coefficient appearing later stops the match rather than being ignored.
  */
 const PALADIN_EXTRACTORS = [
+  {
+    talent: 'Two-Handed Weapon Specialization',
+    kind: 'twoHandedDamageMultiplier',
+    unit: 'fraction per rank',
+    re: /return 1 \+ ([\d.]+)\*float64\(paladin\.Talents\.TwoHandedWeaponSpecialization\)/,
+    value: (m) => Number(m[1]),
+    caveat: 'Applies only while a two-handed weapon is in the main hand, and to physical damage: upstream leaves Seals and Judgements to be done separately.',
+  },
   {
     talent: 'Sanctified Seals',
     kind: 'meleeCritChance',
@@ -873,6 +912,30 @@ const PALADIN_EXTRACTORS = [
 
 const PALADIN_STAT_EXTRACTORS = [
   {
+    talent: 'Divine Intellect',
+    kind: 'statFactor',
+    stat: 'intellect',
+    unit: 'fraction per rank',
+    re: /bonus := 1 \+ ([\d.]+)\*float64\(paladin\.Talents\.DivineIntellect\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Sacred Duty',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /bonus := 1 \+ ([\d.]+)\*float64\(paladin\.Talents\.SacredDuty\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Combat Expertise',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /bonus := 1 \+ ([\d.]+)\*float64\(paladin\.Talents\.CombatExpertise\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
     talent: 'Divine Strength',
     kind: 'statFactor',
     stat: 'strength',
@@ -896,10 +959,10 @@ const PALADIN_SKIPPED = [
   [['Shield Specialization'], 'Paladin\'s raises block VALUE, unlike the Warrior talent of the same name which raises block CHANCE. The incoming-attack table tracks the chance only, so there is nothing here to change.'],
   [['Improved Seal of Righteousness', 'Healing Light', 'Sanctified Light', 'Purifying Power', 'Holy Power', 'Holy Shock'], "Strengthen particular spells (Seal of Righteousness, Holy Light and Flash of Light, Exorcism and Holy Wrath, Holy spells' crit) or teach Holy Shock. TalentModifiers has no per-spell field for them, so none applies, even to Holy Light, which the Holy estimate casts."],
   [['Illumination', 'Divine Favor', "Light's Grace", 'Divine Illumination'], 'Procs and cooldowns: mana back on a heal crit, a guaranteed crit, a faster Holy Light, half-price spells. Each needs a timeline.'],
-  [['Divine Intellect', 'Holy Guidance', 'Sacred Duty', 'Combat Expertise'], "Intellect, spell power from Intellect, Stamina, and expertise with Stamina. Upstream writes Divine Intellect, Sacred Duty and Combat Expertise in talents.go, so their stat factors are expressible; not yet ingested. Holy Guidance is not in that file. Combat Expertise's expertise is a tank's, which the tank estimate does not roll, as with Defiance."],
+  [['Holy Guidance', { talent: 'Combat Expertise', part: 'expertise' }], "Holy Guidance is spell power from Intellect, which upstream's talents.go does not carry. Combat Expertise's Stamina half is ingested; its expertise is a tank's, which the tank estimate does not roll, as with Defiance."],
   [['Improved Blessing of Wisdom', 'Improved Devotion Aura', 'Improved Blessing of Might', 'Improved Retribution Aura', 'Improved Sanctity Aura'], 'Strengthen blessings and auras. The Buffs tab carries them at their untalented values.'],
   [['Redoubt', 'Reckoning', 'One-Handed Weapon Specialization', 'Improved Holy Shield', 'Holy Shield', 'Ardent Defender', "Avenger's Shield"], "Tank procs, damage and threat. The tank estimate rolls a steady incoming-attack table with no timeline, so Redoubt's and Reckoning's procs, Holy Shield's charges and Ardent Defender's low-health window have nothing to run on, and it does not score a tank's damage."],
-  [['Improved Judgement', 'Fanaticism', 'Two-Handed Weapon Specialization'], "Change Retribution's damage: Judgement's cooldown and crit, and +6% physical damage with a two-handed weapon. The estimate judges on the base 10-second cooldown. Upstream writes Two-Handed Weapon Specialization in talents.go as the same two-handed physical multiplier the Warrior talent of that name reaches, so it is expressible; not yet ingested, because it moves every Retribution estimate and wants its own check."],
+  [['Improved Judgement', 'Fanaticism'], "Change Retribution's Judgement: its cooldown and its crit. The estimate judges on the base 10-second cooldown."],
   [['Blessed Life', 'Pursuit of Justice', 'Eye for an Eye', 'Divine Purpose'], 'Survival, or damage returned when you are hit: half damage, spell hit taken, crits taken. A damage dealer or healer has no incoming-damage stream here.'],
 ]
 
@@ -1016,6 +1079,39 @@ const PRIEST_EXTRACTORS = [
 
 const PRIEST_STAT_EXTRACTORS = [
   {
+    talent: 'Enlightenment',
+    kind: 'statFactor',
+    stat: 'intellect',
+    unit: 'fraction per rank',
+    re: /coeff := ([\d.]+) \* float64\(priest\.Talents\.Enlightenment\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Enlightenment',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /coeff := ([\d.]+) \* float64\(priest\.Talents\.Enlightenment\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Enlightenment',
+    kind: 'statFactor',
+    stat: 'spirit',
+    unit: 'fraction per rank',
+    re: /coeff := ([\d.]+) \* float64\(priest\.Talents\.Enlightenment\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Spirit of Redemption',
+    kind: 'statFactor',
+    stat: 'spirit',
+    // A one-rank talent, written as a slope so its single rank gives the factor 1.05.
+    unit: 'fraction per rank',
+    re: /return spirit \+ spirit\*([\d.]+)/,
+    value: (m) => Number(m[1]),
+  },
+  {
     talent: 'Spiritual Guidance',
     kind: 'statConversion',
     from: 'spirit',
@@ -1035,7 +1131,7 @@ const PRIEST_SKIPPED = [
   [['Improved Power Word: Shield', 'Focused Power', 'Divine Fury', 'Searing Light', 'Surge of Light', 'Improved Shadow Word: Pain', 'Improved Mind Blast', 'Shadow Power', 'Reflective Shield', 'Wand Specialization', 'Holy Nova', 'Lightwell'], "Change particular spells (Power Word: Shield, Smite and Mind Blast's hit, Smite, Holy Fire and the big heals' cast time, a free instant Smite after a crit, Shadow Word: Pain's duration, Mind Blast's cooldown and crit, wands) or teach Holy Nova or Lightwell. TalentModifiers has no per-spell field for them, so none applies, even to Shadow Word: Pain and Mind Blast, which the Shadow estimate casts."],
   [['Holy Specialization', 'Shadow Focus', 'Darkness', 'Shadowform'], "Scoped to a school: Holy crit, Shadow hit, Shadow damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped hit and crit have no field. Shadowform also cuts physical damage taken."],
   [['Mental Agility', 'Mental Strength', 'Holy Concentration'], "Mana the healer estimates track: cheaper instant spells (Holy's Circle of Healing), maximum mana, and free heals after a proc (Discipline's Flash Heal). Their mana figures price each heal at base cost, StatBlock has no Mana field, and the proc needs a timeline. Upstream writes Mental Strength in talents.go."],
-  [['Enlightenment', 'Spirit of Redemption', 'Spiritual Healing'], 'Multiply Stamina, Intellect and Spirit, or Spirit alone, or raise all healing. Upstream writes Enlightenment and Spirit of Redemption in talents.go, so their stat factors are expressible; not yet ingested. There is no healing multiplier field.'],
+  [['Spiritual Healing'], 'Raises all healing, and there is no healing multiplier field.'],
   [['Improved Inner Fire', 'Focused Will', 'Spell Warding', 'Blessed Recovery', 'Blessed Resilience', 'Shadow Resilience', 'Pain Suppression'], "Survival: armour, damage taken, heals after a crit, the chance to be crit, and Pain Suppression's cooldown. A damage dealer or healer has no incoming-damage stream here."],
   [['Improved Power Word: Fortitude', 'Improved Divine Spirit'], 'Strengthen Prayer of Fortitude and Prayer of Spirit, which the Buffs tab carries at their untalented values.'],
 ]
@@ -1055,6 +1151,23 @@ const WARLOCK_SOURCES = [
 ]
 
 const WARLOCK_EXTRACTORS = [
+  {
+    talent: 'Demonic Embrace',
+    kind: 'statFactor',
+    stat: 'stamina',
+    unit: 'fraction per rank',
+    re: /bonus := 1 \+ \(([\d.]+)\)\*float64\(warlock\.Talents\.DemonicEmbrace\)/,
+    value: (m) => Number(m[1]),
+  },
+  {
+    talent: 'Demonic Embrace',
+    kind: 'statFactor',
+    stat: 'spirit',
+    unit: 'fraction per rank',
+    re: /negative := 1 - \(([\d.]+)\)\*float64\(warlock\.Talents\.DemonicEmbrace\)/,
+    // Spirit goes down a percent a rank.
+    value: (m) => -Number(m[1]),
+  },
   {
     talent: 'Backlash',
     kind: 'spellCritChance',
@@ -1129,7 +1242,7 @@ const WARLOCK_SKIPPED = [
   [['Suppression', 'Shadow Mastery', 'Devastation'], "Affliction hit, Shadow damage and Destruction crit. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write Shadow Mastery in talents.go, which is all this ingest reads, and hit and crit scoped to a tree have no field."],
   [['Amplify Curse'], 'An activated cooldown for the next curse. Uptime needs a usage policy this model has none of.'],
   [['Improved Imp', 'Improved Sayaad', 'Improved Firebolt', 'Improved Lash of Pain', 'Demonic Knowledge'], "Strengthen demons other than the Felguard, the only demon modelled, or grant spell power from the active demon's Stamina and Intellect, which nothing here tracks. Improved Imp also raises Blood Pact, which the Buffs tab carries at its untalented value."],
-  [['Demonic Embrace', 'Demonic Aegis', 'Master Conjuror'], 'Stamina and Spirit factors, a stronger Fel Armor, and stronger Firestone and Spellstone. Upstream writes Demonic Embrace in talents.go, so it is expressible as a stat factor; not yet ingested. Fel Armor and the stones are not modelled.'],
+  [['Demonic Aegis', 'Master Conjuror'], 'A stronger Fel Armor, and stronger Firestone and Spellstone, none of which is modelled.'],
   [['Malediction'], 'Raises Curse of the Elements to 13%, and the Buffs tab carries the untalented 10%.'],
   [['Demonic Resilience', 'Soul Link', 'Nether Protection'], 'Survival: the chance to be crit, damage shared with the demon, immunity after a spell hit. A damage dealer has no incoming-damage stream here.'],
 ]
