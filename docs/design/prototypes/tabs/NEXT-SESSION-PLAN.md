@@ -1,8 +1,8 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-29): the owner's quick wins, committed; start here
+## ▶ Where we left off (2026-10-29): the owner's quick wins, pushed; start here
 
-The port is complete and live (origin/main at `8bccd3c`). The owner's quick wins are committed on main, not pushed: the roadmap's stale statuses (`c297464`), a dev-server warm-up before the test suite (`56411a3`), and the expressible talents (`f919045`: 80 effects to 94; Rogue Dual Wield Specialization tried and put back because Subtlety then read above its reference). A full run from a cold server passed 431 of 431. **Next:** push when the owner says so; then why Subtlety reads high with Dual Wield Specialization. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+The port is complete and live. The owner's quick wins are pushed (origin/main at `6beceea`): the roadmap's stale statuses (`c297464`), a dev-server warm-up before the test suite (`56411a3`), and the expressible talents (`f919045`: 80 effects to 94; Rogue Dual Wield Specialization tried and put back because Subtlety then read above its reference). A full run from a cold server passed 431 of 431. **Next:** why Subtlety reads high with Dual Wield Specialization. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-24): the scene is in the app, and the port is done
 

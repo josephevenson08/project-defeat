@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**508 commits across 88 days**, from 2026-06-25 to 2026-10-29.
+**509 commits across 88 days**, from 2026-06-25 to 2026-10-29.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,14 @@ explains the change in more detail than its title.
 
 ## October 2026
 
-_81 commits_
+_82 commits_
 
-### Thursday 29 October — 3 commits
+### Thursday 29 October — 4 commits
 
 - Say what the roadmap's import and UI refresh phases actually shipped — [`c297464`](https://github.com/josephevenson08/project-defeat/commit/c297464e510c879dd4edb0d5d7e59c2380047637)
 - Warm the dev server once before the test workers start — [`56411a3`](https://github.com/josephevenson08/project-defeat/commit/56411a34efd93437569608a7b92e1aa82d78e144)
 - Model the talents the refusals said were expressible but not yet ingested — [`f919045`](https://github.com/josephevenson08/project-defeat/commit/f919045067f7be62b736d21498f5b1f7294d67b4)
+- Refresh the daily log — [`6beceea`](https://github.com/josephevenson08/project-defeat/commit/6beceea08980ab557f2ee31a7d45ade237ea8d2a)
 
 ### Monday 26 October — 1 commit
 
