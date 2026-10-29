@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests',
+  // Pays Vite's first transform once, before the workers start (see the file).
+  globalSetup: './tests/global-setup.ts',
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1 --port 5173',
     url: 'http://127.0.0.1:5173',

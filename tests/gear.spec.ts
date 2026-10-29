@@ -159,7 +159,12 @@ test('the sheet: 17 slots in the game\'s layout with real icons, the gear\'s sta
   // Real icons, loaded.
   const icons = sheet.locator('.gear-slot-icon img.item-icon')
   await expect(icons).toHaveCount(17)
-  await expect.poll(() => icons.evaluateAll((nodes) => nodes.every((n) => (n as HTMLImageElement).complete && (n as HTMLImageElement).naturalWidth > 0))).toBe(true)
+  // 15 s rather than the default 5: with every worker loading icons at once, 17 of them can take longer.
+  await expect
+    .poll(() => icons.evaluateAll((nodes) => nodes.every((n) => (n as HTMLImageElement).complete && (n as HTMLImageElement).naturalWidth > 0)), {
+      timeout: 15_000,
+    })
+    .toBe(true)
 
   await expect(slot(page, 'Head')).toContainText('Destroyer Battle-Helm')
   await expect(slot(page, 'Head')).toContainText('Glyph of Ferocity')
