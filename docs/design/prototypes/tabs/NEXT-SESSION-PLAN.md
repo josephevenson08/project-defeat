@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-29): the owner's quick wins, pushed; start here
+## ▶ Where we left off (2026-10-31): Rogue Dual Wield Specialization in, not pushed; start here
+
+Subtlety reading above its reference with Rogue Dual Wield Specialization was its build, not a double count: wowsims' Hemo preset is Combat-majority. The talent is modelled and the best case measures Subtlety at Warcraft Tavern's 20/0/41 (`64432b1`, committed, not pushed). **Next:** push when the owner says so; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-29): the owner's quick wins, pushed
 
 The port is complete and live. The owner's quick wins are pushed (origin/main at `6beceea`): the roadmap's stale statuses (`c297464`), a dev-server warm-up before the test suite (`56411a3`), and the expressible talents (`f919045`: 80 effects to 94; Rogue Dual Wield Specialization tried and put back because Subtlety then read above its reference). A full run from a cold server passed 431 of 431. **Next:** why Subtlety reads high with Dual Wield Specialization. The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
