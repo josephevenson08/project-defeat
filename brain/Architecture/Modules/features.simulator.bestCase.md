@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/bestCase.ts
-lines: 151
+lines: 157
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.bestCase
 
-`src/features/simulator/bestCase.ts` · **features** layer · 151 lines
+`src/features/simulator/bestCase.ts` · **features** layer · 157 lines
 
 _No doc comment at the top of this file._
 
@@ -32,6 +32,7 @@ _No doc comment at the top of this file._
 - [[domain.gear.defaultGear]] — `src/domain/gear/defaultGear.ts`
 - [[domain.gear.itemCatalogue]] — `src/domain/gear/itemCatalogue.ts`
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
+- [[domain.talents.calibrationBuilds]] — `src/domain/talents/calibrationBuilds.ts`
 - [[domain.talents.sampleTalents]] — `src/domain/talents/sampleTalents.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.gear.gearTypes]] — `src/features/gear/gearTypes.ts`

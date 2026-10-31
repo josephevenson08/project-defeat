@@ -307,6 +307,17 @@ const ROGUE_EXTRACTORS = [
     value: (m) => Number(m[1]) / 100,
   },
   {
+    talent: 'Dual Wield Specialization',
+    kind: 'offHandDamageMultiplier',
+    unit: 'fraction per rank',
+    // Twice the Warrior talent's 5% a rank. Ingested on 2026-10-31 once Subtlety's reading above its
+    // reference was traced to its build, not to this: it adds exactly half the off hand and moves
+    // nothing else.
+    re: /BaseDamageFuncMeleeWeapon\(core\.OffHand, false, 0, 1\+([\d.]+)\*float64\(rogue\.Talents\.DualWieldSpecialization\), true\)/,
+    value: (m) => Number(m[1]),
+    caveat: "Off-hand auto attacks only, as upstream applies it: Mutilate's off-hand strike does not take it.",
+  },
+  {
     talent: 'Deadliness',
     kind: 'attackPowerMultiplier',
     unit: 'fraction per rank',
@@ -418,7 +429,6 @@ const ROGUE_POISON_EXTRACTORS = [
 ]
 
 const ROGUE_SKIPPED = [
-  [['Dual Wield Specialization'], "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible. Ingesting it (tried 2026-10-29) took Subtlety's best case to 1,295 against its 1,292 reference, and a spec reading above what players parse is treated here as something counted twice: find that before this goes in."],
   [['Murder'], 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
   [['Serrated Blades'], 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
   [['Seal Fate', 'Ruthlessness'], 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],

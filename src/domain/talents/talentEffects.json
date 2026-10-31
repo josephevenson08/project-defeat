@@ -35,7 +35,7 @@
     "Warlock"
   ],
   "generatedBy": "tools/ingest/ingest-talent-effects.mjs",
-  "effectCount": 94,
+  "effectCount": 95,
   "effects": [
     {
       "className": "Warrior",
@@ -251,6 +251,18 @@
       "kind": "meleeHitChance",
       "unit": "fraction per rank",
       "perRank": 0.01,
+      "source": "sim/rogue/talents.go"
+    },
+    {
+      "className": "Rogue",
+      "talentId": 221,
+      "talent": "Dual Wield Specialization",
+      "tree": "Combat",
+      "maxRank": 5,
+      "kind": "offHandDamageMultiplier",
+      "unit": "fraction per rank",
+      "perRank": 0.1,
+      "caveat": "Off-hand auto attacks only, as upstream applies it: Mutilate's off-hand strike does not take it.",
       "source": "sim/rogue/talents.go"
     },
     {
@@ -1380,17 +1392,6 @@
         }
       ],
       "reason": "A tank's damage and threat. The tank estimate scores survival, and neither DPS estimate casts Shield Slam or Devastate or checks for a one-handed weapon."
-    },
-    {
-      "className": "Rogue",
-      "talent": "Dual Wield Specialization",
-      "talents": [
-        {
-          "talentId": 221,
-          "talent": "Dual Wield Specialization"
-        }
-      ],
-      "reason": "Raises off-hand damage. Upstream writes it in talents.go in the same shape as the Warrior talent of the same name, which reaches offHandDamageMultiplier, so it is expressible. Ingesting it (tried 2026-10-29) took Subtlety's best case to 1,295 against its 1,292 reference, and a spec reading above what players parse is treated here as something counted twice: find that before this goes in."
     },
     {
       "className": "Rogue",

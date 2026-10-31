@@ -183,6 +183,8 @@ import rawSupplementJson from '../src/domain/gear/itemSupplement.json' with { ty
 import craftingPathFile from '../src/domain/professions/craftingPaths.json' with { type: 'json' }
 import professionRecipes from '../tools/ingest/data/professionRecipes.json' with { type: 'json' }
 import talentBuilds from '../src/domain/talents/talentBuilds.json' with { type: 'json' }
+import { calibrationBuildFor } from '../src/domain/talents/calibrationBuilds'
+import { talentProblems } from '../src/domain/talents/talentWindow'
 import {
   SLICE_AND_DICE_BASE_DURATIONS,
   SLICE_AND_DICE_COMBO_POINTS,
@@ -5636,25 +5638,41 @@ test('every DPS spec is measured against what players actually parse', () => {
    */
   console.log(
     `
-${talentBuilds.buildCount} of 20 specs use a wowsims raiding build; ${talentBuilds.unsourced.length} keep the one-tree fill: ` +
+${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtlety a guide's; ${talentBuilds.unsourced.length} keep the one-tree fill: ` +
       talentBuilds.unsourced.map((u) => `${u.className} ${u.spec}`).join(', '),
   )
+  // Seventeen stored presets, which the Talents tab loads; the best case swaps Subtlety's (below).
   expect(talentBuilds.buildCount, 'seventeen sourced builds').toBe(17)
   expect(talentBuilds.unsourced, 'and three that have no upstream preset').toHaveLength(3)
 
   /*
    * **Two honest consequences of using real builds, recorded rather than smoothed over.**
    *
-   * Upstream's Subtlety preset spends only 38 of 61 points, so that spec is measured at a genuinely
-   * incomplete build and reads lower than it would at a full one — a talent gap the ratio will
-   * attribute to the model. And upstream's Destruction build takes Demonic Sacrifice for **+15%
-   * Shadow**, which reaches none of this repo's Destruction rotation, because that rotation is
-   * Immolate and Incinerate and both are Fire. Upstream's own Destruction casts Shadow Bolt; ours
-   * does not. Neither is a defect in the model, and both are reasons a ratio can move for a reason
-   * that is not the model.
+   * Upstream's Subtlety preset is not a Subtlety build. wowsims' `HemoTalents` lists 38 points and 34
+   * of them are Combat, so a log, which files a spec by the tree holding the most points, would call
+   * it Combat, and measuring it against what Subtlety players average compared a Combat build with
+   * them. Once Dual Wield Specialization was modelled (2026-10-31) it read 1,295 against their 1,292
+   * and failed the bound below, with nothing counted twice. So Subtlety is measured at Warcraft
+   * Tavern's 20/0/41 instead (`calibrationBuilds.ts`), and the Talents tab keeps wowsims' preset.
+   * And upstream's Destruction build takes Demonic Sacrifice for **+15% Shadow**, which reaches none
+   * of this repo's Destruction rotation, because that rotation is Immolate and Incinerate and both
+   * are Fire. Upstream's own Destruction casts Shadow Bolt; ours does not. Neither is a defect in the
+   * model, and both are reasons a ratio can move for a reason that is not the model.
    */
-  const subtlety = talentBuilds.builds.find((build) => build.spec === 'Subtlety')!
-  expect(subtlety.pointsSpent, "upstream's Subtlety preset is partial").toBeLessThan(45)
+  const rogueTrees = getTalentData('Rogue')!.trees
+  const pointsByTree = (points: Record<string | number, number>) =>
+    Object.fromEntries(
+      rogueTrees.map((tree) => [tree.spec, tree.talents.reduce((sum, talent) => sum + (points[talent.id] ?? 0), 0)]),
+    ) as Record<'Assassination' | 'Combat' | 'Subtlety', number>
+  const storedSubtlety = pointsByTree(talentBuilds.builds.find((build) => build.spec === 'Subtlety')!.points)
+  expect(storedSubtlety.Combat, "upstream's Subtlety preset is Combat-majority, which is why it is not measured").toBeGreaterThan(
+    storedSubtlety.Subtlety,
+  )
+  const guide = calibrationBuildFor('Rogue', 'Subtlety')!
+  const guideSplit = pointsByTree(guide.points)
+  expect(`${guideSplit.Assassination}/${guideSplit.Combat}/${guideSplit.Subtlety}`, 'the guide build is what it says').toBe(guide.split)
+  expect(guideSplit.Subtlety, 'and a log would file it as Subtlety').toBeGreaterThan(Math.max(guideSplit.Assassination, guideSplit.Combat))
+  expect(talentProblems(rogueTrees, guide.points as Record<number, number>), 'and the game would allow it').toEqual([])
   for (const build of talentBuilds.builds) {
     expect(build.pointsSpent, `${build.spec} cannot exceed the level-70 budget`).toBeLessThanOrEqual(61)
     expect(build.pointsSpent, `${build.spec} must spend something`).toBeGreaterThan(0)
@@ -5705,7 +5723,7 @@ ${talentBuilds.buildCount} of 20 specs use a wowsims raiding build; ${talentBuil
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.04x').toBeGreaterThan(1.02)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.02x').toBeGreaterThan(1.01)
   expect(best).toBeLessThan(1.1)
   expect(worst, 'featureFlags.ts claims the worst spec is around 2.15x').toBeGreaterThan(2.05)
   expect(worst).toBeLessThan(2.25)
@@ -7779,6 +7797,27 @@ test('Hunter and Shaman talents land, and a shared talent name does not cross cl
   expect(warriorDw.meleeHitChance).toBe(0)
   expect(shamanDw.meleeHitChance).toBeCloseTo(0.06, 10)
   expect(shamanDw.offHandDamageMultiplier).toBe(1)
+
+  /*
+   * And the Rogue's, the third of that name: off-hand damage like the Warrior's, at twice the rate
+   * (10% a rank). Its delta on a best case is exactly half the off hand, and nothing else moves,
+   * which is what showed Subtlety's crossing its reference (2026-10-29) was its build and not this.
+   */
+  const rogueDwId = idOf('Rogue', 'Dual Wield Specialization')
+  const rogueDw = deriveTalentModifiers({ [rogueDwId]: 5 })
+  expect(rogueDw.offHandDamageMultiplier).toBeCloseTo(1.5, 10)
+  expect(rogueDw.meleeHitChance).toBe(0)
+  const combatPoints = talentBuilds.builds.find((build) => build.spec === 'Combat')!.points as Record<string, number>
+  expect(combatPoints[String(rogueDwId)], 'the Combat preset takes it').toBe(5)
+  const rogue: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Rogue', spec: 'Combat' }
+  const rogueGear = normalizeGearForCharacter(defaultGear, 'Rogue', 'Combat')
+  const simulateRogue = (points: Record<number, number>) =>
+    calculateSimulation(rogue, rogueGear, calculateStats(rogue, rogueGear, [], [], undefined, deriveTalentModifiers(points)), 'Physical DPS', [], undefined, points)
+  const offHandOf = (result: ReturnType<typeof simulateRogue>) => result.damageSources!.find((source) => source.name === 'Melee off hand')!.dps
+  const off = simulateRogue({ ...combatPoints, [rogueDwId]: 0 })
+  const on = simulateRogue({ ...combatPoints })
+  expect(offHandOf(on)).toBeCloseTo(offHandOf(off) * 1.5, 6)
+  expect(on.scoreExact - off.scoreExact, 'and the off hand is all it moves').toBeCloseTo(offHandOf(off) * 0.5, 6)
 
   /*
    * Hunter is the only class whose specs all run the ranged branch, so its effects land on ranged

@@ -9,6 +9,7 @@ import { normalizeGearForCharacter } from '../../domain/gear/characterItemRules'
 import { defaultGear } from '../../domain/gear/defaultGear'
 import { getItemById } from '../../domain/gear/itemCatalogue'
 import { dpsReference, type DpsReference } from '../../domain/simulation/dpsReference'
+import { calibrationBuildFor } from '../../domain/talents/calibrationBuilds'
 import { getTalentData } from '../../domain/talents/sampleTalents'
 import talentBuilds from '../../domain/talents/talentBuilds.json' with { type: 'json' }
 import { deriveTalentModifiers } from '../../domain/talents/talentModifiers'
@@ -81,11 +82,16 @@ export function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: Cha
   }
 
   /*
-   * **A real raiding build where upstream has one** (`talentBuilds.json`, wowsims' presets for 17 of
-   * the 20 DPS specs), and for the other three the spec's own tree filled in listed order and stopped
+   * **A real raiding build where upstream has one** (`talentBuilds.json`, wowsims' presets for 16 of
+   * the 20 DPS specs, and a guide's for Subtlety, below), and for the other three the spec's own tree filled in listed order and stopped
    * at 61, the level-70 budget, rather than an invented build — the repo owner's call.
    */
-  const sourced = sourcedBuilds.find((build) => build.className === className && build.spec === spec)
+  /*
+   * A guide's build where wowsims' preset belongs to a different tree than the spec's logs
+   * (`calibrationBuilds.ts`: Subtlety, whose stored preset is a Combat-majority Hemorrhage build).
+   */
+  const sourced =
+    calibrationBuildFor(className, spec) ?? sourcedBuilds.find((build) => build.className === className && build.spec === spec)
   const points: Record<number, number> = sourced ? { ...sourced.points } : {}
   if (!sourced) {
     const tree = getTalentData(className)?.trees.find((entry) => entry.spec === spec)

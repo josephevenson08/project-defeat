@@ -153,7 +153,6 @@ const PLAIN_SKIP: Record<string, string> = {
   'Rogue|Improved Kidney Shot / Find Weakness / Dirty Deeds / Master of Subtlety / Shadowstep':
     "It works only for a while (after a finisher, from stealth, below 35% health), and the simulator doesn't play the fight out moment by moment.",
   'Rogue|Improved Sinister Strike / Vigor': 'It changes energy, and the simulator prices Sinister Strike at its base cost and never lets energy cap.',
-  'Rogue|Dual Wield Specialization': "Its off-hand damage isn't read from talents yet.",
   'Rogue|Quick Recovery / Deadened Nerves / Lightning Reflexes / Deflection / Sleight of Hand / Heightened Senses / Enveloping Shadows / Cheat Death': SURVIVAL,
   'Rogue|Improved Expose Armor': "It strengthens Expose Armor, which isn't on the Buffs tab.",
   'Hunter|Focused Fire (Kill Command half)': "Its pet's Kill Command crit isn't simulated; its damage bonus is.",
