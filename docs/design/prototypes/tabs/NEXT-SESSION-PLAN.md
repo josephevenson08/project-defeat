@@ -1,8 +1,12 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-10-31): Rogue Dual Wield Specialization in, not pushed; start here
+## ▶ Where we left off (2026-11-01): the caster-side raid debuffs in and pushed; start here
 
-Subtlety reading above its reference with Rogue Dual Wield Specialization was its build, not a double count: wowsims' Hemo preset is Combat-majority. The talent is modelled and the best case measures Subtlety at Warcraft Tavern's 20/0/41 (`64432b1`, committed, not pushed). **Next:** push when the owner says so; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+Target debuffs reach the spells of their school and multiply: Misery, Shadow Weaving, Improved Scorch and Winter's Chill applied, Curse of the Elements off Nature, and the mana and physical debuffs listed but not applied (the physical ones held out by the owner's choice until the best-case bound is settled) (`53b321c`, pushed). **Next:** ask the owner about the ten missing crafting-path icons; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-10-31): Rogue Dual Wield Specialization in and pushed
+
+Subtlety reading above its reference with Rogue Dual Wield Specialization was its build, not a double count: wowsims' Hemo preset is Combat-majority. The talent is modelled and the best case measures Subtlety at Warcraft Tavern's 20/0/41 (`64432b1`, pushed 2026-11-01). **Next:** the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-10-29): the owner's quick wins, pushed
 
