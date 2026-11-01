@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**513 commits across 90 days**, from 2026-06-25 to 2026-11-01.
+**515 commits across 90 days**, from 2026-06-25 to 2026-11-01.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,11 +13,13 @@ explains the change in more detail than its title.
 
 ## November 2026
 
-_1 commits_
+_3 commits_
 
-### Sunday 1 November — 1 commit
+### Sunday 1 November — 3 commits
 
 - Add the caster-side raid debuffs, by spell school, and list the mana and physical ones — [`53b321c`](https://github.com/josephevenson08/project-defeat/commit/53b321c61cf1b90b9b29c4789f34ea168ca0cfb2)
+- Refresh the daily log — [`385a575`](https://github.com/josephevenson08/project-defeat/commit/385a5754d34ba67994add10544d0178b5c1a4bc6)
+- Vendor the ten crafting-path icons the Professions tab named but never had — [`98276cc`](https://github.com/josephevenson08/project-defeat/commit/98276cc8f03709b2fa75c644a728fc1a4cd98e06)
 
 ## October 2026
 
