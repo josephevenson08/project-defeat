@@ -192,7 +192,7 @@ behind every claim of its that quotes a number.
   the talents that can take a point toward a short row, then the points left unspent
 - Real item icons on the character sheet, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,973 files, 3.4 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,983 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
   and each one opens on its own progression: a skill range, what you gather or craft in it, and the
