@@ -1,3 +1,4 @@
+import type { SpellSchool } from '../abilities/abilityTypes'
 import type { TbcClass, TbcSpec } from '../character/characterTypes'
 import type { BuildRole } from '../gear/itemTypes'
 import type { StatBlock } from '../stats/statTypes'
@@ -67,8 +68,8 @@ export type Buff = BuffProvider & {
    *
    * Distinct from `statMultipliers` because it multiplies the *output*, not an input: there is no
    * stat that "damage dealt" is, so there was nowhere to put this and buffs of this shape were all
-   * `notModelled`. School-scoped versions still are — Sanctity Aura's 10% is Holy only, and nothing
-   * here records a spell school.
+   * `notModelled`. School-scoped versions still are — Sanctity Aura's 10% is Holy only, and a buff has
+   * no school field (target debuffs do: `TargetDebuff.schoolDamageTakenMultipliers`).
    */
   damageMultiplier?: number
   /**
@@ -129,15 +130,27 @@ export type TargetDebuff = BuffProvider & {
    * hit is a separate table with its own 1% miss floor.
    */
   physicalHitTakenBonus?: number
-  /** Increases spell damage the target takes, as a fraction (e.g. 0.1 for +10%). */
-  spellDamageTakenMultiplier?: number
   /**
-   * Set on a debuff whose real scope this app cannot express, holding the actual effect so it can be
-   * listed and read without being applied. Same contract as `Buff.notModelled`.
+   * Damage taken by school, as fractions (Curse of the Elements: 0.1 on Arcane, Fire, Frost and
+   * Shadow). Each spell takes only its own school's entry, read from `SignatureAbility.spellSchool`.
    *
-   * For debuffs the limit is specifically **spell school**: nothing in `SignatureAbility` or the
-   * simulation records whether a cast is Frost or Shadow, so a school-scoped debuff can only be
-   * applied to every spell or to none.
+   * **They multiply**, across debuffs and with the talents' school multipliers, as wowsims applies
+   * each one with `*=` (`applyTargetModifiers`, `sim/core/spell_effect.go`). A Shadow spell under
+   * Curse of the Elements, Misery and Shadow Weaving takes 1.1 × 1.05 × 1.1, not 1.25.
+   *
+   * This replaced a single `spellDamageTakenMultiplier` (2026-11-01), which handed Curse of the
+   * Elements to an Elemental Shaman's Nature spells for want of a school.
+   */
+  schoolDamageTakenMultipliers?: Partial<Record<SpellSchool, number>>
+  /** The chance a spell of the named school crits the target, as a fraction: Winter's Chill's Frost 0.10. Added to `spellCritTakenBonus`. */
+  schoolCritTakenBonus?: Partial<Record<SpellSchool, number>>
+  /**
+   * Set on a debuff this app lists but does not apply, holding the actual effect so it can be read
+   * and credited to whoever brings it. Same contract as `Buff.notModelled`. The reasons differ and
+   * each entry gives its own: another player's stat (Expose Weakness), charges or an uptime nothing
+   * here plays out (Improved Shadow Bolt, Stormstrike), mana this app does not track (Judgement of
+   * Wisdom), or held out of the estimate by the owner's choice until the best-case bound is settled
+   * (Blood Frenzy, Hunter's Mark, Expose Armor, Mangle).
    */
   notModelled?: string
   needsVerification?: boolean

@@ -2401,8 +2401,9 @@ test('every raid buff is sourced to a spell rank and is either applied or explic
 
   expect(problems, problems.join(' | ')).toEqual([])
   expect(modelledBuffs.length + unmodelledBuffs.length).toBe(sampleBuffs.length)
-  // 33 until 2026-10-09, when Tranquil Air Totem came out: no Shaman spec runs it in a raid.
-  expect(sampleBuffs.length, 'TBC Phase 2 has 32 raid buffs here').toBe(32)
+  // 33 until 2026-10-09, when Tranquil Air Totem came out: no Shaman spec runs it in a raid. 33 again
+  // on 2026-11-01, with Vampiric Touch.
+  expect(sampleBuffs.length, 'TBC Phase 2 has 33 raid buffs here').toBe(33)
 })
 
 test('the percentage auras are stored as the rating that actually buys that percentage', async () => {
@@ -2467,8 +2468,8 @@ test('every unmodelled buff carries text a panel could render', async () => {
   // would put 15 rows on screen with a name and nothing else.
   // 15 until Unleashed Rage was modelled on 2026-08-23: its own note said an attack-power multiplier
   // would land before attack power was derived, and `statMultipliersAfterConversion` answered that.
-  // 12 until Tranquil Air Totem came out on 2026-10-09.
-  expect(unmodelledBuffs.length, '11 of the 32 cannot be expressed as stats').toBe(11)
+  // 12 until Tranquil Air Totem came out on 2026-10-09, and 12 again with Vampiric Touch (2026-11-01).
+  expect(unmodelledBuffs.length, '12 of the 33 cannot be expressed as stats').toBe(12)
 
   for (const buff of unmodelledBuffs) {
     expect(buff.stats, `${buff.id} must contribute no stats`).toBeUndefined()
@@ -2521,20 +2522,70 @@ test('the target-debuff corrections that had real wrong values stay corrected', 
   expect(crusader?.physicalCritTakenBonus).toBe(0.03)
   expect(crusader?.spellCritTakenBonus, 'Improved SotC is not physical-only').toBe(0.03)
 
-  // Spell 28595 is Frost-only, and was being applied to every spell school. It is now listed rather
-  // than applied, so it must contribute no crit at all.
+  // Spell 28595 is Frost-only, and was being applied to every spell school. Since spells record a
+  // school (2026-11-01) it is applied to Frost and nothing else.
   const wintersChill = getTargetDebuffById('winters-chill')
   expect(wintersChill?.spellCritTakenBonus ?? 0, "Winter's Chill is Frost-only and must not apply to every spell").toBe(0)
-  expect(wintersChill?.notModelled).toBeTruthy()
+  expect(wintersChill?.schoolCritTakenBonus).toEqual({ Frost: 0.1 })
+  expect(wintersChill?.notModelled).toBeUndefined()
 
-  // Spell 27228: the one value that survived the audit unchanged.
-  expect(getTargetDebuffById('curse-of-elements')?.spellDamageTakenMultiplier).toBe(0.1)
+  // Spell 27228: the one value that survived the audit unchanged, on the four schools it names.
+  expect(getTargetDebuffById('curse-of-elements')?.schoolDamageTakenMultipliers).toEqual({ Arcane: 0.1, Fire: 0.1, Frost: 0.1, Shadow: 0.1 })
 
   // Every entry now cites the rank it was read from, and nothing is left unverified.
   for (const debuff of sampleTargetDebuffs) {
     expect(debuff.spellId, `${debuff.name} must cite the spell rank its numbers came from`).toBeGreaterThan(0)
     expect(debuff.needsVerification ?? false, `${debuff.name} is sourced and should not be flagged`).toBe(false)
   }
+})
+
+test('a school debuff reaches only its school, and school debuffs multiply', () => {
+  /*
+   * Curse of the Elements was applied to every spell for want of a school, so an Elemental Shaman's
+   * Nature took a curse that excludes Nature. Spells record a school now (2026-11-01): each target
+   * debuff reaches the schools it names, and they multiply as wowsims applies them (`*=`, in
+   * `applyTargetModifiers`), so Curse of the Elements with Misery is 1.1 × 1.05, not 1.15.
+   */
+  const caster = (className: TbcClass, spec: TbcSpec, race: CharacterProfile['race']) => {
+    const character: CharacterProfile = { faction: 'Alliance', race, className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    return (debuffs: string[]) => calculateSimulation(character, gear, stats, 'Caster DPS', debuffs).scoreExact
+  }
+
+  const fire = caster('Mage', 'Fire', 'Human')
+  expect(fire(['curse-of-elements']) / fire([])).toBeCloseTo(1.1, 10)
+  expect(fire(['curse-of-elements', 'misery']) / fire([]), 'multiplied, not added').toBeCloseTo(1.1 * 1.05, 10)
+  expect(fire(['curse-of-elements', 'misery', 'improved-scorch']) / fire([])).toBeCloseTo(1.1 * 1.05 * 1.15, 10)
+  expect(fire(['shadow-weaving']), 'Shadow Weaving does not reach Fire').toBe(fire([]))
+
+  // Lightning Bolt is Nature: the curse misses it and Misery does not.
+  const elemental = caster('Shaman', 'Elemental', 'Draenei')
+  expect(elemental(['curse-of-elements']), 'Curse of the Elements excludes Nature').toBe(elemental([]))
+  expect(elemental(['misery']) / elemental([])).toBeCloseTo(1.05, 10)
+
+  // A Shadow Priest's whole rotation is Shadow, so the three Shadow debuffs reach all of it.
+  const shadow = caster('Priest', 'Shadow', 'Human')
+  expect(shadow(['curse-of-elements', 'misery', 'shadow-weaving']) / shadow([])).toBeCloseTo(1.1 * 1.05 * 1.1, 10)
+
+  // Winter's Chill is Frost crit: a Frost Mage gains, a Fire Mage does not.
+  const frost = caster('Mage', 'Frost', 'Human')
+  expect(frost(['winters-chill'])).toBeGreaterThan(frost([]))
+  expect(fire(['winters-chill'])).toBe(fire([]))
+
+  // Misery reaches the spell schools on the physical path too: a Rogue's Nature poisons.
+  const rogue: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Rogue', spec: 'Combat' }
+  const rogueGear = normalizeGearForCharacter(defaultGear, 'Rogue', 'Combat')
+  const rogueStats = calculateStats(rogue, rogueGear)
+  const poisonsOf = (debuffs: string[]) =>
+    calculateSimulation(rogue, rogueGear, rogueStats, 'Physical DPS', debuffs)
+      .damageSources!.filter((source) => /Poison/.test(source.name))
+      .reduce((sum, source) => sum + source.dps, 0)
+  if (poisonsOf([]) > 0) expect(poisonsOf(['misery']) / poisonsOf([])).toBeCloseTo(1.05, 10)
+  expect(poisonsOf(['curse-of-elements']), 'and the curse misses Nature there too').toBeCloseTo(poisonsOf([]), 10)
+
+  // A listed debuff applies nothing, wherever it is ticked.
+  expect(fire(['improved-shadow-bolt', 'judgement-of-wisdom', 'stormstrike'])).toBe(fire([]))
 })
 
 test('the armor debuffs subtract flat armor and stack with each other', async () => {
@@ -2640,23 +2691,42 @@ test('a debuff that cannot be modelled is separated from the ones that can be', 
   // to the split it was really about, exactly as the buff/consumable test above did when the same
   // thing happened to it. BuffsPanel still reads these two lists and still renders the unmodelled
   // ones without a checkbox; what no longer exists is a page to click.
-  expect(unmodelledTargetDebuffs.map((debuff) => debuff.id).sort()).toEqual(['expose-weakness', 'winters-chill'])
+  expect(unmodelledTargetDebuffs.map((debuff) => debuff.id).sort()).toEqual([
+    'blood-frenzy',
+    'expose-armor',
+    'expose-weakness',
+    'hunters-mark',
+    'improved-hunters-mark',
+    'improved-shadow-bolt',
+    'judgement-of-wisdom',
+    'mangle',
+    'stormstrike',
+  ])
 
   /*
-   * Two now, and the second is a different kind of gap worth keeping distinct. Winter's Chill cannot
-   * be modelled because no spell school is recorded anywhere; **Expose Weakness cannot be modelled
-   * because its value is another player's Agility**, and this app models one character. The first is
-   * a missing field, the second is a missing second character — one could be closed by adding a
-   * column, the other could not.
+   * Winter's Chill was the first entry here, waiting on a spell school; it is applied to Frost since
+   * 2026-11-01. What is left are different kinds of gap, kept distinct. **Expose Weakness's value is
+   * another player's Agility**, and this app models one character. Improved Shadow Bolt and Stormstrike
+   * run on charges and an uptime nothing here plays out. Judgement of Wisdom is mana. And the five
+   * physical ones are expressible and held out by the owner's choice (2026-11-01): applied at best
+   * case they take specs past what players average, so what a best case is measured against is
+   * settled first.
    */
-  const exposeWeakness = unmodelledTargetDebuffs.find((debuff) => debuff.id === 'expose-weakness')
-  expect(exposeWeakness?.notModelled, "the reason is another player's stat, not a field").toMatch(/Agility/)
+  const reasonOf = (id: string) => unmodelledTargetDebuffs.find((debuff) => debuff.id === id)!.notModelled!
+  expect(reasonOf('expose-weakness'), "the reason is another player's stat, not a field").toMatch(/Agility/)
+  expect(reasonOf('improved-shadow-bolt')).toMatch(/uptime/)
+  expect(reasonOf('stormstrike')).toMatch(/charges/i)
+  expect(reasonOf('judgement-of-wisdom')).toMatch(/[Mm]ana/)
+  for (const id of ['blood-frenzy', 'hunters-mark', 'improved-hunters-mark', 'expose-armor', 'mangle']) {
+    expect(reasonOf(id), `${id} says it is held out by choice`).toMatch(/owner's call/)
+  }
 
-  // The reason it cannot be modelled is narrow and worth keeping visible: no spell school is recorded
-  // anywhere in the simulation, so a Frost-only debuff can be applied to every spell or to none.
-  const wintersChill = unmodelledTargetDebuffs.find((debuff) => debuff.id === 'winters-chill')!
-  expect(wintersChill.notes, "the Frost-only scope is why it is not modelled").toMatch(/Frost/)
-  expect(wintersChill.spellCritTakenBonus, 'an unmodelled debuff must not also apply its effect').toBeUndefined()
+  // A listed debuff carries its effect in words only, so nothing can apply it by accident.
+  for (const debuff of unmodelledTargetDebuffs) {
+    for (const field of ['armorReduction', 'physicalCritTakenBonus', 'physicalHitTakenBonus', 'spellCritTakenBonus', 'schoolDamageTakenMultipliers', 'schoolCritTakenBonus']) {
+      expect(debuff, `${debuff.id} is listed, so it must not also carry ${field}`).not.toHaveProperty(field)
+    }
+  }
 
   // The modelled ones carry flat armor, not a fraction. TBC has no percentage armor debuff, and
   // reading these as percentages is the bug this dataset was rebuilt to fix.
@@ -5725,8 +5795,8 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    */
   expect(best, 'featureFlags.ts claims the best spec is around 1.02x').toBeGreaterThan(1.01)
   expect(best).toBeLessThan(1.1)
-  expect(worst, 'featureFlags.ts claims the worst spec is around 2.15x').toBeGreaterThan(2.05)
-  expect(worst).toBeLessThan(2.25)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 1.90x').toBeGreaterThan(1.8)
+  expect(worst).toBeLessThan(2.0)
 })
 
 test('a multiplier on a derived stat is applied after the stat is derived', () => {
@@ -7982,7 +8052,9 @@ test('buff scope is sourced for every entry, and party scope dominates', () => {
   // claim the test is making, and party scope dominating is the point.
   // Party went 24 to 23 when Tranquil Air Totem came out on 2026-10-09. This is the *tooltip* scope;
   // how far a buff reaches in a raid is `isPartyScoped`, pinned in the test after next.
-  expect(counts).toEqual({ Party: 23, Raid: 5, Single: 4, Target: 8 })
+  // Party 23 to 24 and Target 8 to 19 on 2026-11-01: Vampiric Touch, and the caster-side, mana and
+  // physical debuffs (Misery, Shadow Weaving, Improved Scorch and eight listed ones).
+  expect(counts).toEqual({ Party: 24, Raid: 5, Single: 4, Target: 19 })
 
   /*
    * The five Raid-scoped buffs are exactly the Greater Blessings, which is what "Greater" buys — the

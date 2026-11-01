@@ -78,6 +78,11 @@
       "spellId": 10060,
       "icon": "spell_holy_powerinfusion"
     },
+    "vampiric-touch": {
+      "name": "Vampiric Touch",
+      "spellId": 34917,
+      "icon": "spell_holy_stoicism"
+    },
     "mark-of-the-wild": {
       "name": "Gift of the Wild",
       "spellId": 26991,
@@ -149,11 +154,6 @@
       "spellId": 16190,
       "icon": "spell_frost_summonwaterelemental"
     },
-    "tranquil-air-totem": {
-      "name": "Tranquil Air Totem",
-      "spellId": 25908,
-      "icon": "spell_nature_brilliance"
-    },
     "unleashed-rage": {
       "name": "Unleashed Rage",
       "spellId": 30806,
@@ -203,6 +203,62 @@
       "name": "Winter's Chill",
       "spellId": 28595,
       "icon": "spell_frost_chillingblast"
+    },
+    "misery": {
+      "name": "Misery",
+      "spellId": 33195,
+      "icon": "spell_shadow_misery"
+    },
+    "shadow-weaving": {
+      "name": "Shadow Weaving",
+      "spellId": 15334,
+      "icon": "spell_shadow_blackplague"
+    },
+    "improved-scorch": {
+      "name": "Improved Scorch",
+      "spellId": 12873,
+      "icon": "spell_fire_soulburn"
+    },
+    "improved-shadow-bolt": {
+      "name": "Improved Shadow Bolt",
+      "spellId": 17803,
+      "icon": "spell_shadow_shadowbolt"
+    },
+    "judgement-of-wisdom": {
+      "name": "Judgement of Wisdom",
+      "spellId": 27164,
+      "icon": "spell_holy_righteousnessaura"
+    },
+    "stormstrike": {
+      "name": "Stormstrike",
+      "spellId": 17364,
+      "icon": "ability_shaman_stormstrike"
+    },
+    "blood-frenzy": {
+      "name": "Blood Frenzy",
+      "spellId": 29859,
+      "icon": "ability_warrior_bloodfrenzy"
+    },
+    "hunters-mark": {
+      "name": "Hunter's Mark",
+      "spellId": 14325,
+      "icon": "ability_hunter_snipershot"
+    },
+    "improved-hunters-mark": {
+      "name": "Improved Hunter's Mark",
+      "spellId": 19425,
+      "icon": "ability_hunter_snipershot"
+    },
+    "expose-armor": {
+      "name": "Expose Armor",
+      "spellId": 26866,
+      "icon": "ability_warrior_riposte"
+    },
+    "mangle": {
+      "name": "Mangle",
+      "spellId": 33876,
+      "icon": "ability_druid_mangle2",
+      "spellName": "Mangle (Cat)"
     },
     "expose-weakness": {
       "name": "Expose Weakness",

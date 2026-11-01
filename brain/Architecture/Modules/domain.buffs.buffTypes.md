@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/buffTypes.ts
-lines: 157
+lines: 170
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.buffTypes
 
-`src/domain/buffs/buffTypes.ts` · **domain** layer · 157 lines
+`src/domain/buffs/buffTypes.ts` · **domain** layer · 170 lines
 
 From the top of the file:
 
@@ -34,6 +34,7 @@ From the top of the file:
 
 ## Imports
 
+- [[domain.abilities.abilityTypes]] — `src/domain/abilities/abilityTypes.ts`
 - [[domain.character.characterTypes]] — `src/domain/character/characterTypes.ts`
 - [[domain.gear.itemTypes]] — `src/domain/gear/itemTypes.ts`
 - [[domain.stats.statTypes]] — `src/domain/stats/statTypes.ts`

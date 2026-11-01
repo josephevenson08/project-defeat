@@ -31,6 +31,24 @@ export function buffEffects(buff: Buff): string[] {
   ].filter(Boolean)
 }
 
+const MAGIC_SCHOOLS = ['Arcane', 'Fire', 'Frost', 'Holy', 'Nature', 'Shadow']
+
+/**
+ * "+10% Arcane, Fire, Frost and Shadow", or "+5% spell" when a value covers every magic school, as
+ * Misery's does. One phrase per value, in the game's school order.
+ */
+function bySchool(values: Partial<Record<string, number>> | undefined, noun: string) {
+  const byValue = new Map<number, string[]>()
+  for (const [school, value] of Object.entries(values ?? {})) {
+    if (value) byValue.set(value, [...(byValue.get(value) ?? []), school])
+  }
+  return [...byValue].map(([value, schools]) => {
+    const ordered = MAGIC_SCHOOLS.filter((school) => schools.includes(school))
+    const names = ordered.length === MAGIC_SCHOOLS.length ? 'spell' : ordered.length > 1 ? `${ordered.slice(0, -1).join(', ')} and ${ordered.at(-1)}` : ordered[0]
+    return `+${percent(value)} ${names} ${noun}`
+  })
+}
+
 /** What a boss debuff does: flat armor, never a percentage, as every TBC armor debuff is. */
 export function debuffEffects(debuff: TargetDebuff): string[] {
   return [
@@ -38,7 +56,8 @@ export function debuffEffects(debuff: TargetDebuff): string[] {
     debuff.physicalCritTakenBonus ? `+${percent(debuff.physicalCritTakenBonus)} physical crit taken` : '',
     debuff.physicalHitTakenBonus ? `+${percent(debuff.physicalHitTakenBonus)} melee and ranged hit taken` : '',
     debuff.spellCritTakenBonus ? `+${percent(debuff.spellCritTakenBonus)} spell crit taken` : '',
-    debuff.spellDamageTakenMultiplier ? `+${percent(debuff.spellDamageTakenMultiplier)} spell damage taken` : '',
+    ...bySchool(debuff.schoolDamageTakenMultipliers, 'damage taken'),
+    ...bySchool(debuff.schoolCritTakenBonus, 'crit taken'),
   ].filter(Boolean)
 }
 

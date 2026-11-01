@@ -45,6 +45,7 @@ From the top of the file:
 - [[domain.abilities.signatureAbilitiesShaman]] — `src/domain/abilities/signatureAbilitiesShaman.ts`
 - [[domain.abilities.signatureAbilitiesWarlock]] — `src/domain/abilities/signatureAbilitiesWarlock.ts`
 - [[domain.abilities.signatureAbilitiesWarrior]] — `src/domain/abilities/signatureAbilitiesWarrior.ts`
+- [[domain.buffs.buffTypes]] — `src/domain/buffs/buffTypes.ts`
 - [[domain.talents.talentModifiers]] — `src/domain/talents/talentModifiers.ts`
 - [[features.simulator.calculateSimulation]] — `src/features/simulator/calculateSimulation.ts`
 

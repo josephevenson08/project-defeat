@@ -131,7 +131,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Warrior|Rampage': "Its attack power builds up hit by hit, and the simulator doesn't play the fight out hit by hit.",
   'Warrior|Enrage': "It triggers when you take a crit, and the simulator doesn't model damage taken by a damage dealer.",
   'Warrior|Sweeping Strikes': 'It hits extra targets, and the simulator models one target.',
-  'Warrior|Blood Frenzy': 'It is a debuff on the boss rather than a change to you.',
+  'Warrior|Blood Frenzy': "It is a debuff on the boss rather than a change to you, which the Buffs tab lists but doesn't apply yet.",
   'Warrior|Mace Specialization / Sword Specialization / Poleaxe Specialization': "It depends on the weapon type, which the simulator doesn't check yet.",
   'Warrior|Impale': "It raises the crit damage of abilities, which the simulator doesn't take from talents yet.",
   'Warrior|Defiance': "Its expertise only matters to the tank model, which scores survival and doesn't roll your own attacks.",
@@ -154,7 +154,7 @@ const PLAIN_SKIP: Record<string, string> = {
     "It works only for a while (after a finisher, from stealth, below 35% health), and the simulator doesn't play the fight out moment by moment.",
   'Rogue|Improved Sinister Strike / Vigor': 'It changes energy, and the simulator prices Sinister Strike at its base cost and never lets energy cap.',
   'Rogue|Quick Recovery / Deadened Nerves / Lightning Reflexes / Deflection / Sleight of Hand / Heightened Senses / Enveloping Shadows / Cheat Death': SURVIVAL,
-  'Rogue|Improved Expose Armor': "It strengthens Expose Armor, which isn't on the Buffs tab.",
+  'Rogue|Improved Expose Armor': "It strengthens Expose Armor, which the Buffs tab lists but doesn't apply yet.",
   'Hunter|Focused Fire (Kill Command half)': "Its pet's Kill Command crit isn't simulated; its damage bonus is.",
   'Hunter|The Beast Within / Bestial Wrath': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Hunter|Survivalist': "It raises health, which the simulator doesn't use for a damage dealer.",
@@ -168,7 +168,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Hunter|Endurance Training / Improved Aspect of the Monkey / Thick Hide / Spirit Bond / Catlike Reflexes / Deflection / Deterrence':
     "It helps you or your pet survive, and the simulator doesn't model damage taken by a damage dealer.",
   'Hunter|Improved Aspect of the Hawk / Go for the Throat': MOMENT_BY_MOMENT,
-  "Hunter|Improved Hunter's Mark": "It strengthens Hunter's Mark, which isn't on the Buffs tab.",
+  "Hunter|Improved Hunter's Mark": "It strengthens Hunter's Mark, which the Buffs tab lists but doesn't apply yet.",
   'Hunter|Efficiency': "It makes shots cheaper, and the simulator's mana figure uses Steady Shot's base cost.",
   'Shaman|Toughness / Anticipation / Shield Specialization': "It helps you take hits, and the simulator scores a Shaman's damage only.",
   'Shaman|Elemental Fury / Concussion / Call of Thunder': "It changes particular spells, and the simulator casts one generic spell for the spec.",
@@ -220,7 +220,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Mage|Arcane Potency / Improved Scorch / Molten Fury':
     "It works only for a while (while Clearcasting, while Scorch is kept up, below 20% health), and the simulator doesn't play the fight out moment by moment.",
   'Mage|Magic Absorption / Arcane Fortitude / Improved Mana Shield / Improved Blink / Prismatic Cloak / Frost Warding / Frozen Core / Ice Barrier': SURVIVAL,
-  'Priest|Shadow Weaving / Misery': "It stacks on the boss as you cast, and the simulator doesn't play the fight out moment by moment.",
+  'Priest|Shadow Weaving / Misery': 'It is a debuff on the boss, which the Buffs tab carries: the simulator reads it from there, not from your talents.',
   'Priest|Inner Focus / Power Infusion': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Priest|Improved Renew / Empowered Healing': 'It strengthens particular heals, and the simulator casts one generic heal.',
   'Priest|Improved Power Word: Shield / Focused Power / Divine Fury / Searing Light / Surge of Light / Improved Shadow Word: Pain / Improved Mind Blast / Shadow Power / Reflective Shield / Wand Specialization / Holy Nova / Lightwell':

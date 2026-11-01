@@ -131,7 +131,7 @@ export const sampleBuffs: readonly Buff[] = [
     providedByClass: 'Paladin',
     spellId: 20218,
     notModelled:
-      'Increases Holy damage done by party members by 10%. A school-specific damage multiplier, and this simulator applies no school multipliers. Improved Sanctity Aura 2/2 adds a further 2% to damage of all schools.',
+      'Increases Holy damage done by party members by 10%. A school-specific damage multiplier, and a buff has no school field (talents and target debuffs do), so it is not applied to a Paladin\'s Holy seal. Improved Sanctity Aura 2/2 adds a further 2% to damage of all schools.',
   },
 
   // ---- Mage ----
@@ -186,6 +186,19 @@ export const sampleBuffs: readonly Buff[] = [
     roles: ['Caster DPS', 'Healer'],
     notModelled:
       'Increases spell casting speed by 20% and reduces the mana cost of all spells by 20% for 15 sec, on a 3 min cooldown. A timed cooldown from another player: averaging it over the fight would misstate it in both directions, and the mana half has nothing to act on while healer mana is unconstrained.',
+  },
+  {
+    id: 'vampiric-touch',
+    name: 'Vampiric Touch',
+    providedByClass: 'Priest',
+    // The 41-point Shadow talent, and the mana half of why a raid brings a Shadow Priest.
+    providedBySpec: 'Shadow',
+    spellId: 34917,
+    roles: ['Caster DPS', 'Healer'],
+    notModelled:
+      "While it is on the target, the Priest's party gains mana equal to 5% of the Shadow spell damage the Priest deals. Another player's damage, which this app has no way to read: wowsims turns it into MP5 from a Shadow Priest DPS it is given (`ShadowPriestDps * 0.25`), and any figure here would be that DPS assumed.",
+    notes:
+      'Rank 3, spell 34917 (130 Shadow damage every 3 sec for 15 sec). Added on 2026-11-01 with Misery and Shadow Weaving, so a Shadow Priest\'s seat credits what a raid brings one for. Party only: the talent text says "all party members", and the mana spell (34919) is a 100-yard party effect.',
   },
 
   // ---- Druid ----

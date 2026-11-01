@@ -141,15 +141,16 @@ for (const entry of entries) {
     unresolved.push({ name: entry.name, why: 'no spellId' })
     continue
   }
-  const tooltip = tooltipFor(await pageFor(entry.spellId), entry.spellId)
-
   /*
    * A target debuff is not a player buff and has no party/raid scope to read: it lands on the boss,
    * and one applier anywhere in the raid covers it. Classified structurally rather than from the
-   * text, because the text is about the target and would never state a player scope.
+   * text, because the text is about the target and would never state a player scope. Its page is
+   * still read, for the evidence line.
    */
+  const isDebuff = debuffIds.has(entry.id)
+  const tooltip = tooltipFor(await pageFor(entry.spellId), entry.spellId)
   const override = OVERRIDES[entry.id]
-  const scope = debuffIds.has(entry.id) ? 'Target' : (classify(tooltip) ?? override?.scope)
+  const scope = isDebuff ? 'Target' : (classify(tooltip) ?? override?.scope)
 
   if (!scope) {
     unresolved.push({ name: entry.name, spellId: entry.spellId, why: 'tooltip states no scope', tooltip: tooltip?.slice(0, 400) })
@@ -159,7 +160,7 @@ for (const entry of entries) {
     name: entry.name,
     spellId: entry.spellId,
     scope,
-    evidence: override && !classify(tooltip) ? override.why : tooltip.slice(0, 200),
+    evidence: override && !classify(tooltip) ? override.why : (tooltip ?? 'A target debuff: lands on the boss, so one applier anywhere covers the raid.').slice(0, 200),
     ...(override && !classify(tooltip) ? { fromOverride: true } : {}),
   }
 }

@@ -61,7 +61,7 @@ behind every claim of its that quotes a number.
   against what players of your spec average on archon.gg ("5.66× below what Fury warriors average"),
   what it misses for your spec and your talents, where the damage comes from (a log-style table that
   sums to the estimate), how it was computed, and every DPS spec's best case by this model against
-  the logs, yours marked (1.02× to 2.13× low, computed). A missing weapon is said first, before
+  the logs, yours marked (1.02× to 1.90× low, computed). A missing weapon is said first, before
   anything else. The page names its fixed encounter and what the model does and does not cover, with
   every figure in that list computed. DPS specs only; Healer and Tank results (estimated healing,
   effective health) are still computed and reachable with `?simulation=1`
@@ -192,7 +192,7 @@ behind every claim of its that quotes a number.
   the talents that can take a point toward a short row, then the points left unspent
 - Real item icons on the character sheet, the ranked-gear rows and the raid loot tables. Icon names are
   ingested from the same pinned wowsims commit as the item catalogue; the artwork is vendored into
-  `public/icons/` (1,972 files, 3.4 MB) so the app keeps working offline and makes no runtime network
+  `public/icons/` (1,973 files, 3.4 MB) so the app keeps working offline and makes no runtime network
   calls. Entries with no catalogued item fall back to the two-letter slot glyph
 - **A page per profession, laid out the way a levelling guide reads** — pick from a grid of thirteen,
   and each one opens on its own progression: a skill range, what you gather or craft in it, and the

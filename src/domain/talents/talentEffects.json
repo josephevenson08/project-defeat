@@ -1213,7 +1213,7 @@
           "talent": "Blood Frenzy"
         }
       ],
-      "reason": "A debuff on the target rather than a change to the player."
+      "reason": "A debuff on the target rather than a change to the player. The Buffs tab lists it but does not apply it yet, the owner's call until the best-case bound is settled."
     },
     {
       "className": "Warrior",
@@ -1612,7 +1612,7 @@
           "talent": "Improved Expose Armor"
         }
       ],
-      "reason": "Strengthens Expose Armor, which the Buffs tab's target debuffs do not carry."
+      "reason": "Strengthens Expose Armor, which the Buffs tab lists at 2/2 but does not apply yet, the owner's call until the best-case bound is settled."
     },
     {
       "className": "Hunter",
@@ -1829,7 +1829,7 @@
           "talent": "Improved Hunter's Mark"
         }
       ],
-      "reason": "Makes Hunter's Mark raise melee attack power too, and the Buffs tab's target debuffs do not carry Hunter's Mark."
+      "reason": "Makes Hunter's Mark raise melee attack power too. The Buffs tab lists both halves but does not apply them yet, the owner's call until the best-case bound is settled."
     },
     {
       "className": "Hunter",
@@ -2697,7 +2697,7 @@
           "talent": "Molten Fury"
         }
       ],
-      "reason": "Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch, and the Buffs tab does not carry it), and damage below 20% health. Each needs a fight timeline."
+      "reason": "Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch; the Buffs tab carries the vulnerability itself, at a full stack), and damage below 20% health. Each needs a fight timeline."
     },
     {
       "className": "Mage",
@@ -2751,7 +2751,7 @@
           "talent": "Misery"
         }
       ],
-      "reason": "Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target."
+      "reason": "Target debuffs applied by casting. The Buffs tab carries both, Shadow Weaving at a full stack, and the estimate reads them from there rather than from the talent."
     },
     {
       "className": "Priest",

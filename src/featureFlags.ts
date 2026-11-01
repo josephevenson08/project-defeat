@@ -34,11 +34,12 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * fails when they stop being true** — the rotation count, the talent split, and the rage figures.
  * Do not add a numeric bullet here without one.
  *
- * The last two bullets are absence claims — "no variance", "no spell school" — which nothing can
- * usefully assert, because the assertion would have to name the thing that does not exist. They are
- * instead written so that *adding* the feature makes the sentence obviously false to whoever adds
- * it. That is weaker, and it is called out rather than papered over: this file has twice claimed
- * more rigour than it had.
+ * The variance bullet near the end is an absence claim — "no variance" — which nothing can usefully
+ * assert, because the assertion would have to name the thing that does not exist. It is instead
+ * written so that *adding* the feature makes the sentence obviously false to whoever adds it. That
+ * is weaker, and it is called out rather than papered over: this file has twice claimed more rigour
+ * than it had. The bullet beside it was the other absence claim, "no spell school", and it proved
+ * the point: abilities gained a school and the sentence sat false until 2026-11-01.
  *
  * **Shown for DPS specs since 2026-08-21, hidden for Healer and Tank**, and here is what is
  * actually true about it now.
@@ -51,7 +52,7 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.02x to 2.13x low** — a range this file has now got
+ *   best case against them. The model reads **1.02x to 1.90x low** — a range this file has now got
  *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
@@ -169,9 +170,9 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   than the coverage figure. Talent groups are still refused by name, each with a reason — but the
  *   **count is asserted from the data rather than written here**, because the figure that used to sit
  *   in this sentence went stale the moment the ingest changed, which is this file's own recurring
- *   failure. The **per-spell** ones — Ignite, Shadow Weaving, Ruin, every "Improved &lt;nuke&gt;" —
- *   need a spell school and a per-spell coefficient, and this simulator models one generic cast per
- *   spec and records no school at all.
+ *   failure. The **per-spell** ones — Ignite, Ruin, every "Improved &lt;nuke&gt;" — need a per-spell
+ *   coefficient, and most specs cast one spell here. A school is no longer what they wait on: every
+ *   damaging ability records one, and the school-scoped talents and target debuffs reach it.
  * - **The stat-pipeline group is no longer among them** (2026-08-20). Toughness, Vitality, Divine
  *   Strength, Sinister Calling, Arcane Mind and the Intellect- and Spirit-to-spell-power talents now
  *   reach `calculateStats`, so they move the stat rail, the gear rankings and the upgrade finder as
@@ -185,8 +186,11 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   the encounter was fixed. (It reads about 5.4 today, which is *not* pinned: only the band is.)
  * - **No multi-iteration variance and no result charting**, so a single point estimate is all there
  *   is to show.
- * - **Spell school is not modelled anywhere**, which is why Winter's Chill is `notModelled` and
- *   Curse of the Elements is approximate.
+ * - **Spell school is recorded per ability** (`SignatureAbility.spellSchool`), and two things read
+ *   it: the talents' school multipliers (Demonic Sacrifice) and, since 2026-11-01, the target's
+ *   school debuffs (Curse of the Elements on Arcane, Fire, Frost and Shadow; Misery on every magic
+ *   school; Shadow Weaving, Improved Scorch and Winter's Chill on one each), multiplied together as
+ *   wowsims applies them. A buff still has no school field, so Sanctity Aura is listed, not applied.
  *
  * **That judgement was taken on 2026-08-21 and it was taken per role, not globally.** The argument
  * against showing it — a caveat under a confident-looking number is not enough when the number is

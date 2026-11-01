@@ -94,6 +94,12 @@
       "scope": "Single",
       "evidence": "Power Infusion Talent 16% of base mana 30 yd range Instant 3 min cooldown Requires Priest Infuses the target with power, increasing spell casting speed by 20% and reducing the mana cost of all spells "
     },
+    "vampiric-touch": {
+      "name": "Vampiric Touch",
+      "spellId": 34917,
+      "scope": "Party",
+      "evidence": "Vampiric Touch Talent 425 Mana 30 yd range 1.5 sec cast Requires Priest Requires level 70 Causes 650 Shadow damage over 15 sec to your target and causes all party members to gain mana equal to 5% of a"
+    },
     "mark-of-the-wild": {
       "name": "Gift of the Wild",
       "spellId": 26991,
@@ -178,12 +184,6 @@
       "scope": "Party",
       "evidence": "Mana Tide Totem Talent 3% of base mana Instant 5 min cooldown Requires Shaman Tools: Water Totem Summons a Mana Tide Totem with 5 health at the feet of the caster for 12 sec that restores 6% of total "
     },
-    "tranquil-air-totem": {
-      "name": "Tranquil Air Totem",
-      "spellId": 25908,
-      "scope": "Party",
-      "evidence": "Tranquil Air Totem 6% of base mana Instant Requires Shaman Requires level 50 Tools: Air Totem Summons a Tranquil Air Totem with 5 health at the feet of the caster. The totem reduces the threat caused "
-    },
     "unleashed-rage": {
       "name": "Unleashed Rage",
       "spellId": 30806,
@@ -244,6 +244,72 @@
       "spellId": 28595,
       "scope": "Target",
       "evidence": "Winter's Chill Talent Requires Mage Gives your Frost damage spells a 100% chance to apply the Winter's Chill effect, which increases the chance a Frost spell will critically hit the target by 2% for 1"
+    },
+    "misery": {
+      "name": "Misery",
+      "spellId": 33195,
+      "scope": "Target",
+      "evidence": "Misery Talent Requires Priest Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target to take an additional 5% spell damage."
+    },
+    "shadow-weaving": {
+      "name": "Shadow Weaving",
+      "spellId": 15334,
+      "scope": "Target",
+      "evidence": "Shadow Weaving Talent Requires Priest Your Shadow damage spells have a 100% chance to cause your target to be vulnerable to Shadow damage. This vulnerability increases the Shadow damage dealt to your "
+    },
+    "improved-scorch": {
+      "name": "Improved Scorch",
+      "spellId": 12873,
+      "scope": "Target",
+      "evidence": "Improved Scorch Talent Requires Mage Your Scorch spells have a 100% chance to cause your target to be vulnerable to Fire damage. This vulnerability increases the Fire damage dealt to your target by 3%"
+    },
+    "improved-shadow-bolt": {
+      "name": "Improved Shadow Bolt",
+      "spellId": 17803,
+      "scope": "Target",
+      "evidence": "Improved Shadow Bolt Talent Requires Warlock Your Shadow Bolt critical strikes increase Shadow damage dealt to the target by 20% until 4 non-periodic damage sources are applied. Effect lasts a maximum"
+    },
+    "judgement-of-wisdom": {
+      "name": "Judgement of Wisdom",
+      "spellId": 27164,
+      "scope": "Target",
+      "evidence": "Judgement of Wisdom 100 yd range Instant Requires Paladin Requires level 68 (Proc chance: 50%)"
+    },
+    "stormstrike": {
+      "name": "Stormstrike",
+      "spellId": 17364,
+      "scope": "Target",
+      "evidence": "Stormstrike Talent 8% of base mana Melee Range Instant 10 sec cooldown Requires Shaman Requires Melee Weapon Instantly attack with both weapons. In addition, the next 2 sources of Nature damage dealt "
+    },
+    "blood-frenzy": {
+      "name": "Blood Frenzy",
+      "spellId": 29859,
+      "scope": "Target",
+      "evidence": "Blood Frenzy Talent Requires Warrior Your Rend and Deep Wounds abilities also increase all physical damage caused to that target by 4%."
+    },
+    "hunters-mark": {
+      "name": "Hunter's Mark",
+      "spellId": 14325,
+      "scope": "Target",
+      "evidence": "Hunter's Mark 60 Mana 100 yd range Instant Requires Hunter Requires level 58 Places the Hunter's Mark on the target, increasing the ranged attack power of all attackers against that target by 110 and "
+    },
+    "improved-hunters-mark": {
+      "name": "Improved Hunter's Mark",
+      "spellId": 19425,
+      "scope": "Target",
+      "evidence": "Improved Hunter's Mark Talent Requires Hunter Causes 100% of your Hunter's Mark ability's base attack power to apply to melee attack power as well."
+    },
+    "expose-armor": {
+      "name": "Expose Armor",
+      "spellId": 26866,
+      "scope": "Target",
+      "evidence": "Expose Armor 25 Energy Melee Range Instant Requires Rogue Requires level 66 Requires Melee Weapon Finishing move that exposes the target for 30 sec, reducing armor per combo point: 1 point : 410 armor"
+    },
+    "mangle": {
+      "name": "Mangle",
+      "spellId": 33876,
+      "scope": "Target",
+      "evidence": "Mangle (Cat) 45 Energy Melee Range Instant Requires Druid Requires level 50 Requires Cat Form Mangle the target for 160% normal damage plus 158 and causes the target to take 30% additional damage from"
     },
     "expose-weakness": {
       "name": "Expose Weakness",

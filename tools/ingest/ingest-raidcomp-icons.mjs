@@ -106,10 +106,12 @@ function gathererPayload(html) {
  * The name cross-check below is strict on purpose, so the few real mismatches have to be stated
  * rather than waved through. Spell 24858 is Moonkin *Form* — the aura is what the form grants, so
  * this app's entry is named for the effect while the spell is named for the shapeshift. Wowhead
- * shows the same icon for both.
+ * shows the same icon for both. Spell 33876 is Mangle (Cat): the entry is the debuff, which the Cat
+ * and Bear spells apply alike, and the Cat spell is the id wowsims cites for it.
  */
 const NAME_ALIASES = {
   'moonkin-aura': 'Moonkin Form',
+  mangle: 'Mangle (Cat)',
 }
 
 const spellIcons = {}

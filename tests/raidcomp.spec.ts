@@ -10,8 +10,9 @@ import { exampleRaid } from '../src/domain/raids/exampleRaids'
  * example roster, and what it adds up to. These are the prototype's hands-on check
  * (`checks/rc-handson.mjs`) with its real numbers: the palette fills group 1 first; aiming at group 3
  * moves the next seat there; Remove, 10-player and Clear each offer Undo; the example is 25 of 25 and
- * marked, and marked edited once a seat moves; its groups receive 8, 7, 4, 5 and 3 of 18 party buffs;
- * only Winter's Chill is missing from it, which needs a Frost Mage; a full raid disables the palette.
+ * marked, and marked edited once a seat moves; its groups receive 8, 7, 5, 5 and 3 of 19 party buffs
+ * (group 3's Shadow Priest brings Vampiric Touch, since 2026-11-01); Winter's Chill and Blood Frenzy
+ * are missing from it, which need a Frost Mage and an Arms Warrior; a full raid disables the palette.
  */
 
 const count = (page: Page) => page.getByTestId('raidcomp-filled')
@@ -23,21 +24,22 @@ async function openRaidComp(page: Page) {
   await expect(page.getByTestId('raidcomp-panel')).toBeVisible()
 }
 
-test('the advice’s data: the example raid’s coverage, its one gap, and what one more seat would add', () => {
-  // 18 of the 32 buffs reach only the caster's party, which is what the hero says.
-  expect(sampleBuffs.filter((buff) => isPartyScoped(buff.id))).toHaveLength(18)
-  expect(partyBuffCount).toBe(18)
-  expect(sampleBuffs).toHaveLength(32)
+test('the advice’s data: the example raid’s coverage, its two gaps, and what one more seat would add', () => {
+  // 19 of the 33 buffs reach only the caster's party, which is what the hero says.
+  expect(sampleBuffs.filter((buff) => isPartyScoped(buff.id))).toHaveLength(19)
+  expect(partyBuffCount).toBe(19)
+  expect(sampleBuffs).toHaveLength(33)
 
   const example = exampleRaid(25)
   const report = computeCoverage(example)
   expect(report.filled).toBe(25)
-  expect(report.groups.map((group) => group.partyBuffs.length), 'party buffs per group').toEqual([8, 7, 4, 5, 3])
+  expect(report.groups.map((group) => group.partyBuffs.length), 'party buffs per group').toEqual([8, 7, 5, 5, 3])
 
   const gaps = raidGaps(example)
-  expect(gaps.raid.map((gap) => `${gap.entry.name} → ${gap.needs}`)).toEqual(["Winter's Chill → a Frost Mage"])
-  expect(gaps.raid[0].reach).toBe('Boss')
-  expect(gaps.groups.map((group) => group.lacking.length)).toEqual([10, 11, 14, 13, 15])
+  // A listed debuff is still a gap: Blood Frenzy is held out of the estimate, not out of the raid.
+  expect(gaps.raid.map((gap) => `${gap.entry.name} → ${gap.needs}`)).toEqual(["Winter's Chill → a Frost Mage", 'Blood Frenzy → an Arms Warrior'])
+  expect(gaps.raid.every((gap) => gap.reach === 'Boss')).toBe(true)
+  expect(gaps.groups.map((group) => group.lacking.length)).toEqual([11, 12, 14, 14, 16])
 
   const groupOne = bestAddition(example.groups[0])!
   expect(groupOne.build.id).toBe('shaman-enhancement')
@@ -118,10 +120,10 @@ test('the example roster is 25 of 25, labelled as the example, and labelled edit
   // It replaced a raid, so Undo is offered.
   await expect(page.getByTestId('raidcomp-undo')).toBeVisible()
 
-  // The groups receive 8, 7, 4, 5 and 3 of 18 party buffs.
-  for (const [group, received] of [8, 7, 4, 5, 3].entries()) {
+  // The groups receive 8, 7, 5, 5 and 3 of 19 party buffs.
+  for (const [group, received] of [8, 7, 5, 5, 3].entries()) {
     await expect(page.getByTestId(`raidcomp-group-${group + 1}`).locator('.raidcomp-group-count')).toHaveText(
-      `5 of 5 seated · ${received} of 18 party buffs`,
+      `5 of 5 seated · ${received} of 19 party buffs`,
     )
   }
   await expect(page.getByTestId('raidcomp-missing')).toContainText("Winter's Chill")
@@ -176,7 +178,7 @@ test('the pencil names a player, and the page names its rules and sources', asyn
   const anyGroup = sampleBuffs.filter((buff) => castOnAnyGroup(buff.id)).map((buff) => buff.name)
   expect(anyGroup).toHaveLength(4)
   const hero = page.getByRole('heading', { name: /Seat your raid so every group gets its buffs/ }).locator('..')
-  await expect(hero).toContainText('18 of the 32 raid buffs reach only the caster')
+  await expect(hero).toContainText('19 of the 33 raid buffs reach only the caster')
   for (const name of anyGroup) await expect(hero).toContainText(name)
   await expect(hero).toContainText('Bloodlust reaches the whole raid on Anniversary realms')
   await expect(page.getByTestId('provenance')).toContainText("each buff's reach from its Wowhead spell tooltip")

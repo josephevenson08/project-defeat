@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/buffs/buffWords.ts
-lines: 65
+lines: 84
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.buffs.buffWords
 
-`src/features/buffs/buffWords.ts` · **features** layer · 65 lines
+`src/features/buffs/buffWords.ts` · **features** layer · 84 lines
 
 _No doc comment at the top of this file._
 

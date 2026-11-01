@@ -63,7 +63,15 @@
   what lets a school-scoped bonus like Demonic Sacrifice apply to the right spells and no others.
 - **A Demonology warlock's Felguard is modelled**, scaling off 57% of the owner's spell power rather
   than any attack power. Only Demonology gets one: Affliction and Destruction sacrifice their demon
-  for a school-scoped damage multiplier, and this simulator records no spell school.
+  for a school-scoped damage multiplier (Demonic Sacrifice), which reaches their spells' school.
+- **The target's school debuffs reach the spells of their school and multiply** (since 2026-11-01):
+  Curse of the Elements (Arcane, Fire, Frost, Shadow, so not an Elemental Shaman's Nature), Misery
+  (every magic school, a Rogue's poisons and a Paladin's Holy seal included), Shadow Weaving, Improved
+  Scorch and Winter's Chill, each at the full stack a raid keeps up. **Listed but not applied:**
+  Vampiric Touch and Judgement of Wisdom (mana, which nothing here tracks for that use), Improved
+  Shadow Bolt and Stormstrike's Nature debuff (charges and an uptime nothing plays out), and, held
+  out by the owner's choice until the best-case bound is settled, Blood Frenzy, Hunter's Mark,
+  Improved Hunter's Mark, Expose Armor and Mangle.
 - **Feral's bleeds are modelled, and bleeds ignore armor.** Rake and Rip are maintained rather than
   spammed — a bleed's rate is how often it falls off, not how often you can afford it — and their
   ticks take no armor mitigation at all, though Rake's opening hit does. Mangle is still missing.

@@ -314,22 +314,30 @@ function isDualWield(gear: EquippedGear) {
  * A debuff carrying `notModelled` contributes nothing by construction: it has no numeric fields to
  * contribute. It stays reachable through `getTargetDebuffById` so a saved build that has one ticked
  * still loads.
+ *
+ * Damage taken by school **multiplies** rather than sums, as wowsims applies each with `*=`, so
+ * `schoolDamageTaken` holds finished factors (1.155 for Curse of the Elements and Misery on Fire).
+ * School crit sums, like every other crit term here.
  */
 function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
-  return activeTargetDebuffIds.reduce(
-    (totals, id) => {
-      const debuff = getTargetDebuffById(id)
-      if (!debuff) return totals
-      return {
-        armorReduction: totals.armorReduction + (debuff.armorReduction ?? 0),
-        physicalCritTakenBonus: totals.physicalCritTakenBonus + (debuff.physicalCritTakenBonus ?? 0),
-        physicalHitTakenBonus: totals.physicalHitTakenBonus + (debuff.physicalHitTakenBonus ?? 0),
-        spellCritTakenBonus: totals.spellCritTakenBonus + (debuff.spellCritTakenBonus ?? 0),
-        spellDamageTakenMultiplier: totals.spellDamageTakenMultiplier + (debuff.spellDamageTakenMultiplier ?? 0),
-      }
-    },
-    { armorReduction: 0, physicalCritTakenBonus: 0, physicalHitTakenBonus: 0, spellCritTakenBonus: 0, spellDamageTakenMultiplier: 0 },
-  )
+  const schoolDamageTaken: Record<SpellSchool, number> = { Physical: 1, Arcane: 1, Fire: 1, Frost: 1, Holy: 1, Nature: 1, Shadow: 1 }
+  const schoolCritTaken: Record<SpellSchool, number> = { Physical: 0, Arcane: 0, Fire: 0, Frost: 0, Holy: 0, Nature: 0, Shadow: 0 }
+  const totals = { armorReduction: 0, physicalCritTakenBonus: 0, physicalHitTakenBonus: 0, spellCritTakenBonus: 0, schoolDamageTaken, schoolCritTaken }
+  for (const id of activeTargetDebuffIds) {
+    const debuff = getTargetDebuffById(id)
+    if (!debuff) continue
+    totals.armorReduction += debuff.armorReduction ?? 0
+    totals.physicalCritTakenBonus += debuff.physicalCritTakenBonus ?? 0
+    totals.physicalHitTakenBonus += debuff.physicalHitTakenBonus ?? 0
+    totals.spellCritTakenBonus += debuff.spellCritTakenBonus ?? 0
+    for (const [school, fraction] of Object.entries(debuff.schoolDamageTakenMultipliers ?? {}) as [SpellSchool, number][]) {
+      schoolDamageTaken[school] *= 1 + fraction
+    }
+    for (const [school, fraction] of Object.entries(debuff.schoolCritTakenBonus ?? {}) as [SpellSchool, number][]) {
+      schoolCritTaken[school] += fraction
+    }
+  }
+  return totals
 }
 
 /**
@@ -1346,7 +1354,15 @@ function calculatePhysicalDps(
    * joins here rather than on the mitigated side. Sending it through the armour term again would
    * double-mitigate the opener and wrongly mitigate every tick.
    */
-  const unmitigatedDps = (paladinHoly?.totalDps ?? 0) + (roguePoisons?.totalDps ?? 0) + (feralBleeds?.totalDps ?? 0)
+  /*
+   * The two spell schools on this path take the target's debuffs on their school: a Rogue's poisons
+   * are Nature and a Paladin's seal and judgement Holy, so Misery reaches both and Curse of the
+   * Elements neither.
+   */
+  const holyTaken = debuffs.schoolDamageTaken.Holy
+  const natureTaken = debuffs.schoolDamageTaken.Nature
+  const unmitigatedDps =
+    (paladinHoly?.totalDps ?? 0) * holyTaken + (roguePoisons?.totalDps ?? 0) * natureTaken + (feralBleeds?.totalDps ?? 0)
   /*
    * A buff damage multiplier scales everything, physical and Holy alike — Ferocious Inspiration is
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
@@ -1393,15 +1409,15 @@ function calculatePhysicalDps(
   }
   if (roguePoisons) {
     if (roguePoisons.instantDps > 0) {
-      sources.push({ name: 'Instant Poison', dps: roguePoisons.instantDps * damageMultiplier })
+      sources.push({ name: 'Instant Poison', dps: roguePoisons.instantDps * natureTaken * damageMultiplier })
     }
     if (roguePoisons.deadlyDps > 0) {
-      sources.push({ name: 'Deadly Poison', dps: roguePoisons.deadlyDps * damageMultiplier })
+      sources.push({ name: 'Deadly Poison', dps: roguePoisons.deadlyDps * natureTaken * damageMultiplier })
     }
   }
   if (paladinHoly) {
-    sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * damageMultiplier })
-    sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * damageMultiplier })
+    sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * holyTaken * damageMultiplier })
+    sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * holyTaken * damageMultiplier })
   }
 
   for (const entry of rotation.specials) {
@@ -1712,20 +1728,24 @@ function calculateCasterDps(
   const spellCritChance =
     computeSpellCritChance(ratingToFraction(stats.spellCritRating, RATING_PER_PERCENT.spellCrit) + talents.spellCritChance) +
     debuffs.spellCritTakenBonus
+  /*
+   * A school's own crit on top, Winter's Chill's Frost 10%, for the one spell the single-ability path
+   * casts. The rotation path rolls one crit chance for every spell in it and does not take this; no
+   * rotation casts Frost, so nothing is lost today.
+   */
+  const singleSchool = cast.ability?.spellSchool
+  const singleCritChance = spellCritChance + (singleSchool ? debuffs.schoolCritTaken[singleSchool] : 0)
   // Percentage haste from buffs is not rating and does not pass through the conversion: Bloodlust is
   // 30% of cast speed whatever the gear says, exactly as it is 30% of swing speed for a melee spec.
   const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste) + buffs.hastePercent
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
-  const damagePerCast =
-    (cast.baseAmount + stats.spellPower * cast.coefficient) *
-    (1 + debuffs.spellDamageTakenMultiplier) *
-    talents.spellDamageMultiplier
-  const expectedDamagePerCast = damagePerCast * (1 + spellCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
+  const damagePerCast = (cast.baseAmount + stats.spellPower * cast.coefficient) * talents.spellDamageMultiplier
+  const expectedDamagePerCast = damagePerCast * (1 + singleCritChance * (SPELL_CRIT_DAMAGE_MULTIPLIER - 1))
   /*
    * A buff damage multiplier scales the finished figure. School-scoped ones are still refused —
-   * Sanctity Aura is Holy only and nothing here records a spell school — so what lands is the
-   * school-agnostic kind, which today is Ferocious Inspiration.
+   * Sanctity Aura is Holy only and a buff has no school field — so what lands is the school-agnostic
+   * kind, which today is Ferocious Inspiration.
    */
   const singleAbilityDps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier)
 
@@ -1733,7 +1753,7 @@ function calculateCasterDps(
     { label: 'Base damage per cast', value: round(cast.baseAmount) },
     { label: 'Spell power scaling', value: round(stats.spellPower * cast.coefficient * castsPerSecond) },
     { label: 'Spell hit chance', value: toPercent(spellHitChance) },
-    { label: 'Spell crit chance', value: toPercent(spellCritChance) },
+    { label: 'Spell crit chance', value: toPercent(singleCritChance) },
     { label: 'Casts per second', value: round(castsPerSecond) },
   ]
 
@@ -1751,10 +1771,16 @@ function calculateCasterDps(
    * Without this a Demonology warlock read 968 rather than 855, holding both halves of an either/or.
    * A measurement caught that, not a test.
    */
-  const schoolMultiplier = (school: SpellSchool) => {
+  const talentSchoolMultiplier = (school: SpellSchool) => {
     if (character.className === 'Warlock' && !sacrificesDemon(character.spec)) return 1
     return talents.schoolDamageMultipliers[school] ?? 1
   }
+  /*
+   * And the target's debuffs on that school, multiplied in rather than added: Curse of the Elements,
+   * Misery, Shadow Weaving and Improved Scorch each reach their own schools and stack as wowsims
+   * stacks them. A spell with no school takes none of them.
+   */
+  const schoolMultiplier = (school: SpellSchool) => talentSchoolMultiplier(school) * debuffs.schoolDamageTaken[school]
 
   const rotationAbilities = getRotationAbilities(character.className, character.spec)
   /*
@@ -1778,13 +1804,12 @@ function calculateCasterDps(
    * still casts something with a school. Applied here rather than inside `damagePerCast` so the two
    * paths read the multiplier from one place.
    */
-  const singleSchool = cast.ability?.spellSchool
   const singleSchoolFactor = singleSchool ? schoolMultiplier(singleSchool) : 1
   let dps = singleAbilityDps * singleSchoolFactor
   let casterSources: { name: string; dps: number }[] = [{ name: cast.label, dps }]
 
   if (rotation) {
-    const shared = (1 + debuffs.spellDamageTakenMultiplier) * talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
+    const shared = talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
     /*
      * **School-scoped multipliers, applied per spell rather than to the total** — which is the whole
      * point of `spellSchool` existing. Demonic Sacrifice grants 15% to Shadow or to Fire, and folding
@@ -1835,7 +1860,7 @@ function calculateCasterDps(
    *
    * **Only Demonology gets one, and upstream's own branch is why.** A warlock either keeps the demon
    * or sacrifices it for a school-scoped damage multiplier, never both; Affliction and Destruction
-   * take the sacrifice, and the multiplier it buys needs a spell school this model does not record.
+   * take the sacrifice, whose multiplier `talentSchoolMultiplier` applies to their spells' school.
    * Summon Felguard is the 41-point Demonology talent, so for that spec the demon *is* the spec.
    */
   let warlockPet: ReturnType<typeof estimateWarlockPet> | undefined

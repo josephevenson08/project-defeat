@@ -78,7 +78,7 @@ export type CoverageReport = {
   size: number
   remaining: number
   roleCounts: Record<CharacterRole, number>
-  /** Raid-wide reach: Greater Blessings, single-target utility, and the six target debuffs. */
+  /** Raid-wide reach: Greater Blessings, single-target utility, and the target debuffs. */
   raidWide: CoverageSection<Buff>
   debuffs: CoverageSection<TargetDebuff>
   /**

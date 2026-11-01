@@ -240,7 +240,7 @@ const WARRIOR_SKIPPED = [
   [['Rampage'], 'Stacking on-hit attack power. Needs a timeline to build stacks.'],
   [['Enrage'], 'Triggers on being crit by the target — the model has no incoming-damage stream for a DPS.'],
   [['Sweeping Strikes'], 'Extra targets. Single-target model.'],
-  [['Blood Frenzy'], 'A debuff on the target rather than a change to the player.'],
+  [['Blood Frenzy'], "A debuff on the target rather than a change to the player. The Buffs tab lists it but does not apply it yet, the owner's call until the best-case bound is settled."],
   [['Mace Specialization', 'Sword Specialization', 'Poleaxe Specialization'], 'Weapon-type gated, and the mace one is a stun proc. Would need per-weapon-type dispatch that nothing else needs yet.'],
   [['Impale'], 'Raises the crit damage bonus of abilities only. Real, but it belongs with the special-attack table rather than the white-swing modifiers this pass covers.'],
   [['Defiance'], 'Grants expertise, which is a threat and hit-table term on the attacking side. The tank path scores survivability and never rolls the player\'s own attack table.'],
@@ -439,7 +439,7 @@ const ROGUE_SKIPPED = [
   [['Improved Kidney Shot', 'Find Weakness', 'Dirty Deeds', 'Master of Subtlety', 'Shadowstep'], 'Windowed bonuses: while Kidney Shot holds, for 10 seconds after a finisher, below 35% health, from stealth, or after Shadowstep. Each needs a fight timeline.'],
   [['Improved Sinister Strike', 'Vigor'], "Energy. Improved Sinister Strike lowers the cost of the Combat estimate's builder, which it prices at base cost; Vigor raises the energy cap, which a sustained energy rate never meets, so energy lost to capping is not modelled either."],
   [['Quick Recovery', 'Deadened Nerves', 'Lightning Reflexes', 'Deflection', 'Sleight of Hand', 'Heightened Senses', 'Enveloping Shadows', 'Cheat Death'], "Survival: healing taken, damage taken, dodge, parry, and the chance to be hit or crit. A damage dealer has no incoming-damage stream here. Quick Recovery's other half refunds energy on a missed finisher, which the sustained rate does not price."],
-  [['Improved Expose Armor'], "Strengthens Expose Armor, which the Buffs tab's target debuffs do not carry."],
+  [['Improved Expose Armor'], "Strengthens Expose Armor, which the Buffs tab lists at 2/2 but does not apply yet, the owner's call until the best-case bound is settled."],
 ]
 
 const ROGUE_NOT_READ = {
@@ -611,7 +611,7 @@ const HUNTER_SKIPPED = [
   [['Careful Aim', 'Master Marksman', 'Survival Instincts', 'Lightning Reflexes'], 'Ranged attack power from Intellect, a ranged attack power multiplier, +4% attack power, and +15% Agility. Upstream writes Careful Aim and Master Marksman in talents.go; Lightning Reflexes would be a stat factor, which that file does not write. None is ingested yet. Survival Instincts also cuts damage taken, which has no stream here.'],
   [['Endurance Training', 'Improved Aspect of the Monkey', 'Thick Hide', 'Spirit Bond', 'Catlike Reflexes', 'Deflection', 'Deterrence'], 'Survival for you and your pet: health, dodge, parry, armour and regeneration, and Deterrence is a cooldown. A damage dealer has no incoming-damage stream here.'],
   [['Improved Aspect of the Hawk', 'Go for the Throat'], 'Procs on ranged attacks: a haste aura, and Focus for the pet on a crit. The pet\'s Focus income is modelled from its regeneration alone.'],
-  [["Improved Hunter's Mark"], "Makes Hunter's Mark raise melee attack power too, and the Buffs tab's target debuffs do not carry Hunter's Mark."],
+  [["Improved Hunter's Mark"], "Makes Hunter's Mark raise melee attack power too. The Buffs tab lists both halves but does not apply them yet, the owner's call until the best-case bound is settled."],
   [['Efficiency'], "Lowers the mana cost of shots. The Hunter estimate's mana figures price Steady Shot at its base cost."],
 ]
 
@@ -1056,7 +1056,7 @@ const MAGE_SKIPPED = [
   [['Critical Mass', 'Pyromaniac', 'Fire Power', 'Piercing Ice', 'Arctic Winds'], "Fire and Frost crit and damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped crit has no field. Arctic Winds also lowers the chance to be hit."],
   [['Spell Power', 'Ice Shards'], 'Raise spell crit damage, for all spells and for Frost spells. There is no crit-damage field for talents, the same gap as Elemental Fury.'],
   [['Arcane Impact', 'Empowered Arcane Missiles', 'Improved Fireball', 'Incineration', 'Improved Flamestrike', 'Improved Frostbolt', 'Improved Cone of Cold', 'Wand Specialization', 'Pyroblast', 'Blast Wave', "Dragon's Breath", 'Summon Water Elemental'], "Change particular spells (Arcane Blast's crit, Arcane Missiles, Fireball's and Frostbolt's cast time, Fire Blast, Scorch, Flamestrike, Cone of Cold, wands) or teach a spell or the Water Elemental. TalentModifiers has no per-spell field for them, so none applies, even to Arcane Blast, Fireball and Frostbolt, which the estimates cast; nothing here models the Water Elemental."],
-  [['Arcane Potency', 'Improved Scorch', 'Molten Fury'], 'Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch, and the Buffs tab does not carry it), and damage below 20% health. Each needs a fight timeline.'],
+  [['Arcane Potency', 'Improved Scorch', 'Molten Fury'], 'Windowed bonuses: crit while Clearcasting, a stacking Fire vulnerability Scorch keeps up (no estimate casts Scorch; the Buffs tab carries the vulnerability itself, at a full stack), and damage below 20% health. Each needs a fight timeline.'],
   [['Magic Absorption', 'Arcane Fortitude', 'Improved Mana Shield', 'Improved Blink', 'Prismatic Cloak', 'Frost Warding', 'Frozen Core', 'Ice Barrier'], 'Survival: resistances, armour, damage taken, absorbs and the chance to be hit. A damage dealer has no incoming-damage stream here.'],
 ]
 
@@ -1135,7 +1135,7 @@ const PRIEST_STAT_EXTRACTORS = [
 ]
 
 const PRIEST_SKIPPED = [
-  [['Shadow Weaving', 'Misery'], 'Stacking target debuffs applied by casting; they need a timeline and a debuff slot on the target.'],
+  [['Shadow Weaving', 'Misery'], 'Target debuffs applied by casting. The Buffs tab carries both, Shadow Weaving at a full stack, and the estimate reads them from there rather than from the talent.'],
   [['Inner Focus', 'Power Infusion'], 'Timed cooldowns, which a closed-form model has no timeline to place.'],
   [['Improved Renew', 'Empowered Healing'], 'Per-spell coefficients; the healer path models one generic cast.'],
   [['Improved Power Word: Shield', 'Focused Power', 'Divine Fury', 'Searing Light', 'Surge of Light', 'Improved Shadow Word: Pain', 'Improved Mind Blast', 'Shadow Power', 'Reflective Shield', 'Wand Specialization', 'Holy Nova', 'Lightwell'], "Change particular spells (Power Word: Shield, Smite and Mind Blast's hit, Smite, Holy Fire and the big heals' cast time, a free instant Smite after a crit, Shadow Word: Pain's duration, Mind Blast's cooldown and crit, wands) or teach Holy Nova or Lightwell. TalentModifiers has no per-spell field for them, so none applies, even to Shadow Word: Pain and Mind Blast, which the Shadow estimate casts."],
