@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/WhatIsModelled.tsx
-lines: 94
+lines: 99
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.WhatIsModelled
 
-`src/features/simulator/WhatIsModelled.tsx` · **features** layer · 94 lines
+`src/features/simulator/WhatIsModelled.tsx` · **features** layer · 99 lines
 
 From the top of the file:
 

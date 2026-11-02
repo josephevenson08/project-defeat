@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/bestCase.ts
-lines: 157
+lines: 161
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.bestCase
 
-`src/features/simulator/bestCase.ts` · **features** layer · 157 lines
+`src/features/simulator/bestCase.ts` · **features** layer · 161 lines
 
 _No doc comment at the top of this file._
 

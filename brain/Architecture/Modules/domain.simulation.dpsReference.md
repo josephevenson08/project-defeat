@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/dpsReference.ts
-lines: 87
+lines: 101
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.dpsReference
 
-`src/domain/simulation/dpsReference.ts` · **domain** layer · 87 lines
+`src/domain/simulation/dpsReference.ts` · **domain** layer · 101 lines
 
 From the top of the file:
 

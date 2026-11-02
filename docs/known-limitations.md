@@ -69,10 +69,14 @@
   (every magic school, a Rogue's poisons and a Paladin's Holy seal included), Shadow Weaving, Improved
   Scorch and Winter's Chill, each at the full stack a raid keeps up. **Listed but not applied:**
   Vampiric Touch and Judgement of Wisdom (mana, which nothing here tracks for that use), Improved
-  Shadow Bolt and Stormstrike's Nature debuff (charges and an uptime nothing plays out), and, held
-  out by the owner's choice until Marksmanship is measured at a real raid build, Blood Frenzy,
-  Hunter's Mark, Improved Hunter's Mark, Expose Armor and Mangle: applied, they take Marksmanship,
-  measured today at a synthetic one-tree build, past its 95th percentile.
+  Shadow Bolt and Stormstrike's Nature debuff (charges and an uptime nothing plays out). **Applied
+  since 2026-11-02:** Blood Frenzy (+4% on every physical source), Hunter's Mark (+440 ranged attack
+  power to the Hunter's shots, not the pet) and Improved Hunter's Mark (+110 melee), Expose Armor
+  (3,075, overwriting Sunder rather than adding) and Mangle (+30% on bleed ticks and Shred).
+- **Marksmanship is exempt from the calibration check** (the owner's call, 2026-11-02): at a sourced
+  raid build with the physical debuffs it reads 1,578 against a 95th percentile of 1,386, drawn from
+  5,495 parses of a spec guides rate F-tier in PvE. The trust range leaves it out and says why.
+  Subtlety and Assassination, with thinner references still, pass by under 1%.
 - **The DPS references are each spec's 95th percentile** (Warcraft Logs, Phase 2, read 2026-11-02),
   not an average. archon.gg's figures used until then were the same measure, labelled "average"
   here by mistake; a best case is therefore compared with what the top 5% of a spec's parses reach.

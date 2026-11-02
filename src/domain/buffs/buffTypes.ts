@@ -167,9 +167,8 @@ export type TargetDebuff = BuffProvider & {
    * Set on a debuff this app lists but does not apply, holding the actual effect so it can be read
    * and credited to whoever brings it. Same contract as `Buff.notModelled`. The reasons differ and
    * each entry gives its own: another player's stat (Expose Weakness), charges or an uptime nothing
-   * here plays out (Improved Shadow Bolt, Stormstrike), mana this app does not track (Judgement of
-   * Wisdom), or held out by the owner's choice until Marksmanship has a real raid build (Blood Frenzy,
-   * Hunter's Mark, Improved Hunter's Mark, Expose Armor, Mangle).
+   * here plays out (Improved Shadow Bolt, Stormstrike), or mana this app does not track (Judgement of
+   * Wisdom).
    */
   notModelled?: string
   needsVerification?: boolean

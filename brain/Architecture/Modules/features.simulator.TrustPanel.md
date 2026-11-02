@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/TrustPanel.tsx
-lines: 62
+lines: 66
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.TrustPanel
 
-`src/features/simulator/TrustPanel.tsx` · **features** layer · 62 lines
+`src/features/simulator/TrustPanel.tsx` · **features** layer · 66 lines
 
 From the top of the file:
 

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/talents/calibrationBuilds.ts
-lines: 77
+lines: 123
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.calibrationBuilds
 
-`src/domain/talents/calibrationBuilds.ts` · **domain** layer · 77 lines
+`src/domain/talents/calibrationBuilds.ts` · **domain** layer · 123 lines
 
 From the top of the file:
 
@@ -24,6 +24,12 @@ From the top of the file:
 > Subtlety players, and once Dual Wield Specialization was modelled (2026-10-31) it read 1,295 against
 > their 1,292, which the calibration test reads as something counted twice. Nothing was: the talent
 > adds exactly half the off hand and moves nothing else. The build was the mismatch.
+> 
+> **And where there is no preset at all.** Marksmanship had none in the file the build ingest reads,
+> so it was measured at the one-tree fill: every Marksmanship talent in listed order, which no raider
+> plays. With the physical debuffs applied that read 1,392 to 1,526 against its 95th percentile of
+> 1,386, and the model put Marksmanship above Survival where the logs put it 327 DPS below. The same
+> mismatch as Subtlety's, from the other side, so it gets a guide's build too (2026-11-02).
 > 
 > Only the best case reads this. The Talents tab's "Load the preset" keeps wowsims' build as stored,
 > which is the owner's call (2026-10-31).

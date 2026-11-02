@@ -44,6 +44,13 @@ export type DpsReference = {
    * reader recognises; Warcraft Logs has no letters, and archon now lists only Phase 3.
    */
   tier: 'S' | 'A' | 'B' | 'C'
+  /**
+   * Set where the reference is too thin to hold the model to, with why: the calibration check exempts
+   * the spec, the trust range leaves it out, and the trust panel and the estimate say so. Marksmanship
+   * only (the owner's call, 2026-11-02): at a sourced raid build with the raid's physical debuffs it
+   * reads above its 95th percentile, which comes from a spec the guides tell raiders not to play.
+   */
+  thin?: string
 }
 
 /** When the table below was read, as an ISO date: part of the datum. */
@@ -76,7 +83,14 @@ export const dpsReference: readonly DpsReference[] = [
   { className: 'Shaman', spec: 'Elemental', dps: 1429, parses: 203624, tier: 'A' },
   { className: 'Druid', spec: 'Balance', dps: 1408, parses: 133090, tier: 'B' },
   { className: 'Rogue', spec: 'Subtlety', dps: 1391, parses: 1276, tier: 'C' },
-  { className: 'Hunter', spec: 'Marksmanship', dps: 1386, parses: 5495, tier: 'C' },
+  {
+    className: 'Hunter',
+    spec: 'Marksmanship',
+    dps: 1386,
+    parses: 5495,
+    tier: 'C',
+    thin: "5,495 parses of a spec guides rate F-tier in PvE (Warcraft Tavern: no reason to play it), against Beast Mastery's 317,425",
+  },
   { className: 'Priest', spec: 'Shadow', dps: 1337, parses: 166434, tier: 'B' },
   { className: 'Mage', spec: 'Frost', dps: 1152, parses: 10515, tier: 'C' },
 ]

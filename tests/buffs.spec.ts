@@ -4,9 +4,10 @@ import { expect, test, type Page } from '@playwright/test'
  * The Character Planner's Buffs tab as decided on 2026-10-09 and ported in step 6 of
  * docs/design/PORT-PLAN.md: design C, the buffs filled in from who is in your raid and your seat in
  * it, with design A's icon tiles. These are the prototype's hands-on check (`checks/buffs-handson.mjs`,
- * run as `p`) on the app's own data: in the example 25-man a Fury Warrior sits in group 2, and 18 of
- * the 24 counted buffs and debuffs reach them (15 of 20 until Misery, Shadow Weaving, Improved Scorch
- * and Winter's Chill were counted on 2026-11-01); group 1 has no Enhancement Shaman, so no Strength of
+ * run as `p`) on the app's own data: in the example 25-man a Fury Warrior sits in group 2, and 22 of
+ * the 29 counted buffs and debuffs reach them (15 of 20 until Misery, Shadow Weaving, Improved Scorch
+ * and Winter's Chill were counted on 2026-11-01, 18 of 24 until the physical debuffs on 2026-11-02;
+ * the raid has no Arms Warrior, so Blood Frenzy is one of the seven missing); group 1 has no Enhancement Shaman, so no Strength of
  * Earth Totem; the raid's four Paladins give Kings, Might and Salvation; an elixir takes out the
  * flask. The prototype's hit-cap steps wait for the hit-cap helper (Gear), and its reload step is a
  * visit to another tab here, since the app starts clean on a reload.
@@ -41,10 +42,10 @@ test('it opens By hand with nothing on, and Your raid waits for a Raid Compositi
   await expect(page.locator('.buff-tile.is-on')).toHaveCount(0)
 })
 
-test('the example 25-man: group 2, 18 of 24 reach you, and Grace of Air waits on the one Shaman', async ({ page }) => {
+test('the example 25-man: group 2, 22 of 29 reach you, and Grace of Air waits on the one Shaman', async ({ page }) => {
   await openBuffs(page)
   await source(page, 'ex25').click()
-  await expect(message(page)).toHaveText("Example 25-man: you're in group 2. 18 counted buffs and debuffs reach you; 6 are missing.")
+  await expect(message(page)).toHaveText("Example 25-man: you're in group 2. 22 counted buffs and debuffs reach you; 7 are missing.")
   await expect(page.getByTestId('buffs-seat-1-0')).toHaveAccessibleName('You, Fury Warrior')
 
   // Your group's buffs, the raid's, and the boss's, each lit.
@@ -135,7 +136,7 @@ test('an elixir takes out the flask', async ({ page }) => {
 test('Just you is what you bring yourself', async ({ page }) => {
   await openBuffs(page)
   await source(page, 'solo').click()
-  await expect(message(page)).toHaveText("Just you: you're in group 1. 2 counted buffs and debuffs reach you; 22 are missing.")
+  await expect(message(page)).toHaveText("Just you: you're in group 1. 2 counted buffs and debuffs reach you; 27 are missing.")
   await expect(page.getByTestId('buff-toggle-battle-shout')).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByTestId('target-debuff-toggle-sunder-armor')).toHaveAttribute('aria-pressed', 'true')
 })

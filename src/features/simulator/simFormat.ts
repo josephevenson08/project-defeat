@@ -42,7 +42,9 @@ export function versusObserved(className: TbcClass, spec: TbcSpec, scoreExact: n
     text:
       ratio >= 1
         ? `${ratio.toFixed(2)}× below the 95th percentile of ${specPlayers(className, spec)}`
-        : `${(1 / ratio).toFixed(2)}× above the 95th percentile of ${specPlayers(className, spec)}, which the model should never be`,
+        : reference.thin
+          ? `${(1 / ratio).toFixed(2)}× above the 95th percentile of ${specPlayers(className, spec)}, a thin reference (${reference.thin})`
+          : `${(1 / ratio).toFixed(2)}× above the 95th percentile of ${specPlayers(className, spec)}, which the model should never be`,
   }
 }
 

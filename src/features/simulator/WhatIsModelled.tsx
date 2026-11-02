@@ -28,6 +28,10 @@ const rotationCoverage = tbcClasses
  */
 export function WhatIsModelled() {
   const { low, high, worst } = trustRange()
+  const thinRows = specTrust().filter((row) => row.thin)
+  const thinCount = thinRows.length
+  const firmCount = specTrust().length - thinCount
+  const thinNames = thinRows.map((row) => `${row.spec} ${row.className}`).join(' and ')
   const specs = rotationCoverage.multi + rotationCoverage.single
 
   return (
@@ -81,8 +85,9 @@ export function WhatIsModelled() {
         </div>
       </div>
       <p className="sim-quote" data-testid="simulation-range">
-        Measured against Warcraft Logs&apos; Phase 2 95th percentiles for all {specTrust().length} DPS specs, the model reads <b>{low.toFixed(2)}×</b> to{' '}
-        <b>{high.toFixed(2)}×</b> low, and no spec may read above its reference. Lowest today: {worst.spec} {worst.className}.
+        Measured against Warcraft Logs&apos; Phase 2 95th percentiles for the {firmCount} DPS specs with a firm reference, the model reads{' '}
+        <b>{low.toFixed(2)}×</b> to <b>{high.toFixed(2)}×</b> low, and none may read above its reference. Lowest today: {worst.spec}{' '}
+        {worst.className}.{thinNames ? ` ${thinNames} ${thinCount === 1 ? 'is' : 'are'} left out: too few parses of a spec raiders were told not to play.` : ''}
       </p>
       <p className="sim-small">
         The tab is shown for the DPS specs (Physical DPS and Caster DPS) by the owner&apos;s call on 2026-08-21. Healer and Tank math is

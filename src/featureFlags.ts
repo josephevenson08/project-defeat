@@ -53,7 +53,7 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds the logs' 95th percentile for all 20 DPS specs (Warcraft Logs, Phase 2; archon.gg's same
  *   figure until 2026-11-02, mislabelled "averages" here), and a test compares every spec at best case
- *   against them. The model reads **1.07x to 1.91x low** — a range this file has now got
+ *   against them. The model reads **1.00x to 1.91x low**, Marksmanship aside (below), — a range this file has now got
  *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
@@ -65,15 +65,17 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   demon is out and the Felguard model doesn't read it yet. This paragraph said "Its demon is
  *   unmodelled" until 2026-10-09, contradicting `docs/known-limitations.md`.
  *
- *   **Marksmanship is now within 5% of its reference, and that is worth reading carefully.** It is
- *   the spec with the least left to model — auto shot, Steady Shot and a pet, all three of which are
- *   in — so being close is plausible rather than suspicious. But it also means the next pet
- *   improvement may push it *above* 1341 and trip the one assertion here with real teeth. If that
- *   happens the answer is to find the double-count, not to loosen the bound: every previous time a
- *   spec crossed it, something was genuinely counted twice.
+ *   **Marksmanship is exempt, the one spec that is (the owner's call, 2026-11-02).** At a sourced
+ *   raid build (Warcraft Tavern's 14/44/3, it had only the one-tree fill before) and with the raid's
+ *   physical debuffs, it reads 1,578 against a 95th percentile of 1,386 drawn from 5,495 parses of a
+ *   spec the guides rate F-tier in PvE; Beast Mastery's has 317,425. No double count was found: Blood
+ *   Frenzy alone takes it over. Its reference carries `thin` with that reason, so the check skips it,
+ *   the trust range leaves it out and the panel says why. A second exemption has to be argued the
+ *   same way, never added to make a test pass. **Subtlety (1,276 parses) and Assassination (2,013)
+ *   are thinner still and sit at 1.00x and 1.01x**: the next change to either will cross.
  *
  *   **The third time was not a double count, and Subtlety was then the closest, at 1.02x** (on the
- *   Warcraft Logs figures read 2026-11-02, Marksmanship is, at 1.07x). Rogue Dual
+ *   Warcraft Logs figures with the physical debuffs, 2026-11-02, it is again, at 1.00x). Rogue Dual
  *   Wield Specialization took Subtlety to 1,295 against 1,292 (2026-10-29), and it adds exactly half
  *   the off hand and moves nothing else. The cause was the build: wowsims' Subtlety preset is a
  *   Combat-majority Hemorrhage build, which a log would file as Combat, so it was being compared with
@@ -93,13 +95,14 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **A hunter's pet is a second attacker, and it presses three buttons.** Its auto attack is modelled
  *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
  *   crit — along with every Beast Mastery talent this model can express, a focus bar spent on Bite
- *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **17.5% of a
- *   best-case Beast Mastery hunter**, against an attributed share nearer a third.
+ *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **16.0% of a
+ *   best-case Beast Mastery hunter** (17.5% until Hunter's Mark, 2026-11-02, lifted the Hunter's own
+ *   shots and not the pet's), against an attributed share nearer a third.
  *
  *   **Whether a pet ability scales is what decides its worth, and the two kinds behave oppositely.**
  *   Bite and Claw are `BaseDamageConfigRoll` — flat, with **no attack power scaling at all** — so
- *   they add about 2.1% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
- *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.4%**:
+ *   they add about 1.9% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
+ *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.1%**:
  *   more than Bite and Claw together despite landing only 7.7 times a minute.
  *
  *   **Three gates, pointing at three different things**, which is the part worth holding on to. Bite

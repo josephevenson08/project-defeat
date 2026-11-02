@@ -83,12 +83,13 @@ export function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: Cha
 
   /*
    * **A real raiding build where upstream has one** (`talentBuilds.json`, wowsims' presets for 16 of
-   * the 20 DPS specs, and a guide's for Subtlety, below), and for the other three the spec's own tree filled in listed order and stopped
+   * the 20 DPS specs, and a guide's for Subtlety and Marksmanship, below), and for the other two the spec's own tree filled in listed order and stopped
    * at 61, the level-70 budget, rather than an invented build — the repo owner's call.
    */
   /*
-   * A guide's build where wowsims' preset belongs to a different tree than the spec's logs
-   * (`calibrationBuilds.ts`: Subtlety, whose stored preset is a Combat-majority Hemorrhage build).
+   * A guide's build where wowsims' preset belongs to a different tree than the spec's logs, or where
+   * there is none (`calibrationBuilds.ts`: Subtlety, whose stored preset is a Combat-majority
+   * Hemorrhage build, and Marksmanship, which had only the one-tree fill).
    */
   const sourced =
     calibrationBuildFor(className, spec) ?? sourcedBuilds.find((build) => build.className === className && build.spec === spec)
@@ -149,8 +150,11 @@ export function specTrust(): readonly SpecTrust[] {
   return trustRows
 }
 
-/** How low the model reads across all 20 DPS specs, and which spec reads lowest. */
+/**
+ * How low the model reads across the DPS specs with a firm reference, and which spec reads lowest. A
+ * spec whose reference is marked `thin` is left out, since its ratio says more about the reference.
+ */
 export function trustRange(rows: readonly SpecTrust[] = specTrust()) {
-  const sorted = [...rows].sort((a, b) => a.ratio - b.ratio)
+  const sorted = rows.filter((row) => !row.thin).sort((a, b) => a.ratio - b.ratio)
   return { low: sorted[0].ratio, high: sorted[sorted.length - 1].ratio, worst: sorted[sorted.length - 1] }
 }

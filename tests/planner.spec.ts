@@ -2588,6 +2588,54 @@ test('a school debuff reaches only its school, and school debuffs multiply', () 
   expect(fire(['improved-shadow-bolt', 'judgement-of-wisdom', 'stormstrike'])).toBe(fire([]))
 })
 
+test('the physical debuffs: Expose overwrites Sunder, Blood Frenzy reaches every physical source, the mark and Mangle only theirs', () => {
+  const physical = (className: TbcClass, spec: TbcSpec, race: TbcRace) => {
+    const character: CharacterProfile = { faction: 'Alliance', race, className, spec }
+    const gear = normalizeGearForCharacter(defaultGear, className, spec)
+    const stats = calculateStats(character, gear)
+    return (debuffs: string[]) => calculateSimulation(character, gear, stats, 'Physical DPS', debuffs)
+  }
+
+  // Sunder and Expose Armor share wowsims' SunderExpose tag: with both, the higher one counts, not the sum.
+  const fury = physical('Warrior', 'Fury', 'Human')
+  const target = defaultSimulationTarget
+  const mitigationAt = (armor: number) => Math.round(computeArmorMitigation(target.armor - armor, 70) * 100 * 10) / 10
+  expect(breakdownValue(fury(['sunder-armor', 'expose-armor']), /Armor mitigation/)).toBe(mitigationAt(3075))
+  expect(breakdownValue(fury(['expose-armor', 'faerie-fire']), /Armor mitigation/), 'and every other armour debuff still adds').toBe(
+    mitigationAt(3075 + 610),
+  )
+
+  // Blood Frenzy multiplies every physical source by 1.04, and nothing else.
+  expect(fury(['blood-frenzy']).scoreExact / fury([]).scoreExact).toBeCloseTo(1.04, 10)
+  const retribution = physical('Paladin', 'Retribution', 'Human')
+  const holyOf = (result: ReturnType<typeof retribution>) =>
+    result.damageSources!.filter((source) => /Seal|Judgement/.test(source.name)).reduce((sum, source) => sum + source.dps, 0)
+  expect(holyOf(retribution(['blood-frenzy'])), "a Paladin's Holy seal is not physical").toBeCloseTo(holyOf(retribution([])), 10)
+
+  // Hunter's Mark is the Hunter's shots' ranged attack power, not the pet's; Improved Hunter's Mark is melee.
+  const hunter = physical('Hunter', 'Marksmanship', 'Night Elf')
+  const petOf = (result: ReturnType<typeof hunter>) =>
+    result.damageSources!.filter((source) => source.name.startsWith('Pet')).reduce((sum, source) => sum + source.dps, 0)
+  expect(hunter(['hunters-mark']).scoreExact).toBeGreaterThan(hunter([]).scoreExact)
+  expect(petOf(hunter(['hunters-mark'])), 'the pet reads its owner, not the mark').toBeCloseTo(petOf(hunter([])), 10)
+  expect(fury(['hunters-mark']).scoreExact, 'a Warrior does not shoot').toBe(fury([]).scoreExact)
+  expect(fury(['improved-hunters-mark']).scoreExact).toBeGreaterThan(fury([]).scoreExact)
+
+  // Mangle is +30% on bleed ticks and Shred: Rip is all ticks, so it moves by exactly 1.3.
+  const feral = physical('Druid', 'Feral', 'Night Elf')
+  const sourceOf = (result: ReturnType<typeof feral>, name: string) => result.damageSources!.find((source) => source.name === name)?.dps ?? 0
+  const [bare, mangled] = [feral([]), feral(['mangle'])]
+  if (sourceOf(bare, 'Rip') > 0) expect(sourceOf(mangled, 'Rip') / sourceOf(bare, 'Rip')).toBeCloseTo(1.3, 10)
+  if (sourceOf(bare, 'Shred') > 0) expect(sourceOf(mangled, 'Shred') / sourceOf(bare, 'Shred')).toBeCloseTo(1.3, 10)
+  // Rake's opener is a direct hit and does not take it, so Rake as a whole moves by less.
+  if (sourceOf(bare, 'Rake') > 0) {
+    const rakeRatio = sourceOf(mangled, 'Rake') / sourceOf(bare, 'Rake')
+    expect(rakeRatio).toBeGreaterThan(1)
+    expect(rakeRatio).toBeLessThan(1.3)
+  }
+  expect(fury(['mangle']).scoreExact, 'nothing else bleeds').toBe(fury([]).scoreExact)
+})
+
 test('the armor debuffs subtract flat armor and stack with each other', async () => {
   // The shape change has to reach the math, not just the data file. Under the old percentage model
   // these three removed 33% of whatever the target had; they remove a fixed 4010 regardless.
@@ -2692,14 +2740,9 @@ test('a debuff that cannot be modelled is separated from the ones that can be', 
   // thing happened to it. BuffsPanel still reads these two lists and still renders the unmodelled
   // ones without a checkbox; what no longer exists is a page to click.
   expect(unmodelledTargetDebuffs.map((debuff) => debuff.id).sort()).toEqual([
-    'blood-frenzy',
-    'expose-armor',
     'expose-weakness',
-    'hunters-mark',
-    'improved-hunters-mark',
     'improved-shadow-bolt',
     'judgement-of-wisdom',
-    'mangle',
     'stormstrike',
   ])
 
@@ -2707,19 +2750,15 @@ test('a debuff that cannot be modelled is separated from the ones that can be', 
    * Winter's Chill was the first entry here, waiting on a spell school; it is applied to Frost since
    * 2026-11-01. What is left are different kinds of gap, kept distinct. **Expose Weakness's value is
    * another player's Agility**, and this app models one character. Improved Shadow Bolt and Stormstrike
-   * run on charges and an uptime nothing here plays out. Judgement of Wisdom is mana. And the five
-   * physical ones are expressible and held out by the owner's choice (2026-11-01): applied at best
-   * case they take Marksmanship past its 95th percentile, and Marksmanship is measured at a synthetic
-   * one-tree build, so they wait on a real one.
+   * run on charges and an uptime nothing here plays out. Judgement of Wisdom is mana. The five physical
+   * ones (Blood Frenzy, Hunter's Mark and its Improved half, Expose Armor, Mangle) were listed here
+   * from 2026-11-01 and applied on 2026-11-02.
    */
   const reasonOf = (id: string) => unmodelledTargetDebuffs.find((debuff) => debuff.id === id)!.notModelled!
   expect(reasonOf('expose-weakness'), "the reason is another player's stat, not a field").toMatch(/Agility/)
   expect(reasonOf('improved-shadow-bolt')).toMatch(/uptime/)
   expect(reasonOf('stormstrike')).toMatch(/charges/i)
   expect(reasonOf('judgement-of-wisdom')).toMatch(/[Mm]ana/)
-  for (const id of ['blood-frenzy', 'hunters-mark', 'improved-hunters-mark', 'expose-armor', 'mangle']) {
-    expect(reasonOf(id), `${id} says it is held out by choice`).toMatch(/owner's call/)
-  }
 
   // A listed debuff carries its effect in words only, so nothing can apply it by accident.
   for (const debuff of unmodelledTargetDebuffs) {
@@ -5662,7 +5701,7 @@ test('every DPS spec is measured against what players actually parse', () => {
    * percentile in the logs for the phase this app is scoped to. The table it prints is the point of the test; the
    * assertions below are the parts that can fail.
    */
-  const rows: { spec: string; modelled: number; target: number; ratio: number; slots: number }[] = []
+  const rows: { spec: string; modelled: number; target: number; ratio: number; slots: number; thin?: string }[] = []
 
   for (const entry of tbcClasses) {
     for (const spec of entry.specs) {
@@ -5683,6 +5722,7 @@ test('every DPS spec is measured against what players actually parse', () => {
         target: reference!.dps,
         ratio: reference!.dps / result.scoreExact,
         slots,
+        thin: reference!.thin,
       })
     }
   }
@@ -5708,8 +5748,11 @@ test('every DPS spec is measured against what players actually parse', () => {
    */
   console.log(
     `
-${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtlety a guide's; ${talentBuilds.unsourced.length} keep the one-tree fill: ` +
-      talentBuilds.unsourced.map((u) => `${u.className} ${u.spec}`).join(', '),
+${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build, Subtlety and Marksmanship a guide's; the rest keep the one-tree fill: ` +
+      talentBuilds.unsourced
+        .filter((u) => !calibrationBuildFor(u.className, u.spec))
+        .map((u) => `${u.className} ${u.spec}`)
+        .join(', '),
   )
   // Seventeen stored presets, which the Talents tab loads; the best case swaps Subtlety's (below).
   expect(talentBuilds.buildCount, 'seventeen sourced builds').toBe(17)
@@ -5743,6 +5786,14 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
   expect(`${guideSplit.Assassination}/${guideSplit.Combat}/${guideSplit.Subtlety}`, 'the guide build is what it says').toBe(guide.split)
   expect(guideSplit.Subtlety, 'and a log would file it as Subtlety').toBeGreaterThan(Math.max(guideSplit.Assassination, guideSplit.Combat))
   expect(talentProblems(rogueTrees, guide.points as Record<number, number>), 'and the game would allow it').toEqual([])
+
+  // Marksmanship had no preset at all, only the one-tree fill; it is measured at a guide's 14/44/3 now.
+  const hunterTrees = getTalentData('Hunter')!.trees
+  const marks = calibrationBuildFor('Hunter', 'Marksmanship')!
+  const marksSplit = hunterTrees.map((tree) => tree.talents.reduce((sum, talent) => sum + (marks.points[talent.id] ?? 0), 0))
+  expect(marksSplit.join('/'), 'the Marksmanship guide build is what it says').toBe(marks.split)
+  expect(talentProblems(hunterTrees, marks.points as Record<number, number>), 'and the game would allow it').toEqual([])
+  expect(talentBuilds.unsourced.map((u) => u.spec), 'it is the one the build ingest has no preset for').toContain('Marksmanship')
   for (const build of talentBuilds.builds) {
     expect(build.pointsSpent, `${build.spec} cannot exceed the level-70 budget`).toBeLessThanOrEqual(61)
     expect(build.pointsSpent, `${build.spec} must spend something`).toBeGreaterThan(0)
@@ -5762,10 +5813,23 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    * without needing to be retuned every time the model improves.
    */
   for (const row of rows) {
+    if (row.thin) continue
     expect(row.modelled, `${row.spec} reads above what players parse, which means something is counted twice`).toBeLessThan(
       row.target,
     )
   }
+
+  /*
+   * **One spec is exempt, by the owner's call (2026-11-02), and the exemption is data, not a skip.**
+   * Marksmanship, at a sourced raid build with the raid's physical debuffs, reads above its 95th
+   * percentile, which comes from 5,495 parses of a spec the guides rate F-tier in PvE. Its reference
+   * carries `thin` with that reason, so the trust range leaves it out and the panel says why. Only it:
+   * a second thin reference has to be argued for, not added here.
+   */
+  expect(rows.filter((row) => row.thin).map((row) => row.spec)).toEqual(['Hunter Marksmanship'])
+  expect(rows.find((row) => row.thin)!.modelled, 'and it does read above its reference, or it would not need the exemption').toBeGreaterThan(
+    rows.find((row) => row.thin)!.target,
+  )
 
   // And every spec produced a real number rather than a zero from an empty BiS list.
   for (const row of rows) {
@@ -5781,8 +5845,9 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    * Pinned loosely on purpose: the bound is what the prose claims, so improving the model fails this
    * and forces the sentence to be rewritten, which is the point.
    */
-  const best = Math.min(...rows.map((row) => row.ratio))
-  const worst = Math.max(...rows.map((row) => row.ratio))
+  const firm = rows.filter((row) => !row.thin)
+  const best = Math.min(...firm.map((row) => row.ratio))
+  const worst = Math.max(...firm.map((row) => row.ratio))
 
   /*
    * Bracketed on both sides rather than bounded on one, and that is deliberate. A one-sided bound
@@ -5793,7 +5858,7 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.07x').toBeGreaterThan(1.01)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.00x').toBeGreaterThan(1)
   expect(best).toBeLessThan(1.1)
   expect(worst, 'featureFlags.ts claims the worst spec is around 1.91x').toBeGreaterThan(1.8)
   expect(worst).toBeLessThan(2.0)
@@ -7232,14 +7297,17 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
 
   const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
 
-  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.1%').toBeGreaterThan(0.018)
-  expect(share(focusRows)).toBeLessThan(0.027)
-  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.4%').toBeGreaterThan(0.030)
-  expect(share([killCommandRow!])).toBeLessThan(0.040)
+  // Recentred on 2026-11-02, when Hunter's Mark lifted the Hunter's shots and not the pet's: 2.1% and
+  // 3.4% became 1.9% and 3.1%.
+  expect(share(focusRows), 'featureFlags says the focus abilities are about 1.9%').toBeGreaterThan(0.015)
+  expect(share(focusRows)).toBeLessThan(0.023)
+  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.1%').toBeGreaterThan(0.026)
+  expect(share([killCommandRow!])).toBeLessThan(0.036)
   // Recentred on 2026-10-20 (it was 0.175 to 0.195, around 18.4%): the off hand's enchant took the
   // owner up and the pet's share from 17.55% to 17.49%, under a floor the prose had already left.
-  expect(share(petRows), 'featureFlags says the pet as a whole is about 17.5%').toBeGreaterThan(0.165)
-  expect(share(petRows)).toBeLessThan(0.185)
+  // And again on 2026-11-02: 17.5% to 16.0%, for the same reason.
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 16.0%').toBeGreaterThan(0.15)
+  expect(share(petRows)).toBeLessThan(0.17)
 
   /*
    * **The comparison featureFlags leans on: Kill Command beats Bite and Claw together.** It lands

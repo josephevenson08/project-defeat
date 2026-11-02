@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/simFormat.ts
-lines: 55
+lines: 57
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.simFormat
 
-`src/features/simulator/simFormat.ts` · **features** layer · 55 lines
+`src/features/simulator/simFormat.ts` · **features** layer · 57 lines
 
 _No doc comment at the top of this file._
 

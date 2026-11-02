@@ -18,7 +18,7 @@ import { calculateStats } from '../src/features/stats/calculateStats'
  * hands-on check (`checks/sim-handson.mjs`) with its real numbers: the estimate is the engine's for
  * the character on screen; it is read against Fury's 95th percentile on Warcraft Logs, 2,069; the damage
  * sources add up to it; it leads with Strength and the best upgrade; the trust panel lists all 20 DPS
- * specs with Fury marked and reads 1.07× to 1.91× low.
+ * specs with Fury marked and reads 1.00× to 1.91× low, Marksmanship's thin reference aside.
  */
 
 const num = (text: string) => Number(text.replace(/[^\d.\-−]/g, '').replace('−', '-'))
@@ -61,13 +61,14 @@ async function engineScore(page: Page) {
   return result.score
 }
 
-test('the trust panel’s data: every DPS spec’s best case against the logs, 1.07× to 1.91× low', () => {
+test('the trust panel’s data: every DPS spec’s best case against the logs, 1.00× to 1.91× low', () => {
   const rows = specTrust()
   expect(rows, 'all 20 DPS specs').toHaveLength(20)
   const fury = rows.find((row) => row.className === 'Warrior' && row.spec === 'Fury')!
   // The prototype's figure (sim-data.js, generated from the same model on 2026-10-11) was 1,348.3;
-  // the 9% miss against a level 73 boss (port step 6, Gear, 2026-10-19) took it to 1,343.2.
-  expect(Math.round(fury.best * 10) / 10).toBe(1343.2)
+  // the 9% miss against a level 73 boss (port step 6, Gear, 2026-10-19) took it to 1,343.2, and the
+  // physical debuffs (2026-11-02: Blood Frenzy, Expose Armor over Sunder, Improved Hunter's Mark) to 1,481.5.
+  expect(Math.round(fury.best * 10) / 10).toBe(1481.5)
   // Warcraft Logs' Phase 2 95th percentile (2026-11-02); archon's 2,053 until then was the same measure.
   expect(fury.dps).toBe(2069)
 
@@ -75,13 +76,19 @@ test('the trust panel’s data: every DPS spec’s best case against the logs, 1
   // 1.05 until the Hunters' off hand took the guide's enchant (2026-10-20): Marksmanship, the
   // lowest, went from 1,275.7 to 1,284.1 against its 1,341. 1.04 until Subtlety was measured at a
   // Subtlety build (2026-10-31): 1,267.3 against its 1,292. 1.02 until the references became Warcraft
-  // Logs' Phase 2 95th percentiles (2026-11-02): Marksmanship, 1,293.6 against 1,386, is lowest now.
-  expect(low.toFixed(2)).toBe('1.07')
+  // Logs' Phase 2 95th percentiles (2026-11-02), and 1.07 until the physical debuffs went in the same
+  // day: Subtlety, 1,388.2 against 1,391, is lowest now, with Marksmanship's thin reference left out.
+  expect(low.toFixed(2)).toBe('1.00')
   // 2.13 (Destruction) until the school debuffs (2026-11-01): Improved Scorch and Misery reach its Fire.
   expect(high.toFixed(2)).toBe('1.91')
   // Computed, so it follows the model. The prototype's hand-written panel still named Demonology.
   expect(`${worst.spec} ${worst.className}`).toBe('Arcane Mage')
-  for (const row of rows) expect(row.best, `${row.spec} ${row.className} reads above its reference`).toBeLessThan(row.dps)
+  for (const row of rows) {
+    if (row.thin) continue
+    expect(row.best, `${row.spec} ${row.className} reads above its reference`).toBeLessThan(row.dps)
+  }
+  // The one thin reference is Marksmanship's, and the range leaves it out (the owner's call, 2026-11-02).
+  expect(rows.filter((row) => row.thin).map((row) => `${row.spec} ${row.className}`)).toEqual(['Marksmanship Hunter'])
 })
 
 test('it leads with what to do next: your stat priority, then your best upgrades, then the estimate', async ({ page }) => {
@@ -143,8 +150,8 @@ test('the trust panel lists all 20 DPS specs with yours marked, and the range is
   await expect(trust.locator('li')).toHaveCount(20)
   await expect(trust.locator('li[aria-current="true"]')).toHaveCount(1)
   await expect(trust.locator('li[aria-current="true"]')).toContainText('Fury Warrior')
-  await expect(trust).toContainText('it reads 1.07× to 1.91× low')
-  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.07× to 1.91× low')
+  await expect(trust).toContainText('it reads 1.00× to 1.91× low')
+  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.00× to 1.91× low')
   await expect(page.getByTestId('simulation-range')).toContainText('Lowest today: Arcane Mage')
 
   // The rotation count is the ability catalogue's, not a sentence written by hand.

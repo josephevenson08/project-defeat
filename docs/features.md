@@ -61,7 +61,7 @@ behind every claim of its that quotes a number.
   against your spec's 95th percentile on Warcraft Logs ("5.66× below the 95th percentile of Fury warriors"),
   what it misses for your spec and your talents, where the damage comes from (a log-style table that
   sums to the estimate), how it was computed, and every DPS spec's best case by this model against
-  the logs, yours marked (1.07× to 1.91× low, computed). A missing weapon is said first, before
+  the logs, yours marked (1.00× to 1.91× low, computed; Marksmanship's thin reference left out of the range). A missing weapon is said first, before
   anything else. The page names its fixed encounter and what the model does and does not cover, with
   every figure in that list computed. DPS specs only; Healer and Tank results (estimated healing,
   effective health) are still computed and reachable with `?simulation=1`
