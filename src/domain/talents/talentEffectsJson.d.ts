@@ -52,9 +52,10 @@ declare module "*/talentEffects.json" {
       className: string
       /**
        * `ability`: it teaches an ability `spec`'s estimate already includes. `buff`: its effect is the
-       * Buffs-tab entry `buff`, or the target debuff `debuff`. `utility`: nothing an estimate computes.
+       * Buffs-tab entry `buff`, or the target debuff `debuff`. `cooldown`: a timed cooldown the estimate
+       * prices at its duration over its cooldown (`classCooldowns.ts`). `utility`: nothing an estimate computes.
        */
-      kind: 'ability' | 'buff' | 'utility'
+      kind: 'ability' | 'buff' | 'cooldown' | 'utility'
       talentId: number
       talent: string
       spec?: string

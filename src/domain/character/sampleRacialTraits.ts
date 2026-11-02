@@ -169,7 +169,7 @@ export const sampleRacialTraits: readonly RacialTrait[] = [
     kind: 'on-use',
     description: '+282 melee and ranged attack power for 15s, on a 2 minute cooldown. Also halves healing received for the duration.',
     notes:
-      'Wowhead TBC spell 20572. Attack power only in TBC — the spell-power version came later, so caster Orcs get nothing from this. Real throughput that this simulator cannot price, because its value depends on cooldown alignment: Orcs are understated here, not equal to a race with no combat racial.',
+      "Wowhead TBC spell 20572, the attack-power version. TBC also has a spell-power version (33702) and one with both (33697), and wowsims grants a caster Orc 143 spell power at 70 (`level × 2 + 3`, beside `level × 4 + 2` attack power); this note said until 2026-11-02 that the spell-power version came later, which Wowhead's TBC data contradicts. Not priced yet: the class cooldowns are (`classCooldowns.ts`, duration ÷ cooldown), and a racial would be the same rule, but the best case's races have none, so it was left for a later pass. Orcs are understated here, not equal to a race with no combat racial.",
   },
   {
     id: 'orc-command',

@@ -236,7 +236,6 @@ const WARRIOR_STAT_EXTRACTORS = [
  */
 const WARRIOR_SKIPPED = [
   [['Deep Wounds'], 'A bleed proc on crit — a damage-over-time source, not a stat, and the simulator has no DoT layer for physical specials.'],
-  [['Death Wish'], 'An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has.'],
   [['Rampage'], 'Stacking on-hit attack power. Needs a timeline to build stacks.'],
   [['Enrage'], 'Triggers on being crit by the target — the model has no incoming-damage stream for a DPS.'],
   [['Sweeping Strikes'], 'Extra targets. Single-target model.'],
@@ -272,6 +271,8 @@ const WARRIOR_SKIPPED = [
  */
 const WARRIOR_NOT_READ = {
   ability: [{ talent: 'Mortal Strike', spec: 'Arms' }, { talent: 'Bloodthirst', spec: 'Fury' }],
+  // Timed cooldowns, priced at duration ÷ cooldown in `classCooldowns.ts` (2026-11-02).
+  cooldown: [{ talent: 'Death Wish', spec: 'Arms' }],
   buff: [],
   utility: ['Improved Charge', 'Iron Will', 'Improved Intercept', 'Improved Hamstring', 'Improved Disciplines', 'Booming Voice', 'Piercing Howl', 'Improved Execute', 'Tactical Mastery', 'Improved Revenge', 'Improved Sunder Armor', 'Improved Disarm', 'Improved Taunt', 'Concussion Blow', 'Improved Shield Bash'],
 }
@@ -432,7 +433,7 @@ const ROGUE_SKIPPED = [
   [['Murder'], 'Gated on the target being a humanoid, beast, giant or dragonkin. Nothing here models a mob type.'],
   [['Serrated Blades'], 'Grants armor penetration, which the engine genuinely does not read — it is the one stat still legitimately on the "not modelled" list.'],
   [['Seal Fate', 'Ruthlessness'], 'Combo-point economy. Slice and Dice models a generation RATE now, but there is still no combo-point resource to add a point to, which is what both of these do.'],
-  [['Adrenaline Rush', 'Blade Flurry', 'Cold Blood'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
+  [['Cold Blood'], 'A one-charge cooldown: the next ability is a certain crit. It is worth one better use per cooldown, not an uptime, and is not priced yet; Adrenaline Rush and Blade Flurry, the timed ones, are.'],
   [['Improved Eviscerate', 'Puncturing Wounds', 'Lethality', 'Aggression', 'Surprise Attacks', 'Opportunity'], "Raise named abilities' damage, crit or crit damage. TalentModifiers has no per-ability field for them, so none applies, even where an estimate casts the ability: Combat's Sinister Strike, Assassination's Mutilate, Subtlety's Hemorrhage."],
   [['Riposte', 'Ghostly Strike', 'Improved Ambush'], 'Teach or strengthen attacks no Rogue estimate makes: Riposte, Ghostly Strike and Ambush.'],
   [['Dagger Specialization', 'Mace Specialization', 'Sword Specialization', 'Fist Weapon Specialization'], 'Weapon-type gated, and the mace one adds a stun. Would need per-weapon-type dispatch, the same reason the Warrior specializations are refused.'],
@@ -444,6 +445,7 @@ const ROGUE_SKIPPED = [
 
 const ROGUE_NOT_READ = {
   ability: [{ talent: 'Mutilate', spec: 'Assassination' }, { talent: 'Hemorrhage', spec: 'Subtlety' }],
+  cooldown: [{ talent: 'Adrenaline Rush', spec: 'Combat' }, { talent: 'Blade Flurry', spec: 'Combat' }],
   buff: [],
   utility: ['Remorseless Attacks', 'Fleet Footed', 'Improved Gouge', 'Endurance', 'Improved Sprint', 'Improved Kick', 'Blade Twisting', 'Nerves of Steel', 'Master of Deception', 'Dirty Tricks', 'Camouflage', 'Initiative', 'Setup', 'Elusiveness', 'Preparation', 'Premeditation'],
 }
@@ -601,7 +603,6 @@ const HUNTER_EXTRACTORS = [
 
 const HUNTER_SKIPPED = [
   [[{ talent: 'Focused Fire', part: 'Kill Command half' }], 'The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor.'],
-  [['The Beast Within', 'Bestial Wrath'], 'Activated cooldowns; uptime needs a usage policy this model has none of.'],
   [['Survivalist'], 'Multiplies Health, which StatBlock has no field for — health is derived from Stamina here.'],
   [['Mortal Shots'], 'Raises the crit damage bonus of ranged attacks. Real, but it belongs with the crit-damage term rather than the white-damage multipliers this pass covers.'],
   [['Expose Weakness'], 'Grants attack power to the raid, not to the hunter. It is a raid buff wearing a talent costume.'],
@@ -617,8 +618,17 @@ const HUNTER_SKIPPED = [
 
 const HUNTER_NOT_READ = {
   ability: [],
+  cooldown: [
+    { talent: 'Bestial Wrath', spec: 'Beast Mastery' },
+    { talent: 'The Beast Within', spec: 'Beast Mastery' },
+    {
+      talent: 'Rapid Killing',
+      spec: 'Marksmanship',
+      note: "It takes a minute a rank off Rapid Fire's cooldown, and the estimate prices Rapid Fire at its duration over that cooldown.",
+    },
+  ],
   buff: [{ talent: 'Trueshot Aura', buff: 'trueshot-aura' }, { talent: 'Ferocious Inspiration', buff: 'ferocious-inspiration' }],
-  utility: ['Improved Revive Pet', 'Pathfinding', 'Bestial Swiftness', 'Improved Mend Pet', 'Intimidation', 'Improved Concussive Shot', 'Improved Arcane Shot', 'Rapid Killing', 'Concussive Barrage', 'Scatter Shot', 'Hawk Eye', 'Entrapment', 'Improved Wing Clip', 'Trap Mastery', 'Improved Feign Death', 'Resourcefulness', 'Wyvern Sting'],
+  utility: ['Improved Revive Pet', 'Pathfinding', 'Bestial Swiftness', 'Improved Mend Pet', 'Intimidation', 'Improved Concussive Shot', 'Improved Arcane Shot', 'Concussive Barrage', 'Scatter Shot', 'Hawk Eye', 'Entrapment', 'Improved Wing Clip', 'Trap Mastery', 'Improved Feign Death', 'Resourcefulness', 'Wyvern Sting'],
 }
 
 const SHAMAN_SOURCES = [{ path: 'sim/shaman/talents.go', cache: 'sim_shaman_talents.go' }]
@@ -1050,7 +1060,7 @@ const MAGE_STAT_EXTRACTORS = [
 
 const MAGE_SKIPPED = [
   [['Ignite', 'Combustion', "Winter's Chill"], 'Per-spell and school-scoped: Ignite is a burn left by Fire crits, Combustion a cooldown, and Winter\'s Chill a stacking debuff Frost spells keep up (the Buffs tab carries the debuff itself). Each needs a timeline or a per-spell field TalentModifiers does not have.'],
-  [['Arcane Power', 'Presence of Mind', 'Icy Veins'], 'Timed cooldowns. A closed-form model has no timeline to place them on.'],
+  [['Presence of Mind'], 'A one-charge cooldown: one instant cast. It is worth one cast sooner per cooldown, not an uptime, and is not priced yet; Arcane Power and Icy Veins, the timed ones, are.'],
   [['Empowered Fireball', 'Empowered Frostbolt'], 'Raise one spell\'s coefficient; the generic cast profile has no per-spell coefficient to raise.'],
   [['Arcane Subtlety', 'Arcane Focus', 'Elemental Precision'], "Hit and resistance scoped to schools: Arcane Focus is Arcane hit, Elemental Precision Fire and Frost hit (and cheaper Fire and Frost spells), Arcane Subtlety lowers the target's resistances. The spell hit field is character-wide, so an Arcane Mage would collect Elemental Precision's hit, and target resistances are not modelled. Upstream does not write them in talents.go."],
   [['Critical Mass', 'Pyromaniac', 'Fire Power', 'Piercing Ice', 'Arctic Winds'], "Fire and Frost crit and damage. A school damage multiplier exists (Demonic Sacrifice uses it), but upstream does not write these in talents.go, which is all this ingest reads, and school-scoped crit has no field. Arctic Winds also lowers the chance to be hit."],
@@ -1062,6 +1072,7 @@ const MAGE_SKIPPED = [
 
 const MAGE_NOT_READ = {
   ability: [],
+  cooldown: [{ talent: 'Arcane Power', spec: 'Arcane' }, { talent: 'Icy Veins', spec: 'Frost' }],
   buff: [],
   utility: ['Arcane Concentration', 'Master of Elements', 'Frost Channeling', 'Improved Arcane Missiles', 'Magic Attunement', 'Improved Counterspell', 'Slow', 'Impact', 'Flame Throwing', 'Improved Fire Blast', 'Burning Soul', 'Molten Shields', 'Blazing Speed', 'Frostbite', 'Improved Frost Nova', 'Permafrost', 'Improved Blizzard', 'Arctic Reach', 'Shatter', 'Cold Snap', 'Ice Floes'],
 }
@@ -1361,8 +1372,8 @@ for (const entry of CLASSES) {
     skippedAll.push({ className: entry.className, talent: label, talents, reason })
   }
 
-  for (const kind of ['ability', 'buff', 'utility']) {
-    for (const listed of entry.notRead[kind]) {
+  for (const kind of ['ability', 'buff', 'cooldown', 'utility']) {
+    for (const listed of entry.notRead[kind] ?? []) {
       const { talent: name, ...rest } = typeof listed === 'string' ? { talent: listed } : listed
       const talent = talentsByName.get(name)
       if (!talent) {
@@ -1429,4 +1440,4 @@ for (const e of effects) {
   console.log(`  ${e.className.padEnd(8)} ${e.talent.padEnd(34)} ${e.kind.padEnd(26)} ${value}`)
 }
 console.log(`\nskipped ${skippedAll.length} talent groups across ${CLASSES.length} classes; see "skipped" in the JSON for why each one.`)
-console.log(`not read: ${notReadAll.length} talents (${['ability', 'buff', 'utility'].map((kind) => `${notReadAll.filter((each) => each.kind === kind).length} ${kind}`).join(', ')}).`)
+console.log(`not read: ${notReadAll.length} talents (${['ability', 'buff', 'cooldown', 'utility'].map((kind) => `${notReadAll.filter((each) => each.kind === kind).length} ${kind}`).join(', ')}).`)

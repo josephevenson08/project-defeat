@@ -53,7 +53,7 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
  *   holds the logs' 95th percentile for all 20 DPS specs (Warcraft Logs, Phase 2; archon.gg's same
  *   figure until 2026-11-02, mislabelled "averages" here), and a test compares every spec at best case
- *   against them. The model reads **1.00x to 1.91x low**, Marksmanship aside (below), — a range this file has now got
+ *   against them. The model reads **1.00x to 1.82x low**, Marksmanship aside (below), — a range this file has now got
  *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
@@ -95,14 +95,14 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  * - **A hunter's pet is a second attacker, and it presses three buttons.** Its auto attack is modelled
  *   — its own weapon, its own attack table, 22% of the owner's ranged attack power and no inherited
  *   crit — along with every Beast Mastery talent this model can express, a focus bar spent on Bite
- *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **16.0% of a
- *   best-case Beast Mastery hunter** (17.5% until Hunter's Mark, 2026-11-02, lifted the Hunter's own
- *   shots and not the pet's), against an attributed share nearer a third.
+ *   and Claw in priority order, Kill Command, and Frenzy speeding its swings. The pet is **16.5% of a
+ *   best-case Beast Mastery hunter** (17.5% until Hunter's Mark lifted the Hunter's own shots and not
+ *   the pet's, then Bestial Wrath its own, both 2026-11-02), against an attributed share nearer a third.
  *
  *   **Whether a pet ability scales is what decides its worth, and the two kinds behave oppositely.**
  *   Bite and Claw are `BaseDamageConfigRoll` — flat, with **no attack power scaling at all** — so
- *   they add about 1.9% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
- *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.1%**:
+ *   they add about 2.0% and gear cannot move them. Kill Command is a real weapon swing plus 127, so
+ *   it follows the owner's attack power through the pet's 22% inheritance, and it is worth **3.2%**:
  *   more than Bite and Claw together despite landing only 7.7 times a minute.
  *
  *   **Three gates, pointing at three different things**, which is the part worth holding on to. Bite
@@ -117,7 +117,8 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   mistake this repo made and a test caught. Gear alone takes them from 17.5% of the pet to 15.1%;
  *   Bestial Discipline takes them to 27.8% by doubling focus income.
  *
- *   Still missing: Bestial Wrath, which needs a cooldown usage policy, and the half of Focused Fire
+ *   Bestial Wrath is priced since 2026-11-02, at its duration over its cooldown like the other class
+ *   cooldowns (`classCooldowns.ts`). Still missing: the half of Focused Fire
  *   that grants Kill Command 10% crit a rank — a per-spell bonus, where every field here is shaped
  *   like an actor. The estimate names the pet family it assumes, because the eight families span 0.91
  *   to 1.1 on damage and this app has no picker for them.

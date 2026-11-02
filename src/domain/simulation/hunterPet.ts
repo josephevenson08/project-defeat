@@ -183,11 +183,14 @@ export const HUNTER_PET_ABILITIES: readonly HunterPetAbility[] = [HUNTER_PET_BIT
  * A browser pass found it and the tests could not have: every number was right and only the prose
  * was lying. That is the argument for driving the app rather than reading the diff.
  */
-export function hunterPetUnmodelled(options: { killCommand: boolean; frenzy: boolean }): string {
+export function hunterPetUnmodelled(options: { killCommand: boolean; frenzy: boolean; bestialWrath?: boolean }): string {
   const pressing = ['Bite and Claw out of its focus bar']
   if (options.killCommand) pressing.push('Kill Command off the owner’s crits')
+  // Priced at duration over cooldown since 2026-11-02 (`classCooldowns.ts`), for a build that has it.
+  if (options.bestialWrath) pressing.push('Bestial Wrath, averaged over its two-minute cooldown')
 
-  const missing = ['Bestial Wrath, which needs a cooldown usage policy']
+  const missing: string[] = []
+  if (!options.bestialWrath) missing.push('Bestial Wrath, which this build has not talented')
   if (!options.killCommand) missing.push('Kill Command, which needs the owner to be critting before it fires at all')
   if (!options.frenzy) missing.push('Frenzy, which this build has not talented')
   missing.push('the half of Focused Fire that adds 10% crit a rank to Kill Command specifically')

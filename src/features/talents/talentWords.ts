@@ -127,7 +127,6 @@ const HEALER_MANA = "It changes mana a healer spends or regains, and the simulat
 
 const PLAIN_SKIP: Record<string, string> = {
   'Warrior|Deep Wounds': "It is a bleed, and the simulator doesn't model bleeds from special attacks.",
-  'Warrior|Death Wish': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Warrior|Rampage': "Its attack power builds up hit by hit, and the simulator doesn't play the fight out hit by hit.",
   'Warrior|Enrage': "It triggers when you take a crit, and the simulator doesn't model damage taken by a damage dealer.",
   'Warrior|Sweeping Strikes': 'It hits extra targets, and the simulator models one target.',
@@ -146,7 +145,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Rogue|Murder': "It only works on some kinds of creature, and the simulator doesn't know what the boss is.",
   'Rogue|Serrated Blades': "It gives armor penetration, which the simulator doesn't read yet.",
   'Rogue|Seal Fate / Ruthlessness': "It adds combo points, and the simulator doesn't count combo points one by one.",
-  'Rogue|Adrenaline Rush / Blade Flurry / Cold Blood': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
+  'Rogue|Cold Blood': "It makes one ability a certain crit each time you press it, and the simulator doesn't price single empowered casts yet.",
   'Rogue|Improved Eviscerate / Puncturing Wounds / Lethality / Aggression / Surprise Attacks / Opportunity': PARTICULAR_ABILITIES,
   'Rogue|Riposte / Ghostly Strike / Improved Ambush': "It strengthens or teaches an attack the simulator doesn't use.",
   'Rogue|Dagger Specialization / Mace Specialization / Sword Specialization / Fist Weapon Specialization': "It depends on the weapon type, which the simulator doesn't check yet.",
@@ -156,7 +155,6 @@ const PLAIN_SKIP: Record<string, string> = {
   'Rogue|Quick Recovery / Deadened Nerves / Lightning Reflexes / Deflection / Sleight of Hand / Heightened Senses / Enveloping Shadows / Cheat Death': SURVIVAL,
   'Rogue|Improved Expose Armor': "It strengthens Expose Armor, which the Buffs tab lists but doesn't apply yet.",
   'Hunter|Focused Fire (Kill Command half)': "Its pet's Kill Command crit isn't simulated; its damage bonus is.",
-  'Hunter|The Beast Within / Bestial Wrath': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
   'Hunter|Survivalist': "It raises health, which the simulator doesn't use for a damage dealer.",
   'Hunter|Mortal Shots': "It raises the crit damage of shots, which the simulator doesn't take from talents yet.",
   'Hunter|Expose Weakness': 'It gives attack power to the raid, not to you.',
@@ -209,7 +207,7 @@ const PLAIN_SKIP: Record<string, string> = {
   'Paladin|Improved Judgement / Fanaticism': "It changes Judgement, and the simulator uses the base Judgement.",
   'Paladin|Blessed Life / Pursuit of Justice / Eye for an Eye / Divine Purpose': SURVIVAL,
   "Mage|Ignite / Combustion / Winter's Chill": "It changes particular spells or schools, and the simulator casts one generic spell for the spec.",
-  'Mage|Arcane Power / Presence of Mind / Icy Veins': "It is a cooldown you press; how often it's up depends on the fight, which the simulator doesn't play out.",
+  'Mage|Presence of Mind': "It makes one spell instant each time you press it, and the simulator doesn't price single empowered casts yet.",
   'Mage|Empowered Fireball / Empowered Frostbolt': "It strengthens one spell, and the simulator casts one generic spell for the spec.",
   'Mage|Arcane Subtlety / Arcane Focus / Elemental Precision':
     'It changes hit or resistances for some schools of magic, and the simulator only reads hit that applies to all your spells.',
@@ -275,6 +273,12 @@ export function talentSimStatus(className: TbcClass, talent: Talent, rank: numbe
   }
   const skipped = skippedById.get(talent.id)
   if (skipped) return { kind: 'skip', text: `Not simulated: ${skipped}` }
+  if (notRead?.kind === 'cooldown') {
+    return {
+      kind: 'ability',
+      text: notRead.note ?? "It is a cooldown: the simulator counts it as pressed whenever it is ready, worth its duration over its cooldown.",
+    }
+  }
   if (notRead?.kind === 'buff') {
     const name = notRead.buff ? getBuffById(notRead.buff)?.name : getTargetDebuffById(notRead.debuff ?? '')?.name
     return { kind: 'ability', text: `It is on the Buffs tab as ${name}: tick it there. The talent point itself isn't read.` }

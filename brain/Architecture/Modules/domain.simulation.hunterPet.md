@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/hunterPet.ts
-lines: 622
+lines: 625
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.hunterPet
 
-`src/domain/simulation/hunterPet.ts` · **domain** layer · 622 lines
+`src/domain/simulation/hunterPet.ts` · **domain** layer · 625 lines
 
 From the top of the file:
 

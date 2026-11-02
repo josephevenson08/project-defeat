@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/talents/talentWords.ts
-lines: 293
+lines: 297
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.talents.talentWords
 
-`src/features/talents/talentWords.ts` · **features** layer · 293 lines
+`src/features/talents/talentWords.ts` · **features** layer · 297 lines
 
 From the top of the file:
 

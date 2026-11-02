@@ -1162,17 +1162,6 @@
     },
     {
       "className": "Warrior",
-      "talent": "Death Wish",
-      "talents": [
-        {
-          "talentId": 133,
-          "talent": "Death Wish"
-        }
-      ],
-      "reason": "An activated cooldown. Uptime depends on fight length and usage policy, neither of which this model has."
-    },
-    {
-      "className": "Warrior",
       "talent": "Rampage",
       "talents": [
         {
@@ -1432,22 +1421,14 @@
     },
     {
       "className": "Rogue",
-      "talent": "Adrenaline Rush / Blade Flurry / Cold Blood",
+      "talent": "Cold Blood",
       "talents": [
-        {
-          "talentId": 205,
-          "talent": "Adrenaline Rush"
-        },
-        {
-          "talentId": 223,
-          "talent": "Blade Flurry"
-        },
         {
           "talentId": 280,
           "talent": "Cold Blood"
         }
       ],
-      "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
+      "reason": "A one-charge cooldown: the next ability is a certain crit. It is worth one better use per cooldown, not an uptime, and is not priced yet; Adrenaline Rush and Blade Flurry, the timed ones, are."
     },
     {
       "className": "Rogue",
@@ -1625,21 +1606,6 @@
         }
       ],
       "reason": "The hunter damage half is ingested. The other half is a per-spell crit bonus — 10% a rank on the pet Kill Command specifically, written as BonusCritRating on that one spell — and TalentModifiers has no field shaped like a spell, only fields shaped like an actor."
-    },
-    {
-      "className": "Hunter",
-      "talent": "The Beast Within / Bestial Wrath",
-      "talents": [
-        {
-          "talentId": 1803,
-          "talent": "The Beast Within"
-        },
-        {
-          "talentId": 1386,
-          "talent": "Bestial Wrath"
-        }
-      ],
-      "reason": "Activated cooldowns; uptime needs a usage policy this model has none of."
     },
     {
       "className": "Hunter",
@@ -2532,22 +2498,14 @@
     },
     {
       "className": "Mage",
-      "talent": "Arcane Power / Presence of Mind / Icy Veins",
+      "talent": "Presence of Mind",
       "talents": [
-        {
-          "talentId": 87,
-          "talent": "Arcane Power"
-        },
         {
           "talentId": 86,
           "talent": "Presence of Mind"
-        },
-        {
-          "talentId": 69,
-          "talent": "Icy Veins"
         }
       ],
-      "reason": "Timed cooldowns. A closed-form model has no timeline to place them on."
+      "reason": "A one-charge cooldown: one instant cast. It is worth one cast sooner per cooldown, not an uptime, and is not priced yet; Arcane Power and Icy Veins, the timed ones, are."
     },
     {
       "className": "Mage",
@@ -3176,6 +3134,13 @@
     },
     {
       "className": "Warrior",
+      "kind": "cooldown",
+      "talentId": 133,
+      "talent": "Death Wish",
+      "spec": "Arms"
+    },
+    {
+      "className": "Warrior",
       "kind": "utility",
       "talentId": 126,
       "talent": "Improved Charge"
@@ -3277,6 +3242,20 @@
       "talentId": 681,
       "talent": "Hemorrhage",
       "spec": "Subtlety"
+    },
+    {
+      "className": "Rogue",
+      "kind": "cooldown",
+      "talentId": 205,
+      "talent": "Adrenaline Rush",
+      "spec": "Combat"
+    },
+    {
+      "className": "Rogue",
+      "kind": "cooldown",
+      "talentId": 223,
+      "talent": "Blade Flurry",
+      "spec": "Combat"
     },
     {
       "className": "Rogue",
@@ -3390,6 +3369,28 @@
     },
     {
       "className": "Hunter",
+      "kind": "cooldown",
+      "talentId": 1386,
+      "talent": "Bestial Wrath",
+      "spec": "Beast Mastery"
+    },
+    {
+      "className": "Hunter",
+      "kind": "cooldown",
+      "talentId": 1803,
+      "talent": "The Beast Within",
+      "spec": "Beast Mastery"
+    },
+    {
+      "className": "Hunter",
+      "kind": "cooldown",
+      "talentId": 1819,
+      "talent": "Rapid Killing",
+      "spec": "Marksmanship",
+      "note": "It takes a minute a rank off Rapid Fire's cooldown, and the estimate prices Rapid Fire at its duration over that cooldown."
+    },
+    {
+      "className": "Hunter",
       "kind": "utility",
       "talentId": 1625,
       "talent": "Improved Revive Pet"
@@ -3429,12 +3430,6 @@
       "kind": "utility",
       "talentId": 1346,
       "talent": "Improved Arcane Shot"
-    },
-    {
-      "className": "Hunter",
-      "kind": "utility",
-      "talentId": 1819,
-      "talent": "Rapid Killing"
     },
     {
       "className": "Hunter",
@@ -3840,6 +3835,20 @@
       "kind": "utility",
       "talentId": 1441,
       "talent": "Repentance"
+    },
+    {
+      "className": "Mage",
+      "kind": "cooldown",
+      "talentId": 87,
+      "talent": "Arcane Power",
+      "spec": "Arcane"
+    },
+    {
+      "className": "Mage",
+      "kind": "cooldown",
+      "talentId": 69,
+      "talent": "Icy Veins",
+      "spec": "Frost"
     },
     {
       "className": "Mage",

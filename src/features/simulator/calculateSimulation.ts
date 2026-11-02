@@ -38,6 +38,7 @@ import {
   estimateSliceAndDice,
 } from '../../domain/simulation/sliceAndDice'
 import { estimateRoguePoisons } from '../../domain/simulation/roguePoisons'
+import { averagedCooldownEffect, type CooldownEffect } from '../../domain/simulation/classCooldowns'
 import { estimateFeralBleeds } from '../../domain/simulation/feralBleeds'
 import {
   WARLOCK_PET_UNMODELLED,
@@ -304,6 +305,19 @@ function toPercent(fraction: number) {
 function isDualWield(gear: EquippedGear) {
   const offHand = gear['Off Hand']?.item
   return Boolean(offHand?.weaponType && DUAL_WIELD_WEAPON_TYPES.has(offHand.weaponType))
+}
+
+/** No cooldowns pressed: what a caller that does not pass any gets. */
+const NO_COOLDOWNS: Required<CooldownEffect> = {
+  damageMultiplier: 0,
+  spellDamageMultiplier: 0,
+  physicalDamageMultiplier: 0,
+  castSpeed: 0,
+  rangedAttackSpeed: 0,
+  meleeAttackSpeed: 0,
+  energyRegen: 0,
+  petDamageMultiplier: 0,
+  meleeCritChance: 0,
 }
 
 /**
@@ -747,6 +761,8 @@ function calculatePhysicalDps(
   talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
   buffs: ReturnType<typeof aggregateBuffEffects> = { hastePercent: 0, damageMultiplier: 0 },
+  /** The character's own cooldowns, each weighted by its uptime (`classCooldowns.ts`). */
+  cooldowns: Required<CooldownEffect> = NO_COOLDOWNS,
 ): SimulationResult {
   const skillDiff = computeSkillDiff(target.level)
   const targetArmor = Math.max(0, target.armor - debuffs.armorReduction)
@@ -758,7 +774,11 @@ function calculatePhysicalDps(
    * what the talent says.
    */
   const rawCritChance =
-    ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) + debuffs.physicalCritTakenBonus + talents.meleeCritChance
+    ratingToFraction(stats.critRating, RATING_PER_PERCENT.meleeCrit) +
+    debuffs.physicalCritTakenBonus +
+    talents.meleeCritChance +
+    // Recklessness, averaged over its 30-minute cooldown.
+    cooldowns.meleeCritChance
   /*
    * Debuff hit joins here rather than anywhere downstream because it is attacker hit, not target
    * avoidance: Improved Faerie Fire raises the chance an attack lands, exactly as hit rating does.
@@ -801,7 +821,9 @@ function calculatePhysicalDps(
    * Percentage haste from buffs joins gear haste additively, which is how TBC stacks them — Bloodlust
    * is 30% whatever the gear says, and it does not pass through the rating conversion at all.
    */
-  const gearAttackSpeedMultiplier = 1 + hasteFraction + buffs.hastePercent
+  // A Hunter's Rapid Fire is ranged speed; Blade Flurry is melee. Each spec has only its own kind.
+  const cooldownSpeed = character.className === 'Hunter' ? cooldowns.rangedAttackSpeed : cooldowns.meleeAttackSpeed
+  const gearAttackSpeedMultiplier = 1 + hasteFraction + buffs.hastePercent + cooldownSpeed
 
   let breakdown: SimulationBreakdownEntry[]
   let rawDps: number
@@ -1010,7 +1032,9 @@ function calculatePhysicalDps(
     const landedShare = Math.max(0, fullTable.hit + fullTable.crit + fullTable.glance + fullTable.block)
 
     let sliceAndDice: ReturnType<typeof estimateSliceAndDice> | undefined
-    let energyPerSecond = ENERGY_PER_SECOND
+    // Adrenaline Rush doubles the regeneration for its share of the fight.
+    const baseEnergyPerSecond = ENERGY_PER_SECOND * (1 + cooldowns.energyRegen)
+    let energyPerSecond = baseEnergyPerSecond
     let combatPotencyEnergy = 0
     let sliceAndDiceSpeed = 1
 
@@ -1020,7 +1044,7 @@ function calculatePhysicalDps(
           gearAttackSpeedMultiplier * flurrySpeedMultiplier(talents.flurryBonus, fullTable.crit) * sliceAndDiceSpeed
         const offHandSwings = dualWield && offHandItem?.weaponSpeed ? speed / offHandItem.weaponSpeed : 0
         combatPotencyEnergy = combatPotencyEnergyPerSecond(offHandSwings * landedShare, talents.offHandEnergyPerProc)
-        energyPerSecond = ENERGY_PER_SECOND + combatPotencyEnergy
+        energyPerSecond = baseEnergyPerSecond + combatPotencyEnergy
 
         sliceAndDice = estimateSliceAndDice({
           durationMultiplier: talents.sliceAndDiceDurationMultiplier,
@@ -1411,9 +1435,19 @@ function calculatePhysicalDps(
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
    */
   const damageMultiplier = 1 + buffs.damageMultiplier
+  /*
+   * The player's cooldowns: all of their damage (Avenging Wrath, The Beast Within) or the physical
+   * part (Death Wish). Not the pet's, whose own is Bestial Wrath, which the Beast Within is not.
+   */
+  const ownMultiplier = damageMultiplier * (1 + cooldowns.damageMultiplier)
+  const physicalCooldown = 1 + cooldowns.physicalDamageMultiplier
+  const petMultiplier = damageMultiplier * (1 + cooldowns.petDamageMultiplier)
   const mitigatedDps =
-    ((rawDps + specialRawDps) * (1 - armorMitigation) * physicalTaken + unmitigatedDps) * damageMultiplier +
-    ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * damageMultiplier
+    ((rawDps + specialRawDps) * (1 - armorMitigation) * physicalTaken * physicalCooldown +
+      unmitigatedDps +
+      (feralBleeds?.totalDps ?? 0) * physicalTaken * (physicalCooldown - 1)) *
+      ownMultiplier +
+    ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * petMultiplier
 
   /*
    * The same total, itemised. Every physical source takes armour and the damage multiplier; the Holy
@@ -1424,9 +1458,9 @@ function calculatePhysicalDps(
    * a source dropped, double-counted, or mitigated on the wrong side of the armour term shows up as
    * a sum that no longer matches the answer, instead of as a plausible row nobody checks.
    */
-  const physical = (raw: number) => raw * (1 - armorMitigation) * physicalTaken * damageMultiplier
+  const physical = (raw: number) => raw * (1 - armorMitigation) * physicalTaken * physicalCooldown * ownMultiplier
   // Already mitigated by its own model, so it takes the damage multipliers and nothing else.
-  const petDps = ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * damageMultiplier
+  const petDps = ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * petMultiplier
   const sources: { name: string; dps: number }[] = [
     ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
     ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
@@ -1439,7 +1473,7 @@ function calculatePhysicalDps(
    * do not scale at all. One "Pet" line would hide a source that shrinks as a share of every upgrade
    * behind one that grows, and the whole point of this table is that a change shows up per source.
    */
-  const petShare = physicalTaken * damageMultiplier
+  const petShare = physicalTaken * petMultiplier
   if (hunterPet && hunterPet.whiteDps > 0) sources.push({ name: 'Pet melee', dps: hunterPet.whiteDps * petShare })
   for (const ability of hunterPet?.abilities ?? []) {
     if (ability.dps > 0) sources.push({ name: `Pet ${ability.name}`, dps: ability.dps * petShare })
@@ -1448,20 +1482,20 @@ function calculatePhysicalDps(
     sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * petShare })
   }
   if (feralBleeds) {
-    if (feralBleeds.rakeDps > 0) sources.push({ name: 'Rake', dps: feralBleeds.rakeDps * physicalTaken * damageMultiplier })
-    if (feralBleeds.ripDps > 0) sources.push({ name: 'Rip', dps: feralBleeds.ripDps * physicalTaken * damageMultiplier })
+    if (feralBleeds.rakeDps > 0) sources.push({ name: 'Rake', dps: feralBleeds.rakeDps * physicalTaken * physicalCooldown * ownMultiplier })
+    if (feralBleeds.ripDps > 0) sources.push({ name: 'Rip', dps: feralBleeds.ripDps * physicalTaken * physicalCooldown * ownMultiplier })
   }
   if (roguePoisons) {
     if (roguePoisons.instantDps > 0) {
-      sources.push({ name: 'Instant Poison', dps: roguePoisons.instantDps * natureTaken * damageMultiplier })
+      sources.push({ name: 'Instant Poison', dps: roguePoisons.instantDps * natureTaken * ownMultiplier })
     }
     if (roguePoisons.deadlyDps > 0) {
-      sources.push({ name: 'Deadly Poison', dps: roguePoisons.deadlyDps * natureTaken * damageMultiplier })
+      sources.push({ name: 'Deadly Poison', dps: roguePoisons.deadlyDps * natureTaken * ownMultiplier })
     }
   }
   if (paladinHoly) {
-    sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * holyTaken * damageMultiplier })
-    sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * holyTaken * damageMultiplier })
+    sources.push({ name: paladinHoly.sealName, dps: paladinHoly.sealDps * holyTaken * ownMultiplier })
+    sources.push({ name: paladinHoly.judgementName, dps: paladinHoly.judgementDps * holyTaken * ownMultiplier })
   }
 
   for (const entry of rotation.specials) {
@@ -1598,7 +1632,7 @@ function calculatePhysicalDps(
    * to be told this number is not about their pet, rather than discovering it by disagreeing with it.
    */
   const petSummary = hunterPet
-    ? ` The pet is counted as a second attacker, modelled as a ${HUNTER_PET_DEFAULT_FAMILY} — the damage families span 0.91 to 1.1 upstream and this app has no pet picker — and ${hunterPetUnmodelled({ killCommand: (killCommand?.dps ?? 0) > 0, frenzy: hunterPet.frenzyMultiplier > 1 })}`
+    ? ` The pet is counted as a second attacker, modelled as a ${HUNTER_PET_DEFAULT_FAMILY} — the damage families span 0.91 to 1.1 upstream and this app has no pet picker — and ${hunterPetUnmodelled({ killCommand: (killCommand?.dps ?? 0) > 0, frenzy: hunterPet.frenzyMultiplier > 1, bestialWrath: cooldowns.petDamageMultiplier > 0 })}`
     : ''
 
   const holySummary = paladinHoly
@@ -1757,8 +1791,11 @@ function calculateCasterDps(
   talents: TalentModifiers = noTalentModifiers,
   unmodelledTalentNote?: string,
   buffs: ReturnType<typeof aggregateBuffEffects> = { hastePercent: 0, damageMultiplier: 0 },
+  cooldowns: Required<CooldownEffect> = NO_COOLDOWNS,
 ): SimulationResult {
   const cast = resolveCastProfile(character, GENERIC_NUKE_CAST_TIME)
+  // Arcane Power and the like, averaged: the caster's own, multiplied on the whole of their spells.
+  const cooldownDamage = (1 + cooldowns.damageMultiplier) * (1 + cooldowns.spellDamageMultiplier)
   const levelDiff = target.level - PLAYER_LEVEL
   /*
    * Talent hit joins the *rating-derived* figure rather than the finished chance, because
@@ -1781,7 +1818,8 @@ function calculateCasterDps(
   const singleCritChance = spellCritChance + (singleSchool ? debuffs.schoolCritTaken[singleSchool] : 0)
   // Percentage haste from buffs is not rating and does not pass through the conversion: Bloodlust is
   // 30% of cast speed whatever the gear says, exactly as it is 30% of swing speed for a melee spec.
-  const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste) + buffs.hastePercent
+  // Icy Veins joins it the same way, averaged over its cooldown.
+  const hastePercent = ratingToFraction(stats.spellHasteRating, RATING_PER_PERCENT.spellHaste) + buffs.hastePercent + cooldowns.castSpeed
   const effectiveCastTime = cast.castTimeSeconds / (1 + hastePercent)
   const castsPerSecond = 1 / effectiveCastTime
   const damagePerCast = (cast.baseAmount + stats.spellPower * cast.coefficient) * talents.spellDamageMultiplier
@@ -1791,7 +1829,7 @@ function calculateCasterDps(
    * Sanctity Aura is Holy only and a buff has no school field — so what lands is the school-agnostic
    * kind, which today is Ferocious Inspiration.
    */
-  const singleAbilityDps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier)
+  const singleAbilityDps = expectedDamagePerCast * spellHitChance * castsPerSecond * (1 + buffs.damageMultiplier) * cooldownDamage
 
   const breakdown: SimulationBreakdownEntry[] = [
     { label: 'Base damage per cast', value: round(cast.baseAmount) },
@@ -1853,7 +1891,7 @@ function calculateCasterDps(
   let casterSources: { name: string; dps: number }[] = [{ name: cast.label, dps }]
 
   if (rotation) {
-    const shared = talents.spellDamageMultiplier * (1 + buffs.damageMultiplier)
+    const shared = talents.spellDamageMultiplier * (1 + buffs.damageMultiplier) * cooldownDamage
     /*
      * **School-scoped multipliers, applied per spell rather than to the total** — which is the whole
      * point of `spellSchool` existing. Demonic Sacrifice grants 15% to Shadow or to Fire, and folding
@@ -2258,9 +2296,11 @@ export function calculateSimulation(
    * nobody has checked.
    */
   const buffs = aggregateBuffEffects(activeBuffIds)
+  // The character's own cooldowns, priced at duration ÷ cooldown (`classCooldowns.ts`). DPS paths only.
+  const cooldowns = averagedCooldownEffect(character.className, character.spec, talentPoints)
 
-  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote, buffs)
+  if (role === 'Caster DPS') return calculateCasterDps(character, stats, target, debuffs, talents, talentNote, buffs, cooldowns)
   if (role === 'Healer') return calculateHealing(character, stats, talents, talentNote)
   if (role === 'Tank') return calculateTankSurvivability(character, gear, stats, target, talents, talentNote)
-  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote, buffs)
+  return calculatePhysicalDps(character, gear, stats, target, debuffs, talents, talentNote, buffs, cooldowns)
 }

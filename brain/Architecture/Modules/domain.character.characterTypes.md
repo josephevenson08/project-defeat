@@ -58,6 +58,7 @@ _No doc comment at the top of this file._
 - [[domain.raidcomp.rosterTypes]] — `src/domain/raidcomp/rosterTypes.ts`
 - [[domain.raids.raidLoot]] — `src/domain/raids/raidLoot.ts`
 - [[domain.raids.raidTypes]] — `src/domain/raids/raidTypes.ts`
+- [[domain.simulation.classCooldowns]] — `src/domain/simulation/classCooldowns.ts`
 - [[domain.simulation.dpsReference]] — `src/domain/simulation/dpsReference.ts`
 - [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.paladinSeals]] — `src/domain/simulation/paladinSeals.ts`

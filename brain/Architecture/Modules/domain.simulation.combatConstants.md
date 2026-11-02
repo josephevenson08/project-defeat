@@ -35,6 +35,7 @@ _None._
 - [[domain.character.sampleRacialTraits]] — `src/domain/character/sampleRacialTraits.ts`
 - [[domain.gear.gearStats]] — `src/domain/gear/gearStats.ts`
 - [[domain.simulation.attackTable]] — `src/domain/simulation/attackTable.ts`
+- [[domain.simulation.classCooldowns]] — `src/domain/simulation/classCooldowns.ts`
 - [[domain.simulation.damageFormulas]] — `src/domain/simulation/damageFormulas.ts`
 - [[domain.simulation.hitCap]] — `src/domain/simulation/hitCap.ts`
 - [[domain.simulation.rageModel]] — `src/domain/simulation/rageModel.ts`

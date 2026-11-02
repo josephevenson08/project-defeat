@@ -509,7 +509,9 @@ import {
   flurrySpeedMultiplier,
   noTalentModifiers,
   unmodelledTalents,
+  unmodelledTalentsInBuild,
 } from '../src/domain/talents/talentModifiers'
+import { classCooldowns, cooldownUptime, cooldownsFor } from '../src/domain/simulation/classCooldowns'
 import { sampleRaidBosses } from '../src/domain/raids/sampleRaidBosses'
 import { sampleRaids } from '../src/domain/raids/sampleRaids'
 import { formatRaidDate } from '../src/features/raidcomp/exportRosterImage'
@@ -2636,6 +2638,49 @@ test('the physical debuffs: Expose overwrites Sunder, Blood Frenzy reaches every
   expect(fury(['mangle']).scoreExact, 'nothing else bleeds').toBe(fury([]).scoreExact)
 })
 
+test('class cooldowns are priced at duration over cooldown, only for the builds that press them', () => {
+  const idOf = (className: string, name: string) =>
+    getTalentData(className)!.trees.flatMap((tree) => tree.talents).find((talent) => talent.name === name)!.id
+
+  // Rapid Fire is baseline; Rapid Killing takes a minute a rank off its five.
+  const rapidFire = classCooldowns.find((cooldown) => cooldown.id === 'rapid-fire')!
+  expect(cooldownUptime(rapidFire, {})).toBeCloseTo(15 / 300, 10)
+  expect(cooldownUptime(rapidFire, { [idOf('Hunter', 'Rapid Killing')]: 1 })).toBeCloseTo(15 / 240, 10)
+  expect(cooldownUptime(rapidFire, { [idOf('Hunter', 'Rapid Killing')]: 2 })).toBeCloseTo(15 / 180, 10)
+
+  // A talent cooldown needs the talent; a baseline one only the class (and, where it says, the spec).
+  const names = (className: TbcClass, spec: TbcSpec, points: Record<number, number>) =>
+    cooldownsFor(className, spec, points).map((cooldown) => cooldown.name)
+  expect(names('Warrior', 'Fury', {}), 'every DPS Warrior has Recklessness, no Fury Warrior Death Wish').toEqual(['Recklessness'])
+  expect(names('Warrior', 'Arms', { [idOf('Warrior', 'Death Wish')]: 1 })).toEqual(['Death Wish', 'Recklessness'])
+  expect(names('Warrior', 'Protection', {}), 'a tank presses none of these').toEqual([])
+  expect(names('Mage', 'Arcane', {}), 'Arcane Power is a talent').toEqual([])
+  expect(names('Paladin', 'Retribution', {})).toEqual(['Avenging Wrath'])
+
+  // And on the estimate: Death Wish is +20% physical for 30 s of every 180, so an Arms Warrior's damage
+  // rises by exactly that average, everything else equal.
+  const arms: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Warrior', spec: 'Arms' }
+  const armsGear = normalizeGearForCharacter(defaultGear, 'Warrior', 'Arms')
+  const armsStats = calculateStats(arms, armsGear)
+  const armsScore = (points: Record<number, number>) =>
+    calculateSimulation(arms, armsGear, armsStats, 'Physical DPS', [], undefined, points).scoreExact
+  expect(armsScore({ [idOf('Warrior', 'Death Wish')]: 1 }) / armsScore({})).toBeCloseTo(1 + 0.2 * (30 / 180), 6)
+
+  // Arcane Power multiplies a Mage's spells by 1 + 0.3 x 15/180, on top of whatever Icy Veins adds.
+  const mage: CharacterProfile = { faction: 'Alliance', race: 'Human', className: 'Mage', spec: 'Arcane' }
+  const mageGear = normalizeGearForCharacter(defaultGear, 'Mage', 'Arcane')
+  const mageStats = calculateStats(mage, mageGear)
+  const mageScore = (points: Record<number, number>) =>
+    calculateSimulation(mage, mageGear, mageStats, 'Caster DPS', [], undefined, points).scoreExact
+  expect(mageScore({ [idOf('Mage', 'Arcane Power')]: 1 }) / mageScore({})).toBeCloseTo(1 + 0.3 * (15 / 180), 6)
+
+  // The cooldown talents are no longer refused, so the caveat stops naming them.
+  const combat = talentBuilds.builds.find((build) => build.spec === 'Combat')!.points as Record<string, number>
+  const combatPoints = Object.fromEntries(Object.entries(combat).map(([id, rank]) => [Number(id), rank]))
+  expect(unmodelledTalentsInBuild('Rogue', combatPoints)).not.toContain('Adrenaline Rush')
+  expect(unmodelledTalentsInBuild('Rogue', combatPoints)).not.toContain('Blade Flurry')
+})
+
 test('the armor debuffs subtract flat armor and stack with each other', async () => {
   // The shape change has to reach the math, not just the data file. Under the old percentage model
   // these three removed 33% of whatever the target had; they remove a fixed 4010 regardless.
@@ -4506,8 +4551,11 @@ test('an empty talent tree reproduces the untalented numbers exactly', () => {
    *
    * **215.3 until 2026-10-19**, when the attack table's miss against a level 73 boss became TBC's 9%
    * rather than 8% (the 1% hit suppression past a 10-point skill gap).
+   *
+   * **213.1 until 2026-11-02**, when Recklessness, baseline for every DPS Warrior, joined at its
+   * averaged 0.8% of a fight (+100% crit for 15 s every 30 minutes).
    */
-  expect(empty.score).toBe(213.1)
+  expect(empty.score).toBe(214.9)
 })
 
 test('main-hand and off-hand picks are separate rankings, not one collided list', () => {
@@ -4892,8 +4940,8 @@ test('talent modifiers come from the ingest, and reach the melee estimate', () =
 
   expect(after.scoreExact, 'talents must raise melee DPS').toBeGreaterThan(before.scoreExact)
   // 224.3 before the base stats and attribute conversions were sourced, and 254.7 before the 9% miss
-  // against a level 73 boss (2026-10-19) — see the untalented figure.
-  expect(after.score).toBe(252.4)
+  // against a level 73 boss (2026-10-19), and 252.4 before Recklessness (2026-11-02) — see the untalented figure.
+  expect(after.score).toBe(254.8)
 })
 
 test('talents do NOT close the rage gap, which is what this pass set out to test', () => {
@@ -4981,7 +5029,9 @@ test('the talents this model cannot express are reported rather than dropped', (
   expect(unmodelledTalents.length).toBeGreaterThan(0)
   const named = unmodelledTalents.map((entry) => entry.talent).join(' ')
   expect(named).toMatch(/Deep Wounds/)
-  expect(named).toMatch(/Death Wish/)
+  // Death Wish was the cooldown named here until it was priced (2026-11-02); the one-charge ones still are refused.
+  expect(named).toMatch(/Cold Blood/)
+  expect(named).not.toMatch(/Death Wish/)
   for (const entry of unmodelledTalents) {
     expect(entry.reason.length, `${entry.talent} needs a real reason, not a placeholder`).toBeGreaterThan(20)
   }
@@ -5860,8 +5910,8 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build, Subtlety
    */
   expect(best, 'featureFlags.ts claims the best spec is around 1.00x').toBeGreaterThan(1)
   expect(best).toBeLessThan(1.1)
-  expect(worst, 'featureFlags.ts claims the worst spec is around 1.91x').toBeGreaterThan(1.8)
-  expect(worst).toBeLessThan(2.0)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 1.82x').toBeGreaterThan(1.75)
+  expect(worst).toBeLessThan(1.9)
 })
 
 test('a multiplier on a derived stat is applied after the stat is derived', () => {
@@ -7298,15 +7348,15 @@ test('the pet shares featureFlags quotes are the shares the model produces', () 
   const share = (rows: typeof sources) => rows.reduce((sum, source) => sum + source.dps, 0) / result.scoreExact
 
   // Recentred on 2026-11-02, when Hunter's Mark lifted the Hunter's shots and not the pet's: 2.1% and
-  // 3.4% became 1.9% and 3.1%.
-  expect(share(focusRows), 'featureFlags says the focus abilities are about 1.9%').toBeGreaterThan(0.015)
+  // 3.4% became 1.9% and 3.1%, then 2.0% and 3.2% with Bestial Wrath.
+  expect(share(focusRows), 'featureFlags says the focus abilities are about 2.0%').toBeGreaterThan(0.015)
   expect(share(focusRows)).toBeLessThan(0.023)
-  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.1%').toBeGreaterThan(0.026)
+  expect(share([killCommandRow!]), 'featureFlags says Kill Command is about 3.2%').toBeGreaterThan(0.026)
   expect(share([killCommandRow!])).toBeLessThan(0.036)
   // Recentred on 2026-10-20 (it was 0.175 to 0.195, around 18.4%): the off hand's enchant took the
   // owner up and the pet's share from 17.55% to 17.49%, under a floor the prose had already left.
-  // And again on 2026-11-02: 17.5% to 16.0%, for the same reason.
-  expect(share(petRows), 'featureFlags says the pet as a whole is about 16.0%').toBeGreaterThan(0.15)
+  // And again on 2026-11-02: 17.5% to 16.0%, for the same reason, then 16.5% with Bestial Wrath.
+  expect(share(petRows), 'featureFlags says the pet as a whole is about 16.5%').toBeGreaterThan(0.15)
   expect(share(petRows)).toBeLessThan(0.17)
 
   /*

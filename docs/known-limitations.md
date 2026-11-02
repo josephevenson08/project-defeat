@@ -77,6 +77,14 @@
   raid build with the physical debuffs it reads 1,578 against a 95th percentile of 1,386, drawn from
   5,495 parses of a spec guides rate F-tier in PvE. The trust range leaves it out and says why.
   Subtlety and Assassination, with thinner references still, pass by under 1%.
+- **Class cooldowns are averaged, not timed** (since 2026-11-02): Arcane Power, Icy Veins, Rapid Fire,
+  Bestial Wrath and The Beast Within, Death Wish, Recklessness, Avenging Wrath, Adrenaline Rush and
+  Blade Flurry are each worth their effect for duration ÷ cooldown of the fight, the rule on-use
+  trinkets use. That is a steady state: a real fight presses each at the pull, so long cooldowns
+  (Recklessness's 30 minutes most) are worth a little more than this gives them. The one-charge
+  cooldowns (Combustion, Cold Blood, Elemental Mastery, Presence of Mind, Inner Focus, Amplify Curse,
+  Shadowstep) are still refused, and pets whose damage is unread (Water Elemental, Fire Elemental
+  Totem, Force of Nature, Shadowfiend) are out.
 - **The DPS references are each spec's 95th percentile** (Warcraft Logs, Phase 2, read 2026-11-02),
   not an average. archon.gg's figures used until then were the same measure, labelled "average"
   here by mistake; a best case is therefore compared with what the top 5% of a spec's parses reach.
