@@ -21,7 +21,7 @@ import {
 } from '../../domain/tierlists/specStanding'
 import { SpecCard, TierLetter } from './SpecCard'
 import { SpecTip } from './SpecTip'
-import { LOGS_READ_ON, formatDps, ordinal, plural, specName } from './tierFormat'
+import { LOGS_READ_ON, TIERS_READ_ON, formatDps, ordinal, plural, specName } from './tierFormat'
 
 type Sort = 'by-logs' | 'by-wowhead'
 
@@ -35,7 +35,7 @@ const topDps = logsOrder[0]?.dps ?? 1
 
 /**
  * Design B, merged into the tab as its second view: Wowhead's tiers against what players actually
- * parse. The 20 damage specs by archon.gg's observed average DPS, each with both letters and the
+ * parse. The 20 damage specs by their 95th-percentile DPS in the logs, each with both letters and the
  * disagreements spelled out; sort by either opinion, or show only where they disagree. Healers and
  * tanks have only Wowhead's lists in the app, and say so.
  */
@@ -82,7 +82,7 @@ export function AgainstTheLogs({ yours, raidCount }: AgainstTheLogsProps) {
         <ul className="tier-notes">
           {comparison.underrated && (
             <li>
-              <b>{specName(comparison.underrated.ref)}</b> averages the {ordinal(comparison.underrated.rank)}-highest DPS of{' '}
+              <b>{specName(comparison.underrated.ref)}</b> has the {ordinal(comparison.underrated.rank)}-highest DPS of{' '}
               {logsOrder.length}, yet sits in Wowhead's {comparison.underrated.wowhead} tier.
             </li>
           )}
@@ -100,15 +100,15 @@ export function AgainstTheLogs({ yours, raidCount }: AgainstTheLogsProps) {
           )}
         </ul>
         <p className="tier-logs-about">
-          Wowhead's tiers are their guide writers' judgement ({dpsList?.title.replace(/ - Wowhead$/, '')}). archon.gg averages uploaded
-          Warcraft Logs parses for Serpentshrine Cavern and Tempest Keep, all bosses{LOGS_READ_ON ? `, read ${LOGS_READ_ON}` : ''}; its
-          tier letters are its own.
+          Wowhead's tiers are their guide writers' judgement ({dpsList?.title.replace(/ - Wowhead$/, '')}). The DPS is each spec's 95th
+          percentile on Warcraft Logs for Serpentshrine Cavern and Tempest Keep, all bosses, Phase 2{LOGS_READ_ON ? `, read ${LOGS_READ_ON}` : ''}; the
+          tier letters are archon.gg's{TIERS_READ_ON ? `, read ${TIERS_READ_ON}` : ''}.
         </p>
       </Panel>
 
       <Panel
         title={`Damage, by ${sort === 'by-logs' ? 'what the logs say' : "Wowhead's tier"}`}
-        eyebrow={onlyDisagreements ? plural(rows.length, 'disagreement') : 'Bars: observed average DPS'}
+        eyebrow={onlyDisagreements ? plural(rows.length, 'disagreement') : 'Bars: 95th-percentile DPS'}
         className="tier-logs-chart"
       >
         <div className="tier-logs-controls">

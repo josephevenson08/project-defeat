@@ -8,12 +8,12 @@ import type { TierListRole } from './tierListTypes'
 
 /**
  * Where a spec stands, gathered from every source the app has: its place on each of Wowhead's lists,
- * what players actually parse (archon.gg), what it brings to a raid, and the ability it is built
+ * what its best players parse (Warcraft Logs' 95th percentile), what it brings to a raid, and the ability it is built
  * around. This is the Spec Tier Lists tab's spec card (design A, decided 2026-10-12), and the rows of
  * its "Against the logs" view (design B).
  *
- * **Two opinions, kept apart.** Wowhead's tiers are their guide writers' judgement; archon.gg's DPS
- * is an average of uploaded logs, with tier letters of its own. Neither is folded into the other, so
+ * **Two opinions, kept apart.** Wowhead's tiers are their guide writers' judgement; the logs' DPS is
+ * Warcraft Logs' 95th percentile, and the tier letters beside it archon.gg's. Neither is folded into the other, so
  * the page can show where they disagree rather than averaging the disagreement away.
  */
 
@@ -64,7 +64,7 @@ export type SpecStanding = SpecRef & {
   brings: readonly SpecContribution[]
 }
 
-/** archon.gg's damage specs by observed average DPS, highest first. */
+/** The damage specs by their 95th-percentile DPS in the logs, highest first. */
 export const logsOrder: readonly DpsReference[] = [...dpsReference].sort((a, b) => b.dps - a.dps)
 
 function findLogs(ref: SpecRef): LogsStanding | undefined {
@@ -158,7 +158,8 @@ export type LogsComparison = {
   underrated?: { ref: SpecRef; rank: number; wowhead: string }
   /**
    * The first spec outside the top ten by DPS that archon still rates above Wowhead's letter — the
-   * proof that archon's letters are not DPS order alone (Elemental Shaman, 13th, archon A).
+   * proof that archon's letters are not DPS order alone (Feral Druid, 11th, archon B; Elemental Shaman,
+   * 13th and archon A, until the references became Warcraft Logs' on 2026-11-02).
    */
   notDpsOrder?: { ref: SpecRef; rank: number; archon: string }
 }

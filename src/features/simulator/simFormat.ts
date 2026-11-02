@@ -25,11 +25,11 @@ export function formatBreakdownValue(value: number) {
 export const metricUnit = (metric: SimulationResult['metricLabel'] | string) =>
   metric === 'Estimated Healing' ? 'HPS' : metric === 'Effective Health' ? 'Effective Health' : 'DPS'
 
-/** "Fury warriors", "Beast Mastery hunters": the people a spec's observed average is made of. */
+/** "Fury warriors", "Beast Mastery hunters": the people a spec's 95th percentile is taken from. */
 export const specPlayers = (className: TbcClass, spec: TbcSpec) => `${spec} ${className.toLowerCase()}s`
 
 /**
- * The estimate against what players of this spec average on archon.gg, or nothing for a spec with no
+ * The estimate against the spec's 95th percentile on Warcraft Logs, or nothing for a spec with no
  * reference (healers and tanks) or an estimate of zero.
  */
 export function versusObserved(className: TbcClass, spec: TbcSpec, scoreExact: number) {
@@ -41,8 +41,8 @@ export function versusObserved(className: TbcClass, spec: TbcSpec, scoreExact: n
     ratio,
     text:
       ratio >= 1
-        ? `${ratio.toFixed(2)}× below what ${specPlayers(className, spec)} average`
-        : `${(1 / ratio).toFixed(2)}× above what ${specPlayers(className, spec)} average, which the model should never be`,
+        ? `${ratio.toFixed(2)}× below the 95th percentile of ${specPlayers(className, spec)}`
+        : `${(1 / ratio).toFixed(2)}× above the 95th percentile of ${specPlayers(className, spec)}, which the model should never be`,
   }
 }
 
@@ -50,5 +50,5 @@ export function versusObserved(className: TbcClass, spec: TbcSpec, scoreExact: n
 export const simulationSources: readonly ProvenanceSource[] = [
   { name: `one fixed encounter, a generic level ${defaultSimulationTarget.level} raid boss` },
   { name: 'coefficients and talent builds from wowsims', href: 'https://github.com/wowsims/tbc', verb: 'ingested' },
-  { name: 'archon.gg logs', href: DPS_REFERENCE_URL, readOn: DPS_REFERENCE_READ_ON, verb: 'read' },
+  { name: 'Warcraft Logs, 95th percentile', href: DPS_REFERENCE_URL, readOn: DPS_REFERENCE_READ_ON, verb: 'read' },
 ]

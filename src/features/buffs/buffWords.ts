@@ -32,6 +32,7 @@ export function buffEffects(buff: Buff): string[] {
 }
 
 const MAGIC_SCHOOLS = ['Arcane', 'Fire', 'Frost', 'Holy', 'Nature', 'Shadow']
+const SCHOOL_ORDER = ['Physical', ...MAGIC_SCHOOLS]
 
 /**
  * "+10% Arcane, Fire, Frost and Shadow", or "+5% spell" when a value covers every magic school, as
@@ -43,9 +44,9 @@ function bySchool(values: Partial<Record<string, number>> | undefined, noun: str
     if (value) byValue.set(value, [...(byValue.get(value) ?? []), school])
   }
   return [...byValue].map(([value, schools]) => {
-    const ordered = MAGIC_SCHOOLS.filter((school) => schools.includes(school))
-    const names = ordered.length === MAGIC_SCHOOLS.length ? 'spell' : ordered.length > 1 ? `${ordered.slice(0, -1).join(', ')} and ${ordered.at(-1)}` : ordered[0]
-    return `+${percent(value)} ${names} ${noun}`
+    const ordered = SCHOOL_ORDER.filter((school) => schools.includes(school))
+    const names = ordered.length === MAGIC_SCHOOLS.length && !ordered.includes('Physical') ? 'spell' : ordered.length > 1 ? `${ordered.slice(0, -1).join(', ')} and ${ordered.at(-1)}` : ordered[0]
+    return `+${percent(value)} ${names.replace('Physical', 'physical')} ${noun}`
   })
 }
 
@@ -58,6 +59,9 @@ export function debuffEffects(debuff: TargetDebuff): string[] {
     debuff.spellCritTakenBonus ? `+${percent(debuff.spellCritTakenBonus)} spell crit taken` : '',
     ...bySchool(debuff.schoolDamageTakenMultipliers, 'damage taken'),
     ...bySchool(debuff.schoolCritTakenBonus, 'crit taken'),
+    debuff.bleedDamageTakenMultiplier ? `+${percent(debuff.bleedDamageTakenMultiplier)} bleed and Shred damage taken` : '',
+    debuff.attackerAttackPower ? `+${debuff.attackerAttackPower} melee attack power for attackers` : '',
+    debuff.attackerRangedAttackPower ? `+${debuff.attackerRangedAttackPower} ranged attack power for attackers` : '',
   ].filter(Boolean)
 }
 

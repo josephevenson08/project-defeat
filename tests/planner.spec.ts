@@ -2709,8 +2709,8 @@ test('a debuff that cannot be modelled is separated from the ones that can be', 
    * another player's Agility**, and this app models one character. Improved Shadow Bolt and Stormstrike
    * run on charges and an uptime nothing here plays out. Judgement of Wisdom is mana. And the five
    * physical ones are expressible and held out by the owner's choice (2026-11-01): applied at best
-   * case they take specs past what players average, so what a best case is measured against is
-   * settled first.
+   * case they take Marksmanship past its 95th percentile, and Marksmanship is measured at a synthetic
+   * one-tree build, so they wait on a real one.
    */
   const reasonOf = (id: string) => unmodelledTargetDebuffs.find((debuff) => debuff.id === id)!.notModelled!
   expect(reasonOf('expose-weakness'), "the reason is another player's stat, not a field").toMatch(/Agility/)
@@ -5658,8 +5658,8 @@ test('every DPS spec is measured against what players actually parse', () => {
    * exactly like a spec reading correctly. `featureFlags.ts` has claimed "roughly 4x low" on one
    * person's judgement for months.
    *
-   * This is that judgement turned into a measurement, against `dpsReference` — archon.gg's observed
-   * averages for the phase this app is scoped to. The table it prints is the point of the test; the
+   * This is that judgement turned into a measurement, against `dpsReference` — each spec's 95th
+   * percentile in the logs for the phase this app is scoped to. The table it prints is the point of the test; the
    * assertions below are the parts that can fail.
    */
   const rows: { spec: string; modelled: number; target: number; ratio: number; slots: number }[] = []
@@ -5720,7 +5720,7 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    *
    * Upstream's Subtlety preset is not a Subtlety build. wowsims' `HemoTalents` lists 38 points and 34
    * of them are Combat, so a log, which files a spec by the tree holding the most points, would call
-   * it Combat, and measuring it against what Subtlety players average compared a Combat build with
+   * it Combat, and measuring it against what Subtlety players parse compared a Combat build with
    * them. Once Dual Wield Specialization was modelled (2026-10-31) it read 1,295 against their 1,292
    * and failed the bound below, with nothing counted twice. So Subtlety is measured at Warcraft
    * Tavern's 20/0/41 instead (`calibrationBuilds.ts`), and the Talents tab keeps wowsims' preset.
@@ -5793,9 +5793,9 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build and Subtl
    * Failing on an improvement is the feature. It is the only thing that has reliably forced this
    * project's prose to keep up with its code.
    */
-  expect(best, 'featureFlags.ts claims the best spec is around 1.02x').toBeGreaterThan(1.01)
+  expect(best, 'featureFlags.ts claims the best spec is around 1.07x').toBeGreaterThan(1.01)
   expect(best).toBeLessThan(1.1)
-  expect(worst, 'featureFlags.ts claims the worst spec is around 1.90x').toBeGreaterThan(1.8)
+  expect(worst, 'featureFlags.ts claims the worst spec is around 1.91x').toBeGreaterThan(1.8)
   expect(worst).toBeLessThan(2.0)
 })
 

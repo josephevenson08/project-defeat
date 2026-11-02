@@ -13,7 +13,7 @@ tags: [brain/architecture, layer/features]
 
 From the top of the file:
 
-> "How far to trust it": every DPS spec's best case by this model against what players of it average.
+> "How far to trust it": every DPS spec's best case by this model against its 95th percentile in the logs.
 > 
 > The best cases are worked out here, from the same function the calibration test in
 > `tests/planner.spec.ts` pins the range with, so the panel and the test cannot disagree. Your spec's

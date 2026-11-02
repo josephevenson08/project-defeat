@@ -1,5 +1,5 @@
 import type { ProvenanceSource } from '../../components/ui/Provenance'
-import { DPS_REFERENCE_READ_ON, DPS_REFERENCE_URL } from '../../domain/simulation/dpsReference'
+import { DPS_REFERENCE_READ_ON, DPS_REFERENCE_URL, DPS_TIER_READ_ON, DPS_TIER_URL } from '../../domain/simulation/dpsReference'
 import { getTierList, tierListsFetchedAt } from '../../domain/tierlists'
 import type { SpecStanding } from '../../domain/tierlists/specStanding'
 
@@ -16,8 +16,11 @@ export const formatDps = (n: number) => n.toLocaleString('en-US')
 export const placesText = (standing: SpecStanding) =>
   standing.places.map((place) => `${place.label} for ${ROLE_WORD[place.role]}`).join(', ')
 
-/** When archon.gg's numbers were read, as the reference data records it. */
+/** When the logs' DPS was read, as the reference data records it. */
 export const LOGS_READ_ON = DPS_REFERENCE_READ_ON
+
+/** When archon.gg's tier letters were read: not when the DPS was, since archon now lists only Phase 3. */
+export const TIERS_READ_ON = DPS_TIER_READ_ON
 
 /** "Mage" for one, "Mages" for several. */
 export const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
@@ -31,9 +34,15 @@ export const tierListSources: readonly ProvenanceSource[] = [
     verb: 'ingested',
   },
   {
-    name: 'archon.gg logs',
+    name: 'Warcraft Logs, 95th percentile',
     href: DPS_REFERENCE_URL,
     readOn: LOGS_READ_ON,
+    verb: 'read',
+  },
+  {
+    name: "archon.gg's tier letters",
+    href: DPS_TIER_URL,
+    readOn: TIERS_READ_ON,
     verb: 'read',
   },
 ]

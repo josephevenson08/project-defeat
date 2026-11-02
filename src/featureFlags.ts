@@ -51,8 +51,9 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   spec whose damage is spread across several buttons. Still the largest remaining gap. See
  *   ROTATION-SCOPE.md.
  * - **The estimate is now measured rather than asserted to be roughly right.** `dpsReference.ts`
- *   holds observed averages for all 20 DPS specs from archon.gg, and a test compares every spec at
- *   best case against them. The model reads **1.02x to 1.90x low** — a range this file has now got
+ *   holds the logs' 95th percentile for all 20 DPS specs (Warcraft Logs, Phase 2; archon.gg's same
+ *   figure until 2026-11-02, mislabelled "averages" here), and a test compares every spec at best case
+ *   against them. The model reads **1.07x to 1.91x low** — a range this file has now got
  *   wrong four times by not moving when the model improved, so the test brackets it on both sides
  *   and fails on an improvement, which is the only thing that has reliably forced this prose to keep
  *   up. The last two were Kill Command and Feral's bleeds, both on 2026-08-27. No spec may read
@@ -71,7 +72,8 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   happens the answer is to find the double-count, not to loosen the bound: every previous time a
  *   spec crossed it, something was genuinely counted twice.
  *
- *   **The third time was not a double count, and Subtlety is now the closest, at 1.02x.** Rogue Dual
+ *   **The third time was not a double count, and Subtlety was then the closest, at 1.02x** (on the
+ *   Warcraft Logs figures read 2026-11-02, Marksmanship is, at 1.07x). Rogue Dual
  *   Wield Specialization took Subtlety to 1,295 against 1,292 (2026-10-29), and it adds exactly half
  *   the off hand and moves nothing else. The cause was the build: wowsims' Subtlety preset is a
  *   Combat-majority Hemorrhage build, which a log would file as Combat, so it was being compared with
@@ -79,7 +81,7 @@ const SIMULATION_ROLES: ReadonlySet<CharacterRole> = new Set<CharacterRole>(['Ph
  *   (`domain/talents/calibrationBuilds.ts`). Read the next crossing with that in mind too: before
  *   looking for a double count, check the build is the one the reference's players run. Subtlety has
  *   the most still unmodelled (Lethality on Hemorrhage, finishers, Hemorrhage's own debuff), so it is
- *   the likeliest to cross next, and its reference is a niche spec's average rather than a ceiling.
+ *   among the likeliest to cross next, and its reference comes from a niche spec's 1,276 parses.
  * - **And "single-ability approximation" was itself too generous until 2026-08-23**, which is worth
  *   keeping here rather than quietly fixing: the three hunter specs had *no* ability modelled at all.
  *   `resolveRotation` filtered on the literal `'Melee Special'`, so Steady Shot — catalogued,

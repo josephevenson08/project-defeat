@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/buffs/sampleTargetDebuffs.ts
-lines: 293
+lines: 296
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.buffs.sampleTargetDebuffs
 
-`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 293 lines
+`src/domain/buffs/sampleTargetDebuffs.ts` · **domain** layer · 296 lines
 
 From the top of the file:
 
@@ -48,6 +48,8 @@ From the top of the file:
 > wowsims' `debuffs.go`: Misery, Shadow Weaving and Improved Scorch are applied; Improved Shadow
 > Bolt, Judgement of Wisdom and Stormstrike's Nature debuff are listed; and Blood Frenzy, Hunter's
 > Mark, Improved Hunter's Mark, Expose Armor and Mangle are listed and held out by the owner's choice.
+> On 2026-11-02 the reference turned out to be the logs' 95th percentile all along (`dpsReference.ts`);
+> the simulator now has a field for each of the five, and they wait on Marksmanship's raid build.
 > 
 > **Spell school is what made it possible.** Every damaging ability records its own school now
 > (`SignatureAbility.spellSchool`), so a school-scoped debuff reaches the spells of its school and
@@ -58,7 +60,7 @@ From the top of the file:
 > **What `notModelled` means for a debuff now.** Listed with its real effect and credited to whoever
 > brings it, but not applied, and each entry says why: another player's stat (Expose Weakness),
 > charges or an uptime nothing here plays out (Improved Shadow Bolt, Stormstrike), mana (Judgement of
-> Wisdom), or the owner's call to hold the physical ones out until the best-case bound is settled.
+> Wisdom), or the owner's call to hold the physical ones out until Marksmanship has a real build.
 
 ## Exports
 

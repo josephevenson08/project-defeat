@@ -58,10 +58,10 @@ behind every claim of its that quotes a number.
   best upgrades**: every legal item in the catalogue simulated as a straight swap with the best
   colour-matched gems, best first, two at most per slot, each with Equip, which applies exactly the
   gems and enchant the score assumed. Then **the estimate, and how far to trust it**: the number
-  against what players of your spec average on archon.gg ("5.66× below what Fury warriors average"),
+  against your spec's 95th percentile on Warcraft Logs ("5.66× below the 95th percentile of Fury warriors"),
   what it misses for your spec and your talents, where the damage comes from (a log-style table that
   sums to the estimate), how it was computed, and every DPS spec's best case by this model against
-  the logs, yours marked (1.02× to 1.90× low, computed). A missing weapon is said first, before
+  the logs, yours marked (1.07× to 1.91× low, computed). A missing weapon is said first, before
   anything else. The page names its fixed encounter and what the model does and does not cover, with
   every figure in that list computed. DPS specs only; Healer and Tank results (estimated healing,
   effective health) are still computed and reachable with `?simulation=1`
@@ -128,7 +128,7 @@ behind every claim of its that quotes a number.
 - **Spec Tier Lists section** (the decided design, ported 2026-10-12): Wowhead's Phase 2 DPS, healer and
   tank rankings as a board of spec icons in class colours, 28 placements covering all 27 specs, with
   your spec marked on every list it appears on. Press any spec for its card: its place on every list,
-  archon.gg's observed DPS and tier, what it brings to a raid (the same counting Raid Composition uses),
+  its 95th-percentile DPS in the logs (Warcraft Logs) with archon.gg's tier, what it brings to a raid (the same counting Raid Composition uses),
   its signature ability, and how many of it are in your saved raid. A switch shows Wowhead's tiers
   against the logs for the 20 damage specs (they agree on 9), sortable either way. Tier letters and
   membership only — Wowhead's analysis prose is not reproduced, and each list links back to its page.

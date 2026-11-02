@@ -2,20 +2,20 @@
 type: module
 layer: features
 source: src/features/tierlists/tierFormat.ts
-lines: 40
+lines: 49
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.tierlists.tierFormat
 
-`src/features/tierlists/tierFormat.ts` · **features** layer · 40 lines
+`src/features/tierlists/tierFormat.ts` · **features** layer · 49 lines
 
 _No doc comment at the top of this file._
 
 ## Exports
 
-**const** — `formatDps`, `LOGS_READ_ON`, `ordinal`, `placesText`, `plural`, `specName`, `tierListSources`
+**const** — `formatDps`, `LOGS_READ_ON`, `ordinal`, `placesText`, `plural`, `specName`, `tierListSources`, `TIERS_READ_ON`
 
 ## Imports
 

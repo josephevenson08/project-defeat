@@ -60,7 +60,7 @@ const SECTIONS: readonly SectionDefinition[] = [
     id: 'simulation',
     label: 'Simulation',
     tagline: 'Estimated DPS',
-    blurb: 'Run the model on your character: your stat priority, your best upgrades, and the estimate against what players average.',
+    blurb: 'Run the model on your character: your stat priority, your best upgrades, and the estimate against what the best players reach.',
     goal: 'Simulate my DPS',
     accent: 'var(--tab-simulation)',
   },
@@ -127,7 +127,7 @@ const dropCount = raidBosses.reduce((sum, boss) => sum + boss.loot.length, 0)
 /** One line of fact per door, every number counted from the data rather than written down. */
 const FACTS: Record<SectionId, string> = {
   planner: `${bisLists.length} specs ranked slot by slot`,
-  simulation: `Measured against what players average, for all ${dpsReference.length} DPS specs`,
+  simulation: `Measured against the logs' 95th percentile, for all ${dpsReference.length} DPS specs`,
   raidcomp: `${modelledBuffs.length} raid buffs counted`,
   tierlists: `${dpsList?.tiers.reduce((sum, tier) => sum + tier.placements.length, 0) ?? 0} DPS specs ranked; ${topTier?.label ?? ''} tier shown`,
   raids: `${raidsInOrder.length} raids · ${raidBosses.length} bosses · ${dropCount} drops`,

@@ -3,7 +3,7 @@ import { SpecIcon } from '../../components/ui/SpecIcon'
 import { getClassColor } from '../../domain/character/classColors'
 import type { SpecStanding, SpecContribution } from '../../domain/tierlists/specStanding'
 import { specTierLists } from '../../domain/tierlists'
-import { LOGS_READ_ON, formatDps, ordinal, plural, specName } from './tierFormat'
+import { LOGS_READ_ON, TIERS_READ_ON, formatDps, ordinal, plural, specName } from './tierFormat'
 
 /**
  * A tier letter in its box. Rank reads through the box's weight and the letter's ink, never through
@@ -97,11 +97,11 @@ export function SpecCard({ standing, isYours, inYourRaid }: SpecCardProps) {
           )
         })}
         <div>
-          <dt>The logs · archon.gg</dt>
+          <dt>The logs · Warcraft Logs</dt>
           <dd>
             {logs ? (
               <>
-                <b>{formatDps(logs.dps)}</b> DPS average, {ordinal(logs.rank)} of {logs.of} · archon's tier{' '}
+                <b>{formatDps(logs.dps)}</b> DPS at the 95th percentile, {ordinal(logs.rank)} of {logs.of} · archon's tier{' '}
                 <TierLetter label={logs.tier} />
               </>
             ) : (
@@ -127,7 +127,7 @@ export function SpecCard({ standing, isYours, inYourRaid }: SpecCardProps) {
         <a href={firstList.sourceUrl} target="_blank" rel="noreferrer noopener">
           Wowhead's reasoning
         </a>{' '}
-        (their words stay on their page){logs && LOGS_READ_ON ? ` · logs: archon.gg, read ${LOGS_READ_ON}` : ''}
+        (their words stay on their page){logs && LOGS_READ_ON ? ` · logs: Warcraft Logs, read ${LOGS_READ_ON}; tiers: archon.gg, read ${TIERS_READ_ON}` : ''}
       </p>
     </div>
   )

@@ -94,7 +94,7 @@ the [port plan](docs/design/PORT-PLAN.md):
 | Step | What | State |
 | --- | --- | --- |
 | 0 | **The look:** dark glass panels, Marcellus and Figtree, a colour and a still backdrop per tab, the phase on every screen | Done, 2026-10-12 |
-| 1 | **Spec Tier Lists:** a board of spec icons from Wowhead's three lists, a card for any spec, and a switch to Wowhead's tiers against what players actually parse (archon.gg) | Done, 2026-10-12 |
+| 1 | **Spec Tier Lists:** a board of spec icons from Wowhead's three lists, a card for any spec, and a switch to Wowhead's tiers against what players actually parse (Warcraft Logs' 95th percentile, archon.gg's tiers) | Done, 2026-10-12 |
 | 2 | **Raids:** a boss journal with your spec's picks, who in your raid wants each drop, and a search across all five raids | Done, 2026-10-13 |
 | 3 | **Professions:** the game's profession window, and which two to take | Done (2026-10-17): recipes coloured at your skill, trainer stops, reagents, each range's loop on its TBC map; "Which two" with your character's two professions. The node refresh of the [maps rework](docs/design/MAPS-PLAN.md) waits for Wowhead to answer scripted requests again |
 | 4 | **Simulation:** what to do next (your stat priority, your best upgrades with Equip, then the estimate) with the damage sources and how far to trust the number | Done, 2026-10-17 |

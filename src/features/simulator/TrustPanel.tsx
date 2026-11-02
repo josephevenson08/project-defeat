@@ -4,7 +4,7 @@ import { specTrust, trustRange } from './bestCase'
 import { formatNumber, versusObserved } from './simFormat'
 
 /**
- * "How far to trust it": every DPS spec's best case by this model against what players of it average.
+ * "How far to trust it": every DPS spec's best case by this model against its 95th percentile in the logs.
  *
  * The best cases are worked out here, from the same function the calibration test in
  * `tests/planner.spec.ts` pins the range with, so the panel and the test cannot disagree. Your spec's
@@ -21,14 +21,14 @@ export function TrustPanel({ character, scoreExact }: { character: CharacterProf
       <p className="sim-trust-key" aria-hidden="true">
         <span>
           <i className="obs" />
-          What players average (archon.gg)
+          95th percentile of players (Warcraft Logs)
         </span>
         <span>
           <i className="mod" />
           This model at best case
         </span>
       </p>
-      <ol className="sim-trust-specs" aria-label="Each DPS spec: the model's best case against what players average">
+      <ol className="sim-trust-specs" aria-label="Each DPS spec: the model's best case against its 95th percentile in the logs">
         {rows.map((row) => {
           const me = row.className === character.className && row.spec === character.spec
           return (

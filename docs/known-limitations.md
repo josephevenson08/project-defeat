@@ -70,8 +70,12 @@
   Scorch and Winter's Chill, each at the full stack a raid keeps up. **Listed but not applied:**
   Vampiric Touch and Judgement of Wisdom (mana, which nothing here tracks for that use), Improved
   Shadow Bolt and Stormstrike's Nature debuff (charges and an uptime nothing plays out), and, held
-  out by the owner's choice until the best-case bound is settled, Blood Frenzy, Hunter's Mark,
-  Improved Hunter's Mark, Expose Armor and Mangle.
+  out by the owner's choice until Marksmanship is measured at a real raid build, Blood Frenzy,
+  Hunter's Mark, Improved Hunter's Mark, Expose Armor and Mangle: applied, they take Marksmanship,
+  measured today at a synthetic one-tree build, past its 95th percentile.
+- **The DPS references are each spec's 95th percentile** (Warcraft Logs, Phase 2, read 2026-11-02),
+  not an average. archon.gg's figures used until then were the same measure, labelled "average"
+  here by mistake; a best case is therefore compared with what the top 5% of a spec's parses reach.
 - **Feral's bleeds are modelled, and bleeds ignore armor.** Rake and Rip are maintained rather than
   spammed — a bleed's rate is how often it falls off, not how often you can afford it — and their
   ticks take no armor mitigation at all, though Rake's opening hit does. Mangle is still missing.

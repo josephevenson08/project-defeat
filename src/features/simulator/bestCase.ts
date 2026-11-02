@@ -126,7 +126,7 @@ export function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: Cha
   }
 }
 
-/** One DPS spec's best case by this model, beside what players of it average. */
+/** One DPS spec's best case by this model, beside its 95th percentile in the logs. */
 export type SpecTrust = DpsReference & {
   /** The model's best case, unrounded. */
   best: number
@@ -137,7 +137,7 @@ export type SpecTrust = DpsReference & {
 let trustRows: readonly SpecTrust[] | undefined
 
 /**
- * Every DPS spec's best case against archon.gg's observed average, in the reference's own order
+ * Every DPS spec's best case against its 95th percentile in the logs, in the reference's own order
  * (highest observed first). Twenty simulations, worked out once on first use: it depends on no
  * character, only on the data.
  */

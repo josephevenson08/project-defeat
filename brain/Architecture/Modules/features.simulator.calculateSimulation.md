@@ -2,14 +2,14 @@
 type: module
 layer: features
 source: src/features/simulator/calculateSimulation.ts
-lines: 2221
+lines: 2267
 generated: true
 tags: [brain/architecture, layer/features]
 ---
 
 # features.simulator.calculateSimulation
 
-`src/features/simulator/calculateSimulation.ts` · **features** layer · 2221 lines
+`src/features/simulator/calculateSimulation.ts` · **features** layer · 2267 lines
 
 _No doc comment at the top of this file._
 

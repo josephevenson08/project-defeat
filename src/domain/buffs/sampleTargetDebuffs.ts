@@ -36,6 +36,8 @@ import type { TargetDebuff } from './buffTypes'
  * wowsims' `debuffs.go`: Misery, Shadow Weaving and Improved Scorch are applied; Improved Shadow
  * Bolt, Judgement of Wisdom and Stormstrike's Nature debuff are listed; and Blood Frenzy, Hunter's
  * Mark, Improved Hunter's Mark, Expose Armor and Mangle are listed and held out by the owner's choice.
+ * On 2026-11-02 the reference turned out to be the logs' 95th percentile all along (`dpsReference.ts`);
+ * the simulator now has a field for each of the five, and they wait on Marksmanship's raid build.
  *
  * **Spell school is what made it possible.** Every damaging ability records its own school now
  * (`SignatureAbility.spellSchool`), so a school-scoped debuff reaches the spells of its school and
@@ -46,7 +48,7 @@ import type { TargetDebuff } from './buffTypes'
  * **What `notModelled` means for a debuff now.** Listed with its real effect and credited to whoever
  * brings it, but not applied, and each entry says why: another player's stat (Expose Weakness),
  * charges or an uptime nothing here plays out (Improved Shadow Bolt, Stormstrike), mana (Judgement of
- * Wisdom), or the owner's call to hold the physical ones out until the best-case bound is settled.
+ * Wisdom), or the owner's call to hold the physical ones out until Marksmanship has a real build.
  */
 export const sampleTargetDebuffs: readonly TargetDebuff[] = [
   {
@@ -55,6 +57,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedByClass: 'Warrior',
     spellId: 25225,
     armorReduction: 2600,
+    armorGroup: 'SunderExpose',
     notes:
       'Rank 6: "reducing it by 520 per Sunder Armor ... Can be applied up to 5 times". 520 × 5 = 2600, the full-stack value a raid tank maintains; the app has no notion of the stack ramping up over the first few seconds. wowsims agrees to the digit (`armorReductionPerStack := 520.0`, `MaxStacks: 5`). Exclusive with a Rogue\'s Expose Armor rather than additive with it — the two share wowsims\' `SunderExpose` tag and the higher one wins, which at Improved Expose Armor 2/2 is Expose at 3075.',
   },
@@ -213,9 +216,9 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedBySpec: 'Arms',
     spellId: 29859,
     notModelled:
-      "+4% physical damage taken (spell 30070) while the Warrior's Rend or Deep Wounds is on the target. Held out of the estimate for now, the owner's call (2026-11-01): applied at best case it alone takes Marksmanship (about 1,294) and Subtlety (about 1,270) past what players of them average (1,341 and 1,292), and what a best case is measured against is to be settled first.",
+      "+4% physical damage taken (spell 30070) while the Warrior's Rend or Deep Wounds is on the target. Held out of the estimate for now, the owner's call (2026-11-02): applied with the other physical debuffs, they take Marksmanship past its 95th percentile (1,392 without Hunter's Mark, 1,526 with, against 1,386), and Marksmanship is measured at a synthetic one-tree build. Applied once it is measured at a real raid build.",
     notes:
-      "Talent rank 2/2, spell 29859, which Rend and Deep Wounds trigger. wowsims: `BloodFrenzyAura`, `PhysicalDamageTakenMultiplier *= 1 + 0.02*points`, applied as permanent; its comment says it lasts as long as the bleed that activates it, so permanent assumes the Warrior keeps one up.",
+      "Talent rank 2/2, spell 29859: Rend and Deep Wounds \"also increase all physical damage caused to that target by 4%\" (debuff spell 30070). Every physical source takes it: swings, specials, bleeds, pets and the Felguard. Applied for as long as the fight, which assumes the Warrior keeps a bleed up. Its field is `schoolDamageTakenMultipliers: { Physical: 0.04 }`, which the simulator reads on every physical source.  wowsims: `BloodFrenzyAura`, `PhysicalDamageTakenMultiplier *= 1 + 0.02*points`, applied as permanent; its comment says it lasts as long as the bleed that activates it.",
   },
   {
     id: 'hunters-mark',
@@ -223,9 +226,9 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedByClass: 'Hunter',
     spellId: 14325,
     notModelled:
-      "+110 ranged attack power for everyone attacking the target, rising by 11 with each ranged hit to 440 (rank 4). Held out with the other physical debuffs until the best-case bound is settled (the owner's call, 2026-11-01).",
+      "+110 ranged attack power for everyone attacking the target, rising by 11 with each ranged hit to 440 (rank 4). Held out of the estimate for now, the owner's call (2026-11-02): applied with the other physical debuffs, they take Marksmanship past its 95th percentile (1,392 without Hunter's Mark, 1,526 with, against 1,386), and Marksmanship is measured at a synthetic one-tree build. Applied once it is measured at a real raid build.",
     notes:
-      "Rank 4, spell 14325: \"increasing the ranged attack power of all attackers against that target by 110 and by an additional 11 each time they are struck by a ranged attack, up to a maximum of 440\". wowsims agrees (`baseRangedBonus = 110.0`, `bonusPerStack = 11.0`, `maxStacks = 30`) and applies it fully stacked. Two Hunters' marks do not stack. The melee half is Improved Hunter's Mark, listed separately as Improved Faerie Fire is.",
+      "Rank 4, spell 14325: \"increasing the ranged attack power of all attackers against that target by 110 and by an additional 11 each time they are struck by a ranged attack, up to a maximum of 440\". wowsims agrees (`baseRangedBonus = 110.0`, `bonusPerStack = 11.0`, `maxStacks = 30`) and applies it fully stacked. Applied, its field is `attackerRangedAttackPower: 440`, reaching the Hunter's shots and not the pet, which reads its owner's attack power. Two Hunters' marks do not stack. The melee half is Improved Hunter's Mark, listed separately as Improved Faerie Fire is.",
   },
   {
     id: 'improved-hunters-mark',
@@ -234,7 +237,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedBySpec: 'Marksmanship',
     spellId: 19425,
     notModelled:
-      "+110 melee attack power for everyone attacking the target: the mark's base value given to melee as well. Held out with the other physical debuffs until the best-case bound is settled (the owner's call, 2026-11-01).",
+      "+110 melee attack power for everyone attacking the target: the mark's base value given to melee as well. Held out of the estimate for now, the owner's call (2026-11-02): applied with the other physical debuffs, they take Marksmanship past its 95th percentile (1,392 without Hunter's Mark, 1,526 with, against 1,386), and Marksmanship is measured at a synthetic one-tree build. Applied once it is measured at a real raid build.",
     notes:
       "Talent rank 5/5, spell 19425: \"100% of your Hunter's Mark ability's base attack power to apply to melee\". wowsims: `meleeBonus := baseRangedBonus * 0.2 * float64(points)`, 110 at 5/5; melee takes the base only, not the ranged ramp. Presupposes Hunter's Mark.",
   },
@@ -244,7 +247,7 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedByClass: 'Rogue',
     spellId: 26866,
     notModelled:
-      "−3,075 armor at Improved Expose Armor 2/2 (2,050 untalented), exclusive with Sunder Armor: the higher one wins, so with both it replaces Sunder's 2,600 rather than adding to it. Held out with the other physical debuffs until the best-case bound is settled (the owner's call, 2026-11-01); applying it also needs the exclusivity with Sunder.",
+      "−3,075 armor at Improved Expose Armor 2/2 (2,050 untalented), exclusive with Sunder Armor: the higher one wins, so with both it replaces Sunder's 2,600. Held out of the estimate for now, the owner's call (2026-11-02): applied with the other physical debuffs, they take Marksmanship past its 95th percentile (1,392 without Hunter's Mark, 1,526 with, against 1,386), and Marksmanship is measured at a synthetic one-tree build. Applied once it is measured at a real raid build.",
     notes:
       "Rank 6, spell 26866, with Improved Expose Armor 2/2 (spell 14169, +50%), which any Rogue can reach. wowsims: `armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))` and the `SunderExposeAuraTag` it shares with Sunder Armor. At 1/2 it is 2,562.5, below a full Sunder, so only 2/2 is worth bringing over a Warrior. The tooltip gives \"5 points: 2050 armor\" (410 a point), and the talent's +50% makes 3,075.",
   },
@@ -255,9 +258,9 @@ export const sampleTargetDebuffs: readonly TargetDebuff[] = [
     providedBySpec: 'Feral',
     spellId: 33876,
     notModelled:
-      "+30% bleed damage and Shred damage taken for 12 seconds, from Mangle (Cat) or Mangle (Bear). Held out with the other physical debuffs until the best-case bound is settled (the owner's call, 2026-11-01); the Feral estimate's own Rake and Rip would take it.",
+      "+30% bleed damage and Shred damage taken for 12 seconds, from Mangle (Cat) or Mangle (Bear). Held out of the estimate for now, the owner's call (2026-11-02): applied with the other physical debuffs, they take Marksmanship past its 95th percentile (1,392 without Hunter's Mark, 1,526 with, against 1,386), and Marksmanship is measured at a synthetic one-tree build. Applied once it is measured at a real raid build.",
     notes:
-      "Spell 33876, the id wowsims cites (rank 1; the 30% is the same at every rank, and which later id is the top rank was not confirmed). wowsims: `MangleAura` multiplies periodic physical damage taken by 1.3, and `sim/druid/shred.go` Shred's by 1.3 while it is up. Cat and Bear apply the one debuff and do not stack.",
+      "Spell 33876, the id wowsims cites (rank 1; the 30% is the same at every rank, and which later id is the top rank was not confirmed). wowsims: `MangleAura` multiplies periodic physical damage taken by 1.3, and `sim/druid/shred.go` Shred's by 1.3 while it is up. Cat and Bear apply the one debuff and do not stack. Applied, its field is `bleedDamageTakenMultiplier: 0.3`, reaching a Feral's Rake and Rip ticks and its Shred; no other modelled spec bleeds.",
   },
   {
     id: 'expose-weakness',

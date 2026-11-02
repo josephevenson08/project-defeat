@@ -2,11 +2,11 @@
  * Builds the best case measures a spec at instead of wowsims' preset, where that preset is not what
  * the players behind the spec's reference run.
  *
- * **Why this exists.** `dpsReference.ts` is archon.gg's average for each spec, and a log's spec is the
+ * **Why this exists.** `dpsReference.ts` is each spec's 95th percentile in the logs, and a log's spec is the
  * talent tree holding the most points. wowsims' `HemoTalents`, stored as Subtlety in
  * `talentBuilds.json`, is a 0/40/21 build with its filler left out: 34 of its 38 listed points are in
  * Combat (Precision, Dual Wield Specialization, Sword Specialization, Combat Potency and the rest), so
- * a log files it as Combat. Measuring it against the Subtlety average compared a Combat build with
+ * a log files it as Combat. Measuring it against the Subtlety reference compared a Combat build with
  * Subtlety players, and once Dual Wield Specialization was modelled (2026-10-31) it read 1,295 against
  * their 1,292, which the calibration test reads as something counted twice. Nothing was: the talent
  * adds exactly half the off hand and moves nothing else. The build was the mismatch.

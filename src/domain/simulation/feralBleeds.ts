@@ -80,6 +80,11 @@ export type FeralBleedInput = {
   comboPointsPerSecond: number
   /** Rake's cost reduction from the Druid's own Ferocity, in energy. 0 when untalented. */
   rakeCostReduction: number
+  /**
+   * The target's bleed damage taken, as a factor: Mangle's 1.3, which wowsims puts on periodic physical
+   * damage. It reaches the ticks and not Rake's opener, which is a direct hit. 1 when absent.
+   */
+  bleedDamageTaken?: number
 }
 
 export type FeralBleedEstimate = {
@@ -112,7 +117,8 @@ export type FeralBleedEstimate = {
  */
 export function estimateFeralBleeds(input: FeralBleedInput): FeralBleedEstimate {
   const attackPower = Math.max(0, input.attackPower)
-  const unmitigated = 1
+  // Armour never reaches a tick; Mangle, when it is up, does.
+  const tickTaken = input.bleedDamageTaken ?? 1
   const mitigated = 1 - Math.max(0, Math.min(1, input.armorMitigation))
 
   const rakeCost = Math.max(0, RAKE.baseEnergyCost - Math.max(0, input.rakeCostReduction))
@@ -147,12 +153,12 @@ export function estimateFeralBleeds(input: FeralBleedInput): FeralBleedEstimate 
     (RAKE.initialFlat + RAKE.initialAttackPowerCoefficient * attackPower) *
     input.specialAttackTableMultiplier *
     mitigated
-  const rakeTickTotal = RAKE.ticks * (RAKE.tickFlat + RAKE.tickAttackPowerCoefficient * attackPower) * unmitigated
+  const rakeTickTotal = RAKE.ticks * (RAKE.tickFlat + RAKE.tickAttackPowerCoefficient * attackPower) * tickTaken
   const rakeDps = rakeCasts * (rakeOpener + rakeTickTotal)
 
   const rip = RIP.byComboPoints[RIP.comboPoints]
   // The opener deals nothing at all; every point of Rip is in the ticks, and none of it takes armour.
-  const ripTotal = (rip.flat + rip.attackPowerCoefficient * attackPower) * unmitigated
+  const ripTotal = (rip.flat + rip.attackPowerCoefficient * attackPower) * tickTaken
   const ripDps = ripCasts * ripTotal
 
   return {

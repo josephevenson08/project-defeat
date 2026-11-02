@@ -81,7 +81,7 @@ export function WhatIsModelled() {
         </div>
       </div>
       <p className="sim-quote" data-testid="simulation-range">
-        Measured against archon.gg&apos;s observed Phase 2 averages for all {specTrust().length} DPS specs, the model reads <b>{low.toFixed(2)}×</b> to{' '}
+        Measured against Warcraft Logs&apos; Phase 2 95th percentiles for all {specTrust().length} DPS specs, the model reads <b>{low.toFixed(2)}×</b> to{' '}
         <b>{high.toFixed(2)}×</b> low, and no spec may read above its reference. Lowest today: {worst.spec} {worst.className}.
       </p>
       <p className="sim-small">

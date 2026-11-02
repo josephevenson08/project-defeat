@@ -16,9 +16,9 @@ import { calculateStats } from '../src/features/stats/calculateStats'
  * "What to do next" (your stat priority, your best upgrades, then the estimate and how far to trust
  * it), with design A's damage sources and breakdown under the estimate. These are the prototype's
  * hands-on check (`checks/sim-handson.mjs`) with its real numbers: the estimate is the engine's for
- * the character on screen; it is read against the 2,053 Fury warriors average on archon.gg; the damage
+ * the character on screen; it is read against Fury's 95th percentile on Warcraft Logs, 2,069; the damage
  * sources add up to it; it leads with Strength and the best upgrade; the trust panel lists all 20 DPS
- * specs with Fury marked and reads 1.02× to 1.90× low.
+ * specs with Fury marked and reads 1.07× to 1.91× low.
  */
 
 const num = (text: string) => Number(text.replace(/[^\d.\-−]/g, '').replace('−', '-'))
@@ -61,22 +61,24 @@ async function engineScore(page: Page) {
   return result.score
 }
 
-test('the trust panel’s data: every DPS spec’s best case against the logs, 1.02× to 1.90× low', () => {
+test('the trust panel’s data: every DPS spec’s best case against the logs, 1.07× to 1.91× low', () => {
   const rows = specTrust()
   expect(rows, 'all 20 DPS specs').toHaveLength(20)
   const fury = rows.find((row) => row.className === 'Warrior' && row.spec === 'Fury')!
   // The prototype's figure (sim-data.js, generated from the same model on 2026-10-11) was 1,348.3;
   // the 9% miss against a level 73 boss (port step 6, Gear, 2026-10-19) took it to 1,343.2.
   expect(Math.round(fury.best * 10) / 10).toBe(1343.2)
-  expect(fury.dps).toBe(2053)
+  // Warcraft Logs' Phase 2 95th percentile (2026-11-02); archon's 2,053 until then was the same measure.
+  expect(fury.dps).toBe(2069)
 
   const { low, high, worst } = trustRange(rows)
   // 1.05 until the Hunters' off hand took the guide's enchant (2026-10-20): Marksmanship, the
   // lowest, went from 1,275.7 to 1,284.1 against its 1,341. 1.04 until Subtlety was measured at a
-  // Subtlety build (2026-10-31): 1,267.3 against its 1,292.
-  expect(low.toFixed(2)).toBe('1.02')
+  // Subtlety build (2026-10-31): 1,267.3 against its 1,292. 1.02 until the references became Warcraft
+  // Logs' Phase 2 95th percentiles (2026-11-02): Marksmanship, 1,293.6 against 1,386, is lowest now.
+  expect(low.toFixed(2)).toBe('1.07')
   // 2.13 (Destruction) until the school debuffs (2026-11-01): Improved Scorch and Misery reach its Fire.
-  expect(high.toFixed(2)).toBe('1.90')
+  expect(high.toFixed(2)).toBe('1.91')
   // Computed, so it follows the model. The prototype's hand-written panel still named Demonology.
   expect(`${worst.spec} ${worst.className}`).toBe('Arcane Mage')
   for (const row of rows) expect(row.best, `${row.spec} ${row.className} reads above its reference`).toBeLessThan(row.dps)
@@ -105,7 +107,7 @@ test('it leads with what to do next: your stat priority, then your best upgrades
   await expect(page.getByTestId('simulation-who')).toContainText('Human Fury Warrior · 0 of 17 slots · talents 0 / 0 / 0')
 })
 
-test('the estimate is the engine’s for the character on screen, against what Fury warriors average', async ({ page }) => {
+test('the estimate is the engine’s for the character on screen, against the Fury warriors’ 95th percentile', async ({ page }) => {
   await openSimulation(page)
   const bare = num(await page.getByTestId('simulation-score').innerText())
   await dress(page)
@@ -116,11 +118,11 @@ test('the estimate is the engine’s for the character on screen, against what F
   await expect(page.getByTestId('simulation-missing-weapon')).toHaveCount(0)
   await expect(page.getByTestId('simulation-who')).toContainText('17 of 17 slots')
 
-  // Against the 2,053 Fury warriors average on archon.gg. The page divides by the unrounded score, so
+  // Against the Fury warriors' 95th percentile, 2,069 on Warcraft Logs. The page divides by the unrounded score, so
   // the ratio is checked to within the shown score's rounding rather than recomputed from it.
   const versus = page.getByTestId('simulation-versus')
-  await expect(versus).toHaveText(/^\d\.\d\d× below what Fury warriors average \(2,053, archon\.gg\)$/)
-  expect(Math.abs(Number((await versus.innerText()).slice(0, 4)) - 2053 / shown)).toBeLessThan(0.006)
+  await expect(versus).toHaveText(/^\d\.\d\d× below the 95th percentile of Fury warriors \(2,069, Warcraft Logs\)$/)
+  expect(Math.abs(Number((await versus.innerText()).slice(0, 4)) - 2069 / shown)).toBeLessThan(0.006)
 
   // The damage sources add up to the estimate.
   const table = page.getByTestId('simulation-damage-sources')
@@ -141,8 +143,8 @@ test('the trust panel lists all 20 DPS specs with yours marked, and the range is
   await expect(trust.locator('li')).toHaveCount(20)
   await expect(trust.locator('li[aria-current="true"]')).toHaveCount(1)
   await expect(trust.locator('li[aria-current="true"]')).toContainText('Fury Warrior')
-  await expect(trust).toContainText('it reads 1.02× to 1.90× low')
-  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.02× to 1.90× low')
+  await expect(trust).toContainText('it reads 1.07× to 1.91× low')
+  await expect(page.getByTestId('simulation-range')).toContainText('the model reads 1.07× to 1.91× low')
   await expect(page.getByTestId('simulation-range')).toContainText('Lowest today: Arcane Mage')
 
   // The rotation count is the ability catalogue's, not a sentence written by hand.
@@ -181,7 +183,7 @@ test('the page names its encounter and its sources, and goes back to the planner
   await expect(target).toContainText(`Level${defaultSimulationTarget.level}`)
   await expect(target).toContainText(`Armor${defaultSimulationTarget.armor.toLocaleString('en-US')}`)
   await expect(page.getByTestId('provenance')).toContainText(`a generic level ${defaultSimulationTarget.level} raid boss`)
-  await expect(page.getByTestId('provenance')).toContainText('archon.gg logs (read 23 Aug 2026)')
+  await expect(page.getByTestId('provenance')).toContainText('Warcraft Logs, 95th percentile (read 2 Nov 2026)')
 
   await page.getByRole('button', { name: 'Change it on the Character Planner' }).click()
   await expect(page.getByTestId('character-name')).toBeVisible()

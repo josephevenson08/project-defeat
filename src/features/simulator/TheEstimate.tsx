@@ -42,7 +42,7 @@ export function TheEstimate({ character, result }: { character: CharacterProfile
         </strong>
         {versus && (
           <span className="sim-versus" data-testid="simulation-versus">
-            {versus.text} ({formatNumber(versus.observed)}, archon.gg)
+            {versus.text} ({formatNumber(versus.observed)}, Warcraft Logs)
           </span>
         )}
       </div>

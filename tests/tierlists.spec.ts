@@ -5,8 +5,10 @@ import { compareWithLogs, getSpecStanding, logsOrder } from '../src/domain/tierl
  * Spec Tier Lists as decided on 2026-10-12 and ported in step 1 of docs/design/PORT-PLAN.md: design A,
  * the tier board with a card for any spec, and design B's chart against the logs behind a switch.
  * These are the prototype's hands-on check (`checks/tiers-handson.mjs`) turned into tests, with the
- * same real numbers: Retribution Paladin is B on Wowhead and 5th by observed DPS (1,785); Fury
- * Warrior is S on Wowhead, A on archon, 3rd (2,053); Wowhead and archon agree on 9 of the 20.
+ * same real numbers: Retribution Paladin is B on Wowhead and 5th by DPS in the logs (1,799); Fury
+ * Warrior is S on Wowhead, A on archon, 3rd (2,069); Wowhead and archon agree on 9 of the 20. The DPS
+ * is Warcraft Logs' Phase 2 95th percentile since 2026-11-02 (archon's same figure before), which
+ * moved Demonology to 10th and Feral to 11th.
  */
 
 const sectionTab = (page: Page, label: string) =>
@@ -34,12 +36,12 @@ const card = (page: Page) => page.getByTestId('spec-card')
 test('the standings come from the app’s own data, and the two opinions are counted, not averaged', () => {
   const fury = getSpecStanding({ className: 'Warrior', spec: 'Fury' })
   expect(fury.places.map((place) => `${place.role} ${place.label}`)).toEqual(['DPS S'])
-  expect(fury.logs).toEqual({ dps: 2053, tier: 'A', rank: 3, of: 20 })
+  expect(fury.logs).toEqual({ dps: 2069, tier: 'A', rank: 3, of: 20 })
   expect(fury.ability).toBe('Bloodthirst')
 
   const feral = getSpecStanding({ className: 'Druid', spec: 'Feral' })
   expect(feral.places.map((place) => `${place.role} ${place.label}`)).toEqual(['DPS C', 'Tank S'])
-  expect(feral.logs?.rank).toBe(10)
+  expect(feral.logs?.rank).toBe(11)
 
   // Healers and tanks have no log numbers in the app, and the standing does not invent any.
   expect(getSpecStanding({ className: 'Priest', spec: 'Holy' }).logs).toBeUndefined()
@@ -52,8 +54,8 @@ test('the standings come from the app’s own data, and the two opinions are cou
 
   const comparison = compareWithLogs()
   expect([comparison.agree, comparison.logsHigher, comparison.wowheadHigher, comparison.wowheadD]).toEqual([9, 3, 5, 3])
-  expect(comparison.underrated).toMatchObject({ ref: { className: 'Druid', spec: 'Feral' }, rank: 10, wowhead: 'C' })
-  expect(comparison.notDpsOrder).toMatchObject({ ref: { className: 'Shaman', spec: 'Elemental' }, rank: 13, archon: 'A' })
+  expect(comparison.underrated).toMatchObject({ ref: { className: 'Warlock', spec: 'Demonology' }, rank: 10, wowhead: 'C' })
+  expect(comparison.notDpsOrder).toMatchObject({ ref: { className: 'Druid', spec: 'Feral' }, rank: 11, archon: 'B' })
 })
 
 test('the board: twenty damage specs in five rows, five healers, three tanks, Feral on two lists', async ({ page }) => {
@@ -74,7 +76,7 @@ test('the board: twenty damage specs in five rows, five healers, three tanks, Fe
   // The page says what these are before anything else, and where they come from.
   await expect(page.locator('.tier-note')).toContainText('These rank specs, not items.')
   await expect(page.locator('.topbar-line').getByTestId('provenance')).toContainText(
-    "Sources: Wowhead's Phase 2 PvE tier lists (ingested 12 Aug 2026) · archon.gg logs (read 23 Aug 2026)",
+    "Sources: Wowhead's Phase 2 PvE tier lists (ingested 12 Aug 2026) · Warcraft Logs, 95th percentile (read 2 Nov 2026) · archon.gg's tier letters (read 23 Aug 2026)",
   )
 })
 
@@ -84,7 +86,7 @@ test('the card opens on your spec, and pressing Feral lights it on both lists', 
   await expect(tile(page, 'DPS', 'fury-warrior')).toHaveAttribute('aria-pressed', 'true')
   await expect(tile(page, 'DPS', 'fury-warrior')).toHaveAccessibleName('Fury Warrior, tier S, your spec')
   await expect(card(page)).toContainText('Fury Warrior')
-  await expect(card(page)).toContainText('2,053 DPS average, 3rd of 20')
+  await expect(card(page)).toContainText('2,069 DPS at the 95th percentile, 3rd of 20')
   await expect(card(page)).toContainText('Bloodthirst')
   await expect(card(page)).toContainText('Your spec')
 
@@ -93,7 +95,7 @@ test('the card opens on your spec, and pressing Feral lights it on both lists', 
   await expect(tile(page, 'Tank', 'feral-druid'), 'the same spec is lit on its other list').toHaveAttribute('aria-pressed', 'true')
   await expect(card(page)).toContainText(/Wowhead · DPS\s*C of S A B C D/)
   await expect(card(page)).toContainText(/Wowhead · Tank\s*S of/)
-  await expect(card(page)).toContainText('1,655 DPS average, 10th of 20')
+  await expect(card(page)).toContainText('1,669 DPS at the 95th percentile, 11th of 20')
 
   await tile(page, 'Healer', 'holy-priest').click()
   await expect(card(page)).toContainText('No log numbers in the app for healers')
@@ -111,7 +113,7 @@ test('with no character the card waits to be asked, and nothing is marked as you
   await expect(page.getByTestId('spec-card-empty')).toBeVisible()
 
   await tile(page, 'DPS', 'retribution-paladin').click()
-  await expect(card(page)).toContainText('1,785 DPS average, 5th of 20')
+  await expect(card(page)).toContainText('1,799 DPS at the 95th percentile, 5th of 20')
 })
 
 test('hovering a spec shows its standing in a tooltip', async ({ page }) => {
@@ -120,7 +122,7 @@ test('hovering a spec shows its standing in a tooltip', async ({ page }) => {
   const tip = page.getByTestId('spec-tip')
   await expect(tip).toContainText('Retribution Paladin')
   await expect(tip).toContainText('B for damage')
-  await expect(tip).toContainText('1,785 DPS in the logs · archon B · 5th of 20')
+  await expect(tip).toContainText('1,799 DPS in the logs · archon B · 5th of 20')
 
   await page.keyboard.press('Escape')
   await expect(tip).toHaveCount(0)
@@ -143,7 +145,7 @@ test('arrow keys move through a board', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'DPS tier list' }).locator('.tier-tile').nth(1)).toBeFocused()
 })
 
-test('against the logs: twenty specs by observed DPS, both letters, and where they disagree', async ({ page }) => {
+test('against the logs: twenty specs by DPS in the logs, both letters, and where they disagree', async ({ page }) => {
   await openTierListsAsFury(page)
   await expect(page.getByTestId('view-board')).toHaveAttribute('aria-pressed', 'true')
   await page.getByTestId('view-logs').click()
@@ -151,7 +153,7 @@ test('against the logs: twenty specs by observed DPS, both letters, and where th
   const rows = page.getByTestId('tier-chart').locator('.tier-chart-row')
   await expect(rows).toHaveCount(20)
   await expect(rows.first()).toContainText('Arcane')
-  await expect(rows.first()).toContainText('2,084')
+  await expect(rows.first()).toContainText('2,092')
   await expect(rows.nth(2)).toContainText('Fury')
   await expect(page.getByRole('region', { name: 'DPS tier list' }), 'the board is gone').toHaveCount(0)
 
@@ -160,8 +162,8 @@ test('against the logs: twenty specs by observed DPS, both letters, and where th
   await expect(summary.locator('.tier-facts')).toContainText(/Logs higher\s*3/)
   await expect(summary.locator('.tier-facts')).toContainText(/Wowhead higher\s*5/)
   await expect(summary.locator('.tier-facts')).toContainText(/Wowhead D, archon C\s*3/)
-  await expect(summary).toContainText("Feral Druid averages the 10th-highest DPS of 20, yet sits in Wowhead's C tier.")
-  await expect(summary).toContainText('Fury Warrior, your spec: Wowhead S, archon A, 3rd by DPS at 2,053.')
+  await expect(summary).toContainText("Demonology Warlock has the 10th-highest DPS of 20, yet sits in Wowhead's C tier.")
+  await expect(summary).toContainText('Fury Warrior, your spec: Wowhead S, archon A, 3rd by DPS at 2,069.')
 
   // Sorted by Wowhead's tier: the four S specs first, the three D specs last.
   await page.getByRole('group', { name: 'Sort' }).getByRole('button', { name: "By Wowhead's tier" }).click()
@@ -180,7 +182,7 @@ test('against the logs: twenty specs by observed DPS, both letters, and where th
   // A row opens the spec's card.
   const ret = page.getByTestId('tier-chart-Paladin|Retribution')
   await ret.getByRole('button').click()
-  await expect(ret).toContainText('1,785 DPS average, 5th of 20')
+  await expect(ret).toContainText('1,799 DPS at the 95th percentile, 5th of 20')
   await expect(ret).toContainText('Crusader Strike')
 
   // Healers and tanks are Wowhead's opinion alone, and say so.

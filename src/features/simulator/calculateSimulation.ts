@@ -322,11 +322,31 @@ function isDualWield(gear: EquippedGear) {
 function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
   const schoolDamageTaken: Record<SpellSchool, number> = { Physical: 1, Arcane: 1, Fire: 1, Frost: 1, Holy: 1, Nature: 1, Shadow: 1 }
   const schoolCritTaken: Record<SpellSchool, number> = { Physical: 0, Arcane: 0, Fire: 0, Frost: 0, Holy: 0, Nature: 0, Shadow: 0 }
-  const totals = { armorReduction: 0, physicalCritTakenBonus: 0, physicalHitTakenBonus: 0, spellCritTakenBonus: 0, schoolDamageTaken, schoolCritTaken }
+  const totals = {
+    armorReduction: 0,
+    physicalCritTakenBonus: 0,
+    physicalHitTakenBonus: 0,
+    spellCritTakenBonus: 0,
+    schoolDamageTaken,
+    schoolCritTaken,
+    /** A factor, like the schools': Mangle's 1.3 on bleed ticks and Shred. */
+    bleedDamageTaken: 1,
+    attackerAttackPower: 0,
+    attackerRangedAttackPower: 0,
+  }
+  // Sunder and Expose overwrite each other: the highest in a group counts, and the groups then add.
+  const groupArmor = new Map<string, number>()
   for (const id of activeTargetDebuffIds) {
     const debuff = getTargetDebuffById(id)
     if (!debuff) continue
-    totals.armorReduction += debuff.armorReduction ?? 0
+    if (debuff.armorGroup) {
+      groupArmor.set(debuff.armorGroup, Math.max(groupArmor.get(debuff.armorGroup) ?? 0, debuff.armorReduction ?? 0))
+    } else {
+      totals.armorReduction += debuff.armorReduction ?? 0
+    }
+    totals.bleedDamageTaken *= 1 + (debuff.bleedDamageTakenMultiplier ?? 0)
+    totals.attackerAttackPower += debuff.attackerAttackPower ?? 0
+    totals.attackerRangedAttackPower += debuff.attackerRangedAttackPower ?? 0
     totals.physicalCritTakenBonus += debuff.physicalCritTakenBonus ?? 0
     totals.physicalHitTakenBonus += debuff.physicalHitTakenBonus ?? 0
     totals.spellCritTakenBonus += debuff.spellCritTakenBonus ?? 0
@@ -337,6 +357,7 @@ function aggregateTargetDebuffs(activeTargetDebuffIds: readonly string[]) {
       schoolCritTaken[school] += fraction
     }
   }
+  for (const armor of groupArmor.values()) totals.armorReduction += armor
   return totals
 }
 
@@ -751,7 +772,12 @@ function calculatePhysicalDps(
   // attack-power-derived damage below rather than being added to the total afterwards.
   // Flat talent attack power lands BEFORE the multiplier, matching upstream: Predatory Strikes
   // adds a stat, and Improved Berserker Stance then scales the total.
-  const attackPower = (stats.attackPower + talents.flatAttackPower) * talents.attackPowerMultiplier
+  // Improved Hunter's Mark's melee attack power is the target's, so it lands after the player's own
+  // multipliers rather than inside them.
+  const attackPower = (stats.attackPower + talents.flatAttackPower) * talents.attackPowerMultiplier + debuffs.attackerAttackPower
+  // Hunter's Mark, for the Hunter's own shots. The pets keep reading the owner's figure: the mark's
+  // ranged half is not theirs, and its melee half is left off them.
+  const markedRangedAttackPower = stats.rangedAttackPower + debuffs.attackerRangedAttackPower
 
   /*
    * Attack speed. Until this existed, `hasteRating` reached no output at all: the white-damage
@@ -845,7 +871,7 @@ function calculatePhysicalDps(
     const weaponDps = weaponDiceToWhiteDps(rangedItem?.weaponDamageMin, rangedItem?.weaponDamageMax, rangedItem?.weaponSpeed)
     // Ranged haste uses the same rating and behaves the same way: more shots, not bigger ones.
     rawDps =
-      (weaponDps + attackPowerToWhiteDps(stats.rangedAttackPower)) *
+      (weaponDps + attackPowerToWhiteDps(markedRangedAttackPower)) *
       effectiveMultiplier *
       gearAttackSpeedMultiplier *
       talents.rangedAttackSpeedMultiplier *
@@ -920,13 +946,13 @@ function calculatePhysicalDps(
     rangedContext = {
       swingSeconds: rangedSwingSeconds,
       weapon: rangedItem,
-      attackPower: stats.rangedAttackPower,
+      attackPower: markedRangedAttackPower,
       rawCritChance: rawCritChance + talents.rangedCritChance,
       damageMultiplier: talents.rangedDamageMultiplier,
     }
 
     breakdown = [
-      { label: 'Attack power', value: round(attackPowerToWhiteDps(stats.rangedAttackPower)) },
+      { label: 'Attack power', value: round(attackPowerToWhiteDps(markedRangedAttackPower)) },
       { label: 'Weapon damage', value: round(weaponDps) },
       { label: 'Hit chance', value: toPercent(table.hit) },
       { label: 'Crit chance', value: toPercent(table.crit) },
@@ -1061,6 +1087,7 @@ function calculatePhysicalDps(
         energyPerSecond: ENERGY_PER_SECOND,
         comboPointsPerSecond: bleedCombo,
         rakeCostReduction: talents.rakeEnergyCostReduction,
+        bleedDamageTaken: debuffs.bleedDamageTaken,
       })
     }
 
@@ -1289,10 +1316,11 @@ function calculatePhysicalDps(
    * this was worth doing: the weave is now two computable ceilings rather than an unknown, so
    * Steady Shot reaches all three hunter specs. See `computeUsageRate`'s weave branch.
    */
-  const rotation = resolveRotation(
+  const resolved = resolveRotation(
     character,
     gear,
-    stats,
+    // The specials read melee attack power from here, so the target's share joins it.
+    { ...stats, attackPower: stats.attackPower + debuffs.attackerAttackPower },
     skillDiff,
     missReduction,
     rawCritChance,
@@ -1300,6 +1328,16 @@ function calculatePhysicalDps(
     talents,
     rangedContext,
   )
+  // Mangle reaches Shred as well as the bleeds (wowsims' `shred.go`), and no other special.
+  const rotation =
+    debuffs.bleedDamageTaken === 1
+      ? resolved
+      : {
+          ...resolved,
+          specials: resolved.specials.map((special) =>
+            special.name === 'Shred' ? { ...special, dps: special.dps * debuffs.bleedDamageTaken } : special,
+          ),
+        }
   const specialRawDps = rotation.specials.reduce((sum, entry) => sum + entry.dps, 0)
 
   /*
@@ -1361,16 +1399,21 @@ function calculatePhysicalDps(
    */
   const holyTaken = debuffs.schoolDamageTaken.Holy
   const natureTaken = debuffs.schoolDamageTaken.Nature
+  // Blood Frenzy's physical damage taken reaches every physical source here: swings, specials, the
+  // bleeds and the pets.
+  const physicalTaken = debuffs.schoolDamageTaken.Physical
   const unmitigatedDps =
-    (paladinHoly?.totalDps ?? 0) * holyTaken + (roguePoisons?.totalDps ?? 0) * natureTaken + (feralBleeds?.totalDps ?? 0)
+    (paladinHoly?.totalDps ?? 0) * holyTaken +
+    (roguePoisons?.totalDps ?? 0) * natureTaken +
+    (feralBleeds?.totalDps ?? 0) * physicalTaken
   /*
    * A buff damage multiplier scales everything, physical and Holy alike — Ferocious Inspiration is
    * "damage dealt", with no school attached — so it lands on the total rather than inside either half.
    */
   const damageMultiplier = 1 + buffs.damageMultiplier
   const mitigatedDps =
-    ((rawDps + specialRawDps) * (1 - armorMitigation) + unmitigatedDps) * damageMultiplier +
-    ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * damageMultiplier
+    ((rawDps + specialRawDps) * (1 - armorMitigation) * physicalTaken + unmitigatedDps) * damageMultiplier +
+    ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * damageMultiplier
 
   /*
    * The same total, itemised. Every physical source takes armour and the damage multiplier; the Holy
@@ -1381,9 +1424,9 @@ function calculatePhysicalDps(
    * a source dropped, double-counted, or mitigated on the wrong side of the armour term shows up as
    * a sum that no longer matches the answer, instead of as a plausible row nobody checks.
    */
-  const physical = (raw: number) => raw * (1 - armorMitigation) * damageMultiplier
-  // Already mitigated by its own model, so it takes the damage multiplier and nothing else.
-  const petDps = ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * damageMultiplier
+  const physical = (raw: number) => raw * (1 - armorMitigation) * physicalTaken * damageMultiplier
+  // Already mitigated by its own model, so it takes the damage multipliers and nothing else.
+  const petDps = ((hunterPet?.dps ?? 0) + (killCommand?.dps ?? 0)) * physicalTaken * damageMultiplier
   const sources: { name: string; dps: number }[] = [
     ...whiteSources.map((entry) => ({ name: entry.name, dps: physical(entry.raw) })),
     ...rotation.specials.map((special) => ({ name: special.name, dps: physical(special.dps) })),
@@ -1396,16 +1439,17 @@ function calculatePhysicalDps(
    * do not scale at all. One "Pet" line would hide a source that shrinks as a share of every upgrade
    * behind one that grows, and the whole point of this table is that a change shows up per source.
    */
-  if (hunterPet && hunterPet.whiteDps > 0) sources.push({ name: 'Pet melee', dps: hunterPet.whiteDps * damageMultiplier })
+  const petShare = physicalTaken * damageMultiplier
+  if (hunterPet && hunterPet.whiteDps > 0) sources.push({ name: 'Pet melee', dps: hunterPet.whiteDps * petShare })
   for (const ability of hunterPet?.abilities ?? []) {
-    if (ability.dps > 0) sources.push({ name: `Pet ${ability.name}`, dps: ability.dps * damageMultiplier })
+    if (ability.dps > 0) sources.push({ name: `Pet ${ability.name}`, dps: ability.dps * petShare })
   }
   if (killCommand && killCommand.dps > 0) {
-    sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * damageMultiplier })
+    sources.push({ name: `Pet ${HUNTER_PET_KILL_COMMAND.name}`, dps: killCommand.dps * petShare })
   }
   if (feralBleeds) {
-    if (feralBleeds.rakeDps > 0) sources.push({ name: 'Rake', dps: feralBleeds.rakeDps * damageMultiplier })
-    if (feralBleeds.ripDps > 0) sources.push({ name: 'Rip', dps: feralBleeds.ripDps * damageMultiplier })
+    if (feralBleeds.rakeDps > 0) sources.push({ name: 'Rake', dps: feralBleeds.rakeDps * physicalTaken * damageMultiplier })
+    if (feralBleeds.ripDps > 0) sources.push({ name: 'Rip', dps: feralBleeds.ripDps * physicalTaken * damageMultiplier })
   }
   if (roguePoisons) {
     if (roguePoisons.instantDps > 0) {
@@ -1891,9 +1935,11 @@ function calculateCasterDps(
     })
 
     if (warlockPet.dps > 0) {
-      dps += warlockPet.dps * (1 + buffs.damageMultiplier)
-      casterSources = [...casterSources, { name: 'Felguard', dps: warlockPet.dps * (1 + buffs.damageMultiplier) }]
-      breakdown.push({ label: 'Felguard DPS', value: round(warlockPet.dps * (1 + buffs.damageMultiplier)) })
+      // The Felguard's axe is physical, so Blood Frenzy reaches it as it reaches a Warrior's.
+      const felguardDps = warlockPet.dps * debuffs.schoolDamageTaken.Physical * (1 + buffs.damageMultiplier)
+      dps += felguardDps
+      casterSources = [...casterSources, { name: 'Felguard', dps: felguardDps }]
+      breakdown.push({ label: 'Felguard DPS', value: round(felguardDps) })
       breakdown.push({ label: 'Felguard attack power', value: round(warlockPet.attackPower) })
     }
   }

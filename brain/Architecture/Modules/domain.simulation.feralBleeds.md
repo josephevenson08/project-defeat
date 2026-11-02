@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/simulation/feralBleeds.ts
-lines: 167
+lines: 173
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.feralBleeds
 
-`src/domain/simulation/feralBleeds.ts` · **domain** layer · 167 lines
+`src/domain/simulation/feralBleeds.ts` · **domain** layer · 173 lines
 
 From the top of the file:
 

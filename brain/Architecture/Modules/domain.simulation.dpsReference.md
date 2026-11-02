@@ -2,47 +2,53 @@
 type: module
 layer: domain
 source: src/domain/simulation/dpsReference.ts
-lines: 71
+lines: 87
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.simulation.dpsReference
 
-`src/domain/simulation/dpsReference.ts` · **domain** layer · 71 lines
+`src/domain/simulation/dpsReference.ts` · **domain** layer · 87 lines
 
 From the top of the file:
 
-> What each DPS spec actually parses at in Phase 2, from logs rather than from theory.
+> What each DPS spec's best players parse in Phase 2, from logs rather than from theory.
 > 
 > **This exists because the simulator had no way to be wrong.** Every number it produced was
 > internally consistent and nothing compared it to reality, so a spec reading 522 where players do
 > 1,693 looked exactly like a spec reading correctly. `featureFlags.ts` said "roughly 4x low" on the
 > strength of one person's judgement; this table is what turns that into a measurement.
 > 
-> **Source:** archon.gg's Classic Fresh DPS tier list for raid content, SSC/Tempest Keep — the same
-> phase this app is scoped to — read on 2026-08-23 from
-> `/classic-fresh/tier-list/dps-rankings/raid/normal/all-bosses`. Archon aggregates uploaded Warcraft
-> Logs parses; the build pages behind the same figures quote 133,329 parses across the top 50% of the
-> last 14 days.
+> **Source:** Warcraft Logs Fresh, SSC / TK, Statistics: Damage, All Bosses, DPS, **95th
+> percentile**, over a range of 2 weeks, current standings, aggregated per second, Phase 2. Read on
+> 2026-11-02, after Phase 3 opened, so the figure covers the whole of Phase 2; the parse count beside
+> each is what that percentile is taken from.
 > 
-> **These are observed averages, not theoretical ceilings, and that is the right target for this
-> app.** A planner should predict what a competent raider does, not what a flawless one could do.
+> **A 95th percentile, and it always was.** Until 2026-11-02 this table held archon.gg's tier-list
+> figures for the same raids, read on 2026-08-23 and called "observed averages" here. archon's page
+> says its figures are each spec's 95th percentile, and Warcraft Logs' Phase 2 95th percentile matches
+> those August figures within about 1% for every widely played spec, in the same order. So the
+> calibration test was already comparing a best case (rank-1 BiS, every buff) with a near-ceiling,
+> not with an average, and every sentence that said "average" was wrong. The thinly played specs
+> moved most with the fuller phase: Subtlety 1,292 to 1,391, Assassination 1,362 to 1,434,
+> Demonology 1,619 to 1,687, Marksmanship 1,341 to 1,386.
 > 
-> Cross-checked where it could be: the repo owner's own Hydross parse came in at **1,709.3** against
-> this table's **1,693** for Enhancement, a 1% difference, which is the only independent confirmation
-> available and is a reassuring one.
+> **Why Warcraft Logs and not archon now:** archon builds its list from the last 14 days, and with
+> Phase 3 live it shows only Black Temple and Hyjal. Warcraft Logs keeps Phase 2 as a partition.
 > 
-> **Two limits worth stating.** These are a single point in time on a moving meta, so they will drift
-> as gear does — the date above is part of the datum. And an average across all bosses flattens
-> fights with heavy movement or add phases, which is why the app should aim to land *near* these
-> rather than on them.
+> Cross-checked where it could be: the repo owner's own Hydross parse came in at **1,709.3**, against
+> Enhancement's 95th percentile here of **1,702**.
+> 
+> **Two limits worth stating.** A spec with few parses (Subtlety's 1,276, Assassination's 2,013) has a
+> percentile that moves more than one with 400,000. And an aggregate over every boss flattens fights
+> with heavy movement or add phases, so the app should land *near* these rather than on them.
 
 ## Exports
 
 **function** — `getDpsReference`
 
-**const** — `DPS_REFERENCE_READ_ON`, `DPS_REFERENCE_SOURCE`, `DPS_REFERENCE_URL`, `dpsReference`
+**const** — `DPS_REFERENCE_READ_ON`, `DPS_REFERENCE_SOURCE`, `DPS_REFERENCE_URL`, `DPS_TIER_READ_ON`, `DPS_TIER_URL`, `dpsReference`
 
 **type** — `DpsReference`
 

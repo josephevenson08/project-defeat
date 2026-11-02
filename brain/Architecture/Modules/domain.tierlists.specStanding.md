@@ -2,24 +2,24 @@
 type: module
 layer: domain
 source: src/domain/tierlists/specStanding.ts
-lines: 191
+lines: 192
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.tierlists.specStanding
 
-`src/domain/tierlists/specStanding.ts` · **domain** layer · 191 lines
+`src/domain/tierlists/specStanding.ts` · **domain** layer · 192 lines
 
 From the top of the file:
 
 > Where a spec stands, gathered from every source the app has: its place on each of Wowhead's lists,
-> what players actually parse (archon.gg), what it brings to a raid, and the ability it is built
+> what its best players parse (Warcraft Logs' 95th percentile), what it brings to a raid, and the ability it is built
 > around. This is the Spec Tier Lists tab's spec card (design A, decided 2026-10-12), and the rows of
 > its "Against the logs" view (design B).
 > 
-> **Two opinions, kept apart.** Wowhead's tiers are their guide writers' judgement; archon.gg's DPS
-> is an average of uploaded logs, with tier letters of its own. Neither is folded into the other, so
+> **Two opinions, kept apart.** Wowhead's tiers are their guide writers' judgement; the logs' DPS is
+> Warcraft Logs' 95th percentile, and the tier letters beside it archon.gg's. Neither is folded into the other, so
 > the page can show where they disagree rather than averaging the disagreement away.
 
 ## Exports

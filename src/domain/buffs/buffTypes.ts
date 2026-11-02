@@ -145,12 +145,31 @@ export type TargetDebuff = BuffProvider & {
   /** The chance a spell of the named school crits the target, as a fraction: Winter's Chill's Frost 0.10. Added to `spellCritTakenBonus`. */
   schoolCritTakenBonus?: Partial<Record<SpellSchool, number>>
   /**
+   * Bleed damage taken, as a fraction: Mangle's 0.3. wowsims puts it on periodic physical damage, so it
+   * reaches bleed ticks and not the direct hit that opens them, and its `shred.go` gives Shred the
+   * same 30% while Mangle is up. Multiplies with `schoolDamageTakenMultipliers.Physical`.
+   */
+  bleedDamageTakenMultiplier?: number
+  /**
+   * Attack power every attacker gains against the target, added after the attacker's own multipliers
+   * since it is the target's, not theirs. Melee (Improved Hunter's Mark's 110) and ranged (Hunter's
+   * Mark's 440 at its full stack) are separate, as in game.
+   */
+  attackerAttackPower?: number
+  attackerRangedAttackPower?: number
+  /**
+   * Debuffs sharing a group overwrite each other, and only the highest armour among them counts:
+   * Sunder Armor and Expose Armor, which wowsims tags `SunderExposeAuraTag`. Every other armour
+   * debuff adds.
+   */
+  armorGroup?: string
+  /**
    * Set on a debuff this app lists but does not apply, holding the actual effect so it can be read
    * and credited to whoever brings it. Same contract as `Buff.notModelled`. The reasons differ and
    * each entry gives its own: another player's stat (Expose Weakness), charges or an uptime nothing
    * here plays out (Improved Shadow Bolt, Stormstrike), mana this app does not track (Judgement of
-   * Wisdom), or held out of the estimate by the owner's choice until the best-case bound is settled
-   * (Blood Frenzy, Hunter's Mark, Expose Armor, Mangle).
+   * Wisdom), or held out by the owner's choice until Marksmanship has a real raid build (Blood Frenzy,
+   * Hunter's Mark, Improved Hunter's Mark, Expose Armor, Mangle).
    */
   notModelled?: string
   needsVerification?: boolean
