@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-11-01): the caster-side raid debuffs in and pushed; start here
+## ▶ Where we left off (2026-11-02): 95th-percentile references, physical debuffs applied; start here
+
+The DPS references were always each spec's 95th percentile (archon's page says so; Warcraft Logs' Phase 2 statistics match), and now come from Warcraft Logs with every "average" relabelled (`e8f7d84`). The physical debuffs are applied, Marksmanship is measured at a guide build and exempt from the check with its thin reference (the owner's call) (`4ceb779`). Both committed, not pushed. **Next:** push when the owner says so; watch Subtlety and Assassination, under 1% from their references; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-11-01): the caster-side raid debuffs in and pushed
 
 Target debuffs reach the spells of their school and multiply: Misery, Shadow Weaving, Improved Scorch and Winter's Chill applied, Curse of the Elements off Nature, and the mana and physical debuffs listed but not applied (the physical ones held out by the owner's choice until the best-case bound is settled) (`53b321c`, pushed). The ten crafting-path icons the Professions tab named but never had are vendored too (`98276cc`). **Next:** the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

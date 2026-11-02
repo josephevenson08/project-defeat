@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**515 commits across 90 days**, from 2026-06-25 to 2026-11-01.
+**518 commits across 91 days**, from 2026-06-25 to 2026-11-02.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,13 +13,19 @@ explains the change in more detail than its title.
 
 ## November 2026
 
-_3 commits_
+_6 commits_
 
-### Sunday 1 November — 3 commits
+### Monday 2 November — 2 commits
+
+- Measure against the logs' 95th percentile, read from Warcraft Logs, and say so — [`e8f7d84`](https://github.com/josephevenson08/project-defeat/commit/e8f7d845e7e6af489079eb045f7d0d33b70f727b)
+- Apply the physical raid debuffs, measure Marksmanship at a guide build, and mark its reference thin — [`4ceb779`](https://github.com/josephevenson08/project-defeat/commit/4ceb7798d134108126f3bb8bf0322ec3c7d2b611)
+
+### Sunday 1 November — 4 commits
 
 - Add the caster-side raid debuffs, by spell school, and list the mana and physical ones — [`53b321c`](https://github.com/josephevenson08/project-defeat/commit/53b321c61cf1b90b9b29c4789f34ea168ca0cfb2)
 - Refresh the daily log — [`385a575`](https://github.com/josephevenson08/project-defeat/commit/385a5754d34ba67994add10544d0178b5c1a4bc6)
 - Vendor the ten crafting-path icons the Professions tab named but never had — [`98276cc`](https://github.com/josephevenson08/project-defeat/commit/98276cc8f03709b2fa75c644a728fc1a4cd98e06)
+- Refresh the daily log — [`511769f`](https://github.com/josephevenson08/project-defeat/commit/511769fb62e02217f656e03ff34d9fef92b7955e)
 
 ## October 2026
 
