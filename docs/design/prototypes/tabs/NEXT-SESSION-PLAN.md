@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-11-02): 95th-percentile references, physical debuffs applied; start here
+## ▶ Where we left off (2026-11-02, later): the timed class cooldowns priced; start here
+
+Arcane Power, Icy Veins, Rapid Fire, Bestial Wrath, The Beast Within, Death Wish, Recklessness, Avenging Wrath, Adrenaline Rush and Blade Flurry are priced at duration ÷ cooldown (`d52b6e4`, committed, not pushed). **Next:** push when the owner says so; then batch 2, the one-charge cooldowns, or another of the handoff's item 4.
+
+## Where we left off (2026-11-02): 95th-percentile references, physical debuffs applied
 
 The DPS references were always each spec's 95th percentile (archon's page says so; Warcraft Logs' Phase 2 statistics match), and now come from Warcraft Logs with every "average" relabelled (`e8f7d84`). The physical debuffs are applied, Marksmanship is measured at a guide build and exempt from the check with its thin reference (the owner's call) (`4ceb779`). Both pushed. **Next:** the simulator's largest gaps (cooldowns, Arcane Blast's mana, Destruction's Shadow Bolt; item 4 of the handoff); watch Subtlety and Assassination, under 1% from their references; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 

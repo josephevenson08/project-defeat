@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**518 commits across 91 days**, from 2026-06-25 to 2026-11-02.
+**521 commits across 91 days**, from 2026-06-25 to 2026-11-02.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,12 +13,15 @@ explains the change in more detail than its title.
 
 ## November 2026
 
-_6 commits_
+_9 commits_
 
-### Monday 2 November — 2 commits
+### Monday 2 November — 5 commits
 
 - Measure against the logs' 95th percentile, read from Warcraft Logs, and say so — [`e8f7d84`](https://github.com/josephevenson08/project-defeat/commit/e8f7d845e7e6af489079eb045f7d0d33b70f727b)
 - Apply the physical raid debuffs, measure Marksmanship at a guide build, and mark its reference thin — [`4ceb779`](https://github.com/josephevenson08/project-defeat/commit/4ceb7798d134108126f3bb8bf0322ec3c7d2b611)
+- Refresh the daily log — [`f2ee73d`](https://github.com/josephevenson08/project-defeat/commit/f2ee73daf809d15acdeb196043e92937d41badac)
+- Say what the simulator's largest gaps really are, and that the last commits are pushed — [`d07f440`](https://github.com/josephevenson08/project-defeat/commit/d07f440078c60d41a0504372928658a2cd0b93d4)
+- Price the timed class cooldowns at duration over cooldown — [`d52b6e4`](https://github.com/josephevenson08/project-defeat/commit/d52b6e4e6919929151dc33af002cb95982dcadbd)
 
 ### Sunday 1 November — 4 commits
 
