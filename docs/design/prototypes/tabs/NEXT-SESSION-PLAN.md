@@ -2,7 +2,7 @@
 
 ## ▶ Where we left off (2026-11-02): 95th-percentile references, physical debuffs applied; start here
 
-The DPS references were always each spec's 95th percentile (archon's page says so; Warcraft Logs' Phase 2 statistics match), and now come from Warcraft Logs with every "average" relabelled (`e8f7d84`). The physical debuffs are applied, Marksmanship is measured at a guide build and exempt from the check with its thin reference (the owner's call) (`4ceb779`). Both committed, not pushed. **Next:** push when the owner says so; watch Subtlety and Assassination, under 1% from their references; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+The DPS references were always each spec's 95th percentile (archon's page says so; Warcraft Logs' Phase 2 statistics match), and now come from Warcraft Logs with every "average" relabelled (`e8f7d84`). The physical debuffs are applied, Marksmanship is measured at a guide build and exempt from the check with its thin reference (the owner's call) (`4ceb779`). Both pushed. **Next:** the simulator's largest gaps (cooldowns, Arcane Blast's mana, Destruction's Shadow Bolt; item 4 of the handoff); watch Subtlety and Assassination, under 1% from their references; then the rest of "Next, in order" at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
 
 ## Where we left off (2026-11-01): the caster-side raid debuffs in and pushed
 
