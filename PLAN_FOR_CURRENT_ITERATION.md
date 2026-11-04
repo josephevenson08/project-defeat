@@ -28,17 +28,21 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 1, 2026-11-03)
+## Status (as of Day 2, 2026-11-04)
 
 | Question | Answer today |
 | --- | --- |
 | What the app targets | TBC Classic Anniversary **Phase 2** (Karazhan, Gruul, Magtheridon, SSC, Tempest Keep). `src/domain/phase.ts` sets `CURRENT_PHASE = 2`. |
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
-| Next in the game | **Phase 5, Fury of the Sunwell.** No firm date found yet ("autumn 2026" on one site). |
+| Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. |
 | Ready to implement? | **No.** Day 1 only sets the baseline. See "Open questions". |
 
-### Naming caution (needs settling on Day 2)
+### Naming (Day 2 finding: Blizzard uses no phase number)
+
+Blizzard's own post for the update is titled **"BCCA: The Gods of Zul'Aman Now Live"** (byline "October 22nd", no year or time in the text
+read) and never says "Phase 3.5" or "Phase 4". "Phase 3.5" and "Phase 4: The Gods of Zul'Aman" are fan-site labels. The plan keeps the
+working label below and uses **"the Zul'Aman update"** in prose.
 
 Sources disagree on what to call the October update. Warcraft Tavern's phase table lists "3.5" and "Phase 4: The Gods of
 Zul'Aman" on the same date, 2026-10-22. Blizzard Watch (2026-10-09) calls it "more of a mini-phase" called Phase 3.5. Until a
@@ -100,13 +104,29 @@ Facts read from the repo on 2026-11-03:
   attunement, 3-day lockout, a timed hostage mechanic for extra loot and the Amani War Bear.
 - **Badges of Justice** drop from all Karazhan, Gruul, Magtheridon, SSC, Tempest Keep and Zul'Aman bosses, plus Doom Lord Kazzak
   and Doomwalker. **G'eras in Shattrath sells new, stronger gear** for badges. This probably changes many specs' BiS lists.
-- **Attunements are removed** for every TBC raid. The Hand of A'dal title goes to players who already completed them.
+- **Attunements:** Blizzard's post (read directly, Day 2) says Mount Hyjal and Black Temple no longer need attunement. Warcraft Tavern's
+  Aug 24 and Aug 27 posts say attunements for Serpentshrine Cavern and Tempest Keep were removed at the **start of Phase 3**, with skips to
+  Lady Vashj and Kael'thas (summary-based, see Unverified). Whether Karazhan, Gruul and Magtheridon ever needed one in this version, and
+  what happens to the Hand of A'dal title, is not yet sourced. Correction: Day 1 said "every TBC raid" on 10-22; that was too broad.
 - **Heroic dungeons are nerfed** to the original 2.4.3 state, and Heroic keys need Honored instead of Revered.
 - **Epic gems** can now come from Magtheridon's Black Sack of Gems and Jewelcrafter's Brilliant Glass.
 - **Primal Nether and Nether Vortex** are no longer soulbound. The two Outland world bosses drop Bind on Equip loot.
-- Leatherworkers can learn upgraded rare drum recipes. Hunter pet buffs apply to all pets at once (listed as Phase 4 in one source).
+- Outland faction vendors sell Leatherworking recipes for **Greater Drums, Knothide Quiver and Knothide Ammo Pouch** (Blizzard post).
+  Correction: Day 1 said "upgraded rare drum recipes"; Blizzard only lists the recipes and says nothing about changed drum effects.
+- Doomlord Kazzak and Doomwalker loot is now Bind on Equip (Blizzard post).
+- "Hunter pet buffs apply to all pets at once" is **not** in Blizzard's post. Moved to Unverified.
+- Zul'Aman is a 10-player raid ("nine of your staunchest allies"), 3-day lockout, six bosses (confirmed by Blizzard's post).
 
 ### Unverified (do not build on these yet)
+
+- **Day 2:** hunter pet buffs applying to all pets: not in Blizzard's Zul'Aman post. Single fan source only.
+- **Day 2:** Phase 3 = patch 2.5.6 comes from Warcraft Tavern's table only. warcraft.wiki.gg says 2.5.6 released 2026-07-07 as a
+  "routine update" with only service-system changes and no gameplay impact, so it probably is not the Black Temple patch. The patch
+  number of the Phase 3 and Zul'Aman content is unknown. The app does not need it unless the owner wants patch labels.
+- **Day 2:** the Warcraft Tavern phase and Phase 5 pages were read through a summarizer after the first ~39k characters, so their table
+  is summary-based. Their table spells the raid "Zul'Amon" (typo) and lists the Oct 22 date under Phase 4 while the intro says "Phase 3.5".
+- **Day 2:** tier-token sources: no readable page names which earlier raids drop which extra tier tokens. Still open.
+- **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
   Anniversary update mirrors. It lists no class, spell or balance changes. Whether the Anniversary update changes balance is
@@ -152,7 +172,9 @@ These need an answer before the plan can be called final. The daily runs add to 
 4. **Phase 5.** Wait for Sunwell news, or plan the data model so it slots in later?
 5. **Ranking source.** Keep Wowhead as the single source (consistent with the current data), or accept a second source where
    Wowhead's phase guides lag?
-6. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
+6. **Naming.** (Added Day 2) Blizzard calls the October update "The Gods of Zul'Aman" with no phase number. In the app, label it
+   "Phase 4", "Phase 3.5" or "Zul'Aman update"? This affects the phase data model and the phase chip text.
+7. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
    to approve each implementation push.
 
 ---
@@ -165,7 +187,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | Day | Date | Topic | Output into this file |
 | --- | --- | --- | --- |
 | 1 | Nov 3 | Baseline: where the app is, where the game is, first gap table | Done. See Daily log. |
-| 2 | Nov 4 | Settle the timeline and naming from Blizzard primary sources: patch notes and news posts for Phase 3 and the Oct 22 update; confirm Phase 5 status | Corrected timeline, unverified list shrunk |
+| 2 | Nov 4 | Settle the timeline and naming from Blizzard primary sources: patch notes and news posts for Phase 3 and the Oct 22 update; confirm Phase 5 status | Done in part. See Daily log. Phase 3 Blizzard post still to find (Day 3 or 8). |
 | 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Coupling inventory, a proposed phase data model |
 | 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Raid data inventory, item counts |
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Item and gem scope with counts |
@@ -186,7 +208,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 Tick these as the daily runs satisfy them. Implementation should not start until the owner has seen every box ticked or has
 explicitly accepted the open ones.
 
-- [ ] The phase timeline and the name of the October update confirmed from Blizzard's own posts
+- [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Phase 3 date and contents still rest on Warcraft Tavern; Phase 5 date unconfirmed)
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
@@ -222,6 +244,32 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 2)**
 - Settle the timeline and naming from Blizzard sources, then shrink the Unverified list.
 
+### Day 2: 2026-11-04
+
+**Done**
+- Read Blizzard's own Zul'Aman post (worldofwarcraft.blizzard.com/news/24310652) through a fetch helper. Read Warcraft Tavern's phases
+  table, Phase 5 page, Aug 24 and Aug 27 posts, and warcraft.wiki.gg Patch 2.5.6. Searched for Sunwell news.
+
+**Learned**
+- Blizzard's title is "BCCA: The Gods of Zul'Aman Now Live". No phase number appears. Fan sites made up 3.5 and 4.
+- Blizzard confirms: Zul'Aman details, Badges of Justice sources, G'eras wares including Nether Vortex, Hyjal and Black Temple
+  attunement removal, Heroic key rep lowered to Honored, Heroic dungeons at "final, reduced difficulty", epic gems in Black Sack and
+  Brilliant Glass (not retroactive), Kazzak and Doomwalker loot BoE, Primal Nether and Nether Vortex unsoulbound, three LW recipes.
+- Blizzard's post lists no class, balance, buff-limit, dual spec, Heroism or pet-buff changes.
+- SSC and TK attunements went away at Phase 3 start (Tavern, summary-based). Extra T6 tokens drop in Hyjal and Black Temple.
+- Patch 2.5.6 was a July service patch, so "Phase 3 = 2.5.6" is doubtful.
+- Phase 5 has no date beyond "Autumn 2026". Sunwell: 25-player, 8 bosses, no attunement, Magisters' Terrace, Quel'Danas, Arena Season 4.
+
+**Corrections to Day 1**
+- "Attunements removed for every TBC raid on 10-22" narrowed (see body). Drum wording fixed. Pet buffs moved to Unverified.
+
+**Still unsure**
+- Blizzard's Phase 3 post and patch notes; tier-token sources; class/balance changes; the exact patch number; Phase 5 date. Two helper
+  fetches (Icy Veins, Massively OP) failed.
+
+**Next (Day 3)**
+- Code audit of Phase 2 coupling in the repo and a proposed phase data model. Also try again for the Blizzard Phase 3 post.
+
 ---
 
 ## Sources (Day 1)
@@ -235,3 +283,13 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Icy Veins, Phase 3/4 gear lists (found, not yet read): https://icy-veins.com/tbc-classic/fury-warrior-dps-pve-phase-3-4-gear-best-in-slot
 - Repo files: `src/domain/phase.ts`, `src/domain/bis/bisRankings.json`, `src/domain/raids/raidTypes.ts`, `docs/design/PORT-PLAN.md`,
   `docs/dev-log/HANDOFF.md`, `docs/ROADMAP.md`
+
+## Sources (Day 2)
+
+- Blizzard, "BCCA: The Gods of Zul'Aman Now Live" (primary): https://worldofwarcraft.blizzard.com/news/24310652 (mirror https://news.blizzard.com/en-us/article/24310652/)
+- Warcraft Tavern, Zul'Aman arrives October 22nd: https://www.warcrafttavern.com/tbc/news/zulaman-arrives-october-22nd-for-tbc-anniversary/
+- Warcraft Tavern, Phase 3 is now live: https://www.warcrafttavern.com/tbc/news/phase-3-is-now-live-for-tbc-anniversary/
+- Warcraft Tavern, extra tier tokens in Phase 3 raids: https://www.warcrafttavern.com/tbc/news/extra-tier-tokens-will-drop-in-phase-3-raids-for-tbc-anniversary/
+- Warcraft Tavern, Phase 5 overview: https://www.warcrafttavern.com/tbc/guides/phase-5/
+- Warcraft Wiki, Patch 2.5.6: https://warcraft.wiki.gg/wiki/Patch_2.5.6
+- Unreachable on Day 2: Icy Veins Zul'Aman news post, Massively OP 2026-10-12 article.
