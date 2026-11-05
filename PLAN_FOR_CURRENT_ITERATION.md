@@ -28,15 +28,15 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 2, 2026-11-04)
+## Status (as of Day 3, 2026-11-05)
 
 | Question | Answer today |
 | --- | --- |
 | What the app targets | TBC Classic Anniversary **Phase 2** (Karazhan, Gruul, Magtheridon, SSC, Tempest Keep). `src/domain/phase.ts` sets `CURRENT_PHASE = 2`. |
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
-| How far behind the app is | Two content updates. |
-| Ready to implement? | **No.** Day 1 only sets the baseline. See "Open questions". |
+| How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
+| Ready to implement? | **No.** Day 3 produced the coupling inventory and a proposed phase model, not a decision. See "Open questions". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -71,8 +71,51 @@ Facts read from the repo on 2026-11-03:
 - **The redesign port is mid-flight.** Port steps 0 to 3 are done (look, Spec Tier Lists, Raids, Professions). Steps 4 to 7
   (Simulation, Raid Composition, Character Planner, 3D scene) are planned. This work has to be sequenced against them. See "Open
   questions".
+- **The catalogue already carries later-phase items** (Day 3): see the coupling inventory below.
 - **Ingest tooling exists** in `tools/ingest/` (`ingest-bis.mjs`, `ingest-raid-loot.mjs`, `ingest-items.mjs`, `ingest-tier-lists.mjs`
   and others), but Wowhead currently refuses scripted requests (the node ingest has been blocked since 2026-10-13).
+
+---
+
+## Coupling inventory and proposed phase model (Day 3)
+
+Read-only audit of the repo on 2026-11-05 using grep and file reads. Counts are from that grep and may move by a few.
+
+### Where "Phase 2" is hard-coded
+
+| Where | What it does | Change needed |
+| --- | --- | --- |
+| `src/domain/phase.ts` | `CURRENT_PHASE = 2` builds `PHASE_LABEL`. Only `PhaseChip.tsx` and `SectionPicker.tsx` read the label. Nothing else imports `CURRENT_PHASE`. | One line plus the label wording. This is the smallest piece. |
+| `src/domain/gear/itemCatalogue.ts` | `defaultMaxPhase = 2`. Slot pickers, the BiS ranking filter and `isWithinDefaultPhase` use it. | Must move together with the label, or the UI says Phase 4 while hiding Phase 3 and 4 gear. |
+| `src/domain/builds/addonImport.ts` | A second, separate constant: `RANKED_THROUGH_PHASE = 2`, used for the "from a later phase" import warning. | A third copy of the same number. Should come from one place. |
+| `src/domain/builds/buildSerialization.ts` | Reuses `defaultMaxPhase` in its "is Phase N gear" message. `BUILD_FORMAT_VERSION = 1`. The grep found no phase field written into a saved build. | Decide whether a build records its phase (open question 9). Gear above the ceiling is already worn and noted, not dropped. |
+| `src/domain/bis/bisLists.ts` | Each ranked list carries `phase`; its id and title are built from it ("... Phase 2 Ranked List"). Entries above the ceiling are dropped. | Titles and ids change with the data. Test text depends on them. |
+| `src/domain/bis/bisRankings.json`, `tierLists.json` | All Phase 2 data. | Re-ingest (see rows 4 and 6 of the gap table). |
+| `src/domain/raids/raidTypes.ts` | `RaidTier = 'T4' \| 'T5'`. | Add T6 (and decide how Zul'Aman, a 10-player raid with its own gear level, is typed). |
+| `src/domain/raids/sampleAttunements.ts` (250 lines), `RaidAbout.tsx`, `App.tsx`, `index.ts` | Attunement chains for the five raids. | Retire or mark as "no longer required" per raid. Depends on Day 9 findings. |
+| `tools/ingest/bis-guides.mjs` | 26 Wowhead guide paths all ending `-pve-phase-2`. `ingest-bis.mjs` and `ingest-tier-lists.mjs` write `phase: 2`. `ingest-bis-recommendations.mjs` derives its gem/enchant path from the phase-2 name. | Parameterise by phase. Wowhead's Phase 3/4 URL names are not yet checked. |
+| `tools/ingest/ingest-raid-loot.mjs` and `data/raid-loot.*.json` | Five raid files only. | Add Hyjal, Black Temple, Zul'Aman (Days 4 and 6). |
+| `tests/` | Phase wording appears in all of: planner (138 lines of 13,439), look (7), ranked (4), raids (2), simulation (2), tierlists (2), compare, gear, professions (1 each). | Day 11 will sort these into "text only" and "number changes". |
+| Docs | `docs/features.md`, `docs/known-limitations.md`, the brain generator and README say Phase 2. Many files under `docs/research` and `docs/design/prototypes` also mention it but are history, not copy. | Do not edit history files. Update the live ones with the work. |
+
+About 63 source files under `src/` contain the words "Phase 2" (code or comments). Most are comments and provenance strings, not logic.
+
+### What is already in the catalogue
+
+`itemCatalogue.json` (4,505 items) is generated from the open-source wowsims/tbc item database, pinned to commit `3301fca5`. Its phase tags are wowsims's: phase 1: 2,691; phase 2: 437; **phase 3: 540**; **phase 4: 137**; **phase 5: 519**; untagged: 181. The phase 3 items include the Band of Eternity ranks, phase 4 includes Jungle Stompers (a Zul'Aman-era item), phase 5 includes Sunwell items (item levels 154 to 159).
+
+Two things follow, both still to be checked:
+
+- wowsims numbers Hyjal and Black Temple as Phase 3, Zul'Aman as Phase 4 and Sunwell as Phase 5. That matches the owner's "Phase 4" and is a third naming source (a community tool, not Blizzard).
+- Raising the ceiling would show these items without a new ingest. But the item stats come from one snapshot of an upstream repo whose date is not recorded here, and it may predate Anniversary-specific changes. Which items the snapshot tags as Phase 4 (Zul'Aman drops, badge gear, or both) is not yet checked. Nothing here says the data is wrong; it says it has not been compared with a current source.
+
+### Proposed phase model (a proposal for the owner to accept or change, not a decision)
+
+1. **One source of truth.** A single module exports the list of phases (id, label, ceiling, release date, display name) and the "current" phase. `phase.ts`, `defaultMaxPhase` and `RANKED_THROUGH_PHASE` all read it. This is a small refactor that is safe on its own because behaviour does not change while the value stays 2.
+2. **Content is tagged, not copied.** Items already carry `phase`. Raids, boss loot, rankings and tier lists would carry a phase too, so Phase 2 content stays in the repo and is hidden or shown by the ceiling. This is what a switcher would use, and it also lets a single-phase release exist first.
+3. **Rankings keyed by phase.** `bisRankings.json` would hold one block per phase instead of one file replaced. This is the part that doubles data if the owner wants the switcher (open question 1).
+4. **Builds.** Because saved builds hold item ids and no phase today, they keep working. Whether to add a `phase` field (and bump `BUILD_FORMAT_VERSION`) is open question 9.
+5. **Order of risk.** Steps 1 and 2 are refactors with no visible change. Raising the ceiling and shipping new data is the visible change.
 
 ---
 
@@ -84,7 +127,7 @@ Facts read from the repo on 2026-11-03:
 | --- | --- | --- | --- | --- |
 | 1 | The Burning Crusade | Karazhan, Gruul's Lair, Magtheridon's Lair, Arena Season 1 | 2026-02-05 | In the app |
 | 2 | Overlords of Outland | Serpentshrine Cavern, Tempest Keep: The Eye, Arena Season 2 | 2026-05-14 | **In the app** |
-| 3 | Black Temple (patch 2.5.6) | Battle for Mount Hyjal (5 bosses), Black Temple (9 bosses), Arena Season 3 | 2026-08-27 | **Not in the app** |
+| 3 | Black Temple (patch number unknown) | Battle for Mount Hyjal (5 bosses), Black Temple (9 bosses). Arena Season 3 began Sept 1 | 2026-08-27, 3:00 PM Pacific (Blizzard Watch, MMOs.com, Warcraft Tavern agree) | **Not in the app** |
 | 3.5 / 4 | The Gods of Zul'Aman | Zul'Aman, Badges of Justice, attunement removal, dungeon changes | 2026-10-22, 3:00 PM Pacific | **Not in the app** |
 | 5 | Fury of the Sunwell | Sunwell Plateau, Magisters' Terrace, Isle of Quel'Danas, Arena Season 4 | "Autumn 2026", unconfirmed | Watch only |
 
@@ -95,7 +138,9 @@ Facts read from the repo on 2026-11-03:
 - **Reputations and dailies:** Scale of the Sands, Ashtongue Deathsworn, Netherwing dailies. Items such as Band of Eternity need
   Scale of the Sands. The Phase 2 roadmap noted these as unreachable.
 - **Extra tier tokens** drop from earlier raids in Phase 3 (Warcraft Tavern headline, details not yet read).
-- **Arena Season 3**, with earlier seasons' gear moving to vendors at a discount.
+- **Arena Season 3**, which begins **September 1**, not on 08-27 (Day 3 correction; Season 2 ended Aug 18, Arena points convert to Honor at 1 to 10). Season 2 gear is discounted at Area 52 and Season 1 gear moves to Honor vendors (three fan-site reads agree).
+- Day 3: Black Temple was still attuned at launch ("The Tablets of Baa'ri") and Hyjal opened through "The Vials of Eternity"; this fits the 10-22 removal for both. Epic gems are mined in Hyjal and drop in Black Temple. Tier 6 gear is **not** mentioned by the three articles read; it is known from the original game, not yet sourced for this version.
+- Day 3: Blizzard's own Phase 3 post probably is https://news.blizzard.com/en-us/article/24291476/bcc-anniversary-edition-black-temple-arrives-august-27 (linked by Blizzard Watch; not read).
 - Legendary: Warglaives of Azzinoth (Black Temple).
 
 ### What the 2026-10-22 update adds (affects the app)
@@ -126,6 +171,9 @@ Facts read from the repo on 2026-11-03:
 - **Day 2:** the Warcraft Tavern phase and Phase 5 pages were read through a summarizer after the first ~39k characters, so their table
   is summary-based. Their table spells the raid "Zul'Amon" (typo) and lists the Oct 22 date under Phase 4 while the intro says "Phase 3.5".
 - **Day 2:** tier-token sources: no readable page names which earlier raids drop which extra tier tokens. Still open.
+- **Day 3:** wowsims-tagged phases in the catalogue (3, 4, 5) are not checked against a current Anniversary source. Which items the snapshot calls Phase 4 is unknown.
+- **Day 3:** whether saved builds hold a phase: grep found none in `buildSerialization.ts`; a full read of that file is still to do on Day 11.
+- **Day 3:** Phase 3 patch number still unknown. Three articles checked, none gives one.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -144,9 +192,9 @@ or more.
 
 | # | Area | What changes | Size |
 | --- | --- | --- | --- |
-| 1 | **Phase model** | Replace the constant with a phase concept that data can be tagged by, keep Phase 2 viewable, and decide how share links and saved builds record a phase. | M |
+| 1 | **Phase model** | Replace the three separate Phase 2 constants (label, catalogue ceiling, addon-import ceiling) with one phase module and decide how saved builds record a phase. Day 3 proposal above. Refactor part: S. | S for the one-source refactor, M with a switcher |
 | 2 | **Raids** | Add Mount Hyjal, Black Temple, Zul'Aman: bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. | L |
-| 3 | **Item catalogue** | Add Tier 6, Hyjal/BT/ZA drops, badge-vendor gear, Season 3 gear. Run the "needs verification" checks on all of it. | L |
+| 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase (Wowhead has Phase 3 and 4 pages; Icy Veins and Warcraft Tavern have Phase 3/4 and Phase 4 lists). Decide on one rankings source per phase. | L |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. | M |
 | 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
@@ -154,7 +202,7 @@ or more.
 | 8 | **Reputations, professions, consumables** | Scale of the Sands, Ashtongue, Netherwing; new Jewelcrafting designs; drums; any new consumables or buffs. | M |
 | 9 | **Simulation** | Only if balance or class changes exist. `dpsReference.ts` and the rotation work depend on the answer to the unverified items above. | unknown |
 | 10 | **UI and copy** | Phase chip, provenance lines, phase switcher, README and docs text that says "Phase 2". | S to M |
-| 11 | **Tests** | The 340-test suite is full of Phase 2 numbers. Expect a large update pass. | M to L |
+| 11 | **Tests** | The 340-test suite is full of Phase 2 numbers. Day 3: phase wording is in 9 spec files, mostly `planner.spec.ts` (138 lines). Day 11 sorts text-only from number changes. | M to L |
 | 12 | **Brain and docs** | `npm run brain`, handoff, features list, roadmap. | S |
 
 ---
@@ -176,6 +224,8 @@ These need an answer before the plan can be called final. The daily runs add to 
    "Phase 4", "Phase 3.5" or "Zul'Aman update"? This affects the phase data model and the phase chip text.
 7. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
    to approve each implementation push.
+8. **Item source.** (Added Day 3) The catalogue comes from a pinned snapshot of wowsims/tbc. Keep that source and re-pin it to a newer commit for Phase 3 and 4, or accept Wowhead as a second source for fixes? A re-pin changes stats for items already in the app.
+9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
 
@@ -188,7 +238,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | --- | --- | --- | --- |
 | 1 | Nov 3 | Baseline: where the app is, where the game is, first gap table | Done. See Daily log. |
 | 2 | Nov 4 | Settle the timeline and naming from Blizzard primary sources: patch notes and news posts for Phase 3 and the Oct 22 update; confirm Phase 5 status | Done in part. See Daily log. Phase 3 Blizzard post still to find (Day 3 or 8). |
-| 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Coupling inventory, a proposed phase data model |
+| 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Done. See "Coupling inventory". |
 | 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Raid data inventory, item counts |
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Item and gem scope with counts |
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | ZA and badge-gear inventory |
@@ -208,7 +258,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 Tick these as the daily runs satisfy them. Implementation should not start until the owner has seen every box ticked or has
 explicitly accepted the open ones.
 
-- [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Phase 3 date and contents still rest on Warcraft Tavern; Phase 5 date unconfirmed)
+- [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Day 3: Phase 3 date and launch contents now agree across Blizzard Watch, MMOs.com and Warcraft Tavern, Blizzard's own post not read; Phase 5 date unconfirmed)
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
@@ -270,6 +320,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 3)**
 - Code audit of Phase 2 coupling in the repo and a proposed phase data model. Also try again for the Blizzard Phase 3 post.
 
+### Day 3: 2026-11-05
+
+**Done**
+- Audited the repo (read-only) for Phase 2 hard-coding: constants, catalogue, build code, ingest tools, tests, docs. Wrote the coupling inventory and a proposed phase model near the top.
+- Read three articles on the Phase 3 launch (via a fetch helper) to firm up the date and contents.
+
+**Learned**
+- Phase 2 is hard-coded as three separate constants (`CURRENT_PHASE`, `defaultMaxPhase`, `RANKED_THROUGH_PHASE`), and the label constant is read by only two components.
+- The catalogue already holds 540 phase-3, 137 phase-4 and 519 phase-5 items from a pinned wowsims snapshot. Rankings, raids, loot and tier lists are Phase 2 only.
+- Saved builds appear to hold no phase (grep only).
+- Phase 3 went live 2026-08-27 at 3:00 PM Pacific (three sources agree). Arena Season 3 began Sept 1.
+
+**Corrections**
+- Day 1/Phase 3 list implied Arena Season 3 started on 08-27; it started Sept 1. Phase 3 patch label "2.5.6" removed from the timeline table (already doubted on Day 2).
+
+**Still unsure**
+- Whether the wowsims snapshot is current for Anniversary; which items it calls Phase 4; Tier 6 sourcing for this version; Phase 3 patch number; Blizzard post 24291476 not read.
+
+**Next (Day 4)**
+- Mount Hyjal and Black Temple: bosses, loot, tokens, and what `ingest-raid-loot` can reuse. Read Blizzard post 24291476.
+
 ---
 
 ## Sources (Day 1)
@@ -293,3 +364,11 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, Phase 5 overview: https://www.warcrafttavern.com/tbc/guides/phase-5/
 - Warcraft Wiki, Patch 2.5.6: https://warcraft.wiki.gg/wiki/Patch_2.5.6
 - Unreachable on Day 2: Icy Veins Zul'Aman news post, Massively OP 2026-10-12 article.
+
+## Sources (Day 3)
+
+- Blizzard Watch, Phase 3 on August 27 (published July 23, updated Aug 27, 2026): https://blizzardwatch.com/2026/08/27/burning-crusade-classic-anniversary-realms-moves-phase-3-august-27/
+- MMOs.com, Black Temple opens August 27: https://mmos.com/news/mmorpg-news/tbc-classic-phase-3-black-temple-august-2026
+- Warcraft Tavern, Phase 3 launches August 27th (part read verbatim, rest summarised): https://www.warcrafttavern.com/tbc/news/phase-3-launches-august-27th-for-tbc-anniversary/
+- Blizzard Phase 3 post, found not read: https://news.blizzard.com/en-us/article/24291476/bcc-anniversary-edition-black-temple-arrives-august-27
+- Repo files read: `src/domain/gear/itemCatalogue.ts` and `.json`, `src/domain/builds/buildSerialization.ts`, `addonImport.ts`, `src/domain/bis/bisLists.ts`, `tools/ingest/*.mjs`
