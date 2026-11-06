@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 3, 2026-11-05)
+## Status (as of Day 4, 2026-11-06)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 3 produced the coupling inventory and a proposed phase model, not a decision. See "Open questions". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo, and every web page fetch this run was blocked. See "Raid data inventory (Day 4)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -119,6 +119,43 @@ Two things follow, both still to be checked:
 
 ---
 
+## Raid data inventory: Mount Hyjal and Black Temple (Day 4)
+
+**Reading limits today.** Every page fetch this run (Blizzard post 24291476, three Warcraft Tavern pages) failed with a "permission request not answered in time" error, because nobody was present to approve it. Web search returned page titles only. So **nothing below about the game itself is newly sourced**; the boss lists are from the original game (the sources already cited say 5 and 9 bosses) and the repo facts are read directly from files.
+
+### What the repo already holds (read directly, 2026-11-06)
+
+| Item | Finding |
+| --- | --- |
+| Catalogue phase 3 items | 540. Item levels: 246 at 146, 207 at 141, 27 at 151, then small groups. Quality: 534 Epic, 4 Rare, 2 Legendary. Item levels 141 and 146 fit Hyjal and Black Temple tiers in the original game (our recollection, not sourced for this version). |
+| Catalogue phase 4 items | 137, all Epic, mostly item level 128 (85), plus 133, 132, 141. Consistent with Badge gear and Zul'Aman, not yet compared with a source. |
+| Named items found | Warglaive of Azzinoth (ids 32837, 32838, phase 3, item level 156); Band of Eternity (29294 to 29296, phase 3, levels 128, 136, 144); Ashtongue Talisman variants (phase 3, level 141); Jungle Stompers (33191, phase 4, level 128). |
+| Tier sets | The catalogue has 222 sets and carries items with a `setId` (1,158 items). Set names such as Absolution Regalia, Onslaught Armor, Skyshatter, Thunderheart are present, so Tier 6 items look catalogued. Which set pieces are phase 3 was not checked. |
+| **What the catalogue lacks** | Item records have **no source field** (no boss, raid or vendor). Keys are id, wowItemId, name, slot, quality, itemLevel, phase, stats, plus armour, class, socket, set and weapon fields. Nothing in the catalogue says which boss drops an item. |
+| Raid classes in code | No Hyjal or Black Temple boss files exist. The only mention of Hyjal in `src/domain/raids` is a quest-item note in `serpentshrineCavernBosses.ts` (Vashj's Vial Remnant, id 29906). `RaidTier` has no T6. |
+
+### What `ingest-raid-loot.mjs` can reuse
+
+- The script is data-driven: a `RAIDS` map of boss id to Wowhead `npc=` or `object=` ids, and a `RAID_ZONES` map that rejects an NPC standing in the wrong zone. Adding Hyjal and Black Temple means adding two map entries and zone ids, plus finding the right NPC ids. It writes `tools/ingest/data/raid-loot.<raid>.json`, then `link-raid-loot.mjs` joins by exact item name and `apply-raid-loot.mts` writes the typed boss files.
+- **It fetches Wowhead with plain `fetch`, which Wowhead has been refusing since 2026-10-13.** So the pipeline works in design and cannot run today. Loot-to-boss data would have to come from another source (owner-run from a browser, a saved page, or a different site) before any raid file can be built.
+- The script filters out quality below Rare, common drops and Badge of Justice rows. That Badge filter was right in Phase 2 and needs a decision now: badges now drop everywhere and some Phase 4 gear is bought with them (open question 11).
+- Trap noted in the script itself: names such as Kael'thas have two NPC entries, one in Sunwell. Archimonde, Illidan and others may have similar duplicates (timewalking versions exist on Wowhead). The zone check must be set with real Hyjal and Black Temple zone ids, which are **not yet known**.
+
+### Boss counts to plan around
+
+| Raid | Bosses | Source |
+| --- | --- | --- |
+| Mount Hyjal | 5 (Rage Winterchill, Anetheron, Kaz'rogal, Azgalor, Archimonde) | Count of 5 from earlier days' sources; names from the original game |
+| Black Temple | 9 (Naj'entus, Supremus, Shade of Akama, Teron Gorefiend, Gurtogg Bloodboil, Reliquary of Souls, Mother Shahraz, Illidari Council, Illidan) | Count of 9 from earlier days' sources; names from the original game |
+
+Existing raid files run from 2 bosses (Gruul) to about 11 (Karazhan); Black Temple's Illidari Council is four NPCs in one encounter, like the Opera event, so it needs a multi-NPC entry.
+
+### Search leads for the loot and token mapping (found, not read)
+
+Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and several boosting and guide sites (timesaver.gg loot priority, kingboost Hyjal and Black Temple guides, wowclassic.com.ua Phase 3 guide, mythic-store Tier 6 token sources). Boosting and store sites are low-trust and must not be the final source.
+
+---
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -174,6 +211,9 @@ Two things follow, both still to be checked:
 - **Day 3:** wowsims-tagged phases in the catalogue (3, 4, 5) are not checked against a current Anniversary source. Which items the snapshot calls Phase 4 is unknown.
 - **Day 3:** whether saved builds hold a phase: grep found none in `buildSerialization.ts`; a full read of that file is still to do on Day 11.
 - **Day 3:** Phase 3 patch number still unknown. Three articles checked, none gives one.
+- **Day 4:** all fetches blocked (permission prompt unanswered in an unattended run): Blizzard post 24291476 and three Warcraft Tavern pages are still unread. Boss names for Hyjal and Black Temple are from the original game, not from a source for this version.
+- **Day 4:** Tier 6 sets look present in the catalogue by set name, but which pieces are phase 3 and which tokens drop from which boss is unsourced.
+- **Day 4:** the item level reading (141 as Hyjal, 146 as Black Temple) is our recollection of the original game, not a source.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -193,7 +233,7 @@ or more.
 | # | Area | What changes | Size |
 | --- | --- | --- | --- |
 | 1 | **Phase model** | Replace the three separate Phase 2 constants (label, catalogue ceiling, addon-import ceiling) with one phase module and decide how saved builds record a phase. Day 3 proposal above. Refactor part: S. | S for the one-source refactor, M with a switcher |
-| 2 | **Raids** | Add Mount Hyjal, Black Temple, Zul'Aman: bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. | L |
+| 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
 | 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase (Wowhead has Phase 3 and 4 pages; Icy Veins and Warcraft Tavern have Phase 3/4 and Phase 4 lists). Decide on one rankings source per phase. | L |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. | M |
@@ -225,6 +265,8 @@ These need an answer before the plan can be called final. The daily runs add to 
 7. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
    to approve each implementation push.
 8. **Item source.** (Added Day 3) The catalogue comes from a pinned snapshot of wowsims/tbc. Keep that source and re-pin it to a newer commit for Phase 3 and 4, or accept Wowhead as a second source for fixes? A re-pin changes stats for items already in the app.
+10. **Loot data source.** (Added Day 4) Wowhead blocks scripts, and the catalogue holds no drop source. For boss loot tables, would you rather (a) save Wowhead pages by hand from your browser for the ingest to read, (b) accept another site's tables for those raids, or (c) wait and see whether Wowhead's block lifts?
+11. **Badges.** (Added Day 4) The loot ingest currently hides Badge of Justice rows. Keep hiding them, or show badges as a currency on boss cards now that they drop from most raid bosses?
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -239,7 +281,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 1 | Nov 3 | Baseline: where the app is, where the game is, first gap table | Done. See Daily log. |
 | 2 | Nov 4 | Settle the timeline and naming from Blizzard primary sources: patch notes and news posts for Phase 3 and the Oct 22 update; confirm Phase 5 status | Done in part. See Daily log. Phase 3 Blizzard post still to find (Day 3 or 8). |
 | 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Done. See "Coupling inventory". |
-| 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Raid data inventory, item counts |
+| 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Done in part (pipeline and catalogue audit done; game sources blocked). See "Raid data inventory (Day 4)"; re-read sources on Day 5. |
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Item and gem scope with counts |
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | ZA and badge-gear inventory |
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Rankings source decision memo |
@@ -262,7 +304,7 @@ explicitly accepted the open ones.
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
-- [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts
+- [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 4: pipeline reuse understood, no working data source yet; see open question 10)
 - [ ] A rankings source chosen for each of the 27 specs
 - [ ] The test impact estimated, with a plan to keep the suite green during the change
 - [ ] Work packages ordered, each with a done-test, and sequenced against the redesign port
@@ -341,6 +383,28 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 4)**
 - Mount Hyjal and Black Temple: bosses, loot, tokens, and what `ingest-raid-loot` can reuse. Read Blizzard post 24291476.
 
+### Day 4: 2026-11-06
+
+**Done**
+- Tried to read Blizzard's Phase 3 post and Warcraft Tavern's Phase 3, Hyjal and Black Temple pages. All fetches failed (permission prompt unanswered in an unattended run), so they stay unread. Ran two web searches for loot and Tier 6 token sources and noted the leads.
+- Read `ingest-raid-loot.mjs`, the five raid-loot data files' shape, `raidTypes.ts`, and profiled the item catalogue by phase, item level, sets and fields.
+- Added "Raid data inventory (Day 4)", open questions 10 and 11, new Unverified items, and updated gap row 2.
+
+**Learned**
+- The catalogue holds no drop-source field, so boss loot cannot be derived from it. The loot ingest is the only route, and it depends on Wowhead.
+- Phase 3 catalogue items cluster at item levels 141 and 146; phase 4 at 128. Tier 6 set names are in the catalogue.
+- Adding a raid to the ingest is a small config change; finding NPC and zone ids and getting around the Wowhead block is the real work.
+- The Badge of Justice filter in the ingest was a Phase 2 choice that no longer fits.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Everything about Hyjal and Black Temple loot, token-to-boss mapping, trash drops and zone ids. Blizzard's Phase 3 post. Whether the catalogue's Tier 6 pieces are tagged phase 3.
+
+**Next (Day 5)**
+- Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra earlier-raid tokens. Retry the blocked pages first; if still blocked, work from search results and the repo and say so.
+
 ---
 
 ## Sources (Day 1)
@@ -372,3 +436,11 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, Phase 3 launches August 27th (part read verbatim, rest summarised): https://www.warcrafttavern.com/tbc/news/phase-3-launches-august-27th-for-tbc-anniversary/
 - Blizzard Phase 3 post, found not read: https://news.blizzard.com/en-us/article/24291476/bcc-anniversary-edition-black-temple-arrives-august-27
 - Repo files read: `src/domain/gear/itemCatalogue.ts` and `.json`, `src/domain/builds/buildSerialization.ts`, `addonImport.ts`, `src/domain/bis/bisLists.ts`, `tools/ingest/*.mjs`
+
+## Sources (Day 4)
+
+- Blizzard Phase 3 post, still unread (fetch blocked): https://news.blizzard.com/en-us/article/24291476/bcc-anniversary-edition-black-temple-arrives-august-27
+- Wowhead, Black Temple overview (search lead, not read): https://www.wowhead.com/tbc/tw/guide/black-temple-bt-raid-overview-burning-crusade-classic
+- Warcraft Tavern, extra tier tokens (search lead, not read this run): https://www.warcrafttavern.com/tbc/news/extra-tier-tokens-will-drop-in-phase-3-raids-for-tbc-anniversary/
+- Low-trust leads (boost and store sites): https://timesaver.gg/blog/tbc-anniversary-phase-3-loot-priority , https://kingboost.net/blogs/wow-classic-anniversary-edition/tbc-mount-hyjal-guide/ , https://kingboost.net/blogs/wow-classic-anniversary-edition/tbc-anniversary-complete-black-temple-guide/ , https://wowclassic.com.ua/en/tbc/phase-3/ , https://mythic-store.com/blog/tier-6-sets-in-tbc-classic-token-sources-set-bonuses-and-how-to-plan-your-pieces
+- Repo files read: `tools/ingest/ingest-raid-loot.mjs`, `tools/ingest/data/raid-loot.*.json`, `src/domain/raids/raidTypes.ts`, `src/domain/gear/itemCatalogue.json`
