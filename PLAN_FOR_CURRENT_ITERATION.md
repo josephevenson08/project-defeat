@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 4, 2026-11-06)
+## Status (as of Day 5, 2026-11-07)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo, and every web page fetch this run was blocked. See "Raid data inventory (Day 4)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. See "Raid data inventory (Day 4)" and "Tier 6, tokens and gems (Day 5)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -156,6 +156,42 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 
 ---
 
+## Tier 6, tokens and gems (Day 5)
+
+**Reading limits today.** Blizzard's Phase 3 post (24291476) was refused again (the fetch helper reported the permission request went unanswered). Warcraft Tavern's extra-token article was read only through a summarizer. Two pages were read fully enough to use: warcraft.wiki.gg "Tier 6 armor tokens" (a 2019 page about the **original** game) and Icy Veins' Phase 3 overview (a **2022** page about the original Phase 3). Neither describes this Anniversary version, so everything below is "original game, to be confirmed for the Anniversary".
+
+### Tier 6 token sources (original game, wiki, summarized)
+
+| Slot token | Boss | Raid |
+| --- | --- | --- |
+| Helm | Archimonde | Mount Hyjal |
+| Gloves | Azgalor | Mount Hyjal |
+| Shoulders | Mother Shahraz | Black Temple |
+| Legs | Illidari Council | Black Temple |
+| Chest | Illidan Stormrage | Black Temple |
+| Bracers, Belt, Boots | Sunwell Plateau bosses (Kalecgos, Brutallus, Felmyst and the Eredar Twins) | Phase 5 |
+
+- Token names are the "Forgotten" tokens, grouped by class: **Conqueror** (Paladin, Priest, Warlock), **Protector** (Warrior, Hunter, Shaman), **Vanquisher** (Rogue, Mage, Druid).
+- The wiki says all of Tier 6 comes from Hyjal, Black Temple and Sunwell. The three non-token slots (bracers, belt, boots) are Sunwell-only, so **in Phase 3 and 4 Tier 6 is a five-piece set at most**. This matters for set-bonus logic: the 2-piece and 4-piece bonuses are reachable, the 5th slot items (bracers, belt, boots) are not. Not yet checked against Anniversary.
+- Warcraft Tavern (2026-08-24, summary-based) says extra tier tokens drop from the bosses of **both Phase 3 raids** "making it easier for players to get their Tier 6 sets", added at launch, not on the PTR. It names no bosses, rates or earlier raids. **Correction to the Day 2 and Day 4 wording:** earlier text said "extra tokens in earlier raids". The only reading we have says Hyjal and Black Temple. Nothing read says Karazhan, Gruul, Magtheridon, SSC or Tempest Keep get extra tokens. Treat "earlier raids" as unsupported.
+- The app impact is small: tokens are not gear, so the planner needs to know **which boss gives the item that the token turns into**, not the token drop rate. Extra token drops change farming speed, which the app does not model.
+
+### Epic gems and Jewelcrafting
+
+- Icy Veins (2022 page, verbatim) names only one epic gem example, "Delicate Crimson Spinel". No full list.
+- Same page (summarized): the Scale of the Sands and Ashtongue Deathsworn reputations give access to Jewelcrafting designs and class trinkets; Netherwing dailies lead to mounts, not gear.
+- Blizzard's Zul'Aman post (Day 2) says epic gems also come from Magtheridon's Black Sack of Gems and Jewelcrafter's Brilliant Glass, not retroactive.
+- Day 3 sources: epic gems are mined in Hyjal and drop in Black Temple.
+- **Not found:** the list of epic gems and which designs come from which rep rank. Search leads only (not read): timesaver.gg and expcarry.com epic gem guides (low-trust), Wowhead and Warcraft Tavern's Phase 3 overview (not read).
+- Repo side not yet audited: how `sampleGems`/gem data represent cut gems and whether an "epic" quality tier or a design-source field exists. That is the first thing for Day 6 or Day 9 to check.
+
+### Scope estimate for items and gems (provisional)
+
+- Tier 6 pieces are already in the catalogue by set name (Day 4). Work is to confirm each piece's phase tag and add **source = boss** links via the loot pipeline.
+- Epic gems: likely a small list (around a dozen cuts in the original game, our recollection, unsourced). Needs a source before sizing is firm.
+
+---
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -214,6 +250,10 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Day 4:** all fetches blocked (permission prompt unanswered in an unattended run): Blizzard post 24291476 and three Warcraft Tavern pages are still unread. Boss names for Hyjal and Black Temple are from the original game, not from a source for this version.
 - **Day 4:** Tier 6 sets look present in the catalogue by set name, but which pieces are phase 3 and which tokens drop from which boss is unsourced.
 - **Day 4:** the item level reading (141 as Hyjal, 146 as Black Temple) is our recollection of the original game, not a source.
+- **Day 5:** the token-to-boss table (Archimonde helm, Azgalor gloves, Shahraz shoulders, Council legs, Illidan chest) is from a 2019 wiki page about the original game. Not checked against this version.
+- **Day 5:** whether extra tokens also drop in earlier raids: no source says so; only Hyjal and Black Temple are named, and that from a summary.
+- **Day 5:** the epic gem list, Jewelcrafting design sources and rep ranks are not sourced for this version.
+- **Day 5:** the claim that Tier 6 is a 5-piece set before Sunwell comes from the same old wiki page.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -236,7 +276,7 @@ or more.
 | 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
 | 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase (Wowhead has Phase 3 and 4 pages; Icy Veins and Warcraft Tavern have Phase 3/4 and Phase 4 lists). Decide on one rankings source per phase. | L |
-| 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. | M |
+| 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
 | 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
 | 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. | M |
 | 8 | **Reputations, professions, consumables** | Scale of the Sands, Ashtongue, Netherwing; new Jewelcrafting designs; drums; any new consumables or buffs. | M |
@@ -282,7 +322,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 2 | Nov 4 | Settle the timeline and naming from Blizzard primary sources: patch notes and news posts for Phase 3 and the Oct 22 update; confirm Phase 5 status | Done in part. See Daily log. Phase 3 Blizzard post still to find (Day 3 or 8). |
 | 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Done. See "Coupling inventory". |
 | 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Done in part (pipeline and catalogue audit done; game sources blocked). See "Raid data inventory (Day 4)"; re-read sources on Day 5. |
-| 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Item and gem scope with counts |
+| 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Done in part (token map from old sources; gem list not found). See "Tier 6, tokens and gems (Day 5)". Re-open on Day 9. |
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | ZA and badge-gear inventory |
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Rankings source decision memo |
 | 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources | Sim impact list, shrinks "Unverified" |
@@ -301,7 +341,7 @@ Tick these as the daily runs satisfy them. Implementation should not start until
 explicitly accepted the open ones.
 
 - [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Day 3: Phase 3 date and launch contents now agree across Blizzard Watch, MMOs.com and Warcraft Tavern, Blizzard's own post not read; Phase 5 date unconfirmed)
-- [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source
+- [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
 - [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 4: pipeline reuse understood, no working data source yet; see open question 10)
@@ -405,6 +445,26 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 5)**
 - Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra earlier-raid tokens. Retry the blocked pages first; if still blocked, work from search results and the repo and say so.
 
+### Day 5: 2026-11-07
+
+**Done**
+- Searched for extra-token, Tier 6 token and epic gem sources. Read (through a fetch helper) Warcraft Tavern's extra-token article (summary-based), warcraft.wiki.gg Tier 6 armor tokens and Icy Veins' Phase 3 overview. Blizzard's Phase 3 post was refused again.
+- Added "Tier 6, tokens and gems (Day 5)", new Unverified items, and updated the schedule, gap row 5 and the checklist.
+
+**Learned**
+- In the original game five Tier 6 slots drop in Hyjal and Black Temple (Archimonde, Azgalor, Shahraz, Illidari Council, Illidan) and the other three are Sunwell-only. Token groups are Conqueror, Protector and Vanquisher by class.
+- The only reading of the "extra tokens" change names Hyjal and Black Temple, not earlier raids.
+- No fetched page gives a usable epic gem list for this version.
+
+**Corrections**
+- Earlier wording that extra tokens drop "in earlier raids" is not supported by anything read; narrowed to Hyjal and Black Temple.
+
+**Still unsure**
+- Everything in "Tier 6, tokens and gems" for the Anniversary version; epic gems and designs; Blizzard's Phase 3 post; whether Phase 3 catalogue items include the Tier 6 pieces.
+
+**Next (Day 6)**
+- Zul'Aman: bosses, loot, timed-hostage loot, mount; Badges of Justice and G'eras vendor inventory. Retry Blizzard's posts first.
+
 ---
 
 ## Sources (Day 1)
@@ -444,3 +504,11 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, extra tier tokens (search lead, not read this run): https://www.warcrafttavern.com/tbc/news/extra-tier-tokens-will-drop-in-phase-3-raids-for-tbc-anniversary/
 - Low-trust leads (boost and store sites): https://timesaver.gg/blog/tbc-anniversary-phase-3-loot-priority , https://kingboost.net/blogs/wow-classic-anniversary-edition/tbc-mount-hyjal-guide/ , https://kingboost.net/blogs/wow-classic-anniversary-edition/tbc-anniversary-complete-black-temple-guide/ , https://wowclassic.com.ua/en/tbc/phase-3/ , https://mythic-store.com/blog/tier-6-sets-in-tbc-classic-token-sources-set-bonuses-and-how-to-plan-your-pieces
 - Repo files read: `tools/ingest/ingest-raid-loot.mjs`, `tools/ingest/data/raid-loot.*.json`, `src/domain/raids/raidTypes.ts`, `src/domain/gear/itemCatalogue.json`
+
+## Sources (Day 5)
+
+- Warcraft Wiki, Tier 6 armor tokens (2019 page, original game): https://warcraft.wiki.gg/wiki/Tier_6_armor_tokens
+- Icy Veins, TBC Classic Phase 3 overview (2022 page, original game): https://icy-veins.com/tbc-classic/tbc-classic-phase-3
+- Warcraft Tavern, extra tier tokens (summary-based read): https://www.warcrafttavern.com/tbc/news/extra-tier-tokens-will-drop-in-phase-3-raids-for-tbc-anniversary/
+- Blizzard Phase 3 post, refused again: https://worldofwarcraft.blizzard.com/news/24291476
+- Search leads, not read (low-trust): https://timesaver.gg/blog/tbc-anniversary-phase-3-epic-gems , https://expcarry.com/tbc-anniversary-epic-gems-sources-cuts-priorities , https://expcarry.com/tier-6-token-bosses-classes-set-pieces , https://www.tentonhammer.com/guides/tier-6-armor-set-information
