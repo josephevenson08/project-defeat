@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 5, 2026-11-07)
+## Status (as of Day 6, 2026-11-08)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. See "Raid data inventory (Day 4)" and "Tier 6, tokens and gems (Day 5)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -192,6 +192,33 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 
 ---
 
+## Zul'Aman and badge gear (Day 6)
+
+**Reading limits today.** Both Blizzard pages (the Zul'Aman post 24310652 and its mirror, plus the Phase 3 post 24291476) and Warcraft Tavern's Phase 4 guide were refused again with the same "permission request not answered in time" error. Warcraft Tavern's Zul'Aman news article returned only a model-made summary, not page text. Web search returned titles only. So **no Zul'Aman item list and no G'eras item list was read today.** What follows is what is confirmed from earlier reads plus new search leads.
+
+### What is confirmed (Blizzard post read on Day 2, Tavern summary agrees)
+
+| Item | Finding |
+| --- | --- |
+| Raid | Zul'Aman, Ghostlands, 10 players (level 70), no attunement, 3-day lockout, six bosses: Nalorakk, Akil'zon, Jan'alai, Halazzi, Hex Lord Malacrass, Zul'jin. |
+| Timed run | The timer starts when the raid breaches the gates. Defeating one of Zul'jin's lieutenants and rescuing a hostage gives extra loot and extends the timer (Tavern summary). Timer length, which bosses give the extra chests, and the chest contents are **not stated** in anything read. |
+| Mount | Amani War Bear, rare battle mount, for rescuing all hostages in time (Tavern summary). No drop details. |
+| Badges of Justice | Drop from all bosses in Karazhan, Gruul, Magtheridon, SSC, Tempest Keep and Zul'Aman, plus Doom Lord Kazzak and Doomwalker. No per-boss amounts read. |
+| G'eras (Shattrath) | Sells "more powerful wares" for badges, including Nether Vortex. No item names, slots or costs read. |
+
+### New leads (search titles only, not read)
+
+- Wowhead news "Upcoming Changes in Burning Crusade Classic Phase 4: New Badge Gear" (id 326391) and Wowhead's Zul'Aman raid overview and loot tool. **Caution:** the Wowhead posts titled "Patch Notes Version 2.5.4: The Gods of Zul'Aman" and the Blizzard post "Zul'Aman is Now Open" (23783585) are from the **original 2022 TBC Classic** Phase 4. The Anniversary update reuses that content, so these are useful for item lists but must be checked for Anniversary differences.
+- Warcraft Tavern "Badge of Justice Guide: Farming, Vendors, Rewards" and Icy Veins "Zul'Aman Raid Guides". Low-trust: timesaver.gg ZA loot and badge-gear rankings, accountshark.net, kami-labs.fr, bittsguides.com.
+- Naming note: in the original game this content was TBC Classic **Phase 4** (patch 2.5.4). That is a fourth source for "Phase 4" and fits the wowsims tag (137 catalogue items tagged phase 4). It does not prove the Anniversary content matches item for item.
+
+### Repo-side reading for the app (from Day 3 and Day 4 facts, nothing new read today)
+
+- Phase 4 items in the catalogue are 137, nearly all item level 128. That is a plausible size for Zul'Aman drops plus badge vendor gear, but the catalogue has no source field, so it cannot be split into "ZA boss" and "G'eras" without a source.
+- Zul'Aman is a 10-player raid with six bosses, close in shape to Gruul's Lair (2 bosses) and Karazhan (about 11). `RaidTier` has no value for it.
+- Badge vendor gear is a different kind of source (a vendor with a currency cost), so `acquisitionCosts.json` needs a Badge of Justice currency and a vendor source type. That is gap row 7.
+- Timed-run loot is a rules question the app has no model for: the app would list the loot tables, and could note that some drops need the timer. Decision for the owner (open question 12).
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -254,6 +281,9 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Day 5:** whether extra tokens also drop in earlier raids: no source says so; only Hyjal and Black Temple are named, and that from a summary.
 - **Day 5:** the epic gem list, Jewelcrafting design sources and rep ranks are not sourced for this version.
 - **Day 5:** the claim that Tier 6 is a 5-piece set before Sunwell comes from the same old wiki page.
+- **Day 6:** no Zul'Aman loot table, no G'eras item list or badge costs, no timer length, no extra-chest bosses: none read. Every Blizzard page and the Tavern Phase 4 guide were refused again.
+- **Day 6:** the Tavern Zul'Aman article was a summary, not page text. The timed-hostage rules above are summary-based.
+- **Day 6:** that the Anniversary Zul'Aman and badge gear match the original 2022 Phase 4 is an assumption, not checked.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -278,7 +308,7 @@ or more.
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase (Wowhead has Phase 3 and 4 pages; Icy Veins and Warcraft Tavern have Phase 3/4 and Phase 4 lists). Decide on one rankings source per phase. | L |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
 | 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
-| 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. | M |
+| 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. Day 6: the G'eras item list and costs are still unread, so this size is a guess; it also needs a vendor source type, since the catalogue has no source field. | M (could rise to L) |
 | 8 | **Reputations, professions, consumables** | Scale of the Sands, Ashtongue, Netherwing; new Jewelcrafting designs; drums; any new consumables or buffs. | M |
 | 9 | **Simulation** | Only if balance or class changes exist. `dpsReference.ts` and the rotation work depend on the answer to the unverified items above. | unknown |
 | 10 | **UI and copy** | Phase chip, provenance lines, phase switcher, README and docs text that says "Phase 2". | S to M |
@@ -307,6 +337,8 @@ These need an answer before the plan can be called final. The daily runs add to 
 8. **Item source.** (Added Day 3) The catalogue comes from a pinned snapshot of wowsims/tbc. Keep that source and re-pin it to a newer commit for Phase 3 and 4, or accept Wowhead as a second source for fixes? A re-pin changes stats for items already in the app.
 10. **Loot data source.** (Added Day 4) Wowhead blocks scripts, and the catalogue holds no drop source. For boss loot tables, would you rather (a) save Wowhead pages by hand from your browser for the ingest to read, (b) accept another site's tables for those raids, or (c) wait and see whether Wowhead's block lifts?
 11. **Badges.** (Added Day 4) The loot ingest currently hides Badge of Justice rows. Keep hiding them, or show badges as a currency on boss cards now that they drop from most raid bosses?
+12. **Timed Zul'Aman loot.** (Added Day 6) Some Zul'Aman loot and the Amani War Bear depend on a timer. Show all loot with a note, or only the loot that needs no timer?
+13. **Fetch access.** (Added Day 6) Four daily runs have had Blizzard and Tavern pages refused because nobody can approve the fetch permission. Can fetch access be pre-approved for the scheduled run (Blizzard, Wowhead news, Warcraft Tavern, Icy Veins)? Without it the plan stays stuck on the same unread pages.
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -323,7 +355,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 3 | Nov 5 | Code audit: every Phase 2 coupling in `src/`, `tests/`, `tools/`, docs; how `phase` flows through data, types, share links and saved builds | Done. See "Coupling inventory". |
 | 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Done in part (pipeline and catalogue audit done; game sources blocked). See "Raid data inventory (Day 4)"; re-read sources on Day 5. |
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Done in part (token map from old sources; gem list not found). See "Tier 6, tokens and gems (Day 5)". Re-open on Day 9. |
-| 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | ZA and badge-gear inventory |
+| 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | Done in part (bosses, rules, sources confirmed; no item lists read, fetches refused). See "Zul'Aman and badge gear (Day 6)". Re-open on Day 9 or 12. |
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Rankings source decision memo |
 | 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources | Sim impact list, shrinks "Unverified" |
 | 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Scope for items 8 and the attunement code |
@@ -344,7 +376,7 @@ explicitly accepted the open ones.
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
-- [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 4: pipeline reuse understood, no working data source yet; see open question 10)
+- [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
 - [ ] A rankings source chosen for each of the 27 specs
 - [ ] The test impact estimated, with a plan to keep the suite green during the change
 - [ ] Work packages ordered, each with a done-test, and sequenced against the redesign port
@@ -465,6 +497,26 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 6)**
 - Zul'Aman: bosses, loot, timed-hostage loot, mount; Badges of Justice and G'eras vendor inventory. Retry Blizzard's posts first.
 
+### Day 6: 2026-11-08
+
+**Done**
+- Tried again to read Blizzard's Zul'Aman post, its mirror, Blizzard's Phase 3 post and Warcraft Tavern's Phase 4 guide: all refused. The Tavern Zul'Aman article came back as a summary. Ran two searches for Zul'Aman loot and G'eras badge gear.
+- Added "Zul'Aman and badge gear (Day 6)", open questions 12 and 13, Unverified items, and updated gap row 7, the schedule and the checklist.
+
+**Learned**
+- Zul'Aman basics and the timed-hostage rule are consistent across Blizzard (Day 2) and Tavern, but no timer length or chest detail is public in anything read.
+- In the original game this content was TBC Classic Phase 4 (patch 2.5.4), which supports the "Phase 4" label. Several search hits are original 2022 pages.
+- Wowhead has a "New Badge Gear" news post and a Zul'Aman loot tool, both worth reading when access allows.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- All Zul'Aman loot, the G'eras item list and costs, timer length, whether Anniversary matches the 2022 content.
+
+**Next (Day 7)**
+- BiS: which Phase 3 and Phase 4 lists exist per spec (Wowhead, Icy Veins, Warcraft Tavern), how they differ, fit with `ingest-bis.mjs`. Retry Blizzard posts and the Wowhead badge-gear news first.
+
 ---
 
 ## Sources (Day 1)
@@ -512,3 +564,11 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, extra tier tokens (summary-based read): https://www.warcrafttavern.com/tbc/news/extra-tier-tokens-will-drop-in-phase-3-raids-for-tbc-anniversary/
 - Blizzard Phase 3 post, refused again: https://worldofwarcraft.blizzard.com/news/24291476
 - Search leads, not read (low-trust): https://timesaver.gg/blog/tbc-anniversary-phase-3-epic-gems , https://expcarry.com/tbc-anniversary-epic-gems-sources-cuts-priorities , https://expcarry.com/tier-6-token-bosses-classes-set-pieces , https://www.tentonhammer.com/guides/tier-6-armor-set-information
+
+## Sources (Day 6)
+
+- Blizzard Zul'Aman post and mirror, refused again: https://worldofwarcraft.blizzard.com/news/24310652
+- Warcraft Tavern, Zul'Aman arrives October 22nd (summary-based): https://www.warcrafttavern.com/tbc/news/zulaman-arrives-october-22nd-for-tbc-anniversary/
+- Warcraft Tavern, Phase 4 guide, refused: https://www.warcrafttavern.com/tbc/guides/phase-4/
+- Search leads, not read: https://www.wowhead.com/news/burning-crusade-classic-patch-notes-version-2-5-4-the-gods-of-zulaman-326438 (original 2022), https://es.tbc.wowhead.com/news/upcoming-changes-in-burning-crusade-classic-phase-4-new-badge-gear-326391 , https://www.wowhead.com/tbc/tw/guide/zulaman-za-raid-overview-burning-crusade-classic , https://warcrafttavern.com/tbc/guides/badge-of-justice-guide-farming-vendors-rewards , https://icy-veins.com/tbc-classic/zul-aman-raid-guides , https://worldofwarcraft.blizzard.com/news/23783585/ (original 2022)
+- Low-trust leads: https://timesaver.gg/blog/tbc-anniversary-zulaman-loot-ranked , https://timesaver.gg/blog/tbc-anniversary-badge-of-justice-geras-new-items-ranked , https://accountshark.net/blog/tbc-anniversary-phase-3-5-zulaman-raid-guide-amani-war-bear-timer-badges-october-22
