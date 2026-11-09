@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 6, 2026-11-08)
+## Status (as of Day 7, 2026-11-09)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -219,6 +219,38 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - Badge vendor gear is a different kind of source (a vendor with a currency cost), so `acquisitionCosts.json` needs a Badge of Justice currency and a vendor source type. That is gap row 7.
 - Timed-run loot is a rules question the app has no model for: the app would list the loot tables, and could note that some drops need the timer. Decision for the owner (open question 12).
 
+## BiS sources for Phase 3 and Phase 4 (Day 7)
+
+**Reading limits today.** Fetches worked for Icy Veins and Warcraft Tavern (through a fetch helper) and Method. Wowhead's page was refused again (permission request unanswered). Web search returned titles only. Wowhead lists below are therefore known from URLs and titles, not content.
+
+### Which lists exist (from search titles and URLs)
+
+| Site | Phase 3 | Phase 4 (Zul'Aman and badge gear) | Notes |
+| --- | --- | --- | --- |
+| Wowhead | Flat slugs such as `.../tbc/guide/shaman-healer-bt-hyjal-phase-3-best-in-slot-gear-burning-crusade` ("BT / Hyjal") | Slugs such as `.../tbc/guide/arcane-mage-dps-za-phase-4-best-in-slot-gear-burning-crusade` ("ZA") | Seen for several specs only; a full 27-spec check was not done. Content not read. Slugs say "burning-crusade", not "anniversary", so they may be the original 2022 guides. |
+| Icy Veins | One combined page per spec, slug `...-phase-3-4-gear-best-in-slot` | Same page | Fury Warrior page read in full: title "Phase 3 / 4", **last updated 02 May 2022**, single table per slot covering Phase 3 and 4 in prose, includes Tier 6 helm and chest, Zul'Aman timed-chest items and G'eras items with badge costs (e.g. 60 badges). The word "Phase 5" is absent. |
+| Warcraft Tavern | Pages titled "... Best in Slot (BiS) Gear" (undated) | "Shadow Priest PvE Phase 4 Best in Slot (BiS)" and similar for Ret Paladin, BM Hunter, Assassination Rogue | Shadow Priest page covers Black Temple, Hyjal and Zul'Aman, includes badge gear and Tier 6 Absolution; no date on page; read partly verbatim (first ~40k of 116k characters), rest summarised. Has "Previous Guide" and "Next Guide" links, so Phase 3, 4 and 5 are separate pages. |
+| Method | Not applicable | Not applicable | Its "Phase 4" pages are for vanilla WoW Classic Anniversary (Zul'Gurub). Ignore for TBC. |
+
+### What this means for the app
+
+- **The Wowhead ingest cannot be reused by changing a number.** `tools/ingest/bis-guides.mjs` builds paths like `mage/arcane/dps-bis-gear-pve-phase-2` under `.../tbc/guide/classes/`. Wowhead's Phase 3 and 4 guides use flat slugs with `bt-hyjal-phase-3` and `za-phase-4` in the name. The path table (25 guides) has to be rewritten per phase, and the spec-name sanity check in the ingest still helps. Also, Phase 3 and Phase 4 are **separate** Wowhead guides, so a "Phase 4" ranking needs both only if the owner wants Phase 3 and 4 shown separately (open question 14).
+- **Icy Veins merges Phase 3 and 4** into one list per spec. That does not fit the app's one-ranking-per-phase shape without a choice.
+- **Staleness risk.** The Icy Veins page is dated May 2022 and refers to the original Phase 4 patch. Whether the Anniversary version was reviewed is unknown. Icy Veins also reuses URL slugs: search results show pages with a `phase-3-4` slug titled "Phase 5 / Tier 6" (Protection Warrior, Demonology Warlock) and a `gear-best-in-slot` slug titled "Phase 5 / Tier 6". Page titles change under the same URL, so the ingest must check the title, not the slug (as it already does for Wowhead).
+- **Tavern is the only site with clearly separate, Anniversary-era Phase 4 pages**, but its content is undated and the page read was partly summarised.
+- Specs counted in search results so far: Wowhead and Icy Veins have pages for Warrior (Arms, Fury, Prot), Hunter (BM, MM, SV), Mage, Priest, Paladin, Shaman, Warlock, Rogue, Druid. Coverage of all 27 specs is not confirmed on any site.
+
+### Differences already visible between the sources (one spec each)
+
+- Fury Warrior (Icy Veins, 2022): Warglaive of Azzinoth in both hands, Onslaught set, Ancient Amani Longbow (Zul'Aman), G'eras items such as Dory's Embrace (cloak) and Chain of Unleashed Rage.
+- Shadow Priest (Tavern): Absolution set, Zhar'doom, Icon of the Silver Crescent (badge) and Hex Shrunken Head (Zul'Aman).
+- No cross-site comparison for the same spec was possible today; that needs Wowhead content.
+
+### Fit with `ingest-bis.mjs`
+
+- It writes `phase: 2` in entries and `$schema: 'wowhead tbc phase 2 bis rankings'`. It stores 1,427 entries from 24 guides. For a new phase it needs the phase as a parameter, a new path table and a check of the page layout (Wowhead may have changed). It also hits Wowhead with plain `fetch`, which is blocked, so rankings would have to come from pages the owner saves or from another source (open question 10 covers loot; the same question applies to rankings).
+- A second-source parser (Tavern or Icy Veins) would be new code. Their tables name item and source but item ids are not known without matching by name against the catalogue (the same join the loot pipeline already does).
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -284,6 +316,10 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Day 6:** no Zul'Aman loot table, no G'eras item list or badge costs, no timer length, no extra-chest bosses: none read. Every Blizzard page and the Tavern Phase 4 guide were refused again.
 - **Day 6:** the Tavern Zul'Aman article was a summary, not page text. The timed-hostage rules above are summary-based.
 - **Day 6:** that the Anniversary Zul'Aman and badge gear match the original 2022 Phase 4 is an assumption, not checked.
+- **Day 7:** Wowhead's Phase 3 and 4 BiS guides exist only as URLs and titles seen in search; content, dates and whether they were updated for the Anniversary are unread.
+- **Day 7:** Icy Veins' Fury Warrior page is dated 2022; nothing says whether Anniversary reviewed it. One spec read only.
+- **Day 7:** Warcraft Tavern's Shadow Priest Phase 4 page is undated and was partly summarised. One spec read only.
+- **Day 7:** that all 27 specs have Phase 3/4 lists on any site is not checked.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -305,7 +341,7 @@ or more.
 | 1 | **Phase model** | Replace the three separate Phase 2 constants (label, catalogue ceiling, addon-import ceiling) with one phase module and decide how saved builds record a phase. Day 3 proposal above. Refactor part: S. | S for the one-source refactor, M with a switcher |
 | 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
 | 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
-| 4 | **BiS rankings** | Re-ingest 27 specs for the new phase (Wowhead has Phase 3 and 4 pages; Icy Veins and Warcraft Tavern have Phase 3/4 and Phase 4 lists). Decide on one rankings source per phase. | L |
+| 4 | **BiS rankings** | Re-ingest 27 specs for the new phase. Day 7: Wowhead has separate Phase 3 and Phase 4 guides on a different URL scheme (so the path table is rewritten); Icy Veins has one merged Phase 3/4 page per spec (2022 date); Warcraft Tavern has Phase 4 pages. Decide on one rankings source per phase, and how to get the pages while scripts are blocked. | L (data access is the risk) |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
 | 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
 | 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. Day 6: the G'eras item list and costs are still unread, so this size is a guess; it also needs a vendor source type, since the catalogue has no source field. | M (could rise to L) |
@@ -329,7 +365,7 @@ These need an answer before the plan can be called final. The daily runs add to 
    parallel on a branch?
 4. **Phase 5.** Wait for Sunwell news, or plan the data model so it slots in later?
 5. **Ranking source.** Keep Wowhead as the single source (consistent with the current data), or accept a second source where
-   Wowhead's phase guides lag?
+   Wowhead's phase guides lag? (Day 7: Wowhead has Phase 3 and 4 guides but is the source we cannot fetch; see 14 and 15.)
 6. **Naming.** (Added Day 2) Blizzard calls the October update "The Gods of Zul'Aman" with no phase number. In the app, label it
    "Phase 4", "Phase 3.5" or "Zul'Aman update"? This affects the phase data model and the phase chip text.
 7. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
@@ -339,6 +375,8 @@ These need an answer before the plan can be called final. The daily runs add to 
 11. **Badges.** (Added Day 4) The loot ingest currently hides Badge of Justice rows. Keep hiding them, or show badges as a currency on boss cards now that they drop from most raid bosses?
 12. **Timed Zul'Aman loot.** (Added Day 6) Some Zul'Aman loot and the Amani War Bear depend on a timer. Show all loot with a note, or only the loot that needs no timer?
 13. **Fetch access.** (Added Day 6) Four daily runs have had Blizzard and Tavern pages refused because nobody can approve the fetch permission. Can fetch access be pre-approved for the scheduled run (Blizzard, Wowhead news, Warcraft Tavern, Icy Veins)? Without it the plan stays stuck on the same unread pages.
+14. **Phase 3 vs Phase 4 rankings.** (Added Day 7) Wowhead publishes separate Phase 3 (Black Temple / Hyjal) and Phase 4 (Zul'Aman) guides; Icy Veins merges them. Should the app show one ranking for "current" (the Phase 4 list), or keep Phase 3 and Phase 4 as two switchable lists?
+15. **Rankings from a 2022 page.** (Added Day 7) Icy Veins' Phase 3/4 pages are dated 2022 and written for the original game. Is a rankings source acceptable if it predates the Anniversary re-release, or should the app wait for a source dated after 2026-10-22?
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -356,7 +394,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 4 | Nov 6 | Mount Hyjal and Black Temple: bosses, loot tables, trash drops, tokens. Check what the `ingest-raid-loot` pipeline can reuse | Done in part (pipeline and catalogue audit done; game sources blocked). See "Raid data inventory (Day 4)"; re-read sources on Day 5. |
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Done in part (token map from old sources; gem list not found). See "Tier 6, tokens and gems (Day 5)". Re-open on Day 9. |
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | Done in part (bosses, rules, sources confirmed; no item lists read, fetches refused). See "Zul'Aman and badge gear (Day 6)". Re-open on Day 9 or 12. |
-| 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Rankings source decision memo |
+| 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Done in part (list landscape and ingest fit; Wowhead content unread, one spec read on two sites). See "BiS sources (Day 7)". Re-open on Day 10 or 12. |
 | 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources | Sim impact list, shrinks "Unverified" |
 | 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Scope for items 8 and the attunement code |
 | 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Tier list scope |
@@ -377,7 +415,7 @@ explicitly accepted the open ones.
 - [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
 - [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
-- [ ] A rankings source chosen for each of the 27 specs
+- [ ] A rankings source chosen for each of the 27 specs (Day 7: three candidate sites, none fully read; see open questions 14 and 15)
 - [ ] The test impact estimated, with a plan to keep the suite green during the change
 - [ ] Work packages ordered, each with a done-test, and sequenced against the redesign port
 - [ ] The owner has read the go/no-go summary and said go
@@ -517,6 +555,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 7)**
 - BiS: which Phase 3 and Phase 4 lists exist per spec (Wowhead, Icy Veins, Warcraft Tavern), how they differ, fit with `ingest-bis.mjs`. Retry Blizzard posts and the Wowhead badge-gear news first.
 
+### Day 7: 2026-11-09
+
+**Done**
+- Searched for Phase 3 and Phase 4 BiS guides on Wowhead, Icy Veins and Warcraft Tavern. Read Icy Veins' Fury Warrior Phase 3/4 page in full, Warcraft Tavern's Shadow Priest Phase 4 page (partly summarised) and Method's Mage Phase 4 page. Wowhead's Arcane Mage Phase 4 page was refused. Read `tools/ingest/bis-guides.mjs` and `ingest-bis.mjs` for fit.
+- Added "BiS sources for Phase 3 and Phase 4 (Day 7)", open questions 14 and 15, Unverified items, and updated gap row 4, the schedule and the checklist.
+
+**Learned**
+- Wowhead's Phase 3 and 4 guides are separate and use flat slugs (`...-bt-hyjal-phase-3-...`, `...-za-phase-4-...`), unlike the nested `-pve-phase-2` paths the ingest uses. The path table must be rebuilt.
+- Icy Veins merges Phase 3 and 4 and its Fury page is dated May 2022. Its slugs get reused for later-phase titles.
+- Tavern has distinct Phase 4 pages with Zul'Aman and badge gear in them.
+- Method's Phase 4 pages are vanilla Classic and not relevant.
+
+**Corrections**
+- None to earlier days. (Day 3's note that `ingest-bis` writes `phase: 2` is confirmed.)
+
+**Still unsure**
+- What Wowhead's lists say, whether any list was reviewed for the Anniversary, full 27-spec coverage, and how rankings would be fetched while Wowhead blocks scripts.
+
+**Next (Day 8)**
+- Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources.
+
 ---
 
 ## Sources (Day 1)
@@ -572,3 +631,13 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, Phase 4 guide, refused: https://www.warcrafttavern.com/tbc/guides/phase-4/
 - Search leads, not read: https://www.wowhead.com/news/burning-crusade-classic-patch-notes-version-2-5-4-the-gods-of-zulaman-326438 (original 2022), https://es.tbc.wowhead.com/news/upcoming-changes-in-burning-crusade-classic-phase-4-new-badge-gear-326391 , https://www.wowhead.com/tbc/tw/guide/zulaman-za-raid-overview-burning-crusade-classic , https://warcrafttavern.com/tbc/guides/badge-of-justice-guide-farming-vendors-rewards , https://icy-veins.com/tbc-classic/zul-aman-raid-guides , https://worldofwarcraft.blizzard.com/news/23783585/ (original 2022)
 - Low-trust leads: https://timesaver.gg/blog/tbc-anniversary-zulaman-loot-ranked , https://timesaver.gg/blog/tbc-anniversary-badge-of-justice-geras-new-items-ranked , https://accountshark.net/blog/tbc-anniversary-phase-3-5-zulaman-raid-guide-amani-war-bear-timer-badges-october-22
+
+## Sources (Day 7)
+
+- Icy Veins, Fury Warrior Phase 3 / 4 gear (read, dated 2022-05-02): https://www.icy-veins.com/tbc-classic/fury-warrior-dps-pve-phase-3-4-gear-best-in-slot
+- Warcraft Tavern, Shadow Priest PvE Phase 4 BiS (partly summarised): https://www.warcrafttavern.com/tbc/guides/pve-shadow-priest-phase-4-bis/
+- Method, Mage BiS Phase 4 (vanilla Classic Anniversary, not TBC): https://www.method.gg/wow-classic/mage-best-in-slot-wow-classic-anniversary
+- Wowhead, Arcane Mage ZA Phase 4 BiS (refused, URL seen in search): https://www.wowhead.com/tbc/cn/guide/arcane-mage-dps-za-phase-4-best-in-slot-gear-burning-crusade
+- Wowhead, Phase 3 BT / Hyjal BiS slugs (search titles only): https://www.wowhead.com/tbc/tw/guide/shaman-healer-bt-hyjal-phase-3-best-in-slot-gear-burning-crusade , https://www.wowhead.com/tbc/tw/guide/destruction-warlock-dps-bt-hyjal-phase-3-best-in-slot-gear-burning-crusade
+- Warcraft Tavern, other Phase 4 BiS pages (search titles only): https://www.warcrafttavern.com/tbc/guides/pve-retribution-paladin-phase-4-bis/ , https://www.warcrafttavern.com/tbc/guides/pve-beast-mastery-hunter-phase-4-bis/ , https://www.warcrafttavern.com/tbc/guides/assassination-rogue-pve-phase-4-best-in-slot-bis/
+- Repo files read: `tools/ingest/bis-guides.mjs`, `tools/ingest/ingest-bis.mjs`, `src/domain/bis/bisRankings.json` (header)
