@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 7, 2026-11-09)
+## Status (as of Day 8, 2026-11-10)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -251,6 +251,35 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - It writes `phase: 2` in entries and `$schema: 'wowhead tbc phase 2 bis rankings'`. It stores 1,427 entries from 24 guides. For a new phase it needs the phase as a parameter, a new path table and a check of the page layout (Wowhead may have changed). It also hits Wowhead with plain `fetch`, which is blocked, so rankings would have to come from pages the owner saves or from another source (open question 10 covers loot; the same question applies to rankings).
 - A second-source parser (Tavern or Icy Veins) would be new code. Their tables name item and source but item ids are not known without matching by name against the catalogue (the same join the loot pipeline already does).
 
+## Anniversary mechanics (Day 8)
+
+**Reading limits today.** Two kinds of fetch worked: Blizzard's forum post "The Burning Crusade Classic Anniversary PTR Development Notes" (primary, read in full as plain text, about 8,800 characters, undated in the text; it refers to December 12 to 15, so late 2025) and several Warcraft Tavern pages. The Tavern pages came through a fetch helper that returns a model-made extract, so their quotes are labelled "extractor's verbatim" and are not checked against the page. The Tavern changes guide has no date. The PTR notes are for **patch 2.5.5** and were written *before* launch; they are "planned for testing", not final release notes. Blizzard's Anniversary patch notes for Phase 3 and the October update were not found.
+
+### Item by item
+
+| Claim from earlier days | What Day 8 found | Status |
+| --- | --- | --- |
+| Heroism and Bloodlust are raid-wide, 10-minute debuff, reset on boss kill or wipe | Blizzard's PTR notes say so in two sentences ("raid-wide with a 10-minute Sated/Exhaustion debuff"; reset "on boss kill and wipe"). Tavern (2025-11-18) agrees on the reset, but its article body does not say raid-wide. The repo's `buffScope.json` already records this (cites the 2.5.5 notes, "Confirmed by the owner on 2026-10-09") and `buffScope.ts` has an `anniversaryRaidWide` flag. | **Confirmed from a primary source (pre-launch). Already in the app.** |
+| Buff and debuff limit removed | Only the Tavern changes guide says so (extractor's label). It is **not** in Blizzard's PTR notes. The one forum thread found by search is a player request, not a Blizzard statement. | **Single fan source. Stays Unverified.** |
+| Dual talent specialization | Blizzard's notes put Dual Spec on **Classic Era and Hardcore realms**, not in the Burning Crusade list. The Tavern guide lists it as an Anniversary change, while also saying dual spec did not exist until Wrath. | **Not confirmed for TBC Anniversary. Sources disagree.** Stays Unverified. |
+| Hunter pet buffs apply to all pets at once | The Tavern article is from **2022-04-02** (modified 2025-06-01) and describes *original* TBC Classic: Greater Blessings buff every hunter pet (and some warlock pets), credited to the Zul'Aman patch. The changes guide repeats it ("As of Phase 4"). So it is an original-game 2.5.4 behaviour that probably carries over. No Blizzard source. | **Probably true for Phase 4, fan sources only, unverified.** |
+| Class, spell, talent or balance changes | None in Blizzard's PTR notes and none in the Zul'Aman post (Day 2). Tavern lists only: Seal of Blood and Seal of Vengeance for both factions, a 2-minute Tinnitus debuff on Leatherworking drums, Outland buffs purged on entering an instance, ring enchants and gems stop working if the profession is dropped, limited vendor recipes made unlimited. A Tavern post of 2026-01-17 says Paladin Consecration and Shaman two-handed weapon training were **bugs hotfixed**, not new rules. | **No primary-source balance changes found.** |
+
+### What this means for the simulator and data
+
+- **Heroism and Bloodlust:** nothing to do; the repo already models the raid-wide change.
+- **Paladin seals:** `src/domain/simulation/paladinSeals.ts` is faction-split (Seal of Blood for Horde, Seal of Command for Alliance). Tavern says both factions get Seal of Blood and Seal of Vengeance on Anniversary. That **may** make the split wrong for the current game. It needs a primary source before anyone touches it (open question 16).
+- **Drums:** the Tinnitus debuff matters only for drum-uptime modelling. One source.
+- **Buff limit:** if the limit is really removed, buff lists could change. A grep found no buff-limit logic in `src`, so code impact is probably nil; avoid stating it in copy until confirmed.
+- **Account-wide attunements:** Blizzard's notes and Tavern agree (first character attunes, others unlocked, Heroic keys account-bound, raids launch post-nerf). With the October removal (Day 2), the attunement tracker (gap row 2) can mostly retire. Day 9 owns this.
+- **Heroic dungeons:** Blizzard's Dec 2025 PTR notes restored pre-nerf Heroics (Tier 4 raids stay post-nerf); Blizzard's Oct 22 post says "final, reduced difficulty". The app does not need the order of these.
+- **PvP changes** in the PTR notes (arena rating start, resets, dampening, gear requirements) are out of scope for a PvE planner.
+
+### Differences between sources
+
+- Dual spec: Blizzard places it on Classic Era; Tavern's guide lists it for Anniversary. Unresolved.
+- Tavern's changes guide has no date, and its comments read "11 months ago", so it probably predates the October update.
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -320,6 +349,12 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Day 7:** Icy Veins' Fury Warrior page is dated 2022; nothing says whether Anniversary reviewed it. One spec read only.
 - **Day 7:** Warcraft Tavern's Shadow Priest Phase 4 page is undated and was partly summarised. One spec read only.
 - **Day 7:** that all 27 specs have Phase 3/4 lists on any site is not checked.
+- **Day 8:** buff and debuff limit removal: Tavern guide only; not in Blizzard's PTR notes.
+- **Day 8:** dual spec on TBC Anniversary: Blizzard's notes name only Classic Era and Hardcore; Tavern's guide lists it for Anniversary. Sources disagree.
+- **Day 8:** hunter pets buffed all at once: original-game 2.5.4 behaviour per a 2022 Tavern article; Anniversary carry-over assumed.
+- **Day 8:** Seal of Blood and Seal of Vengeance for both factions: Tavern guide only (extractor label); would change `paladinSeals.ts`.
+- **Day 8:** Blizzard's notes are PTR "planned" notes for 2.5.5 from late 2025; final release notes for 2.5.5 and later patches were not found.
+- **Day 8:** Tavern quotes this day came from a model extractor, not raw page text.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -377,6 +412,7 @@ These need an answer before the plan can be called final. The daily runs add to 
 13. **Fetch access.** (Added Day 6) Four daily runs have had Blizzard and Tavern pages refused because nobody can approve the fetch permission. Can fetch access be pre-approved for the scheduled run (Blizzard, Wowhead news, Warcraft Tavern, Icy Veins)? Without it the plan stays stuck on the same unread pages.
 14. **Phase 3 vs Phase 4 rankings.** (Added Day 7) Wowhead publishes separate Phase 3 (Black Temple / Hyjal) and Phase 4 (Zul'Aman) guides; Icy Veins merges them. Should the app show one ranking for "current" (the Phase 4 list), or keep Phase 3 and Phase 4 as two switchable lists?
 15. **Rankings from a 2022 page.** (Added Day 7) Icy Veins' Phase 3/4 pages are dated 2022 and written for the original game. Is a rankings source acceptable if it predates the Anniversary re-release, or should the app wait for a source dated after 2026-10-22?
+16. **Paladin seals.** (Added Day 8) One fan source says both factions now get Seal of Blood and Seal of Vengeance. The simulator models Seal of Blood (Horde) and Seal of Command (Alliance). Wait for a Blizzard source, or can you check in game?
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -395,7 +431,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 5 | Nov 7 | Tier 6 sets and tokens, epic gems, Jewelcrafting designs, extra tier tokens in earlier raids | Done in part (token map from old sources; gem list not found). See "Tier 6, tokens and gems (Day 5)". Re-open on Day 9. |
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | Done in part (bosses, rules, sources confirmed; no item lists read, fetches refused). See "Zul'Aman and badge gear (Day 6)". Re-open on Day 9 or 12. |
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Done in part (list landscape and ingest fit; Wowhead content unread, one spec read on two sites). See "BiS sources (Day 7)". Re-open on Day 10 or 12. |
-| 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources | Sim impact list, shrinks "Unverified" |
+| 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources Done in part (Blizzard PTR notes read; Heroism confirmed, no balance change found; buff limit and dual spec unconfirmed). See "Anniversary mechanics (Day 8)". Re-open on Day 12. |
 | 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Scope for items 8 and the attunement code |
 | 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Tier list scope |
 | 11 | Nov 13 | Tests and docs impact: which of the 340 tests break and why; what the redesign port changes about it | Test impact table |
@@ -412,7 +448,7 @@ explicitly accepted the open ones.
 
 - [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Day 3: Phase 3 date and launch contents now agree across Blizzard Watch, MMOs.com and Warcraft Tavern, Blizzard's own post not read; Phase 5 date unconfirmed)
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
-- [ ] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source
+- [~] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source (Day 8: Heroism confirmed and already in the app; no balance change in Blizzard's PTR notes; buff limit, dual spec, seals and pet buffs still single-source)
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
 - [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
 - [ ] A rankings source chosen for each of the 27 specs (Day 7: three candidate sites, none fully read; see open questions 14 and 15)
@@ -576,6 +612,28 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 8)**
 - Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources.
 
+### Day 8: 2026-11-10
+
+**Done**
+- Read Blizzard's forum post "PTR Development Notes" (patch 2.5.5, primary) and six Warcraft Tavern pages (changes guide, Heroism, hunter pet buffs, Paladin and Shaman training hotfix, account-wide attunements, Heroic revert) through fetch helpers. Grepped the repo for Heroism, buff limits and seals (read-only).
+- Added "Anniversary mechanics (Day 8)", open question 16, Unverified items, and updated the status, schedule and checklist.
+
+**Learned**
+- Raid-wide Heroism and Bloodlust with a 10-minute debuff reset on boss kill or wipe is in Blizzard's PTR notes, and the repo already models it.
+- Blizzard's notes list no class, spell, talent or balance changes and say nothing on buff limit or pet buffs. Dual Spec is named for Classic Era and Hardcore only.
+- The pet-buff claim is an original-game 2.5.4 change (Tavern, 2022), not an Anniversary invention.
+- Possible simulator issue: Tavern says Seal of Blood and Vengeance are no longer faction-exclusive, while `paladinSeals.ts` is faction-split.
+
+**Corrections**
+- The Day 1 and Day 2 pet-buff and dual-spec claims are now traced or marked as disputed (see body). No other corrections.
+
+**Still unsure**
+- Final 2.5.5 and later patch notes; buff limit; dual spec; seals. Fetch helpers returned extracts, not raw text.
+- Still unread from earlier days: Blizzard's Phase 3 post, Zul'Aman and G'eras item lists, Wowhead BiS content.
+
+**Next (Day 9)**
+- Reputations (Scale of the Sands, Ashtongue, Netherwing), attunement removal in code and game, professions, consumables and buffs. Retry Blizzard's Phase 3 post and Wowhead's badge-gear news.
+
 ---
 
 ## Sources (Day 1)
@@ -641,3 +699,15 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Wowhead, Phase 3 BT / Hyjal BiS slugs (search titles only): https://www.wowhead.com/tbc/tw/guide/shaman-healer-bt-hyjal-phase-3-best-in-slot-gear-burning-crusade , https://www.wowhead.com/tbc/tw/guide/destruction-warlock-dps-bt-hyjal-phase-3-best-in-slot-gear-burning-crusade
 - Warcraft Tavern, other Phase 4 BiS pages (search titles only): https://www.warcrafttavern.com/tbc/guides/pve-retribution-paladin-phase-4-bis/ , https://www.warcrafttavern.com/tbc/guides/pve-beast-mastery-hunter-phase-4-bis/ , https://www.warcrafttavern.com/tbc/guides/assassination-rogue-pve-phase-4-best-in-slot-bis/
 - Repo files read: `tools/ingest/bis-guides.mjs`, `tools/ingest/ingest-bis.mjs`, `src/domain/bis/bisRankings.json` (header)
+
+## Sources (Day 8)
+
+- Blizzard forums, "The Burning Crusade Classic Anniversary PTR Development Notes" (primary, patch 2.5.5 PTR, late 2025, read in full): https://us.forums.blizzard.com/en/wow/t/2201610
+- Warcraft Tavern, changes from the original Burning Crusade (undated, extractor-based): https://www.warcrafttavern.com/tbc/guides/changes-from-the-original-burning-crusade/
+- Warcraft Tavern, Heroism and Bloodlust reset (2025-11-18): https://www.warcrafttavern.com/tbc/news/heroism-bloodlust-will-reset-for-bosses-in-tbc-classic-anniversary-edition/
+- Warcraft Tavern, buff all hunter pets at once (2022-04-02, original game): https://www.warcrafttavern.com/tbc/news/psa-you-can-now-buff-all-hunter-pets-at-once-tbc-classic
+- Warcraft Tavern, Paladin and Shaman training hotfix (2026-01-17): https://www.warcrafttavern.com/tbc/news/paladin-shaman-training-hotfixed-for-tbc-anniversary/
+- Warcraft Tavern, attunements account-wide (2025-11-18): https://www.warcrafttavern.com/tbc/news/attunements-will-be-account-wide-in-tbc-classic-anniversary-edition/
+- Warcraft Tavern, Heroic dungeons pre-nerf (2025-12-12): https://www.warcrafttavern.com/tbc/news/heroic-dungeons-will-be-pre-nerf-but-not-tier-4-raids-in-tbc-anniversary/
+- Blizzard forums, player request to remove the debuff limit (not a Blizzard statement): https://us.forums.blizzard.com/en/wow/t/please-remove-the-debuff-limit/2009889
+- Repo files read: `src/domain/buffs/buffScope.ts` and `.json`, `src/domain/simulation/paladinSeals.ts` (grep)
