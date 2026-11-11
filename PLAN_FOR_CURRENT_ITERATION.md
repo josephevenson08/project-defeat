@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 8, 2026-11-10)
+## Status (as of Day 9, 2026-11-11)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -280,6 +280,52 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - Dual spec: Blizzard places it on Classic Era; Tavern's guide lists it for Anniversary. Unresolved.
 - Tavern's changes guide has no date, and its comments read "11 months ago", so it probably predates the October update.
 
+## Attunements, reputations and consumables (Day 9)
+
+**Reading limits today.** Fetches worked through a fetch helper. Blizzard's **Phase 3 post (24291476) was read in full for the first time** (title on the page: "BCC Anniversary Edition: Black Temple Now Live", byline "August 27th", no year). Blizzard's Zul'Aman post (24310652) was re-read; its mirror on news.blizzard.com was refused. Warcraft Tavern's potion and Phase 3 preview pages were truncated, so their later parts are extractor summaries. The Icy Veins Scale of the Sands page is dated **2021-05-26** (original game).
+
+### Attunements (Blizzard primary sources, both read)
+
+| Raid | What Blizzard says | Source |
+| --- | --- | --- |
+| Black Temple | Phase 3 post (Aug 27): attunement required ("complete the attunement process", links a Wowhead guide, no steps on the page). Zul'Aman post (Oct 22): Hyjal and Black Temple "will no longer require attunement to enter". | Blizzard, both posts |
+| Mount Hyjal | Phase 3 post: enter by finishing "The Vials of Eternity"; "You do not need to be in a raid group to enter." Removed on Oct 22 as above. | Blizzard |
+| Karazhan, Gruul, Magtheridon, Serpentshrine Cavern, Tempest Keep | **Neither Blizzard post mentions them in an attunement context.** Warcraft Tavern (Aug 24/27, summary-based) says SSC and Tempest Keep attunements were removed with skips to Vashj and Kael'thas at Phase 3. Blizzard's PTR notes (Day 8) say attunements are account-wide. | Not settled by Blizzard |
+
+Corrections and consequences:
+
+- **Narrowing confirmed.** Day 9 confirms from the Blizzard text itself that only Hyjal and Black Temple are named on Oct 22. Whether the other five raids still have attunements in the live game is **not established by any Blizzard text read**; only the Tavern summary says SSC/TK were dropped in August.
+- **Code impact.** `sampleAttunements.ts` (250 lines) has exactly three chains: Karazhan ("The Master's Key"), Serpentshrine Cavern ("The Cudgel of Kar'desh") and Tempest Keep ("The Trial of the Naaru"). So the Hyjal and Black Temple removal needs **no deletion** (no chains exist for them); they only need raid entries with an "open to all" attunement line. The three existing chains are the open item: retire, keep, or mark "skipped in the current game". `RaidAbout.tsx` and `BossJournal.tsx` read `raid.attunement` and `getAttunementChainForRaid`, and the SSC chain feeds other raids, so retiring one chain touches the "Part of an attunement" panel. Decision belongs to the owner (open question 17).
+
+### Reputations (Phase 3 source: Blizzard; rank rewards: Icy Veins 2021)
+
+- **Ashtongue Deathsworn:** rewards from Okuno inside Black Temple (Blizzard). Reward list not read anywhere.
+- **Scale of the Sands:** rewards from Indormi, Keeper of Ancient Gem Lore, inside Hyjal. Icy Veins (2021, original game) lists Jewelcrafting designs at 6 gold each: Friendly 12 designs, Honored 12, Revered 4 (epic Crimson Spinel, Lionseye, Empyrean Sapphire, Pyrestone, Seaspray Emerald and Shadowsong Amethyst cuts), plus one of four role rings chosen at Friendly. Reputation comes only from Hyjal Summit (12 per trash mob, 60 per Frost Wyrm, 375 per boss, 1,500 per Archimonde).
+- **Band of Eternity is not on that Icy Veins page**, so the Day 1 claim that it needs Scale of the Sands is not supported by what was read today. It stays Unverified.
+- **Netherwing:** dailies from Netherwing Ledge; at Exalted you can buy the six Netherwing Drake mounts from Drake Dealer Hurlunk (needs Artisan Riding and the "Blood Oath of the Netherwing" quest). Mounts are not gear: the planner can ignore them.
+- **Heroic keys:** the Oct 22 post lowers the reputation needed to buy Heroic dungeon keys to Honored (Blizzard).
+- **App impact.** Grep of `src/` finds no reputation, Scale of the Sands, Ashtongue or Netherwing data in the domain. The repo has no reputation model. If the owner wants "where do I get this" for rep-gated gear, that is new data and a new source type (open question 18).
+
+### Professions and gems
+
+- **Epic gems (Blizzard, Phase 3):** mined in Hyjal with Mining 375, or rare drops in Black Temple; designs sold by Indormi. Oct 22 adds Magtheridon's Black Sack of Gems and Jewelcrafter's Brilliant Glass (not retroactive).
+- **Repo already holds the gems.** `gemCatalogue.json` (212 gems, same wowsims snapshot) has 35 Epic gems tagged phase 3, 6 Epic tagged phase 5, 1 Epic tagged phase 2, 58 Epic tagged phase 1 and 4 Epic with no phase. It includes Bold, Delicate and Runed Crimson Spinel. So gem cuts need verifying, not adding; what is missing is the design source (rep rank, drop) and a mined-gem source. The Day 5 audit item on gem representation is done: quality and phase fields exist; there is no source field.
+- **Tavern's 2021 preview** (original game, hedged) names Bold and Runed Crimson Spinel as new epic gems in Phase 3; consistent with the catalogue.
+- **Leatherworking:** Outland faction vendors offer Greater Drums, Knothide Quiver and Knothide Ammo Pouch recipes from Oct 22 (Blizzard). `craftingPaths.json` and `sampleProfessionTiers.ts` were not read today; whether they list drums is a Day 11/12 check.
+- **Primal Nether and Nether Vortex no longer soulbound** (Blizzard): affects material notes only.
+
+### Consumables and buffs
+
+- `consumableCatalogue.json` has 31 entries from wowsims `consumes.go` at the pinned commit.
+- **Shattrath Flask of Relentless Assault** (bought with Mark of the Illidari) comes from a 2021 original-game Tavern preview. Not confirmed for the Anniversary.
+- **Haste and Destruction Potions on Shattrath vendors:** Warcraft Tavern, 2026-08-10, **PTR only** at that time, 10 for 1 Mark of the Illidari, earned in Phase 3 raids. No live date read. `acquisitionCost.ts` knows Badge of Justice; a Mark of the Illidari currency would be new. Single source; Unverified.
+- No Blizzard text read mentions new flasks, elixirs or food in Phase 3 or the October update.
+
+### Differences between sources
+
+- Tavern says SSC/TK attunements ended in August; Blizzard's two posts say nothing about them.
+- The Phase 3 post says Black Temple needed attunement at launch, which disagrees with any reading that all attunements went at Phase 3.
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -298,10 +344,10 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Epic gems** from Jewelcrafting designs learned in the Caverns of Time, and as drops from the Tier 6 raids.
 - **Reputations and dailies:** Scale of the Sands, Ashtongue Deathsworn, Netherwing dailies. Items such as Band of Eternity need
   Scale of the Sands. The Phase 2 roadmap noted these as unreachable.
-- **Extra tier tokens** drop from earlier raids in Phase 3 (Warcraft Tavern headline, details not yet read).
+- **Extra tier tokens** drop in Phase 3 raids (Warcraft Tavern headline; Day 5 narrowed this to Hyjal and Black Temple; the Blizzard Phase 3 post, read Day 9, does not mention tokens).
 - **Arena Season 3**, which begins **September 1**, not on 08-27 (Day 3 correction; Season 2 ended Aug 18, Arena points convert to Honor at 1 to 10). Season 2 gear is discounted at Area 52 and Season 1 gear moves to Honor vendors (three fan-site reads agree).
 - Day 3: Black Temple was still attuned at launch ("The Tablets of Baa'ri") and Hyjal opened through "The Vials of Eternity"; this fits the 10-22 removal for both. Epic gems are mined in Hyjal and drop in Black Temple. Tier 6 gear is **not** mentioned by the three articles read; it is known from the original game, not yet sourced for this version.
-- Day 3: Blizzard's own Phase 3 post probably is https://news.blizzard.com/en-us/article/24291476/bcc-anniversary-edition-black-temple-arrives-august-27 (linked by Blizzard Watch; not read).
+- Day 3: Blizzard's own Phase 3 post is https://worldofwarcraft.blizzard.com/news/24291476 (read on Day 9; titled "Black Temple Now Live"; it names no patch number and no Tier 6).
 - Legendary: Warglaives of Azzinoth (Black Temple).
 
 ### What the 2026-10-22 update adds (affects the app)
@@ -355,6 +401,11 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - **Day 8:** Seal of Blood and Seal of Vengeance for both factions: Tavern guide only (extractor label); would change `paladinSeals.ts`.
 - **Day 8:** Blizzard's notes are PTR "planned" notes for 2.5.5 from late 2025; final release notes for 2.5.5 and later patches were not found.
 - **Day 8:** Tavern quotes this day came from a model extractor, not raw page text.
+- **Day 9:** attunement status of Karazhan, Gruul, Magtheridon, SSC and Tempest Keep in the live game: no Blizzard text read; Tavern summary only for SSC/TK.
+- **Day 9:** Band of Eternity needing Scale of the Sands (Day 1 claim): not on the Icy Veins page; unsupported.
+- **Day 9:** Scale of the Sands rank rewards are from a 2021 original-game page; Ashtongue rewards unread.
+- **Day 9:** Haste and Destruction Potions for Marks of the Illidari: Tavern, PTR-only as of 2026-08-10; live status unread. Shattrath Flask of Relentless Assault: 2021 preview only.
+- **Day 9:** Tavern potion and Phase 3 preview pages were truncated; later parts are extractor summaries.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -374,13 +425,13 @@ or more.
 | # | Area | What changes | Size |
 | --- | --- | --- | --- |
 | 1 | **Phase model** | Replace the three separate Phase 2 constants (label, catalogue ceiling, addon-import ceiling) with one phase module and decide how saved builds record a phase. Day 3 proposal above. Refactor part: S. | S for the one-source refactor, M with a switcher |
-| 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Remove or retire attunement content. Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
+| 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Day 9: no Hyjal/BT attunement chains exist to remove; the three existing chains (Karazhan, SSC, Tempest Keep) are the decision (question 17). Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
 | 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase. Day 7: Wowhead has separate Phase 3 and Phase 4 guides on a different URL scheme (so the path table is rewritten); Icy Veins has one merged Phase 3/4 page per spec (2022 date); Warcraft Tavern has Phase 4 pages. Decide on one rankings source per phase, and how to get the pages while scripts are blocked. | L (data access is the risk) |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
 | 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
 | 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. Day 6: the G'eras item list and costs are still unread, so this size is a guess; it also needs a vendor source type, since the catalogue has no source field. | M (could rise to L) |
-| 8 | **Reputations, professions, consumables** | Scale of the Sands, Ashtongue, Netherwing; new Jewelcrafting designs; drums; any new consumables or buffs. | M |
+| 8 | **Reputations, professions, consumables** | Day 9: no rep model exists in the repo; the 35 phase-3 Epic gems are already in `gemCatalogue.json` (they need verifying and a design/mining source, not adding); drum recipes unchecked in `craftingPaths.json`; potion/flask changes only single-sourced. Needs the owner's call on whether rep rewards are in scope. | M (S if rep rewards are out of scope) |
 | 9 | **Simulation** | Only if balance or class changes exist. `dpsReference.ts` and the rotation work depend on the answer to the unverified items above. | unknown |
 | 10 | **UI and copy** | Phase chip, provenance lines, phase switcher, README and docs text that says "Phase 2". | S to M |
 | 11 | **Tests** | The 340-test suite is full of Phase 2 numbers. Day 3: phase wording is in 9 spec files, mostly `planner.spec.ts` (138 lines). Day 11 sorts text-only from number changes. | M to L |
@@ -413,6 +464,8 @@ These need an answer before the plan can be called final. The daily runs add to 
 14. **Phase 3 vs Phase 4 rankings.** (Added Day 7) Wowhead publishes separate Phase 3 (Black Temple / Hyjal) and Phase 4 (Zul'Aman) guides; Icy Veins merges them. Should the app show one ranking for "current" (the Phase 4 list), or keep Phase 3 and Phase 4 as two switchable lists?
 15. **Rankings from a 2022 page.** (Added Day 7) Icy Veins' Phase 3/4 pages are dated 2022 and written for the original game. Is a rankings source acceptable if it predates the Anniversary re-release, or should the app wait for a source dated after 2026-10-22?
 16. **Paladin seals.** (Added Day 8) One fan source says both factions now get Seal of Blood and Seal of Vengeance. The simulator models Seal of Blood (Horde) and Seal of Command (Alliance). Wait for a Blizzard source, or can you check in game?
+17. **Existing attunement chains.** (Added Day 9) Blizzard says only Hyjal and Black Temple lost their attunement (Oct 22). Karazhan, SSC and Tempest Keep chains are in the app. Keep them as history, mark them "skipped in the current game" (needs a source), or remove them from the Raids tab?
+18. **Reputation rewards.** (Added Day 9) The app has no reputation data. Should the planner show which reputation rank gates an item (Scale of the Sands, Ashtongue), or only list the gear?
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -432,7 +485,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 6 | Nov 8 | Zul'Aman: bosses, loot, timed-hostage loot, mount. Badges of Justice and G'eras vendor inventory | Done in part (bosses, rules, sources confirmed; no item lists read, fetches refused). See "Zul'Aman and badge gear (Day 6)". Re-open on Day 9 or 12. |
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Done in part (list landscape and ingest fit; Wowhead content unread, one spec read on two sites). See "BiS sources (Day 7)". Re-open on Day 10 or 12. |
 | 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources Done in part (Blizzard PTR notes read; Heroism confirmed, no balance change found; buff limit and dual spec unconfirmed). See "Anniversary mechanics (Day 8)". Re-open on Day 12. |
-| 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Scope for items 8 and the attunement code |
+| 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Done in part (Blizzard Phase 3 post read; attunement code scoped; rep rewards and consumable changes thinly sourced). See "Attunements, reputations and consumables (Day 9)". Re-open on Day 12. |
 | 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Tier list scope |
 | 11 | Nov 13 | Tests and docs impact: which of the 340 tests break and why; what the redesign port changes about it | Test impact table |
 | 12 | Nov 14 | Sequencing against port steps 4 to 7; risks (Wowhead blocking, data accuracy, phase switcher); effort ranges | Ordered work packages with estimates |
@@ -446,8 +499,8 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 Tick these as the daily runs satisfy them. Implementation should not start until the owner has seen every box ticked or has
 explicitly accepted the open ones.
 
-- [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Day 3: Phase 3 date and launch contents now agree across Blizzard Watch, MMOs.com and Warcraft Tavern, Blizzard's own post not read; Phase 5 date unconfirmed)
-- [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
+- [~] The phase timeline and the name of the October update confirmed from Blizzard's own posts (Day 2: October update name and contents confirmed from Blizzard; Day 3: Phase 3 date and launch contents now agree across Blizzard Watch, MMOs.com and Warcraft Tavern, Day 9: Blizzard's Phase 3 post read, agrees on date and Arena Season 3 on Sept 1, has no year or patch number; Phase 5 date unconfirmed)
+- [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 9: Hyjal/BT attunements, epic gem sources, Netherwing and key reputation now Blizzard-sourced; rep rewards, consumable changes and the other raids' attunements still not; Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
 - [~] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source (Day 8: Heroism confirmed and already in the app; no balance change in Blizzard's PTR notes; buff limit, dual spec, seals and pet buffs still single-source)
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
 - [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
@@ -634,6 +687,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 9)**
 - Reputations (Scale of the Sands, Ashtongue, Netherwing), attunement removal in code and game, professions, consumables and buffs. Retry Blizzard's Phase 3 post and Wowhead's badge-gear news.
 
+### Day 9: 2026-11-11
+
+**Done**
+- Read Blizzard's Phase 3 post (24291476) in full for the first time and re-read the Zul'Aman post (24310652). Read Warcraft Tavern's potion news (2026-08-10) and 2021 Phase 3 preview, and Icy Veins' Scale of the Sands guide (2021). Read-only checks of `sampleAttunements.ts`, `RaidAbout.tsx`, `BossJournal.tsx`, `gemCatalogue.json` and `consumableCatalogue.json`.
+- Added "Attunements, reputations and consumables (Day 9)", open questions 17 and 18, Unverified items, and updated status, gap rows 2 and 8, the schedule and the checklist.
+
+**Learned**
+- Blizzard confirms Black Temple needed attunement at launch and Hyjal needed the Vials of Eternity; both were removed on Oct 22. No Blizzard text read mentions the other five raids' attunements.
+- The repo has only three attunement chains (Karazhan, SSC, Tempest Keep), none for Hyjal or Black Temple, so no deletion is needed for the October removal.
+- 35 Epic phase-3 gems are already in the gem catalogue; the gap is their source, not the gems.
+- The repo has no reputation model. Phase 3 and 4 consumable changes are only single-sourced.
+
+**Corrections**
+- Day 1's claim that Band of Eternity needs Scale of the Sands is not supported by the page read today; moved to Unverified. The Day 3 Phase 3 post link is corrected to the worldofwarcraft.blizzard.com address; the post's title is "Black Temple Now Live".
+
+**Still unsure**
+- Live attunement state of Karazhan/Gruul/Magtheridon/SSC/TK; Ashtongue rewards; Scale of the Sands rewards for this version; live status of the Illidari potions; drum recipes in the crafting data. Zul'Aman and G'eras item lists remain unread.
+
+**Next (Day 10)**
+- Tier lists and logs data for the current phase and what the Spec Tier Lists tab needs. Retry Wowhead news on badge gear.
+
 ---
 
 ## Sources (Day 1)
@@ -711,3 +785,13 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, Heroic dungeons pre-nerf (2025-12-12): https://www.warcrafttavern.com/tbc/news/heroic-dungeons-will-be-pre-nerf-but-not-tier-4-raids-in-tbc-anniversary/
 - Blizzard forums, player request to remove the debuff limit (not a Blizzard statement): https://us.forums.blizzard.com/en/wow/t/please-remove-the-debuff-limit/2009889
 - Repo files read: `src/domain/buffs/buffScope.ts` and `.json`, `src/domain/simulation/paladinSeals.ts` (grep)
+
+## Sources (Day 9)
+
+- Blizzard, "BCC Anniversary Edition: Black Temple Now Live" (primary, read in full): https://worldofwarcraft.blizzard.com/news/24291476
+- Blizzard, "BCCA: The Gods of Zul'Aman Now Live" (primary, re-read; news.blizzard.com mirror refused): https://worldofwarcraft.blizzard.com/news/24310652
+- Warcraft Tavern, Haste and Destruction Potions to vendors (2026-08-10, PTR; partly summarised): https://www.warcrafttavern.com/tbc/news/haste-destruction-potions-coming-to-vendors-in-tbc-anniversary/
+- Warcraft Tavern, new content coming with TBC Classic Phase 3 (2021, original game, partly summarised): https://www.warcrafttavern.com/tbc/news/new-content-coming-with-tbc-classic-phase-3/
+- Icy Veins, Scale of the Sands reputation guide (2021-05-26, original game): https://www.icy-veins.com/tbc-classic/the-scale-of-the-sands-reputation-and-rewards-guide
+- Search leads, not read: https://www.icy-veins.com/wow-classic/news/face-the-gods-of-zulaman-on-october-22-in-burning-crusade-classic-anniversary/ , https://timesaver.gg/blog/tbc-anniversary-october-22-patch-changes , https://www.warcrafttavern.com/tbc/news/tbc-patch-2-5-3-finalized-patch-notes-phase-3/ , https://dving.net/guides/tbc-anniversary-phase-3
+- Repo files read: `src/domain/raids/sampleAttunements.ts`, `src/features/raids/RaidAbout.tsx`, `BossJournal.tsx`, `src/domain/gems/gemCatalogue.json`, `src/domain/consumables/consumableCatalogue.json`
