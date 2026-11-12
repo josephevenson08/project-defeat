@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 9, 2026-11-11)
+## Status (as of Day 10, 2026-11-12)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -326,6 +326,39 @@ Corrections and consequences:
 - Tavern says SSC/TK attunements ended in August; Blizzard's two posts say nothing about them.
 - The Phase 3 post says Black Temple needed attunement at launch, which disagrees with any reading that all attunements went at Phase 3.
 
+## Tier lists and logs data (Day 10)
+
+**Reading limits today.** Fetches worked through a fetch helper for Warcraft Tavern, Icy Veins, Timesaver and three archon.gg help pages. **Wowhead's DPS tier list and its Warcraft Logs analysis news post were refused again** (permission request unanswered), so Wowhead's Phase 3 and 4 tier letters are still unread. The Tavern DPS page was cut at about 40% and the rest is a model summary. Web search returned titles only.
+
+### What the Spec Tier Lists tab is built on (repo, read directly)
+
+| Piece | Finding |
+| --- | --- |
+| Tier placements | `src/domain/tierlists/tierLists.json` (235 lines): 3 lists (DPS, Healer, Tank), 28 placements, 27 specs covered, `phase: 2`, fetched 2026-08-12. Written by `tools/ingest/ingest-tier-lists.mjs` from three Wowhead guide pages (`dps-`, `healer-`, `tank-rankings-tier-list-pve-burning-crusade-classic-wow`). |
+| Ingest guards | The script refuses a page whose title lacks "Phase 2" and fetches with plain `fetch`. It says Wowhead rewrites these pages in place each phase. It reads `[tier-list=rows]` markup and the spec from `[spec-badge=...]`. The slug names have **no phase in them**, so the same three URLs now probably show a newer phase; the title check would stop the run, which is the intended behaviour. Wowhead blocks scripted requests, so it cannot run today. |
+| Logs figures | `src/domain/simulation/dpsReference.ts` holds Warcraft Logs Fresh **Phase 2** (SSC / TK) 95th-percentile DPS for the damage specs, read 2026-11-02, with parse counts. Its header says archon.gg's list now covers only Black Temple and Hyjal, which is why Warcraft Logs was used. Letters beside the logs figures are archon's (tier field), no D tier. |
+| Where phase text appears | `TierListsPanel.tsx` ("Spec Tier Lists · Phase 2"; "Wowhead's three Phase 2 rankings"), `tierFormat.ts` (`LOGS_READ_ON`, `TIERS_READ_ON`), `AgainstTheLogs.tsx` (compares 20 damage specs), `specStanding.ts` (joins both opinions, kept apart on purpose). |
+| Code needing change | None for the join logic if placements stay keyed by (role, spec). Wording, dates and the two data files change. A switcher would need lists keyed by phase (gap row 6). |
+
+### What exists outside the repo for the current phase
+
+| Source | What it is | Version | Usable? |
+| --- | --- | --- | --- |
+| Wowhead tier lists (Phase 3 updated 2026-08-26 per Timesaver; Phase 4 unknown) | Same three pages the ingest reads | Anniversary, if Timesaver is right | **Unread.** Needed for the existing pipeline. |
+| Timesaver.gg "Phase 3 Best DPS Rankings" (published 2026-08-28, updated 2026-09-07) | S: BM Hunter, Fury Warrior, Destruction Warlock. A: Arcane Mage, Ret Paladin, Arms Warrior, Enhancement Shaman, Affliction Warlock, Survival Hunter. B: Combat Rogue, Shadow Priest, Feral Druid, Elemental Shaman, Balance Druid, Fire Mage. C: Frost Mage, Demonology Warlock. D: Marksmanship Hunter, Assassination Rogue, Subtlety Rogue. | Anniversary Phase 3 | **Low-trust** (boosting site). Says its tiers "follow Wowhead's Phase 3 tier list" and that no live Black Temple parses existed yet. Useful only as a hint to check Wowhead against. Predates the Zul'Aman update. |
+| Icy Veins DPS tier list | Title "Phase 5", last updated **2022-05-07**: S: BM Hunter, Destruction and Demonology Warlock, Arcane Mage; A: Fury Warrior, Combat Rogue, Survival Hunter, Fire Mage; B: Enhancement, Elemental, Arms, Retribution, Affliction; C: Balance, Feral, Shadow Priest, Marksmanship; D: Assassination, Frost, Subtlety. | **Original 2022** | Not usable for the Anniversary. It also shows the same URL carries a different phase title over time. |
+| Icy Veins healer tier list | Title says Phase 3, "Last Updated Jan 12, 2026", changelog entry "08 Dec. 2025: Updated for TBC Anniversary Phase 1 and raid-wide Bloodlust". A: Shaman, Paladin, Priest, Druid; no S; no B. Rates throughput and utility separately. | Anniversary Phase 1 content under a Phase 3 title | Mixed and stale. Ranks classes, not specs. |
+| Warcraft Tavern DPS rankings | Ranked tables per phase with a "DPS %" column from Warcraft Logs, no tier letters; no date. Its dates refer to 2021 phases. | **Original TBC Classic** | Not Anniversary data. |
+| Warcraft Logs Fresh (via archon.gg articles) | BT and Hyjal are one combined raid with their own partition that starts the raid-release week (25 Aug NA, 26 Aug EU, per an article last updated 2026-08-24). Parse rules for the new raids are published (tank damage-taken requirements, per-boss damage exclusions, banned buffs). | Anniversary | Confirms a Phase 3 partition exists. **Nothing read** about a Zul'Aman partition, about whether Phase 2 stays a partition, or about a way to fetch a 95th-percentile figure by script. |
+
+### What this means for the plan
+
+- **Tier letters.** The only trustworthy source for the existing pipeline is Wowhead's three pages, which cannot be fetched by script and could not be read by hand today either. The Anniversary placements are therefore **unknown**; Timesaver's list is a hint, not data. Open question 19.
+- **Logs figures need a new read.** The logs table is Phase 2 by design. A Phase 3 or 4 table would be a fresh read from Warcraft Logs (BT / Hyjal partition) by hand, with the same percentile and range. Zul'Aman logs may be thin or non-existent: it is a 10-player raid with a timer, and nothing read says how Warcraft Logs ranks it. Whether the logs view should cover Phase 3 only, Phase 4 only or stay on Phase 2 is open question 20.
+- **Comparison caveat.** `AgainstTheLogs` compares a spec's tier letter with its parse. If the letters move to Phase 4 while the logs stay Phase 3, the two columns describe different content. The page's "read on" dates already make this visible, but the owner should decide whether to allow a mismatch.
+- **Tank and healer lists.** Healer and tank tier letters on current sources are class-level (Icy Veins) or unread (Wowhead). The tab's three-list shape depends on Wowhead keeping them.
+- **Size.** If Wowhead pages can be saved by hand: re-run the ingest (S) plus text and test fixes (S to M). If not, a hand-built data file from a second source is M and loses the Wowhead provenance the tab advertises.
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -406,6 +439,10 @@ Corrections and consequences:
 - **Day 9:** Scale of the Sands rank rewards are from a 2021 original-game page; Ashtongue rewards unread.
 - **Day 9:** Haste and Destruction Potions for Marks of the Illidari: Tavern, PTR-only as of 2026-08-10; live status unread. Shattrath Flask of Relentless Assault: 2021 preview only.
 - **Day 9:** Tavern potion and Phase 3 preview pages were truncated; later parts are extractor summaries.
+- **Day 10:** Wowhead's current DPS, healer and tank tier letters: unread (refused). Timesaver's Phase 3 list (low-trust, says it copies Wowhead's of 2026-08-26) is unverified.
+- **Day 10:** Tavern's DPS rankings page is cut after about 40% and has no date; treated as original-game.
+- **Day 10:** Icy Veins healer page mixes Phase 3 title, Phase 1 Anniversary changelog and a Jan 2026 date; its phase is unclear.
+- **Day 10:** Warcraft Logs: whether Phase 2 stays a separate partition, whether Zul'Aman has one, and how to get 95th-percentile figures were not answered by any page read. Two archon.gg articles disagree on the restriction window (first 5 guilds vs first 6 hours); irrelevant to the app but shows the sources are not uniform.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -429,7 +466,7 @@ or more.
 | 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase. Day 7: Wowhead has separate Phase 3 and Phase 4 guides on a different URL scheme (so the path table is rewritten); Icy Veins has one merged Phase 3/4 page per spec (2022 date); Warcraft Tavern has Phase 4 pages. Decide on one rankings source per phase, and how to get the pages while scripts are blocked. | L (data access is the risk) |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
-| 6 | **Tier lists** | Re-ingest Wowhead's tier lists and the logs-based view for the new phase. | S to M |
+| 6 | **Tier lists** | Day 10: re-ingest Wowhead's three tier pages (the ingest's title check requires "Phase 2" and must be parameterised) and redo the Warcraft Logs table (`dpsReference.ts`) for Phase 3 or 4 by hand. Panel and format wording change; join logic does not. Tier letters for the current phase are unread; a Zul'Aman logs source is unknown. A switcher needs lists keyed by phase. | S to M (M if Wowhead cannot be used) |
 | 7 | **Acquisition and costs** | Badges of Justice, G'eras vendor, Nether Vortex as currency. `acquisitionCosts.json` needs new currencies. Day 6: the G'eras item list and costs are still unread, so this size is a guess; it also needs a vendor source type, since the catalogue has no source field. | M (could rise to L) |
 | 8 | **Reputations, professions, consumables** | Day 9: no rep model exists in the repo; the 35 phase-3 Epic gems are already in `gemCatalogue.json` (they need verifying and a design/mining source, not adding); drum recipes unchecked in `craftingPaths.json`; potion/flask changes only single-sourced. Needs the owner's call on whether rep rewards are in scope. | M (S if rep rewards are out of scope) |
 | 9 | **Simulation** | Only if balance or class changes exist. `dpsReference.ts` and the rotation work depend on the answer to the unverified items above. | unknown |
@@ -466,6 +503,8 @@ These need an answer before the plan can be called final. The daily runs add to 
 16. **Paladin seals.** (Added Day 8) One fan source says both factions now get Seal of Blood and Seal of Vengeance. The simulator models Seal of Blood (Horde) and Seal of Command (Alliance). Wait for a Blizzard source, or can you check in game?
 17. **Existing attunement chains.** (Added Day 9) Blizzard says only Hyjal and Black Temple lost their attunement (Oct 22). Karazhan, SSC and Tempest Keep chains are in the app. Keep them as history, mark them "skipped in the current game" (needs a source), or remove them from the Raids tab?
 18. **Reputation rewards.** (Added Day 9) The app has no reputation data. Should the planner show which reputation rank gates an item (Scale of the Sands, Ashtongue), or only list the gear?
+19. **Tier list source.** (Added Day 10) The tab shows Wowhead's tier letters, which we cannot fetch by script. Can you save Wowhead's three current tier-list pages from your browser for the ingest, or would you accept a different source (with its own provenance line) if Wowhead stays unavailable?
+20. **Logs phase.** (Added Day 10) The "Against the logs" view uses Phase 2 Warcraft Logs figures. Should it move to Phase 3 (Black Temple / Hyjal), to Phase 4 once data exists, or stay on Phase 2 until then, even if the tier letters move on?
 9. **Builds and phases.** (Added Day 3) Add a phase field to saved builds (and bump the build format version), or keep builds phase-free as they are now?
 
 ---
@@ -486,7 +525,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 7 | Nov 9 | BiS: which published lists exist for Phase 3 and Phase 4 per spec (Wowhead, Icy Veins, Warcraft Tavern); how they differ; fit with `ingest-bis.mjs` | Done in part (list landscape and ingest fit; Wowhead content unread, one spec read on two sites). See "BiS sources (Day 7)". Re-open on Day 10 or 12. |
 | 8 | Nov 10 | Anniversary-specific mechanics: balance, talents, buff limit, Heroism reset, dual spec, pet buffs. Find primary sources Done in part (Blizzard PTR notes read; Heroism confirmed, no balance change found; buff limit and dual spec unconfirmed). See "Anniversary mechanics (Day 8)". Re-open on Day 12. |
 | 9 | Nov 11 | Reputations, attunement removal, professions, consumables and buffs added or changed | Done in part (Blizzard Phase 3 post read; attunement code scoped; rep rewards and consumable changes thinly sourced). See "Attunements, reputations and consumables (Day 9)". Re-open on Day 12. |
-| 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Tier list scope |
+| 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Done in part (tab's data and ingest scoped; Wowhead letters unread; logs partition for Phase 3 confirmed, Phase 4 unknown). See "Tier lists and logs data (Day 10)". Re-open on Day 12. |
 | 11 | Nov 13 | Tests and docs impact: which of the 340 tests break and why; what the redesign port changes about it | Test impact table |
 | 12 | Nov 14 | Sequencing against port steps 4 to 7; risks (Wowhead blocking, data accuracy, phase switcher); effort ranges | Ordered work packages with estimates |
 | 13 | Nov 15 | Draft implementation plan v1: work packages, order, acceptance checks per package | Implementation plan v1 |
@@ -504,6 +543,7 @@ explicitly accepted the open ones.
 - [~] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source (Day 8: Heroism confirmed and already in the app; no balance change in Blizzard's PTR notes; buff limit, dual spec, seals and pet buffs still single-source)
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
 - [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
+- [ ] Tier-list and logs data for the current phase scoped (Day 10: tab and ingest scoped; Wowhead letters unread; logs for Phase 4 unknown; see open questions 19 and 20)
 - [ ] A rankings source chosen for each of the 27 specs (Day 7: three candidate sites, none fully read; see open questions 14 and 15)
 - [ ] The test impact estimated, with a plan to keep the suite green during the change
 - [ ] Work packages ordered, each with a done-test, and sequenced against the redesign port
@@ -708,6 +748,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 10)**
 - Tier lists and logs data for the current phase and what the Spec Tier Lists tab needs. Retry Wowhead news on badge gear.
 
+### Day 10: 2026-11-12
+
+**Done**
+- Read the Spec Tier Lists domain and ingest code (`tierLists.json`, `ingest-tier-lists.mjs`, `dpsReference.ts`, panel files) read-only. Read, through fetch helpers, Warcraft Tavern's DPS rankings, Icy Veins' DPS and healer tier lists, Timesaver's Phase 3 DPS rankings and three archon.gg Warcraft Logs articles. Wowhead's tier list and its Warcraft Logs analysis post were refused again.
+- Added "Tier lists and logs data (Day 10)", open questions 19 and 20, Unverified items, and updated status, gap row 6, the schedule and the checklist.
+
+**Learned**
+- The tab depends on three Wowhead pages with no phase in the URL, and the ingest stops if the title is not Phase 2, so it will fail safe rather than ingest the wrong phase.
+- The logs table is a hand-read Warcraft Logs figure, not scripted, so a new phase is a manual read either way.
+- Warcraft Logs Fresh gave Black Temple and Hyjal their own combined partition from the raid-release week. No page read covers Zul'Aman logs.
+- Icy Veins' DPS page is a 2022 Phase 5 original-game list under a reused URL; Tavern's is original-game too. The only Anniversary Phase 3 list found is a boosting site's.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Wowhead's current tier letters for all three lists; Phase 4 tier changes; whether any logs exist for Zul'Aman; whether Phase 2 remains available on Warcraft Logs.
+
+**Next (Day 11)**
+- Tests and docs impact: which of the 340 tests break and why, and what the port changes. Retry Wowhead for tier letters and badge gear if access allows.
+
 ---
 
 ## Sources (Day 1)
@@ -795,3 +856,15 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Icy Veins, Scale of the Sands reputation guide (2021-05-26, original game): https://www.icy-veins.com/tbc-classic/the-scale-of-the-sands-reputation-and-rewards-guide
 - Search leads, not read: https://www.icy-veins.com/wow-classic/news/face-the-gods-of-zulaman-on-october-22-in-burning-crusade-classic-anniversary/ , https://timesaver.gg/blog/tbc-anniversary-october-22-patch-changes , https://www.warcrafttavern.com/tbc/news/tbc-patch-2-5-3-finalized-patch-notes-phase-3/ , https://dving.net/guides/tbc-anniversary-phase-3
 - Repo files read: `src/domain/raids/sampleAttunements.ts`, `src/features/raids/RaidAbout.tsx`, `BossJournal.tsx`, `src/domain/gems/gemCatalogue.json`, `src/domain/consumables/consumableCatalogue.json`
+
+## Sources (Day 10)
+
+- Timesaver.gg, TBC Anniversary Phase 3 best DPS rankings (low-trust, 2026-08-28, updated 2026-09-07): https://timesaver.gg/blog/tbc-anniversary-phase-3-best-dps-rankings
+- Icy Veins, DPS rankings (titled Phase 5, last updated 2022-05-07, original game): https://icy-veins.com/tbc-classic/dps-rankings-tier-list-for-tbc-classic
+- Icy Veins, healer rankings (mixed phase, last updated Jan 2026): https://www.icy-veins.com/tbc-classic/healer-rankings-tier-list-for-tbc-classic
+- Warcraft Tavern, TBC DPS rankings (undated, original game, partly summarised): https://www.warcrafttavern.com/tbc/dps-rankings/
+- archon.gg, T6 Black Temple and Hyjal on WCL Fresh (updated 2026-08-24): https://www.archon.gg/classic-fresh/articles/news/t6-black-temple-and-hyjal-on-wcl-fresh
+- archon.gg, T6 BT/Hyjal parsing and speedrun rules on WCL Fresh: https://www.archon.gg/classic-fresh/articles/help/t6-bt-hyjal-parsing-and-speedrun-rules-on-wcl-fresh
+- archon.gg, Warcraft Logs and Phase 3 changes (undated): https://www.archon.gg/classic-mop/articles/news/warcraft-logs-and-phase-3-changes
+- Wowhead DPS tier list and Warcraft Logs end-of-phase analysis, refused: https://www.wowhead.com/tbc/guide/dps-rankings-tier-list-pve-burning-crusade-classic-wow , https://pt.tbc.wowhead.com/news/warcraft-logs-analysis-tier-6-burning-crusade-classic-end-of-phase-wrap-up-327120
+- Repo files read: `src/domain/tierlists/tierLists.json`, `specStanding.ts`, `src/domain/simulation/dpsReference.ts`, `tools/ingest/ingest-tier-lists.mjs`, `src/features/tierlists/*` (grep)
