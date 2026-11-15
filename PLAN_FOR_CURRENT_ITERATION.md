@@ -28,7 +28,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 12, 2026-11-14)
+## Status (as of Day 13, 2026-11-15)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +36,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". Day 11: the suite is **431 to 434 tests, not 340**, and the redesign port is **finished** (steps 0 to 7, last on 2026-10-25), so the plan's old "port steps 4 to 7 are planned" was wrong. About 90 tests carry Phase 2 text, and several check numbers that will change when the ceiling rises. See "Test and docs impact (Day 11)". Day 12: risks, a nine-package order and effort ranges are drafted (about 3 to 8 weeks depending on data access, plus 1 to 3 for a switcher). Packages 1 to 3 (phase module, types, catalogue check) need no Wowhead access and change nothing visible; the data packages wait on open questions 10 and 19. See "Risks, effort and work packages (Day 12)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". Day 11: the suite is **431 to 434 tests, not 340**, and the redesign port is **finished** (steps 0 to 7, last on 2026-10-25), so the plan's old "port steps 4 to 7 are planned" was wrong. About 90 tests carry Phase 2 text, and several check numbers that will change when the ceiling rises. See "Test and docs impact (Day 11)". Day 12: risks, a nine-package order and effort ranges are drafted (about 3 to 8 weeks depending on data access, plus 1 to 3 for a switcher). Packages 1 to 3 (phase module, types, catalogue check) need no Wowhead access and change nothing visible; the data packages wait on open questions 10 and 19. See "Risks, effort and work packages (Day 12)". Day 13: implementation plan v1 written (three tracks, five gates, acceptance checks for nine packages); packages 1 to 3 can start on the owner's go, the data packages still cannot. See "Implementation plan v1 (Day 13)". |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -459,6 +459,71 @@ Packages 1 to 3 are safe to start first: they change no visible behaviour and ne
 
 These are guesses from sizes, not from measured velocity, and the biggest swing is data access (R1). Treat them as order-of-magnitude until questions 10 and 19 are answered.
 
+## Implementation plan v1 (Day 13)
+
+**Reading limits today.** One fetch helper read Warcraft Tavern's phases page (the first ~40k of 104k characters verbatim; the Phase 5 row sits in the model-summarised part). Blizzard's Zul'Aman post was refused again (permission request unanswered). Two web searches returned titles only. No new game facts were read, so this section is a plan built on Days 1 to 12. It adds structure (gates, acceptance checks, a start order), not new data. **Nothing here starts until the owner says go.**
+
+### How the work is split
+
+Three tracks. Track A needs no owner answers and no Wowhead access. Track B is the data work and is blocked until the owner picks a data source. Track C is the single visible switch at the end.
+
+| Track | Packages | Visible to players? | Blocked by |
+| --- | --- | --- | --- |
+| A. Foundations | 1 Phase module, 2 Types and schema room, 3 Catalogue check | No | Only "go" from the owner |
+| B. Data (hidden behind the ceiling) | 4 Raids, 5 Badge gear, 6 Rankings, 7 Tier lists and logs | No, while the ceiling stays 2 | Questions 10 and 19 (data source), 11, 12, 14, 17 |
+| C. Switch-on | 8 Ceiling raise and test rewrite, then 9 Extras | Yes, in one commit | Tracks A and B done, question 7 (owner approves the push) |
+
+### Gates (a package may not start until its gate is passed)
+
+| Gate | Passed when | Opens |
+| --- | --- | --- |
+| G0 Go | Owner reads the go/no-go summary and says go | Track A |
+| G1 Data source | Owner answers questions 10 and 19 (hand-saved pages, a second source, or wait) | Packages 4, 6, 7 |
+| G2 Scope | Owner answers 1 (switcher), 2 (target phase), 14 (one or two lists), 17 (old attunement chains) | Final shape of 2, 4, 6, 8 |
+| G3 Sources read | The Zul'Aman loot, G'eras list and costs, and Phase 3/4 BiS pages have each been read once from a current source | Package 5 and the item lists in 4 and 6 |
+| G4 Switch-on | Suite green on the branch, owner has seen a screenshot or preview, question 7 answered | Package 8 push |
+
+### Package-by-package acceptance checks
+
+| # | Package | Acceptance checks (all must hold) | Can start at |
+| --- | --- | --- | --- |
+| 1 | Phase module | (a) One module lists phases with id, label, ceiling, date and display name; `phase.ts`, `defaultMaxPhase` and `RANKED_THROUGH_PHASE` read it. (b) Value is still 2. (c) Full suite passes with no expected value edited. (d) A text search of `src/` finds no second place that stores the number 2 as the phase. | G0 |
+| 2 | Types and schema room | (a) `RaidTier` accepts T6 and a Zul\'Aman value; acquisition sources accept a vendor type and a Badge of Justice currency. (b) Rankings and tier-list files accept a phase key without changing today's file contents. (c) `tsc` passes and no snapshot or count test changes. (d) Question 9 (builds) is recorded as a decision in the code comment or docs, not guessed. | G0 (question 9 can default to "builds stay phase-free") |
+| 3 | Catalogue check | (a) A written table of at least 20 sampled phase-3 and phase-4 items (Tier 6 pieces, Warglaives, Band of Eternity, a spread of badge items) compared with one current source: name, slot, item level, stats. (b) Each mismatch is listed with the item id. (c) No data file is edited unless the owner agreed (question 8). | G0 and G3 for the comparison source |
+| 4 | Raids | (a) Hyjal 5 bosses, Black Temple 9 (Illidari Council as a four-NPC entry), Zul\'Aman 6 exist as typed files. (b) Every boss has loot with item ids that match the catalogue; unmatched rows are counted and listed (the Phase 2 data had 124 of 272 unmatched, so a count is expected, not a failure). (c) Tier 6 token-to-boss links agree with a second source. (d) Zul\'Aman timed loot is marked per question 12. (e) Each raid has a provenance line with its fetch date. (f) Hidden while the ceiling is 2: the Raids tab still shows five raids. | G1, G2, G3 |
+| 5 | Badge gear | (a) Every G\'eras item has badge cost, slot and vendor. (b) Badge currency renders in the same place as other costs. (c) Costs agree between two sources or the item carries a needs-verification flag, as existing data does. | G3 |
+| 6 | Rankings | (a) The path table lists every spec the owner wants, per chosen phase, and the ingest refuses a page whose title lacks the phase. (b) 27 specs have a list, or the missing ones are named. (c) Items outside the catalogue are counted and listed. (d) Provenance line names the source and date. (e) Old Phase 2 lists stay in the repo and are hidden by the ceiling. | G1, G2, G3 |
+| 7 | Tier lists and logs | (a) Tab letters come from one named source with a read-on date. (b) The logs table says which raid and partition it covers (question 20). (c) If letters and logs describe different content, the page says so. | G1 |
+| 8 | Ceiling raise and test rewrite | (a) Ceiling and current phase raised in one commit. (b) Test groups C and D rewritten with new expected numbers taken from the new data, not guessed. (c) Phase 5 items are the new "later phase" fixture. (d) README, `docs/features.md`, `docs/known-limitations.md` updated, and the README line "stays on Phase 2 on purpose" changed only with the owner\'s say-so. (e) `npm run brain` run. (f) Full suite green once, on the final commit. | G4 |
+| 9 | Extras | Each extra has its own acceptance note, written when the owner picks it. | After 8 |
+
+### Suggested start order (if the owner says go before the data questions are answered)
+
+1. Package 1, then package 2, each its own commit on a branch (question 21). Run the full suite once at the end of each (about 10.7 minutes).
+2. Package 3 once a current comparison source can be read (it needs G3 for one source only, not the whole list).
+3. Stop and report. Do not start Track B until G1 is passed. This keeps the branch useful and avoids building loot data on sources that may be replaced.
+
+If the owner answers questions 10 and 19 first, packages 4, 6 and 7 can run next to each other after package 2.
+
+### Test handling per package (from Day 11)
+
+| Package | Test groups touched | Handling |
+| --- | --- | --- |
+| 1 | B (text) only if label wording moves | Keep text identical this step |
+| 2 | None | Types only |
+| 4, 5 | None while hidden; new unit checks for the new raids | Add checks that read the data directly, not the front door counts |
+| 6 | A (imports) | Keep every old `...Phase2Bis` name as an alias until package 8 |
+| 7 | tierlists spec | Update with the new data's numbers |
+| 8 | B, C, D | Rewrite together; strings built from the phase module |
+
+### What this plan does not cover
+
+Implementation of any package, PvP and arena data, Phase 5 (Sunwell) content, and anything the owner has not asked for (reputation rewards, seals, switcher UI) beyond the questions that gate them.
+
+### Plan v1: honest status
+
+The order and acceptance checks are firm enough to start Track A. They are **not** firm enough to start Track B: the items in the Zul\'Aman, G\'eras and BiS lists were never read from a current source (Days 6 and 7), and the data source is undecided. The effort ranges from Day 12 stand unchanged.
+
 ## Where the game is (research)
 
 ### Phase timeline
@@ -547,6 +612,8 @@ These are guesses from sizes, not from measured velocity, and the biggest swing 
 - **Day 11:** Phase 5 (Sunwell) date: a search found only the original-game dates and fan pages; still no Blizzard date and still "Autumn 2026" from Warcraft Tavern only.
 - **Day 12:** effort ranges (3 to 8 weeks, plus 1 to 3 for a switcher) are estimates from sizes, not measured; they depend on data access.
 - **Day 12:** Massively OP's 2026-10-12 and 2026-10-26 Zul'Aman articles could not be fetched; only titles known. Sunwell search again found only original-game pages; Phase 5 date still unconfirmed.
+- **Day 13:** Phase 5 date: Warcraft Tavern's phases page still says "Autumn 2026", patch "TBA" (that row was in the model-summarised part of the page). A Timesaver.gg article titled "No Sunwell Date Yet, and the October 22 Mix-Up" was seen as a title only (low-trust). No Blizzard date found; Blizzard's Zul'Aman post was refused again.
+- **Day 13:** the acceptance checks for packages 4 to 7 assume the item lists exist and can be read; none of the Zul'Aman, G'eras or Phase 3/4 BiS contents has been read from a current source.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -634,7 +701,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 10 | Nov 12 | Tier lists and logs data for the current phase; what the Spec Tier Lists tab needs | Done in part (tab's data and ingest scoped; Wowhead letters unread; logs partition for Phase 3 confirmed, Phase 4 unknown). See "Tier lists and logs data (Day 10)". Re-open on Day 12. |
 | 11 | Nov 13 | Tests and docs impact: which tests break and why; what the redesign port changes about it | Done (read-only audit; no test run). See "Test and docs impact (Day 11)". Port found finished; test count corrected. |
 | 12 | Nov 14 | Sequencing against port steps 4 to 7; risks (Wowhead blocking, data accuracy, phase switcher); effort ranges | Done (port already finished; risks, nine ordered packages and effort ranges drafted from Days 1 to 11; no new primary sources read). See "Risks, effort and work packages (Day 12)". |
-| 13 | Nov 15 | Draft implementation plan v1: work packages, order, acceptance checks per package | Implementation plan v1 |
+| 13 | Nov 15 | Draft implementation plan v1: work packages, order, acceptance checks per package | Done (tracks, gates, acceptance checks and start order written; no new game sources readable). See "Implementation plan v1 (Day 13)". |
 | 14 | Nov 16 | Go/no-go review: walk the "Sureness checklist", list anything unresolved, summarise for the owner | Go/no-go summary at the top of this file |
 
 ---
@@ -652,7 +719,7 @@ explicitly accepted the open ones.
 - [ ] Tier-list and logs data for the current phase scoped (Day 10: tab and ingest scoped; Wowhead letters unread; logs for Phase 4 unknown; see open questions 19 and 20)
 - [ ] A rankings source chosen for each of the 27 specs (Day 7: three candidate sites, none fully read; see open questions 14 and 15)
 - [~] The test impact estimated, with a plan to keep the suite green during the change (Day 11: impact sorted into four groups with a staging idea; not yet run against a real change, test count corrected to 431 to 434)
-- [~] Work packages ordered, each with a done-test, and sequenced against the redesign port (Day 12: nine packages with done-tests and sizes drafted; port needs no sequencing; order and acceptance checks to be firmed up in Day 13's v1 plan)
+- [x] Work packages ordered, each with a done-test, and sequenced against the redesign port (Day 12 drafted; Day 13 added gates, acceptance checks and a start order; port needs no sequencing. Track B acceptance checks still depend on unread sources)
 - [ ] The owner has read the go/no-go summary and said go
 
 ---
@@ -915,6 +982,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 13)**
 - Draft implementation plan v1: firm up package order, acceptance checks per package, and which packages can start without owner answers. Retry unread Blizzard and Wowhead pages first.
 
+### Day 13: 2026-11-15
+
+**Done**
+- Re-read the whole plan and wrote "Implementation plan v1 (Day 13)": three tracks (foundations, hidden data, switch-on), five gates (go, data source, scope, sources read, switch-on), acceptance checks for all nine packages, a start order if the owner says go early, and test handling per package.
+- Retried the Warcraft Tavern phases page (read through a fetch helper) and Blizzard's Zul'Aman post (refused again). Two searches on Sunwell news.
+- Updated the status table, schedule row 13, the sureness checklist and the Unverified list.
+
+**Learned**
+- Packages 1 and 2 need no owner answers beyond "go" and can be done on a branch with the suite green and nothing visible changing. Package 3 needs one current comparison source.
+- The packages that carry the real risk (4 to 7) cannot have firm acceptance checks until G1 (data source) and G3 (items read from a current source) pass.
+- Phase 5 (Sunwell) is still "Autumn 2026", patch "TBA", from Warcraft Tavern only. Search titles show nothing from Blizzard. A date has not been confirmed.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Zul'Aman loot, G'eras items and costs, Wowhead lists and tier letters, live attunement status of the other five raids, Phase 5 date. All unread, unchanged.
+
+**Next (Day 14)**
+- Go/no-go review: walk the sureness checklist, add the "Go/no-go summary" section near the top, list what is unresolved for the owner.
+
 ---
 
 ## Sources (Day 1)
@@ -1026,3 +1114,10 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Massively OP, Zul'Aman unlocked with war bears (2026-10-26; fetch failed): https://massivelyop.com/2026/10/26/world-of-warcraft-burning-crusade-anniversary-unlocks-its-zulaman-raid-with-all-the-war-bears/
 - Search only, original-game Sunwell dates (not Anniversary): https://warcrafttavern.com/tbc/news/sunwell-phase-5-content-coming-may-12-tbc-classic
 - Repo: this plan file only (Days 1 to 11 content)
+
+## Sources (Day 13)
+
+- Warcraft Tavern, phases, schedule and roadmap (re-read via fetch helper; Phase 5 row summary-based): https://www.warcrafttavern.com/tbc/guides/phases/
+- Blizzard Zul'Aman post, refused again: https://worldofwarcraft.blizzard.com/news/24310652
+- Search titles only, low-trust: https://timesaver.gg/blog/tbc-anniversary-phase-4-fury-of-the-sunwell , https://timesaver.gg/blog/will-tbc-anniversary-go-to-wotlk
+- Repo: this plan file only
