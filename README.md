@@ -10,7 +10,6 @@ A gear / talent / raid comp planner for **World of Warcraft: The Burning Crusade
 ![Project Defeat home screen](docs/images/home.jpg)
 
 ## What it does
-
 - **Character planner.** Pick a faction, race, class and spec, then fill every slot from real Phase 2 best-in-slot rankings, including gems and enchants. You see your stats update as you go.
 - **Gear comparison and upgrades.** Compare two items inside the set you're actually wearing, or rank every legal upgrade for a slot.
 - **Talents.** Talent trees for all nine classes, with real icons and rank descriptions.
