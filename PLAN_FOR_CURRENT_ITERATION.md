@@ -10,6 +10,28 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 ---
 
+## Go/no-go summary (Day 14, 2026-11-16; kept current by later runs)
+
+**Short answer: GO for Track A only (packages 1 to 3). NO-GO for the data packages (4 to 7) and the switch-on (8).**
+
+| Part of the job | Verdict | Why |
+| --- | --- | --- |
+| Track A: one phase module, type room for T6 / Zul'Aman / badges, catalogue spot-check (packages 1 to 3) | **Go** | Needs no Wowhead access and changes nothing players see. The suite stays green with the value still 2. Rough size: a few days. |
+| Track B: Hyjal, Black Temple and Zul'Aman loot, G'eras badge gear, Phase 3/4 rankings, tier lists and logs (packages 4 to 7) | **No-go** | Two blockers. (1) No usable data source: Wowhead refuses scripts and the catalogue has no drop-source field (questions 10, 19). (2) Across 14 days, no Zul'Aman loot list, G'eras item list or current Phase 3/4 BiS page was ever read from a current source (Blizzard and Wowhead pages were refused most days). |
+| Track C: raise the ceiling and rewrite tests (package 8) | **No-go** | Depends on Track B. Raising the ceiling early would show Phase 3/4 gear with no rankings, raids or tier lists to match. |
+
+**What the owner needs to decide first, in this order:** 21 (branch or `main`), 22 (start Track A now), then 10 and 19 (how the data gets in; the biggest unlock), then 1, 2, 14, 17 (scope), then 23 (date or a smaller first release).
+
+**What is solid (two or more sources, or Blizzard directly):** Phase 3 went live 2026-08-27; the Zul'Aman update went live 2026-10-22 (Blizzard calls it "The Gods of Zul'Aman", no phase number); Hyjal and Black Temple lost their attunements; Zul'Aman is 10-player with six bosses; Badges of Justice drop in the TBC raids and G'eras sells gear for them; the 2.5.5 PTR notes show no class or balance change, so the simulator looks unaffected beyond data; the repo already holds 540 phase-3 and 137 phase-4 items from the wowsims snapshot.
+
+**What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
+
+**Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
+
+**Standing risk:** if fetch access (question 13) and a data source are not fixed, the daily runs will keep hitting the same refused pages and Track B will stay blocked.
+
+---
+
 ## How the daily run works
 
 Each morning (7:00 AM Central) a scheduled run does this, in order:
@@ -28,7 +50,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 
 ---
 
-## Status (as of Day 13, 2026-11-15)
+## Status (as of Day 14, 2026-11-16)
 
 | Question | Answer today |
 | --- | --- |
@@ -36,7 +58,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
 | Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
-| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". Day 11: the suite is **431 to 434 tests, not 340**, and the redesign port is **finished** (steps 0 to 7, last on 2026-10-25), so the plan's old "port steps 4 to 7 are planned" was wrong. About 90 tests carry Phase 2 text, and several check numbers that will change when the ceiling rises. See "Test and docs impact (Day 11)". Day 12: risks, a nine-package order and effort ranges are drafted (about 3 to 8 weeks depending on data access, plus 1 to 3 for a switcher). Packages 1 to 3 (phase module, types, catalogue check) need no Wowhead access and change nothing visible; the data packages wait on open questions 10 and 19. See "Risks, effort and work packages (Day 12)". Day 13: implementation plan v1 written (three tracks, five gates, acceptance checks for nine packages); packages 1 to 3 can start on the owner's go, the data packages still cannot. See "Implementation plan v1 (Day 13)". |
+| Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". Day 11: the suite is **431 to 434 tests, not 340**, and the redesign port is **finished** (steps 0 to 7, last on 2026-10-25), so the plan's old "port steps 4 to 7 are planned" was wrong. About 90 tests carry Phase 2 text, and several check numbers that will change when the ceiling rises. See "Test and docs impact (Day 11)". Day 12: risks, a nine-package order and effort ranges are drafted (about 3 to 8 weeks depending on data access, plus 1 to 3 for a switcher). Packages 1 to 3 (phase module, types, catalogue check) need no Wowhead access and change nothing visible; the data packages wait on open questions 10 and 19. See "Risks, effort and work packages (Day 12)". Day 13: implementation plan v1 written (three tracks, five gates, acceptance checks for nine packages); packages 1 to 3 can start on the owner's go, the data packages still cannot. See "Implementation plan v1 (Day 13)". Day 14: go/no-go review done; see the "Go/no-go summary" at the top. Go for packages 1 to 3 only; Sunwell still undated in every source read. |
 
 ### Naming (Day 2 finding: Blizzard uses no phase number)
 
@@ -614,6 +636,8 @@ The order and acceptance checks are firm enough to start Track A. They are **not
 - **Day 12:** Massively OP's 2026-10-12 and 2026-10-26 Zul'Aman articles could not be fetched; only titles known. Sunwell search again found only original-game pages; Phase 5 date still unconfirmed.
 - **Day 13:** Phase 5 date: Warcraft Tavern's phases page still says "Autumn 2026", patch "TBA" (that row was in the model-summarised part of the page). A Timesaver.gg article titled "No Sunwell Date Yet, and the October 22 Mix-Up" was seen as a title only (low-trust). No Blizzard date found; Blizzard's Zul'Aman post was refused again.
 - **Day 13:** the acceptance checks for packages 4 to 7 assume the item lists exist and can be read; none of the Zul'Aman, G'eras or Phase 3/4 BiS contents has been read from a current source.
+- **Day 14:** Phase 5 (Sunwell) is undated in the two newest pages read: RealmList (2026-09-15, "undated", "later in 2026") and Timesaver.gg (2026-10-20, "no specific date beyond the roadmap's Autumn 2026 window"). Timesaver is a boosting/gold-selling site; its "announcement around mid-November" is its own extrapolation, and its rumoured Wrath roadmap image is unconfirmed. Neither page covers anything after about 2026-10-28.
+- **Day 14:** Timesaver teasers (titles only, articles unread) mention Heroic keys needing only Honored (Oct 28), Doomwalker and Kazzak loot BoE (Oct 27) and Arena Season 4 not launching with Zul'Aman (Oct 23). The first two match Blizzard's Zul'Aman post; the Season 4 start date is unread.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -702,7 +726,7 @@ later day finds a mistake. After Day 14, keep the daily run going: re-verify, tr
 | 11 | Nov 13 | Tests and docs impact: which tests break and why; what the redesign port changes about it | Done (read-only audit; no test run). See "Test and docs impact (Day 11)". Port found finished; test count corrected. |
 | 12 | Nov 14 | Sequencing against port steps 4 to 7; risks (Wowhead blocking, data accuracy, phase switcher); effort ranges | Done (port already finished; risks, nine ordered packages and effort ranges drafted from Days 1 to 11; no new primary sources read). See "Risks, effort and work packages (Day 12)". |
 | 13 | Nov 15 | Draft implementation plan v1: work packages, order, acceptance checks per package | Done (tracks, gates, acceptance checks and start order written; no new game sources readable). See "Implementation plan v1 (Day 13)". |
-| 14 | Nov 16 | Go/no-go review: walk the "Sureness checklist", list anything unresolved, summarise for the owner | Go/no-go summary at the top of this file |
+| 14 | Nov 16 | Go/no-go review: walk the "Sureness checklist", list anything unresolved, summarise for the owner | Done. "Go/no-go summary" at the top of this file. From Day 15 the run re-verifies, tracks Sunwell and reduces Unverified items. |
 
 ---
 
@@ -1003,6 +1027,26 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 14)**
 - Go/no-go review: walk the sureness checklist, add the "Go/no-go summary" section near the top, list what is unresolved for the owner.
 
+### Day 14: 2026-11-16
+
+**Done**
+- Re-read the whole plan and walked the sureness checklist. Added the "Go/no-go summary" near the top (go for packages 1 to 3, no-go for 4 to 8) and updated the status heading, status table and schedule row 14.
+- Two searches on Sunwell news; one fetch helper read RealmList (2026-09-15) and Timesaver.gg (2026-10-20). `add_repo` was not needed (repo already cloned and reset to `origin/main`).
+
+**Learned**
+- Still no Blizzard date for Sunwell. Both pages call it "Phase 4: Fury of the Sunwell" while Timesaver calls Zul'Aman "Phase 3.5", so fan naming disagrees (this file's "Phase 5" follows Warcraft Tavern and wowsims). Timesaver's "about 26 days after Oct 22, so mid-November" is the site's own guess, not a leak.
+- Timesaver teaser titles suggest Arena Season 4 did not start with Zul'Aman (2026-10-23); not read.
+- Checklist result: 1 box ticked, 3 partly met, 6 open. The open ones all trace back to unread sources or owner answers.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Zul'Aman loot, G'eras items and costs, Phase 3/4 BiS content, current tier letters, live attunements of the older raids, Sunwell date, Arena Season 4 date. The Blizzard Zul'Aman post was not re-fetched today.
+
+**Next (Day 15 onward)**
+- Re-verify the biggest claims, try the Blizzard posts again, search for Blizzard's Sunwell announcement and Season 4 date, and reduce Unverified items. Keep the go/no-go summary current.
+
 ---
 
 ## Sources (Day 1)
@@ -1120,4 +1164,11 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, phases, schedule and roadmap (re-read via fetch helper; Phase 5 row summary-based): https://www.warcrafttavern.com/tbc/guides/phases/
 - Blizzard Zul'Aman post, refused again: https://worldofwarcraft.blizzard.com/news/24310652
 - Search titles only, low-trust: https://timesaver.gg/blog/tbc-anniversary-phase-4-fury-of-the-sunwell , https://timesaver.gg/blog/will-tbc-anniversary-go-to-wotlk
+- Repo: this plan file only
+
+## Sources (Day 14)
+
+- RealmList, TBC Anniversary still waiting on Sunwell (2026-09-15; no Blizzard date): https://realmlist.org/resources/briefings/tbc-anniversary-sunwell-still-waiting/
+- Timesaver.gg, Will TBC Anniversary go to WotLK (2026-10-20; low-trust, sells boosting; Sunwell undated): https://timesaver.gg/blog/will-tbc-anniversary-go-to-wotlk
+- Search titles only: https://timesaver.gg/blog/tbc-anniversary-phase-4-fury-of-the-sunwell , https://mmonster.co/blog/tbc-classic-anniversary-release-date-phase-roadmap
 - Repo: this plan file only
