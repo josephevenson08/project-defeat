@@ -110,6 +110,10 @@ The app stays on Phase 2 on purpose, even though Phase 3 is live.
 
 A working planner, focused on Phase 2 and on DPS specs. Healer and tank math still runs but isn't the focus. Every dataset comes from a pinned source, and wherever the app can't model something, it says so on screen. This is my biggest project so far and it's still growing.
 
+## Current dealings
+
+Right now im working on making this up to date with TBC, but it's taking a while, so ill update when i can :D
+
 ## License
 
 [MIT](LICENSE). World of Warcraft and its artwork are trademarks of Blizzard Entertainment. This is a fan-made tool and is not affiliated with or endorsed by Blizzard.
