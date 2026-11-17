@@ -24,6 +24,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **What is solid (two or more sources, or Blizzard directly):** Phase 3 went live 2026-08-27; the Zul'Aman update went live 2026-10-22 (Blizzard calls it "The Gods of Zul'Aman", no phase number); Hyjal and Black Temple lost their attunements; Zul'Aman is 10-player with six bosses; Badges of Justice drop in the TBC raids and G'eras sells gear for them; the 2.5.5 PTR notes show no class or balance change, so the simulator looks unaffected beyond data; the repo already holds 540 phase-3 and 137 phase-4 items from the wowsims snapshot.
 
+**Day 15 check (2026-11-17):** nothing changed. No Blizzard Sunwell date found; the verdicts above stand.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -638,6 +640,8 @@ The order and acceptance checks are firm enough to start Track A. They are **not
 - **Day 13:** the acceptance checks for packages 4 to 7 assume the item lists exist and can be read; none of the Zul'Aman, G'eras or Phase 3/4 BiS contents has been read from a current source.
 - **Day 14:** Phase 5 (Sunwell) is undated in the two newest pages read: RealmList (2026-09-15, "undated", "later in 2026") and Timesaver.gg (2026-10-20, "no specific date beyond the roadmap's Autumn 2026 window"). Timesaver is a boosting/gold-selling site; its "announcement around mid-November" is its own extrapolation, and its rumoured Wrath roadmap image is unconfirmed. Neither page covers anything after about 2026-10-28.
 - **Day 14:** Timesaver teasers (titles only, articles unread) mention Heroic keys needing only Honored (Oct 28), Doomwalker and Kazzak loot BoE (Oct 27) and Arena Season 4 not launching with Zul'Aman (Oct 23). The first two match Blizzard's Zul'Aman post; the Season 4 start date is unread.
+- **Day 15:** Sunwell (Phase 5) date: still none from Blizzard. A search for the date returned only original-game 2022 pages (Sunwell May 12, 2022), which do not apply to the Anniversary. Blizzard's hotfix log (read up to 2026-10-06) has no TBC Anniversary entries for October and no mention of Sunwell, Zul'Aman, G'eras, Arena Season 4 or attunements. The log's earlier part was partly a model summary, so low confidence there.
+- **Day 15:** Wowhead's TBC news listing was refused (permission request unanswered), so Wowhead posts from 2026-10-07 onward are unread.
 - **Day 2:** unreachable: Icy Veins Zul'Aman news post and the Massively OP article (client errors). Blizzard's main Phase 3 post was not found.
 
 - The patch notes page read on Day 1 (Warcraft Tavern, "2.5.4") is the **original 2022 TBC Classic 2.5.4** notes, which the
@@ -1049,6 +1053,28 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 15: 2026-11-17
+
+**Done**
+- Schedule is finished, so this was a re-verify and Sunwell-tracking run. Cloned repo already present; reset to `origin/main` (`dd602b4`); `add_repo` tool not available, not needed.
+- Two searches (Sunwell date; TBC Anniversary patch notes November 2026) and one fetch round of five pages.
+
+**Learned**
+- Still no Blizzard date for Sunwell (Phase 5). The Sunwell search returned only original-game 2022 pages (Wowhead, Icy Veins, Warcraft Tavern "May 12"), which must not be mistaken for Anniversary dates.
+- Blizzard's hotfix log (news.blizzard.com article 24296142, read through 2026-10-06) has no TBC Anniversary entries for October. TBC entries found: 2026-09-29 Honorary Brewer Hand Stamp purchasable; 2026-09-10 Arena Season 2 belts, bracers, boots, rings and necklaces discounted at Hall of Legends and Champion's Hall vendors. This hints Season 2 gear is still being adjusted, which matches the app's Phase 2 era, but says nothing about Season 4.
+- The two weekly roundups fetched were from November 2025 (pre-patch timing) and are not useful for the current iteration.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Everything on the Day 14 list: Zul'Aman loot, G'eras items and costs, Phase 3/4 BiS contents, tier letters, live attunements, Sunwell date, Arena Season 4 date. Wowhead's TBC news listing was refused, so newer Wowhead posts are unread.
+
+**Next (Day 16)**
+- Try Blizzard's Zul'Aman post and a Blizzard TBC Anniversary news listing again, look for Wowhead or Blizzard posts dated after 2026-10-28, and check any Season 4 announcement. Keep the go/no-go summary current.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1172,3 +1198,10 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Timesaver.gg, Will TBC Anniversary go to WotLK (2026-10-20; low-trust, sells boosting; Sunwell undated): https://timesaver.gg/blog/will-tbc-anniversary-go-to-wotlk
 - Search titles only: https://timesaver.gg/blog/tbc-anniversary-phase-4-fury-of-the-sunwell , https://mmonster.co/blog/tbc-classic-anniversary-release-date-phase-roadmap
 - Repo: this plan file only
+
+## Sources (Day 15)
+
+- Blizzard, Hotfixes (running log, read to 2026-10-06; early part partly summarised): https://news.blizzard.com/en-us/article/24296142/
+- Wowhead, profession re-specialization hotfix (2026-01-27, pre-patch era, not relevant to content): https://www.wowhead.com/tbc/news/blizzard-temporarily-disables-profession-re-specialization-in-the-burning-380142
+- Original-game Sunwell dates (2022, not applicable): https://www.wowhead.com/tbc/news/fury-of-the-sunwell-phase-5-burning-crusade-classic-may-10th-sunwell-plateau-may-326968
+- Refused: https://www.wowhead.com/tbc/news
