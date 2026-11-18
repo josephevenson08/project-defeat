@@ -24,7 +24,7 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **What is solid (two or more sources, or Blizzard directly):** Phase 3 went live 2026-08-27; the Zul'Aman update went live 2026-10-22 (Blizzard calls it "The Gods of Zul'Aman", no phase number); Hyjal and Black Temple lost their attunements; Zul'Aman is 10-player with six bosses; Badges of Justice drop in the TBC raids and G'eras sells gear for them; the 2.5.5 PTR notes show no class or balance change, so the simulator looks unaffected beyond data; the repo already holds 540 phase-3 and 137 phase-4 items from the wowsims snapshot.
 
-**Day 15 check (2026-11-17):** nothing changed. No Blizzard Sunwell date found; the verdicts above stand.
+**Day 16 check (2026-11-18):** nothing changed. No Blizzard Sunwell or Arena Season 4 date found; the verdicts above stand.
 
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
@@ -1075,6 +1075,29 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 16: 2026-11-18
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo already present; reset to `origin/main` (`55308f8`). The `add_repo` and `register_repo_root` tools were not available, and were not needed.
+- Two searches (Sunwell date; TBC Anniversary patch notes November 2026) and one fetch round of two pages: Blizzard's content update notes (page 2) and the Icy Veins TBC Anniversary overview.
+
+**Learned**
+- Still no Blizzard date for Sunwell (Phase 5) or for Arena Season 4. The Sunwell search again returned mostly original-game 2022 pages, which do not apply to Anniversary.
+- Blizzard's content update notes page 2 loaded this time (not refused) but holds no TBC Anniversary entries; its newest item is Legion Remix. Page 1 was not read, so a Blizzard TBC notes list is still unchecked.
+- The Icy Veins overview loaded but was last updated 2026-01-13 and lists Phases 2 to 5 with date "Unknown". It is stale and not evidence for or against any date.
+- The November search returned no TBC Anniversary patch notes dated after 2026-10-22.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Same list as Day 15: Zul'Aman loot, G'eras items and costs, Phase 3/4 BiS contents, tier letters, live attunements, Sunwell date, Arena Season 4 date. The go/no-go verdicts at the top stand.
+
+**Next (Day 17)**
+- Try content update notes page 1 and the Blizzard Zul'Aman post (news/24310652) again, look for any Blizzard TBC Anniversary news after 2026-10-28, and keep the go/no-go summary current.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1205,3 +1228,9 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Wowhead, profession re-specialization hotfix (2026-01-27, pre-patch era, not relevant to content): https://www.wowhead.com/tbc/news/blizzard-temporarily-disables-profession-re-specialization-in-the-burning-380142
 - Original-game Sunwell dates (2022, not applicable): https://www.wowhead.com/tbc/news/fury-of-the-sunwell-phase-5-burning-crusade-classic-may-10th-sunwell-plateau-may-326968
 - Refused: https://www.wowhead.com/tbc/news
+
+## Sources (Day 16)
+
+- Blizzard, content update notes page 2 (read; no TBC Anniversary entries): https://worldofwarcraft.blizzard.com/en-us/content-update-notes?page=2
+- Icy Veins, TBC Classic Anniversary overview (read; last updated 2026-01-13, phases listed as "Unknown"): https://www.icy-veins.com/tbc-classic/tbc-classic-anniversary-overview
+- Search only, original-game Sunwell dates (not Anniversary): https://realsport101.com/wow/wow-classic-tbc-phase-5-sunwell-plateau-release-date-time-raid-lockout
