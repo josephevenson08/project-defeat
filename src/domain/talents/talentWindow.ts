@@ -178,8 +178,10 @@ export function hintStillLive(trees: readonly TalentTree[], points: TalentPoints
 }
 
 /*
- * wowsims' presets for 17 builds, as stored: wowsims lists only the talents its simulator reads, so
- * each leaves out the filler points that open its deeper rows, and the window shows what that breaks.
+ * wowsims' presets for the 20 DPS specs, as stored. Seventeen come from its simulator's Go files, which
+ * list only the talents the simulator reads, so each leaves out the filler points that open its deeper
+ * rows and the window shows what that breaks; Marksmanship, Affliction and Demonology come from its UI
+ * files, which are full in-game builds (2026-11-19).
  * Cast at the boundary, as `bestCase.ts` does: TypeScript otherwise infers every build's own keys.
  */
 type StoredBuild = { className: string; spec: string; source: string; points: Record<string, number> }

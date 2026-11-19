@@ -5793,20 +5793,22 @@ test('every DPS spec is measured against what players actually parse', () => {
   /*
    * **Which specs are measured against a real build, and which are not.** Printed beside the table
    * because the two are not the same measurement: a sourced spec is compared at a build a raider
-   * plays, and the other three at a synthetic one-tree fill. Mixing them silently would make the
-   * column look more uniform than it is.
+   * plays, and a spec without one at a synthetic one-tree fill. Mixing them silently would make the
+   * column look more uniform than it is. Since 2026-11-19 none is left on the fill: wowsims' UI files
+   * gave Marksmanship, Affliction and Demonology their builds.
    */
   console.log(
     `
-${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build, Subtlety and Marksmanship a guide's; the rest keep the one-tree fill: ` +
+${talentBuilds.buildCount - 2} of 20 specs use a wowsims raiding build, Subtlety and Marksmanship a guide's; one-tree fill: ` +
       talentBuilds.unsourced
         .filter((u) => !calibrationBuildFor(u.className, u.spec))
         .map((u) => `${u.className} ${u.spec}`)
         .join(', '),
   )
-  // Seventeen stored presets, which the Talents tab loads; the best case swaps Subtlety's (below).
-  expect(talentBuilds.buildCount, 'seventeen sourced builds').toBe(17)
-  expect(talentBuilds.unsourced, 'and three that have no upstream preset').toHaveLength(3)
+  // Twenty stored presets, which the Talents tab loads; the best case swaps Subtlety's and Marksmanship's (below).
+  // Seventeen from the Go files, and three more from wowsims' UI files since 2026-11-19.
+  expect(talentBuilds.buildCount, 'twenty sourced builds').toBe(20)
+  expect(talentBuilds.unsourced, 'and none without one').toHaveLength(0)
 
   /*
    * **Two honest consequences of using real builds, recorded rather than smoothed over.**
@@ -5843,7 +5845,8 @@ ${talentBuilds.buildCount - 1} of 20 specs use a wowsims raiding build, Subtlety
   const marksSplit = hunterTrees.map((tree) => tree.talents.reduce((sum, talent) => sum + (marks.points[talent.id] ?? 0), 0))
   expect(marksSplit.join('/'), 'the Marksmanship guide build is what it says').toBe(marks.split)
   expect(talentProblems(hunterTrees, marks.points as Record<number, number>), 'and the game would allow it').toEqual([])
-  expect(talentBuilds.unsourced.map((u) => u.spec), 'it is the one the build ingest has no preset for').toContain('Marksmanship')
+  // wowsims' UI preset (17/44/0, the same 44 Marksmanship points) is stored for the Talents tab; the best case keeps the guide's.
+  expect(talentBuilds.builds.find((build) => build.spec === 'Marksmanship')!.source).toMatch(/^ui\/hunter\/presets\.ts/)
   for (const build of talentBuilds.builds) {
     expect(build.pointsSpent, `${build.spec} cannot exceed the level-70 budget`).toBeLessThanOrEqual(61)
     expect(build.pointsSpent, `${build.spec} must spend something`).toBeGreaterThan(0)

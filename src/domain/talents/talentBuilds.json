@@ -5,8 +5,8 @@
     "sha": "3301fca59306a747e521274c36e073e69acc7b77"
   },
   "generatedBy": "tools/ingest/ingest-talent-builds.mjs",
-  "note": "Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps.",
-  "buildCount": 17,
+  "note": "Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps. Builds sourced from ui/<class>/presets.ts are wowsims' UI presets, full in-game builds in Wowhead's calculator code, used where the Go files have none.",
+  "buildCount": 20,
   "builds": [
     {
       "className": "Hunter",
@@ -519,20 +519,100 @@
         "1692": 3,
         "1693": 1
       }
-    }
-  ],
-  "unsourced": [
+    },
     {
       "className": "Hunter",
-      "spec": "Marksmanship"
+      "spec": "Marksmanship",
+      "source": "ui/hunter/presets.ts:MarksmanTalents",
+      "pointsSpent": 61,
+      "legal": true,
+      "gaps": [],
+      "points": {
+        "1342": 1,
+        "1343": 5,
+        "1344": 5,
+        "1345": 1,
+        "1347": 3,
+        "1349": 5,
+        "1353": 1,
+        "1361": 1,
+        "1362": 5,
+        "1382": 5,
+        "1389": 1,
+        "1393": 2,
+        "1396": 5,
+        "1624": 2,
+        "1625": 2,
+        "1804": 2,
+        "1806": 3,
+        "1807": 5,
+        "1818": 2,
+        "1819": 2,
+        "1821": 3
+      }
     },
     {
       "className": "Warlock",
-      "spec": "Affliction"
+      "spec": "Affliction",
+      "source": "ui/warlock/presets.ts:AfflicationTalents",
+      "pointsSpent": 61,
+      "legal": true,
+      "gaps": [],
+      "points": {
+        "943": 5,
+        "944": 5,
+        "963": 1,
+        "964": 2,
+        "967": 1,
+        "981": 5,
+        "985": 2,
+        "1002": 2,
+        "1003": 5,
+        "1005": 5,
+        "1007": 2,
+        "1022": 1,
+        "1041": 1,
+        "1042": 5,
+        "1061": 1,
+        "1101": 2,
+        "1667": 3,
+        "1669": 5,
+        "1763": 5,
+        "1764": 3
+      }
     },
     {
       "className": "Warlock",
-      "spec": "Demonology"
+      "spec": "Demonology",
+      "source": "ui/warlock/presets.ts:DemonologistTalents",
+      "pointsSpent": 61,
+      "legal": true,
+      "gaps": [],
+      "points": {
+        "943": 5,
+        "944": 5,
+        "963": 1,
+        "964": 2,
+        "981": 5,
+        "985": 1,
+        "1003": 1,
+        "1221": 2,
+        "1223": 5,
+        "1226": 1,
+        "1227": 2,
+        "1241": 3,
+        "1242": 3,
+        "1244": 5,
+        "1262": 5,
+        "1263": 3,
+        "1281": 1,
+        "1282": 1,
+        "1671": 3,
+        "1672": 1,
+        "1673": 5,
+        "1681": 1
+      }
     }
-  ]
+  ],
+  "unsourced": []
 }

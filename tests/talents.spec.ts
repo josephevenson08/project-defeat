@@ -94,8 +94,9 @@ test('the stored Fury preset is 9 / 39 / 0 and breaks 3 rules; Enrage 5/5 fixes 
   for (const id of lit) expect(arms.talents.find((entry) => entry.id === id)!.row).toBeLessThan(2)
 })
 
-test('every preset belongs to its class and spec; the 10 specs without one say so', () => {
-  expect(talentPresetCount).toBe(17)
+test('every preset belongs to its class and spec; the 7 specs without one say so', () => {
+  // 17 until 2026-11-19, when wowsims' UI presets filled Marksmanship, Affliction and Demonology.
+  expect(talentPresetCount).toBe(20)
   const withPreset: string[] = []
   for (const { className, specs } of tbcClasses) {
     for (const spec of specs) {
@@ -107,8 +108,9 @@ test('every preset belongs to its class and spec; the 10 specs without one say s
       for (const id of Object.keys(preset.points)) expect(ids.has(Number(id)), `${spec} ${className}'s preset names talent ${id}`).toBe(true)
     }
   }
-  expect(withPreset).toHaveLength(17)
-  expect(withPreset).not.toContain('Marksmanship Hunter')
+  expect(withPreset).toHaveLength(20)
+  expect(withPreset).toContain('Marksmanship Hunter')
+  // The seven without one are the healers and tanks: wowsims ships DPS presets.
   expect(withPreset).not.toContain('Holy Priest')
 })
 
@@ -234,6 +236,22 @@ test('opens untalented with real icons, and the Fury preset loads as stored with
   // The preset's first broken prerequisite is the talent shown under the frame.
   await expect(page.getByTestId('talent-selected')).toContainText('Flurry')
   await expect(page.getByTestId('talent-selected')).toContainText('Requires 5 points in Enrage')
+})
+
+test("a Marksmanship Hunter's preset loads from wowsims' UI files, a full build that breaks no rule", async ({ page }) => {
+  /*
+   * The Go presets list only what wowsims' simulator reads, so they break rules; the three filled in on
+   * 2026-11-19 (Marksmanship, Affliction, Demonology) are its UI presets, full in-game builds.
+   */
+  await openTalents(page, { dressed: false })
+  await (await characterField(page, 'Race')).selectOption('Night Elf')
+  await (await characterField(page, 'Class')).selectOption('Hunter')
+  await (await characterField(page, 'Specialization')).selectOption('Marksmanship')
+  await page.getByTestId('talents-preset').click()
+  await expect(split(page)).toHaveText('17 / 44 / 0')
+  await expect(message(page)).toHaveText('Loaded the Marksmanship preset as stored: 17 / 44 / 0, 61 of 61 points.')
+  await expect(left(page)).toHaveText('0')
+  await expect(off(page)).toContainText('Every rule holds and all 61 points are spent.')
 })
 
 test('the hit cap follows Precision: 140 / 95 at 3/3, 111 at 2/3, and the Gear tab agrees', async ({ page }) => {

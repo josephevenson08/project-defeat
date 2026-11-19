@@ -83,7 +83,8 @@ export function bestCaseSimulation(className: TbcClass, spec: TbcSpec, role: Cha
 
   /*
    * **A real raiding build where upstream has one** (`talentBuilds.json`, wowsims' presets for 16 of
-   * the 20 DPS specs, and a guide's for Subtlety and Marksmanship, below), and for the other two the spec's own tree filled in listed order and stopped
+   * the 20 DPS specs: seventeen from its Go files and Affliction and Demonology from its UI files since
+   * 2026-11-19, with a guide's for Subtlety and Marksmanship below), and, for a spec with none, the spec's own tree filled in listed order and stopped
    * at 61, the level-70 budget, rather than an invented build — the repo owner's call.
    */
   /*

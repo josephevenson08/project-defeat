@@ -187,7 +187,7 @@ behind every claim of its that quotes a number.
   tree is one tab stop, moved around with the arrow keys, Home and End; Enter or + learns, − or Delete
   unlearns. Points left and the split ("9 / 39 / 0") at the top, with **the hit cap as Precision and
   its kin move it** ("Hit 140 / 95, 45 over the cap"). It opens untalented; **"Load the <spec>
-  preset"** puts in wowsims' preset where it has one (17 builds), as stored, and **"What's off"** lists
+  preset"** puts in wowsims' preset where it has one (all 20 DPS specs), as stored, and **"What's off"** lists
   every rule a build breaks with a one-press fix ("Add Enrage to 5/5") or "Show where", which lights
   the talents that can take a point toward a short row, then the points left unspent
 - Real item icons on the character sheet, the ranked-gear rows and the raid loot tables. Icon names are

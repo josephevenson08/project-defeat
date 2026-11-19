@@ -16,10 +16,12 @@
 //         ...
 //     }
 //
-// **17 of 20 DPS specs have one.** Hunter Marksmanship, Warlock Affliction and Warlock Demonology do
-// not, and the harness keeps its old rule for exactly those three rather than inventing a build —
-// the repo owner's call on 2026-08-27. The generated file records which specs are sourced so the
-// calibration table can say so rather than mixing two methodologies silently.
+// **17 of 20 DPS specs have one in the Go files.** Hunter Marksmanship, Warlock Affliction and Warlock
+// Demonology do not, and until 2026-11-19 the harness kept its one-tree fill for exactly those three.
+// **wowsims' UI files at the same commit do have all three** (`ui/hunter/presets.ts`,
+// `ui/warlock/presets.ts`), written in Wowhead's talent-calculator code: one digit per talent in row
+// then column order, a dash between trees. Those are full in-game builds, and they fill the three gaps
+// (the owner's call, 2026-11-19). The generated file still records each build's source.
 //
 // **They are simulator presets, not builds you could put in the game.** wowsims lists only the talents
 // its simulator reads, so every preset leaves out the filler points that open its deeper rows (and
@@ -84,11 +86,18 @@ const BUILDS = [
 ]
 
 /** Specs with no upstream preset, recorded so the harness can say which rule it used. */
-const UNSOURCED = [
-  { className: 'Hunter', spec: 'Marksmanship' },
-  { className: 'Warlock', spec: 'Affliction' },
-  { className: 'Warlock', spec: 'Demonology' },
+/*
+ * Read from wowsims' UI presets where the Go files have none. `AfflicationTalents` is upstream's own
+ * spelling.
+ */
+const UI_BUILDS = [
+  { className: 'Hunter', spec: 'Marksmanship', path: 'ui/hunter/presets.ts', variable: 'MarksmanTalents' },
+  { className: 'Warlock', spec: 'Affliction', path: 'ui/warlock/presets.ts', variable: 'AfflicationTalents' },
+  { className: 'Warlock', spec: 'Demonology', path: 'ui/warlock/presets.ts', variable: 'DemonologistTalents' },
 ]
+
+/** DPS specs with no preset in either file, which keep the harness's one-tree fill. None, since 2026-11-19. */
+const UNSOURCED = []
 
 const TALENT_JSON = {
   Warrior: 'warriorTalents.json',
@@ -194,6 +203,42 @@ for (const entry of BUILDS) {
   builds.push({ ...entry, pointsSpent: spent, legal: gaps.length === 0, gaps, points })
 }
 
+/*
+ * The UI presets, in Wowhead's calculator code. Each tree's digits follow its talents in row then
+ * column order, which is how the ingested trees are laid out; a digit with no talent behind it, or a
+ * rank over the talent's maximum, fails rather than being clamped, since the code is the game's own
+ * format and a mismatch means the order is wrong.
+ */
+for (const entry of UI_BUILDS) {
+  const source = await readSource(entry.path)
+  const code = new RegExp(`export const ${entry.variable} = \\{[^}]*?data:\\s*'([0-9-]+)'`).exec(source)?.[1]
+  if (!code) {
+    failures.push(`${entry.className} ${entry.spec}: no talent string named ${entry.variable} in ${entry.path}`)
+    continue
+  }
+  const tree = JSON.parse(readFileSync(resolve(REPO, `src/domain/talents/${TALENT_JSON[entry.className]}`), 'utf8'))
+  const parts = code.split('-')
+  const points = {}
+  let spent = 0
+  tree.trees.forEach((t, index) => {
+    const ordered = [...t.talents].sort((a, b) => a.row - b.row || a.column - b.column)
+    const digits = parts[index] ?? ''
+    if (digits.length > ordered.length) failures.push(`${entry.className} ${entry.spec}: ${digits.length} digits for ${t.spec}'s ${ordered.length} talents`)
+    ;[...digits].forEach((digit, position) => {
+      const rank = Number(digit)
+      if (rank === 0) return
+      const talent = ordered[position]
+      if (!talent) return
+      if (rank > talent.maxRank) failures.push(`${entry.className} ${entry.spec}: ${talent.name} ${rank} over its ${talent.maxRank}`)
+      points[talent.id] = rank
+      spent += rank
+    })
+  })
+  if (spent > 61) failures.push(`${entry.className} ${entry.spec}: ${spent} points spent, over the 61 cap`)
+  const gaps = gapsOf(tree.trees, points)
+  builds.push({ ...entry, pointsSpent: spent, legal: gaps.length === 0, gaps, points })
+}
+
 if (failures.length > 0) {
   console.error('REFUSING TO WRITE — some builds did not resolve:')
   for (const f of failures) console.error(`  - ${f}`)
@@ -204,7 +249,7 @@ const out = {
   $schema: 'wowsims talent-build extraction',
   upstream: { repo: 'wowsims/tbc', sha: UPSTREAM_SHA },
   generatedBy: 'tools/ingest/ingest-talent-builds.mjs',
-  note: 'Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps.',
+  note: "Simulator presets: wowsims lists only the talents its simulator reads, so a build that leaves out filler points is not legal in the game. Each build records legal and its gaps. Builds sourced from ui/<class>/presets.ts are wowsims' UI presets, full in-game builds in Wowhead's calculator code, used where the Go files have none.",
   buildCount: builds.length,
   builds: builds.map(({ className, spec, path, variable, pointsSpent, legal, gaps, points }) => ({
     className,
@@ -236,4 +281,8 @@ if (clamped.length > 0) {
 ${clamped.length} rank(s) clamped to the ingested tree's cap, which upstream exceeds:`)
   for (const c of clamped) console.log(`  - ${c}`)
 }
-console.log(`\n${UNSOURCED.length} DPS specs have no upstream preset and keep the harness's own rule: ${UNSOURCED.map((u) => `${u.className} ${u.spec}`).join(', ')}.`)
+console.log(
+  UNSOURCED.length === 0
+    ? '\nEvery DPS spec has an upstream preset.'
+    : `\n${UNSOURCED.length} DPS specs have no upstream preset and keep the harness's own rule: ${UNSOURCED.map((u) => `${u.className} ${u.spec}`).join(', ')}.`,
+)

@@ -2,14 +2,14 @@
 type: module
 layer: domain
 source: src/domain/talents/calibrationBuilds.ts
-lines: 123
+lines: 125
 generated: true
 tags: [brain/architecture, layer/domain]
 ---
 
 # domain.talents.calibrationBuilds
 
-`src/domain/talents/calibrationBuilds.ts` · **domain** layer · 123 lines
+`src/domain/talents/calibrationBuilds.ts` · **domain** layer · 125 lines
 
 From the top of the file:
 
@@ -29,7 +29,9 @@ From the top of the file:
 > so it was measured at the one-tree fill: every Marksmanship talent in listed order, which no raider
 > plays. With the physical debuffs applied that read 1,392 to 1,526 against its 95th percentile of
 > 1,386, and the model put Marksmanship above Survival where the logs put it 327 DPS below. The same
-> mismatch as Subtlety's, from the other side, so it gets a guide's build too (2026-11-02).
+> mismatch as Subtlety's, from the other side, so it gets a guide's build too (2026-11-02). wowsims' UI
+> files turned out to have one after all (17/44/0, the same 44 Marksmanship points), stored since
+> 2026-11-19 for the Talents tab; the best case keeps the guide's, the owner's call.
 > 
 > Only the best case reads this. The Talents tab's "Load the preset" keeps wowsims' build as stored,
 > which is the owner's call (2026-10-31).

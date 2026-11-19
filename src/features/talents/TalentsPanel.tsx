@@ -168,7 +168,8 @@ function TalentTip({ className, tree, talent, points, hint }: { className: Chara
  *
  * **It opens untalented, as the app starts clean** (the owner's call, 2026-10-19): the prototype
  * opened on the wowsims Fury preset. "Load the <spec> preset" puts wowsims' preset in where it has one
- * (17 builds), as stored, so "What's off" lists the rules it breaks; the other specs say there is none.
+ * (all 20 DPS specs), as stored, so "What's off" lists the rules it breaks; the healers and tanks say
+ * there is none.
  */
 export function TalentsPanel({ character, points, onChange, hitCap, gear, session, onSession }: TalentsPanelProps) {
   const data = getTalentData(character.className)
