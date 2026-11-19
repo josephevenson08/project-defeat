@@ -26,6 +26,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 16 check (2026-11-18):** nothing changed. No Blizzard Sunwell or Arena Season 4 date found; the verdicts above stand.
 
+**Day 17 check (2026-11-19):** still no Blizzard date for Sunwell. Blizzard Watch estimates December 2026 (an estimate, not Blizzard); Kami Labs says only "later in 2026". Verdicts stand.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1098,6 +1100,29 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 17: 2026-11-19
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo already present; reset to `origin/main` (`aca5306`). The `add_repo` and `register_repo_root` tools were not available, and were not needed.
+- Two searches (Sunwell date; TBC Anniversary patch notes November 2026) and one fetch round of three pages: Blizzard's Zul'Aman post, a Kami Labs Sunwell article and a Blizzard Watch phase-dates article.
+
+**Learned**
+- Blizzard's Zul'Aman post (news/24310652) was refused again (permission request unanswered). Zul'Aman loot, G'eras items and attunement wording remain unread from Blizzard.
+- Still no Blizzard date for Sunwell (Phase 5). Two non-Blizzard sources now disagree on the window: Blizzard Watch (page says updated 2026-10-08/09; its slug and first-published dates conflict) estimates **"Phase 4" (Sunwell, Quel'Danas, Shattered Sun Offensive, Arena Season 4) in December 2026**, labelled an estimate. Kami Labs (2026-09-10, fan site) says Blizzard gave no date and its reading of the Classic 2026 roadmap is only "later in 2026". Neither quotes Blizzard. Note the naming clash: Blizzard Watch calls Sunwell "Phase 4" and the October update "Phase 3.5", while this plan and wowsims call the October update Phase 4 and Sunwell Phase 5.
+- Blizzard Watch also lists Phase 2 on 2026-05-14 (with a Blizzard link) and Arena Season 3 with Phase 3, which fits earlier days. It links a Blizzard "state of Azeroth" roadmap recap (news/24250385), not yet read.
+- Search for November patch notes again found nothing for TBC Anniversary after 2026-10-22.
+
+**Corrections**
+- None to earlier days. The Day 14 line "no Blizzard date for Sunwell" stands; a December 2026 estimate now exists but is third-party.
+
+**Still unsure**
+- Same list as Day 16, plus: whether Blizzard's roadmap recap gives a Sunwell window. Go/no-go verdicts at the top stand. If Sunwell lands in December, open question 23 (date versus a smaller first release) gets more pressing: the app would target Phase 2 while the game is two phases ahead.
+
+**Next (Day 18)**
+- Read Blizzard's roadmap recap (news/24250385) and content update notes page 1; retry the Zul'Aman post; look for any Blizzard Sunwell or Arena Season 4 announcement.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1234,3 +1259,10 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Blizzard, content update notes page 2 (read; no TBC Anniversary entries): https://worldofwarcraft.blizzard.com/en-us/content-update-notes?page=2
 - Icy Veins, TBC Classic Anniversary overview (read; last updated 2026-01-13, phases listed as "Unknown"): https://www.icy-veins.com/tbc-classic/tbc-classic-anniversary-overview
 - Search only, original-game Sunwell dates (not Anniversary): https://realsport101.com/wow/wow-classic-tbc-phase-5-sunwell-plateau-release-date-time-raid-lockout
+
+## Sources (Day 17)
+
+- Blizzard Watch, TBC Anniversary phase release dates (read; dates on the page conflict; Sunwell "estimated December 2026", an estimate): https://blizzardwatch.com/2026/01/29/burning-crusade-classic-anniversary-phase-release-dates/
+- Kami Labs, Phase 4 Sunwell and BlizzCon (2026-09-10, fan site; no Blizzard date): https://kami-labs.fr/en/wow-classic/tbc-phase-4-sunwell-blizzcon/
+- Blizzard Zul'Aman post, refused again: https://worldofwarcraft.blizzard.com/news/24310652
+- Blizzard roadmap recap (link seen, not read): https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap
