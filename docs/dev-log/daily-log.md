@@ -2,7 +2,7 @@
 
 Every day with a commit, newest first, one line per commit — straight from `git log`.
 
-**521 commits across 91 days**, from 2026-06-25 to 2026-11-02.
+**544 commits across 108 days**, from 2026-06-25 to 2026-11-19.
 
 For *why* something was done and what it turned up, read [`HANDOFF.md`](HANDOFF.md): it is the
 narrative this is the index into. Each hash below links to the full commit, whose message usually
@@ -13,15 +13,89 @@ explains the change in more detail than its title.
 
 ## November 2026
 
-_9 commits_
+_32 commits_
 
-### Monday 2 November — 5 commits
+### Thursday 19 November — 3 commits
+
+- Plan: Day 17 re-verify, Sunwell tracking, log entry \[skip ci\] — [`2357cf2`](https://github.com/josephevenson08/project-defeat/commit/2357cf23e4ea11b34dfa72782fdc2c306adbb067)
+- Bring the README up to where the project is — [`43c1a1f`](https://github.com/josephevenson08/project-defeat/commit/43c1a1f173d393201354f946717100253c37e110)
+- Give every DPS spec a talent preset from wowsims' UI files — [`8346fa4`](https://github.com/josephevenson08/project-defeat/commit/8346fa4cb71e10df78ca51836ae336e68b20f03a)
+
+### Wednesday 18 November — 1 commit
+
+- Plan: Day 16 re-verify, Sunwell tracking, log entry \[skip ci\] — [`aca5306`](https://github.com/josephevenson08/project-defeat/commit/aca5306282da08e633cdfdb4d58bfacd3bb7621f)
+
+### Tuesday 17 November — 1 commit
+
+- Plan: Day 15 re-verify, Sunwell tracking, log entry \[skip ci\] — [`55308f8`](https://github.com/josephevenson08/project-defeat/commit/55308f884fc2f43526bae7445630f78d5593db79)
+
+### Monday 16 November — 2 commits
+
+- Plan Day 14: go/no-go summary, Sunwell status \[skip ci\] — [`59318a1`](https://github.com/josephevenson08/project-defeat/commit/59318a127a75e6175a82b535aa0c380d128ba02f)
+- Update README with current project status — [`dd602b4`](https://github.com/josephevenson08/project-defeat/commit/dd602b4d69e06e81979483c38a9e6026a1bccdaa)
+
+### Sunday 15 November — 3 commits
+
+- Plan Day 13: implementation plan v1 with gates and acceptance checks \[skip ci\] — [`fde75dc`](https://github.com/josephevenson08/project-defeat/commit/fde75dc1944079f1ec952b206655f732f0114e81)
+- Update README to remove a feature description — [`78904dc`](https://github.com/josephevenson08/project-defeat/commit/78904dc389c1734d9592dba9ef8782d7055886d9)
+- Update project features in README — [`52f25f4`](https://github.com/josephevenson08/project-defeat/commit/52f25f4704a29aa26b3c47cafe90144c0388a5d6)
+
+### Saturday 14 November — 1 commit
+
+- Plan Day 12: risks, work packages and effort ranges \[skip ci\] — [`7ac1941`](https://github.com/josephevenson08/project-defeat/commit/7ac194173411aa560f66c81e3c0886c07ba54339)
+
+### Friday 13 November — 1 commit
+
+- Plan Day 11: tests and docs impact; correct test count and port status \[skip ci\] — [`370ba22`](https://github.com/josephevenson08/project-defeat/commit/370ba2282b24e581f961c00a5a5308ce6d0fbe3c)
+
+### Thursday 12 November — 1 commit
+
+- Plan Day 10: tier lists and logs data research \[skip ci\] — [`8753c56`](https://github.com/josephevenson08/project-defeat/commit/8753c567ca7f67fc15191443dc43724f677332ff)
+
+### Wednesday 11 November — 1 commit
+
+- Plan Day 9: attunements, reputations, consumables research \[skip ci\] — [`09ff937`](https://github.com/josephevenson08/project-defeat/commit/09ff937a4c7ecdfddf8181709168e6424466d0ca)
+
+### Tuesday 10 November — 1 commit
+
+- Plan Day 8: Anniversary mechanics research \[skip ci\] — [`2c88a65`](https://github.com/josephevenson08/project-defeat/commit/2c88a65f9bcfbc7cf5b6eace7ccb591dbed87e63)
+
+### Monday 9 November — 1 commit
+
+- Plan day 7: BiS sources for Phase 3 and 4 \[skip ci\] — [`76e7a50`](https://github.com/josephevenson08/project-defeat/commit/76e7a501ad8ca06a3f4912fc318cdd34c97ec6fd)
+
+### Sunday 8 November — 1 commit
+
+- Plan day 6: Zul'Aman and badge gear scope \[skip ci\] — [`d849ea0`](https://github.com/josephevenson08/project-defeat/commit/d849ea007122c972ac526e099c0f89adfb1dbd8c)
+
+### Saturday 7 November — 1 commit
+
+- Plan day 5: Tier 6 tokens and epic gems scope \[skip ci\] — [`32f723d`](https://github.com/josephevenson08/project-defeat/commit/32f723d43cff9de537f17bd8b6fde55ee0ed471d)
+
+### Friday 6 November — 1 commit
+
+- Plan day 4: Hyjal/Black Temple data inventory and ingest reuse \[skip ci\] — [`d3fedd3`](https://github.com/josephevenson08/project-defeat/commit/d3fedd31b76929016346032874ccced416f8c38e)
+
+### Thursday 5 November — 1 commit
+
+- Plan day 3: Phase 2 coupling inventory and proposed phase model \[skip ci\] — [`277a283`](https://github.com/josephevenson08/project-defeat/commit/277a283b30496d319ed172489a253ad3101b2c22)
+
+### Wednesday 4 November — 1 commit
+
+- Plan day 2: settle update naming from Blizzard post \[skip ci\] — [`9b4d2eb`](https://github.com/josephevenson08/project-defeat/commit/9b4d2ebe284638d87ee53da0a2efc2bf456e79fe)
+
+### Tuesday 3 November — 1 commit
+
+- Start the plan for the current iteration of the game \[skip ci\] — [`859c74a`](https://github.com/josephevenson08/project-defeat/commit/859c74a5f5cac4f82d47add8ea6a8df39973d961)
+
+### Monday 2 November — 6 commits
 
 - Measure against the logs' 95th percentile, read from Warcraft Logs, and say so — [`e8f7d84`](https://github.com/josephevenson08/project-defeat/commit/e8f7d845e7e6af489079eb045f7d0d33b70f727b)
 - Apply the physical raid debuffs, measure Marksmanship at a guide build, and mark its reference thin — [`4ceb779`](https://github.com/josephevenson08/project-defeat/commit/4ceb7798d134108126f3bb8bf0322ec3c7d2b611)
 - Refresh the daily log — [`f2ee73d`](https://github.com/josephevenson08/project-defeat/commit/f2ee73daf809d15acdeb196043e92937d41badac)
 - Say what the simulator's largest gaps really are, and that the last commits are pushed — [`d07f440`](https://github.com/josephevenson08/project-defeat/commit/d07f440078c60d41a0504372928658a2cd0b93d4)
 - Price the timed class cooldowns at duration over cooldown — [`d52b6e4`](https://github.com/josephevenson08/project-defeat/commit/d52b6e4e6919929151dc33af002cb95982dcadbd)
+- Refresh the daily log — [`b19b681`](https://github.com/josephevenson08/project-defeat/commit/b19b681e5abb971fdf6872768ff4855e3905b14c)
 
 ### Sunday 1 November — 4 commits
 

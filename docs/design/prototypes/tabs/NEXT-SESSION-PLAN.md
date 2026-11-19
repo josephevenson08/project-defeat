@@ -1,6 +1,10 @@
 # Next session plan: owner feedback on the tab prototypes
 
-## ▶ Where we left off (2026-11-02, later): the timed class cooldowns priced; start here
+## ▶ Where we left off (2026-11-19): housekeeping done; start here
+
+The README is rewritten to where the project is (`43c1a1f`, pushed). Every DPS spec has a talent preset now: wowsims' UI files gave Marksmanship, Affliction and Demonology theirs (`8346fa4`, committed, not pushed). The owner kept no Run button and the missing-weapon note first. **Next:** the owner's answer on the big fork (move to the current game content, `PLAN_FOR_CURRENT_ITERATION.md`, or keep improving Phase 2 first); the simulator's gaps either way (one-charge cooldowns, caster mana). The full brief is at the top of [`docs/dev-log/HANDOFF.md`](../../../dev-log/HANDOFF.md).
+
+## Where we left off (2026-11-02, later): the timed class cooldowns priced
 
 Arcane Power, Icy Veins, Rapid Fire, Bestial Wrath, The Beast Within, Death Wish, Recklessness, Avenging Wrath, Adrenaline Rush and Blade Flurry are priced at duration ÷ cooldown (`d52b6e4`, committed, not pushed). **Next:** push when the owner says so; then batch 2, the one-charge cooldowns, or another of the handoff's item 4.
 
