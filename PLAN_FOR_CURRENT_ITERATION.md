@@ -28,6 +28,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 17 check (2026-11-19):** still no Blizzard date for Sunwell. Blizzard Watch estimates December 2026 (an estimate, not Blizzard); Kami Labs says only "later in 2026". Verdicts stand.
 
+**Day 18 check (2026-11-20):** nothing changed. Blizzard's roadmap recap and notes page were refused again; no Sunwell or Arena Season 4 date found. Verdicts stand.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1123,6 +1125,28 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 18: 2026-11-20
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo already present; reset to `origin/main` (`c3ed6be`). The `add_repo` and `register_repo_root` tools were not available, and were not needed.
+- Two searches (Sunwell date; TBC Anniversary patch notes November 2026) and one fetch round of three pages: Blizzard's roadmap recap (news/24250385), Blizzard's content update notes page 1, and the Warcraft Tavern Zul'Aman announcement post.
+
+**Learned**
+- Blizzard's roadmap recap and content update notes page 1 were both refused (permission request unanswered). Whether either holds a Sunwell window or any TBC Anniversary entry after 2026-10-22 is still unknown.
+- The Warcraft Tavern Zul'Aman post (page dated 2026-10-08) loaded, but only as a model-extracted summary because the page was truncated inside its menu. The summary agrees with earlier days: six bosses (Nalorakk, Akil'zon, Jan'alai, Halazzi, Hex Lord Malacrass, Zul'jin), level 70, no attunement needed, 3-day lockout, every boss can drop Badges of Justice, the timed hostage event gives extra loot and the rare Amani War Bear mount, and the G'eras vendor in Shattrath sells stronger wares for badges (including Nether Vortex). It gives no loot table, no item list and no costs, so the Zul'Aman and badge-gear scope is still unknown. Single source (summary), so the 3-day lockout and no-attunement lines stay under Unverified until Blizzard's own post is read.
+- Still no Blizzard date for Sunwell (Phase 5) or Arena Season 4. The Sunwell search again returned mostly original-game 2022 pages and fan or boosting sites, which do not apply. The November hotfix search found nothing for TBC Anniversary after 2026-10-22.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Same list as Day 17: Zul'Aman loot, G'eras items and costs, Phase 3/4 BiS contents, tier letters, live attunements, Sunwell date, Arena Season 4 date, and whether Blizzard's recap gives a Sunwell window. Go/no-go verdicts at the top stand.
+
+**Next (Day 19)**
+- Retry Blizzard's recap and notes pages once more; try Warcraft Tavern's Phase 4 guide for a G'eras item list; look for any Blizzard Sunwell or Arena Season 4 announcement.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1266,3 +1290,7 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Kami Labs, Phase 4 Sunwell and BlizzCon (2026-09-10, fan site; no Blizzard date): https://kami-labs.fr/en/wow-classic/tbc-phase-4-sunwell-blizzcon/
 - Blizzard Zul'Aman post, refused again: https://worldofwarcraft.blizzard.com/news/24310652
 - Blizzard roadmap recap (link seen, not read): https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap
+
+- Warcraft Tavern, Zul'Aman arrives October 22nd (page dated 2026-10-08; read as a summary only, body truncated): https://www.warcrafttavern.com/tbc/news/zulaman-arrives-october-22nd-for-tbc-anniversary/
+- Blizzard roadmap recap and content update notes page 1, refused: https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap , https://worldofwarcraft.blizzard.com/en-us/content-update-notes
+- Search only (no new TBC Anniversary information): https://www.iggm.com/news/wow-tbc-classic-anniversary-phase-4-fury-of-the-sunwell-release-date-content-predictions
