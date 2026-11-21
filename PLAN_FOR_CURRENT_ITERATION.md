@@ -30,6 +30,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 18 check (2026-11-20):** nothing changed. Blizzard's roadmap recap and notes page were refused again; no Sunwell or Arena Season 4 date found. Verdicts stand.
 
+**Day 19 check (2026-11-21):** nothing changed in the verdicts. Blizzard's recap page was refused again. Still no Blizzard date for Sunwell or Arena Season 4. Unverified teasers only (see Day 19 log): Arena Season 4 did not launch with Zul'Aman; a Doomwalker/Kazzak loot change to BoE (2026-10-27).
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1147,6 +1149,30 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 19: 2026-11-21
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo reset to `origin/main` (`d533921`). `add_repo` and `register_repo_root` were not available and not needed.
+- Two searches (Sunwell date; November hotfixes) and a fetch round of three pages: Blizzard's roadmap recap, a Timesaver.gg BlizzCon piece and an MMOs.com Phase 3 piece.
+
+**Learned**
+- Blizzard's roadmap recap (news/24250385) was refused again (permission request unanswered). Third failed attempt; it stays unread.
+- Timesaver.gg (boosting site, low-trust, body dated 2026-09-08) says Sunwell is on the roadmap for "Autumn 2026" with no confirmed date, attributed to Warcraft Wiki. It calls Sunwell "Phase 4"; the plan's naming (Phase 5) follows Warcraft Tavern and wowsims. This is a naming disagreement to keep in mind, not a change.
+- MMOs.com (2026-07-24) confirms Phase 3 went live 2026-08-27 at 3:00 p.m. PDT and Arena Season 3 began 2026-09-01, and that Zul'Aman and Sunwell had no firm dates at that time. Second source for the Phase 3 date besides Blizzard.
+- Unverified, from sidebar headlines only (linked articles not read): Zul'Aman went live 2026-10-22 at 3:00 p.m. PDT and Arena Season 4 did not launch with it (2026-10-23); Doomwalker and Kazzak loot changed to BoE (2026-10-27); a heroic keys change (2026-10-28). The first agrees with earlier days apart from the time of day. The BoE change and keys change are new and do not yet touch the plan, but a world-boss loot change would matter if world bosses are ever added to the Raids tab.
+- Still no Blizzard date for Sunwell or Arena Season 4. No Zul'Aman loot list or G'eras item list was found.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Same list as Day 18, plus: whether Arena Season 4 is tied to Sunwell, and the Doomwalker/Kazzak BoE change. Go/no-go verdicts stand.
+
+**Next (Day 20)**
+- Try the Warcraft Tavern Phase 4 guide and Icy Veins' Zul'Aman page for a G'eras or loot list; look for the 2026-10-27 BoE and 2026-10-28 articles; look for any Blizzard Sunwell announcement.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1294,3 +1320,10 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Warcraft Tavern, Zul'Aman arrives October 22nd (page dated 2026-10-08; read as a summary only, body truncated): https://www.warcrafttavern.com/tbc/news/zulaman-arrives-october-22nd-for-tbc-anniversary/
 - Blizzard roadmap recap and content update notes page 1, refused: https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap , https://worldofwarcraft.blizzard.com/en-us/content-update-notes
 - Search only (no new TBC Anniversary information): https://www.iggm.com/news/wow-tbc-classic-anniversary-phase-4-fury-of-the-sunwell-release-date-content-predictions
+
+## Sources (Day 19)
+
+- Timesaver.gg, BlizzCon 2026 and your realm (low-trust, body 2026-09-08; sidebar teasers unverified): https://timesaver.gg/blog/tbc-anniversary-blizzcon-2026-what-it-means-for-your-realm
+- MMOs.com, Black Temple opens August 27 (2026-07-24; read): https://mmos.com/news/mmorpg-news/tbc-classic-phase-3-black-temple-august-2026
+- Blizzard roadmap recap, refused again: https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap
+- Search only (no new information): Blizzard hotfix pages for 2026 (none after 2026-10-06 seen)
