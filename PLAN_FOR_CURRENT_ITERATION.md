@@ -32,6 +32,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 19 check (2026-11-21):** nothing changed in the verdicts. Blizzard's recap page was refused again. Still no Blizzard date for Sunwell or Arena Season 4. Unverified teasers only (see Day 19 log): Arena Season 4 did not launch with Zul'Aman; a Doomwalker/Kazzak loot change to BoE (2026-10-27).
 
+**Day 20 check (2026-11-22):** nothing changed in the verdicts. Blizzard Watch's phase-dates page (last updated 2026-10-09) still estimates Sunwell for December 2026, with Arena Season 4 and the Isle of Quel'danas listed with it; it is an estimate, not Blizzard, and predates the Zul'Aman launch. Warcraft Tavern's phase table was refused again. Still no Blizzard date.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1173,6 +1175,29 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 ---
 
+### Day 20: 2026-11-22
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo already at `origin/main` (`3c3ecd6`). `add_repo` and `register_repo_root` were not available and not needed.
+- Two searches (Sunwell date; November hotfixes) and one fetch round (Warcraft Tavern phase table, Blizzard Watch phase-dates page) through the fetch helper.
+
+**Learned**
+- Blizzard Watch's phase-release-dates article (written 2026-01-30, last updated 2026-10-09) lists "Phase 4 - estimated December 2026" containing the Sunwell Plateau raid, the Isle of Quel'danas hub and PvP Arena Season 4, and gives Phase 3 as 2026-08-27 and the Zul'Aman update as 2026-10-22 ("Phase 3.5"). It is an estimate, it predates the Zul'Aman launch, and it gives no patch number. Arena Season 4 has no separate date there. This is another outlet that numbers Sunwell "Phase 4" (as Timesaver.gg did on Day 19), against Warcraft Tavern and wowsims "Phase 5". The naming split is now documented in three sources; the plan keeps "Phase 5 (Sunwell)" and the owner's wording is open question 1 territory.
+- Warcraft Tavern's phase table was refused again (permission request unanswered). The first search returned only the original 2022 game's "Face the Fury of the Sunwell on May 12" post, which is not about this edition.
+- The November hotfix search surfaced only unrelated "WoW: Forever" retail hotfix threads dated 2026-11-11 and 11-13; nothing Anniversary-specific was seen, and none were read.
+- Still no Blizzard Sunwell date, no Zul'Aman loot list and no G'eras item list.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Same list as Day 19. Sunwell date (December is a fan-site estimate), Arena Season 4 timing, and whether Sunwell is called Phase 4 or 5 in Blizzard's own words.
+
+**Next (Day 21)**
+- Look again for a Blizzard Sunwell announcement and the 2026-10-27 BoE and 2026-10-28 articles; try Icy Veins' Zul'Aman page for a loot list; if Sunwell is announced, note what it adds to the catalogue (519 phase-5 items) and the Tier 6 fifth-slot logic.
+
+---
+
 ## Sources (Day 1)
 
 - Warcraft Tavern, content phases, schedule and roadmap: https://www.warcrafttavern.com/tbc/guides/phases/
@@ -1327,3 +1352,8 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - MMOs.com, Black Temple opens August 27 (2026-07-24; read): https://mmos.com/news/mmorpg-news/tbc-classic-phase-3-black-temple-august-2026
 - Blizzard roadmap recap, refused again: https://worldofwarcraft.blizzard.com/en-us/news/24250385/catch-up-on-the-state-of-azeroth-in-our-recap
 - Search only (no new information): Blizzard hotfix pages for 2026 (none after 2026-10-06 seen)
+
+## Sources (Day 20)
+
+- Blizzard Watch, phase release dates (updated 2026-10-09): https://blizzardwatch.com/2026/01/29/burning-crusade-classic-anniversary-phase-release-dates/
+- Warcraft Tavern phase table (refused again): https://www.warcrafttavern.com/tbc/guides/phases/
