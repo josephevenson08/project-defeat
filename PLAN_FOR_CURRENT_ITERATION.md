@@ -34,6 +34,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 20 check (2026-11-22):** nothing changed in the verdicts. Blizzard Watch's phase-dates page (last updated 2026-10-09) still estimates Sunwell for December 2026, with Arena Season 4 and the Isle of Quel'danas listed with it; it is an estimate, not Blizzard, and predates the Zul'Aman launch. Warcraft Tavern's phase table was refused again. Still no Blizzard date.
 
+**Day 21 check (2026-11-23):** nothing changed in the verdicts. Still no Blizzard date for Sunwell or Arena Season 4 (Timesaver.gg, 2026-10-23, says Season 4 did not start with Zul'Aman and that its Sunwell date of about 10 December is its own arithmetic from 2022, not Blizzard). Blizzard's 2026-11-07 hotfix post lists one TBC Anniversary entry (2026-10-27: Heroic dungeon keys need Honored instead of Revered); no raid, item or BoE hotfix.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1196,6 +1198,26 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 21)**
 - Look again for a Blizzard Sunwell announcement and the 2026-10-27 BoE and 2026-10-28 articles; try Icy Veins' Zul'Aman page for a loot list; if Sunwell is announced, note what it adds to the catalogue (519 phase-5 items) and the Tier 6 fifth-slot logic.
 
+### Day 21: 2026-11-23
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo reset to `origin/main` (`9b254f5`). `add_repo` and `register_repo_root` were not available and not needed.
+- Two searches (Sunwell date; Arena Season 4 and November notes) and a fetch round through the fetch helper: Timesaver.gg Season 4 page, Blizzard hotfix post of 2026-11-06. Icy Veins' TBC index was refused (permission request unanswered).
+
+**Learned**
+- Blizzard "Hotfixes: November 6, 2026" (posted 2026-11-07, covers 2026-10-13 to 11-06): the only TBC Anniversary heading entry is 2026-10-27, Heroic Dungeon keys now need Honored reputation instead of Revered. This is a primary-source fact and relevant to the reputation/attunement section (Day 9): heroic key rep gate is Honored now. Two Zul'Aman quest-NPC fixes (2026-10-14, 10-15) sit under Quests. No raid, loot or Bind-on-Equip hotfix appears, so the Day 19 Doomwalker/Kazzak BoE teaser is still unconfirmed by Blizzard.
+- Timesaver.gg (published 2026-10-23, low-trust): Arena Season 4 did not start with Zul'Aman; Season 3 (Vengeful Gladiator, from 2026-09-01) continues. Its Sunwell estimate (about 10 December) is its own projection from 2022 gaps, and the page contradicts itself on Season 4 timing. It says Blizzard's window is "Autumn 2026" (not checked against Blizzard).
+- Still no Blizzard Sunwell date, no Zul'Aman loot list and no G'eras item list.
+
+**Corrections**
+- None to earlier days. Day 9's heroic key reputation note should read Honored as of 2026-10-27 (single Blizzard source).
+
+**Still unsure**
+- Sunwell date and name (Phase 4 vs 5), Arena Season 4 timing, Doomwalker/Kazzak BoE, Zul'Aman loot, G'eras items.
+
+**Next (Day 22)**
+- Try Blizzard news for a Sunwell announcement and newer hotfixes after 2026-11-06; try another Zul'Aman loot source (Wowhead pages are refused, so Icy Veins or Warcraft Tavern guides via search results).
+
 ---
 
 ## Sources (Day 1)
@@ -1357,3 +1379,9 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 
 - Blizzard Watch, phase release dates (updated 2026-10-09): https://blizzardwatch.com/2026/01/29/burning-crusade-classic-anniversary-phase-release-dates/
 - Warcraft Tavern phase table (refused again): https://www.warcrafttavern.com/tbc/guides/phases/
+
+## Sources (Day 21)
+
+- Blizzard, Hotfixes: November 6, 2026 (read): https://worldofwarcraft.blizzard.com/news/24307310/
+- Timesaver.gg, Arena Season 4 start date (2026-10-23, low-trust, read): https://timesaver.gg/blog/tbc-anniversary-arena-season-4-start-date
+- Icy Veins TBC index, refused: https://www.icy-veins.com/tbc-classic/
