@@ -36,6 +36,8 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 21 check (2026-11-23):** nothing changed in the verdicts. Still no Blizzard date for Sunwell or Arena Season 4 (Timesaver.gg, 2026-10-23, says Season 4 did not start with Zul'Aman and that its Sunwell date of about 10 December is its own arithmetic from 2022, not Blizzard). Blizzard's 2026-11-07 hotfix post lists one TBC Anniversary entry (2026-10-27: Heroic dungeon keys need Honored instead of Revered); no raid, item or BoE hotfix.
 
+**Day 22 check (2026-11-24):** nothing changed in the verdicts. Still no Blizzard date for Sunwell or Arena Season 4. Blizzard's EU forum hotfix thread for The Burning Crusade (updated 2026-10-27) has one entry after the Zul'Aman launch, the Honored heroic-key change already logged; no raid, loot or BoE hotfix. A Blizzard retail "WoW: Forever" hotfix post of 2026-11-11 exists but is not about this game version.
+
 **What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
@@ -1218,6 +1220,27 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 22)**
 - Try Blizzard news for a Sunwell announcement and newer hotfixes after 2026-11-06; try another Zul'Aman loot source (Wowhead pages are refused, so Icy Veins or Warcraft Tavern guides via search results).
 
+### Day 22: 2026-11-24
+
+**Done**
+- Re-verify and Sunwell-tracking run. Repo reset to `origin/main` (`fd40c6d`). `add_repo` and `register_repo_root` were not available and not needed.
+- Two searches (Sunwell date and Blizzard announcements; November hotfixes) and one fetch round through the fetch helper: Blizzard EU forum thread "The Burning Crusade Hotfixes" (read), Icy Veins Zul'Aman raid guides (refused, permission request unanswered).
+
+**Learned**
+- The Sunwell search returned only the February 2026 launch posts and older material; no Blizzard Sunwell or Arena Season 4 announcement was found.
+- The Blizzard hotfix thread (titled "Updated 27 October") has a single entry after 2026-10-22: 2026-10-27, Heroic Dungeon keys need Honored instead of Revered. This is a second Blizzard channel agreeing with the Day 21 reading of the 2026-11-06 hotfix post, so the Honored fact now has two Blizzard sources. The thread labels its section "The Burning Crusade Classic", not Anniversary, so the label is a small caveat. Page 1 only was read. No raid, loot or Bind-on-Equip hotfix, so the Doomwalker/Kazzak BoE teaser is still unconfirmed.
+- The search also showed Blizzard hotfix posts titled "WoW: Forever Hotfixes" dated 2026-11-05, 11-11 and 11-13 (retail). Not read and not about this version.
+- Still no Zul'Aman loot list and no G'eras item list.
+
+**Corrections**
+- None to earlier days.
+
+**Still unsure**
+- Sunwell date and name (Phase 4 vs 5), Arena Season 4 timing, Doomwalker/Kazzak BoE, Zul'Aman loot, G'eras items, live attunement status of the older raids.
+
+**Next (Day 23)**
+- Check Blizzard news and the TBC hotfix thread for anything after 2026-11-24; try Warcraft Tavern's Zul'Aman or badge guides through search results for a loot list; re-read the Go/no-go table against open questions.
+
 ---
 
 ## Sources (Day 1)
@@ -1385,3 +1408,9 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - Blizzard, Hotfixes: November 6, 2026 (read): https://worldofwarcraft.blizzard.com/news/24307310/
 - Timesaver.gg, Arena Season 4 start date (2026-10-23, low-trust, read): https://timesaver.gg/blog/tbc-anniversary-arena-season-4-start-date
 - Icy Veins TBC index, refused: https://www.icy-veins.com/tbc-classic/
+
+## Sources (Day 22)
+
+- Blizzard EU forums, The Burning Crusade Hotfixes (updated 2026-10-27; page 1 read): https://eu.forums.blizzard.com/en/wow/t/601545
+- Icy Veins, Zul'Aman raid guides, refused: https://icy-veins.com/tbc-classic/zul-aman-raid-guides
+- Search only (retail, not this version): https://worldofwarcraft.blizzard.com/news/24315281
