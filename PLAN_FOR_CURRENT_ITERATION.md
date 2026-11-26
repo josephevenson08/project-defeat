@@ -17,7 +17,7 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 | Part of the job | Verdict | Why |
 | --- | --- | --- |
 | Track A: one phase module, type room for T6 / Zul'Aman / badges, catalogue spot-check (packages 1 to 3) | **Go** | Needs no Wowhead access and changes nothing players see. The suite stays green with the value still 2. Rough size: a few days. |
-| Track B: Hyjal, Black Temple and Zul'Aman loot, G'eras badge gear, Phase 3/4 rankings, tier lists and logs (packages 4 to 7) | **No-go** | Two blockers. (1) No usable data source: Wowhead refuses scripts and the catalogue has no drop-source field (questions 10, 19). (2) No Zul'Aman loot list, trusted G'eras item list or current Phase 3/4 BiS page has been read (Day 23 read only a low-trust, "expected" G'eras list). |
+| Track B: Hyjal, Black Temple and Zul'Aman loot, G'eras badge gear, Phase 3/4 rankings, tier lists and logs (packages 4 to 7) | **No-go** | Two blockers. (1) No usable data source: Wowhead refuses scripts and the catalogue has no drop-source field (questions 10, 19). (2) Zul'Aman (Day 24, one pre-launch Wowhead guide) and Black Temple (Day 24, one original-game page) loot lists are now read, but Mount Hyjal item names, a trusted G'eras item list and current Phase 3/4 BiS pages are not. |
 | Track C: raise the ceiling and rewrite tests (package 8) | **No-go** | Depends on Track B. Raising the ceiling early would show Phase 3/4 gear with no rankings, raids or tier lists to match. |
 
 **What the owner needs to decide first, in this order:** 21 (branch or `main`), 22 (start Track A now), then 10 and 19 (how the data gets in; the biggest unlock), then 1, 2, 14, 17 (scope), then 23 (date or a smaller first release).
@@ -40,7 +40,9 @@ owner says go.** The goal is to be completely sure of the data, the scope and th
 
 **Day 23 check (2026-11-25):** verdicts unchanged, with three updates. (1) The fetch helper read two Wowhead guide pages (Wowhead guides were usually refused before); neither has a loot or badge-gear list. This does not show the ingest scripts would work. (2) A low-trust site's badge-gear list (it calls itself "expected") matches names already in the catalogue, but some of those items, all item level 128 relics, are tagged phase 1, so they pass today's Phase 2 ceiling. This should be checked in package 3, before any ceiling change (new question 24). (3) Correction: Days 19, 21 and 22 called the Doomwalker/Kazzak Bind-on-Equip change unconfirmed by Blizzard. Day 2 had already read it in Blizzard's own Zul'Aman post. Sunwell still has no exact date in anything read.
 
-**What is still not firm:** every item list for the new content, Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
+**Day 24 check (2026-11-26):** verdicts unchanged, but Track B's second blocker is smaller. (1) A Wowhead Zul'Aman loot guide was read: 73 gear items by boss and timed chest, with ids. All 73 are in the catalogue; 72 are tagged phase 4. (2) An Icy Veins Black Temple page (original game, 2022) gave 119 item names by boss and trash; all are in the catalogue and tagged phase 3. (3) Mount Hyjal names, a trusted G'eras list and current Phase 3/4 BiS pages are still unread. (4) These were one-off reads, not an ingest route, so the data-source decision (questions 10, 19) still blocks Track B. Blizzard's 2026-11-24 hotfix post shows no new TBC entry; no exact Sunwell date was seen.
+
+**What is still not firm:** every item list for the new content (Zul'Aman and Black Temple have one unconfirmed list each since Day 24; Hyjal and badge gear have no usable one), Tier 6 token sources for this version (original-game wiki only), live attunement status of the older raids, current tier letters and logs, and the Phase 5 (Sunwell) date. As of 2026-11-16 no Blizzard date for Sunwell was found.
 
 **Effort if go:** about 3 to 8 weeks depending on data access, plus 1 to 3 for a phase switcher (estimates, not measured).
 
@@ -72,7 +74,7 @@ fan sites or a single source under "Unverified" until a second source agrees; an
 | --- | --- |
 | What the app targets | TBC Classic Anniversary **Phase 2** (Karazhan, Gruul, Magtheridon, SSC, Tempest Keep). `src/domain/phase.ts` sets `CURRENT_PHASE = 2`. |
 | What the game is on | **Phase 3** (Black Temple and Mount Hyjal) went live 2026-08-27. The **Zul'Aman / catch-up update went live 2026-10-22**. Fan sites call it Phase 3.5 or Phase 4. The owner calls it Phase 4. |
-| Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). No Blizzard post mentions it. |
+| Next in the game | **Phase 5, Fury of the Sunwell.** No firm date. Warcraft Tavern says "Autumn 2026", patch TBA (Day 2, summary-based read). Day 24 correction: Wowhead (2026-01-29) reports that Blizzard's State of Azeroth roadmap names Fury of the Sunwell, expected "before Winter". No Blizzard text with the name or a date has been read by these runs. |
 | How far behind the app is | Two content updates. The item catalogue already holds wowsims-tagged Phase 3, 4 and 5 items (see "Coupling inventory"), but rankings, raids, loot tables and tier lists do not. |
 | Ready to implement? | **No.** Day 4 found that Hyjal and Black Temple loot cannot be linked to bosses from data already in the repo. Day 5 got a token-to-boss mapping, but only from a 2019 wiki page about the original game, and Blizzard's own Phase 3 post is still unread. Day 6: Zul'Aman loot and the G'eras badge-gear list could not be read at all (fetches refused again), so the badge-gear and Zul'Aman item scope is still unknown. See "Raid data inventory (Day 4)", "Tier 6, tokens and gems (Day 5)" and "Zul'Aman and badge gear (Day 6)". Day 7: BiS lists for Phase 3 and 4 do exist on three sites, but the one Icy Veins page read is a 2022 original-game page, Wowhead's were refused, and the ingest's Wowhead URL scheme does not match the Phase 3/4 pages (see "BiS sources (Day 7)"). Day 8: no class, spell, talent or balance change was found in Blizzard's 2.5.5 PTR notes or the Zul'Aman post, so the simulator looks unaffected by game updates beyond data (see "Anniversary mechanics (Day 8)"). Day 9: Blizzard's Phase 3 post was finally read; it confirms the Hyjal/Black Temple attunement facts and the Phase 3 rep and gem sources, and the repo already holds 35 Epic phase-3 gems. See "Attunements, reputations and consumables (Day 9)". Day 10: the Spec Tier Lists tab runs on three Wowhead pages and a Phase 2 Warcraft Logs table; Wowhead's current tier letters could not be read, and the only Anniversary Phase 3 list found is a low-trust boosting site. See "Tier lists and logs data (Day 10)". Day 11: the suite is **431 to 434 tests, not 340**, and the redesign port is **finished** (steps 0 to 7, last on 2026-10-25), so the plan's old "port steps 4 to 7 are planned" was wrong. About 90 tests carry Phase 2 text, and several check numbers that will change when the ceiling rises. See "Test and docs impact (Day 11)". Day 12: risks, a nine-package order and effort ranges are drafted (about 3 to 8 weeks depending on data access, plus 1 to 3 for a switcher). Packages 1 to 3 (phase module, types, catalogue check) need no Wowhead access and change nothing visible; the data packages wait on open questions 10 and 19. See "Risks, effort and work packages (Day 12)". Day 13: implementation plan v1 written (three tracks, five gates, acceptance checks for nine packages); packages 1 to 3 can start on the owner's go, the data packages still cannot. See "Implementation plan v1 (Day 13)". Day 14: go/no-go review done; see the "Go/no-go summary" at the top. Go for packages 1 to 3 only; Sunwell still undated in every source read. |
 
@@ -196,6 +198,20 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 
 ---
 
+### Day 24 additions: Black Temple and Hyjal loot pages
+
+Both pages are Icy Veins loot-priority guides for the **original** TBC Classic Phase 3 (Black Temple page last updated 2022-01-14; Hyjal changelog 2022-01-14). Neither mentions the Anniversary. A priority guide may not be a complete loot table.
+
+| Page | What was read | Catalogue cross-check |
+| --- | --- | --- |
+| Black Temple | Nine bosses by name, trash drops, and 119 non-token item names | All 119 names found (120 records, because the Warglaive has two ids). All tagged phase 3: trash 12 at level 141 and 3 at 151; the first eight boss encounters all 141; Illidan 12 at 151 plus the two Warglaives at 156. |
+| Mount Hyjal | Five bosses and trash, but only slot and type per row. Item names are icons and did not come through. Rows: trash 9, Winterchill 12, Anetheron 12, Kaz'rogal 12, Azgalor 9, Archimonde 15 (the last two include 3 token rows each). | Not possible without names. |
+
+- **Correction to Day 4.** Day 4 read item level 141 as Hyjal and 146 as Black Temple (from memory). This list shows most Black Temple drops at 141 and Illidan's at 151. None is at 146. What the 246 level-146 phase-3 items are is not established.
+- Boss names for both raids now have a page source (original game), not only recollection.
+- 120 of the 540 phase-3 records are on the Black Temple list.
+- Wowhead's two raid overview pages (reached through a redirect from its `cn.` host) were denied by the fetch permission check. They were not retried.
+
 ## Tier 6, tokens and gems (Day 5)
 
 **Reading limits today.** Blizzard's Phase 3 post (24291476) was refused again (the fetch helper reported the permission request went unanswered). Warcraft Tavern's extra-token article was read only through a summarizer. Two pages were read fully enough to use: warcraft.wiki.gg "Tier 6 armor tokens" (a 2019 page about the **original** game) and Icy Veins' Phase 3 overview (a **2022** page about the original Phase 3). Neither describes this Anniversary version, so everything below is "original game, to be confirmed for the Anniversary".
@@ -212,6 +228,7 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 | Bracers, Belt, Boots | Sunwell Plateau bosses (Kalecgos, Brutallus, Felmyst and the Eredar Twins) | Phase 5 |
 
 - Token names are the "Forgotten" tokens, grouped by class: **Conqueror** (Paladin, Priest, Warlock), **Protector** (Warrior, Hunter, Shaman), **Vanquisher** (Rogue, Mage, Druid).
+- Day 24: the two Icy Veins raid pages (2022, original game) agree on all five slots: Azgalor gloves, Archimonde helm, Shahraz shoulders, Council legs, Illidan chest. That is two sources for the original game and still none for the Anniversary. The Hyjal rows show the slot but not the token's name.
 - The wiki says all of Tier 6 comes from Hyjal, Black Temple and Sunwell. The three non-token slots (bracers, belt, boots) are Sunwell-only, so **in Phase 3 and 4 Tier 6 is a five-piece set at most**. This matters for set-bonus logic: the 2-piece and 4-piece bonuses are reachable, the 5th slot items (bracers, belt, boots) are not. Not yet checked against Anniversary.
 - Warcraft Tavern (2026-08-24, summary-based) says extra tier tokens drop from the bosses of **both Phase 3 raids** "making it easier for players to get their Tier 6 sets", added at launch, not on the PTR. It names no bosses, rates or earlier raids. **Correction to the Day 2 and Day 4 wording:** earlier text said "extra tokens in earlier raids". The only reading we have says Hyjal and Black Temple. Nothing read says Karazhan, Gruul, Magtheridon, SSC or Tempest Keep get extra tokens. Treat "earlier raids" as unsupported.
 - The app impact is small: tokens are not gear, so the planner needs to know **which boss gives the item that the token turns into**, not the token drop rate. Extra token drops change farming speed, which the app does not model.
@@ -279,6 +296,33 @@ Wowhead's Black Temple overview, Warcraft Tavern's extra-tier-token post, and se
 - So the wowsims phase tags cannot be treated as an availability list. Package 3 should check tags around this id range and list every item whose tag disagrees with a trusted source.
 
 **Zul'Aman-era world boss loot.** The 20 Doomwalker and Kazzak items named by Timesaver (2026-10-27) are all in the catalogue as phase 1, item level 120. Blizzard's post (Day 2) says their loot is now Bind on Equip. The planner models stats, not binding, so no data change follows from that.
+
+### Day 24 additions: Zul'Aman loot by boss
+
+**What was read.** Wowhead, "Zul'Aman Raid Gear and Loot Guide" (updated 2025-12-22, header "Patch 2.5.6"), page text in full. It is dated before the Anniversary launch and does not say which version it describes. It is the same site as the Day 23 overview, so it is not a second source for the overview's claims.
+
+| Source on the page | Gear items | In catalogue | Catalogue tags and item levels (read directly) |
+| --- | --- | --- | --- |
+| Akil'zon | 7 | 7 | phase 4: five at 128, two at 132 |
+| Nalorakk | 7 | 7 | phase 4: six at 128, one at 132 |
+| Jan'alai | 7 | 7 | phase 4: six at 128, one at 132 |
+| Halazzi | 7 | 7 | phase 4: all 128 |
+| Hex Lord Malacrass | 14 | 14 | phase 4: three at 128, four at 132, seven at 133 |
+| Zul'jin | 12 | 12 | phase 4: one at 132, seven at 133, four at 138 |
+| First hostage chest | 8 | 8 | seven phase 4 at 128; **Life-step Belt (33483) is tagged phase 3** |
+| Second hostage chest | 6 | 6 | phase 4: all 132 |
+| Third and fourth hostage chests (same five Signet rings) | 5 | 5 | phase 4: all 141 |
+| **Total** | **73** | **73** | 72 phase 4, 1 phase 3 |
+
+- Matching was by item id. Also listed and not counted as gear: the Executioner enchant formula (33307), the quest item Blood of Zul'jin (33102) and the Amani War Bear (33809).
+- The page confirms the Day 23 inference that the five level-141 Signet rings (33496 to 33500) are chest rings.
+- It gives 13 Badges of Justice per full clear (2 from each of the first five bosses, 3 from Zul'jin). The 13 matches the Day 23 overview.
+- Two mismatches. The Day 23 overview puts Zul'jin at 133 to 138, but one item in this list is 132 in the catalogue. This guide says Zul'jin's drops are higher level than other bosses', but the catalogue has Malacrass items at 133, the same as Zul'jin's lower ones.
+- Of the catalogue's 137 phase-4 items, 72 are on this list. The other 65 (51 at level 128, 1 at 132, 5 at 133, 4 at 136, 4 at 141) are not Zul'Aman drops according to this page. Some match badge-gear names; the rest are unsorted.
+
+**Badge gear, second look.** Warcraft Tavern's Badge of Justice guide loaded this time, but only the first 39,902 of 138,775 characters were page text. Its G'eras tables reached us as a model summary, it shows no update date, and its wording ("When Phase 4 goes live") may be from the original game. It lists a Phase 4 group at 15 to 75 badges, including **all five relics** from Day 23. It does not mention the October 2026 launch in the part we could check. This is a weak lead, not a second trusted source.
+
+**Level-128 tags.** Of the 16 level-128 items tagged phase 3 in ids 33279 to 33600, 8 now have a source placing them in Zul'Aman or badge gear: Life-step Belt (Wowhead chest list); Master Assassin Wristwraps (Timesaver and the Tavern summary); Shallow-grave Trousers and Vestments of Hibernation (Timesaver); Gargon's Bracers of Peaceful Slumber, Armwraps of the Kaldorei Protector, Band of the Swift Paw and Wristguards of Tranquil Thought (Tavern summary). Only Life-step Belt rests on page text from a non-boosting site.
 
 ## BiS sources for Phase 3 and Phase 4 (Day 7)
 
@@ -646,7 +690,7 @@ The order and acceptance checks are firm enough to start Track A. They are **not
 - **Day 5:** whether extra tokens also drop in earlier raids: no source says so; only Hyjal and Black Temple are named, and that from a summary.
 - **Day 5:** the epic gem list, Jewelcrafting design sources and rep ranks are not sourced for this version.
 - **Day 5:** the claim that Tier 6 is a 5-piece set before Sunwell comes from the same old wiki page.
-- **Day 6:** no Zul'Aman loot table, no G'eras item list or badge costs, no timer length, no extra-chest bosses: none read. Every Blizzard page and the Tavern Phase 4 guide were refused again.
+- **Day 6 (loot table partly resolved Day 24):** no Zul'Aman loot table, no G'eras item list or badge costs, no timer length, no extra-chest bosses: none read. Every Blizzard page and the Tavern Phase 4 guide were refused again.
 - **Day 6:** the Tavern Zul'Aman article was a summary, not page text. The timed-hostage rules above are summary-based.
 - **Day 6:** that the Anniversary Zul'Aman and badge gear match the original 2022 Phase 4 is an assumption, not checked.
 - **Day 7:** Wowhead's Phase 3 and 4 BiS guides exist only as URLs and titles seen in search; content, dates and whether they were updated for the Anniversary are unread.
@@ -686,10 +730,14 @@ The order and acceptance checks are firm enough to start Track A. They are **not
 - "Buff and debuff limit removed" and "dual talent specialization" still need a primary source. (Heroism reset was confirmed on Day 8.)
 - Tier 6 set and token details were not on the pages read. The dates for Phase 5 are not firm.
 
-- **Day 23:** the G'eras item names and badge costs come only from Timesaver.gg, which calls its list "expected". No per-boss Zul'Aman loot was read.
+- **Day 23:** the G'eras item names and badge costs come only from Timesaver.gg, which calls its list "expected". No per-boss Zul'Aman loot had been read then (see Day 24).
 - **Day 23:** the Zul'Aman item level table and 13-badge figure come from one Wowhead page written before the Anniversary launch.
 - **Day 23:** which catalogue phase tags are wrong; the five relics and the 16 level-128 phase-3 items (see "Day 23 additions") are candidates, not proven errors.
 - ~~**Day 9:** drum recipes unchecked in `craftingPaths.json`.~~ Checked Day 23: it has Drums of War, Battle and Panic; a search of the domain data (catalogue and icons excluded) found no Greater Drums, Knothide Quiver or Knothide Ammo Pouch.
+
+- **Day 24:** the Zul'Aman per-boss list is one Wowhead page dated before the Anniversary launch; it does not name its version.
+- **Day 24:** the Black Temple item list is one original-game Icy Veins priority guide; it may be incomplete or differ on the Anniversary.
+- **Day 24:** Warcraft Tavern's G'eras tables were read only as a model summary of an undated page.
 
 ---
 
@@ -701,8 +749,8 @@ or more.
 | # | Area | What changes | Size |
 | --- | --- | --- | --- |
 | 1 | **Phase model** | Replace the three separate Phase 2 constants (label, catalogue ceiling, addon-import ceiling) with one phase module and decide how saved builds record a phase. Day 3 proposal above. Refactor part: S. | S for the one-source refactor, M with a switcher |
-| 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Day 9: no Hyjal/BT attunement chains exist to remove; the three existing chains (Karazhan, SSC, Tempest Keep) are the decision (question 17). Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. | L (the data source is the risk) |
-| 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. Day 23: some phase tags look wrong (five level-128 relics pass the Phase 2 ceiling), so tags need checking, not just items. | M to L |
+| 2 | **Raids** | Add Mount Hyjal (5 bosses), Black Temple (9), Zul'Aman (6): bosses, loot, art. Widen `RaidTier` for T6. Day 9: no Hyjal/BT attunement chains exist to remove; the three existing chains (Karazhan, SSC, Tempest Keep) are the decision (question 17). Update the "five raids" assumptions and tests. Day 4: the pipeline exists but cannot fetch while Wowhead blocks scripts, and the catalogue has no drop-source field, so loot linking needs a new data source. Day 24: Zul'Aman (73 gear items) and Black Temple (119 names) each have one readable list that matches the catalogue; Hyjal names do not. Size unchanged. | L (the data source is the risk) |
+| 3 | **Item catalogue** | Day 3: 540 phase-3 and 137 phase-4 items are already present from the wowsims snapshot, so the work shifts from "add" to "verify, and fill gaps" (loot-table links, vendor sources, Season 3 gear). Re-pinning the snapshot is a separate choice. Day 23: some phase tags look wrong (five level-128 relics pass the Phase 2 ceiling), so tags need checking, not just items. Day 24: every item on the Zul'Aman and Black Temple lists is already catalogued, so missing items look less likely than wrong tags (two lists only). | M to L |
 | 4 | **BiS rankings** | Re-ingest 27 specs for the new phase. Day 7: Wowhead has separate Phase 3 and Phase 4 guides on a different URL scheme (so the path table is rewritten); Icy Veins has one merged Phase 3/4 page per spec (2022 date); Warcraft Tavern has Phase 4 pages. Decide on one rankings source per phase, and how to get the pages while scripts are blocked. | L (data access is the risk) |
 | 5 | **Gems and enchants** | Epic gems and any new enchants. Update per-spec gem recommendations. Day 5: gem list and design sources still unsourced; repo gem representation not yet audited. | M |
 | 6 | **Tier lists** | Day 10: re-ingest Wowhead's three tier pages (the ingest's title check requires "Phase 2" and must be parameterised) and redo the Warcraft Logs table (`dpsReference.ts`) for Phase 3 or 4 by hand. Panel and format wording change; join logic does not. Tier letters for the current phase are unread; a Zul'Aman logs source is unknown. A switcher needs lists keyed by phase. | S to M (M if Wowhead cannot be used) |
@@ -732,7 +780,7 @@ These need an answer before the plan can be called final. The daily runs add to 
 7. **Deploy rule.** Today the plan commits with `[skip ci]`. Implementation pushes redeploy the live site. Confirm you still want
    to approve each implementation push.
 8. **Item source.** (Added Day 3) The catalogue comes from a pinned snapshot of wowsims/tbc. Keep that source and re-pin it to a newer commit for Phase 3 and 4, or accept Wowhead as a second source for fixes? A re-pin changes stats for items already in the app.
-10. **Loot data source.** (Added Day 4) Wowhead blocks scripts, and the catalogue holds no drop source. For boss loot tables, would you rather (a) save Wowhead pages by hand from your browser for the ingest to read, (b) accept another site's tables for those raids, or (c) wait and see whether Wowhead's block lifts?
+10. **Loot data source.** (Added Day 4) Wowhead blocks scripts, and the catalogue holds no drop source. For boss loot tables, would you rather (a) save Wowhead pages by hand from your browser for the ingest to read, (b) accept another site's tables for those raids, or (c) wait and see whether Wowhead's block lifts? (Day 24: for (b), Icy Veins' Black Temple page matched the catalogue by name on all 119 items, but it is a 2022 page and its Hyjal page gives no names as read. Option (a) is still needed for the ingest, which cannot use these reads.)
 11. **Badges.** (Added Day 4) The loot ingest currently hides Badge of Justice rows. Keep hiding them, or show badges as a currency on boss cards now that they drop from most raid bosses?
 12. **Timed Zul'Aman loot.** (Added Day 6) Some Zul'Aman loot and the Amani War Bear depend on a timer. Show all loot with a note, or only the loot that needs no timer?
 13. **Fetch access.** (Added Day 6) Four daily runs have had Blizzard and Tavern pages refused because nobody can approve the fetch permission. Can fetch access be pre-approved for the scheduled run (Blizzard, Wowhead news, Warcraft Tavern, Icy Veins)? Without it the plan stays stuck on the same unread pages. (Day 23: two Wowhead guide pages did load, but Blizzard's post, Warcraft Tavern's badge guide and Icy Veins' Zul'Aman page were refused.)
@@ -747,7 +795,7 @@ These need an answer before the plan can be called final. The daily runs add to 
 21. **Where the work happens.** (Added Day 12) Package 1 to 3 change nothing visible. Do you want them on `main` (each push redeploys) or on a branch that merges only when the whole set is ready? A branch protects the live site but delays seeing real data in the app.
 22. **Order of the first packages.** (Added Day 12) Start with the no-risk refactor (packages 1 to 3) while the data source question is open, or hold everything until questions 10 and 19 are answered?
 23. **Time budget.** (Added Day 12) The effort ranges are 3 to 8 weeks of work. Is there a target date, or a smaller first release (for example Phase 3 raids only, or Zul'Aman plus badge gear only) you would accept? Note question 2 says Phase 3 alone would be out of date on arrival.
-24. **Early items under today's ceiling.** (Added Day 23) Five item level 128 relics are tagged phase 0 or 1, so the code lets them through the Phase 2 ceiling, and one low-trust source lists three of them as new badge gear. Do you want them checked in game and corrected as a small separate fix, or handled with the rest of the catalogue check (package 3)? Any fix is a `src/` change and waits for your go.
+24. **Early items under today's ceiling.** (Added Day 23) Five item level 128 relics are tagged phase 0 or 1, so the code lets them through the Phase 2 ceiling, and one low-trust source lists three of them as new badge gear. Do you want them checked in game and corrected as a small separate fix, or handled with the rest of the catalogue check (package 3)? (Day 24: Warcraft Tavern's summarised G'eras table lists all five. Life-step Belt, a Zul'Aman chest item per Wowhead but tagged phase 3, is a related case; it is hidden today, so it matters only when the ceiling moves.) Any fix is a `src/` change and waits for your go.
 
 ---
 
@@ -784,7 +832,7 @@ explicitly accepted the open ones.
 - [ ] Every Phase 3 and October-update change that touches stats, items, raids or rules is listed with a source (Day 9: Hyjal/BT attunements, epic gem sources, Netherwing and key reputation now Blizzard-sourced; rep rewards, consumable changes and the other raids' attunements still not; Day 5: Tier 6 token map only from an original-game wiki; epic gem list missing)
 - [~] Anniversary-specific mechanics (balance, buffs, talents) confirmed or ruled out from a primary source (Day 8: Heroism confirmed and already in the app; no balance change in Blizzard's PTR notes; buff limit, dual spec, seals and pet buffs still single-source)
 - [ ] A phase data model chosen, with the owner's answers to open questions 1 to 3
-- [ ] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
+- [~] Item and raid counts for each new raid, with a way to get the data that works while Wowhead blocks scripts (Day 24: one list each for Zul'Aman and Black Temple, Hyjal row counts only, no repeatable data route; Day 6: Zul'Aman has 6 bosses confirmed, no loot read; Day 4: pipeline reuse understood, no working data source yet; see open question 10)
 - [ ] Tier-list and logs data for the current phase scoped (Day 10: tab and ingest scoped; Wowhead letters unread; logs for Phase 4 unknown; see open questions 19 and 20)
 - [ ] A rankings source chosen for each of the 27 specs (Day 7: three candidate sites, none fully read; see open questions 14 and 15)
 - [~] The test impact estimated, with a plan to keep the suite green during the change (Day 11: impact sorted into four groups with a staging idea; not yet run against a real change, test count corrected to 431 to 434)
@@ -1295,6 +1343,28 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 **Next (Day 24)**
 - Search for Wowhead's separate Zul'Aman loot guide (the overview mentions one without a link we could see) and a Wowhead badge-gear page, using URLs that a search returns. Extend the tag check to other id ranges. Look again for a Blizzard Sunwell announcement and newer hotfixes.
 
+### Day 24: 2026-11-26
+
+**Done**
+- Re-verify run. The repo was already cloned and clean; reset to `origin/main` (`3552ec1`). `add_repo` and `register_repo_root` were not available and not needed.
+- Six searches (Zul'Aman loot, badge gear, Sunwell, hotfixes, Black Temple loot, Hyjal loot) and three fetch-helper rounds. Read: Wowhead's Zul'Aman loot guide and 2026 roadmap news, Blizzard's 2026-11-24 hotfix post, Warcraft Tavern's badge guide (partly summarised), two Icy Veins raid loot pages. Denied: two Wowhead raid overviews. One http redirect of the hotfix post was not followed; the news.blizzard.com copy loaded.
+- Repo, read-only: matched the Zul'Aman ids and Black Temple names against `itemCatalogue.json`. No tests run.
+
+**Learned**
+- All 73 Zul'Aman gear items and all 119 Black Temple names are already in the catalogue. Tags agree except Life-step Belt (see the two "Day 24 additions" sections). This makes package 3 look more like tag checking than adding items.
+- Blizzard "Hotfixes: November 24, 2026" (covers 10-13 to 11-24): the only entry under The Burning Crusade Classic is still the 10-27 Honored heroic-key change. No mention there of Sunwell, Arena Season, G'eras or Badges of Justice; Zul'Aman appears once, in a quest fix under another heading.
+- Searches showed no exact Sunwell date.
+
+**Corrections**
+- Day 4's item level reading (141 Hyjal, 146 Black Temple) does not fit the Black Temple list.
+- The Status table said no Blizzard post mentions Sunwell. Wowhead reports it was on Blizzard's January roadmap broadcast. The line now says what was and was not read.
+
+**Still unsure**
+- Mount Hyjal item names, whether the old lists match the Anniversary, trusted G'eras items and costs, what the level-146 items are, the other 65 phase-4 items, Sunwell date, live attunement status of the older raids, current BiS and tier lists.
+
+**Next (Day 25)**
+- Look through search results for a Hyjal loot page that gives item names, and a G'eras list with page text and a date. Match any Hyjal names against the catalogue. Check Blizzard news for a Sunwell date.
+
 ---
 
 ## Sources (Day 1)
@@ -1479,3 +1549,14 @@ Newest entry last. Each run appends; never rewrite earlier entries (correct them
 - WoWClassicUI roadmap (2026-02-16, read): https://wowclassicui.com/2026/02/16/tbc-classic-anniversary-roadmap-2026/
 - Refused: https://worldofwarcraft.blizzard.com/news/24310652 , https://warcrafttavern.com/tbc/guides/badge-of-justice-guide-farming-vendors-rewards , https://icy-veins.com/tbc-classic/zul-aman-raid-guides
 - Repo files read: `src/domain/gear/itemCatalogue.ts` and `.json`, `src/domain/builds/buildSerialization.ts`, `buildTypes.ts` (search), `src/domain/professions/craftingPaths.json` (search), `README.md`, git history
+
+## Sources (Day 24)
+
+- Wowhead, Zul'Aman raid gear and loot guide (read; updated 2025-12-22): https://www.wowhead.com/tbc/guide/zulaman-za-loot-gear-guide-burning-crusade-classic
+- Wowhead, 2026 TBC Anniversary roadmap news (read; 2026-01-29): https://www.wowhead.com/tbc/news/the-burning-crusade-anniversary-2026-roadmap-final-phase-will-release-this-year-380188
+- Blizzard, Hotfixes: November 24, 2026 (read): https://news.blizzard.com/en-gb/article/24307310/hotfixes-november-24-2026
+- Warcraft Tavern, Badge of Justice guide (undated; first part page text, tables summarised): https://www.warcrafttavern.com/tbc/guides/badge-of-justice-guide-farming-vendors-rewards/
+- Icy Veins, Black Temple loot priority (read; 2022, original game): https://www.icy-veins.com/tbc-classic/black-temple-loot-priority-guide
+- Icy Veins, Hyjal Summit loot priority (read; 2022, original game, no item names): https://www.icy-veins.com/tbc-classic/hyjal-summit-the-battle-for-mount-hyjal-loot-priority-guide
+- Denied: https://www.wowhead.com/tbc/cn/guide/hyjal-summit-mount-hyjal-raid-overview-burning-crusade-classic , https://www.wowhead.com/tbc/cn/guide/black-temple-bt-raid-overview-burning-crusade-classic
+- Repo files read: `src/domain/gear/itemCatalogue.json`, `itemCatalogue.ts` (search)
